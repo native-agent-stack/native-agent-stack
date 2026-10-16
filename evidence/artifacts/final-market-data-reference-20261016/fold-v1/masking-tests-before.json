@@ -14,19 +14,21 @@
   ],
   "cwd": "<fold-scratch>",
   "declared_inputs": {
-    "alpaca-py": "0.44.0",
-    "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+    "component": "capture_recorder_and_masker",
+    "scope": "synthetic regression fixtures"
   },
   "exit_code": 1,
   "finished_utc": "2026-10-16T07:45:20.564586+00:00",
   "masking_rule": "mask_capture.py:mask_bytes",
   "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
   "output": "masking-tests-before.log",
   "output_sha256": "d716dc9b1e46ffa5657affc836cc19b75be71f6320b685180e46f7d19c9c3288",
   "private_capture_name": "masking-tests-before",
   "private_mapping_name": "mask-map.json",
   "private_original_name": "stdout.raw",
   "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
   "schema": "masked-native-command/1",
   "started_utc": "2026-10-16T07:45:20.501017+00:00",
   "stream": "stdout_and_stderr_merged_as_bytes"

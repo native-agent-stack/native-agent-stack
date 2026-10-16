@@ -56,7 +56,26 @@ def mask_bytes(raw: bytes, rules: list[dict[str, str]]) -> bytes:
         return raw
     keys = sorted(replacements, key=lambda key: (-len(key), key))
     pattern = re.compile(b"|".join(re.escape(key) for key in keys))
-    return pattern.sub(lambda match: replacements[match.group(0)], raw)
+    masked = pattern.sub(lambda match: replacements[match.group(0)], raw)
+    # unittest/pytest can abbreviate a repr before the full private root is
+    # visible, e.g. '/var/tmp/private-prefix[47 chars]suffix'. Match each known
+    # scratch-root prefix only at an explicit truncation marker. A shared
+    # prefix gets a neutral token rather than guessing which full root it was.
+    # CPython 3.12 unittest.util._common_shorten_repr supplies that marker.
+    prefixes = set()
+    boundary = len("/var/tmp/")
+    for source in sources:
+        if source.startswith("/var/tmp/"):
+            prefixes.update(source[:size].encode("utf-8")
+                            for size in range(boundary + 1, len(source)))
+    if prefixes:
+        partial = re.compile(
+            b"(?:" + b"|".join(re.escape(key) for key in
+                sorted(prefixes, key=lambda key: (-len(key), key)))
+            + rb")(?=\[\d+ chars\]|\.{3}|\xe2\x80\xa6)"
+        )
+        masked = partial.sub(b"<private-scratch-prefix>", masked)
+    return masked
 
 
 def main() -> None:

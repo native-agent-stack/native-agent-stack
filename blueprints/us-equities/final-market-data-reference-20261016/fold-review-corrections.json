@@ -1,7 +1,7 @@
 {
   "schema": "market-data-preparation-review-fold/1",
   "reviewed_head": "7d740ccb66a9e2f041ea9b34ee1585996f859560",
-  "status": "BOTH_FAMILIES_FOLDED_FULL_PRIVATE_PASS_RELEASED",
+  "status": "SMALL_FOLD_PRIVATE_PASS_RELEASED",
   "review_records": {
     "CC": "MICRO-full-7d740ccb.md",
     "GPT": "GPT-VERDICT-7d740ccb6.md"
@@ -73,6 +73,36 @@
       "private_only_retired_capture": "pytest-override-help",
       "replacement": "fold-v1/pytest-override-help-final.json",
       "scope": "Native privacy scanner found a generic upstream home-path example; original retained privately and correct declared masking applied to a new native capture, not reconstructed output."
+    },
+    "pypi_vendor_custody": {
+      "private_repository": "seathatflowsinourveins/horizon",
+      "vendor_path": "vendor/market-data-pypi-20261016",
+      "public_transform": "publish_capture.py:release_projection",
+      "scope": "Complete third-party source retained in private vendor custody with provenance/licenses; public release fields are projected, not verbatim README copies or E2E substitutes.",
+      "licenses_scope": "Original upstream package LICENSE files retained for source/README attribution; PyPI API JSON has no separate LICENSE.",
+      "pull_request": "https://github.com/seathatflowsinourveins/horizon/pull/8"
+    },
+    "truncated_scratch_prefix": {
+      "before": "small-fold-v1/masking-before.log",
+      "after": "small-fold-v1/masking-after.log",
+      "scope": "Fail-first known-root partial/truncated repr regression; masker matches prefixes only at explicit truncation markers, unrelated paths untouched."
+    },
+    "declared_inputs": {
+      "source": "publish_capture.py:corrected_inputs",
+      "scope": "Published per-component declarations corrected explicitly; exact native original metadata stays unchanged privately. Commands, observed rc and times unaltered."
+    },
+    "survivor_installation_scope_restatement": {
+      "record": "survivors.json",
+      "pointers": [
+        "/survivors/0/installation_scope",
+        "/survivors/1/installation_scope",
+        "/survivors/3/installation_scope"
+      ],
+      "scope": "Removed misleading no_install_reason wording: package installation is not blocked by vendor keys. These carried SDK records remain source screens without a new trial; the separately cited key/rights requirement applies to acquisition only. No survivor was silently retired or upgraded."
+    },
+    "public_source_raw_digests": {
+      "record": "receipt.json#/vendor_custody/public_source_captures",
+      "scope": "Each exact public PyPI response is recomputed against the immutable native stdout and horizon vendor copy; publish that public-source digest separately from the current projected output digest. No private metadata/original-host digest is disclosed."
     }
   },
   "gpt_follow_ups": [
@@ -89,15 +119,15 @@
       "scope": "Before broader recorder reuse, record explicit private completion on process-launch OSError and add a transition regression. Current launch failure leaves spec/stdout only and creates no successful public receipt."
     }
   ],
-  "private_custody": "Original recapture-v1 and new fold-v1 captures remain private by name. Co-op reproduced all 102 current derivatives from 51 public capture pairs and reran 7 masker plus 2 custody tests. No test/recorder source change is folded for the two deferred GPT P3s. Sequential actual-wheel-digest check passed: native require-hashes installation followed the published release records and verified all three downloaded wheels against the published hashes.",
+  "private_custody": "Earlier PASS is historical. Current57pairs/114derivatives passed co-op private reproduction using publish_capture.py public_pair, including3allowlisted source projections and documented metadata corrections; all originals/maps retained.",
   "admission": "PREPARATION_ONLY_NO_FINAL_OR_DEFAULT",
   "capture_counts": {
-    "original": 16,
-    "fold": 35,
-    "total": 51,
-    "derivatives": 102,
-    "inventory_outputs": 103,
-    "private_originals_total": 52,
+    "prior": 51,
+    "small_fold": 6,
+    "total": 57,
+    "derivatives": 114,
+    "inventory_outputs": 115,
+    "private_originals_total": 58,
     "private_only_retired": 1
   },
   "sequential_wheel_digest_verification": {
@@ -119,17 +149,43 @@
     ],
     "install_started_source": {
       "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
-      "line": 31
+      "line": 37
     },
     "install_finished_source": {
       "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
-      "line": 21
+      "line": 25
     },
     "install_exit_source": {
       "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
-      "line": 20
+      "line": 24
     },
     "private_original_digests_published": false,
     "verification_authority": "Co-op full private check 2026-10-16; no private review fingerprint published."
+  },
+  "small_fold_private_check": {
+    "status": "PASS",
+    "public_capture_pairs": 57,
+    "published_derivatives": 114,
+    "output_bindings": 115,
+    "private_integrity_rows": [
+      80,
+      183,
+      30
+    ],
+    "test_counts": [
+      9,
+      2,
+      4
+    ],
+    "scan_scope": "No full/truncated scratch, pytest-temp-login, UUID-shaped, user/host hits in published files.",
+    "vendor_copy_check": "3original source JSON copies byte-identical;9custody paths checked.",
+    "review_fingerprint": "Cited by co-op check name only; no private original or private commit digest published."
+  },
+  "landing_rebase": {
+    "from_reviewed_head": "151149f186ef15f3d35942f2130bfd7600b25ca2",
+    "onto_main": "9d5bc9f9e076e033a24fcef2a26d41986506c647",
+    "status": "LOCAL_REBASE_PREPARED_PUSH_HELD",
+    "conflict_scope": "Only evidence registry conflicts; keyed3way merge preserved every current-main row and other registry field, native ordering generator used.",
+    "capture_scope": "All57capture pairs/114derivatives unchanged; no new native component evidence."
   }
 }

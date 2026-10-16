@@ -11,19 +11,22 @@
   ],
   "cwd": "<fold-scratch>",
   "declared_inputs": {
-    "alpaca-py": "0.44.0",
-    "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+    "component": "resolved_closure_source_audit",
+    "runtime_lock": "uv.lock",
+    "scope": "not component E2E"
   },
   "exit_code": 0,
   "finished_utc": "2026-10-16T07:54:20.170477+00:00",
   "masking_rule": "mask_capture.py:mask_bytes",
   "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
   "output": "original-closure-audit.log",
   "output_sha256": "95c27b89f7b274f0f3d3dec1d200eac0d369dc0a123ea644b207c407fbcf0952",
   "private_capture_name": "original-closure-audit",
   "private_mapping_name": "mask-map.json",
   "private_original_name": "stdout.raw",
   "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
   "schema": "masked-native-command/1",
   "started_utc": "2026-10-16T07:54:19.970970+00:00",
   "stream": "stdout_and_stderr_merged_as_bytes"

@@ -78,7 +78,7 @@
           },
           "exit_code_locator": {
             "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.json",
-            "line": 18
+            "line": 19
           }
         },
         {
@@ -115,7 +115,8 @@
         },
         "pypi_release_source": {
           "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-alpaca.log",
-          "line": 1
+          "line": 12,
+          "scope": "Allowlisted selected wheel SHA256 value; complete source in horizon vendor custody."
         },
         "binding_sha256_source": {
           "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/wheel-release-bindings.log",
@@ -220,7 +221,7 @@
           },
           "exit_code_locator": {
             "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.json",
-            "line": 18
+            "line": 19
           }
         },
         {
@@ -319,7 +320,8 @@
         },
         "pypi_release_source": {
           "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-edgar.log",
-          "line": 1
+          "line": 12,
+          "scope": "Allowlisted selected wheel SHA256 value; complete source in horizon vendor custody."
         },
         "binding_sha256_source": {
           "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/wheel-release-bindings.log",
@@ -401,7 +403,7 @@
           },
           "exit_code_locator": {
             "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.json",
-            "line": 18
+            "line": 19
           }
         },
         {
@@ -438,7 +440,8 @@
         },
         "pypi_release_source": {
           "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-calendar.log",
-          "line": 1
+          "line": 12,
+          "scope": "Allowlisted selected wheel SHA256 value; complete source in horizon vendor custody."
         },
         "binding_sha256_source": {
           "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/wheel-release-bindings.log",
@@ -457,7 +460,7 @@
   "closure_reconciliation": {
     "scope": "Execution pins match, freshly resolved closures do not equal the accepted runtime lock; no locked migration or production acceptance.",
     "original_full_audit": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/original-closure-audit.log",
-    "alpaca_run_closure_audit": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-closure-audit.log",
+    "alpaca_run_closure_audit": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-closure-audit.log",
     "explicit_deltas": [
       {
         "package": "numpy",
@@ -489,6 +492,7 @@
       }
     ],
     "final_test_environment_audit": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-closure-audit.log",
-    "final_native_freeze": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-freeze.log"
+    "final_native_freeze": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-freeze.log",
+    "closure_binding_note": "Use final native freeze/audit after both upstream test dependency installs; earlier fold-freeze is an intermediate observation, not final installed closure."
   }
 }

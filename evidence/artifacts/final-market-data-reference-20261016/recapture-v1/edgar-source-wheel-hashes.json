@@ -20,22 +20,21 @@
   ],
   "cwd": "<scratch>",
   "declared_inputs": {
-    "winner_pins": [
-      "edgartools==5.61.1",
-      "alpaca-py==0.44.0",
-      "exchange-calendars==4.13.2"
-    ]
+    "edgartools": "5.61.1",
+    "source_commit": "7338aa335f6442c52dfa0695422cf1cd27e946e0"
   },
   "exit_code": 0,
   "finished_utc": "2026-10-16T06:23:48.119274+00:00",
   "masking_rule": "mask_capture.py:mask_bytes",
   "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
   "output": "edgar-source-wheel-hashes.log",
   "output_sha256": "d6dc115080c26747158355827782c4080fec4413455b13e00cc43ec41849cff2",
   "private_capture_name": "edgar-source-wheel-hashes",
   "private_mapping_name": "mask-map.json",
   "private_original_name": "stdout.raw",
   "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
   "schema": "masked-native-command/1",
   "started_utc": "2026-10-16T06:23:48.105371+00:00",
   "stream": "stdout_and_stderr_merged_as_bytes"

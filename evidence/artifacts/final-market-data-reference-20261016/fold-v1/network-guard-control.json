@@ -9,19 +9,21 @@
   ],
   "cwd": "<fold-scratch>",
   "declared_inputs": {
-    "alpaca-py": "0.44.0",
-    "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+    "component": "audit_hook",
+    "scope": "negative control, not a sandbox"
   },
   "exit_code": 86,
   "finished_utc": "2026-10-16T07:53:32.675392+00:00",
   "masking_rule": "mask_capture.py:mask_bytes",
   "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
   "output": "network-guard-control.log",
   "output_sha256": "0ec7ba0e9acd0bb91bb1161f13f827748afc777f102ba60947ec41de0fc9d604",
   "private_capture_name": "network-guard-control",
   "private_mapping_name": "mask-map.json",
   "private_original_name": "stdout.raw",
   "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
   "schema": "masked-native-command/1",
   "started_utc": "2026-10-16T07:53:32.507928+00:00",
   "stream": "stdout_and_stderr_merged_as_bytes"

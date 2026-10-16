@@ -8,7 +8,7 @@ Traceback (most recent call last):
   File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_native_capture.py", line 41, in test_failed_child_retains_raw_and_exact_command_before_masking
     self.assertEqual(published_metadata["cwd"], "<scratch>")
     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError: '/var/tmp/ingestion-b-final-market-data-e2[47 chars]lash' != '<scratch>'
+AssertionError: '<private-scratch-prefix>[47 chars]lash' != '<scratch>'
 - <fold-scratch>/tmp/tmp0hrohaq_/café"back\slash
 + <scratch>
 

@@ -162,7 +162,8 @@ Massive carried commit. Arctic A1 at carried 7d30a6ee is source-only; the
 6.26.0/e620d857 run is explicitly a separate release capability record.
 
 All three proposed run commits now have native official tag records and
-complete native PyPI release records under fold-v1/. Each selected release
+native PyPI release identity projections under fold-v1/, with complete JSON
+source/README bytes held in private horizon vendor custody. Each selected release
 wheel SHA256 equals its accepted runtime-lock wheel entry; native uv
 `--no-deps --require-hashes` installed those exact wheels in fresh scratch.
 Alpaca's pinned pyproject.toml:4 is a dynamic 0.0.0 placeholder, with backend
@@ -195,10 +196,14 @@ No subset fallback was needed. Warning categories at log :225 and :235
 remain disclosed: deprecated class-scoped fixture methods and NumPy generic
 timedeltas. This is offline calendar code evidence, not market-data history.
 
-A nonremovable Python audit hook stops before socket/DNS; the negative
-control at network-guard-calendar.log:3 and matching recorder exit 86 proves
-refusal. Upstream broker/order fixtures remain mocks. The suites cannot
-reach a real broker; no account or order state changes.
+A diagnostic Python audit hook refuses the listed socket/DNS audit events;
+the negative control at network-guard-calendar.log:3 and matching recorder
+exit 86 observes that refusal. CPython audit hooks are not a sandbox, and
+native extensions or subprocesses may bypass them. No comprehensive network
+or process-isolation claim is made. Printed installed module paths before
+pytest's prepend collection are import-order observations, not an enforced
+boundary. The observed suites used upstream mocked broker/order fixtures;
+no real broker call or account/order change was observed or authorized.
 
 The fold publishes 35 further command captures and 70 further derivatives.
 Together with the initial family, the current publication contains **51
@@ -239,3 +244,63 @@ current launch-failure behavior remain as checked. A failed launch creates no
 successful public receipt. Neither deferred change is presented as implemented
 or tested in this fold. The private verdict is cited by name only:
 GPT-VERDICT-7d740ccb6.md.
+
+## Custody and partial-prefix correction
+
+The subsequent CC micro is cited by name, MICRO-delta-89330e16.md. This small
+fold moves the three complete PyPI response bodies, including copied READMEs,
+to the companion private horizon custody PR under
+vendor/market-data-pypi-20261016. PROVENANCE.md records public source URLs,
+native fetch intervals and capture names. Original package licenses are
+included for source/README attribution; the captured PyPI JSON has no separate
+LICENSE for the API response envelope. No complete third-party description
+or README bytes remain in the public capture logs.
+
+The three public logs are explicitly labelled allowlisted source projections:
+package name/version, endpoint URL, selected wheel filename/URL/digest/type.
+They remain source identity evidence, not E2E or invoke output. The published
+publish_capture.py deterministically projects those three logs, masks other
+native output and corrects declared-input metadata by component, preserving
+commands, return codes and timestamps. Exact original metadata stays private;
+the corrected public fields are explicitly labelled rather than presented as
+unchanged native declarations. Its synthetic projection tests cover field
+omission, scope labels, return-code preservation and metadata correction.
+
+The prior failing custody-test output contained a truncated private root in
+unittest's shortened repr. A fail-first regression covers every nontrivial
+known scratch-root prefix at an explicit truncation marker and an unrelated
+path control. The masker now emits a neutral private-scratch-prefix token
+there, while ordinary bytes remain unchanged. The new native masker run has
+9 cases, custody has 2, and publication transform has 4. The raw failure and
+all earlier native results remain retained; no failed command is relabelled.
+
+Current publication: 57 capture pairs / 114 derivatives, plus the packet:
+115 inventory outputs. There are 58 private originals, including the one
+retired generic-help capture. The previous 51/102 PASS remains historical;
+the revised masker/publisher and all current derivatives passed the co-op
+private check, including full/truncated scratch fragments, pytest temporary
+identities, UUID-shaped values and user/host tokens. The companion is horizon
+PR8; private commit fingerprints remain outside this public record.
+The final test closure points to fold-final-freeze/fold-final-closure-audit;
+intermediate pre-calendar freeze is not asserted as the final installed state.
+Vendor package installability is distinct from keyed acquisition: no key
+requirement is offered as a reason that an SDK cannot be installed locally.
+
+## Landing rebase and public-source digest provenance
+
+The CC direct read is cited by name: MICRO-direct-89330e16..151149f1.md.
+Its two residual P3s are prepared with the one authorized landing rebase:
+the correction ledger explicitly lists the survivors' installation-scope
+restatement, and the custody section of receipt.json publishes each complete
+public PyPI response's own byte count and SHA256. Those digests were recomputed
+against both the immutable native stdout and the unchanged horizon vendor
+copy. They bind PUBLIC source bytes, not private recorder/host metadata.
+Projected-log hashes remain separate; full README copies stay in custody.
+
+The local native rebase targets main
+9d5bc9f9e076e033a24fcef2a26d41986506c647. Only the evidence registry conflicted;
+three-way keyed inventory replay and the supported ordering generator preserve
+all main rows and other registry fields. Native capture and derivative bytes
+remain unchanged. The original source locators keep their explicit historical
+base pin; rebasing does not relabel old source claims as new evidence. The
+rebased head stays local until the co-op releases the push after paced reads.

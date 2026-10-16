@@ -70,3 +70,35 @@ recorder-tests-after.log:5 (2). Before-fix failing native runs are retained
 beside them. Native network guard controls deliberately return 86; the initial
 upstream helper-collection failure returns 1. These are not passing E2E
 receipts. Every command retains its actual return code and original bytes.
+
+## Small custody correction
+
+The current public set is 57 capture pairs / 114 derivatives and 115 inventory
+outputs, with 58 private originals including one retired help capture. The
+former 51/102 reproduction PASS does not qualify the revised publication.
+Use publish_capture.py:public_pair for the complete current reproduction:
+it takes stdout.raw, receipt.raw.json, mask-map.json, family and label.
+
+For the three PyPI records it projects only release/wheel identity fields;
+complete native source JSON/README bytes move to private horizon vendor
+custody. Those outputs are labelled projected_native_source_capture and
+cannot substitute for E2E results. For other native output it applies the
+byte masker. Public metadata is deterministically reserialized with a new
+output hash, explicit source-specific declared-input corrections and the
+publication-transform label; original commands/rc/times stay unchanged.
+That correction is labelled and never presented as unchanged native metadata.
+
+The masker additionally recognizes known scratch-root partial prefixes only
+when followed by an explicit shortened-repr/ellipsis marker. A neutral token
+avoids guessing the original root when a shared prefix is shortened. An
+unrelated-path control prevents broad prefix matching. Raw output is never
+reconstructed. New native checks: 9 masker, 2 custody, 4 projection cases;
+the fail-first truncated-prefix run remains a real failure in custody.
+The private co-op reproduction must also scan full and truncated scratch
+fragments; home/user/host token checks alone missed the original repr fragment.
+
+The small correction received co-op private PASS: 114/114 derivatives reproduce
+through public_pair, all 115 output bindings and private integrity rows match,
+and 9 masker / 2 custody / 4 projection cases pass. Expanded scratch-fragment,
+pytest-temporary-login, UUID-shaped, user/host scans are clear. Full source
+custody is horizon PR8, cited by name rather than private commit fingerprint.

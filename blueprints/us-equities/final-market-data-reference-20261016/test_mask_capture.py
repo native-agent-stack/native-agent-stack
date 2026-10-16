@@ -7,6 +7,22 @@ from mask_capture import mask_bytes
 
 
 class MaskCaptureTests(unittest.TestCase):
+    def test_truncated_scratch_prefixes_are_masked(self):
+        root = "/var/tmp/fixture-private-workspace-20261016"
+        rules = [{"source": root, "placeholder": "<scratch>"}]
+        for size in range(len("/var/tmp/") + 1, len(root)):
+            with self.subTest(prefix_length=size):
+                partial = root[:size].encode()
+                raw = b"AssertionError: '" + partial + b"[47 chars]tail'"
+                self.assertEqual(mask_bytes(raw, rules),
+                    b"AssertionError: '<private-scratch-prefix>[47 chars]tail'")
+
+    def test_partial_root_does_not_eat_unrelated_path(self):
+        rules = [{"source": "/var/tmp/fixture-private-workspace",
+                  "placeholder": "<scratch>"}]
+        raw = b"/var/tmp/fixture-unrelated-file"
+        self.assertEqual(mask_bytes(raw, rules), raw)
+
     def test_json_encoded_private_literals_are_masked(self):
         literals = ["caf\u00e9", 'quoted"path', "back\\slash"]
         tokens = ["<unicode>", "<quote>", "<backslash>"]

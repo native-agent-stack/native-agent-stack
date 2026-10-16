@@ -9,19 +9,22 @@
   ],
   "cwd": "<fold-scratch>",
   "declared_inputs": {
-    "alpaca-py": "0.44.0",
-    "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+    "component": "uv",
+    "scope": "installed-client help",
+    "version": "0.12.22"
   },
   "exit_code": 0,
   "finished_utc": "2026-10-16T07:49:50.324354+00:00",
   "masking_rule": "mask_capture.py:mask_bytes",
   "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
   "output": "uv-pip-install-help.log",
   "output_sha256": "eb770df4eede6f58ad927391fb205f367bd74ca0971208311b6d4e1259149645",
   "private_capture_name": "uv-pip-install-help",
   "private_mapping_name": "mask-map.json",
   "private_original_name": "stdout.raw",
   "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
   "schema": "masked-native-command/1",
   "started_utc": "2026-10-16T07:49:50.303085+00:00",
   "stream": "stdout_and_stderr_merged_as_bytes"

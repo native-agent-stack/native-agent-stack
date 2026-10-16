@@ -106,7 +106,7 @@
           "sources": [
             {
               "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.json",
-              "line": 17
+              "line": 18
             },
             {
               "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
@@ -118,7 +118,7 @@
             },
             {
               "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.json",
-              "line": 30
+              "line": 27
             },
             {
               "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.log",
@@ -475,7 +475,7 @@
     }
   ],
   "adjudication_request": "Co-op two-family maximum-setting reads of this bounded delta. No model read self-dispatched; require a recorded GAP disposition or converged evidence before any FINAL admission.",
-  "publication_status": "FULL_PRIVATE_PASS_RELEASED_ONE_NORMAL_FOLD",
+  "publication_status": "SMALL_FOLD_PRIVATE_PASS_RELEASED",
   "blinding_contract": {
     "path": "tools/sota-convergence/blind_checkout.py",
     "line": 56,

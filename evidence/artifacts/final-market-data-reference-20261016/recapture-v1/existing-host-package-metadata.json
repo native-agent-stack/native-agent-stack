@@ -9,22 +9,25 @@
   ],
   "cwd": "<scratch>",
   "declared_inputs": {
-    "winner_pins": [
-      "edgartools==5.61.1",
-      "alpaca-py==0.44.0",
-      "exchange-calendars==4.13.2"
-    ]
+    "scope": "multi-package environment or identity audit",
+    "winner_versions": {
+      "alpaca-py": "0.44.0",
+      "edgartools": "5.61.1",
+      "exchange-calendars": "4.13.2"
+    }
   },
   "exit_code": 0,
   "finished_utc": "2026-10-16T06:20:57.645384+00:00",
   "masking_rule": "mask_capture.py:mask_bytes",
   "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
   "output": "existing-host-package-metadata.log",
   "output_sha256": "6e6fbe3eba3fbb52ca067b8a189875a3031b46ffc4a630d1d866a882228f4ae1",
   "private_capture_name": "existing-host-package-metadata",
   "private_mapping_name": "mask-map.json",
   "private_original_name": "stdout.raw",
   "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
   "schema": "masked-native-command/1",
   "started_utc": "2026-10-16T06:20:57.532488+00:00",
   "stream": "stdout_and_stderr_merged_as_bytes"

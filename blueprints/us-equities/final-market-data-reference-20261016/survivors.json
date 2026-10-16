@@ -23,7 +23,6 @@
       "e2e": "NOT_RUN",
       "gap": "VENDOR_KEY_AND_MATCHED_PIT_RIGHTS_GAP",
       "survivor_remains": true,
-      "no_install_reason": "Vendor acquisition needs authorized key/rights per the pinned README; no such acquisition was authorized or performed.",
       "carried_pin_source": {
         "path": "evidence/artifacts/landscape-sweep-20260926/databento-databento-python.json",
         "line": 7,
@@ -50,7 +49,9 @@
           "at_commit": "7d740ccb66a9e2f041ea9b34ee1585996f859560"
         },
         "scope": "Carried source review is newer than the older catalog/packet release identity; both scopes retained, no adoption or retirement inferred."
-      }
+      },
+      "installation_status": "NOT_RUN_IN_THIS_BOUNDED_SOURCE_DELTA",
+      "installation_scope": "No claim that package installation requires a vendor key. The key/rights requirement applies to acquisition only; the current record is a carried-source screen, not completed vendor E2E."
     },
     {
       "repository": "https://github.com/hydrosquall/tiingo-python",
@@ -71,12 +72,13 @@
       "e2e": "NOT_RUN",
       "gap": "VENDOR_KEY_AND_MATCHED_PIT_RIGHTS_GAP",
       "survivor_remains": true,
-      "no_install_reason": "Vendor acquisition needs authorized key/rights per the pinned README; no such acquisition was authorized or performed.",
       "carried_pin_source": {
         "path": "evidence/artifacts/landscape-sweep-20260926/hydrosquall-tiingo-python.json",
         "line": 7,
         "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
-      }
+      },
+      "installation_status": "NOT_RUN_IN_THIS_BOUNDED_SOURCE_DELTA",
+      "installation_scope": "No claim that package installation requires a vendor key. The key/rights requirement applies to acquisition only; the current record is a carried-source screen, not completed vendor E2E."
     },
     {
       "repository": "https://github.com/man-group/arcticdb",
@@ -199,7 +201,6 @@
       "e2e": "NOT_RUN",
       "gap": "VENDOR_KEY_AND_MATCHED_PIT_RIGHTS_GAP",
       "survivor_remains": true,
-      "no_install_reason": "Vendor acquisition needs authorized key/rights per the pinned README; no such acquisition was authorized or performed.",
       "carried_pin_source": {
         "path": "evidence/artifacts/landscape-sweep-20260926/massive-com-client-python.json",
         "line": 7,
@@ -219,7 +220,9 @@
           "at_commit": "7d740ccb66a9e2f041ea9b34ee1585996f859560"
         },
         "scope": "Carried source commit differs from catalog/packet release; version at the carried source is not inferred from the older2.8.0record."
-      }
+      },
+      "installation_status": "NOT_RUN_IN_THIS_BOUNDED_SOURCE_DELTA",
+      "installation_scope": "No claim that package installation requires a vendor key. The key/rights requirement applies to acquisition only; the current record is a carried-source screen, not completed vendor E2E."
     }
   ],
   "new_discovery": false,

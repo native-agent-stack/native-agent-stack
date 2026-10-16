@@ -1,0 +1,34 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Synthetic regression testing only, not component E2E or acquisition evidence.",
+  "command": [
+    "/usr/bin/python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "<repository>/blueprints/us-equities/final-market-data-reference-20261016",
+    "-p",
+    "test_publish_capture.py",
+    "-v"
+  ],
+  "cwd": "<small-fold-scratch>",
+  "declared_inputs": {
+    "component": "mask_capture",
+    "scope": "explicitly synthetic scratch-prefix/custody regressions"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T10:50:50.186690+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "output": "publication-after.log",
+  "output_sha256": "a385e56aca2a13361e9af443d45ff39f7d008aeb7a8b68a8d9f894a56586300d",
+  "private_capture_name": "publication-after",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T10:50:50.077203+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

@@ -1,8 +1,9 @@
-"""Pytest plugin: stop the process BEFORE any outbound socket/DNS attempt.
+"""Pytest diagnostic plugin: refuse the listed Python socket/DNS audit events.
 
 Applies to the upstream mock suite, including its broker/order fixtures.
-No fixture can remove a Python audit hook. The hard exit makes a network
-attempt observable even if a test would catch an ordinary exception.
+The hard exit makes those observed Python events visible even if a test would
+catch an ordinary exception. CPython audit hooks are NOT a sandbox or proof of
+complete network/process isolation; native extensions can bypass these events.
 Reference: CPython 3.12 sys.addaudithook and socket audit events.
 https://docs.python.org/3.12/library/sys.html#sys.addaudithook
 """
@@ -21,7 +22,8 @@ sys.addaudithook(refuse_network)
 
 # Load the installed, hash-pinned SDK before pytest's default upstream test
 # collection prepends helper/package directories. All submodule resolution then
-# stays under this installed package, while upstream flat helper imports work.
+# normally follows this installed package during the observed tests; this is
+# import-order evidence, not an enforced isolation boundary.
 import alpaca
 import exchange_calendars
 
