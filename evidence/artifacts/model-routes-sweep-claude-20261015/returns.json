@@ -1,0 +1,1839 @@
+{
+ "sweep_id": "model-routes-claude-20261015",
+ "discovery": {
+  "model-routes": {
+   "catalog": "foundation",
+   "layer_id": "model-routes",
+   "proposed": [
+    "https://dev.meta.ai/docs/muse-code#muse-code-wonder-full",
+    "https://dev.meta.ai/docs/models#muse-code-wonder-api",
+    "https://dev.meta.ai/docs/models#codex-wonder-api",
+    "https://dev.meta.ai/docs/models#opencode-wonder-api",
+    "https://dev.meta.ai/docs/models#claude-code-wonder-api",
+    "https://dev.meta.ai/docs/models#harness-spark-api",
+    "https://dev.meta.ai/docs/models#muse-subscription-foreign-harness",
+    "https://developers.openai.com/codex/models#codex-gpt-6-1-sol",
+    "https://developers.openai.com/codex/models#codex-gpt-6-astra",
+    "https://developers.openai.com/codex/models#codex-gpt-6-luna",
+    "https://code.claude.com/docs/en/model-config#claude-code-claude-opus-5-5",
+    "https://code.claude.com/docs/en/model-config#claude-code-claude-sonnet-5-5",
+    "https://code.claude.com/docs/en/model-config#claude-code-claude-haiku-5-5",
+    "https://developers.openai.com/codex/models#openai-pool-foreign-harness",
+    "https://code.claude.com/docs/en/model-config#claude-code-claude-fable-5-1",
+    "https://github.com/diegosouzapw/omniroute",
+    "https://platform.claude.com/docs/en/about-claude/models/overview#anthropic-api-claude-opus-5-5",
+    "https://dev.meta.ai/docs/models#muse-code-spark-subscription",
+    "https://developers.openai.com/codex/models#codex-omniroute-gpt-6-1-sol"
+   ],
+   "requirement_sha256": "5dc75497f0f3a2e5f78edb128df2109ce148e7f9e34cf24478c67a9fb0a27693",
+   "platform_profiles_sha256": "cc6f4bef036223ea12a4fb637945a43c9de3a7dec1a55c0b4acf2be8303b76ba",
+   "families": {
+    "https://dev.meta.ai/docs/muse-code#muse-code-wonder-full": [
+     "claude"
+    ],
+    "https://dev.meta.ai/docs/models#muse-code-wonder-api": [
+     "claude"
+    ],
+    "https://dev.meta.ai/docs/models#codex-wonder-api": [
+     "claude"
+    ],
+    "https://dev.meta.ai/docs/models#opencode-wonder-api": [
+     "claude"
+    ],
+    "https://dev.meta.ai/docs/models#claude-code-wonder-api": [
+     "claude"
+    ],
+    "https://dev.meta.ai/docs/models#harness-spark-api": [
+     "claude"
+    ],
+    "https://dev.meta.ai/docs/models#muse-subscription-foreign-harness": [
+     "claude"
+    ],
+    "https://developers.openai.com/codex/models#codex-gpt-6-1-sol": [
+     "claude"
+    ],
+    "https://developers.openai.com/codex/models#codex-gpt-6-astra": [
+     "claude"
+    ],
+    "https://developers.openai.com/codex/models#codex-gpt-6-luna": [
+     "claude"
+    ],
+    "https://code.claude.com/docs/en/model-config#claude-code-claude-opus-5-5": [
+     "claude"
+    ],
+    "https://code.claude.com/docs/en/model-config#claude-code-claude-sonnet-5-5": [
+     "claude"
+    ],
+    "https://code.claude.com/docs/en/model-config#claude-code-claude-haiku-5-5": [
+     "claude"
+    ],
+    "https://developers.openai.com/codex/models#openai-pool-foreign-harness": [
+     "claude"
+    ],
+    "https://code.claude.com/docs/en/model-config#claude-code-claude-fable-5-1": [
+     "claude"
+    ],
+    "https://github.com/diegosouzapw/omniroute": [
+     "claude"
+    ],
+    "https://platform.claude.com/docs/en/about-claude/models/overview#anthropic-api-claude-opus-5-5": [
+     "claude"
+    ],
+    "https://dev.meta.ai/docs/models#muse-code-spark-subscription": [
+     "claude"
+    ],
+    "https://developers.openai.com/codex/models#codex-omniroute-gpt-6-1-sol": [
+     "claude"
+    ]
+   },
+   "families_returned": {
+    "first": [
+     "claude"
+    ]
+   }
+  }
+ },
+ "votes": {
+  "model-routes": [
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://dev.meta.ai/docs/muse-code#muse-code-wonder-full",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.85,
+     "reasoning": "Every cited fact checks out. dev.meta.ai/docs/models (read 20:45Z) says Full is 'the higher-capability variant, is available only in Muse Code with a subscription, so setting reasoning effort to \"max\" on Muse Wonder doesn't select it'. Its table lists Full as Model API 'Not available' and Muse Code Power/Maximum Usage. It also gives the 1,048,576-token context, the minimal..max effort range and 'Muse Wonder is in preview'. The subscriptions page confirms: Power Usage includes Muse Wonder Full at 20x; Maximum Usage 80x; Everyday Usage 10-50 prompts every 5 hours; the default is Contributor mode; at the limit you upgrade or wait; billing is a flat monthly rate. The fence decision (worktree, 8053f14e7) matches at :18-19 (exact muse-bin-1.4.7-R6101.1 ELF), :93-94 (mandatory flags), :123-129 (smoke 22:57:44Z-22:57:58Z, exit 0, 39 events, muse-wonder-full-1.0) and :153-155 (one reader smoke; route reservation is a separate decision). The angle record has A1 '+' with the 1.4.6-R6000.1 note, and A5 'U' with AA Muse Wonder (Max) 52 not transferable. Correction: the Muse Code changelog lists 1.4.9 and 1.4.8 above 1.4.7, so the client is two releases past the fence pin (1.4.9 is newest), not only 1.4.8. Plan prices, Full's own effort ladder and the AA/model-card leads remain UNVERIFIED, as the proposal flags. The /docs/muse-code identity page itself was not opened; all cited facts come from sibling pages.",
+     "refs": [
+      "https://dev.meta.ai/docs/models",
+      "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "https://dev.meta.ai/docs/muse-code/changelog"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://dev.meta.ai/docs/muse-code#muse-code-wonder-full",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.6,
+      "reasoning": "Holds. Verified 2026-10-15 at dev.meta.ai/docs/models: 'Muse Wonder Full, the higher-capability variant, is available only in Muse Code with a subscription, so setting reasoning effort to max on Muse Wonder doesn't select it'; availability Power Usage and Maximum Usage. The subscriptions page confirms 'Muse Code subscriptions default to Contributor mode', Everyday '10-50 prompts every 5 hours' and Maximum '80x more usage than the Everyday Usage plan'. Fence decision at 8053f14e7 verified: :16-21 exact muse-bin-1.4.7-R6101.1 ELF and a whole-argv contract; :93-94 mandatory --disable-web-tools and --contributor-mode off; :123-129 one reader smoke, exit 0, 39 events, muse-wonder-full-1.0; :153-155 scope is exactly one smoke and route reservation is a separate decision. This is the only route matching the requirement's family (c) 'Wonder Full'. It runs on the already-entitled subscription (the smoke ran on it), so it needs no new credential, and a bounded WSL trial is feasible after the CC reservation; targeted_candidate fits. Caveats that do not overturn the label: (1) Published quality does not favor Full over the incumbents (angle record A5 'U'; Muse Wonder (Max) AA 52 is not transferable; the Full 56 and the model-card date are unopened leads). (2) The fenced reader has native shell and write tools disabled (fence :110-111), so the Claude Code and Codex arms need matching tool limits or the comparison confounds tooling with model. (3) The drop rule should say why parity at zero marginal subscription cost is not enough. (4) Fence status :7-8 still lists the CC DELTA and GPT fix5 reads as pending. (5) Muse Code 1.4.8 (unopened lead) would need fence re-qualification.",
+      "refs": [
+       "https://dev.meta.ai/docs/models",
+       "https://dev.meta.ai/docs/muse-code/subscriptions",
+       "<repo>/docs/decisions/2026-10-14-muse-file-fence.md:7-8,16-21,93-94,110-111,123-129,153-155",
+       "<repo>/catalogs/landscape/angles/foundation-model-routes.json:114,217"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://dev.meta.ai/docs/models#muse-code-wonder-api",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.9,
+     "reasoning": "All verified. The models page reads 'Muse Wonder (muse-wonder-1.0) | Available (Standard mode only) | Pay-as-you-go and every plan' and 'For Muse Wonder, Contributor mode isn't available on pay-as-you-go'. It gives the minimal..max effort range, and max does not select Full. The pricing page gives cached $0.20 / input $4.00 / output $20.00 per 1M, with Contributor 'Not available'. Rate limits are muse-wonder-1.0 3,000 RPM and 4,000,000 TPM, applied 'per team, not per API key'. Background responses are capped at 600 submissions per minute per team. There is no long-context premium, and web search grounding costs $2.50 per 1,000 queries. The subscriptions page says additional API keys are billed pay-as-you-go. The angle-record entitlement 'pending' matches the input record.",
+     "refs": [
+      "https://dev.meta.ai/docs/models",
+      "https://dev.meta.ai/docs/pricing-rate-limits",
+      "https://dev.meta.ai/docs/muse-code/subscriptions"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://dev.meta.ai/docs/models#muse-code-wonder-api",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.85,
+      "reasoning": "Refuted. The proposal concedes 'No gap is demonstrated' and that it needs a new paid pay-as-you-go credential. None exists: adoption/credential-inventory.json holds anthropic-api keys and no Meta key. The selection principles allow a new credential only for a demonstrated gap. Its sole stated value, isolating the Full-vs-standard variant at a fixed harness, does not need the key. dev.meta.ai/docs/models (read 2026-10-15) lists muse-wonder-1.0 in Muse Code for 'Pay-as-you-go and every plan' and says 'With a subscription, Muse Wonder is available on every plan and Muse Wonder Full on the Power Usage and Maximum Usage plans, each in Standard mode and Contributor mode'. So muse-wonder-1.0 vs muse-wonder-full-1.0 can run on the existing subscription in Standard mode, given the same fence argv-contract change and reservation the API arm would need (fence :16-21). keep_but_compare 'keeps its incumbent while the comparison the row names is still owed' (scripts/new_host_grand_list.py:603), and this NOT_ADOPTED route has no incumbent role. Pricing and limits are correct (verified at dev.meta.ai/docs/pricing-rate-limits): $4.00/$20.00/$0.20 per 1M, Contributor not available, 3,000 RPM / 4,000,000 TPM per team, 600 background submissions/min/team. The right label is not_adopted.",
+      "refs": [
+       "https://dev.meta.ai/docs/models",
+       "https://dev.meta.ai/docs/pricing-rate-limits",
+       "https://dev.meta.ai/docs/muse-code/subscriptions",
+       "<repo>/adoption/credential-inventory.json:234-459",
+       "<repo>/scripts/new_host_grand_list.py:603",
+       "<repo>/docs/decisions/2026-10-14-muse-file-fence.md:16-21"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://dev.meta.ai/docs/models#codex-wonder-api",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.75,
+     "reasoning": "GitHub API facts match. openai/codex: 129385 stars, pushed_at 2026-10-15T20:00:32Z, archived false, Apache-2.0. releases/latest: rust-v0.162.1, published 2026-10-09T19:44:51Z. commits?since=2026-07-17: newest 97ebf2d9 at 2026-10-15T19:54:27Z, so the client is maintained. stack.json:300 records 0.160.0. On the Meta side, the $4/$20/$0.20 pricing, the 3,000 RPM / 4M TPM per-team limits, 'Muse Wonder and Muse Spark take the same requests on the same endpoints' and the muse-wonder-1.0 Standard-only status are all verified. The Codex-to-Meta-Responses mechanism rests on the angle record: role 'Codex with Meta Responses API', with A1 source dev.meta.ai/docs/coding-agents read 2026-10-12T21:53:40Z. That record says what the proposal cites. The coding-agents page itself was not re-read (outside the fetch budget). 'Via the Responses reasoning parameter' is an inference; the minimal..max range is confirmed on the models page.",
+     "refs": [
+      "https://api.github.com/repos/openai/codex",
+      "https://api.github.com/repos/openai/codex/releases/latest",
+      "https://api.github.com/repos/openai/codex/commits?since=2026-07-17T00:00:00Z&per_page=1",
+      "https://dev.meta.ai/docs/pricing-rate-limits",
+      "https://dev.meta.ai/docs/models"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://dev.meta.ai/docs/models#codex-wonder-api",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.8,
+      "reasoning": "Refuted. The proposal concedes 'No gap is demonstrated' and a new paid Meta credential (no Meta key in adoption/credential-inventory.json). Harness isolation (Codex vs Muse Code on a fixed Meta model) is a research question, not a gap in this layer. The requirement's family (c) is Meta's Muse 'through the muse-code provider', and Codex on the Meta Responses API is outside the three named families. The client is maintained (openai/codex commits?since=2026-07-17 newest 97ebf2d9 at 2026-10-15T19:54:27Z, verified), so maintenance is not the issue. Pricing and per-team limits match dev.meta.ai/docs/pricing-rate-limits (verified). The effort-parameter mapping rests on the angle record's 2026-10-12 coding-agents read and was not re-read (UNVERIFIED). keep_but_compare presumes an incumbent kept while a comparison is owed (scripts/new_host_grand_list.py:603); none exists. Correct label: not_adopted.",
+      "refs": [
+       "https://api.github.com/repos/openai/codex/commits?since=2026-07-17T00:00:00Z&per_page=1",
+       "https://dev.meta.ai/docs/pricing-rate-limits",
+       "https://dev.meta.ai/docs/models",
+       "<repo>/adoption/credential-inventory.json:234-459",
+       "<work-dir>/inputs/model-routes.json:5"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://dev.meta.ai/docs/models#opencode-wonder-api",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.75,
+     "reasoning": "repos/sst/opencode returns full_name anomalyco/opencode (the rename is confirmed): 213875 stars, pushed_at 2026-10-15T20:13:56Z, archived false, MIT, default_branch dev. anomalyco/opencode releases/latest is v1.19.1, published 2026-10-15T19:19:45Z. My commits?since=2026-07-17 read (20:47Z) shows newest 412b2b1d at 2026-10-15T20:34:08Z. That is newer than the proposal's fe87944b (20:18:38Z), which is consistent; the client is maintained. Meta pricing and per-team limits are verified. The vendor-adapter and reasoning-replay mechanism rests on the angle record: role 'OpenCode with the vendor-recommended OpenAI adapter and reasoning replay', with A1 source dev.meta.ai/docs/coding-agents read 2026-10-12. That is verified as cited; the doc itself was not re-read.",
+     "refs": [
+      "https://api.github.com/repos/sst/opencode",
+      "https://api.github.com/repos/anomalyco/opencode/releases/latest",
+      "https://api.github.com/repos/anomalyco/opencode/commits?since=2026-07-17T00:00:00Z&per_page=1",
+      "https://dev.meta.ai/docs/pricing-rate-limits"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://dev.meta.ai/docs/models#opencode-wonder-api",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.8,
+      "reasoning": "Refuted on the same basis as codex-wonder-api. The proposal concedes no gap and a new paid Meta credential, and the route sits outside the requirement's family (c) 'through the muse-code provider'. Client facts verified: api.github.com/repos/sst/opencode (raw API response) returns full_name anomalyco/opencode, archived false, default_branch dev. anomalyco/opencode commits?since=2026-07-17 newest is 412b2b1d at 2026-10-15T20:34:08Z, so the client is maintained under its renamed owner and maintenance is not the issue. The wire claim that reasoning replay preserves effort is UNVERIFIED (coding-agents doc not re-read). Correct label: not_adopted.",
+      "refs": [
+       "https://api.github.com/repos/sst/opencode",
+       "https://api.github.com/repos/anomalyco/opencode/commits?since=2026-07-17T00:00:00Z&per_page=1",
+       "https://dev.meta.ai/docs/pricing-rate-limits",
+       "<work-dir>/inputs/model-routes.json:5"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://dev.meta.ai/docs/models#claude-code-wonder-api",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.75,
+     "reasoning": "model-config.md has both quotes verbatim: 'ANTHROPIC_BASE_URL changes where requests are sent, not which model answers them' and 'The available effort levels depend on the model. Models not listed here do not support effort'. The effort table lists only Claude models. anthropics/claude-code: pushed_at 2026-10-15T19:22:05Z, archived false, license null. Stars were 151053 at my 20:47Z read against 151050 at the proposer's read, which is drift only. The top of the releases list is v2.1.301, published 2026-10-15T19:22:06Z, not a prerelease. stack.json:194 records 2.1.295. Meta pricing is verified. The Messages-API integration rests on the angle record (role, plus its coding-agents source read 2026-10-12), which was not re-read. The doubtful effort control for a non-Claude model is correctly flagged UNVERIFIED.",
+     "refs": [
+      "https://code.claude.com/docs/en/model-config.md",
+      "https://api.github.com/repos/anthropics/claude-code",
+      "https://api.github.com/repos/anthropics/claude-code/releases?per_page=8",
+      "https://dev.meta.ai/docs/pricing-rate-limits"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://dev.meta.ai/docs/models#claude-code-wonder-api",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.85,
+      "reasoning": "Refuted, most firmly of the Meta API arms. Besides the conceded absence of a gap and the new paid Meta credential, the layer requires effort controls for each route. code.claude.com/docs/en/model-config.md (read 2026-10-15) says 'ANTHROPIC_BASE_URL changes where requests are sent, not which model answers them' and 'The available effort levels depend on the model. Models not listed here do not support effort'. Its table lists only Fable 5.1/5, Opus/Sonnet/Haiku 5.5 and older Claude models. The client's own docs therefore give no max-effort control for muse-wonder-1.0. Correct label: not_adopted, reopened only if a model-free capture shows an effort or reasoning field reaching Meta.",
+      "refs": [
+       "https://code.claude.com/docs/en/model-config.md",
+       "https://dev.meta.ai/docs/pricing-rate-limits",
+       "<repo>/adoption/credential-inventory.json:234-459"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://dev.meta.ai/docs/models#harness-spark-api",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.9,
+     "reasoning": "The models page describes muse-spark-1.3 as 'the latest version, tuned for agentic workflows ... Supports all reasoning effort levels, including the \"max\" level for extended reasoning (not available with muse-spark-1.3-contributor). Recommended for new work.' It gives a 1,048,576-token context and lists 'Muse Spark 1.3 | Standard mode | Pay-as-you-go and every plan'. The pricing page shows Standard cached $0.15 / input $1.25 / output $4.25 and Contributor $0.002 / $0.10 / $0.20. Limits are muse-spark-1.3 3,000 RPM / 4M TPM and muse-spark-1.3-contributor 150 RPM / 3M TPM. The angle record's A1 note matches the proposal: 'Use Standard muse-spark-1.3; the contributor variant does not support max effort'.",
+     "refs": [
+      "https://dev.meta.ai/docs/models",
+      "https://dev.meta.ai/docs/pricing-rate-limits"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://dev.meta.ai/docs/models#harness-spark-api",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.85,
+      "reasoning": "Refuted. The proposal states 'Gap: none for an API key' and that it needs a new paid credential. It also names the cheaper equivalent itself: Everyday Usage includes 'Access to Muse Spark, Muse Wonder and Muse Image' (dev.meta.ai/docs/muse-code/subscriptions, read 2026-10-15), so muse-spark-1.3 is reachable in the already-entitled Muse Code harness. Verified facts for the record: muse-spark-1.3 'Supports all reasoning effort levels, including the max level for extended reasoning (not available with muse-spark-1.3-contributor). Recommended for new work'; 1,048,576-token context; 3,000 RPM / 4,000,000 TPM per team; contributor 150 RPM / 3,000,000 TPM. A new key without a gap fails the selection principles. Correct label: not_adopted.",
+      "refs": [
+       "https://dev.meta.ai/docs/models",
+       "https://dev.meta.ai/docs/muse-code/subscriptions",
+       "https://dev.meta.ai/docs/pricing-rate-limits"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://dev.meta.ai/docs/models#muse-subscription-foreign-harness",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.9,
+     "reasoning": "The subscriptions page says 'The subscription applies to the Muse Code API key that is automatically connected in the Muse Code CLI onboarding process. This credential is for use with Muse Code only.' It also says 'Subscription: a flat monthly rate ... It works only through the Muse Code CLI while signed in with your Meta Model API account', and lists revocation for 'Policy violation'. In the angle record this candidate has A1 '-' with the terms section 3.2 note, verdict REJECTED and disqualifier missing_capability, which matches the proposal. The terms page itself was not re-read; the proposal correctly dates that read to the angle record.",
+     "refs": [
+      "https://dev.meta.ai/docs/muse-code/subscriptions"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://dev.meta.ai/docs/models#muse-subscription-foreign-harness",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.85,
+      "reasoning": "Holds. The decisive rejection reason is verified verbatim at dev.meta.ai/docs/muse-code/subscriptions (read 2026-10-15): 'The subscription applies to the Muse Code API key that is automatically connected in the Muse Code CLI onboarding process. This credential is for use with Muse Code only', and the subscription 'works only through the Muse Code CLI while signed in with your Meta Model API account'. Using that credential in another harness is outside the documented entitlement, so not_adopted is correct and its stated reason is right. Neutral trial permission does not create entitlement. Minor: the angle record's disqualifier 'missing_capability' mislabels what is an entitlement conflict. The 'Policy violation' revocation clause was not re-read here.",
+      "refs": [
+       "https://dev.meta.ai/docs/muse-code/subscriptions",
+       "<repo>/catalogs/landscape/angles/foundation-model-routes.json:691,725"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://developers.openai.com/codex/models#codex-gpt-6-1-sol",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.8,
+     "reasoning": "codex/models (HTML and .md) confirms: rollout 'Plus, Pro, Business, Enterprise, and Edu'; on Enterprise/Edu it is off until an administrator enables it; 'Free and Go are not included at launch'; 'Standard and Fast modes are available where supported. Ultrafast is available on Pro $500 and eligible Enterprise and Edu plans'. It also says 'Reasoning effort ranges from Light to Ultra. Max and Ultra depend on your settings', that GPT-5.6 Sol/Terra/Luna remain available, and 'Near-Astra performance for complex work at a lower cost than Astra'. pricing.md confirms the Plus $20/month card bullet 'GPT-6.1 Sol and GPT-6 Luna', the speed table (Fast 2.5x/2x; GPT-6.1 Sol Ultrafast 8x/6x) and 'ChatGPT Work and Codex share usage'. On GitHub, b1e72963 is 'Add GPT-6.1 Sol as the default catalog model (#49318)', authored 2026-09-29T17:12:00Z. rust-v0.161.0 was published 2026-10-07T15:58:45Z with the bundled/Bedrock default note (#49318, #49339). The OmniRoute #15192 body carries the reverse-engineered <0.159.0 rejection claim and the 872k/128k registry. stack.json:300, :1941 and :2206-2213 match, as does angle A5 (58.18%, 2026-09-29). Corrections: the 1.05M/872k figures also appear in OmniRoute #15167's body, so 'only in #15192' is inexact (both are third-party). The TUI snapshot strings were not independently read; the commit message does say snapshots were updated for the new default. released_at 2026-09-29 rests on the stack.json OpenAI-changelog basis plus the commit date; the OpenAI changelog was not re-read.",
+     "refs": [
+      "https://developers.openai.com/codex/models",
+      "https://developers.openai.com/codex/models.md",
+      "https://developers.openai.com/codex/pricing.md",
+      "https://api.github.com/repos/openai/codex/commits/b1e72963c3b71a9265a551e54beff078384efed9",
+      "https://api.github.com/repos/openai/codex/releases/tags/rust-v0.161.0",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15192",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15167"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://developers.openai.com/codex/models#codex-gpt-6-1-sol",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.6,
+      "reasoning": "Holds as targeted_candidate. Verified 2026-10-15 at developers.openai.com/codex/models: 'For complex coding and agentic workflows, use GPT-6.1 Sol when available to your account and client' and 'GPT-6.1 Sol offers near-Astra performance for complex work at a lower cost than Astra'. openai/codex rust-v0.161.0 (published 2026-10-07T15:58:45Z): 'GPT-6.1 Sol is now the default model in the bundled and Amazon Bedrock catalogs'. The client is maintained (97ebf2d9, 2026-10-15T19:54:27Z). Its CURRENT standing rests on incumbency (no retained A6), and a native paired trial on the existing subscription is bounded and feasible. Caveats: (1) The vendor page confirms a client gate ('available to your account and client'); the <0.159.0 threshold is only OmniRoute PR #15192's reverse-engineered claim. (2) stack.json:1941 records installed Codex 0.157.1 while stack.json:300 says 0.160.0, so CURRENT at the installed pin is doubtful until codex --version is read; the trial must pin >=0.159.0. (3) The same page defines Ultra as a subagent mode ('Ultra mode goes beyond a single-agent run. It uses subagents'), so the Astra anchor must not run ultra while Sol runs max. Speed-mode table verified at codex/pricing.md: Fast 2.5x included / 2x credits, GPT-6.1 Sol Ultrafast 8x / 6x. The Plus-card line and numeric limits were not re-verified.",
+      "refs": [
+       "https://developers.openai.com/codex/models",
+       "https://developers.openai.com/codex/pricing.md",
+       "https://api.github.com/repos/openai/codex/releases/tags/rust-v0.161.0",
+       "https://api.github.com/repos/openai/codex/commits?since=2026-07-17T00:00:00Z&per_page=1",
+       "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15192",
+       "<repo>/manifests/stack.json:300,1941,2206-2219"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://developers.openai.com/codex/models#codex-gpt-6-astra",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.8,
+     "reasoning": "codex/models.md has the Astra ModelDetails description verbatim ('Our most capable model for complex work across code, apps, and research, combining advanced reasoning, computer use, and stronger judgment'), with Codex CLI and API Access true. It shows 'codex -m gpt-6-astra' and says 'Start with High for Luna or Light for Astra. In configuration, Astra's Light setting is low'. pricing.md lists GPT-6 Astra Ultrafast at 8x/6x. The Plus card bullets list 'GPT-6.1 Sol and GPT-6 Luna' and no Astra line, which confirms the not-shown-on-Plus claim. A GitHub commit search finds ed391d4dd213 'Add GPT-6-Astra to the bundled model catalog (#42607)', authored 2026-09-03T19:47:07Z. It also finds 'Update GPT-6-Astra Fast tier speed description (#42638)', 2026-09-03T23:54:50Z, with '2x speed with increased usage'. The OmniRoute v3.8.51 body has #13026: GPT-6 Astra with effort aliases -low through -ultra. stack.json:2222-2229 and angle A5 (58.18%, 2026-09-03) match. The 2026-09-29 default move is supported by b1e72963's message; the exact snapshot strings were not independently read. The Pro card remains UNVERIFIED, as the proposal says.",
+     "refs": [
+      "https://developers.openai.com/codex/models.md",
+      "https://developers.openai.com/codex/pricing.md",
+      "https://api.github.com/search/commits?q=repo:openai/codex+gpt-6-astra",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/releases?per_page=3"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://developers.openai.com/codex/models#codex-gpt-6-astra",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.55,
+      "reasoning": "Holds, with a design correction. Verified at developers.openai.com/codex/models (2026-10-15): Astra is 'Our most capable model for complex work across code, apps, and research, combining advanced reasoning, computer use, and stronger judgment' (codex -m gpt-6-astra; surfaces include Codex CLI and API Access). The vendor's own claim that GPT-6.1 Sol offers 'near-Astra performance for complex work at a lower cost than Astra' is a concrete, testable question. Astra's consequential-judgment role (stack.json:2222-2236) rests on incumbency: the angle record's Terminal-Bench shows Astra and 6.1 Sol both at 58.18%, so no measured advantage is recorded. The shared bounded family (b) trial with codex-gpt-6-1-sol is feasible on the existing subscription. Correction: the comparison's 'max, ultra where enabled' for Astra confounds model with orchestration, because the same page defines Ultra as a subagent mode. Preregister both arms at max. Astra Ultrafast 8x included / 6x credits verified at codex/pricing.md. The Pro-card availability and the 'Light ... low' starting-effort line were not re-verified.",
+      "refs": [
+       "https://developers.openai.com/codex/models",
+       "https://developers.openai.com/codex/pricing.md",
+       "<repo>/manifests/stack.json:2222-2236",
+       "<repo>/catalogs/landscape/angles/foundation-model-routes.json:821,929"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://developers.openai.com/codex/models#codex-gpt-6-luna",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.85,
+     "reasoning": "codex/models.md has the Luna description verbatim ('Our most efficient model for focused, high-volume tasks, including summarization, extraction, and focused coding') and 'Start with High for Luna'. In pricing.md the Free $0 and Go $8 cards read 'GPT-6 Luna at Standard speed in the desktop app, subject to rollout', and the Plus card includes GPT-6 Luna. On GitHub, 49e95cc73f4e is 'Add GPT-6 Sol and Luna to the model catalog (#47332)', authored 2026-09-22T18:06:57Z, and includes 'Recommend gpt-6-luna in the rate-limit switch prompt'. OmniRoute v3.8.51 (#14677) lists Luna efforts -low through -max. Angle A5 (16.36%, 2026-09-22) matches.",
+     "refs": [
+      "https://developers.openai.com/codex/models.md",
+      "https://developers.openai.com/codex/pricing.md",
+      "https://api.github.com/repos/openai/codex/commits/49e95cc7",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/releases?per_page=3"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://developers.openai.com/codex/models#codex-gpt-6-luna",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.55,
+      "reasoning": "Holds as keep_but_compare. Luna is a carried TRIAL route on the existing ChatGPT subscription, so it needs no new credential. The label keeps that status while a bounded mechanical-tier check against the incumbent gpt-6.1-sol (low) is owed. The tier question is live here: Codex lanes run on gpt-6.1-sol as 'frontier coordination and workers' (stack.json:2206-2219), and the 2026-10-12 routing decision records the owner's rule to use the least expensive model and effort that keeps quality (docs/decisions/2026-10-12-model-effort-routing.md:4-6). Vendor positioning verified at developers.openai.com/codex/models: 'Use Luna for focused, repeatable tasks'. Its Terminal-Bench 16.36% (angle record :1037) confines it to mechanical work, which the proposal states. The contrast with muse-code-spark-subscription is that family (b) has a running workload that a cheaper tier could serve. Not verified here: the Free/Go plan-class lines and the 'Start with High for Luna' guidance (searches returned generic sections). Catalog commit 49e95cc7 was not re-fetched.",
+      "refs": [
+       "https://developers.openai.com/codex/models",
+       "<repo>/manifests/stack.json:2206-2219",
+       "<repo>/docs/decisions/2026-10-12-model-effort-routing.md:4-6",
+       "<repo>/catalogs/landscape/angles/foundation-model-routes.json:1037"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://code.claude.com/docs/en/model-config#claude-code-claude-opus-5-5",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.88,
+     "reasoning": "model-config.md confirms: the Anthropic API alias row is Opus 5.5 / Sonnet 5.5 / Haiku 5.5; 'Pro, Max, Team, Enterprise, and Anthropic API: defaults to Opus 5.5'; the v2.1.280 opus row; effort low..max with the 5.5 models defaulting to medium. Two quotes are verbatim: 'Unless you set it through the CLAUDE_CODE_EFFORT_LEVEL environment variable, Claude Code applies max to the current session only' and 'a top-level effortLevel in your user settings file doesn't count for Opus 5.5'. The overview gives $4/$20, Adaptive (always on), default effort medium, 1M / 128K, retirement 'Not sooner than September 22, 2027', cache reads at 5% and batch at 50% off. The release notes have the 2026-09-22 launch of claude-opus-5-5; the 2026-09-24 notes that thinking cannot be disabled and tool_choice any/tool return 400; and the 2026-10-15 exit of fast mode from research preview. The claude-api skill's installed models.md:64 and marketplace :79 ($4/$20, cache $0.20, default medium) match. v2.1.301 was published 2026-10-15T19:22:06Z. stack.json:2158-2165 and angle A5 (64.85%) match. Plan limits and subscription fast-mode billing are correctly flagged UNVERIFIED.",
+     "refs": [
+      "https://code.claude.com/docs/en/model-config.md",
+      "https://platform.claude.com/docs/en/about-claude/models/overview.md",
+      "https://platform.claude.com/docs/en/release-notes/overview.md",
+      "https://api.github.com/repos/anthropics/claude-code/releases?per_page=8"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://code.claude.com/docs/en/model-config#claude-code-claude-opus-5-5",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.6,
+      "reasoning": "Holds. Verified 2026-10-15. platform.claude.com models overview: 'start with Claude Opus 5.5 for most workloads. Use Claude Fable 5.1 for demanding reasoning and long-horizon agentic work, or when your evals on Claude Opus 5.5 at higher effort still fall short'; retirement 'Not sooner than September 22, 2027'; cache reads 5% on Opus 5.5. code.claude.com model-config: version history 'v2.1.280 opus resolves to Opus 5.5'; effort low/medium/high/xhigh/max, with Opus 5.5 defaulting to medium. Release notes 2026-10-15: 'Fast mode is out of research preview for Claude Opus 5.5'. CURRENT rests on incumbency (no retained A6 against Fable), and the vendor names exactly the eval that decides it, so a bounded family (a) trial on the existing subscription is warranted. Caveats: (1) The client must move from the repository pin 2.1.295 (stack.json:194) to v2.1.301 (releases/latest, verified) by the supported update path. (2) Gate work stays on Opus under the CC routing rule (docs/decisions/2026-10-12-model-effort-routing.md:39-44), so the trial informs main and advisor selection, not that rule. (3) Plan usage limits remain UNVERIFIED.",
+      "refs": [
+       "https://platform.claude.com/docs/en/about-claude/models/overview.md",
+       "https://code.claude.com/docs/en/model-config.md",
+       "https://platform.claude.com/docs/en/release-notes/overview.md",
+       "https://api.github.com/repos/anthropics/claude-code/releases/latest",
+       "<repo>/manifests/stack.json:194,2158-2172",
+       "<repo>/docs/decisions/2026-10-12-model-effort-routing.md:39-44"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://code.claude.com/docs/en/model-config#claude-code-claude-sonnet-5-5",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.85,
+     "reasoning": "model-config.md has the v2.1.284 row ('sonnet resolves to Sonnet 5.5 on the Anthropic API') and a Claude Code default of medium. The overview gives $2/$10, an API default effort of high, Adaptive thinking, 1M context, retirement 'Not sooner than September 28, 2027', and cache reads at 5% (= $0.10). The 2026-10-07 release note lowered Sonnet 5.5 cache reads from $0.20 to $0.10 per million tokens. The release notes also say Sonnet 5.5 thinking blocks work only in the producing or a linked account. The skill marketplace models.md:85 confirms $2/$10, default high and thinking-disabled 400; its 'cache reads $0.20' is stale against the 10-07 note, which is a skill-staleness issue, not a proposal error. stack.json:2174-2181 records in_use 'frontier fan-out', :2176 the release date 2026-09-28, and angle A5 61.82%. The launch entry did not surface in my read either; the proposal already flags that basis.",
+     "refs": [
+      "https://code.claude.com/docs/en/model-config.md",
+      "https://platform.claude.com/docs/en/about-claude/models/overview.md",
+      "https://platform.claude.com/docs/en/release-notes/overview.md"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://code.claude.com/docs/en/model-config#claude-code-claude-sonnet-5-5",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.55,
+      "reasoning": "Refuted. The proposal concedes 'No gap versus Opus 5.5 for judgment'. For fan-out, Sonnet 5.5 is already the settled incumbent. docs/decisions/2026-10-12-model-effort-routing.md:21-25 routes source-scout, stack-verifier and stack-researcher to Sonnet, and :39-44 keeps Sonnet for non-gate foundation work under the CC routing-run-5 rule. :124-125 sets that ruling's own reopen rule: a lower tier is raised when a gate read or the other review family finds a reproduced miss. The proposed 'fan-out paired check ... Adopt as the fan-out default only if' re-runs that settled choice with no new evidence. The comparison it names is therefore not owed, and keep_but_compare's premise fails. The asymmetry with claude-code-claude-fable-5-1, which has the same manifest-versus-route pattern, is that Fable states a gap: its usage-credit billing class is unrecorded, and Anthropic's own eval guidance names a comparison not yet run here. Facts verified for the record: $2/$10 per MTok; cache reads lowered from $0.20 to $0.10 on 2026-10-07; 'v2.1.284 sonnet resolves to Sonnet 5.5'; Claude Code default effort medium.",
+      "refs": [
+       "<repo>/docs/decisions/2026-10-12-model-effort-routing.md:21-25,39-44,124-125",
+       "https://code.claude.com/docs/en/model-config.md",
+       "https://platform.claude.com/docs/en/release-notes/overview.md",
+       "https://platform.claude.com/docs/en/about-claude/models/overview.md",
+       "<repo>/manifests/stack.json:2174-2188"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://code.claude.com/docs/en/model-config#claude-code-claude-haiku-5-5",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.88,
+     "reasoning": "The 2026-10-07 release note reads 'We've launched Claude Haiku 5.5 (claude-haiku-5-5)... 1M token context window, 128k max output tokens, and adaptive thinking with the effort parameter', and lists the Haiku 4.5 breakage (budget_tokens; temperature, top_p and top_k; prefill). v2.1.293 was published 2026-10-07T18:10:20Z, and its body reads verbatim 'Added Claude Haiku 5.5 (claude-haiku-5-5), now the default Haiku model on the Anthropic API — 1M context, $0.10/$0.50 per Mtok ($0.50/$2.50 for prompts over 100K)'. model-config.md has the v2.1.293 haiku row, ANTHROPIC_DEFAULT_HAIKU_MODEL 'The model to use for haiku, or background functionality', and a default of medium. The overview gives 'From $0.10 / input MTok, From $0.50 / output MTok' and retirement 'Not sooner than October 7, 2027'. Skill models.md:87 confirms the ~30% tokenizer inflation, and stack.json:2469-2476 matches. The '75% lower cost' lead is flagged unopened and was not relied on.",
+     "refs": [
+      "https://platform.claude.com/docs/en/release-notes/overview.md",
+      "https://api.github.com/repos/anthropics/claude-code/releases?per_page=8",
+      "https://code.claude.com/docs/en/model-config.md",
+      "https://platform.claude.com/docs/en/about-claude/models/overview.md"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://code.claude.com/docs/en/model-config#claude-code-claude-haiku-5-5",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.75,
+      "reasoning": "Holds strongly. The repository's own overturn condition is met. stack.json:2469-2479 keeps claude-haiku-4-5-20251001 for background tasks with overturn 'An Anthropic Haiku 5.x model ID becomes available'. The release notes (read 2026-10-15) record 'We've launched Claude Haiku 5.5 (claude-haiku-5-5)' on 2026-10-07, with 1M context, 128k output and the effort parameter. model-config shows 'v2.1.293 haiku resolves to Haiku 5.5 on the Anthropic API', ANTHROPIC_DEFAULT_HAIKU_MODEL as 'The model to use for haiku, or background functionality', and Haiku 5.5 in the low..max effort table. The overview gives retirement 'Not sooner than October 7, 2027'. docs/decisions/2026-10-12-model-effort-routing.md:31-36 also names a Haiku 5.5 repeat trial as its overturn condition. Keeping a pinned 4.5 override against the client's upstream default needs evidence, and the proposed background-task check is cheap, bounded and runs on the existing subscription. Before reusing any 4.5 configuration, note the verified breakage list: budget_tokens, sampling parameters and prefill each return 400.",
+      "refs": [
+       "https://platform.claude.com/docs/en/release-notes/overview.md",
+       "https://code.claude.com/docs/en/model-config.md",
+       "https://platform.claude.com/docs/en/about-claude/models/overview.md",
+       "<repo>/manifests/stack.json:2469-2479",
+       "<repo>/docs/decisions/2026-10-12-model-effort-routing.md:31-36"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://developers.openai.com/codex/models#openai-pool-foreign-harness",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.85,
+     "reasoning": "The angle record has entitlement status 'unverified' with the three sources read 2026-10-12, trial_permitted true and final_eligible false. The OmniRoute v3.8.51 body lists GPT-6 Astra aliases (#13026), GPT-6 Sol/Luna (#14677) and 'account-live listings as the chat catalog source for Claude/Codex/Copilot/AGY'. It has no GPT-6.1 Sol entry, which is consistent with stack.json:1940 and with the later merge dates. #15192 was merged 2026-10-07T18:56:50Z and #15171 2026-10-09T15:52:31Z, both into base release/v3.8.52. The owner (OWNER association) commented on #16027 at 2026-10-10T11:31:32Z: 'It is not shipped yet ... This close does not mean the defect is already fixed'. #16038 is open with merged_at null. stack.json:1941 matches: a keyless loopback gateway on 20128 and CODEX_CLIENT_VERSION 0.159.1.",
+     "refs": [
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/releases?per_page=3",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15192",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15171",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/issues/16027/comments",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/16038"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://developers.openai.com/codex/models#openai-pool-foreign-harness",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.65,
+      "reasoning": "Refuted. The proposal states no advantage over native Codex, and stack.json:1941 records 'Native Codex stays the max-quality default'. Codex-model evaluations do not transfer to a foreign harness (angle record :1448 says so), so no evidence supports this route. Entitlement is unverified. The rule that unknown is pending, never refuted, covers maintenance facts only. The OpenAI Terms page returned HTTP 403 to this lane; the angle record's 2026-10-12 read notes a credential-sharing restriction. The route also inherits the gateway's non-upstream state. Max-effort gpt-6.1-sol comes from PR #15167 (merged_at null, verified). OmniRoute PR #15192's body (verified) says the backend rejects Codex clients below 0.159.0 for gpt-6.1-sol, which a non-Codex client passes only because the gateway presents a Codex client identity. Harness identity separates this route from codex-omniroute-gpt-6-1-sol: that one is the requirement's named family (b) path with a first-party client, while this one adds a foreign client and states no gap. Correct label: not_adopted until a vendor statement covers pooled accounts behind a gateway.",
+      "refs": [
+       "<repo>/manifests/stack.json:1940-1941",
+       "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15167",
+       "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15192",
+       "https://openai.com/policies/terms-of-use/",
+       "<repo>/catalogs/landscape/angles/foundation-model-routes.json:1393,1448"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://code.claude.com/docs/en/model-config#claude-code-claude-fable-5-1",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.88,
+     "reasoning": "model-config.md has these verbatim: the best and fable alias text; the v2.1.257 row ('fable resolves to Fable 5.1, except in Claude apps gateway sessions'); Fable 5.1 effort low..max; and 'Depending on your plan and seat tier, Fable usage can bill to usage credits instead of drawing on your plan's included limits', with a consent prompt. The overview has the guidance quote verbatim, plus $10/$50, cache reads at 2.5%, default effort high, 1M / 128K and retirement 'Not sooner than September 1, 2027'. The 2026-09-01 release-note launch text is verbatim. The v2.1.301 body fixes the fable/best alias, which now 'retries once on the previous Fable model'. The claude-api skill's installed models.md:60 and marketplace :76 ($10/$50, cache $0.25) match, as does stack.json:2190-2197. The AA figures are flagged unopened leads and were not relied on.",
+     "refs": [
+      "https://code.claude.com/docs/en/model-config.md",
+      "https://platform.claude.com/docs/en/about-claude/models/overview.md",
+      "https://platform.claude.com/docs/en/release-notes/overview.md",
+      "https://api.github.com/repos/anthropics/claude-code/releases?per_page=8"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://code.claude.com/docs/en/model-config#claude-code-claude-fable-5-1",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.6,
+      "reasoning": "Holds. stack.json:2190-2197 records claude-fable-5-1 in_use for 'frontier main and advisor', yet no carried route exists, so the family (a) catalog is incomplete without it. Verified 2026-10-15 in model-config: best 'Uses the model the fable alias resolves to where Fable is available to you'; 'v2.1.257 fable resolves to Fable 5.1'; effort low..max; 'Depending on your plan and seat tier, Fable usage can bill to usage credits instead of drawing on your plan's included limits'. Release notes 2026-09-01: launch at $10/$50 per MTok, 1M context, 128k output, always-on adaptive thinking. Overview: use Fable 'when your evals on Claude Opus 5.5 at higher effort still fall short'. The Claude Code v2.1.301 release body (verified) fixed the fable/best alias error with a retry on the previous Fable. The gap is concrete: the plan-class billing is unrecorded and the vendor-named Opus-vs-Fable eval has not run here. The shared family (a) trial is bounded. Caveats: (1) Proposed TRIAL understates the recorded in_use status. (2) Usage-credit spend should be recorded as a need before the trial. (3) The AA figures are unopened leads.",
+      "refs": [
+       "https://code.claude.com/docs/en/model-config.md",
+       "https://platform.claude.com/docs/en/release-notes/overview.md",
+       "https://platform.claude.com/docs/en/about-claude/models/overview.md",
+       "https://api.github.com/repos/anthropics/claude-code/releases/latest",
+       "<repo>/manifests/stack.json:2190-2204"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://github.com/diegosouzapw/omniroute",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.9,
+     "reasoning": "The repository API matches: 76968 stars, pushed_at 2026-10-15T20:06:16Z, archived false, MIT (information only), default_branch release/v3.8.52, created_at 2026-02-13T12:38:31Z (not too new to assess), open_issues_count 424. My releases?per_page=3 read (20:47Z) shows latest v3.8.51, published 2026-09-30T01:41:50Z, target_commitish release/v3.8.52, plus the rolling radar-export-latest; there is no v3.8.52. It is maintained: commits?since=2026-07-17 shows newest ff88d08e at 2026-10-15T20:25:45Z, newer than the proposal's 2b1f2447 (20:00:09Z). The v3.8.51 body is verbatim: #13026 with @openai/codex@0.153.4; #14677 with Sol -low..-ultra, Luna -low..-max and max no longer clamped to xhigh; 'safe Codex model discovery'. #15192 was merged 2026-10-07T18:56:50Z into release/v3.8.52. Its body has the ultra/max/xhigh/high/medium/low variants, the 872k/128k registry, client identity 0.159.2 and the >=0.159.0 claim, and names tests/unit/codex-gpt61-sol.test.ts and executor-codex.test.ts. #15171 was merged 2026-10-09T15:52:31Z; #15167 has merged_at null. #16027 was closed 2026-10-10T11:31:33Z as not_planned, with the owner's comment. #16038 is open and unmerged. c1e30b76 was authored 2026-09-29T22:58:13Z. stack.json:1905-1941 matches.",
+     "refs": [
+      "https://api.github.com/repos/diegosouzapw/OmniRoute",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/releases?per_page=3",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/commits?since=2026-07-17T00:00:00Z&per_page=1",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15192",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15171",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15167",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/issues/16027",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/issues/16027/comments",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/16038",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/commits/c1e30b7676975feb298b49eff6ff58923c04b89e"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://github.com/diegosouzapw/omniroute",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.6,
+      "reasoning": "Holds. Maintenance verified. commits?since=2026-07-17 newest is ff88d08e at 2026-10-15T20:25:45Z. The repository is archived false, default_branch release/v3.8.52, MIT, created 2026-02-13 (not too new). releases?per_page=3 shows the v3.8.51 release (assets created 2026-09-30T01:41:52Z) and the rolling radar-export-latest, with no v3.8.52. The running 20128 build carries PR #15167 (merged_at null, verified), while upstream merged its own GPT-6.1 Sol path in #15192 (merged_at 2026-10-07T18:56:50Z, verified). That is a non-upstream delta on the gateway the requirement names for family (b). stack.json:1940 records that gpt-6.1-sol is absent from the v3.8.51 tag alias sets; the v3.8.51 release body was not re-read here. The selection rule allows pinning a branch commit when the needed fix exists only on the branch, and the model-free-first plan using upstream tests is bounded. Caveats: (1) The same build also carries #13788 and a local affinity patch (stack.json:1940-1941); the re-pin plan must decide each one, not only #15167. (2) #16038 is open and unmerged (state open, base release/v3.8.52, verified), so the plan's avoidance of the -ultra suffix is required. (3) An unreleased branch with 424 open issues is supply-chain risk to record. The #15171 merge was not re-fetched.",
+      "refs": [
+       "https://api.github.com/repos/diegosouzapw/OmniRoute",
+       "https://api.github.com/repos/diegosouzapw/OmniRoute/commits?since=2026-07-17T00:00:00Z&per_page=1",
+       "https://api.github.com/repos/diegosouzapw/OmniRoute/releases?per_page=3",
+       "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15167",
+       "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15192",
+       "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/16038",
+       "<repo>/manifests/stack.json:1905-1941"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://platform.claude.com/docs/en/about-claude/models/overview#anthropic-api-claude-opus-5-5",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.85,
+     "reasoning": "The overview confirms: $4/$20; 'Batch API requests are 50% off'; cache reads at 5% on Claude Opus 5.5; default effort medium; Adaptive (always on); 1M / 128K; and Message Batches up to 300k output tokens with the output-300k-2026-03-24 beta header. The release notes confirm the 2026-10-15 exit of fast mode from research preview for Opus 5.5 and 'a default fast mode rate limit in every usage tier'. They also confirm the 2026-09-24 note that disabling thinking and tool_choice any/tool return 400, and the 2026-09-22 launch. The claude-api skill's installed models.md:64 and live-sources.md:18-22 (Models Overview and Pricing URLs) match. The API-credits-for-subscribers lead is flagged UNVERIFIED and was not relied on.",
+     "refs": [
+      "https://platform.claude.com/docs/en/about-claude/models/overview.md",
+      "https://platform.claude.com/docs/en/release-notes/overview.md"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://platform.claude.com/docs/en/about-claude/models/overview#anthropic-api-claude-opus-5-5",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.55,
+      "reasoning": "Holds, narrowly. The requirement's family (a) is 'the Anthropic API', and every carried Anthropic row is a Claude Code subscription route, so a dated API route record fills a requirement field. The credential class exists (adoption/credential-inventory.json:234-459, anthropic-api through anthropic-api-10). The probe-only scope matches the repository rule that a bare API call is a measurement probe. Verified 2026-10-15: the overview says 'Batch API requests are 50% off; prompt cache reads cost ... 5% on Claude Opus 5.5', and Message Batches support 300k output with the output-300k-2026-03-24 beta header. Release notes 2026-10-15: fast mode is out of research preview for Opus 5.5, and 'Claude Opus 5.5 now has a default fast mode rate limit in every usage tier'. The API-credits page opens with 'Claude Max and Team plans include monthly credits for the Claude API'; the amounts and the Claude Code exclusion were not extracted (UNVERIFIED). Weakness: its comparison is a usage condition, not paired arms.",
+      "refs": [
+       "https://platform.claude.com/docs/en/about-claude/models/overview.md",
+       "https://platform.claude.com/docs/en/release-notes/overview.md",
+       "https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers.md",
+       "<repo>/adoption/credential-inventory.json:234-459",
+       "<work-dir>/inputs/model-routes.json:5"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://dev.meta.ai/docs/models#muse-code-spark-subscription",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.88,
+     "reasoning": "The models page reads 'Muse Spark 1.3 (muse-spark-1.3) | Standard mode | Pay-as-you-go and every plan'. It says max is supported but not on the -contributor variant, and describes 'Muse Spark: high-volume, latency-sensitive, or cost-sensitive work, such as sub-agent tasks'. The subscriptions page describes Everyday Usage as 'Access to Muse Spark, Muse Wonder and Muse Image' and '10-50 prompts every 5 hours'. The pricing page gives the API reference rates: $0.15 cached / $1.25 input / $4.25 output. Fence decision :16-21 says the wrapper compares the whole native argv (roles, model, reasoning, workspace, contributor mode, disabled web tools) against the accepted contract, so a model change needs a reviewed contract change, as the proposal states.",
+     "refs": [
+      "https://dev.meta.ai/docs/models",
+      "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "https://dev.meta.ai/docs/pricing-rate-limits"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://dev.meta.ai/docs/models#muse-code-spark-subscription",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.6,
+      "reasoning": "Refuted. No family (c) fan-out workload exists. Muse use here is exactly one reserved reader smoke (fence decision :123-129, :153-155), so the claimed gap, a cheaper fan-out tier for family (c), is hypothetical. The proposal offers no published or measured Spark 1.3 quality on this workload. Its only stated advantage is over harness-spark-api, itself without a gap, not over the fan-out tiers already in use (Sonnet 5.5 in the non-gate agent definitions, docs/decisions/2026-10-12-model-effort-routing.md:21-25). With NOT_ADOPTED status and no incumbent, keep_but_compare, which 'keeps its incumbent while the comparison the row names is still owed' (scripts/new_host_grand_list.py:603), does not fit. Facts verified for the record: Spark is on every plan (Everyday Usage includes Muse Spark); muse-spark-1.3 max effort is not available on -contributor; API-equivalent price is $1.25/$4.25/$0.15 per 1M. Correct label: not_adopted, reopened when a family (c) fan-out workload is recorded.",
+      "refs": [
+       "<repo>/docs/decisions/2026-10-14-muse-file-fence.md:123-129,153-155",
+       "<repo>/docs/decisions/2026-10-12-model-effort-routing.md:21-25",
+       "<repo>/scripts/new_host_grand_list.py:603",
+       "https://dev.meta.ai/docs/models",
+       "https://dev.meta.ai/docs/muse-code/subscriptions",
+       "https://dev.meta.ai/docs/pricing-rate-limits"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "https://developers.openai.com/codex/models#codex-omniroute-gpt-6-1-sol",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.85,
+     "reasoning": "stack.json:1940-1941 matches the proposal. The 20128 build cf6748d04 carries #13788, the local affinity patch and #15167. The units announce CODEX_CLIENT_VERSION 0.159.1, so the live catalog lists gpt-6.1-sol. The gateway is adopted for pooled GPT-6 access by gateway-routed Codex lanes, native Codex stays the max-quality default, and 'its deployed max support belongs to the #15167 delta'. #15167 has merged_at null, and its body reads verbatim 'Public API limits stay 1,050,000 context / 128,000 output. Codex's live maximum context (872,000) is kept separate. max is preserved through translation'. #15192 and #15171 were merged into release/v3.8.52 on 2026-10-07 and 2026-10-09. codex/models says 'Reasoning effort ranges from Light to Ultra. Max and Ultra depend on your settings'. The angle-record entitlement note (pool/gateway configuration not certified, read 2026-10-12) matches. Pooled-plan limits are correctly flagged UNVERIFIED.",
+     "refs": [
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15167",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15192",
+      "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15171",
+      "https://developers.openai.com/codex/models"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ],
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "https://developers.openai.com/codex/models#codex-omniroute-gpt-6-1-sol",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.55,
+      "reasoning": "Holds, modestly. The requirement defines family (b) as 'OpenAI through OmniRoute (the Codex models page; OmniRoute's own model listing and release notes at its running pin)'. The carried codex-gpt-* rows are native sign-in routes, so this is the only proposal that records the route the requirement names. stack.json:1941 shows it in use ('The gateway is adopted for pooled GPT-6 access by gateway-routed Codex lanes'). keep_but_compare, meaning keep that in-use route while the native-vs-gateway comparison is owed, matches the label's meaning (scripts/new_host_grand_list.py:603). Caveats for the record: (1) Entitlement for pooled accounts behind a gateway is pending; the OpenAI Terms page returned 403 here, and the carried Codex routes also carry 'pending'. (2) The gpt-6.1-sol listing depends on the units announcing CODEX_CLIENT_VERSION 0.159.1 while stack.json:1941 records installed Codex 0.157.1, and PR #15192's body (verified) describes a backend gate below 0.159.0. (3) Max effort comes from unmerged #15167 (merged_at null, verified); the OmniRoute re-pin trial resolves this, and this comparison is sequenced after it. Retention should stay conditional on documented entitlement and wire-level parity.",
+      "refs": [
+       "<work-dir>/inputs/model-routes.json:5",
+       "<repo>/manifests/stack.json:1940-1941",
+       "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15167",
+       "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15192",
+       "https://developers.openai.com/codex/models",
+       "<repo>/scripts/new_host_grand_list.py:603"
+      ],
+      "skills_used": [
+       "fp-check",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "missing": true,
+      "skills_used": []
+     },
+     "notes": [
+      "GPT-6 fit vote missing (counted as refuted)"
+     ]
+    }
+   }
+  ]
+ },
+ "raw": {
+  "model-routes": {
+   "first": {
+    "claude_discover": {
+     "layer_id": "model-routes",
+     "proposed": [
+      {
+       "repository": "https://dev.meta.ai/docs/muse-code#muse-code-wonder-full",
+       "proposed_label": "targeted_candidate",
+       "demonstrated_gap": "Route: Muse Code CLI (installed muse-bin-1.4.7-R6101.1, run only inside tools/muse_file_fence.py per docs/decisions/2026-10-14-muse-file-fence.md:18-19) + Meta Muse Code subscription credential (Power Usage or Maximum Usage plan) + Meta-hosted endpoint; model id muse-wonder-full-1.0. Read 2026-10-15T20:09Z: Muse Wonder Full is Meta's higher-capability variant, 'available only in Muse Code with a subscription'. It is not on Model API, and setting effort max on muse-wonder-1.0 does not select it. Muse Wonder is marked Preview. Effort/tier: max per the carried role. The Muse Wonder ladder is minimal..max; Full's own ladder is not documented separately (UNVERIFIED, cheapest check: muse --help at the pin). Standard mode requires Contributor mode off, because subscriptions default to Contributor mode; the fence makes --contributor-mode off and --disable-web-tools mandatory (fence decision :93-94). Limits: Power Usage = 20x Everyday Usage, Maximum Usage = 80x, Everyday = 10-50 prompts every 5 hours; at the limit, upgrade or wait for the refresh. Plan class: flat monthly subscription. Plan prices are not on the pages read (search leads say $50 Power / $200 Maximum, not opened, UNVERIFIED). Adoption today: TRIAL (carried). One fenced reader smoke ran 2026-10-14 22:57:44Z-22:57:58Z: exit 0, 39 events, model muse-wonder-full-1.0 (fence decision :123-129). Gap: this is the only Full-variant route in family (c) and has no comparative A6. A bounded trial is feasible on the WSL host through the landed fence, but the fence decision accepts exactly one reader smoke, so a separate CC route-reservation decision is a prerequisite (fence decision :153-155). Client drift: a 1.4.8 changelog entry exists (search result, not opened); the fence pins the exact 1.4.7 ELF, so moving to 1.4.8 needs fence re-qualification.",
+       "comparison_that_would_overturn": "After a CC route reservation: one preregistered reader-role task set through tools/muse_file_fence.py. Arms run in the same window on identical prompts (skill-creator paired design): muse-wonder-full-1.0 at max vs claude-code-claude-opus-5-5 (max) and codex-gpt-6-1-sol (max). Metrics: named-assertion pass rate, wall time, tokens or plan-usage draw, mean +/- stddev over >=3 runs. Drop to keep_but_compare if Full's pass-rate delta is within run-to-run stddev of the best other route, or if any fence probe fails.",
+       "evidence": [
+        "https://dev.meta.ai/docs/models (read 2026-10-15T20:09Z): 'Muse Wonder Full, the higher-capability variant, is available only in Muse Code with a subscription, so setting reasoning effort to max on Muse Wonder doesn't select it'; availability table Full = Power Usage and Maximum Usage; Muse Wonder 1,048,576-token context, effort minimal..max; 'Muse Wonder is in preview'",
+        "https://dev.meta.ai/docs/muse-code/subscriptions (read 2026-10-15T20:09Z): Power Usage 'Access to the most powerful Muse models, including Muse Wonder Full', '20x more usage than the Everyday Usage plan'; Maximum Usage '80x'; Everyday '10-50 prompts every 5 hours'; 'Muse Code subscriptions default to Contributor mode'",
+        "<repo>/docs/decisions/2026-10-14-muse-file-fence.md:18-19,93-94,123-129,153-155 (8053f14e7): exact muse-bin-1.4.7-R6101.1 ELF; mandatory --disable-web-tools and --contributor-mode off; one reader smoke exit 0, 39 events, muse-wonder-full-1.0; accepted scope is exactly one reader-role smoke, route reservation is a separate decision",
+        "catalogs/landscape/angles/foundation-model-routes.json (sha256 f71c92983ce1a7ebcf47574793509213c465fc719f194e5fcdc3fae915a1506e): A1 '+' from Muse Code 1.4.6-R6000.1 observation (superseded by the 1.4.7 fence pin); A5 'U', Artificial Analysis 'Muse Wonder (Max)' 52 not transferable to Full",
+        "Lead, search result not opened: artificialanalysis.ai/articles/muse-wonder and the AA leaderboard list 'Muse Wonder Full (Max)' at 56; research.meta.ai/static/muse-wonder-model-card gives release date 2026-10-12; about.fb.com/news/2026/10/introducing-muse-wonder-models/ (URL path 2026/10). Cheapest check: open the model card",
+        "Lead, search result not opened: https://dev.meta.ai/docs/muse-code/changelog lists a Muse Code 1.4.8 entry"
+       ],
+       "upstream_now": {
+        "latest_release": "muse-wonder-full-1.0",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record via layer input); re-verified against Meta vendor pages fetched 2026-10-15 and the repository Muse fence decisions."
+      },
+      {
+       "repository": "https://dev.meta.ai/docs/models#muse-code-wonder-api",
+       "proposed_label": "keep_but_compare",
+       "demonstrated_gap": "Route: Muse Code CLI (1.4.7-R6101.1 fence pin) + Meta Model API pay-as-you-go key (a credential separate from the subscription key) + Model API endpoint; model muse-wonder-1.0, Standard mode only (pay-as-you-go has no Contributor mode for Wonder). Read 2026-10-15: effort minimal..max, and max does not select Full. Limits: 3,000 RPM and 4,000,000 TPM per team (shared by every key in the team); 1,048,576-token context; background responses capped at 600 submissions/min/team. Pricing: $4.00 input, $20.00 output, $0.20 cached input per 1M tokens; no long-context premium; web search $2.50 per 1,000 queries. Adoption today: NOT_ADOPTED. No gap is demonstrated: in the same harness, Meta positions Full as the higher-capability variant, and this arm needs a new paid credential (the selection principle allows that only for a demonstrated gap). Its only value is isolating the Full-vs-standard variant effect at a fixed harness.",
+       "comparison_that_would_overturn": "Only if a decision needs the variant effect: the same fenced Muse Code task set, muse-wonder-1.0 (max, API key) vs muse-wonder-full-1.0 (max, subscription), paired arms, pass rate/time/tokens over >=3 runs. Adopt only if standard matches Full within stddev at lower total cost than the subscription.",
+       "evidence": [
+        "https://dev.meta.ai/docs/models (read 2026-10-15T20:09Z): 'Muse Wonder (muse-wonder-1.0) | Available (Standard mode only) | Pay-as-you-go and every plan'; 'For Muse Wonder, Contributor mode isn't available on pay-as-you-go'",
+        "https://dev.meta.ai/docs/pricing-rate-limits (read 2026-10-15T20:17Z): muse-wonder-1.0 Standard $0.20 cached / $4.00 input / $20.00 output per 1M, Contributor 'Not available'; rate limits muse-wonder-1.0 3,000 RPM, 4,000,000 TPM, per team not per key; background responses 600 submissions/min/team",
+        "https://dev.meta.ai/docs/muse-code/subscriptions (read 2026-10-15T20:09Z): 'Any additional API keys you create under your Meta Model API account will be billed through pay-as-you-go'",
+        "Angle record entitlement 'pending': a separately entitled pay-as-you-go API route is required (terms read 2026-10-12T21:53:40Z, not re-fetched)"
+       ],
+       "upstream_now": {
+        "latest_release": "muse-wonder-1.0",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record); pricing and limits re-read from dev.meta.ai on 2026-10-15."
+      },
+      {
+       "repository": "https://dev.meta.ai/docs/models#codex-wonder-api",
+       "proposed_label": "keep_but_compare",
+       "demonstrated_gap": "Route: Codex CLI (upstream openai/codex rust-v0.162.1, 2026-10-09T19:44:51Z; repository pin 0.160.0 at manifests/stack.json:300, a repository record) + Meta Responses API with a pay-as-you-go key + muse-wonder-1.0 (Standard only). Pricing and limits match muse-code-wonder-api: $4/$20/$0.20 cached per 1M; 3,000 RPM / 4M TPM per team. Effort minimal..max via the Responses reasoning parameter, per Meta's coding-agents integration read 2026-10-12 in the angle record (not re-read). Adoption today: NOT_ADOPTED. No gap is demonstrated: the route would isolate the harness effect (Codex vs Muse Code) on a fixed Meta model, and it needs a new paid credential. The client is maintained: default-branch commit 2026-10-15T19:54:27Z, not archived.",
+       "comparison_that_would_overturn": "Harness-isolation run: identical tasks on muse-wonder-1.0 through Codex vs Muse Code vs OpenCode, paired arms, pass rate/time/tokens over >=3 runs. Promote only if Codex beats Muse Code on the same model beyond run-to-run stddev and the API spend has a recorded need.",
+       "evidence": [
+        "https://api.github.com/repos/openai/codex (read 2026-10-15T20:11Z): 129385 stars, pushed_at 2026-10-15T20:00:32Z, archived false, Apache-2.0; releases/latest rust-v0.162.1 published 2026-10-09T19:44:51Z; commits?since=2026-07-17 newest 97ebf2d9 2026-10-15T19:54:27Z",
+        "https://dev.meta.ai/docs/pricing-rate-limits (read 2026-10-15T20:17Z): muse-wonder-1.0 $4.00/$20.00/$0.20 per 1M; 3,000 RPM, 4,000,000 TPM",
+        "https://dev.meta.ai/docs/models (read 2026-10-15T20:09Z): 'Muse Wonder and Muse Spark take the same requests on the same endpoints'; muse-wonder-1.0 Model API Standard mode only",
+        "Angle record A1 note: Codex with Meta Responses API via dev.meta.ai/docs/coding-agents (read 2026-10-12T21:53:40Z)"
+       ],
+       "upstream_now": {
+        "latest_release": "muse-wonder-1.0",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record); client facts from GitHub REST 2026-10-15."
+      },
+      {
+       "repository": "https://dev.meta.ai/docs/models#opencode-wonder-api",
+       "proposed_label": "keep_but_compare",
+       "demonstrated_gap": "Route: OpenCode + Meta's vendor-recommended OpenAI adapter with reasoning replay (angle record) + pay-as-you-go key + muse-wonder-1.0 (Standard only). Client health: the canonical repository moved from sst/opencode to anomalyco/opencode (the API returns full_name anomalyco/opencode). Latest release v1.19.1 published 2026-10-15T19:19:45Z; default branch dev has a commit at 2026-10-15T20:18:38Z; MIT; not archived. Pricing and limits as for the other Wonder API arms ($4/$20/$0.20 per 1M; 3,000 RPM / 4M TPM per team). Adoption today: NOT_ADOPTED. No gap is demonstrated, and it needs a new paid credential. It is a harness-isolation arm only.",
+       "comparison_that_would_overturn": "The same harness-isolation run as codex-wonder-api (fixed muse-wonder-1.0, OpenCode vs Muse Code vs Codex), with a wire check that reasoning replay preserves effort. Promote only on a pass-rate win beyond stddev.",
+       "evidence": [
+        "https://api.github.com/repos/sst/opencode (read 2026-10-15T20:15Z): full_name anomalyco/opencode, 213875 stars, pushed_at 2026-10-15T20:13:56Z, archived false, MIT, default_branch dev",
+        "https://api.github.com/repos/anomalyco/opencode/releases/latest (read 2026-10-15T20:21Z): v1.19.1 published 2026-10-15T19:19:45Z; commits?since=2026-07-17 newest fe87944b 2026-10-15T20:18:38Z",
+        "https://dev.meta.ai/docs/pricing-rate-limits (read 2026-10-15T20:17Z): muse-wonder-1.0 pricing and per-team limits",
+        "Angle record A1: OpenCode with the vendor-recommended OpenAI adapter and reasoning replay (dev.meta.ai/docs/coding-agents read 2026-10-12T21:53:40Z, not re-read)"
+       ],
+       "upstream_now": {
+        "latest_release": "muse-wonder-1.0",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record); rename detected through GitHub REST 2026-10-15."
+      },
+      {
+       "repository": "https://dev.meta.ai/docs/models#claude-code-wonder-api",
+       "proposed_label": "keep_but_compare",
+       "demonstrated_gap": "Route: Claude Code (upstream v2.1.301, 2026-10-15T19:22:06Z; repository pin 2.1.295 at manifests/stack.json:194, a repository record) + Meta Messages API integration (ANTHROPIC_BASE_URL plus a model override) + pay-as-you-go key + muse-wonder-1.0. Read 2026-10-15 in Claude Code docs: 'ANTHROPIC_BASE_URL changes where requests are sent, not which model answers them'. The effort table lists only Claude models, and 'Models not listed here do not support effort', so a max-effort control for muse-wonder-1.0 through Claude Code is UNVERIFIED (cheapest check: Meta coding-agents doc plus a model-free request capture). Pricing and limits are as for the other Wonder API arms. Adoption today: NOT_ADOPTED. No gap is demonstrated, it needs a new paid credential, and the effort control is doubtful.",
+       "comparison_that_would_overturn": "A model-free capture first, showing whether Claude Code sends any effort/reasoning field to Meta for a non-Claude model. If it does, run it in the harness-isolation run above. Otherwise reject for max-effort use.",
+       "evidence": [
+        "https://code.claude.com/docs/en/model-config.md (read 2026-10-15T20:09Z): 'ANTHROPIC_BASE_URL changes where requests are sent, not which model answers them'; 'The available effort levels depend on the model. Models not listed here do not support effort'",
+        "https://api.github.com/repos/anthropics/claude-code (read 2026-10-15T20:11Z): 151050 stars, pushed_at 2026-10-15T19:22:05Z, archived false, license null in API; releases/latest v2.1.301 published 2026-10-15T19:22:06Z",
+        "https://dev.meta.ai/docs/pricing-rate-limits (read 2026-10-15T20:17Z): muse-wonder-1.0 $4.00/$20.00/$0.20 per 1M; 3,000 RPM, 4M TPM",
+        "Angle record A1: Claude Code with the vendor Messages API integration (dev.meta.ai/docs/coding-agents read 2026-10-12T21:53:40Z, not re-read)"
+       ],
+       "upstream_now": {
+        "latest_release": "muse-wonder-1.0",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record); Claude Code mechanism re-read 2026-10-15."
+      },
+      {
+       "repository": "https://dev.meta.ai/docs/models#harness-spark-api",
+       "proposed_label": "keep_but_compare",
+       "demonstrated_gap": "Route: a converged harness + Meta Model API pay-as-you-go key + muse-spark-1.3 (Standard). Read 2026-10-15: muse-spark-1.3 is 'the latest version, tuned for agentic workflows' and 'Recommended for new work'. It supports all effort levels including max, which is unavailable on muse-spark-1.3-contributor. Context 1,048,576 tokens. Pricing per 1M: Standard $1.25 input / $4.25 output / $0.15 cached; the Contributor variant ($0.10 / $0.20 / $0.002) trains Meta models. Limits: 3,000 RPM / 4M TPM per team (contributor 150 RPM / 3M TPM). Adoption today: NOT_ADOPTED. Gap: none for an API key. It needs a new paid credential, and Meta lists muse-spark-1.3 in Muse Code on every subscription plan, so the same model is reachable inside the existing entitled harness (new route muse-code-spark-subscription) without a new key.",
+       "comparison_that_would_overturn": "Reopen only if a non-Muse-Code harness is required for Spark and wins a paired fan-out task set against the subscription route beyond stddev.",
+       "evidence": [
+        "https://dev.meta.ai/docs/models (read 2026-10-15T20:09Z): muse-spark-1.3 'Supports all reasoning effort levels, including the max level for extended reasoning (not available with muse-spark-1.3-contributor). Recommended for new work.'; availability 'Muse Spark 1.3 | Standard mode | Pay-as-you-go and every plan'",
+        "https://dev.meta.ai/docs/pricing-rate-limits (read 2026-10-15T20:17Z): Muse Spark Standard $0.15/$1.25/$4.25, Contributor $0.002/$0.10/$0.20 per 1M; muse-spark-1.3 3,000 RPM 4M TPM; contributor 150 RPM 3M TPM",
+        "Angle record A1: 'Use Standard muse-spark-1.3; the contributor variant does not support max effort'"
+       ],
+       "upstream_now": {
+        "latest_release": "muse-spark-1.3",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record); re-read 2026-10-15."
+      },
+      {
+       "repository": "https://dev.meta.ai/docs/models#muse-subscription-foreign-harness",
+       "proposed_label": "not_adopted",
+       "demonstrated_gap": "Decisive reason: Meta's subscriptions page (read 2026-10-15T20:09Z) says the subscription 'applies to the Muse Code API key that is automatically connected in the Muse Code CLI onboarding process. This credential is for use with Muse Code only'. It also says a subscription 'works only through the Muse Code CLI while signed in with your Meta Model API account'. The angle record's Model API Terms section 3.2 read (2026-10-12T21:53:40Z) corroborates this. Meta may revoke a subscription for a policy violation. Using the subscription credential in another harness is outside the documented entitlement. Adoption today: NOT_ADOPTED; the operator's neutral trial permission does not create entitlement.",
+       "comparison_that_would_overturn": "Only a vendor-published change that allows the subscription credential outside Muse Code (subscriptions page or terms). An independently entitled pay-as-you-go key turns this into one of the *-wonder-api routes instead.",
+       "evidence": [
+        "https://dev.meta.ai/docs/muse-code/subscriptions (read 2026-10-15T20:09Z): 'This credential is for use with Muse Code only'; 'Subscription: a flat monthly rate ... It works only through the Muse Code CLI while signed in with your Meta Model API account'; revocation for 'Policy violation'",
+        "Angle record (sha256 f71c9298...): A1 '-', terms section 3.2 prohibits use of the coding-harness subscription credential outside its harness; verdict REJECTED, disqualifier missing_capability"
+       ],
+       "upstream_now": {
+        "latest_release": null,
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record); decisive text re-read 2026-10-15."
+      },
+      {
+       "repository": "https://developers.openai.com/codex/models#codex-gpt-6-1-sol",
+       "proposed_label": "targeted_candidate",
+       "demonstrated_gap": "Route: Codex CLI (upstream rust-v0.162.1, 2026-10-09; repository pin 0.160.0 at manifests/stack.json:300, a repository record) + ChatGPT subscription sign-in + chatgpt.com Codex Responses backend; model gpt-6.1-sol. Read 2026-10-15T20:09Z: recommended 'for complex coding and agentic workflows', with 'Near-Astra performance for complex work at a lower cost than Astra'. Rollout covers Plus, Pro, Business, Enterprise and Edu (Enterprise/Edu off until an admin enables it; Free/Go excluded). 'Reasoning effort ranges from Light to Ultra. Max and Ultra depend on your settings'. Standard and Fast where supported; Ultrafast on Pro $500 and eligible Enterprise/Edu. Pricing page (2026-10-15T20:17Z): the Plus $20/month card lists 'GPT-6.1 Sol and GPT-6 Luna'. Fast uses 2.5x included usage (2x credits); GPT-6.1 Sol Ultrafast uses 8x (6x credits). Numeric usage limits were not extracted (UNVERIFIED; cheapest check: usage-limits table on codex/pricing.md or the usage dashboard). Upstream: openai/codex b1e72963 (2026-09-29T17:12:00Z) added gpt-6.1-sol as the default catalog model, and rust-v0.161.0 (2026-10-07) made it the default in the bundled and Bedrock catalogs. The 872k Codex / 1.05M API context figures appear only in OmniRoute PR #15192, a third-party source (UNVERIFIED; check codex-rs/models-manager/models.json at rust-v0.162.1). Client gate: OmniRoute PR #15192 claims, by reverse engineering and not from OpenAI documentation, that the backend rejects Codex clients below 0.159.0 for gpt-6.1-sol on ChatGPT accounts. Repository records disagree on the installed Codex (stack.json:300 says 0.160.0, stack.json:1941 says installed 0.157.1); cheapest check: codex --version. Adoption today: CURRENT (carried), but that status rests on incumbency because no A6 is retained. This route is the subject of the single family (b) paired trial, with codex-gpt-6-astra as the anchor arm; the trial is feasible natively on the WSL host.",
+       "comparison_that_would_overturn": "One preregistered family (b) paired trial: Codex at one pinned client (>=0.159.0, preferably rust-v0.162.1), identical task set, arms gpt-6.1-sol (max) vs gpt-6-astra (max, ultra where enabled), launched concurrently. Metrics: named-assertion pass rate, wall time, tokens, included-usage draw; >=3 runs, mean +/- stddev. 6.1 Sol keeps CURRENT for complex work if its pass rate is within stddev of Astra at lower usage draw. Otherwise Astra keeps consequential judgment and 6.1 Sol moves to fan-out.",
+       "evidence": [
+        "https://developers.openai.com/codex/models (read 2026-10-15T20:09Z): GPT-6.1 Sol rollout plans; 'Reasoning effort ranges from Light to Ultra. Max and Ultra depend on your settings'; Ultrafast on Pro $500 and eligible Enterprise/Edu; 'GPT-5.6 Sol, GPT-5.6 Terra, and GPT-5.6 Luna remain available during the rollout'",
+        "https://developers.openai.com/codex/pricing.md (read 2026-10-15T20:17Z): Plus $20/month 'GPT-6.1 Sol and GPT-6 Luna'; speed table Fast 2.5x/2x, GPT-6.1 Sol Ultrafast 8x/6x; 'ChatGPT Work and Codex share usage'; preview 'GPT-5.5 retires from Codex with ChatGPT sign-in on Oc...'",
+        "https://api.github.com/repos/openai/codex/commits/b1e72963c3b71a9265a551e54beff078384efed9 (read 2026-10-15T20:15Z): 'Add GPT-6.1 Sol as the default catalog model (#49318)', authored 2026-09-29T17:12:00Z; TUI snapshot 'GPT-6-Astra default' -> 'GPT-6.1-Sol default'",
+        "https://api.github.com/repos/openai/codex/releases/tags/rust-v0.161.0 (published 2026-10-07T15:58:45Z): 'GPT-6.1 Sol is now the default model in the bundled and Amazon Bedrock catalogs. (#49318, #49339)'",
+        "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15192 (read 2026-10-15T20:15Z): third-party claim that the backend rejects clients < 0.159.0 for gpt-6.1-sol; registry 872k context / 128k output",
+        "Repository records <repo>/manifests/stack.json:300 (codex 0.160.0), :1941 (installed Codex 0.157.1), :2206-2213 (gpt-6.1-sol in_use, 2026-09-29)",
+        "Angle record A5: Terminal-Bench Codex/GPT-6.1 Sol max 58.18%, submitted 2026-09-29 (tbench.ai read 2026-10-12T21:44:03Z). Lead, search result not opened: AA Terminal-Bench 4.0 comparison GPT-6.1 Sol max 56.1% vs Fable 5.1 max 52.0%"
+       ],
+       "upstream_now": {
+        "latest_release": "gpt-6.1-sol",
+        "released_at": "2026-09-29",
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record); re-verified against developers.openai.com pages and openai/codex GitHub REST on 2026-10-15."
+      },
+      {
+       "repository": "https://developers.openai.com/codex/models#codex-gpt-6-astra",
+       "proposed_label": "targeted_candidate",
+       "demonstrated_gap": "Route: Codex CLI + ChatGPT subscription sign-in + Codex backend; model gpt-6-astra. Read 2026-10-15: 'Our most capable model for complex work across code, apps, and research, combining advanced reasoning, computer use, and stronger judgment'. Surfaces include Codex CLI and API Access. Effort: start at Light (config value low) and raise it. OmniRoute v3.8.51 notes list Astra effort aliases -low through -ultra (third-party). Tier: Ultrafast uses 8x included usage (6x credits); upstream describes the Fast tier as '2x speed with increased usage' (openai/codex 0e0f55fc, 2026-09-03). Plan class: the Plus card lists only GPT-6.1 Sol and GPT-6 Luna, so Astra on Plus is not shown; the Pro card was not extracted (UNVERIFIED, cheapest check: codex/pricing.md Pro card). Upstream catalog entry: openai/codex ed391d4d 'Add GPT-6-Astra to the bundled model catalog', 2026-09-03T19:47:07Z. The Codex default moved from GPT-6-Astra to GPT-6.1-Sol on 2026-09-29 (b1e72963). Adoption today: CURRENT (carried; repository role 'frontier consequential judgment' at stack.json:2222-2229, a repository record). Gap: the vendor claims 6.1 Sol gives near-Astra results at lower cost, which is untested here. Astra is the anchor arm of the single family (b) paired trial defined under codex-gpt-6-1-sol, not a separate trial.",
+       "comparison_that_would_overturn": "The same family (b) paired trial as codex-gpt-6-1-sol (identical tasks, concurrent arms, >=3 runs). Astra keeps consequential judgment if its pass rate exceeds 6.1 Sol's beyond run-to-run stddev. If not, 6.1 Sol replaces it at lower usage draw.",
+       "evidence": [
+        "https://developers.openai.com/codex/models (read 2026-10-15T20:09Z): Astra card 'Our most capable model...', 'codex -m gpt-6-astra'; 'Start with ... Light for Astra. In configuration, Astra's Light setting is low'",
+        "https://developers.openai.com/codex/pricing.md (read 2026-10-15T20:17Z): GPT-6 Astra Ultrafast 8x included / 6x credits; Plus card lists GPT-6.1 Sol and GPT-6 Luna only",
+        "https://api.github.com/search/commits?q=repo:openai/codex+gpt-6-astra (read 2026-10-15T20:25Z): ed391d4d 'Add GPT-6-Astra to the bundled model catalog (#42607)' 2026-09-03T19:47:07Z; 0e0f55fc 'Update GPT-6-Astra Fast tier speed description' 2026-09-03T23:54:50Z",
+        "https://api.github.com/repos/diegosouzapw/OmniRoute/releases/tags/v3.8.51 (read 2026-10-15T20:11Z): 'Codex and OpenAI catalogs list GPT-6 Astra with effort aliases (-low through -ultra)' (#13026)",
+        "Repository record manifests/stack.json:2222-2229: gpt-6-astra in_use, release basis 2026-09-03",
+        "Angle record A5: Terminal-Bench Codex/GPT-6 Astra max 58.18%, submitted 2026-09-03 (read 2026-10-12)"
+       ],
+       "upstream_now": {
+        "latest_release": "gpt-6-astra",
+        "released_at": "2026-09-03",
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record); re-verified 2026-10-15."
+      },
+      {
+       "repository": "https://developers.openai.com/codex/models#codex-gpt-6-luna",
+       "proposed_label": "keep_but_compare",
+       "demonstrated_gap": "Route: Codex CLI + ChatGPT subscription sign-in + Codex backend; model gpt-6-luna. Read 2026-10-15: 'Our most efficient model for focused, high-volume tasks, including summarization, extraction, and focused coding'; recommended starting effort High. OmniRoute v3.8.51 notes list efforts -low through -max (third-party). Plan class: Free $0 and Go $8 get 'GPT-6 Luna at Standard speed in the desktop app, subject to rollout'; Plus lists it. Upstream: openai/codex 49e95cc7 'Add GPT-6 Sol and Luna to the model catalog', 2026-09-22T18:06:57Z, which also recommends gpt-6-luna in the rate-limit switch prompt. Published: Terminal-Bench max 16.36% (angle record), against 58.18% for Sol and Astra, a large gap that confines it to mechanical fan-out. Adoption today: TRIAL. No gap versus the frontier routes.",
+       "comparison_that_would_overturn": "A mechanical-tier paired check: Luna (high) vs gpt-6.1-sol (low) on a preregistered extraction/summarization set, measuring pass rate and usage draw. Adopt for that tier only if the pass rate is within stddev at lower usage.",
+       "evidence": [
+        "https://developers.openai.com/codex/models (read 2026-10-15T20:09Z): 6 Luna card; 'Start with High for Luna'",
+        "https://developers.openai.com/codex/pricing.md (read 2026-10-15T20:17Z): Free and Go cards 'GPT-6 Luna at Standard speed in the desktop app, subject to rollout'; Plus card includes GPT-6 Luna",
+        "https://api.github.com/search/commits?q=repo:openai/codex+%22GPT-6-Luna%22+catalog (read 2026-10-15T20:27Z): 49e95cc7 'Add GPT-6 Sol and Luna to the model catalog (#47332)', authored 2026-09-22T18:06:57Z",
+        "Angle record A5: Terminal-Bench Codex/GPT-6 Luna max 16.36%, submitted 2026-09-22 (read 2026-10-12)"
+       ],
+       "upstream_now": {
+        "latest_release": "gpt-6-luna",
+        "released_at": "2026-09-22",
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record); released_at is the upstream Codex catalog commit date, not an OpenAI product-release entry."
+      },
+      {
+       "repository": "https://code.claude.com/docs/en/model-config#claude-code-claude-opus-5-5",
+       "proposed_label": "targeted_candidate",
+       "demonstrated_gap": "Route: Claude Code (upstream v2.1.301, 2026-10-15T19:22:06Z; repository pin 2.1.295 at manifests/stack.json:194, a repository record) + claude.ai subscription OAuth (Pro/Max/Team/Enterprise) + first-party Anthropic API endpoint; model claude-opus-5-5. Read 2026-10-15: 'opus' resolves to Opus 5.5 since v2.1.280, and 'default' resolves to Opus 5.5 on Pro, Max, Team, Enterprise and the Anthropic API. Effort low/medium/high/xhigh/max, default medium in Claude Code; max applies to the current session only unless set via CLAUDE_CODE_EFFORT_LEVEL; a top-level user effortLevel does not count for Opus 5.5. Thinking cannot be disabled (release notes 2026-09-24). Limits: 1M context by default, 128K output. Pricing: API $4/$20 per MTok, cache reads 5% of input, batch 50% off. Plan class: subscription default model; plan usage limits not re-read (UNVERIFIED, cheapest check support.claude.com/en/articles/11145838). Fast mode left research preview on the Claude API for Opus 5.5 on 2026-10-15. Claude Code subscription fast-mode billing (usage credits only per a search result, not opened) is UNVERIFIED. Launched 2026-09-22 (release-notes entry). Published: Terminal-Bench max 64.85% (angle record). Adoption today: CURRENT, resting on incumbency because no A6 is retained. Gap: Anthropic's own guidance is to start with Opus 5.5 and use Fable 5.1 'when your evals on Claude Opus 5.5 at higher effort still fall short'. That eval has not been run here. Opus 5.5 is the anchor arm of the single family (a) paired trial defined under claude-code-claude-fable-5-1.",
+       "comparison_that_would_overturn": "Family (a) paired trial: Claude Code 2.1.301, identical preregistered task set, --model opus --effort max vs --model fable --effort max, arms launched concurrently. Metrics: named-assertion pass rate, wall time, tokens, plan-usage and usage-credit draw; >=3 runs, mean +/- stddev. Opus 5.5 stays the default unless Fable's pass-rate gain exceeds stddev at an acceptable usage-credit cost.",
+       "evidence": [
+        "https://code.claude.com/docs/en/model-config.md (read 2026-10-15T20:09Z): alias table 'Anthropic API | Opus 5.5 | Sonnet 5.5 | Haiku 5.5'; 'Pro, Max, Team, Enterprise, and Anthropic API: defaults to Opus 5.5'; effort ladder and Opus 5.5 default medium; version history 'v2.1.280 opus resolves to Opus 5.5'",
+        "https://platform.claude.com/docs/en/about-claude/models/overview.md (read 2026-10-15T20:09Z): '$4 / input MTok, $20 / output MTok'; thinking 'Adaptive (always on)'; default effort medium; 1M context, 128K output; retirement 'Not sooner than September 22, 2027'",
+        "https://platform.claude.com/docs/en/release-notes/overview.md (read 2026-10-15T20:17Z): 2026-09-22 'We've launched Claude Opus 5.5 (claude-opus-5-5)'; 2026-09-24 thinking cannot be disabled, forced tool_choice 400; 2026-10-15 'Fast mode is out of research preview for Claude Opus 5.5'",
+        "claude-api skill, installed plugin anthropics/skills@dbd4588f9e1033efb41dad4bef2f7947c8993d44, ~/.claude/plugins/cache/anthropic-agent-skills/claude-api/dbd4588f9e10/skills/claude-api/shared/models.md:64 (claude-opus-5-5, 1M, 128K, Active); marketplace checkout shared/models.md:79 ($4/$20, cache $0.20, effort default medium)",
+        "https://api.github.com/repos/anthropics/claude-code/releases/latest (read 2026-10-15T20:11Z): v2.1.301 published 2026-10-15T19:22:06Z; repo pushed_at 2026-10-15T19:22:05Z, not archived",
+        "Repository record manifests/stack.json:2158-2165: claude-opus-5-5 in_use 'frontier judgment and subagents'",
+        "Angle record A5: Terminal-Bench Claude Code/Opus 5.5 max 64.85%, submitted 2026-09-22 (read 2026-10-12)"
+       ],
+       "upstream_now": {
+        "latest_release": "claude-opus-5-5",
+        "released_at": "2026-09-22",
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record); re-verified against code.claude.com and platform.claude.com on 2026-10-15."
+      },
+      {
+       "repository": "https://code.claude.com/docs/en/model-config#claude-code-claude-sonnet-5-5",
+       "proposed_label": "keep_but_compare",
+       "demonstrated_gap": "Route: Claude Code + subscription OAuth + first-party Anthropic API; model claude-sonnet-5-5. Read 2026-10-15: 'sonnet' resolves to Sonnet 5.5 since v2.1.284. Effort low..max with a Claude Code default of medium (the API default is high per the overview). Thinking is adaptive; thinking type disabled returns 400 (claude-api skill models.md:85); thinking blocks are account-bound (release notes). Limits: 1M context, 128K output. Pricing: $2/$10 per MTok; cache reads were lowered from $0.20 to $0.10 per MTok on 2026-10-07 (release notes). Released 2026-09-28. Basis: the overview retirement row 'Not sooner than September 28, 2027' (read 2026-10-15) plus repository record stack.json:2176; the release-notes launch entry was not retrieved. Published: Terminal-Bench max 61.82% (angle record). Adoption today: TRIAL in the angle record, while the repository manifest records it in_use for fan-out (stack.json:2174-2181, a repository record); the conflict needs reconciling. No gap versus Opus 5.5 for judgment; it is a credible fan-out tier.",
+       "comparison_that_would_overturn": "A fan-out paired check: Sonnet 5.5 (medium and high) vs Opus 5.5 (medium) on a preregistered non-gate task set. Adopt as the fan-out default only if the pass rate is within stddev at lower usage draw.",
+       "evidence": [
+        "https://code.claude.com/docs/en/model-config.md (read 2026-10-15T20:09Z): 'v2.1.284 sonnet resolves to Sonnet 5.5 on the Anthropic API'; Sonnet 5.5 default effort medium in Claude Code",
+        "https://platform.claude.com/docs/en/about-claude/models/overview.md (read 2026-10-15T20:09Z): '$2 / input MTok, $10 / output MTok'; API default effort high; retirement 'Not sooner than September 28, 2027'",
+        "https://platform.claude.com/docs/en/release-notes/overview.md (read 2026-10-15T20:17Z): 2026-10-07 'lowered the price of prompt cache reads on Claude Sonnet 5.5 from $0.20 USD to $0.10 USD per million tokens'; Sonnet 5.5 thinking blocks are account-bound",
+        "claude-api skill marketplace checkout shared/models.md:85: Sonnet 5.5 $2/$10, effort default high, thinking disabled returns 400",
+        "Repository record manifests/stack.json:2174-2181: claude-sonnet-5-5 in_use 'frontier fan-out'",
+        "Angle record A5: Terminal-Bench Claude Code/Sonnet 5.5 max 61.82%, submitted 2026-09-28 (read 2026-10-12)"
+       ],
+       "upstream_now": {
+        "latest_release": "claude-sonnet-5-5",
+        "released_at": "2026-09-28",
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record); re-verified 2026-10-15."
+      },
+      {
+       "repository": "https://code.claude.com/docs/en/model-config#claude-code-claude-haiku-5-5",
+       "proposed_label": "targeted_candidate",
+       "demonstrated_gap": "Route: Claude Code + subscription OAuth + first-party Anthropic API; model claude-haiku-5-5. Launched 2026-10-07 (release notes), within the last 4 weeks. Claude Code v2.1.293 (2026-10-07T18:10:20Z) says: 'Added Claude Haiku 5.5 ... now the default Haiku model on the Anthropic API - 1M context, $0.10/$0.50 per Mtok ($0.50/$2.50 for prompts over 100K)'. The 'haiku' alias resolves to it since v2.1.293, and background functionality follows ANTHROPIC_DEFAULT_HAIKU_MODEL (model-config). Effort low..max, default medium; 128K output. Code written for Haiku 4.5 can break: budget_tokens, sampling parameters and prefill return 400 (release notes). Adoption today: TRIAL (carried). The repository manifest still keeps claude-haiku-4-5-20251001 in_use for Claude Code background tasks as an owner's dated exception for the latest Haiku line (stack.json:2469-2476, a repository record); Haiku 4.5 is no longer the latest Haiku line. Anthropic's launch post claims about 75% lower cost than Haiku 4.5 (search result, not opened). Gap: an effort-capable replacement for background tasks with no measured check here. The check is bounded and cheap.",
+       "comparison_that_would_overturn": "A background-task paired check in Claude Code 2.1.301: ANTHROPIC_DEFAULT_HAIKU_MODEL=claude-haiku-5-5 vs claude-haiku-4-5-20251001 on preregistered title, summary and safety-check fixtures. Metrics: pass rate, latency, and tokens per task (Haiku 5.5's newer tokenizer counts about 30% more tokens, per claude-api skill models.md:87). Keep 4.5 if 5.5 fails assertions beyond stddev or costs more per task.",
+       "evidence": [
+        "https://platform.claude.com/docs/en/release-notes/overview.md (read 2026-10-15T20:17Z): 2026-10-07 'We've launched Claude Haiku 5.5 (claude-haiku-5-5)... 1M token context window, 128k max output tokens, and adaptive thinking with the effort parameter'; Haiku 4.5 code-breakage list",
+        "https://api.github.com/repos/anthropics/claude-code/releases?per_page=8 (read 2026-10-15T20:25Z): v2.1.293 published 2026-10-07T18:10:20Z, 'Added Claude Haiku 5.5 (claude-haiku-5-5), now the default Haiku model on the Anthropic API - 1M context, $0.10/$0.50 per Mtok ($0.50/$2.50 for prompts over 100K)'",
+        "https://code.claude.com/docs/en/model-config.md (read 2026-10-15T20:09Z): 'v2.1.293 haiku resolves to Haiku 5.5 on the Anthropic API'; ANTHROPIC_DEFAULT_HAIKU_MODEL 'The model to use for haiku, or background functionality'; Haiku 5.5 default effort medium",
+        "https://platform.claude.com/docs/en/about-claude/models/overview.md (read 2026-10-15T20:09Z): 'From $0.10 / input MTok, From $0.50 / output MTok'; retirement 'Not sooner than October 7, 2027'",
+        "Repository record manifests/stack.json:2469-2476: claude-haiku-4-5-20251001 in_use for simple Claude Code background tasks"
+       ],
+       "upstream_now": {
+        "latest_release": "claude-haiku-5-5",
+        "released_at": "2026-10-07",
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record); launch verified in Anthropic release notes and the Claude Code v2.1.293 release on 2026-10-15."
+      },
+      {
+       "repository": "https://developers.openai.com/codex/models#openai-pool-foreign-harness",
+       "proposed_label": "keep_but_compare",
+       "demonstrated_gap": "Route: non-Codex clients (for example Claude Code or OpenCode) -> OmniRoute pooled ChatGPT accounts (a keyless loopback gateway on port 20128 per manifests/stack.json:1941, a repository record) -> Codex backend; model gpt-6.1-sol. Entitlement remains unverified, not refuted. The angle record's vendor gateway read (learn.chatgpt.com sign-in through a gateway, 2026-10-12, not re-fetched) uses the signed-in user's ChatGPT credential plus a separate gateway credential, and the OpenAI Terms of Use restrict credential sharing. Pooled multi-account use is not certified. New today: the OmniRoute v3.8.51 release Codex catalog lists GPT-6 Astra/Sol/Luna but not GPT-6.1 Sol. GPT-6.1 Sol support was merged only into the unreleased release/v3.8.52 branch (#15192 on 2026-10-07, #15171 on 2026-10-09). The gpt-6.1-sol-ultra alias defect (#16027) is unshipped per the owner, and fix PR #16038 is open. Codex-model evaluations do not qualify a different harness. Adoption today: COMPARISON_ARM, not FINAL eligible.",
+       "comparison_that_would_overturn": "Resolve entitlement first, with a vendor statement covering pooled accounts behind a gateway. Then a paired run: the same tasks via native Codex (codex-gpt-6-1-sol) vs a non-Codex client through the pool, with a wire capture of reasoning.effort and model id. Adopt only with documented entitlement and a pass rate equal within stddev.",
+       "evidence": [
+        "Angle record entitlement 'unverified' (openai.com/policies/terms-of-use, developers.openai.com/codex/auth, learn.chatgpt.com gateway doc, all read 2026-10-12T21:53:40Z); trial_permitted true, final_eligible false",
+        "https://api.github.com/repos/diegosouzapw/OmniRoute/releases/tags/v3.8.51 (read 2026-10-15T20:11Z): catalogs list GPT-6 Astra (#13026) and GPT-6 Sol/Luna (#14677); 'account-live listings as the chat catalog source for Claude/Codex/Copilot/AGY'",
+        "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15192 (merged 2026-10-07T18:56:50Z into release/v3.8.52) and /pulls/15171 (merged 2026-10-09T15:52:31Z into release/v3.8.52)",
+        "https://api.github.com/repos/diegosouzapw/OmniRoute/issues/16027/comments (owner, 2026-10-10T11:31:32Z): 'It is not shipped yet ... This close does not mean the defect is already fixed'; search/issues shows PR #16038 open, merged_at null",
+        "Repository record manifests/stack.json:1941: gateway 20128 keyless loopback, units announce CODEX_CLIENT_VERSION 0.159.1"
+       ],
+       "upstream_now": {
+        "latest_release": "gpt-6.1-sol",
+        "released_at": "2026-09-29",
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "Carried candidate (angle record); gateway state re-read through GitHub REST 2026-10-15."
+      },
+      {
+       "repository": "https://code.claude.com/docs/en/model-config#claude-code-claude-fable-5-1",
+       "proposed_label": "targeted_candidate",
+       "demonstrated_gap": "Route: Claude Code (v2.1.301) + subscription OAuth or Anthropic API + first-party endpoint; model claude-fable-5-1, selected with the 'fable' alias (resolves to Fable 5.1 since v2.1.257) or 'best'. Read 2026-10-15: Anthropic recommends it 'for demanding reasoning and long-horizon agentic work, or when your evals on Claude Opus 5.5 at higher effort still fall short'. $10/$50 per MTok, cache reads 2.5% of input, adaptive thinking always on, API default effort high, 1M context / 128K output, retirement not sooner than 2027-09-01. Launched 2026-09-01. In Claude Code: effort low..max; 'Depending on your plan and seat tier, Fable usage can bill to usage credits instead of drawing on your plan's included limits', with a consent prompt. v2.1.301 (2026-10-15) fixed the fable/best alias erroring when the newest Fable is unavailable to the organization; it now retries the previous Fable. Adoption today: the repository manifest records claude-fable-5-1 in_use for Claude Code main and advisor selections (stack.json:2190-2197, a repository record), yet no carried route exists. Its plan-class billing (included limits vs usage credits) and its quality versus Opus 5.5 are therefore unrecorded. Proposed record status: TRIAL. Published, search results not opened: AA reports Fable 5.1 at the top of its Intelligence Index (66) and 91.4% on Terminal-Bench 2.1 at Max with default fallback; AA's Terminal-Bench 4.0 comparison shows GPT-6.1 Sol max 56.1% vs Fable 5.1 max 52.0%. Cheapest check: open artificialanalysis.ai/articles/claude-fable-5-1.",
+       "comparison_that_would_overturn": "The single family (a) paired trial (see claude-code-claude-opus-5-5): Claude Code 2.1.301, identical preregistered tasks, fable max vs opus max, concurrent arms, >=3 runs, pass rate/time/tokens/usage-credit draw. Fable is kept for main and advisor only if its pass-rate gain over Opus 5.5 max exceeds run-to-run stddev and its usage-credit draw on the operator's plan is acceptable. Otherwise Opus 5.5 max takes those roles.",
+       "evidence": [
+        "https://code.claude.com/docs/en/model-config.md (read 2026-10-15T20:09Z): 'best: Uses the model the fable alias resolves to where Fable is available to you'; 'the fable alias resolves to Fable 5.1, except in Claude apps gateway sessions'; effort 'Fable 5.1 and Fable 5 | low, medium, high, xhigh, max'; 'Fable usage can bill to usage credits instead of drawing on your plan's included limits'; 'v2.1.257 fable resolves to Fable 5.1'",
+        "https://platform.claude.com/docs/en/about-claude/models/overview.md (read 2026-10-15T20:09Z): 'Use Claude Fable 5.1 for demanding reasoning and long-horizon agentic work, or when your evals on Claude Opus 5.5 at higher effort still fall short'; '$10 / input MTok, $50 / output MTok'; cache reads 2.5%; default effort high; retirement 'Not sooner than September 1, 2027'",
+        "https://platform.claude.com/docs/en/release-notes/overview.md (read 2026-10-15T20:17Z): 2026-09-01 'We've launched Claude Fable 5.1 (claude-fable-5-1)... 1M token context window by default, 128k max output tokens, and always-on adaptive thinking, at $10 / $50 USD per MTok'",
+        "https://api.github.com/repos/anthropics/claude-code/releases/latest (read 2026-10-15T20:11Z): v2.1.301 'Fixed the fable (and best) model alias erroring on the Anthropic API when the newest Fable model is not available to your organization: Claude Code now retries once on the previous Fable model'",
+        "claude-api skill installed plugin anthropics/skills@dbd4588f9e1033efb41dad4bef2f7947c8993d44 shared/models.md:60 (claude-fable-5-1, 1M, 128K, Active); marketplace checkout :76 ($10/$50, cache reads $0.25/MTok)",
+        "Repository record manifests/stack.json:2190-2197: claude-fable-5-1 in_use, 'frontier main and advisor'",
+        "Leads, search results not opened: https://artificialanalysis.ai/articles/claude-fable-5-1 ; https://artificialanalysis.ai/models/releases/comparisons/gpt-6-1-sol-vs-claude-fable-5-1"
+       ],
+       "upstream_now": {
+        "latest_release": "claude-fable-5-1",
+        "released_at": "2026-09-01",
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "New: repository manifest lead (stack.json:2190-2197) verified against code.claude.com model-config and platform.claude.com overview and release notes fetched 2026-10-15."
+      },
+      {
+       "repository": "https://github.com/diegosouzapw/OmniRoute",
+       "proposed_label": "targeted_candidate",
+       "demonstrated_gap": "Family (b) gateway at its running pin. Release v3.8.51 (published 2026-09-30T01:41:50Z; tag commit c1e30b76 authored 2026-09-29T22:58:13Z) is still the latest release, and the releases API shows no v3.8.52 release or prerelease as of 2026-10-15. Its notes list GPT-6 Astra/Sol/Luna in the Codex catalog with effort aliases (#13026, #14677) and account-live listings, but not GPT-6.1 Sol. Upstream added GPT-6.1 Sol only on the unreleased default branch release/v3.8.52. #15192, merged 2026-10-07T18:56:50Z, registers gpt-6.1-sol with ultra/max/xhigh/high/medium/low variants (872k/128k Codex registry) and client identity 0.159.2. #15171, merged 2026-10-09T15:52:31Z, adds catalogs, pricing and wiring. The repository's running 20128 build instead carries upstream PR #15167 (manifests/stack.json:1940-1941, a repository record), which upstream never merged (merged_at null). That is a non-upstream delta on the CURRENT gateway path. Known defect on the branch: gpt-6.1-sol-ultra is rejected against the live catalog (#16027; the owner commented on 2026-10-10 that it is not shipped and the close does not mean it is fixed); fix PR #16038 is open and unmerged. Maintenance: default-branch commit 2026-10-15T20:00:09Z (commits?since=2026-07-17), not archived, MIT, 424 open issues; created 2026-02-13, so not too new to assess. Gap: replace the unmerged #15167 carry with upstream's merged GPT-6.1 Sol path, pinned at a release/v3.8.52 commit after 2026-10-09T15:52:31Z. The selection rule says to pin the commit when a needed fix exists only on the branch.",
+       "comparison_that_would_overturn": "Model-free first. Build the pinned release/v3.8.52 commit through upstream's supported source path. Run upstream's own tests/unit/codex-gpt61-sol.test.ts and executor-codex tests. Then compare /v1/models listings and the reasoning-effort wire mapping for gpt-6.1-sol against the 20128 #15167 build, sending low..max as the effort parameter and never the -ultra suffix while #16038 is unmerged. Then run at most one reserved smoke per route. Keep the current carry if the branch build regresses listing or effort parity, or if v3.8.52 ships with #16038 soon enough to re-pin to a release.",
+       "evidence": [
+        "https://api.github.com/repos/diegosouzapw/OmniRoute (read 2026-10-15T20:11Z): 76968 stars, pushed_at 2026-10-15T20:06:16Z, archived false, MIT, default_branch release/v3.8.52, created_at 2026-02-13T12:38:31Z, open_issues_count 424",
+        "https://api.github.com/repos/diegosouzapw/OmniRoute/releases/latest and /releases?per_page=3 (read 2026-10-15T20:11Z and 20:25Z): latest v3.8.51 published 2026-09-30T01:41:50Z, target_commitish release/v3.8.52; no newer release or prerelease besides the rolling radar-export-latest asset",
+        "https://api.github.com/repos/diegosouzapw/OmniRoute/commits?since=2026-07-17T00:00:00Z&per_page=1: newest 2b1f2447 2026-10-15T20:00:09Z",
+        "https://api.github.com/repos/diegosouzapw/OmniRoute/releases/tags/v3.8.51: Codex catalog GPT-6 Astra with aliases -low..-ultra and pinned Codex CLI identity @openai/codex@0.153.4 (#13026); GPT-6 Sol (-low..-ultra) and Luna (-low..-max), explicit max no longer clamped to xhigh (#14677); 'safe Codex model discovery'",
+        "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15192: merged true, merged_at 2026-10-07T18:56:50Z, base release/v3.8.52, client version >= 0.159.0 claim; /pulls/15171: merged_at 2026-10-09T15:52:31Z, base release/v3.8.52; /pulls/15167: merged_at null",
+        "https://api.github.com/repos/diegosouzapw/OmniRoute/issues/16027 (closed 2026-10-10T11:31:33Z, state_reason not_planned) and /comments (owner: 'not shipped yet'); https://api.github.com/search/issues?q=repo:diegosouzapw/OmniRoute+16027+is:pr: PR #16038 'fix(codex): recognize ultra effort suffix...' open, merged_at null",
+        "https://api.github.com/repos/diegosouzapw/OmniRoute/commits/c1e30b7676975feb298b49eff6ff58923c04b89e: authored 2026-09-29T22:58:13Z (source_pin)",
+        "Repository record <repo>/manifests/stack.json:1905-1941: version 3.8.51, source_pin c1e30b76; running 20128 build cf6748d04 carries PR #13788, a local affinity patch and PR #15167; 'gpt-6.1-sol is absent from those tag alias sets'"
+       ],
+       "upstream_now": {
+        "latest_release": "v3.8.51",
+        "released_at": "2026-09-30T01:41:50Z",
+        "stars": 76968,
+        "pushed_at": "2026-10-15T20:06:16Z",
+        "archived": false,
+        "license": "MIT"
+       },
+       "source": "New: requirement family (b) asks for OmniRoute's model listing and release notes at its running pin. Running pin from manifests/stack.json; PR leads from a github.com web search, then verified through GitHub REST on 2026-10-15."
+      },
+      {
+       "repository": "https://platform.claude.com/docs/en/about-claude/models/overview#anthropic-api-claude-opus-5-5",
+       "proposed_label": "keep_but_compare",
+       "demonstrated_gap": "Family (a) names the Anthropic API, but every carried Anthropic route is a Claude Code subscription route. Route: Anthropic Messages API (Console-organization API key, an existing credential class) + first-party endpoint; model claude-opus-5-5. Use is limited to measurement probes and smokes; a bare API call is a probe, not a harness route. Read 2026-10-15: $4/$20 per MTok, cache reads 5% of input, batch 50% off. Default effort medium, effort up to max, adaptive thinking always on. 1M context / 128K output, and up to 300k output on Message Batches with the output-300k-2026-03-24 beta header. Fast mode left research preview for Opus 5.5 on 2026-10-15, with a default fast-mode rate limit in every usage tier. Forced tool_choice and disabling thinking return 400 (2026-09-24). The installed claude-api skill (anthropics/skills dbd4588f) lists the same id and prices. Plan-class lead: an 'API credits for Max and Team plans' page (search result, not opened) reports monthly API credits for Max ($100 on Max 5x, $200 on Max 20x) that cover the Claude API but not Claude Code. UNVERIFIED; cheapest check: platform.claude.com/docs/en/about-claude/api-credits-for-subscribers. Adoption today: no route record; proposed TRIAL limited to probes. Gap: a dated API route record for probe and control arms (batch pricing, fast mode GA) that the subscription routes cannot provide.",
+       "comparison_that_would_overturn": "Stay probe-only unless a probe need cannot be met by fenced claude -p runs. Reject if API-credit coverage is confirmed absent and probe spend has no recorded need. Measure one request (cost, stop_reason) before sizing any batch.",
+       "evidence": [
+        "https://platform.claude.com/docs/en/about-claude/models/overview.md (read 2026-10-15T20:09Z): 'Batch API requests are 50% off; prompt cache reads cost ... 5% on Claude Opus 5.5'; Opus 5.5 $4/$20; default effort medium; Message Batches up to 300k output tokens with the output-300k-2026-03-24 beta header",
+        "https://platform.claude.com/docs/en/release-notes/overview.md (read 2026-10-15T20:17Z): 2026-10-15 'Fast mode is out of research preview for Claude Opus 5.5 ... Claude Opus 5.5 now has a default fast mode rate limit in every usage tier'; 2026-09-22 Opus 5.5 launch",
+        "claude-api skill installed plugin anthropics/skills@dbd4588f9e1033efb41dad4bef2f7947c8993d44, shared/models.md:64 and live-sources.md:18-22 (Models Overview and Pricing URLs)",
+        "Lead, search result not opened: https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers (Max/Team monthly API credits, 2026-10-07)"
+       ],
+       "upstream_now": {
+        "latest_release": "claude-opus-5-5",
+        "released_at": "2026-09-22",
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "New: requirement family (a) (Anthropic API, claude-api skill references); verified against platform.claude.com pages fetched 2026-10-15."
+      },
+      {
+       "repository": "https://dev.meta.ai/docs/models#muse-code-spark-subscription",
+       "proposed_label": "keep_but_compare",
+       "demonstrated_gap": "Route: Muse Code CLI (fenced) + the existing Muse Code subscription (any plan) + muse-spark-1.3 in Standard mode (Contributor off), max effort. Read 2026-10-15: muse-spark-1.3 is available in Muse Code 'Pay-as-you-go and every plan'. It 'Supports all reasoning effort levels, including the max level' (not on -contributor) and has a 1,048,576-token context. It is positioned for high-volume, latency-sensitive sub-agent tasks; Everyday Usage includes Muse Spark. Limits follow the plan (Everyday 10-50 prompts per 5 hours; higher plans are multiples). Pricing: included in the plan (the API equivalent is $1.25/$4.25 per 1M, for reference). Adoption today: NOT_ADOPTED; no record exists. Gap: the carried harness-spark-api needs a new pay-as-you-go credential, whereas this route reaches the same model inside the already-entitled, already-fenced harness, giving family (c) a cheaper fan-out tier. The fence compares the full native argv, including the model, against its accepted contract (fence decision :16-20), so running Spark needs a reviewed argv-contract change plus a CC route reservation.",
+       "comparison_that_would_overturn": "Fenced paired reader tasks: muse-spark-1.3 (max) vs muse-wonder-full-1.0 (max) within Muse Code, pass rate/time/plan-usage draw over >=3 runs. Adopt Spark for fan-out only if its pass rate is within stddev at lower usage draw.",
+       "evidence": [
+        "https://dev.meta.ai/docs/models (read 2026-10-15T20:09Z): 'Muse Spark 1.3 (muse-spark-1.3) | Standard mode | Pay-as-you-go and every plan'; supports max (not with -contributor); 'Muse Spark: high-volume, latency-sensitive, or cost-sensitive work, such as sub-agent tasks'",
+        "https://dev.meta.ai/docs/muse-code/subscriptions (read 2026-10-15T20:09Z): Everyday Usage 'Access to Muse Spark, Muse Wonder and Muse Image', '10-50 prompts every 5 hours'",
+        "https://dev.meta.ai/docs/pricing-rate-limits (read 2026-10-15T20:17Z): muse-spark-1.3 Standard $1.25/$4.25/$0.15 per 1M (API reference)",
+        "<repo>/docs/decisions/2026-10-14-muse-file-fence.md:16-20: the wrapper compares the whole native argv (roles, model, reasoning, contributor mode, disabled web tools) against the accepted contract"
+       ],
+       "upstream_now": {
+        "latest_release": "muse-spark-1.3",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "New: derived from the Meta models-page availability table (2026-10-15) while assessing the carried harness-spark-api."
+      },
+      {
+       "repository": "https://developers.openai.com/codex/models#codex-omniroute-gpt-6-1-sol",
+       "proposed_label": "keep_but_compare",
+       "demonstrated_gap": "Route: Codex CLI -> OmniRoute gateway 20128 (codex provider, keyless loopback, pooled ChatGPT accounts) -> chatgpt.com Codex Responses backend; model gpt-6.1-sol. The repository records this as the adopted path for gateway-routed Codex lanes (manifests/stack.json:1941, a repository record), but no carried route represents it: the carried codex-gpt-* rows are native-sign-in routes, and openai-pool-foreign-harness covers non-Codex clients. At the running pin, the gateway lists gpt-6.1-sol because its units announce CODEX_CLIENT_VERSION 0.159.1, and its max-effort support comes from the unmerged #15167 carry (stack.json:1940, a repository record). Upstream's merged support is on the unreleased release/v3.8.52 branch (#15192, #15171). Effort/tier: the vendor ladder of the native route (Light..Ultra; Max and Ultra settings-dependent). Limits and pricing follow the pooled accounts' plans (UNVERIFIED). Entitlement: the vendor gateway doc (angle record, 2026-10-12) does not certify pooled accounts behind a gateway; this is pending, not refuted. Adoption today: in use per the repository record; proposed record status TRIAL.",
+       "comparison_that_would_overturn": "After the OmniRoute re-pin trial: a paired native-vs-gateway run. Identical tasks via native Codex sign-in vs Codex through OmniRoute, with a wire capture of reasoning.effort and model id, error/429 rate, pass rate and latency. Keep only if parity holds within stddev and entitlement is documented.",
+       "evidence": [
+        "Repository record <repo>/manifests/stack.json:1940-1941: 20128 build cf6748d04 with PR #15167; units announce CODEX_CLIENT_VERSION 0.159.1; gateway adopted for pooled GPT-6 access by gateway-routed Codex lanes; native Codex stays the max-quality default",
+        "https://developers.openai.com/codex/models (read 2026-10-15T20:09Z): 'Reasoning effort ranges from Light to Ultra. Max and Ultra depend on your settings'",
+        "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15167 (read 2026-10-15T20:15Z): merged_at null; body 'Public API limits stay 1,050,000 context / 128,000 output. Codex's live maximum context (872,000) is kept separate. max is preserved through translation'",
+        "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/15192 and /pulls/15171: merged into release/v3.8.52 on 2026-10-07 and 2026-10-09",
+        "Angle record entitlement note: the vendor gateway guidance uses the signed-in user's ChatGPT credential; a specific pool/gateway configuration is not certified (read 2026-10-12T21:53:40Z)"
+       ],
+       "upstream_now": {
+        "latest_release": "gpt-6.1-sol",
+        "released_at": "2026-09-29",
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+       },
+       "source": "New: an in-use route found in the repository manifest (stack.json:1941) with no carried route record; gateway facts verified through GitHub REST on 2026-10-15."
+      }
+     ],
+     "calls": {
+      "web_search": 10,
+      "web_fetch": 8,
+      "gh_api": 27
+     },
+     "notes": "The layer has no winners (winners: []). The three carried CURRENT labels (codex-gpt-6-1-sol, codex-gpt-6-astra, claude-code-claude-opus-5-5) rest on incumbency, because no comparative A6 is retained. The proposals define one paired trial per family: (a) Opus 5.5 vs Fable 5.1, (b) 6.1 Sol vs Astra, (c) Wonder Full, which first needs a CC route reservation. Two bounded checks sit outside the paired trials: Haiku 5.5 vs Haiku 4.5 for background tasks, and the OmniRoute re-pin.\n\nRoute and winner health. Every fact from manifests/stack.json below is a repository record at 8053f14e7, not upstream truth:\n(1) stack.json:2190-2197 records claude-fable-5-1 in_use for Claude Code main and advisor, but no carried route exists; it is proposed as a new route. stack.json:2174-2181 records claude-sonnet-5-5 in_use, while the angle record says TRIAL. stack.json:2469-2476 keeps claude-haiku-4-5-20251001 for background tasks under a dated exception tied to the latest Haiku line. Haiku 5.5 launched 2026-10-07, and haiku resolves to it since Claude Code v2.1.293.\n(2) Client drift. Claude Code is pinned at 2.1.295; upstream is v2.1.301 (2026-10-15T19:22:06Z), which fixes the fable alias fallback. Codex is pinned at 0.160.0; upstream is rust-v0.162.1 (2026-10-09T19:44:51Z). stack.json:1941 says the installed Codex is 0.157.1, which contradicts the 0.160.0 row. If 0.157.1 is real, it is below the >=0.159.0 gpt-6.1-sol gate that OmniRoute PR #15192 claims; that gate is third-party reverse engineering, not OpenAI documentation. Cheapest check: codex --version. The Muse Code fence pins 1.4.7-R6101.1, while Meta's changelog shows a 1.4.8 entry (search result, not opened).\n(3) OmniRoute. The running 20128 build carries upstream PR #15167, which upstream never merged. Upstream merged GPT-6.1 Sol support (#15192 on 2026-10-07, #15171 on 2026-10-09) only into the unreleased release/v3.8.52 branch. The ultra-alias defect #16027 is unshipped, and fix PR #16038 is open. v3.8.51 is still the latest release. v3.8.51 also pins its Codex CLI identity at 0.153.4 (#13026).\n(4) Rename: sst/opencode resolves to anomalyco/opencode. No archived or stale repository was found; Claude Code, Codex, OpenCode and OmniRoute all have default-branch commits on 2026-10-15.\n\nNewest releases (last 4 weeks):\n- Opus 5.5, 2026-09-22 (release notes).\n- Sonnet 5.5, 2026-09-28 (overview retirement row plus a repository record; the launch entry was not retrieved).\n- GPT-6 Luna and GPT-6 Sol entered the Codex catalog 2026-09-22.\n- GPT-6.1 Sol, 2026-09-29 (Codex catalog commit); default in rust-v0.161.0 on 2026-10-07.\n- Haiku 5.5 and the Sonnet 5.5 cache-read price cut, 2026-10-07.\n- Muse Wonder and Wonder Full, 2026-10-12 per the model card (search result, not opened).\n- Opus 5.5 fast mode GA on the Claude API, 2026-10-15.\n\nChecked and not proposed:\n- Muse Spark Open (816B MoE, 42B active, BF16 or NVFP4 weights per dev.meta.ai/docs/models) exceeds the 24 GB RTX 4090 and 64 GB Mac hosts, and NVFP4 is not native on Ada.\n- Muse Glimmer (open-weight, local runtimes) belongs to a local-inference layer, not the muse-code provider family.\n- GPT-6 Sol is superseded by 6.1 Sol; the GPT-5.6 models are rollout carry-overs; GPT-5.5 is retiring from Codex with ChatGPT sign-in (pricing-page preview, truncated).\n- The input has no seeded candidates.\n\nLeads not opened, with cheapest checks:\n- Max/Team API credits: platform.claude.com/docs/en/about-claude/api-credits-for-subscribers\n- Claude Code fast-mode billing: code.claude.com/docs/en/fast-mode\n- Muse Code plan prices: dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription\n- AA scores: artificialanalysis.ai/articles/claude-fable-5-1 and /articles/muse-wonder\n- Codex numeric usage limits and the Pro card: developers.openai.com/codex/pricing.md (fetched, but the table was not extracted)\n- Codex context windows: codex-rs/models-manager/models.json at rust-v0.162.1\nEntitlement sources (terms, gateway doc, consumer terms) were not re-fetched; their 2026-10-12 angle-record reads are cited instead.\n\nSkills:\n- search-first: channel preflight. No Bash or gh CLI in this role, so GitHub REST went through ctx_fetch_and_index; the page budget ran out at 8.\n- iterative-retrieval: three cycles (vendor pages, then GitHub REST, then targeted searches).\n- fp-check: claims restated before verdicts. For example, closing #16027 did not mean it was fixed, and search summaries stayed as leads.\n- supply-chain-risk-auditor: rules applied by hand (unavailable data is never treated as risk; maintenance from commits?since; rename and archived checks). Its collector scripts were not run in this read-only role.\n- skill-creator: read only for the paired-arm, metric and decision-rule design of the comparisons.\n\nFences: no model was invoked and no keyed call was made. No native-agent-stack pull requests and no model-routes-sweep artifacts were read. The relayed handoff/READY request needs a messaging tool this worker role does not have; it belongs to the parent session.",
+     "skills_used": [
+      "search-first",
+      "iterative-retrieval",
+      "fp-check",
+      "supply-chain-risk-auditor",
+      "skill-creator"
+     ]
+    },
+    "gpt6_discover": {
+     "status": null,
+     "output": null,
+     "usage": null,
+     "started": null,
+     "finished": null
+    },
+    "dropped": [],
+    "fit_gpt6_meta": {
+     "status": null,
+     "usage": null,
+     "started": null,
+     "finished": null
+    },
+    "followup_reason": null
+   },
+   "followup": {
+    "lost": true,
+    "followup_reason": {
+     "reason": "Discovery adjudicated the 14 carried routes and added 5 new ones. All 5 came from the requirement text, the angle record or manifests/stack.json, and discovery never looked at route classes outside those inputs. Primary sources show four classes it missed. (1) Family (a) harness routes on the Console API credential. https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers (read 2026-10-15) says Max 5x includes $100 and Max 20x $200 a month in credits. The credits cover the Claude API, Claude Managed Agents and the Claude Agent SDK, but not Claude Code. No proposal uses the Agent SDK or Managed Agents. The only API route proposed (anthropic-api-claude-opus-5-5) is a bare probe, and the converged-harness rule limits bare probes to measurement. The repository already records Managed Agents as a conditional TRIAL (docs/decisions/2026-10-09-claude-code-gap-resolution.md:176-181 at 8053f14e7). It also runs Pi/OpenCode trial profiles on claude-opus-5-5 with injected credential slots (tools/adoption/runtime_profiles.py:39-42, notes/runtime-profiles-20261012/README.md:131-134). None of these has a route record. (2) Family (b) per-user ChatGPT sign-in in a non-Codex harness. https://opencode.ai/docs/providers (read 2026-10-15) documents a ChatGPT Plus/Pro browser OAuth through /connect. It also lists ChatGPT Plus among the subscriptions usable 'with zero setup'. Yet the repo's opencode-gpt and pi-gpt profiles reach gpt-6.1-sol only through the pooled OmniRoute route (runtime_profiles.py:43-44, docs/decisions/2026-09-30-task-model-routing.md:138). That pooled route's entitlement is unverified, and the Claude fit refuter refuted it. (3) No gateway comparator for the OmniRoute leg. For router-for-me/CLIProxyAPI, api.github.com reports MIT, created 2025-07-01, archived false and pushed_at 2026-10-15T19:37:16Z. Commit search shows c8a2bfe8 'feat(models): add gpt-6.1-sol model' at 2026-09-29T18:26:25Z. OmniRoute's GPT-6.1 Sol support sits only on its unreleased release/v3.8.52 branch, and the running 20128 build carries unmerged PR #15167. OpenAI publishes the gateway conformance bar at https://developers.openai.com/codex/enterprise/gateway-compatibility. (4) Family (c) programmatic client surface. https://dev.meta.ai/docs/muse-code/changelog lists apps connecting to muse serve over the session protocol, an SDK resume option (1.4.8), a Python wire-types package and an unattended muse exec flag (1.4.9). Both 1.4.8 and 1.4.9 are newer than the 1.4.7 ELF the fence pins, and no route record covers this surface. Most of these pages were indexed in the shared context store on 2026-10-15 (labels anth-api-credits-subscribers, critic-opencode-providers, critic-codex-gateway-compatibility, meta-musecode-changelog, muse-code-subscriptions-20261015). Search them with ctx_search before refetching.",
+     "search_directions": [
+      "Family (a) credits-funded harness routes, at most 2 proposals. Read https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers and https://support.claude.com/en/articles/17154008-monthly-api-credits-for-max-and-team-plans. Propose the Claude Agent SDK route as the expected targeted_candidate, for example https://platform.claude.com/docs/en/about-claude/models/overview#agent-sdk-claude-opus-5-5. Its clients are https://github.com/anthropics/claude-agent-sdk-python and https://github.com/anthropics/claude-agent-sdk-typescript, both with default-branch commits on 2026-10-15 per commits?since=2026-07-17. Record Claude Managed Agents as keep_but_compare or not_adopted against the local-first rule, checking https://platform.claude.com/docs/en/managed-agents/overview and https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes. State the plan class (included monthly credits that expire each cycle and that the owner claims by linking a Console organization), plus effort controls, limits and pricing. Resolve whether claude -p with a Console key draws the credits. docs/decisions/2026-10-09-claude-code-gap-resolution.md:179-181 says it does, but the 2026-10-15 page lists Claude Code as not covered. Put the Pi/OpenCode Claude arm (tools/adoption/runtime_profiles.py:39-42) in notes unless a slot remains, and confirm that its credential class is a Console API key, not a subscription login.",
+      "Family (b) non-Codex harness with per-user ChatGPT sign-in and no pool, 1 proposal. Base it on the OpenAI section of https://opencode.ai/docs/providers (ChatGPT Plus/Pro OAuth through /connect, and the 'zero setup' subscription list). Propose a route such as https://developers.openai.com/codex/models#opencode-chatgpt-signin-gpt-6-1-sol. Find a statement from OpenAI itself that permits ChatGPT sign-in in third-party harnesses (try developers.openai.com/codex/auth, learn.chatgpt.com and help.openai.com). The only OpenAI-partnership claim found so far is a secondary blog. Pin the client: anomalyco/opencode v1.19.1, or the 'OpenCode v2' line that the docs banner announces. Confirm that gpt-6.1-sol is listed with max or ultra effort. Check whether Pi (earendil-works/pi, the repo's other trial harness) documents a ChatGPT subscription login. Compare the result with openai-pool-foreign-harness, which the opencode-gpt and pi-gpt profiles use today (runtime_profiles.py:43-44). Label it targeted_candidate only if OpenAI documents the entitlement, otherwise keep_but_compare.",
+      "Family (b) gateway comparator to OmniRoute, 1 proposal: https://github.com/router-for-me/CLIProxyAPI. Confirm the 90-day maintenance rule with commits?since=2026-07-17. Commit search showed c8a2bfe8 'feat(models): add gpt-6.1-sol model' at 2026-09-29T18:26:25Z. Check whether a tagged release contains GPT-6.1 Sol, and read how it maps reasoning effort for max and ultra. Judge it against https://developers.openai.com/codex/enterprise/gateway-compatibility.md (wire_api responses, and POST /v1/responses preserving streaming, continuation and tool calls) and the ChatGPT-workspace forwarding doc that page links. The repo read CLIProxyAPI only for routing mechanics, at v8.0.2 (evidence/artifacts/omniroute-routing-20260928/route-job2.last.json:366-370). Its description says it wraps ChatGPT Codex, Claude Code and Muse Code as API services. Record the Muse Code wrapping as out of bounds (https://dev.meta.ai/docs/muse-code/subscriptions says 'This credential is for use with Muse Code only'). Record the Claude Code wrapping as out of bounds pending Anthropic's own terms: OpenCode's provider docs say Anthropic explicitly prohibits Claude Pro/Max in other tools, but that is OpenCode's statement. Pooled-account entitlement stays pending, as it does for OmniRoute. Expected label: keep_but_compare for family (b) only, or not_adopted with the reason.",
+      "Family (c) programmatic client surface on the existing subscription, 1 proposal. Start from https://dev.meta.ai/docs/muse-code/changelog: apps on the muse serve session protocol, the SDK resume option in 1.4.8, the Python wire-types package, and muse exec with --disable-request-user-input in 1.4.9. Find the session-protocol and SDK docs on dev.meta.ai. Then check whether the subscription statement that it 'works only through the Muse Code CLI while signed in' (https://dev.meta.ai/docs/muse-code/subscriptions) covers apps connected to muse serve. Propose a route such as https://dev.meta.ai/docs/muse-code#muse-serve-wonder-full only if it does, otherwise record the reason in notes. Any trial needs a CC route reservation and fence re-qualification, because 1.4.8 and 1.4.9 are newer than the 1.4.7 ELF that docs/decisions/2026-10-14-muse-file-fence.md pins. Expected label: keep_but_compare."
+     ],
+     "already": [
+      "https://dev.meta.ai/docs/muse-code#muse-code-wonder-full",
+      "https://dev.meta.ai/docs/models#muse-code-wonder-api",
+      "https://dev.meta.ai/docs/models#codex-wonder-api",
+      "https://dev.meta.ai/docs/models#opencode-wonder-api",
+      "https://dev.meta.ai/docs/models#claude-code-wonder-api",
+      "https://dev.meta.ai/docs/models#harness-spark-api",
+      "https://dev.meta.ai/docs/models#muse-subscription-foreign-harness",
+      "https://developers.openai.com/codex/models#codex-gpt-6-1-sol",
+      "https://developers.openai.com/codex/models#codex-gpt-6-astra",
+      "https://developers.openai.com/codex/models#codex-gpt-6-luna",
+      "https://code.claude.com/docs/en/model-config#claude-code-claude-opus-5-5",
+      "https://code.claude.com/docs/en/model-config#claude-code-claude-sonnet-5-5",
+      "https://code.claude.com/docs/en/model-config#claude-code-claude-haiku-5-5",
+      "https://developers.openai.com/codex/models#openai-pool-foreign-harness",
+      "https://code.claude.com/docs/en/model-config#claude-code-claude-fable-5-1",
+      "https://github.com/diegosouzapw/OmniRoute",
+      "https://platform.claude.com/docs/en/about-claude/models/overview#anthropic-api-claude-opus-5-5",
+      "https://dev.meta.ai/docs/models#muse-code-spark-subscription",
+      "https://developers.openai.com/codex/models#codex-omniroute-gpt-6-1-sol"
+     ]
+    }
+   }
+  }
+ },
+ "failures": {
+  "model-routes": [
+   {
+    "round": "first",
+    "cause": "discovery_missing",
+    "family": "gpt6",
+    "status": null,
+    "detail": "the gpt6 discovery researcher returned nothing usable"
+   },
+   {
+    "round": "followup",
+    "cause": "round_lost",
+    "detail": "the round returned nothing, so its discovery and votes are missing"
+   },
+   {
+    "round": "first",
+    "cause": "vote_missing",
+    "role": "fit_gpt6",
+    "repositories": [
+     "https://dev.meta.ai/docs/muse-code#muse-code-wonder-full",
+     "https://dev.meta.ai/docs/models#muse-code-wonder-api",
+     "https://dev.meta.ai/docs/models#codex-wonder-api",
+     "https://dev.meta.ai/docs/models#opencode-wonder-api",
+     "https://dev.meta.ai/docs/models#claude-code-wonder-api",
+     "https://dev.meta.ai/docs/models#harness-spark-api",
+     "https://dev.meta.ai/docs/models#muse-subscription-foreign-harness",
+     "https://developers.openai.com/codex/models#codex-gpt-6-1-sol",
+     "https://developers.openai.com/codex/models#codex-gpt-6-astra",
+     "https://developers.openai.com/codex/models#codex-gpt-6-luna",
+     "https://code.claude.com/docs/en/model-config#claude-code-claude-opus-5-5",
+     "https://code.claude.com/docs/en/model-config#claude-code-claude-sonnet-5-5",
+     "https://code.claude.com/docs/en/model-config#claude-code-claude-haiku-5-5",
+     "https://developers.openai.com/codex/models#openai-pool-foreign-harness",
+     "https://code.claude.com/docs/en/model-config#claude-code-claude-fable-5-1",
+     "https://github.com/diegosouzapw/omniroute",
+     "https://platform.claude.com/docs/en/about-claude/models/overview#anthropic-api-claude-opus-5-5",
+     "https://dev.meta.ai/docs/models#muse-code-spark-subscription",
+     "https://developers.openai.com/codex/models#codex-omniroute-gpt-6-1-sol"
+    ],
+    "detail": "the GPT-6 fit refuter returned no vote on these proposals; each counts as refuted",
+    "status": null
+   }
+  ]
+ },
+ "superseded_retained": {},
+ "skills_usage": {
+  "discover_claude": {
+   "search-first": 1,
+   "iterative-retrieval": 1,
+   "fp-check": 1,
+   "supply-chain-risk-auditor": 1,
+   "skill-creator": 1
+  },
+  "facts": {
+   "fp-check": 1,
+   "supply-chain-risk-auditor": 1
+  },
+  "fit_claude": {
+   "fp-check": 1,
+   "iterative-retrieval": 1,
+   "supply-chain-risk-auditor": 1,
+   "skill-creator": 1
+  }
+ },
+ "gpt6_usage": {
+  "jobs": 0,
+  "by_status": {},
+  "usage": {},
+  "usage_unavailable": 0,
+  "earlier_attempts": {
+   "attempts": 0,
+   "usage": {},
+   "usage_unavailable": 0
+  }
+ }
+}

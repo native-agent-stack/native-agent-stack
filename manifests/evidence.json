@@ -41442,6 +41442,86 @@
       "bytes": 3552
     },
     {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/build_input.py",
+      "sha256": "0b2c37319278823dd0968b33aea87ea31118c000115023a8a017d16518f1b0db",
+      "bytes": 7716
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/child-usage-wf_27e93022-5c0.json",
+      "sha256": "2ce33ab8cddd42529a7b6a819d0e1be031d832dd72590e43e15f6360b0738bd6",
+      "bytes": 2987
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/child-usage-wf_424f30f4-0af.json",
+      "sha256": "23bfd02372a9a9d7c9c79b699f51481dd3f767084f0d8c3775e23bec9c7bb0f5",
+      "bytes": 2060
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/child-usage-wf_d251d8c8-3b7.json",
+      "sha256": "5f7db102f34ceabebaaa454e055e3cc7de1c5c18d084d22486e67f0005cc7aa6",
+      "bytes": 2035
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/cost.py",
+      "sha256": "03eea985e4629ec6dc6e5014b54c7515a4c6fd7aaa46828b7b323e7b09fcf35c",
+      "bytes": 908
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/gen_stage1.py",
+      "sha256": "7d96a2a35f025c6b63d750e9ee061c5dbc2c1c5733d2d7822d3bf0f4f83598bc",
+      "bytes": 2082
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/gen_stage2.py",
+      "sha256": "fc9247942c1170f6dff22642832d077d9eee0cdffef5907c66827b16041830f1",
+      "bytes": 6828
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/gen_stage3.py",
+      "sha256": "429797f71893577b3a0a6936bc9e31f0235aed806e084c82176554ba0c809c5c",
+      "bytes": 3249
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/hashes.json",
+      "sha256": "83a0843b979641a8fab5a067e442e27f2f63e40bef07bdc66df82dff35917fb8",
+      "bytes": 3048
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/join_usage.py",
+      "sha256": "d59c91967ca83cec8d79a5d08b50474e74b046d5ff835b13fc3de8e12f1c84c7",
+      "bytes": 1790
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/synthesize.py",
+      "sha256": "5384eb9e40019762123b54186d922187ce1e64f469cfd3bfa39f785078747ea3",
+      "bytes": 2754
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/usage-joined.json",
+      "sha256": "817f064f6813b95a8423d3648e2502e68c57e615761bcbe92daffb946b75b615",
+      "bytes": 3990
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015/MERGE-PLAN.md",
+      "sha256": "a669da45e26b5566b1734a3e63c2c7500b65d1b83913888bd0a3e39bb5c247bf",
+      "bytes": 2933
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015/RUN-RECORD.md",
+      "sha256": "0c4a51a7fe8c63c01494796dcface59be4c4cfcffcf21f42c4586f1359cfa775",
+      "bytes": 12364
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015/layer-input.json",
+      "sha256": "63aed082dc3fccd336c75e0ba74252f371a60607d92553248761d09163ea019b",
+      "bytes": 27513
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-claude-20261015/returns.json",
+      "sha256": "498651465682013d9e8c668b0f1aa0c9d936f51c3c7fed6612d80fb71292f5e6",
+      "bytes": 154836
+    },
+    {
       "path": "evidence/artifacts/native-claude-coop-20260921/loki-discovery.json",
       "sha256": "b272572b57b6cfa63cf4679341e4d35a793fb27b2ed3ceb856b798417927f2ca",
       "bytes": 10460
@@ -64218,8 +64298,8 @@
     },
     {
       "path": "tests/test_provenance_digest_custody.py",
-      "sha256": "e88d23d9c25186a2d373879d86fd8513b845fb1c897ccae69f1306599a7c2cd9",
-      "bytes": 15448
+      "sha256": "7229f97fb51bef1d384ea7db134556fbc1fa517a69c76fad2a26c8bd1e9b69c8",
+      "bytes": 25250
     },
     {
       "path": "tests/test_public_starred.py",

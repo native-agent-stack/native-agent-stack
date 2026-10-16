@@ -1,0 +1,550 @@
+{
+ "catalog": "foundation",
+ "layer_id": "model-routes",
+ "title": "model-routes",
+ "requirement": "The current model ids and routes for three route families: (a) the Anthropic API (vendor model pages and release notes, read and dated; the claude-api skill's model and pricing references); (b) OpenAI through OmniRoute (the Codex models page; OmniRoute's own model listing and release notes at its running pin); (c) Meta's Muse through the muse-code provider (Wonder Full; dev.meta.ai docs; the Muse fence decisions). For each route: model id; route (client + provider + endpoint class); the pin it was read at; effort and tier controls; limits; pricing or plan class; adoption status today (CURRENT, TRIAL, NOT_ADOPTED); each verified with a dated primary source or marked UNVERIFIED with the cheapest check. Selection serves the NativeHorizonNY harness (TRIAL labels only from this sweep).",
+ "research_status": "unswept",
+ "next_action": "Initial sweep scoped to the gap (layer-resolution protocol step 3): adjudicate the 14 carried angle candidates and propose new routes only with primary sources.",
+ "decision_ref": "command-center/research-cc-role-20261008/direction-cc-20261015T1912Z-new-wsl-harness-first.md, ruling 2 (Models: model-routes); CC ruling 2026-10-15T19:52Z (A) to the co-op",
+ "requirement_sha256": "5dc75497f0f3a2e5f78edb128df2109ce148e7f9e34cf24478c67a9fb0a27693",
+ "platform_profiles_sha256": "cc6f4bef036223ea12a4fb637945a43c9de3a7dec1a55c0b4acf2be8303b76ba",
+ "winners": [],
+ "alternatives": [],
+ "upstream_checked_at": null,
+ "components_vs_upstream": [],
+ "open_gaps": [
+  "Protocol steps 1-3 at 8053f14e7: no catalog verdict for model-routes in catalogs/landscape/foundation.json, no wave in catalogs/sota-convergence/layer-verdict-waves.json, no sweep for (foundation, model-routes) in catalogs/saturation/ledger.json; catalogs/landscape/final-stack.json status unswept, 0 winners, 0 survivors.",
+  "The layer is not registered in foundation.json or research-state.json; a registration PR under #1130's pending-empty path is separate work.",
+  "The model-routes layer has no catalog verdict, verdict wave, recorded sweep or retained comparison at this base. Its angle-only row is initial evidence, not a selection.",
+  "A2–A4 remain pending at the route level; a harness's stars or traffic are not automatically a model-route score.",
+  "No comparative A6 on these subscription routes is retained.",
+  "No source-based row establishes FINAL without a matching run pin, upstream E2E receipt and invocation evidence or recorded reason.",
+  "The Facebook subscription-terms page did not yield readable terms in the public fetch. Meta's readable Model API Terms section 3.2 and subscription documentation establish the coding-harness credential restriction."
+ ],
+ "open_gaps_followup": [],
+ "verdict_checked_at": null,
+ "verdict_note": "No sealed verdict exists for this layer; the carried candidates come from the angle record named in input_provenance.",
+ "overturn_when": "",
+ "previous_sweep": {},
+ "known_repositories": [
+  "https://code.claude.com/docs/en/model-config#claude-code-claude-haiku-5-5",
+  "https://code.claude.com/docs/en/model-config#claude-code-claude-opus-5-5",
+  "https://code.claude.com/docs/en/model-config#claude-code-claude-sonnet-5-5",
+  "https://dev.meta.ai/docs/models#claude-code-wonder-api",
+  "https://dev.meta.ai/docs/models#codex-wonder-api",
+  "https://dev.meta.ai/docs/models#harness-spark-api",
+  "https://dev.meta.ai/docs/models#muse-code-wonder-api",
+  "https://dev.meta.ai/docs/models#muse-subscription-foreign-harness",
+  "https://dev.meta.ai/docs/models#opencode-wonder-api",
+  "https://dev.meta.ai/docs/muse-code#muse-code-wonder-full",
+  "https://developers.openai.com/codex/models#codex-gpt-6-1-sol",
+  "https://developers.openai.com/codex/models#codex-gpt-6-astra",
+  "https://developers.openai.com/codex/models#codex-gpt-6-luna",
+  "https://developers.openai.com/codex/models#openai-pool-foreign-harness"
+ ],
+ "seeded_candidates": [],
+ "carried_candidates": [
+  {
+   "id": "muse-code-wonder-full",
+   "route_identity": "https://dev.meta.ai/docs/muse-code#muse-code-wonder-full",
+   "name": "Muse Code + Muse Wonder Full",
+   "doc_url": "https://dev.meta.ai/docs/muse-code",
+   "pin": "muse-wonder-full-1.0",
+   "role": "Muse Code Power Usage subscription; Muse Wonder Full at max effort",
+   "adoption_status": "TRIAL",
+   "verdict": "INSUFFICIENT",
+   "provisional": false,
+   "disqualifier": null,
+   "measure_next": "Complete the pinned harness screen, resolve deployment entitlement, source the missing angles and retain a preregistered comparative run.",
+   "entitlement": {
+    "status": "documented",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/legal/terms-of-service",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "read_at": "2026-10-13T02:53:02Z"
+     }
+    ],
+    "note": "Vendor terms section 3.2 confines the subscription credential to its coding harness. Muse Code is that harness. Subscription availability is documented; this record does not verify an account or its settings."
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  },
+  {
+   "id": "muse-code-wonder-api",
+   "route_identity": "https://dev.meta.ai/docs/models#muse-code-wonder-api",
+   "name": "Muse Code + muse-wonder-1.0 Model API",
+   "doc_url": "https://dev.meta.ai/docs/models",
+   "pin": "muse-wonder-1.0",
+   "role": "Muse Code pay-as-you-go Model API; separate from its Full subscription",
+   "adoption_status": "NOT_ADOPTED",
+   "verdict": "INSUFFICIENT",
+   "provisional": false,
+   "disqualifier": null,
+   "measure_next": "Complete the pinned harness screen, resolve deployment entitlement, source the missing angles and retain a preregistered comparative run.",
+   "entitlement": {
+    "status": "pending",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/legal/terms-of-service",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "read_at": "2026-10-13T02:53:02Z"
+     }
+    ],
+    "note": "A separately entitled pay-as-you-go API route is required. The Muse Code subscription credential is not an entitlement for an API comparison arm."
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  },
+  {
+   "id": "codex-wonder-api",
+   "route_identity": "https://dev.meta.ai/docs/models#codex-wonder-api",
+   "name": "Codex + muse-wonder-1.0 Model API",
+   "doc_url": "https://dev.meta.ai/docs/models",
+   "pin": "muse-wonder-1.0",
+   "role": "Codex with Meta Responses API",
+   "adoption_status": "NOT_ADOPTED",
+   "verdict": "INSUFFICIENT",
+   "provisional": false,
+   "disqualifier": null,
+   "measure_next": "Complete the pinned harness screen, resolve deployment entitlement, source the missing angles and retain a preregistered comparative run.",
+   "entitlement": {
+    "status": "pending",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/legal/terms-of-service",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "read_at": "2026-10-13T02:53:02Z"
+     }
+    ],
+    "note": "A separately entitled pay-as-you-go API route is required. The Muse Code subscription credential is not an entitlement for an API comparison arm."
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  },
+  {
+   "id": "opencode-wonder-api",
+   "route_identity": "https://dev.meta.ai/docs/models#opencode-wonder-api",
+   "name": "OpenCode + muse-wonder-1.0 Model API",
+   "doc_url": "https://dev.meta.ai/docs/models",
+   "pin": "muse-wonder-1.0",
+   "role": "OpenCode with the vendor-recommended OpenAI adapter and reasoning replay",
+   "adoption_status": "NOT_ADOPTED",
+   "verdict": "INSUFFICIENT",
+   "provisional": false,
+   "disqualifier": null,
+   "measure_next": "Complete the pinned harness screen, resolve deployment entitlement, source the missing angles and retain a preregistered comparative run.",
+   "entitlement": {
+    "status": "pending",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/legal/terms-of-service",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "read_at": "2026-10-13T02:53:02Z"
+     }
+    ],
+    "note": "A separately entitled pay-as-you-go API route is required. The Muse Code subscription credential is not an entitlement for an API comparison arm."
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  },
+  {
+   "id": "claude-code-wonder-api",
+   "route_identity": "https://dev.meta.ai/docs/models#claude-code-wonder-api",
+   "name": "Claude Code + muse-wonder-1.0 Model API",
+   "doc_url": "https://dev.meta.ai/docs/models",
+   "pin": "muse-wonder-1.0",
+   "role": "Claude Code using the vendor Messages API integration",
+   "adoption_status": "NOT_ADOPTED",
+   "verdict": "INSUFFICIENT",
+   "provisional": false,
+   "disqualifier": null,
+   "measure_next": "Complete the pinned harness screen, resolve deployment entitlement, source the missing angles and retain a preregistered comparative run.",
+   "entitlement": {
+    "status": "pending",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/legal/terms-of-service",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "read_at": "2026-10-13T02:53:02Z"
+     }
+    ],
+    "note": "A separately entitled pay-as-you-go API route is required. The Muse Code subscription credential is not an entitlement for an API comparison arm."
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  },
+  {
+   "id": "harness-spark-api",
+   "route_identity": "https://dev.meta.ai/docs/models#harness-spark-api",
+   "name": "Converged harness + muse-spark-1.3 Standard",
+   "doc_url": "https://dev.meta.ai/docs/models",
+   "pin": "muse-spark-1.3",
+   "role": "A converged harness using Model API Muse Spark Standard",
+   "adoption_status": "NOT_ADOPTED",
+   "verdict": "INSUFFICIENT",
+   "provisional": false,
+   "disqualifier": null,
+   "measure_next": "Complete the pinned harness screen, resolve deployment entitlement, source the missing angles and retain a preregistered comparative run.",
+   "entitlement": {
+    "status": "pending",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/legal/terms-of-service",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "read_at": "2026-10-13T02:53:02Z"
+     }
+    ],
+    "note": "A separately entitled pay-as-you-go API route is required. The Muse Code subscription credential is not an entitlement for an API comparison arm."
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  },
+  {
+   "id": "muse-subscription-foreign-harness",
+   "route_identity": "https://dev.meta.ai/docs/models#muse-subscription-foreign-harness",
+   "name": "Muse Code subscription outside Muse Code",
+   "doc_url": "https://dev.meta.ai/docs/models",
+   "pin": "muse-code-subscription",
+   "role": "Withdrawn subscription credential route in another harness",
+   "adoption_status": "NOT_ADOPTED",
+   "verdict": "REJECTED",
+   "provisional": false,
+   "disqualifier": "missing_capability",
+   "measure_next": "Reopen only if the vendor changes the entitlement or an independently entitled API route is supplied.",
+   "entitlement": {
+    "status": "conflict",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/legal/terms-of-service",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "read_at": "2026-10-13T02:53:02Z"
+     }
+    ],
+    "note": "conflict (vendor subscription terms). The vendor's coding-harness-only subscription restriction remains evidenced; neutral trial permission does not change the REJECTED verdict."
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  },
+  {
+   "id": "codex-gpt-6-1-sol",
+   "route_identity": "https://developers.openai.com/codex/models#codex-gpt-6-1-sol",
+   "name": "Codex + GPT-6.1 Sol",
+   "doc_url": "https://developers.openai.com/codex/models",
+   "pin": "gpt-6.1-sol",
+   "role": "Native Codex subscription model route; max effort where supported",
+   "adoption_status": "CURRENT",
+   "verdict": "INSUFFICIENT",
+   "provisional": false,
+   "disqualifier": null,
+   "measure_next": "Complete the pinned harness screen, resolve deployment entitlement, source the missing angles and retain a preregistered comparative run.",
+   "entitlement": {
+    "status": "pending",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://openai.com/policies/terms-of-use/",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://developers.openai.com/codex/auth",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://learn.chatgpt.com/docs/enterprise/sign-in-with-chatgpt-through-a-gateway",
+      "read_at": "2026-10-12T21:53:40Z"
+     }
+    ],
+    "note": "Codex subscription sign-in is documented; vendor gateway guidance uses the signed-in user's ChatGPT credential and a separate gateway credential. The Terms of Use restrict credential sharing. A specific pool/gateway configuration is not certified by these source reads."
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  },
+  {
+   "id": "codex-gpt-6-astra",
+   "route_identity": "https://developers.openai.com/codex/models#codex-gpt-6-astra",
+   "name": "Codex + GPT-6 Astra",
+   "doc_url": "https://developers.openai.com/codex/models",
+   "pin": "gpt-6-astra",
+   "role": "Native Codex subscription model route; max effort where supported",
+   "adoption_status": "CURRENT",
+   "verdict": "INSUFFICIENT",
+   "provisional": false,
+   "disqualifier": null,
+   "measure_next": "Complete the pinned harness screen, resolve deployment entitlement, source the missing angles and retain a preregistered comparative run.",
+   "entitlement": {
+    "status": "pending",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://openai.com/policies/terms-of-use/",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://developers.openai.com/codex/auth",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://learn.chatgpt.com/docs/enterprise/sign-in-with-chatgpt-through-a-gateway",
+      "read_at": "2026-10-12T21:53:40Z"
+     }
+    ],
+    "note": "Codex subscription sign-in is documented; vendor gateway guidance uses the signed-in user's ChatGPT credential and a separate gateway credential. The Terms of Use restrict credential sharing. A specific pool/gateway configuration is not certified by these source reads."
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  },
+  {
+   "id": "codex-gpt-6-luna",
+   "route_identity": "https://developers.openai.com/codex/models#codex-gpt-6-luna",
+   "name": "Codex + GPT-6 Luna",
+   "doc_url": "https://developers.openai.com/codex/models",
+   "pin": "gpt-6-luna",
+   "role": "Native Codex subscription model route; max effort where supported",
+   "adoption_status": "TRIAL",
+   "verdict": "INSUFFICIENT",
+   "provisional": false,
+   "disqualifier": null,
+   "measure_next": "Complete the pinned harness screen, resolve deployment entitlement, source the missing angles and retain a preregistered comparative run.",
+   "entitlement": {
+    "status": "pending",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://openai.com/policies/terms-of-use/",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://developers.openai.com/codex/auth",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://learn.chatgpt.com/docs/enterprise/sign-in-with-chatgpt-through-a-gateway",
+      "read_at": "2026-10-12T21:53:40Z"
+     }
+    ],
+    "note": "Codex subscription sign-in is documented; vendor gateway guidance uses the signed-in user's ChatGPT credential and a separate gateway credential. The Terms of Use restrict credential sharing. A specific pool/gateway configuration is not certified by these source reads."
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  },
+  {
+   "id": "claude-code-claude-opus-5-5",
+   "route_identity": "https://code.claude.com/docs/en/model-config#claude-code-claude-opus-5-5",
+   "name": "Claude Code + opus 5.5",
+   "doc_url": "https://code.claude.com/docs/en/model-config",
+   "pin": "claude-opus-5-5",
+   "role": "Native Claude Code model route; subscription-oriented foundation",
+   "adoption_status": "CURRENT",
+   "verdict": "INSUFFICIENT",
+   "provisional": false,
+   "disqualifier": null,
+   "measure_next": "Complete the pinned harness screen, resolve deployment entitlement, source the missing angles and retain a preregistered comparative run.",
+   "entitlement": {
+    "status": "documented",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://code.claude.com/docs/en/legal-and-compliance",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://www.anthropic.com/legal/consumer-terms",
+      "read_at": "2026-10-12T21:53:41Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan",
+      "read_at": "2026-10-12T21:53:41Z"
+     }
+    ],
+    "note": "Vendor docs document Claude Code access on Pro/Max and application of Consumer Terms for Max. API-key usage follows a separate API billing/terms route. This verifies the supported native entitlement mechanism, not an individual account."
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  },
+  {
+   "id": "claude-code-claude-sonnet-5-5",
+   "route_identity": "https://code.claude.com/docs/en/model-config#claude-code-claude-sonnet-5-5",
+   "name": "Claude Code + sonnet 5.5",
+   "doc_url": "https://code.claude.com/docs/en/model-config",
+   "pin": "claude-sonnet-5-5",
+   "role": "Native Claude Code model route; subscription-oriented foundation",
+   "adoption_status": "TRIAL",
+   "verdict": "INSUFFICIENT",
+   "provisional": false,
+   "disqualifier": null,
+   "measure_next": "Complete the pinned harness screen, resolve deployment entitlement, source the missing angles and retain a preregistered comparative run.",
+   "entitlement": {
+    "status": "documented",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://code.claude.com/docs/en/legal-and-compliance",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://www.anthropic.com/legal/consumer-terms",
+      "read_at": "2026-10-12T21:53:41Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan",
+      "read_at": "2026-10-12T21:53:41Z"
+     }
+    ],
+    "note": "Vendor docs document Claude Code access on Pro/Max and application of Consumer Terms for Max. API-key usage follows a separate API billing/terms route. This verifies the supported native entitlement mechanism, not an individual account."
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  },
+  {
+   "id": "claude-code-claude-haiku-5-5",
+   "route_identity": "https://code.claude.com/docs/en/model-config#claude-code-claude-haiku-5-5",
+   "name": "Claude Code + haiku 5.5",
+   "doc_url": "https://code.claude.com/docs/en/model-config",
+   "pin": "claude-haiku-5-5",
+   "role": "Native Claude Code model route; subscription-oriented foundation",
+   "adoption_status": "TRIAL",
+   "verdict": "INSUFFICIENT",
+   "provisional": false,
+   "disqualifier": null,
+   "measure_next": "Complete the pinned harness screen, resolve deployment entitlement, source the missing angles and retain a preregistered comparative run.",
+   "entitlement": {
+    "status": "documented",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://code.claude.com/docs/en/legal-and-compliance",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://www.anthropic.com/legal/consumer-terms",
+      "read_at": "2026-10-12T21:53:41Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan",
+      "read_at": "2026-10-12T21:53:41Z"
+     }
+    ],
+    "note": "Vendor docs document Claude Code access on Pro/Max and application of Consumer Terms for Max. API-key usage follows a separate API billing/terms route. This verifies the supported native entitlement mechanism, not an individual account."
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  },
+  {
+   "id": "openai-pool-foreign-harness",
+   "route_identity": "https://developers.openai.com/codex/models#openai-pool-foreign-harness",
+   "name": "OpenAI subscription pool in non-Codex clients",
+   "doc_url": "https://developers.openai.com/codex/models",
+   "pin": "gpt-6.1-sol",
+   "role": "Non-Codex comparison route with an unverified entitlement check",
+   "adoption_status": "COMPARISON_ARM",
+   "verdict": "INSUFFICIENT",
+   "provisional": false,
+   "disqualifier": null,
+   "measure_next": "Resolve the capability and entitlement evidence gaps; this route is not FINAL eligible.",
+   "entitlement": {
+    "status": "unverified",
+    "sources": [
+     {
+      "kind": "url",
+      "url": "https://openai.com/policies/terms-of-use/",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://developers.openai.com/codex/auth",
+      "read_at": "2026-10-12T21:53:40Z"
+     },
+     {
+      "kind": "url",
+      "url": "https://learn.chatgpt.com/docs/enterprise/sign-in-with-chatgpt-through-a-gateway",
+      "read_at": "2026-10-12T21:53:40Z"
+     }
+    ],
+    "note": "unverified"
+   },
+   "confounds": [
+    "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+   ]
+  }
+ ],
+ "layer_instructions": [
+  "CANDIDATE IDENTITY FOR THIS LAYER: a candidate is a model ROUTE (client + provider + endpoint class + model id). Use repository = '<primary vendor doc URL>#<route-id>' with a lowercase kebab route-id (the carried set's route_identity values follow this form). A tool repository (client, gateway, SDK) keeps its canonical GitHub URL as the selection principles say. The 90-day default-branch maintenance rule applies to repositories; for a vendor-hosted model route, judge currency from the vendor's dated model page, release notes or changelog and record it in upstream_now (latest_release = model id or version, released_at = the vendor's date; null where unknowable).",
+  "CARRIED SET: each of the 14 carried_candidates must be adjudicated. List every one in proposed[] under its route_identity with your label, demonstrated_gap, comparison_that_would_overturn, evidence and upstream_now. They do not count toward the cap of 6 proposals, which applies to NEW candidates only. The refuters vote on every carried candidate.",
+  "REQUIREMENT FIELDS: state each route's adoption status today (CURRENT, TRIAL, NOT_ADOPTED), effort and tier controls, limits and pricing or plan class inside demonstrated_gap or evidence text, each with its dated source URL.",
+  "FENCES: read-only research only. No keyed API call and no invocation of any Anthropic, OpenAI or Meta model. The Muse fence decisions hold: docs/decisions/2026-10-14-muse-file-fence.md and docs/decisions/2026-10-15-muse-toolchain-directory-grants.md in the repository worktree named in input_provenance.",
+  "INDEPENDENCE: a GPT-family half of this sweep runs separately and stays sealed until both halves finish. Do not read pull requests of seathatflowsinourveins/native-agent-stack (also served as native-agent-stack/native-agent-stack) about model routes, nor any evidence/artifacts/model-routes-sweep-* directory. Your returns must be independent."
+ ],
+ "input_provenance": {
+  "hand_built": true,
+  "why": "model-routes is not a registered catalog layer at 8053f14e7, so build_inputs.py cannot write this input",
+  "repository_worktree": "<co-op worktree of seathatflowsinourveins/native-agent-stack at 8053f14e7>",
+  "commit": "8053f14e7",
+  "angles_file": "catalogs/landscape/angles/foundation-model-routes.json",
+  "angles_file_sha256": "f71c92983ce1a7ebcf47574793509213c465fc719f194e5fcdc3fae915a1506e",
+  "final_stack_sha256": "e482c30346bbe97fc06a8909a43e86d8d69a93983a443747f92ad7d3d8b9d46d",
+  "requirement_sha256_rule": "scripts/saturation_ledger.py requirement_sha256 over {next_action, decision_ref} above",
+  "platform_profiles_sha256_source": "scripts/saturation_ledger.py --scope at 8053f14e7",
+  "published_copy_note": "The workers read the unmasked layer input, kept privately in the co-op work directory; no digest of it is published. This copy masks the host worktree path. Its decision_ref names the CC direction record without the record's digest, which the workers' copy carried (CC full read, 2026-10-15), so requirement_sha256 is recomputed over the published next_action and decision_ref by the same rule; the requirement's meaning is unchanged."
+ }
+}
