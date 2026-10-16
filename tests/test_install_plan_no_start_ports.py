@@ -54,7 +54,8 @@ class NoStartTests(unittest.TestCase):
                 self.assertIn("CALL server stop", result.stdout)
             else:
                 self.assertNotIn("CALL", result.stdout)
-                self.assertNotIn("KIT", result.stdout)
+                self.assertIn("KIT models download --tier standard", result.stdout)
+                self.assertIn("KIT models verify --tier standard", result.stdout)
 
     def test_docker_no_start_masks_package_activation_and_skips_setup(self):
         checker = module(PLAN / "check_plan.py", "docker_check")

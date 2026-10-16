@@ -1,4 +1,5 @@
 """PR1180 review_output.json regressions: renderers and extracted helpers only."""
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -225,10 +226,16 @@ class ReviewWave4DocumentationTests(unittest.TestCase):
         addendum = ROOT / "docs/decisions/2026-10-16-new-wsl-host-allocation-addendum.md"
         self.assertTrue(addendum.is_file())
         text = addendum.read_text()
-        for name in ("2026-10-01-new-wsl-distro-recipe.md", "2026-10-02-new-wsl-client-configuration.md"):
+        # Frozen public bytes at main8053f14e7, also retained in the scope receipt.
+        # A squash checkout/export need not retain any PR-only commit objects.
+        frozen = {
+            "2026-10-01-new-wsl-distro-recipe.md": "8df3f18af352be4f1dd1a2a2dc5a4d718804582b8a6281e6d461dddd73e2647c",
+            "2026-10-02-new-wsl-client-configuration.md": "be8a467cd2070d715a820213ab47fd35c49d727fdb7dabd1f4f01b1cbec7c5ef",
+        }
+        for name, digest in frozen.items():
             self.assertIn(name, text)
             path = "docs/decisions/" + name
-            self.assertEqual((ROOT / path).read_bytes(), subprocess.check_output(["git", "show", "5e3d3c2a:" + path], cwd=ROOT))
+            self.assertEqual(hashlib.sha256((ROOT / path).read_bytes()).hexdigest(), digest)
         self.assertIn("WSL_DISTRO_NAME", text)
         self.assertIn("Supersedes", text)
 

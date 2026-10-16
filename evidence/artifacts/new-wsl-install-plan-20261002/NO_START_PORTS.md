@@ -17,12 +17,17 @@ with no candidate selection, landscape comparison or default-owner reopening.
   start. The target operator reported MinerU 4.0.10 using `~/.mineru/doclib.sock`
   with `tcp.enabled=false` on both distributions; this lane did not reproduce
   that observation. The fixture proves the normal transient start/stop pair and
-  proves that no-start skips it, including daemon-dependent model configuration.
+  proves that no-start skips it. Standalone model download/verification still
+  runs, satisfying post-install acceptance; telemetry and managed-mode changes
+  wait for the normal installation/activation pass.
 - With no-start, Dagu uses `--service no`, then installs its cited user-unit form
   with nonsecret settings when a unit is absent. Existing units are preserved.
   Normal installation retains the vendor's service/bootstrap flow. A coordinator
   port drop-in is placed before the installer runs, so its first start uses the
   selected port. No-start defers native bootstrap; normal installation completes it.
+  Normal reruns recognize the pinned installer's exact user-unit output as well
+  as the plan adaptation. Unknown units, symlinks and differing drop-ins still
+  fail before configuration writes or reloads.
 - Docker's rootless setup tool starts and enables the unit internally, so the
   no-start path installs its pinned unit form without executing that tool.
   Rootful Docker/socket/containerd units are masked before package installation
@@ -79,8 +84,15 @@ with no candidate selection, landscape comparison or default-owner reopening.
   [src/core/config.rs:299–307](https://github.com/rtk-ai/rtk/blob/v0.51.0/src/core/config.rs#L299),
   [README.md:485](https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L485):
   missing-hook warning and the supported suppression switch.
-- Foreground commands use the existing pins and sources in SOURCES.md: OTel
-  Contrib v0.162.0 README.md; Loki v3.7.8 `docs/sources/setup/install/local.md:74`;
+- The OTel Contrib distribution is named and pinned by
+  [collector-releases v0.162.0, distributions/otelcol-contrib/manifest.yaml:1–10](https://github.com/open-telemetry/opentelemetry-collector-releases/blob/v0.162.0/distributions/otelcol-contrib/manifest.yaml#L1).
+  Its supported `--config` flag is defined by
+  [collector v0.162.0, otelcol/flags.go:15,35–37](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.162.0/otelcol/flags.go#L35);
+  [otelcol/command.go:31–48](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.162.0/otelcol/command.go#L31)
+  runs the collector in the foreground. The Contrib README only redirects to
+  distribution documentation and is superseded as the command citation.
+- Other foreground commands use the existing pins and sources in SOURCES.md:
+  Loki v3.7.8 `docs/sources/setup/install/local.md:74`;
   Grafana v13.2.3 `docs/sources/setup-grafana/start-restart-grafana.md:107`;
   Alertmanager v0.34.1 `Procfile:1` and `README.md:394–396`.
 
@@ -317,6 +329,18 @@ write. A failed row can leave a rendered file or unit candidate at the requested
 port while the prior snapshot remains active. Neither that snapshot nor a health
 response alone certifies completion of the attempted installation.
 
+Before a first listener-row install writes configuration, the installer records
+its staged allocation in `.service-ports.pending.json`, under the same advisory
+lock as publication. This recovery record is separate from the committed
+snapshot and is never read by clients. Failure retains it, allowing a retry with
+the same complete host input; a different allocation is refused before writes.
+Successful completion publishes the committed snapshot and removes the pending
+record. Portless rows create neither record. A legacy config with no allocation
+or recovery record still requires custody.
+For a first-install rollback, remove the pending record only after the partial
+configuration and unit files have been recovered; replacing the host file alone
+does not undo those writes.
+
 1. Retain the host input used for the attempt and identify every selected row that
    may have written files. Keep startup and acceptance pending during recovery.
 2. Retry that original selection with the same complete host input and
@@ -425,3 +449,74 @@ Its direct and credential-wrapped checks use the same current profile environmen
 fixtures intercept all native/credential calls and assert the allocated endpoint
 on both paths. Invalid explicit allocation must be corrected before retry. No
 production change to that acceptance caller was needed.
+
+## Fifth review: repeated installations and post-install model readiness
+
+`review_output.json` identified three install-path regressions at `3a74c27f`.
+Each primary flow failed before its correction; the synthetic results are
+retained in `review-wave-5-receipt.json`.
+
+- A portless row publishes no service allocation. Staging now recognizes its
+  exact declared configuration copies, including the renamed worker and
+  research assets, so Docker-first provisioning can be followed by a rerun or
+  a listener row. Promptfoo's declared runtime-state directory is opaque and
+  does not establish listener ownership. Unknown files, changed copies,
+  listener-owner configuration and symlinks still require custody. This is
+  repository policy around the existing plan dispatcher and configuration
+  paths; it does not infer running services or claim unselected ports.
+  The CC delta additionally identified failed first installs: these now retain
+  uncommitted allocation intent, so the documented same-host retry is possible
+  without treating unknown legacy configuration as a new installation.
+- MinerU downloads and verifies Standard models in both modes. Its standalone
+  [kit commands at c221cc41, models.py:86–116,171–205](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/mineru/kit/commands/models.py#L86)
+  call the model download/verification helpers without the doclib lifecycle.
+  No-start therefore satisfies the existing post-install model check while
+  continuing to defer telemetry and managed-mode configuration. The target
+  completes that configuration with a normal MinerU-row install before service
+  acceptance. A failed model download stops before verification or daemon work.
+- Dagu normal reruns recognize the exact vendor-generated user unit from
+  [v2.18.2 scripts/installer.sh:1666–1698](https://github.com/dagucloud/dagu/blob/v2.18.2/scripts/installer.sh#L1666),
+  with the native [path defaults:657–675](https://github.com/dagucloud/dagu/blob/v2.18.2/scripts/installer.sh#L657)
+  and [environment-file names:1630–1637](https://github.com/dagucloud/dagu/blob/v2.18.2/scripts/installer.sh#L1630).
+  Recognition reads only unit bytes, never environment-file contents. It is
+  restricted to normal mode; no-start keeps its inline nonsecret unit contract.
+  Unknown units and drop-ins, symlinks and changed coordinator settings are
+  rejected before any write, reload or fake installer call in the fixtures.
+
+`MICRO-delta-3a74c27f.md` also identified a test's dependency on a PR-only Git
+object and conflicting activation order in F9. The frozen-document test now
+checks the retained public byte hashes and passes in a source export with no
+Git history; changing a frozen document still fails. Both the recipe and
+checklist require separate activation and listener-ownership checks before
+after-sign-in acceptance. Each correction has a failing-before fixture.
+
+All checks use extracted commands, fakes and disposable files. This lane has
+not run either full shell script, a native installer, model download, service
+activation or target listener acceptance. Existing default renders and live
+install/accept citation anchors remain unchanged.
+
+## Fifth-review publication correction
+
+`GPT-VERDICT-3a74c27f0.md` identified four owner-conversation carriers in the
+generated JSON. The two explicit quote fields and two embedded prose fields are
+replaced by dated, attributed paraphrases using they/them. The rendered-output
+guard failed before this change and passes afterward; it checks fields and
+counts in memory without retaining quoted text or a digest of it. The structural
+publication precedent is
+[#1116 PublicationSurfaces at39b3fcaf, tests/test_session_relaunch.py:660–693](https://github.com/native-agent-stack/native-agent-stack/blob/39b3fcaf5bcb96c8a672fb6198972dffd3d9937a/tests/test_session_relaunch.py#L660).
+
+Published main at `5bab63233ef90260bec4a8ee0cec4f5e4431776c` already contains
+the four carriers at `docs/new-wsl-handbook.json:851,933,934,2383`.
+The checked Markdown projection has zero matches for those complete carrier
+values. Rulings188939/189041 authorize this normal fold and retain the three
+source evidence files and public history. No source-evidence cleanup PR is
+scheduled. The final handbook receipt preserves all published history and
+appends one final generation/binding; superseded unpublished preparation
+bindings are not added as new public digests.
+
+The cheap source-pointer follow-up now cites the Collector's pinned CLI flags
+and foreground runner, plus the current alert receiver selector. The review
+packet's missing mirror captures, target-native lifecycle/disabled-unit/listener
+acceptance, and merged-tree verification are separate remaining boundaries.
+Earlier full-shard results remain historical validation; this wave does not
+claim a new full-shard run or target acceptance.

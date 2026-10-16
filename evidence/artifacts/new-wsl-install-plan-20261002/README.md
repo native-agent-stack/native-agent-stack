@@ -30,7 +30,8 @@ Both scripts refuse root. Installation selects dependencies, isolates owner fail
 units, including the Grafana research timer. Dagu uses its pinned installer's
 `--service no` mode; rootless Docker setup is deferred and the upstream unit form
 is installed directly. The rootful Docker/containerd units are masked before apt
-can activate them. MinerU's daemon-dependent model/configuration step is deferred.
+can activate them. MinerU downloads and verifies Standard models through its
+standalone kit; daemon-dependent telemetry/managed-mode configuration is deferred.
 Existing enabled/running units keep their state; this option does not undo earlier
 activation. Foreground observability services receive disabled user units.
 
@@ -335,7 +336,12 @@ These changes serve code navigation and local document reading for the research 
 - **Structural search.** The same mise-installed ast-grep 0.45.3 binary runs the unchanged README's `-r '$A?.()'` preview as well as search. The check requires the replacement text and a no-match control returning exactly 1. It uses neither `-U` nor `-i`, so the preview writes no source file. The Opus adjudication rejected the proposed source-build coverage stage; this recipe adds no Rust toolchain. Existing CLI wiring through PATH stays sufficient under that adjudication.
 - **MinerU.** The base 4.0.10 package uses CPU-capable ONNX and llama.cpp, and the row now records `needs.gpu: false`. The installer disables telemetry, installs the pinned upstream `mineru` skill for Claude Code and Codex, downloads and verifies Standard models, sets the managed tier before managed mode, and fetches upstream's public `demo1.pdf` by commit and sha256. The slot's own `config/mineru-skills-manifest.json` uses the existing repository installer's supported `--manifest` route because the shared adoption skills manifest is outside this builder's ownership. `post_install` retains upstream's `mineru --help`, adds pinned skill/list/placement checks and verifies model files. Skills CLI JSON goes to a regular file before parsing. Start the upstream server explicitly, then run `service_health`: healthy local Standard support, successful parse, and a read of the returned page locator must all pass, with first-page text containing `afforestation`. `after_sign_in` repeats parse and read through the skill in fresh sessions of both clients and checks actual successful tool output.
 
-Installation temporarily starts doclib for telemetry and configuration, then stops only the server it started. Run the persistent MinerU lifecycle in this order after installation:
+Normal installation temporarily starts doclib for telemetry and configuration,
+then stops only the server it started. With `--no-start`, the standalone
+`mineru-kit` still downloads and verifies Standard models, so `post_install`
+can check them without starting doclib. Before activation, rerun the MinerU row
+without `--no-start`, using the same explicit host file, to complete telemetry
+and managed-mode configuration. Then run the persistent MinerU lifecycle:
 
 ```sh
 mineru server start

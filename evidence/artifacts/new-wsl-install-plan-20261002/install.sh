@@ -267,6 +267,10 @@ stage_plan_sources() {
     --source-root "$plan_dir/config" --output-root "$config_source_root" --plan-file "$plan_dir/install-plan.json" "${port_args[@]}" || return "$?"
   # Freeze the selected allocation, overriding any inherited host-file selector.
   export NS2604_HOST_FILE="$config_source_root/.service-ports.json"
+  # Record first-install intent before row writes; failure can retry the same allocation.
+  local begin_args=()
+  if [[ -n "${only:-}" ]]; then begin_args+=(--slot "$only"); fi
+  python3 "$plan_dir/config/observability_config.py" begin-ports --config-root "$config_root" --source-root "$plan_dir/config" --host-file "$NS2604_HOST_FILE" --plan-file "$plan_dir/install-plan.json" "${begin_args[@]}"
 }
 commit_allocation() {
   # Publish only after every selected row (including dependencies) succeeds.
@@ -467,8 +471,8 @@ mineru() {
   run_command 'npm install --global --prefix "$tool_root/skills-1.7.0" skills@1.7.0' || return "$?"
   # Planned. Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files
   run_command 'python3 -B "$repo_root/tools/adoption/install_skills.py" --manifest "$plan_dir/config/mineru-skills-manifest.json" --skills-bin "$tool_root/skills-1.7.0/bin/skills" --json --only mineru' || return "$?"
-  # Source: https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md#L525
-  run_command 'if [[ "$NS2604_NO_START" != 1 ]]; then mineru_started=false; if ! mineru server status --json | jq -e '"'"'.running == true'"'"' >/dev/null; then   mineru server start;   mineru_started=true; fi; trap '"'"'if $mineru_started; then mineru server stop; fi'"'"' EXIT; mineru telemetry disable; mineru-kit models download --tier standard; mineru-kit models verify --tier standard; mineru config set parse_server.local.managed_tier standard; mineru config set parse_server.local.mode managed; else printf "Deferred MinerU daemon/model configuration under --no-start.\\n"; fi' || return "$?"
+  # Source: https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/mineru/kit/commands/models.py#L86 ; download/verify are daemon-free; README.md:525 retains the managed-mode sequence.
+  run_command 'mineru-kit models download --tier standard; mineru-kit models verify --tier standard; if [[ "$NS2604_NO_START" != 1 ]]; then mineru_started=false; if ! mineru server status --json | jq -e '"'"'.running == true'"'"' >/dev/null; then   mineru server start;   mineru_started=true; fi; trap '"'"'if $mineru_started; then mineru server stop; fi'"'"' EXIT; mineru telemetry disable; mineru config set parse_server.local.managed_tier standard; mineru config set parse_server.local.mode managed; else printf "MinerU models verified; daemon/managed-mode configuration deferred under --no-start.\\n"; fi' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/opendatalab/MinerU/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/demo/pdfs/demo1.pdf
   run_command 'fetch_verified https://raw.githubusercontent.com/opendatalab/MinerU/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/demo/pdfs/demo1.pdf f3b3be345bf2df8979f2491ca9466e078e4fd1d6a216611faa8566e4c44d474b "$tool_root/mineru/demo1.pdf"' || return "$?"
 }
@@ -926,7 +930,7 @@ actionlint-kjanat() {
 dagu() {
   # Dagu | native-installer | planned
   # Source: https://github.com/dagucloud/dagu/blob/v2.18.2/scripts/installer.sh#L1666 ; preflight custody before any configuration write/reload.
-  run_command 'unit="$HOME/.config/systemd/user/dagu.service"; if [[ -L "$unit" ]] || { [[ -e "$unit" ]] && ! cmp -s -- "$plan_dir/config/dagu.service" "$unit"; }; then printf "needs_owner: existing Dagu unit differs; retained before provisioning.\n" >&2; exit 1; fi; for drop in "$HOME/.config/systemd/user/dagu.service.d"/*.conf; do [[ -e "$drop" || -L "$drop" ]] || continue; if [[ -L "$drop" || "$drop" != "$HOME/.config/systemd/user/dagu.service.d/20-ns2604-coordinator.conf" ]] || ! cmp -s -- "$plan_dir/config/dagu-coordinator.conf" "$drop"; then printf "needs_owner: existing Dagu drop-in differs; retained before provisioning.\n" >&2; exit 1; fi; done' || return "$?"
+  run_command 'native_dagu_unit() { printf "%s\n" "[Unit]" "Description=Dagu Workflow Engine" "After=network.target" "Wants=network-online.target" "" "[Service]" "Type=simple" "ExecStart=${DAGU_INSTALL_DIR:-$HOME/.local/bin}/dagu start-all" "WorkingDirectory=$HOME/.dagu" "EnvironmentFile=$HOME/.config/dagu/dagu.env" "EnvironmentFile=-$HOME/.config/dagu/bootstrap.env" "Restart=always" "RestartSec=10" "" "[Install]" "WantedBy=default.target"; }; unit="$HOME/.config/systemd/user/dagu.service"; if [[ -L "$unit" ]] || { [[ -e "$unit" ]] && ! cmp -s -- "$plan_dir/config/dagu.service" "$unit" && { [[ "$NS2604_NO_START" == 1 ]] || ! cmp -s -- <(native_dagu_unit) "$unit"; }; }; then printf "needs_owner: existing Dagu unit differs; retained before provisioning.\n" >&2; exit 1; fi; for drop in "$HOME/.config/systemd/user/dagu.service.d"/*.conf; do [[ -e "$drop" || -L "$drop" ]] || continue; if [[ -L "$drop" || "$drop" != "$HOME/.config/systemd/user/dagu.service.d/20-ns2604-coordinator.conf" ]] || ! cmp -s -- "$plan_dir/config/dagu-coordinator.conf" "$drop"; then printf "needs_owner: existing Dagu drop-in differs; retained before provisioning.\n" >&2; exit 1; fi; done' || return "$?"
   copy_config 'dagu-coordinator.conf' || return "$?"
   # Source: https://github.com/dagucloud/dagu/blob/v2.18.2/internal/cmn/config/loader.go#L2266
   # Source: https://github.com/systemd/systemd/blob/v259/man/systemd.unit.xml#L198

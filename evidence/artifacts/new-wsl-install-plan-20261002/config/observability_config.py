@@ -176,7 +176,68 @@ def gateway_url(host_file=None, config_root=None):
     return f"http://127.0.0.1:{ports['GATEWAY']}/v1"
 
 
-def installation_ports(ports, root, plan, slot=None):
+def only_portless_configuration(root, plan, ports, source):
+    """Recognize exact plan copies without treating them as listener ownership.
+
+    A portless row's successful install deliberately publishes no port snapshot.
+    Its unchanged configuration must therefore be safe to encounter on the next
+    stage. Unknown files, listener owners' files, and symlinks still need custody.
+    """
+    if root.is_symlink() or not root.is_dir():
+        return False
+    owners = {owner for owner, _ in SERVICE_PORTS.values()}
+    repo = Path(__file__).resolve().parents[4]
+    aliases = {
+        "openhands/worker.py": source / "openhands-worker.py",
+        "openhands/job-template.json": source / "openhands-job.json",
+        "openhands/srt-template.json": source / "openhands-srt.json",
+        "gpt-researcher.sh": repo / "tools/research/gpt_researcher.sh",
+        "gpt-researcher.config.json": repo / "tools/research/gpt-researcher.config.json",
+    }
+    expected, state_directories = {}, set()
+    for row in plan["owners"]:
+        if row["slot"] in owners:
+            continue
+        for name in row.get("config_paths", []):
+            if not name.startswith("$config_root/"):
+                continue
+            relative = Path(name.removeprefix("$config_root/"))
+            # promptfoo's native CONFIG_DIR stores opaque runtime data, not a
+            # listener configuration. The row declares this exact directory.
+            if row["slot"] == "promptfoo" and relative == Path("promptfoo-state"):
+                state_directories.add(relative)
+                continue
+            candidate = aliases.get(relative.as_posix(), source / relative)
+            if ".." not in relative.parts and not relative.is_absolute() and candidate.is_file():
+                expected[relative] = candidate
+    directories = {parent for name in expected for parent in name.parents} | state_directories
+    for path in root.rglob("*"):
+        relative = path.relative_to(root)
+        if path.is_symlink():
+            return False
+        if any(directory in relative.parents for directory in state_directories) and (path.is_dir() or path.is_file()):
+            continue
+        if path.is_dir() and relative in directories:
+            continue
+        if path.is_file() and relative == Path(".service-ports.lock"):
+            continue
+        candidate = expected.get(relative)
+        if not path.is_file() or candidate is None:
+            return False
+        if path.read_bytes() != render_asset(candidate.name, candidate.read_text(), ports).encode():
+            return False
+    return True
+
+
+def pending_service_ports(root):
+    """Uncommitted first-install intent; clients never read this recovery record."""
+    pending = root / ".service-ports.pending.json"
+    if pending.is_symlink() or (pending.exists() and not pending.is_file()):
+        raise ValueError("needs_owner: pending allocation is not a regular file; retained")
+    return service_ports(json.loads(pending.read_text()), require_complete=True) if pending.exists() else None
+
+
+def installation_ports(ports, root, plan, slot=None, source=None):
     """Keep unselected owners on their recorded allocation, including all references.
 
     The plan's installed/default rows and named-only measurement rows are the
@@ -190,7 +251,12 @@ def installation_ports(ports, root, plan, slot=None):
     selected = {slot} if slot is not None else {name for name, row in rows.items() if row.get("installed")}
     active = root / ".service-ports.json"
     if not active.exists():
-        if root.exists() and any(path.name != ".service-ports.lock" for path in root.iterdir()):
+        pending = pending_service_ports(root)
+        if pending is not None:
+            if ports != pending:
+                raise ValueError("needs_owner: incomplete first installation has another allocation; retry with its original host file or recover the partial assets first")
+            return pending
+        if root.exists() and not only_portless_configuration(root, plan, ports, source or Path(__file__).parent):
             raise ValueError("needs_owner: existing configuration has no allocation snapshot; establish the installed owners' complete allocation before migration")
         return ports
     previous = service_ports(json.loads(active.read_text()), require_complete=True)
@@ -416,7 +482,7 @@ def destination():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("otel", "grafana", "alerting", "alerting-ready", "grafana-check", "prometheus", "stage", "command", "units", "gateway", "listeners", "commit-ports", "code-graph"))
+    parser.add_argument("action", choices=("otel", "grafana", "alerting", "alerting-ready", "grafana-check", "prometheus", "stage", "command", "units", "gateway", "listeners", "begin-ports", "commit-ports", "code-graph"))
     parser.add_argument("--config-root", type=Path)
     parser.add_argument("--source-root", type=Path)
     parser.add_argument("--tools-root", type=Path)
@@ -465,14 +531,16 @@ def main():
     if args.action == "command":
         print(render_command(sys.stdin.read(), ports), end="")
         return 0
-    if args.action == "commit-ports":
+    if args.action in {"begin-ports", "commit-ports"}:
         if args.host_file is None:
-            raise ValueError("commit-ports requires the successful installation's candidate --host-file")
+            raise ValueError(f"{args.action} requires the staged candidate --host-file")
+        if args.action == "begin-ports" and args.plan_file is None:
+            raise ValueError("begin-ports requires --plan-file")
         if args.slot is not None and args.slot not in {owner for owner, _ in SERVICE_PORTS.values()}:
             return 0  # An unrelated row cannot establish an initial service allocation either.
         baseline_path = args.host_file.parent / ".allocation-baseline.json"
         if not baseline_path.is_file():
-            raise ValueError("commit-ports requires the baseline captured during staging")
+            raise ValueError(f"{args.action} requires the baseline captured during staging")
         baseline = json.loads(baseline_path.read_text())
         # CPython v3.13.16 Doc/library/fcntl.rst: flock serializes cooperating publishers.
         root.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -481,7 +549,20 @@ def main():
             fcntl.flock(lock, fcntl.LOCK_EX)
             if baseline != {"sha256": allocation_fingerprint(root)}:
                 raise ValueError("needs_owner: allocation changed after staging; publication refused")
-            atomic(root / ".service-ports.json", json.dumps({"NS_PORT_" + name: str(port) for name, port in ports.items()}, indent=2) + "\n")
+            pending = pending_service_ports(root)
+            if not (root / ".service-ports.json").exists():
+                if pending is not None and pending != ports:
+                    raise ValueError("needs_owner: pending first-install allocation changed; retained")
+                if args.action == "begin-ports":
+                    installation_ports(ports, root, json.loads(args.plan_file.read_text()), args.slot,
+                                       args.source_root or Path(__file__).parent)
+            encoded = json.dumps({"NS_PORT_" + name: str(port) for name, port in ports.items()}, indent=2) + "\n"
+            if args.action == "begin-ports":
+                if not (root / ".service-ports.json").exists() and pending is None:
+                    atomic(root / ".service-ports.pending.json", encoded)
+                return 0
+            atomic(root / ".service-ports.json", encoded)
+            (root / ".service-ports.pending.json").unlink(missing_ok=True)
         return 0
     if args.action == "code-graph":
         # DeusData/codebase-memory-mcp v0.11.0 src/ui/config.c:124-157:
@@ -506,7 +587,7 @@ def main():
             raise ValueError("stage requires --source-root and --output-root")
         baseline = allocation_fingerprint(root)
         if args.plan_file is not None:
-            ports = installation_ports(ports, root, json.loads(args.plan_file.read_text()), args.slot)
+            ports = installation_ports(ports, root, json.loads(args.plan_file.read_text()), args.slot, source)
         for path in sorted(source.rglob("*")):
             if path.is_file() and "__pycache__" not in path.parts:
                 text = path.read_text()

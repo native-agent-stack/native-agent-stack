@@ -1137,7 +1137,7 @@ sets), so each client keeps its own defaults and a value a person set is never t
 (it adds a setting the file lacks and keeps a differing value, printed beside the render's), and the receipt's
 `authorization_settings` records who asked.
 
-After the `--apply` line, run `codex login`, then `claude`, by hand (leave it once it is signed in). Then run the plan's
+After the `--apply` line, run `codex login`, then `claude`, by hand (leave it once it is signed in). Complete separate operator activation and a fresh listener-ownership check before running the plan's
 after-sign-in checks one owner at a time, `bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only <slot>
 --stage after_sign_in`, for `codex`, `claude-agent-sdk`, `codex-sdk-and-codex-exec-app-server`, `agent-messaging`, `sandbox-runtime-srt`, `serena`, `tobi-qmd`, `mineru`, `ccusage`, `command-output`, `local-model-server`, `alerting`, `session-analytics`, `inspect-ai`, `promptfoo`, `worktrunk`, `difftastic`, `gpt-gateway`, `agent-runtime-worker`, `research-harnesses`, `cross-family-review`, `mcp-inspector`, `playwright-cli`, `harbor-containerized-agent-e2e-runner`, `lm-program-optimization`, `skill-vetting`, `trajectory-analysis`, `mcp-protocol-conformance` and `grafana`, the owners whose plan row has that stage. The `command-output` check runs a fresh `codex exec` and requires the `rtk` prefix on the command it executed and that command's exit status 0. This includes acceptance-only cross-family-review and named-only mcp-inspector and grafana. Run `install.sh --only mcp-inspector` first for its declared Chromium host prerequisites. No trust
 grant or hook approval of another host is carried over, so a project's own `.codex/config.toml` stays disabled until

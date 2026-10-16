@@ -1,4 +1,4 @@
-# OTel Contrib v0.162.0 README.md (foreground --config); systemd v259 systemd.service(5).
+# OTel Collector v0.162.0 otelcol/flags.go:15,35-37 and command.go:31-48 (foreground --config); systemd v259 systemd.service(5).
 [Unit]
 Description=Native stack OTel Collector
 

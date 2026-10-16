@@ -3,11 +3,11 @@
   "kind": "new-wsl-handbook-profile-integration",
   "source_main": "86bb669ad6c81b9adafdb222d545a1bf2aa95218",
   "evidence_class": "local_integration",
-  "generator_sha256": "e8f3922837f4cb7a9ec67dab459ae60896dbae950d65c7de58d7b1a00354b496",
+  "generator_sha256": "a57a56c5d9d935d0f5a73eec9fab9b716b37924a43f0022bd66ec542d9566048",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "cdaf9a106f1b9ce4d2cd9e2ac514dff6b602ed09b8a5b07e4a25795acc2ea02c",
-    "docs/new-wsl-handbook.json": "f99f64e83cf425353efcfb7a7a6aec0f4423d8d7096979d3744d993e8802b28c"
+    "docs/new-wsl-handbook.md": "2b98d8150307c97d203c2a647cedc7ed18e418f42bdd6d8c325c1ff9105e222a",
+    "docs/new-wsl-handbook.json": "11b58ef3e508abe6371c90676e43a5385d8f26c7bcee227ce92b6a061fb616bf"
   },
   "inventory": {
     "layers": 37,
@@ -1067,6 +1067,19 @@
       },
       "evidence_class": "local_integration",
       "scope": "Current generated-byte binding for the explicit-host/no-start addendum only; no host or upstream acceptance."
+    },
+    {
+      "date": "2026-10-16",
+      "source_base": "3a74c27f0c22f96d448998a6279933b935d085bc",
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "a57a56c5d9d935d0f5a73eec9fab9b716b37924a43f0022bd66ec542d9566048",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "2b98d8150307c97d203c2a647cedc7ed18e418f42bdd6d8c325c1ff9105e222a",
+        "docs/new-wsl-handbook.json": "11b58ef3e508abe6371c90676e43a5385d8f26c7bcee227ce92b6a061fb616bf"
+      },
+      "evidence_class": "local_integration",
+      "scope": "Final native regeneration for activation order and publication privacy under grants186741/188939. Source evidence and public history remain unchanged per189041; no host acceptance."
     }
   ],
   "previous_outputs": [
@@ -1292,6 +1305,23 @@
       "superseded_at_utc": "2026-10-16",
       "source_head": "5e3d3c2a501d5adf90891337bd70bf8bbb45d270",
       "reason": "Explicit-host/no-start F8/F9 addendum updates current stage-order instructions and generated handbook; prior history retained."
+    },
+    {
+      "generator_sha256": "e8f3922837f4cb7a9ec67dab459ae60896dbae950d65c7de58d7b1a00354b496",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "cdaf9a106f1b9ce4d2cd9e2ac514dff6b602ed09b8a5b07e4a25795acc2ea02c",
+        "docs/new-wsl-handbook.json": "f99f64e83cf425353efcfb7a7a6aec0f4423d8d7096979d3744d993e8802b28c"
+      },
+      "inventory": {
+        "layers": 37,
+        "profile_entries": 78,
+        "projected_tools": 82,
+        "canonical_package_ids": 26
+      },
+      "superseded_at_utc": "2026-10-16",
+      "source_head": "3a74c27f0c22f96d448998a6279933b935d085bc",
+      "reason": "Released fifth fold corrects activation ordering and publishes dated attributed decision paraphrases; prior published history is retained."
     }
   ]
 }

@@ -848,7 +848,11 @@
                 "contract": "Persisted, delivered and acknowledged are counted separately; duplicates and order; latency, nudges and context added; orphan cleanup; across idle, busy, restart, interruption and project isolation. Existing daemon and session ownership is preserved.",
                 "date_utc": "2026-10-02",
                 "decision": "the owner wants messaging between sessions and between the two clients; the transport is measured before one is selected",
-                "owner_verbatim": "need to be passwardless seamless workflow,passwardmangement and llm native is a must,bypasspremission seamless across session messaging, claude-codex messaging etc",
+                "owner_paraphrase": {
+                  "attribution": "Owner (they/them), paraphrased",
+                  "date": "2026-10-02",
+                  "summary": "They set the messaging contract and comparison described in this amendment."
+                },
                 "sources": [
                   "https://code.claude.com/docs/en/cross-session-messaging.md",
                   "https://github.com/aannoo/hcom/blob/v0.7.27/README.md",
@@ -930,8 +934,8 @@
               "outcome": "owner_default",
               "overturn": "the preregistered messaging measurement (prereg r3 of 2026-10-03, never started), or the verdict's paired Harbor comparison against a released agmsg; revert to configuring the native incumbents if both upstreams document a native cross-client ingress; each reports to the owner and removes nothing by itself",
               "pin": "aannoo/hcom tag v0.7.27 = commit 2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b, published 2026-10-01T02:11:55Z. hcom-installer.sh sha256 3bc057fcd763748c32fae0ae25e150abf2b1df0d4c9451432c28f4ddde176a98, which equals the release API asset digest. hcom-x86_64-unknown-linux-gnu.tar.gz sha256 8ae97ff6fef63c637d66ddf882651aadd035bd74ae26c0787743869c20a5391d; the installer embeds this value and checks it with verify_checksum (installer L313, L374-375). Installs to ~/.local/bin; receipt goes to ~/.config/hcom. The upstream alternative is uv tool install hcom==0.7.27 (PyPI manylinux x86_64 wheel; no provenance). Re-pin at the first release that closes issue 151.",
-              "posture": "the hcom posture both lanes converged on (2026-10-03; Codex root source-accept), from the owner's answer on the posture question, quoted: \"we need full sota convergneced llm native automation at highest quality\"; verbatim record: https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684",
-              "reason": "Decide round 2 applied the owner's repository-quality rule to the gap workers/agent-messaging; its Opus verification named hcom against live upstream. Uphold: the critic's revised verdict (hcom) survives refutation.\n\n(1) Requirement gate. Met under A(1), two-client Claude Code plus Codex work, and A(3): the 2026-10-02 amendment quotes the owner asking for \"claude-codex messaging\", and the user's Q11 answer is quoted verbatim in https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684: \"we need full sota convergneced llm native automation at highest quality\"; that answer names no tool.\n\n(2) hcom passes every candidate gate:\n- Maintained: not archived; main commit 2026-10-04; release 2026-10-01.\n- Linux x86_64 install: documented, with a checksum-verifying installer; the source has explicit WSL detection.\n- Self-hosted: local SQLite. The relay stays inactive until",
+              "posture": "Paraphrased 2026-10-16: Their recorded agent-messaging default is hcom 0.7.27 (the Claude Code <-> Codex message transport only; Claude <-> Claude stays on native cross-session messaging). Installation and acceptance follow the cited contracts.",
+              "reason": "Paraphrased 2026-10-16: They recorded this choice as resolved, with outcome owner_default. Earlier comparisons and superseded decisions remain linked separately.",
               "sources": [
                 "docs/decisions/2026-10-04-final-architecture-round2.md",
                 "docs/decisions/2026-10-04-repository-quality-rule.md",
@@ -2379,8 +2383,12 @@
                   "date_utc": "2026-10-03",
                   "decision": "use context-mode in both clients of the destination (the owner's pin that the wave-2 ruling for the context layer adopts)",
                   "kind": "owner_decision",
-                  "relayed_by": "wave2-records.json owner_decisions[1]",
-                  "verbatim": "please always use the sota gpt powered sota sdks, runtime for the research, context mode etc, we are evolve beyond simple action of web search"
+                  "owner_paraphrase": {
+                    "attribution": "Owner (they/them), paraphrased",
+                    "date": "2026-10-03",
+                    "summary": "They established the historical context-supply interim; the surrounding amendment records how it was superseded."
+                  },
+                  "relayed_by": "wave2-records.json owner_decisions[1]"
                 },
                 "configuration": {
                   "claude": "the plugin from the marketplace at the reviewed revision, with the compare gate (only stats.json changed) before every update",
@@ -7887,7 +7895,7 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "c6a9847197c06a3357930d1b45efeddcf249f954c32768103a26ffbda7f8f06d"
+      "sha256": "313f7df7b120d72a0bc0f234117d1b74922797091b2d4cf2059ba4333e03e560"
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
