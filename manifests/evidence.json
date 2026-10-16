@@ -44987,6 +44987,11 @@
       "bytes": 5258
     },
     {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/frozen-prefix-receipt.json",
+      "sha256": "1aa9a90249df0db14e8715bdab062fa1ff29c4e6b5a03efbf090d3d1bcadda29",
+      "bytes": 5814
+    },
+    {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/inspector-client-probe.sh",
       "sha256": "30ae30741e4343f467cf812642469ae130e2c4b54fc523cab9088cd6dfe8ea5a",
       "bytes": 2282

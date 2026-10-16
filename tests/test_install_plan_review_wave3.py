@@ -228,16 +228,18 @@ class ReviewWave4DocumentationTests(unittest.TestCase):
         addendum = ROOT / "docs/decisions/2026-10-16-new-wsl-host-allocation-addendum.md"
         self.assertTrue(addendum.is_file())
         text = addendum.read_text()
-        # Frozen public bytes at main8053f14e7, also retained in the scope receipt.
+        # Frozen public prefixes at main8053f14e7: appends do not rewrite them.
         # A squash checkout/export need not retain any PR-only commit objects.
         frozen = {
-            "2026-10-01-new-wsl-distro-recipe.md": "8df3f18af352be4f1dd1a2a2dc5a4d718804582b8a6281e6d461dddd73e2647c",
-            "2026-10-02-new-wsl-client-configuration.md": "be8a467cd2070d715a820213ab47fd35c49d727fdb7dabd1f4f01b1cbec7c5ef",
+            "2026-10-01-new-wsl-distro-recipe.md": (151947, "8df3f18af352be4f1dd1a2a2dc5a4d718804582b8a6281e6d461dddd73e2647c"),
+            "2026-10-02-new-wsl-client-configuration.md": (149798, "be8a467cd2070d715a820213ab47fd35c49d727fdb7dabd1f4f01b1cbec7c5ef"),
         }
-        for name, digest in frozen.items():
+        for name, (length, digest) in frozen.items():
             self.assertIn(name, text)
             path = "docs/decisions/" + name
-            self.assertEqual(hashlib.sha256((ROOT / path).read_bytes()).hexdigest(), digest)
+            content = (ROOT / path).read_bytes()
+            self.assertGreaterEqual(len(content), length)
+            self.assertEqual(hashlib.sha256(content[:length]).hexdigest(), digest)
         self.assertIn("WSL_DISTRO_NAME", text)
         self.assertIn("Supersedes", text)
 

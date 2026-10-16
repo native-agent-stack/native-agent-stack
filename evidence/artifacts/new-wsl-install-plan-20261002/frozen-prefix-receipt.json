@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-16",
+  "authorization_event": 202609,
+  "before_head": "d4253c8cdf3dd69329d176c340dc3ca7a247a058",
+  "evidence_class": "synthetic",
+  "problem": "The preservation guard hashed whole decision files. A legitimate append from #1158 made both the guard and its exported-tree rerun fail CI although the frozen8053f14e bytes were unchanged.",
+  "CI_before": {
+    "run": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38890998876",
+    "head": "d4253c8cdf3dd69329d176c340dc3ca7a247a058",
+    "failed_shards": [3, 6],
+    "failures_per_shard": 1,
+    "aggregate_validate_failed": true,
+    "methods": [
+      "tests.test_install_plan_review_wave3.ReviewWave4DocumentationTests.test_addendum_supersedes_both_decisions_without_rewriting_them",
+      "tests.test_install_plan_review_wave5.DocumentationFlowTests.test_frozen_document_checks_work_without_pr_only_git_objects"
+    ]
+  },
+  "frozen_reference": {
+    "commit": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+    "files": [
+      {
+        "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
+        "bytes": 151947,
+        "sha256": "8df3f18af352be4f1dd1a2a2dc5a4d718804582b8a6281e6d461dddd73e2647c"
+      },
+      {
+        "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
+        "bytes": 149798,
+        "sha256": "be8a467cd2070d715a820213ab47fd35c49d727fdb7dabd1f4f01b1cbec7c5ef"
+      }
+    ],
+    "measurement": "Byte lengths and original digests were measured directly from the pinned Git blobs; source text was not printed. Runtime tests use fixed lengths/digests and need no Git object database."
+  },
+  "append_reference": {
+    "PR": 1158,
+    "commit": "7dcbe9a58ff85dcd6b91fbc7cd69fc9b5b098fa6",
+    "current_main_observed": "9d5bc9f9e076e033a24fcef2a26d41986506c647",
+    "client_decision_additional_bytes": 828,
+    "both_current_documents_equal_main": true,
+    "both_original_blobs_are_unchanged_prefixes": true
+  },
+  "before": {
+    "runner": "python3 -B /tmp/install-nostart-safe-tests-velo.py tests.test_install_plan_frozen_prefix tests.test_install_plan_review_wave3.ReviewWave4DocumentationTests.test_addendum_supersedes_both_decisions_without_rewriting_them tests.test_install_plan_review_wave5.DocumentationFlowTests",
+    "guard_source": "Unchanged d4253c8c wave3 and wave5 tests",
+    "log_name": "install-nostart-prefix-before-velo.log",
+    "exit_file_name": "install-nostart-prefix-before-velo.exit.json",
+    "tests": 6,
+    "failures": 5,
+    "errors": 0,
+    "skips": 0,
+    "exit_code": 1,
+    "failing_cases": [
+      "Append to the original recipe",
+      "Append to the original client decision",
+      "Current main decisions in a source export",
+      "Existing wave3 preservation guard",
+      "Existing wave5 exported-tree guard rerun"
+    ],
+    "negative_controls": "Changing one byte at the start, middle or last byte of either original prefix was already rejected: six controls."
+  },
+  "change": {
+    "wave3": "Retain the original8053 digests and add their original byte lengths. Require enough bytes, then hash only the frozen prefix. Appends pass; rewritten or truncated prefixes fail. No repin to current main.",
+    "wave5": "This test delegates to the real wave3 guard and contains no duplicate digest. Its negative control now mutates a byte inside the frozen recipe prefix instead of treating an append as a rewrite.",
+    "new_regressions": "Both append cases, six in-prefix byte mutations and the current main files run through the real guard in disposable exported trees without .git."
+  },
+  "after": {
+    "runner": "python3 -B /tmp/install-nostart-safe-tests-velo.py tests.test_install_plan_frozen_prefix tests.test_install_plan_review_wave3 tests.test_install_plan_review_wave5",
+    "log_name": "install-nostart-prefix-after-velo.log",
+    "exit_file_name": "install-nostart-prefix-after-velo.exit.json",
+    "tests": 35,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "exit_code": 0,
+    "check_plan": {"rows": 84, "commands": 198, "acceptance_entries": 113, "exit_code": 0}
+  },
+  "sources": [
+    {
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "pin": "d4253c8cdf3dd69329d176c340dc3ca7a247a058",
+      "file": "tests/test_install_plan_review_wave3.py",
+      "lines": "225-242",
+      "mechanism": "Existing frozen-public-byte preservation contract and original digests"
+    },
+    {
+      "repository": "https://github.com/python/cpython",
+      "pin": "v3.13.0",
+      "file": "Doc/library/stdtypes.rst",
+      "lines": "981,2547",
+      "mechanism": "Sequence slices and immutable byte sequences"
+    },
+    {
+      "repository": "https://github.com/python/cpython",
+      "pin": "v3.13.0",
+      "file": "Doc/library/hashlib.rst",
+      "lines": "106-116",
+      "mechanism": "SHA-256 over the selected byte sequence"
+    }
+  ],
+  "source_boundary": "Published CPython3.13.0 documentation supplies the stable bytes/hashlib semantics. The local unittest runtime is3.13.16; fetching the corresponding public documentation tag returned404, so no exact-patch-source claim is made.",
+  "execution": "Checks run detached in an inherited native shell context, inside systemd-run --user --scope -p CPUWeight=idle --quiet, with separate log/exit files. The count-only runner suppresses assertion data and adds no skips.",
+  "required_before_commit": "Run python3 scripts/validate.py after evidence registration; record its outcome and the committed-tip push gate in the PR body and lane coordination log.",
+  "scope": "Two existing tests, one new regression module and this registered receipt. No decision document, installer, acceptance script or service configuration is changed. The separate two-P2 activation follow-up still waits for #1180's merge."
+}

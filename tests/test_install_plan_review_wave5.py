@@ -229,7 +229,9 @@ class DocumentationFlowTests(unittest.TestCase):
             self.assertEqual(len(result.failures), 0, result.failures)
             self.assertFalse(result.skipped)
             target = root / "docs/decisions/2026-10-01-new-wsl-distro-recipe.md"
-            target.write_bytes(target.read_bytes() + b"\nchanged frozen bytes\n")
+            rewritten = bytearray(target.read_bytes())
+            rewritten[0] ^= 1
+            target.write_bytes(rewritten)
             changed = unittest.TestResult()
             with mock.patch.object(wave3, "ROOT", root):
                 case.run(changed)
