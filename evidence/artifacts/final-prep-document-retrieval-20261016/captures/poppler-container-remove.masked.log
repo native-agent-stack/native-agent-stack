@@ -1,0 +1,4 @@
+Script started on 2026-10-16 02:07:58-04:00 [COMMAND="docker --config <SCRATCH>/docker-config rm final-prep-poppler-2610" <not executed on terminal>]
+Error response from daemon: cannot remove container "final-prep-poppler-2610": container is running: stop the container before removing or force remove
+
+Script done on 2026-10-16 02:07:58-04:00 [COMMAND_EXIT_CODE="1"]

@@ -1,0 +1,4 @@
+Script started on 2026-10-16 01:46:17-04:00 [COMMAND="docker --config <SCRATCH>/docker-config run --detach --name final-prep-poppler-2610 --cpus 2 --memory 8g --mount type=bind,src=<SCRATCH>,dst=/work ubuntu@sha256:534baea6a22c03a63003dbc8dbe78fe34bc0d7e595d9a9dc9834884ff530eb55 tail -f /dev/null" <not executed on terminal>]
+<CONTAINER_ID>
+
+Script done on 2026-10-16 01:46:18-04:00 [COMMAND_EXIT_CODE="0"]

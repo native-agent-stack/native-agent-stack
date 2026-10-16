@@ -1,0 +1,9 @@
+Script started on 2026-10-16 02:11:06-04:00 [COMMAND="env UV_CACHE_DIR=<SCRATCH>/uv-cache uv --no-config pip install --python <SCRATCH>/prefixes/markitdown/bin/python --default-index https://pypi.org/simple --reinstall-package markitdown markitdown[pdf,docx]==0.1.8" <not executed on terminal>]
+Using Python 3.13.16 environment at: <SCRATCH>/prefixes/markitdown
+Resolved 30 packages in 136ms
+Prepared 1 package in 1ms
+Uninstalled 1 package in 6ms
+Installed 1 package in 23ms
+ ~ markitdown==0.1.8
+
+Script done on 2026-10-16 02:11:06-04:00 [COMMAND_EXIT_CODE="0"]

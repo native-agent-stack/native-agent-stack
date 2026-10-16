@@ -1,0 +1,7 @@
+Script started on 2026-10-16 01:50:14-04:00 [COMMAND="mise exec node@24.21.0 -- env XDG_CACHE_HOME=<SCRATCH>/qmd-cache QMD_CONFIG_DIR=<SCRATCH>/qmd-config <SCRATCH>/prefixes/qmd-verified/bin/qmd collection add <SCRATCH>/sources/qmd/test/fixtures/eval-docs --name vendor-smoke" <not executed on terminal>]
+Collection path does not exist.
+  Received: <SCRATCH>/sources/qmd/test/fixtures/eval-docs
+  Resolved: <SCRATCH>/sources/qmd/test/fixtures/eval-docs
+Provide an existing directory and run 'qmd collection add <path>' again.
+
+Script done on 2026-10-16 01:50:14-04:00 [COMMAND_EXIT_CODE="1"]

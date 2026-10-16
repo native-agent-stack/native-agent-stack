@@ -1,0 +1,6 @@
+Script started on 2026-10-16 02:07:56-04:00 [COMMAND="docker --config <SCRATCH>/docker-config exec -e LD_LIBRARY_PATH=/work/prefixes/poppler-26.10.0/lib final-prep-poppler-2610 /work/prefixes/poppler-26.10.0/bin/pdftotext -v" <not executed on terminal>]
+pdftotext version 26.10.0
+Copyright 2005-2026 The Poppler Developers - http://poppler.freedesktop.org
+Copyright 1996-2011, 2022 Glyph & Cog, LLC
+
+Script done on 2026-10-16 02:07:56-04:00 [COMMAND_EXIT_CODE="0"]

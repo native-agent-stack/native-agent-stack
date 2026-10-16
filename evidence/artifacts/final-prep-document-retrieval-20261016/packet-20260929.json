@@ -1,0 +1,688 @@
+{
+ "candidates": [
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c1",
+   "name": "datalab-to/surya",
+   "newcomer": true,
+   "note": "This answers the direction's question: no. Surya does not close the scanned-page gap without a full VLM, because Surya OCR 2 is itself a 650M-parameter VLM. One model does layout, OCR and table recognition, served by vllm on GPU or llama.cpp on CPU and Apple Silicon. Over the winners it adds layout labels, reading order, table rows and columns, per-block polygons and bboxes, and confidence, in 90+ languages. Its own olmOCR-bench table gives 83.3 ('top under 3B params'). Its weakest source there is OldScan at 41.8, which is exactly the scanned-page gap. Serving: auto-spawn on NVIDIA needs Docker plus the NVIDIA Container Toolkit. SURYA_INFERENCE_URL can attach to an existing OpenAI-compatible vllm server, but whether stock vllm 0.30.0 serves Surya's weights is unverified. Its Apple Silicon row is 0.108 pages/s (p50 59 s/page). Code is Apache-2.0; the weights use a modified OpenRAIL-M licence (information only). Maintenance passes the rule, but every default-branch commit since 2026-07-23 is a CLA-bot signature, and the last release is v0.22.1 (2026-07-20). Keep it as a comparator, not a stronger first trial than the 0.8B arms.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/datalab-to/surya",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "poppler",
+   "decisions": [
+    {
+     "capability": "Convert supported local documents into bounded source evidence",
+     "evidence_scope": "Selected HTML conversion passed; native Poppler preserved three designed PDF pages, twenty-four cells and twelve positive/absent queries on Mac and WSL.",
+     "id": "source-document-conversion",
+     "limitations": [
+      "Base MarkItDown HTML acceptance does not imply optional PDF/Office extras.",
+      "The designed born-digital PDF fixture does not qualify OCR, arbitrary layouts or semantic retrieval."
+     ],
+     "next_gap": "Freeze a representative layout/OCR protocol before extending the claim.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c2",
+   "name": "Poppler",
+   "pin": "26.09.0",
+   "pin_behind_upstream": null,
+   "recipe_ref": "blueprints/convergence-practice/document-ingestion/README.md",
+   "registered_receipts": [
+    {
+     "id": "mac-native-document-ingestion-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/convergence-practice/document-ingestion/receipt.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "wsl-document-ingestion-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/wsl-document-ingestion-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/tsdgeos/poppler_mirror",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": null,
+    "license": "GPL-2.0",
+    "prerelease": null,
+    "pushed_at": "2026-09-13",
+    "released_at": null,
+    "renamed_to": null,
+    "stars": 61
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c3",
+   "name": "opendatalab/mineru",
+   "newcomer": true,
+   "note": "The winners leave OCR, inferred layouts and arbitrary filings unqualified: poppler acceptance covers only born-digital Latin pages with explicit table geometry, and markitdown's PDF/Office extras are unestablished. MinerU 4.0.0 (2026-09-16) is a major rebuild with four parsing tiers. The flash tier reads native PDF text with no models. The basic tier runs ONNX OCR and table models on CPU. The standard and advanced tiers add a VLM; they need 8 GB+ VRAM through PyTorch plus vLLM on NVIDIA, and use PyTorch plus llama.cpp on Apple Silicon. MinerU 4 parses Office, EPUB, HTML and CSV natively. It also ships a local library (find/search/read/show/watch/scan) with stable locators of the form doc:{id}/tier:{tier}/page:{page}/block:{block}, which return the original page or block for citation. No winner provides that for PDFs or Office files. Limits: its README says it is not a RAG framework or vector database, and that search covers only content MinerU has already indexed. The search method is undocumented, so MinerU complements qmd rather than replacing it. No independent benchmark covers 4.0. OmniDocBench is run by opendatalab, MinerU's own organisation; it scores the MinerU2.5-Pro VLM at 95.75 and MinerU-Pipeline at 86.47, and the 4.0 mapping from tier to model is unverified. Risks: rapid churn (4.0.0 on 2026-09-16 to 4.0.9 on 2026-09-28), opt-out telemetry, and a license of Apache-2.0 plus additional terms (information only). Proposed as one arm of a shared trial with Docling against poppler.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/opendatalab/mineru",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c4",
+   "name": "datalab-to/chandra",
+   "newcomer": true,
+   "note": "Decisive reason: stale under the Scorecard-derived rule. The default-branch commits query since 2026-07-01 returned nothing, and pushed_at is 2026-06-26, so no branch has moved in the 90-day window. The last release is v0.2.0 (2026-03-18). Chandra OCR 2 (4B, 85.9 on Surya's self-reported olmOCR-bench table) is otherwise Datalab's strongest model, and prior sweeps proposed chandra. This records the rejection on maintenance, not on merit. Its maintained sibling, datalab-to/surya, is proposed above.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/datalab-to/chandra",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c5",
+   "name": "alibaba/logics-parsing",
+   "newcomer": true,
+   "note": "A maintained GitHub-hosted model for the VLM-OCR class this layer lacks. The 09-26 return found GLM-OCR, dots.ocr and DeepSeek-OCR-2 stale and OvisOCR2 HF-only, and this round confirms dots.ocr and dots.mocr are stale. Logics-Parsing-V3 (released 2026-09-22) is a 0.8B vision-language model that parses multi-page documents. It carries a structural state across pages to merge cross-page tables, keep text continuous and recover the heading hierarchy, and writes markdown.md, hierarchy.md, raw_output.dsl and result.json. That targets the unqualified OCR, inferred-layout and arbitrary-filing gaps: Poppler has no OCR, and cross-page tables are common in filings. At 0.8B it fits the RTX 4090. Every score is self-reported: the highest Overall on MPDocBench and on a self-constructed MPDocBench-Long, 'competitive' results on OmniDocBench v1.6, and 1.39 s/page against OvisOCR2 1.40, Unlimited-OCR 1.72 and MinerU2.5-Pro 3.35 on unspecified hardware. Go/no-go risk: the README pins vllm==0.22.1 and transformers==5.6.0. Not established: whether result.json carries per-block bboxes.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/alibaba/logics-parsing",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c6",
+   "name": "pymupdf/pymupdf4llm",
+   "newcomer": true,
+   "note": "A model-free, CPU-only PDF-to-Markdown arm for Poppler's unqualified inferred-layout pages and MarkItDown's unestablished PDF path. PyPI 1.28.2 (2026-08-06) installs PyMuPDF plus PyMuPDF Layout. It rebuilds reading order across multi-column pages, emits GFM or HTML tables, chunks by page with metadata, and OCRs only the regions that need it (Tesseract through PyMuPDF, or rapidocr_onnxruntime; with neither installed, OCR is off with a warning). The opendataloader-pdf README benchmark covers 200 real-world PDFs; it is competitor-authored and does not state the pymupdf4llm version. It scores pymupdf4llm at 0.732 overall, 0.885 reading order, 0.401 table and 0.412 heading, at 0.091 s/page. MarkItDown scores 0.589, 0.844, 0.273 and 0.000 at 0.114 s/page. That table has no Poppler row, so it is evidence against MarkItDown only, not a measured gap against Poppler. Scope: PDF only, since Office support needs the commercial PyMuPDF Pro, so it does not close the Office gap. License AGPL-3.0 (information only). Packaging: GitHub releases stop at v0.3.4 (2026-02-14) while PyPI follows PyMuPDF's 1.28.x line. The 2026-09-27 default-branch commit swaps the pymupdf dependency for pymupdf_core ahead of the next release, so trial the exact PyPI 1.28.2 pin.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/pymupdf/pymupdf4llm",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c7",
+   "name": "xberg-io/xberg",
+   "newcomer": true,
+   "note": "The winners split the work. MarkItDown is qualified only for HTML conversion (open_gaps leaves its PDF/Office extras unestablished), and Poppler covers only designed born-digital Latin pages, with no OCR or inferred layout. Xberg was renamed from kreuzberg-dev/kreuzberg; its README calls it 'the next iteration of Kreuzberg ... under a fresh v1 line'. It is one MIT-licensed Rust engine with Python bindings, a CLI and an MCP server (`xberg mcp --transport stdio`, 9 tools). It converts PDF, Office and image files to Markdown with OCR (Tesseract, PaddleOCR on ONNX Runtime, Candle or VLM), ML layout models (PP-DocLayout-V3, RT-DETR) and table structure (TATR, SLANet), on CPU by default. So one component targets both unqualified gaps. v1.3.0 (2026-09-29) sends pages whose text-layer character map is unusable to Tesseract PSM 6 and records the mode in metadata.additional.ocr_page_segmentation_modes. Risks to test rather than assume: (a) the sources I read do not identify the default 'native' PDF backend; pdfium is opt-in and libpdfium is not bundled. (b) Automatic OCR fallback could replace text-layer bodies. (c) Churn is high: the v1 line began at v1.0.0 on 2026-07-28 and has shipped about 40 release tags since, including v1.2.0 to v1.3.0 in 15 days, so pin v1.3.0 / commit 1409e7be4b. Xberg is open-core: Pro and Enterprise are commercial, and only the MIT engine is in scope. The xberg.io/benchmarks claims are vendor-authored and were not read.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/xberg-io/xberg",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c8",
+   "name": "arabold/docs-mcp-server",
+   "newcomer": true,
+   "note": "It is the maintained candidate for the role Context Hub was held for, which is now stale: version-pinned third-party documentation under controlled ingestion. It fetches official docs from websites, GitHub, npm, PyPI and local files, and offers CLI scrape, search and fetch-url plus an MCP server. Embeddings are optional, and Ollama is supported for local use. qmd indexes only local Markdown collections and has no pinned upstream-docs ingestion. The previous sweep left it unadjudicated only because a vote did not return. Supply-chain facts: a single human npm publisher, no build provenance and no security policy.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/arabold/docs-mcp-server",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c9",
+   "name": "LlamaIndex",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/foundation-memory.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/run-llama/llama_index",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c10",
+   "name": "Docling",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/foundation-memory.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/docling-project/docling",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "context-hub",
+   "decisions": [
+    {
+     "capability": "Retrieve selected curated developer documentation",
+     "evidence_scope": "Retained native Context Hub search/retrieval supports its selected developer-document operation.",
+     "id": "curated-developer-docs",
+     "limitations": [
+      "This is not a claim that all external documentation is current or indexed."
+     ],
+     "next_gap": "Recheck the relevant source revision when its API or requirement changes.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    }
+   ],
+   "evidence_kind": "mixed",
+   "evidence_refs": [
+    "docs/token-native-saturation.md",
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c11",
+   "name": "Context Hub",
+   "pin": "0.1.4",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "registered_receipts": [
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "component-history",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/component-history.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-native-retained-functional-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-native-retained-functional-20260920.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/andrewyng/context-hub",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.1.4",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-05-31",
+    "released_at": "2026-04-27",
+    "renamed_to": null,
+    "stars": 13983
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "markitdown",
+   "decisions": [
+    {
+     "capability": "Convert supported local documents into bounded source evidence",
+     "evidence_scope": "Selected HTML conversion passed; native Poppler preserved three designed PDF pages, twenty-four cells and twelve positive/absent queries on Mac and WSL.",
+     "id": "source-document-conversion",
+     "limitations": [
+      "Base MarkItDown HTML acceptance does not imply optional PDF/Office extras.",
+      "The designed born-digital PDF fixture does not qualify OCR, arbitrary layouts or semantic retrieval."
+     ],
+     "next_gap": "Freeze a representative layout/OCR protocol before extending the claim.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c12",
+   "name": "MarkItDown",
+   "pin": "0.1.8",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "registered_receipts": [
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "component-history",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/component-history.json"
+    },
+    {
+     "id": "markitdown-018-qualification-20260925",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/markitdown-018-qualification-20260925.json"
+    },
+    {
+     "id": "portable-cli-artifacts",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/portable-cli-artifacts.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-practice-artifacts-20260920",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/microsoft/markitdown",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.1.8",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 187476
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "qmd",
+   "decisions": [
+    {
+     "capability": "Reproduce native context-tool commands in a clean CI environment",
+     "evidence_scope": "Local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks; retained artifact/source hashes matched.",
+     "id": "clean-token-tool-ci",
+     "limitations": [
+      "CI acceptance covers these four tool fixtures, not live providers, GPU execution or a full new-PC stack."
+     ],
+     "next_gap": "Extend a specific missing native-tool CI behavior only with its own useful fixture.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    },
+    {
+     "capability": "Resolve persistent native command and MCP environments",
+     "evidence_scope": "Fresh native processes resolved selected commands/MCP servers and Claude startup hooks; restarted Desktop source retrieval has its own dated receipt.",
+     "id": "native-process-defaults",
+     "limitations": [
+      "Configuration presence does not prove an already-running task hot-reloaded it.",
+      "The Linux/WSL and Desktop process/configuration boundaries remain distinct."
+     ],
+     "next_gap": "Collect the specific new-host or changed-session activation evidence; do not copy account stores.",
+     "review_status": "accepted_within_scope",
+     "selection": "default"
+    },
+    {
+     "capability": "Search and read a named local Markdown corpus",
+     "evidence_scope": "Native scoped QMD search/get passed; the fixed twelve-query benchmark returned the intended source in eight top-three results. The current-clone catalog repair returned both selected handbook sources first, with exact source bodies and independent configuration review.",
+     "id": "scoped-document-bm25",
+     "limitations": [
+      "All four benchmark misses remain; exact source retrieval on a fixture does not establish arbitrary corpus recall.",
+      "The selected BM25 lane needs no downloaded embedding model."
+     ],
+     "next_gap": "Evaluate positive and absent queries for a new corpus.",
+     "review_status": "accepted_within_scope",
+     "selection": "default"
+    }
+   ],
+   "evidence_kind": "measured_comparison",
+   "evidence_refs": [
+    "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+    "docs/foundation-rd-readiness.md"
+   ],
+   "key": "c13",
+   "name": "QMD BM25",
+   "pin": "2.8.3",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "registered_receipts": [
+    {
+     "id": "native-research-efficiency-20260920",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/us-equities/research-efficiency/native-receipt.json"
+    },
+    {
+     "id": "qmd-bm25-retrieval-20260919",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/us-equities/retrieval-evaluation/receipt.json"
+    },
+    {
+     "id": "claude-host-practice-readback-20260928",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-host-practice-readback-20260928.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "codex-desktop-live-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/codex-desktop-live-20260920.json"
+    },
+    {
+     "id": "component-history",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/component-history.json"
+    },
+    {
+     "id": "desktop-cli-workflows",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/desktop-cli-workflows.json"
+    },
+    {
+     "id": "foundation-native-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-native-20260920.json"
+    },
+    {
+     "id": "foundation-rd-20260921",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-rd-20260921.json"
+    },
+    {
+     "id": "full-stack-convergence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/full-stack-convergence-20260921.json"
+    },
+    {
+     "id": "memory-landscape-lifecycle-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/memory-landscape-lifecycle-20260921.json"
+    },
+    {
+     "id": "native-catalog-retrieval-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-catalog-retrieval-20260920.json"
+    },
+    {
+     "id": "native-cli-gaps",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-cli-gaps.json"
+    },
+    {
+     "id": "native-dashboard-data-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-dashboard-data-20260921.json"
+    },
+    {
+     "id": "native-memory-rag-alignment-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-memory-rag-alignment-20260921.json"
+    },
+    {
+     "id": "native-returned-results-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-returned-results-20260921.json"
+    },
+    {
+     "id": "native-session-defaults-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-session-defaults-20260920.json"
+    },
+    {
+     "id": "native-token-ci-github-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-ci-github-20260920.json"
+    },
+    {
+     "id": "native-token-ci-local-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-ci-local-20260920.json"
+    },
+    {
+     "id": "portable-userspace-install-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/portable-userspace-install-20260921.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-practice-artifacts-20260920",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    },
+    {
+     "id": "wsl-retrieval-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/wsl-retrieval-20260920.json"
+    },
+    {
+     "id": "wsl-retrieval-retirement-20261003",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/wsl-retrieval-retirement-20261003.json"
+    }
+   ],
+   "repository": "https://github.com/tobi/qmd",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.8.3",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-09",
+    "released_at": "2026-08-16",
+    "renamed_to": null,
+    "stars": 30094
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c14",
+   "name": "baidu/unlimited-ocr",
+   "newcomer": true,
+   "note": "A maintained GitHub-hosted end-to-end VLM-OCR model. It was created 2026-06-18, 103 days ago, so it is old enough to assess; the last default-branch commit is 2026-07-29. It extends DeepSeek-OCR to document-level multi-page parsing. Inference runs through transformers with trust_remote_code, through an official vLLM recipe with a dedicated vllm/vllm-openai:unlimited-ocr image, or through SGLang. Its <|det|>type [bbox] output markers give block-level provenance. Against the proposed 0.8B arms: its parameter count and OmniDocBench score were not established here. Logics-Parsing's self-reported comparison gives it 1.72 s/page against 1.39 to 1.40 s, and a larger quality decline as documents get longer. Mainline vllm 0.30.0 support is unverified because it ships a dedicated image, and the repository has no GitHub releases. It is the third VLM comparator, not a first trial.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/baidu/unlimited-ocr",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c15",
+   "name": "vectifyai/pageindex",
+   "newcomer": true,
+   "note": "It targets the open gap 'semantic questions remain unqualified' on long filings: an LLM builds a tree index over a long PDF and reasons over it to retrieve, with page-level citations in local mode (the SDK shipped local mode in August 2026). qmd has no measured result on filing QA. The headline 98.7% FinanceBench score belongs to Mafin 2.5, a product built on PageIndex, not to the open-source local mode. Local mode handles text-based PDFs only; OCR, block-level citations and MCP are cloud-only. Index builds (about $0.001/page per the README) and every query spend LLM tokens, which cuts against the ecosystem's token-efficiency priority. The default-branch pyproject depends on litellm>=1.97.0 and openai>=1.70.0, so routing through the existing OpenAI-compatible gateway is plausible, but no documented endpoint setting was verified. Without such routing it would need a new paid credential.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/vectifyai/pageindex",
+   "review_status": null,
+   "upstream": null
+  }
+ ],
+ "catalog": "foundation",
+ "checked_at": "2026-10-16",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "A sealed representative corpus/query set shows useful quality gains with acceptable repeated end-to-end latency, or layout/OCR failures justify a separately qualified parser.",
+ "group": null,
+ "layer_id": "document-retrieval",
+ "limitations": [
+  "The QMD diagnostic used one ordered run and an incompletely sealed expanded index; it is not a general retrieval ranking.",
+  "HTML/PDF fixtures do not qualify arbitrary Office documents, scans, tables or filing layouts. Context Hub's retained size comparison grew by 85 tokens."
+ ],
+ "registered_receipts_note": "registered_receipts lists the receipts manifests/evidence.json registers for a candidate's component: matched_by component_id when the receipt names its id, alias when it names the same component under its manifests/stack.json spelling, repository when the receipt names the only registered component with its repository and no other manifest component shares that repository. A receipt may name several components, and its kind is the registrant's label, not a checked evidence class: open it and judge what it actually ran for this component, as for evidence_refs.",
+ "requirement": "Find source-grounded Markdown/document content with controlled ingestion and retrieve the original body before relying on a result.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories. Read only the packet and files under the repository root: no memory stores, code indexes, MCP tools, web search, git history, or other checkouts or work directories, which can carry the verdict you must reach.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. Adoption, incumbency, installation, retained-control status, receipt count, packet position, license, stars and popularity are not evidence of fit; choose among adopted candidates on what their evidence shows was run. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Documents and ingestion",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale"
+ ]
+}

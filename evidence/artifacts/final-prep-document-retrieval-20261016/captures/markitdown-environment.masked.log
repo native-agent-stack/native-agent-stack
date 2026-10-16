@@ -1,0 +1,40 @@
+Script started on 2026-10-16 02:11:06-04:00 [COMMAND="env UV_CACHE_DIR=<SCRATCH>/uv-cache uv --no-config pip freeze --python <SCRATCH>/prefixes/markitdown/bin/python" <not executed on terminal>]
+Using Python 3.13.16 environment at: <SCRATCH>/prefixes/markitdown
+beautifulsoup4==4.15.0
+certifi==2026.7.22
+cffi==2.1.1
+charset-normalizer==3.5.2
+click==8.5.0
+cobble==0.1.4
+cryptography==50.0.2
+defusedxml==0.7.1
+flatbuffers==25.12.19
+fonttools==4.67.0
+fpdf2==2.8.9
+idna==3.20
+iniconfig==2.3.1
+lxml==6.1.3
+magika==0.6.3
+mammoth==1.11.0
+markdownify==1.2.3
+markitdown==0.1.8
+numpy==2.5.4
+onnxruntime==1.31.0
+packaging==26.3
+pdfminer-six==20260107
+pdfplumber==0.11.10
+pillow==12.3.0
+pluggy==1.7.0
+protobuf==7.36.2
+pycparser==3.11
+pygments==2.21.0
+pypdfium2==5.14.0
+pytest==9.1.1
+python-dotenv==1.2.4
+requests==2.34.2
+six==1.17.0
+soupsieve==3.0.3
+typing-extensions==4.16.0
+urllib3==2.8.0
+
+Script done on 2026-10-16 02:11:06-04:00 [COMMAND_EXIT_CODE="0"]

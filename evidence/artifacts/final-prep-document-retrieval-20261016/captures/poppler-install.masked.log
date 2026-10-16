@@ -1,0 +1,129 @@
+Script started on 2026-10-16 02:07:05-04:00 [COMMAND="docker --config <SCRATCH>/docker-config exec final-prep-poppler-2610 cmake --install /work/poppler-build" <not executed on terminal>]
+-- Install configuration: "RelWithDebInfo"
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler.so.165.0.0
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler.so.165
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler.so
+-- Installing: /work/prefixes/poppler-26.10.0/bin/pdftoppm
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/bin/pdftoppm" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/share/man/man1/pdftoppm.1
+-- Installing: /work/prefixes/poppler-26.10.0/bin/pdftocairo
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/bin/pdftocairo" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/share/man/man1/pdftocairo.1
+-- Installing: /work/prefixes/poppler-26.10.0/bin/pdfdetach
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/bin/pdfdetach" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/share/man/man1/pdfdetach.1
+-- Installing: /work/prefixes/poppler-26.10.0/bin/pdfattach
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/bin/pdfattach" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/share/man/man1/pdfattach.1
+-- Installing: /work/prefixes/poppler-26.10.0/bin/pdffonts
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/bin/pdffonts" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/share/man/man1/pdffonts.1
+-- Installing: /work/prefixes/poppler-26.10.0/bin/pdfimages
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/bin/pdfimages" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/share/man/man1/pdfimages.1
+-- Installing: /work/prefixes/poppler-26.10.0/bin/pdfinfo
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/bin/pdfinfo" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/share/man/man1/pdfinfo.1
+-- Installing: /work/prefixes/poppler-26.10.0/bin/pdfsig
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/bin/pdfsig" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/share/man/man1/pdfsig.1
+-- Installing: /work/prefixes/poppler-26.10.0/bin/pdftops
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/bin/pdftops" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/share/man/man1/pdftops.1
+-- Installing: /work/prefixes/poppler-26.10.0/bin/pdftotext
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/bin/pdftotext" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/share/man/man1/pdftotext.1
+-- Installing: /work/prefixes/poppler-26.10.0/bin/pdftohtml
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/bin/pdftohtml" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/share/man/man1/pdftohtml.1
+-- Installing: /work/prefixes/poppler-26.10.0/bin/pdfseparate
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/bin/pdfseparate" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/share/man/man1/pdfseparate.1
+-- Installing: /work/prefixes/poppler-26.10.0/bin/pdfunite
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/bin/pdfunite" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/share/man/man1/pdfunite.1
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler-glib.so.8.31.0
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler-glib.so.8
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/lib/libpoppler-glib.so.8.31.0" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler-glib.so
+-- Up-to-date: /work/prefixes/poppler-26.10.0/lib/libpoppler-glib.so.8.31.0
+-- Up-to-date: /work/prefixes/poppler-26.10.0/lib/libpoppler-glib.so.8
+-- Up-to-date: /work/prefixes/poppler-26.10.0/lib/libpoppler-glib.so
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-action.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-date.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-document.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-page.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-attachment.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-form-field.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-annot.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-layer.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-movie.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-media.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-structure-element.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-enums.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-features.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/glib/poppler-macros.h
+-- Installing: /work/prefixes/poppler-26.10.0/share/gir-1.0/Poppler-0.18.gir
+-- Installing: /work/prefixes/poppler-26.10.0/lib/girepository-1.0/Poppler-0.18.typelib
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler-qt5.so.1.41.0
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler-qt5.so.1
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/lib/libpoppler-qt5.so.1.41.0" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler-qt5.so
+-- Up-to-date: /work/prefixes/poppler-26.10.0/lib/libpoppler-qt5.so.1.41.0
+-- Up-to-date: /work/prefixes/poppler-26.10.0/lib/libpoppler-qt5.so.1
+-- Up-to-date: /work/prefixes/poppler-26.10.0/lib/libpoppler-qt5.so
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt5/poppler-qt5.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt5/poppler-link.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt5/poppler-annotation.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt5/poppler-form.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt5/poppler-optcontent.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt5/poppler-page-transition.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt5/poppler-media.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt5/poppler-export.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt5/poppler-version.h
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler-qt6.so.3.13.0
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler-qt6.so.3
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/lib/libpoppler-qt6.so.3.13.0" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler-qt6.so
+-- Up-to-date: /work/prefixes/poppler-26.10.0/lib/libpoppler-qt6.so.3.13.0
+-- Up-to-date: /work/prefixes/poppler-26.10.0/lib/libpoppler-qt6.so.3
+-- Up-to-date: /work/prefixes/poppler-26.10.0/lib/libpoppler-qt6.so
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt6/poppler-qt6.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt6/poppler-link.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt6/poppler-annotation.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt6/poppler-form.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt6/poppler-optcontent.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt6/poppler-page-transition.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt6/poppler-media.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt6/poppler-converter.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt6/poppler-export.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/qt6/poppler-version.h
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler-cpp.so.3.1.0
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler-cpp.so.3
+-- Set non-toolchain portion of runtime path of "/work/prefixes/poppler-26.10.0/lib/libpoppler-cpp.so.3.1.0" to ""
+-- Installing: /work/prefixes/poppler-26.10.0/lib/libpoppler-cpp.so
+-- Up-to-date: /work/prefixes/poppler-26.10.0/lib/libpoppler-cpp.so.3.1.0
+-- Up-to-date: /work/prefixes/poppler-26.10.0/lib/libpoppler-cpp.so.3
+-- Up-to-date: /work/prefixes/poppler-26.10.0/lib/libpoppler-cpp.so
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler-destination.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler-document.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler-embedded-file.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler-font.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler-font-private.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler-global.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler-image.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler-page.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler-page-renderer.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler-page-transition.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler-rectangle.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler-toc.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler_cpp_export.h
+-- Installing: /work/prefixes/poppler-26.10.0/include/poppler/cpp/poppler-version.h
+-- Installing: /work/prefixes/poppler-26.10.0/lib/pkgconfig/poppler.pc
+-- Installing: /work/prefixes/poppler-26.10.0/lib/pkgconfig/poppler-qt5.pc
+-- Installing: /work/prefixes/poppler-26.10.0/lib/pkgconfig/poppler-qt6.pc
+-- Installing: /work/prefixes/poppler-26.10.0/lib/pkgconfig/poppler-glib.pc
+-- Installing: /work/prefixes/poppler-26.10.0/lib/pkgconfig/poppler-cpp.pc
+
+Script done on 2026-10-16 02:07:05-04:00 [COMMAND_EXIT_CODE="0"]

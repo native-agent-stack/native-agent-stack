@@ -1,0 +1,11 @@
+Script started on 2026-10-16 01:51:19-04:00 [COMMAND="env UV_CACHE_DIR=<SCRATCH>/uv-cache uv --no-config pip install --python <SCRATCH>/prefixes/markitdown/bin/python --default-index https://pypi.org/simple markitdown[pdf,docx]==0.1.8 pytest fpdf2" <not executed on terminal>]
+Using Python 3.13.16 environment at: <SCRATCH>/prefixes/markitdown
+Resolved 36 packages in 338ms
+Downloading fonttools (5.1MiB)
+ Downloaded fonttools
+Prepared 2 packages in 129ms
+Installed 2 packages in 58ms
+ + fonttools==4.67.0
+ + fpdf2==2.8.9
+
+Script done on 2026-10-16 01:51:20-04:00 [COMMAND_EXIT_CODE="0"]

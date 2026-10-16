@@ -1,0 +1,20 @@
+Script started on 2026-10-16 01:47:08-04:00 [COMMAND="mise exec node@24.21.0 bun@1.4.2 -- env XDG_CACHE_HOME=<SCRATCH>/qmd-cache XDG_CONFIG_HOME=<SCRATCH>/qmd-config BUN_INSTALL_CACHE_DIR=<SCRATCH>/bun-cache bun install --frozen-lockfile" <not executed on terminal>]
+bun install v1.4.2 (744846f84)
+Installing
+ [71/228] Installing
+ [87/228] Installing
+ [102/228] Installing
+ [116/228] Installing
+ [135/228] Installing
+ [152/228] Installing
+ [165/228] Installing
+ [181/228] Installing
+ [183/228] Installing
+ [184/228] Installing
+ [185/228] Installing
+ [186/228] Installing
+ [207/228] /usr/bin/bash: line 1: node-gyp: command not found
+
+error: install script from "better-sqlite3" exited with 127
+
+Script done on 2026-10-16 01:47:10-04:00 [COMMAND_EXIT_CODE="127"]

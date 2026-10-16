@@ -1,0 +1,16 @@
+Script started on 2026-10-16 01:52:23-04:00 [COMMAND="mise exec node@24.21.0 -- env XDG_CACHE_HOME=<SCRATCH>/qmd-cache QMD_CONFIG_DIR=<SCRATCH>/qmd-config <SCRATCH>/prefixes/qmd-verified/bin/qmd collection add <SCRATCH>/sources/qmd/test/eval-docs --name vendor-smoke" <not executed on terminal>]
+Creating collection 'vendor-smoke'...
+Collection: <SCRATCH>/sources/qmd/test/eval-docs (**/*.md)
+
+Indexing: 1/6        
+Indexing: 2/6        
+Indexing: 3/6 ETA: 0s        
+Indexing: 4/6 ETA: 0s        
+Indexing: 5/6 ETA: 0s        
+Indexing: 6/6 ETA: 0s        
+Indexed: 6 new, 0 updated, 0 unchanged, 0 removed
+
+Run 'qmd embed' to update embeddings (6 unique hashes need vectors)
+✓ Collection 'vendor-smoke' created successfully
+
+Script done on 2026-10-16 01:52:24-04:00 [COMMAND_EXIT_CODE="0"]

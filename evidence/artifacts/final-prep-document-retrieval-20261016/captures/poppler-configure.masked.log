@@ -1,0 +1,221 @@
+Script started on 2026-10-16 01:50:40-04:00 [COMMAND="docker --config <SCRATCH>/docker-config exec final-prep-poppler-2610 cmake -S /work/sources/poppler-26.10.0 -B /work/poppler-build -G Ninja -DENABLE_GPGME=OFF -DTESTDATADIR=/work/sources/poppler-test-data -DCMAKE_INSTALL_PREFIX=/work/prefixes/poppler-26.10.0" <not executed on terminal>]
+-- The C compiler identification is GNU 13.3.0
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test GCC_HAS_AS_NEEDED
+-- Performing Test GCC_HAS_AS_NEEDED - Success
+-- Found PkgConfig: /usr/bin/pkg-config (found version "1.8.1") 
+-- Checking _FILE_OFFSET_BITS for large files
+-- Checking _FILE_OFFSET_BITS for large files - not needed
+-- Found Freetype: /usr/lib/x86_64-linux-gnu/libfreetype.so (found suitable version "2.13.2", minimum required is "2.13") 
+-- Found Fontconfig: /usr/lib/x86_64-linux-gnu/libfontconfig.so (found suitable version "2.15.0", minimum required is "2.15") 
+-- Checking for module 'nss>=3.98'
+--   Found nss, version 3.98
+-- Found NSS3: nss3;nssutil3;smime3;ssl3;plds4;plc4;nspr4 (Required is at least version "3.98") 
+-- Found TIFF: /usr/lib/x86_64-linux-gnu/libtiff.so (found suitable version "4.5.1", minimum required is "4.5")  
+-- Checking for module 'libbrotlidec>=1.1'
+--   Found libbrotlidec, version 1.1.0
+-- Found libbrotlidec: brotlidec (Required is at least version "1.1") 
+-- Checking for module 'harfbuzz'
+--   Found harfbuzz, version 8.3.0
+-- Found harfbuzz: /usr/lib/x86_64-linux-gnu/libharfbuzz.so  
+-- Checking for module 'harfbuzz-subset'
+--   Found harfbuzz-subset, version 8.3.0
+-- Found harfbuzz-subset: /usr/lib/x86_64-linux-gnu/libharfbuzz-subset.so;/usr/lib/x86_64-linux-gnu/libharfbuzz.so  
+-- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.3")  
+-- Found PNG: /usr/lib/x86_64-linux-gnu/libpng.so (found version "1.6.43") 
+-- Found JPEG: /usr/lib/x86_64-linux-gnu/libjpeg.so (found version "80") 
+-- Performing Test HAVE_JPEG_MEM_SRC
+-- Performing Test HAVE_JPEG_MEM_SRC - Success
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE  
+-- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so   
+-- Found WrapOpenGL: TRUE  
+-- Found XKB: /usr/lib/x86_64-linux-gnu/libxkbcommon.so (found suitable version "1.6.0", minimum required is "0.5.0") 
+-- Found WrapVulkanHeaders: /usr/include  
+-- Checking for module 'cairo>=1.18.0'
+--   Found cairo, version 1.18.0
+-- Found Cairo: /usr/lib/x86_64-linux-gnu/libcairo.so (Required is at least version "1.18.0") 
+-- Checking for modules 'glib-2.0>=2.80;gobject-2.0>=2.80;gio-2.0>=2.80'
+--   Found glib-2.0, version 2.80.0
+--   Found gobject-2.0, version 2.80.0
+--   Found gio-2.0, version 2.80.0
+-- Found GLIB: gio-2.0;gobject-2.0;glib-2.0  
+-- Checking for module 'gobject-introspection-1.0'
+--   Found gobject-introspection-1.0, version 1.80.1
+-- Checking for modules 'gtk+-3.0>=3.24;gdk-pixbuf-2.0>=2.42'
+--   Found gtk+-3.0, version 3.24.41
+--   Found gdk-pixbuf-2.0, version 2.42.10
+-- Found GTK: gtk-3;gdk-3;z;pangocairo-1.0;pango-1.0;harfbuzz;atk-1.0;cairo-gobject;cairo;gio-2.0;gdk_pixbuf-2.0;gobject-2.0;glib-2.0  
+-- Performing Test Iconv_IS_BUILT_IN
+-- Performing Test Iconv_IS_BUILT_IN - Success
+-- Found Iconv: built in to C library  
+-- Performing Test ICONV_SECOND_ARGUMENT_IS_CONST
+-- Performing Test ICONV_SECOND_ARGUMENT_IS_CONST - Failed
+-- The imported target "openjpip" references the file
+   "/usr/lib/x86_64-linux-gnu/libopenjpip.so.2.5.0"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/x86_64-linux-gnu/openjpeg-2.5/OpenJPEGTargets.cmake"
+but not all the files it references.
+
+-- The imported target "opj_decompress" references the file
+   "/usr/bin/opj_decompress"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/x86_64-linux-gnu/openjpeg-2.5/OpenJPEGTargets.cmake"
+but not all the files it references.
+
+-- The imported target "opj_compress" references the file
+   "/usr/bin/opj_compress"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/x86_64-linux-gnu/openjpeg-2.5/OpenJPEGTargets.cmake"
+but not all the files it references.
+
+-- The imported target "opj_dump" references the file
+   "/usr/bin/opj_dump"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/x86_64-linux-gnu/openjpeg-2.5/OpenJPEGTargets.cmake"
+but not all the files it references.
+
+-- The imported target "opj_jpip_addxml" references the file
+   "/usr/bin/opj_jpip_addxml"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/x86_64-linux-gnu/openjpeg-2.5/OpenJPEGTargets.cmake"
+but not all the files it references.
+
+-- The imported target "opj_server" references the file
+   "/usr/bin/opj_server"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/x86_64-linux-gnu/openjpeg-2.5/OpenJPEGTargets.cmake"
+but not all the files it references.
+
+-- The imported target "opj_dec_server" references the file
+   "/usr/bin/opj_dec_server"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/x86_64-linux-gnu/openjpeg-2.5/OpenJPEGTargets.cmake"
+but not all the files it references.
+
+-- The imported target "opj_jpip_transcode" references the file
+   "/usr/bin/opj_jpip_transcode"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/x86_64-linux-gnu/openjpeg-2.5/OpenJPEGTargets.cmake"
+but not all the files it references.
+
+-- The imported target "opj_jpip_test" references the file
+   "/usr/bin/opj_jpip_test"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/x86_64-linux-gnu/openjpeg-2.5/OpenJPEGTargets.cmake"
+but not all the files it references.
+
+-- Checking for module 'lcms2'
+--   Found lcms2, version 2.14
+-- Found lcms version 2.14, /usr/lib/x86_64-linux-gnu/liblcms2.so
+-- Found CURL: /usr/lib/x86_64-linux-gnu/libcurl.so (found suitable version "8.5.0", minimum required is "8.5")  
+-- Checking for module 'poppler-data'
+--   Package 'poppler-data', required by 'virtual:world', not found
+-- Looking for fseek64
+-- Looking for fseek64 - not found
+-- Looking for fseeko
+-- Looking for fseeko - found
+-- Looking for pread64
+-- Looking for pread64 - found
+-- Looking for lseek64
+-- Looking for lseek64 - found
+-- Looking for gmtime_r
+-- Looking for gmtime_r - found
+-- Looking for timegm
+-- Looking for timegm - found
+-- Looking for localtime_r
+-- Looking for localtime_r - found
+-- Looking for strtok_r
+-- Looking for strtok_r - found
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR - Success
+-- Performing Test SUPPORT_VERSION_SCRIPT
+-- Performing Test SUPPORT_VERSION_SCRIPT - Success
+-- Could NOT find Gettext (missing: GETTEXT_MSGMERGE_EXECUTABLE GETTEXT_MSGFMT_EXECUTABLE) 
+-- Found Intl: built in to C library  
+-- Looking for explicit_bzero
+-- Looking for explicit_bzero - found
+-- Looking for CAIRO_HAS_PNG_FUNCTIONS
+-- Looking for CAIRO_HAS_PNG_FUNCTIONS - found
+-- Looking for CAIRO_HAS_PDF_SURFACE
+-- Looking for CAIRO_HAS_PDF_SURFACE - found
+-- Looking for CAIRO_HAS_PS_SURFACE
+-- Looking for CAIRO_HAS_PS_SURFACE - found
+-- Looking for CAIRO_HAS_SVG_SURFACE
+-- Looking for CAIRO_HAS_SVG_SURFACE - found
+Building Poppler with support for:
+  font configuration:   fontconfig
+  font subsetting:      yes
+  use boost (Splash):   yes
+  cairo output:         yes
+  qt5 wrapper:          yes
+  qt6 wrapper:          yes
+  glib wrapper:         yes
+    introspection:      yes
+    gtk-doc:            no
+  cpp wrapper:          yes
+  use libjpeg:          yes
+  use libpng:           yes
+  use libtiff:          yes
+  use brotli:           yes
+  use zlib uncompress:  no
+  use nss3:             yes
+  use gpg:              no
+    default signature backend:          NSS
+    enable pgp signatures in gpg backend by default:                                no
+  use curl:             yes
+  use libopenjpeg2:     yes
+  use lcms2:            yes
+  command line utils:   yes
+  fuzz target:          no
+  test data dir:        /work/sources/poppler-test-data
+-- Configuring done (5.0s)
+-- Generating done (0.7s)
+-- Build files have been written to: /work/poppler-build
+
+Script done on 2026-10-16 01:50:46-04:00 [COMMAND_EXIT_CODE="0"]

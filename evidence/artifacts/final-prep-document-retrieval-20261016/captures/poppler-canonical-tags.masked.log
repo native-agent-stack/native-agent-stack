@@ -1,0 +1,7 @@
+Script started on 2026-10-16 01:55:12-04:00 [COMMAND="git ls-remote --tags https://gitlab.freedesktop.org/poppler/poppler.git *26.09* *26.10*" <not executed on terminal>]
+cd58510145725f4870c3e51dbbf2b03ea97e4887	refs/tags/poppler-26.09.0
+e661b7b61a1b1feeb3193e5eced6274cc03e0ffa	refs/tags/poppler-26.09.0^{}
+32b144c4b940d838a27c69feb39d1dcc5669a3af	refs/tags/poppler-26.10.0
+2703be11769c1f86f4d0dc3b276ec94bba5ac6d3	refs/tags/poppler-26.10.0^{}
+
+Script done on 2026-10-16 01:55:13-04:00 [COMMAND_EXIT_CODE="0"]

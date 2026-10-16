@@ -1,0 +1,4 @@
+Script started on 2026-10-16 01:50:13-04:00 [COMMAND="mise exec node@24.21.0 -- env XDG_CACHE_HOME=<SCRATCH>/qmd-cache QMD_CONFIG_DIR=<SCRATCH>/qmd-config <SCRATCH>/prefixes/qmd-verified/bin/qmd --version" <not executed on terminal>]
+qmd 2.8.3 (facd35e)
+
+Script done on 2026-10-16 01:50:13-04:00 [COMMAND_EXIT_CODE="0"]

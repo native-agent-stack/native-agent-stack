@@ -1,0 +1,21 @@
+Script started on 2026-10-16 01:53:10-04:00 [COMMAND="mise exec node@24.21.0 -- env XDG_CACHE_HOME=<SCRATCH>/qmd-cache QMD_CONFIG_DIR=<SCRATCH>/qmd-config <SCRATCH>/prefixes/qmd-verified/bin/qmd search API -c vendor-smoke -n 2 --json" <not executed on terminal>]
+[
+  {
+    "docid": "#762e73",
+    "score": 0.55,
+    "file": "qmd://vendor-smoke/api-design-principles.md",
+    "line": 1,
+    "title": "API Design Principles",
+    "snippet": "@@ -1,3 @@ (0 before, 71 after)\n# API Design Principles\n\n## Introduction"
+  },
+  {
+    "docid": "#80dc01",
+    "score": 0.45,
+    "file": "qmd://vendor-smoke/product-launch-retrospective.md",
+    "line": 20,
+    "title": "Product Launch Retrospective: Project Phoenix",
+    "snippet": "@@ -19,4 @@ (18 before, 56 after)\n### 3. Documentation\nEngineering wrote comprehensive API docs. The developer portal received positive feedback from partners.\n\n### 4. Launch Metrics"
+  }
+]
+
+Script done on 2026-10-16 01:53:10-04:00 [COMMAND_EXIT_CODE="0"]

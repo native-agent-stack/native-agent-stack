@@ -1,0 +1,5 @@
+Script started on 2026-10-16 02:07:06-04:00 [COMMAND="git ls-remote --tags https://github.com/tobi/qmd refs/tags/v2.8.3 refs/tags/v2.8.3^{}" <not executed on terminal>]
+30edfa8b11b3bdcb8ff2bb34d85c10d542333cc1	refs/tags/v2.8.3
+facd35e01359e59d938bc9418e93fb9318addee3	refs/tags/v2.8.3^{}
+
+Script done on 2026-10-16 02:07:06-04:00 [COMMAND_EXIT_CODE="0"]
