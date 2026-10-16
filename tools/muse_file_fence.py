@@ -20,6 +20,11 @@ import stat
 import subprocess
 import tempfile
 
+if __package__:
+    from .muse_order_safety import OrderSafetyRefused, check_order_safety
+else:
+    from muse_order_safety import OrderSafetyRefused, check_order_safety
+
 
 MODEL = "muse-wonder-full-1.0"
 VERSION = "1.4.9-R6297.1"
@@ -519,18 +524,37 @@ def main():
     runtime_sha256 = verify_runtime_identity(fence.runtime)
     lane = checked_path(options.lane)
     lane_sha256 = hashlib.sha256(lane.read_bytes()).hexdigest()
-    argv = native_argv(lane, fence.runtime, fence.worktree, fence.brief,
-                       fence.logdir, options.role, options.max_model_steps)
     fence.logdir.mkdir(mode=0o700)  # exclusive fresh log dir; never overwrite a run
     for name in ('tmp', 'data', 'state', 'cache'):
         (fence.logdir / name).mkdir(mode=0o700)
     start = datetime.datetime.now(datetime.timezone.utc).isoformat()
     with fence.prepared() as command:
+        order_safety = []
+
+        def require_order_safety():
+            if options.role == 'reader':
+                return
+            try:
+                order_safety.append(check_order_safety(
+                    writable_roots=(fence.worktree, fence.logdir)))
+            except OrderSafetyRefused as exc:
+                write_json(fence.artifacts['fence-probe.json'], {
+                    'schema': 'muse-file-fence-probe/1', 'pass': False,
+                    'order_safety': [*order_safety, exc.receipt]})
+                raise
+
+        require_order_safety()
+        argv = native_argv(lane, fence.runtime, fence.worktree, fence.brief,
+                           fence.logdir, options.role, options.max_model_steps)
         version = subprocess.run(command + [str(fence.runtime), '--version'],
                                  env={}, capture_output=True, text=True, timeout=20, check=True)
         if f'({VERSION})' not in version.stdout:
             raise ValueError('runtime pin mismatch')
-        probe(fence, command, argv)
+        probe_receipt = probe(fence, command, argv)
+        require_order_safety()
+        if order_safety:
+            probe_receipt['order_safety'] = order_safety
+            write_json(fence.artifacts['fence-probe.json'], probe_receipt)
         if options.probe_only:
             print('muse-file-fence: model-free probe PASS')
             return 0
@@ -542,6 +566,8 @@ def main():
                        finished_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
                        network='shared host network; no egress allowlist',
                        argv=argv, lane_sha256=lane_sha256, runtime_sha256=runtime_sha256)
+        if order_safety:
+            receipt['order_safety'] = order_safety
         receipt['toolchain_directories'] = [str(p) for p in fence.toolchain_dirs]
         write_json(fence.artifacts['receipt.json'], receipt)
     print(json.dumps({k: receipt[k] for k in ('exit_code', 'event_count', 'models', 'terminal_counts')}))

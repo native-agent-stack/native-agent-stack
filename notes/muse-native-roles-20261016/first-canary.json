@@ -1,0 +1,588 @@
+{
+  "schema": "muse-native-role-canary/1",
+  "observed_utc": "2026-10-16T05:09:31.507859+00:00",
+  "source_base": "fa6cf1a2360bbd1be810045819f222e4432e12bc",
+  "safe_policy": "tools/policies/muse_native_safe_loopback.json",
+  "lanes": [
+    {
+      "name": "muse-wonder-builder",
+      "first_receipt": "REFUSED",
+      "state": "CLOSED"
+    },
+    {
+      "name": "muse-wonder-reviewer",
+      "first_receipt": "REFUSED",
+      "state": "CLOSED"
+    }
+  ],
+  "decision": "REFUSED",
+  "listener_set": [
+    {
+      "port": 4002,
+      "process": "rootlesskit"
+    },
+    {
+      "port": 5432,
+      "process": "postgres"
+    },
+    {
+      "port": 5900,
+      "process": "rootlesskit"
+    },
+    {
+      "port": 8788,
+      "process": "python3"
+    },
+    {
+      "port": 8888,
+      "process": "hindsight-api"
+    },
+    {
+      "port": 9749,
+      "process": "codebase-memory"
+    },
+    {
+      "port": 21080,
+      "process": "dagu"
+    },
+    {
+      "port": 21081,
+      "process": "dagu"
+    },
+    {
+      "port": 21090,
+      "process": "prometheus"
+    },
+    {
+      "port": 21093,
+      "process": "alertmanager"
+    },
+    {
+      "port": 21128,
+      "process": "omniroute (v16."
+    },
+    {
+      "port": 21129,
+      "process": "omniroute (v16."
+    },
+    {
+      "port": 21131,
+      "process": "omniroute (v16."
+    },
+    {
+      "port": 21255,
+      "process": "node_exporter"
+    },
+    {
+      "port": 21256,
+      "process": "process-exporte"
+    },
+    {
+      "port": 21257,
+      "process": "nvidia_gpu_expo"
+    },
+    {
+      "port": 21259,
+      "process": "cadvisor"
+    },
+    {
+      "port": 21300,
+      "process": "loki"
+    },
+    {
+      "port": 21301,
+      "process": "grafana"
+    },
+    {
+      "port": 21317,
+      "process": "otelcol-contrib"
+    },
+    {
+      "port": 21318,
+      "process": "otelcol-contrib"
+    },
+    {
+      "port": 21333,
+      "process": "otelcol-contrib"
+    },
+    {
+      "port": 21396,
+      "process": "loki"
+    },
+    {
+      "port": 21633,
+      "process": "rootlesskit"
+    },
+    {
+      "port": 21808,
+      "process": "agentsview"
+    },
+    {
+      "port": 21851,
+      "process": "MainThread"
+    },
+    {
+      "port": 21887,
+      "process": "python"
+    },
+    {
+      "port": 21888,
+      "process": "otelcol-contrib"
+    },
+    {
+      "port": 21889,
+      "process": "otelcol-contrib"
+    },
+    {
+      "port": 24158,
+      "process": "hcom"
+    },
+    {
+      "port": 24166,
+      "process": "codex"
+    },
+    {
+      "port": 24214,
+      "process": "codex"
+    },
+    {
+      "port": 24282,
+      "process": "serena"
+    },
+    {
+      "port": 24283,
+      "process": "serena"
+    },
+    {
+      "port": 24284,
+      "process": "serena"
+    },
+    {
+      "port": 24285,
+      "process": "serena"
+    },
+    {
+      "port": 24286,
+      "process": "serena"
+    },
+    {
+      "port": 24287,
+      "process": "serena"
+    },
+    {
+      "port": 24288,
+      "process": "serena"
+    },
+    {
+      "port": 24289,
+      "process": "serena"
+    },
+    {
+      "port": 24290,
+      "process": "serena"
+    },
+    {
+      "port": 24291,
+      "process": "serena"
+    },
+    {
+      "port": 24292,
+      "process": "serena"
+    },
+    {
+      "port": 24293,
+      "process": "serena"
+    },
+    {
+      "port": 24294,
+      "process": "serena"
+    },
+    {
+      "port": 24295,
+      "process": "serena"
+    },
+    {
+      "port": 24296,
+      "process": "serena"
+    },
+    {
+      "port": 24297,
+      "process": "serena"
+    },
+    {
+      "port": 24298,
+      "process": "serena"
+    },
+    {
+      "port": 24299,
+      "process": "serena"
+    },
+    {
+      "port": 24300,
+      "process": "serena"
+    },
+    {
+      "port": 24301,
+      "process": "serena"
+    },
+    {
+      "port": 24302,
+      "process": "serena"
+    },
+    {
+      "port": 24303,
+      "process": "serena"
+    },
+    {
+      "port": 24304,
+      "process": "serena"
+    },
+    {
+      "port": 24305,
+      "process": "serena"
+    },
+    {
+      "port": 24306,
+      "process": "serena"
+    },
+    {
+      "port": 24307,
+      "process": "serena"
+    },
+    {
+      "port": 24308,
+      "process": "serena"
+    },
+    {
+      "port": 24309,
+      "process": "serena"
+    },
+    {
+      "port": 24310,
+      "process": "serena"
+    },
+    {
+      "port": 24311,
+      "process": "serena"
+    },
+    {
+      "port": 24312,
+      "process": "serena"
+    },
+    {
+      "port": 24313,
+      "process": "serena"
+    },
+    {
+      "port": 24314,
+      "process": "serena"
+    },
+    {
+      "port": 24358,
+      "process": "hcom"
+    },
+    {
+      "port": 24388,
+      "process": "hcom"
+    },
+    {
+      "port": 24394,
+      "process": "hcom"
+    },
+    {
+      "port": 24408,
+      "process": "hcom"
+    },
+    {
+      "port": 24414,
+      "process": "hcom"
+    },
+    {
+      "port": 24420,
+      "process": "hcom"
+    },
+    {
+      "port": 24430,
+      "process": "codex"
+    },
+    {
+      "port": 24436,
+      "process": "codex"
+    },
+    {
+      "port": 24450,
+      "process": "codex"
+    },
+    {
+      "port": 24474,
+      "process": "codex"
+    },
+    {
+      "port": 24540,
+      "process": "codex"
+    },
+    {
+      "port": 24594,
+      "process": "hcom"
+    },
+    {
+      "port": 24640,
+      "process": "codex"
+    },
+    {
+      "port": 24650,
+      "process": "codex"
+    },
+    {
+      "port": 24664,
+      "process": "codex"
+    },
+    {
+      "port": 24716,
+      "process": "hcom"
+    },
+    {
+      "port": 24828,
+      "process": "hcom"
+    },
+    {
+      "port": 24832,
+      "process": "hcom"
+    },
+    {
+      "port": 24834,
+      "process": "hcom"
+    },
+    {
+      "port": 24836,
+      "process": "hcom"
+    },
+    {
+      "port": 24868,
+      "process": "hcom"
+    },
+    {
+      "port": 24876,
+      "process": "hcom"
+    },
+    {
+      "port": 24950,
+      "process": "hcom"
+    },
+    {
+      "port": 24954,
+      "process": "hcom"
+    },
+    {
+      "port": 24970,
+      "process": "hcom"
+    },
+    {
+      "port": 25122,
+      "process": "hcom"
+    },
+    {
+      "port": 25140,
+      "process": "hcom"
+    },
+    {
+      "port": 25158,
+      "process": "hcom"
+    },
+    {
+      "port": 25160,
+      "process": "hcom"
+    },
+    {
+      "port": 25172,
+      "process": "hcom"
+    },
+    {
+      "port": 25196,
+      "process": "hcom"
+    },
+    {
+      "port": 25198,
+      "process": "hcom"
+    },
+    {
+      "port": 25224,
+      "process": "hcom"
+    },
+    {
+      "port": 25350,
+      "process": "hcom"
+    },
+    {
+      "port": 25364,
+      "process": "codex"
+    },
+    {
+      "port": 25376,
+      "process": "codex"
+    },
+    {
+      "port": 25416,
+      "process": "hcom"
+    },
+    {
+      "port": 25432,
+      "process": "hcom"
+    },
+    {
+      "port": 25460,
+      "process": "codex"
+    },
+    {
+      "port": 25496,
+      "process": "hcom"
+    },
+    {
+      "port": 25506,
+      "process": "hcom"
+    },
+    {
+      "port": 25606,
+      "process": "hcom"
+    },
+    {
+      "port": 25632,
+      "process": "codex"
+    },
+    {
+      "port": 25634,
+      "process": "codex"
+    },
+    {
+      "port": 25650,
+      "process": "hcom"
+    },
+    {
+      "port": 25654,
+      "process": "codex"
+    },
+    {
+      "port": 25692,
+      "process": "hcom"
+    },
+    {
+      "port": 25696,
+      "process": "hcom"
+    },
+    {
+      "port": 25708,
+      "process": "codex"
+    },
+    {
+      "port": 25718,
+      "process": "codex"
+    },
+    {
+      "port": 25736,
+      "process": "hcom"
+    },
+    {
+      "port": 25758,
+      "process": "hcom"
+    },
+    {
+      "port": 25768,
+      "process": "codex"
+    },
+    {
+      "port": 25784,
+      "process": "hcom"
+    },
+    {
+      "port": 25806,
+      "process": "hcom"
+    },
+    {
+      "port": 25840,
+      "process": "codex"
+    },
+    {
+      "port": 25850,
+      "process": "hcom"
+    },
+    {
+      "port": 25938,
+      "process": "hcom"
+    },
+    {
+      "port": 26014,
+      "process": "codex"
+    },
+    {
+      "port": 26020,
+      "process": "codex"
+    },
+    {
+      "port": 26046,
+      "process": "hcom"
+    },
+    {
+      "port": 26050,
+      "process": "hcom"
+    },
+    {
+      "port": 26080,
+      "process": "hcom"
+    },
+    {
+      "port": 26102,
+      "process": "hcom"
+    },
+    {
+      "port": 28231,
+      "process": "vllm"
+    },
+    {
+      "port": 29374,
+      "process": "ai-memory"
+    },
+    {
+      "port": 53,
+      "process": "unknown"
+    },
+    {
+      "port": 53,
+      "process": "unknown"
+    },
+    {
+      "port": 24270,
+      "process": "VLLM::EngineCor"
+    },
+    {
+      "port": 25156,
+      "process": "VLLM::EngineCor"
+    },
+    {
+      "port": 25280,
+      "process": "VLLM::EngineCor"
+    },
+    {
+      "port": 25342,
+      "process": "VLLM::EngineCor"
+    },
+    {
+      "port": 26080,
+      "process": "VLLM::EngineCor"
+    },
+    {
+      "port": 26178,
+      "process": "VLLM::EngineCor"
+    }
+  ],
+  "listener_count": 139,
+  "observation": "Linux TCP LISTEN metadata plus ss process names; conservative refusal before TCP contact.",
+  "tcp_contacts": 0,
+  "model_requests": 0,
+  "reason": "No listener has an approved SAFE entry. Neither lane is qualified on this listener set.",
+  "control": "The TCP socket constructor was instrumented to fail if reached during refusal capture; it was never called.",
+  "limits": [
+    "Shared networking remains unchanged; no general hostile-network isolation is claimed.",
+    "The listener set is a launch-time observation, not a continuous monitor.",
+    "No protected endpoint, broker protocol, account API or existing application service was contacted."
+  ]
+}

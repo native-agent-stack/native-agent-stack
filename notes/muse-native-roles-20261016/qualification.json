@@ -1,0 +1,82 @@
+{
+  "schema": "muse-native-role-qualification/1",
+  "recorded_utc": "2026-10-16T05:21:15Z",
+  "source_base": "fa6cf1a2360bbd1be810045819f222e4432e12bc",
+  "scope": "Model-free native builder/reviewer filesystem, process, startup and order-safety controls; no live role qualification.",
+  "lane_states": {
+    "muse-wonder-builder": "CLOSED",
+    "muse-wonder-reviewer": "CLOSED"
+  },
+  "first_receipt": "notes/muse-native-roles-20261016/first-canary.json",
+  "second_receipt": "notes/muse-native-roles-20261016/second-canary.json",
+  "first_decision": "REFUSED",
+  "runtime": {
+    "version": "1.4.9-R6297.1",
+    "sha256": "a228010021276e112aa8422eb56ae82c0375405701950f6529bed4c9fe8abe05",
+    "provider": "echo",
+    "meta_model_requests": 0
+  },
+  "installed_offline_controls": [
+    {
+      "role": "builder",
+      "named_checks": 38,
+      "all_checks_pass": true,
+      "echo_exit_code": 0,
+      "echo_event_count": 14,
+      "completed_terminal_count": 1,
+      "model_ids": []
+    },
+    {
+      "role": "reviewer",
+      "named_checks": 38,
+      "all_checks_pass": true,
+      "echo_exit_code": 0,
+      "echo_event_count": 14,
+      "completed_terminal_count": 1,
+      "model_ids": []
+    }
+  ],
+  "regression_suite": {
+    "command": "MUSE_FENCE_NATIVE_PROBE=1 MUSE_FENCE_TOOLCHAIN_PROBE=1 python3 -B -m unittest tests.test_muse_file_fence tests.test_muse_toolchain_dirs tests.test_muse_runtime_currency tests.test_muse_native_roles tests.test_muse_order_safety -v",
+    "exit_code": 0,
+    "tests": 62,
+    "skips": 0,
+    "elapsed_seconds": 19.235,
+    "finished_utc": "2026-10-16T05:20:04.692787+00:00"
+  },
+  "validation": {
+    "command": "python3 scripts/validate.py",
+    "exit_code": 0,
+    "status": "passed",
+    "finished_utc": "2026-10-16T05:21:15.371025+00:00"
+  },
+  "mutation_controls": [
+    {
+      "test": "test_both_roles_refuse_before_any_runtime_start",
+      "mutation": "Replace initial policy result with always-pass in an isolated test subprocess.",
+      "result": "Two role subtests fail at the forbidden argv-start seam; zero errors. Unmodified code passes."
+    },
+    {
+      "test": "test_new_listener_during_offline_probe_refuses_live_start",
+      "mutation": "Omit the pre-live check after a checked initial startup in an isolated test subprocess.",
+      "result": "Two role subtests fail at the forbidden live-execution seam; zero errors. Unmodified code passes."
+    },
+    {
+      "test": "test_kernel_inventory_ipv4_ipv6_mapped_and_wildcards",
+      "mutation": "Initial prototype omitted canonical IPv4-mapped normalization.",
+      "result": "Failed before its normalization correction, passed afterward. This was a prototype result, not a baseline-main security finding."
+    }
+  ],
+  "attempt_history": [
+    "Initial synthetic settings omitted schema_version. Eight role subtests errored. Only installed native echo facts were established then; the premature aggregate update was corrected. Adding the required fixture schema made all five native-role tests pass.",
+    "The temporary host-registry prototype passed eight unit tests before the CC final erratum replaced it. No host registry was created. The final API uses only the PR-owned SAFE allowlist and has no launcher override.",
+    "The actual host canary conservatively refused before TCP contact. Both lanes remain closed; there was no native builder or reviewer model smoke."
+  ],
+  "public_boundary": "Derived facts only; private coordination/review records are cited by name, native diagnostic logs are not published or hash-bound, and listener publication is restricted to port and process name.",
+  "limitations": [
+    "Shared networking is unchanged and the owned public loopback fixture remains reachable.",
+    "The launch check is a snapshot, not continuous network isolation.",
+    "No real builder change, reviewer judgment, wire-effort value or paid cost was measured.",
+    "A stronger network mechanism remains a separate proposal."
+  ]
+}

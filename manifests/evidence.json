@@ -19342,6 +19342,11 @@
       "bytes": 9884
     },
     {
+      "path": "docs/decisions/2026-10-16-muse-native-role-order-safety.md",
+      "sha256": "085479f72c845afff5f00e18474aad1b13d74fe8bbe4a8d38c5221c009625f20",
+      "bytes": 7854
+    },
+    {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
       "sha256": "f646835af1648cfab7798f64626141c3964dfba4799d780dc728ea27f91f7f6c",
       "bytes": 15393
@@ -61862,6 +61867,26 @@
       "bytes": 4900
     },
     {
+      "path": "notes/muse-native-roles-20261016/PREREG.md",
+      "sha256": "36742d8977431ee9383504f5b01f5303faa52a399d01f797b9e8b4d78e1804df",
+      "bytes": 9976
+    },
+    {
+      "path": "notes/muse-native-roles-20261016/first-canary.json",
+      "sha256": "6ac91e4feac866dc0a223a4bd73af23e74a165a102ab2863ff962c6537e61be4",
+      "bytes": 9628
+    },
+    {
+      "path": "notes/muse-native-roles-20261016/qualification.json",
+      "sha256": "3e1a15f876e5777e88b7a419229270c25795ade26dab77bf565acc68c926568f",
+      "bytes": 3976
+    },
+    {
+      "path": "notes/muse-native-roles-20261016/second-canary.json",
+      "sha256": "9d96ab1fe07d3e9658c2f0b90bac1cc3a196638646af5373979b050c38353af8",
+      "bytes": 9644
+    },
+    {
       "path": "notes/muse-requal-149-20261015/receipt.md",
       "sha256": "d7faddf87cc2e95dcf9808de413eeaa577c94687e092dcb5781f0a2472d46152",
       "bytes": 13374
@@ -64127,6 +64152,16 @@
       "bytes": 34078
     },
     {
+      "path": "tests/test_muse_native_roles.py",
+      "sha256": "f0a50469a33a3dd73b205f45ea5501cf43388ea292ad1f004f696d6340709635",
+      "bytes": 11920
+    },
+    {
+      "path": "tests/test_muse_order_safety.py",
+      "sha256": "a02dda14c2a8d2eb9970447b0c5df4bb7447b14369a086b1d3f7addd69d573bd",
+      "bytes": 17020
+    },
+    {
       "path": "tests/test_muse_runtime_currency.py",
       "sha256": "2a2baaa2884474cb67f628de9b947a72753ba462a2ce7796b35893a40ed07cb9",
       "bytes": 6070
@@ -65253,13 +65288,23 @@
     },
     {
       "path": "tools/muse_file_fence.py",
-      "sha256": "0d8ad38a46ddd595f5a3b79d9789ece1c25c3b4c0e860b638cd4ef8805df9a17",
-      "bytes": 29177
+      "sha256": "d0c558b8a55cde885063a25194506c736b1fccf445e55313c43d098ebdc7a7d0",
+      "bytes": 30208
+    },
+    {
+      "path": "tools/muse_order_safety.py",
+      "sha256": "1f4f02da0288c416e3bb495c2c2b749a8f7bb5a0f7254a3fcf9e064189165d6f",
+      "bytes": 11596
     },
     {
       "path": "tools/omniroute/gateway_record.py",
       "sha256": "d5cfcfbd61bcfcb1808270deab7e793d4021c8dd0c3079fe5ff71ee723ab46e6",
       "bytes": 4963
+    },
+    {
+      "path": "tools/policies/muse_native_safe_loopback.json",
+      "sha256": "88d63cd29cbb264553fc9601e849304635503751f19ed219b660c375cc373f25",
+      "bytes": 65
     },
     {
       "path": "tools/research/dispatch",
