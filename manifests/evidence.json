@@ -19308,8 +19308,8 @@
     },
     {
       "path": "docs/decisions/2026-10-14-session-relaunch-after-wsl-restart.md",
-      "sha256": "f651f994a9c1892ef0a58029ec2ae672c0d2c07bc4d42a53b1e9b5593e74d57e",
-      "bytes": 7950
+      "sha256": "0ad8fa191708626b5f2aca234b6f8395665f635ed8e59973c35b48962355de85",
+      "bytes": 10011
     },
     {
       "path": "docs/decisions/2026-10-14-stream-integrity-followups.md",
@@ -52803,7 +52803,7 @@
     },
     {
       "path": "evidence/artifacts/session-relaunch-20261014/README.md",
-      "sha256": "57ec01fae2910aeb510cdd2c472e42062c1672efa8efcb7e7b4fca5aeefb10fd",
+      "sha256": "5a169bbf1ef7e5dac4b838e3575466d4fd995bc8cd84ef2a6fef8eda1d19f177",
       "bytes": 2110
     },
     {
@@ -52833,8 +52833,8 @@
     },
     {
       "path": "evidence/artifacts/session-relaunch-20261014/receipts/sources.json",
-      "sha256": "a0c08c14cc9ae6c681ead63798fe7e758b6b885954b9ea44addb0ccf624ac0c8",
-      "bytes": 2712
+      "sha256": "62662a883e10105e2c2fff3ee19a8608beb8daf4f7042453eb46da4ab98b2990",
+      "bytes": 3556
     },
     {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-before.log",
@@ -64843,8 +64843,8 @@
     },
     {
       "path": "tests/test_session_relaunch.py",
-      "sha256": "c06a8ef09245c3893f47e4b6ffe27d76fe100fd4c43c365335ef44ce36cba3b7",
-      "bytes": 55163
+      "sha256": "be9783e08784b3a9472b995ed14f3d86d121e210157a6c892ad5247e0e24e167",
+      "bytes": 80369
     },
     {
       "path": "tests/test_shell_parser_ci.py",
@@ -65528,8 +65528,8 @@
     },
     {
       "path": "tools/session-relaunch/README.md",
-      "sha256": "74ab904805c79d7b97958466aadf8a223b490950ae921aba5b2dee14c1fe3ed8",
-      "bytes": 14781
+      "sha256": "a42f3ba50e8264ce943a1907a82473c5eb4ddbffdb5efb115425061182e1aac7",
+      "bytes": 17132
     },
     {
       "path": "tools/session-relaunch/config.example.json",
@@ -65538,8 +65538,8 @@
     },
     {
       "path": "tools/session-relaunch/session_relaunch.py",
-      "sha256": "487313ce39a8fa4ccb97248e8734d3348a9625527c618f24e6120b6f06e55642",
-      "bytes": 31997
+      "sha256": "ea863ac1f6a7d16f9d9d67d92b5034806fb17935fc8a55580221b95829ba983a",
+      "bytes": 41249
     },
     {
       "path": "tools/session-relaunch/units/ns-session-relaunch.service",

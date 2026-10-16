@@ -16,6 +16,8 @@ import stat
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -48,9 +50,12 @@ argv = sys.argv[1:]
 with open(os.environ["FAKE_PS_LOG"], "a") as log:
     log.write(json.dumps(argv) + "\\n")
 rc = int(os.environ.get("FAKE_PS_RC", "0"))
+launcher = argv[argv.index("-Name") + 1]
+if launcher in os.environ.get("FAKE_PS_FAIL_NAMES", "").split(","):
+    rc = 1
 if os.environ.get("FAKE_PS_LAUNCH", "1" if rc == 0 else "0") == "1":
     names = json.loads(os.environ["FAKE_PS_NAMES"])
-    launched = names[argv[argv.index("-Name") + 1]]
+    launched = names[launcher]
     path = os.environ["FAKE_AGENTS_JSON"]
     rows = json.load(open(path))
     gone = json.loads(os.environ.get("FAKE_PS_KILL", "{}")).get(argv[argv.index("-Name") + 1])
@@ -339,6 +344,49 @@ class Relaunch(Fixture):
         self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()], ["cc", "trading-cc", "coop", "cc"])
         self.assertEqual((self.state()["status"], set(self.outcomes().values())), ("complete", {"running"}))
 
+    def test_a_session_that_registers_and_exits_before_a_crash_stays_carried(self):
+        # The command center's FULL read of #1141 at b2755a0e (P2): a row left the carry as soon as its session was seen
+        # running, so when the command center registered and then exited while the next tab opened, and the boot stopped
+        # before the final pass, every snapshot wrote this boot's roster without it, and the next boot dropped it. A row
+        # now leaves the carry only when the final list shows its session running.
+        self.crash_roster()
+        launched, real_one = [], R.relaunch_one
+
+        def one(*args, **kwargs):
+            launched.append(real_one(*args, **kwargs))
+            if len(launched) == 2:
+                raise Interrupted()  # the boot stops right after the second tab
+            return launched[-1]
+
+        os.environ["FAKE_PS_KILL"] = json.dumps({"trading-cc": "wsl-architecture-design"})
+        try:
+            with mock.patch.object(R, "relaunch_one", side_effect=one), self.assertRaises(Interrupted):
+                self.run_relaunch()
+        finally:
+            del os.environ["FAKE_PS_KILL"]
+        self.assertEqual(self.main("snapshot", boot=THIS), 0)
+        roster = json.loads((R.roster_dir(self.config) / f"roster-{THIS}.json").read_text())
+        self.assertIn("wsl-architecture-design", {row["name"] for row in roster["sessions"]})
+
+    def test_a_session_that_registers_and_then_exits_is_carried_again(self):
+        # Rebase resolution of #1141 onto #1145 (main's completion rule meets #1141's carry retirement): a session seen
+        # running and then missing from the final list is absent and still to be brought back, so a second crash in this
+        # boot finds its row in this boot's roster. It guards the retire rule: a row leaves the carry only when the final
+        # list shows its session running, and the test fails when an absent session's row is retired too (GPT fix2 of
+        # #1141 at 07ea5674: the separate re-carry line it once guarded had become redundant and is removed).
+        self.crash_roster()
+        os.environ["FAKE_PS_KILL"] = json.dumps({"trading-cc": "wsl-architecture-design"})
+        try:
+            self.run_relaunch()
+        finally:
+            del os.environ["FAKE_PS_KILL"]
+        self.assertEqual(self.outcomes()["wsl-architecture-design"], "absent")
+        self.assertIn("wsl-architecture-design", [row["name"] for row in self.state()["carry"]])
+        self.assertNotIn("trading-cc", [row["name"] for row in self.state()["carry"]])
+        self.assertEqual(self.main("snapshot", boot=THIS), 0)
+        roster = json.loads((R.roster_dir(self.config) / f"roster-{THIS}.json").read_text())
+        self.assertIn("wsl-architecture-design", {row["name"] for row in roster["sessions"]})
+
     def test_an_unreadable_final_list_never_completes_a_run(self):
         # The same finding: completion rests on a final live list that was read. When that read fails, the run is
         # partial (exit 1, the alert), and a rerun reads the list again and completes without a tab.
@@ -357,6 +405,370 @@ class Relaunch(Fixture):
         self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
         self.assertEqual(len(self.ps_calls()), 3)
         self.assertEqual((self.state()["status"], set(self.outcomes().values())), ("complete", {"running"}))
+
+    def test_a_timer_snapshot_never_overwrites_the_seed_roster_of_a_starting_relaunch(self):
+        # Local review P2 at 7aad5a02 (:496; the seed roster write at c8d7fa9e :512): a timer snapshot that read its
+        # carry before the relaunch saved its state, and wrote after the seed, replaced the seed with the live list only.
+        # The snapshot holds a pause between its carry read and its roster write; the relaunch starts inside that pause.
+        self.crash_roster()
+        # GPT res1 at aedf5549 (P3, :419): the pause was a one-second sleep. It now ends only once the relaunch has
+        # reached roster_lock (or, without the lock, has finished), so the interleaving no longer rests on timing.
+        paused, contending, real_carry, real_lock = threading.Event(), threading.Event(), R.carried_rows, R.roster_lock
+        timer_thread = []
+
+        def slow_carry(config, boot_id, live):
+            rows = real_carry(config, boot_id, live)
+            paused.set()
+            contending.wait(10)
+            return rows
+
+        @contextlib.contextmanager
+        def watched_lock(config):
+            if threading.current_thread() not in timer_thread:
+                contending.set()  # the relaunch is at the lock the snapshot holds
+            with real_lock(config):
+                yield
+
+        with mock.patch.object(R, "carried_rows", side_effect=slow_carry), \
+                mock.patch.object(R, "roster_lock", side_effect=watched_lock), \
+                mock.patch.object(R, "current_boot_id", return_value=THIS):
+            results = []
+            timer = threading.Thread(target=lambda: results.append(
+                R.main(["snapshot", "--config", str(self.tmp / "config.json")])))
+            timer_thread.append(timer)
+            timer.start()
+            self.assertTrue(paused.wait(10))
+            self.run_relaunch()
+            contending.set()  # without the lock the relaunch never contends; release the snapshot
+            timer.join(10)
+        self.assertEqual(results, [0])  # the snapshot ran to its end (a thread error would leave this empty)
+        seeded = json.loads((R.roster_dir(self.config) / f"roster-{THIS}.json").read_text())
+        self.assertLessEqual({"wsl-architecture-design", "trading-cc", "ns2604-coop"},
+                             {row["name"] for row in seeded["sessions"]})
+
+    def test_a_partial_relaunch_keeps_its_unfinished_rows_in_this_boots_roster(self):
+        # Local review P2 at 7aad5a02 (:222; carried_rows at c8d7fa9e :221-223): only an in_progress state carried its
+        # rows, so the first snapshot after a partial run kept the live sessions only, and a second crash lost the lanes
+        # the relaunch had not brought back. A partial state of this boot carries them too.
+        self.crash_roster()
+        os.environ["FAKE_PS_RC"] = "1"
+        self.run_relaunch()
+        self.assertEqual(self.state()["status"], "partial")
+        self.agents.write_text(json.dumps([row("trading-cc", "s-by-hand")]))
+        self.assertEqual(self.main("snapshot", boot=THIS), 0)
+        roster = json.loads((R.roster_dir(self.config) / f"roster-{THIS}.json").read_text())
+        names = [r["name"] for r in roster["sessions"]]
+        self.assertEqual(names.count("trading-cc"), 1)  # live, not carried a second time
+        self.assertLessEqual({"wsl-architecture-design", "ns2604-coop", "trading-cc"}, set(names))
+
+    def test_a_lane_brought_back_by_a_partial_run_leaves_the_carry(self):
+        # Local review P2 at 474cf2b6 (:244-245): the carry was taken before any tab opened, so a lane the run brought
+        # back stayed carried; once it exited on purpose, the next snapshot listed its old row again and a second crash
+        # would relaunch it. A row leaves the carry when its session is seen running.
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "trading-cc"}):
+            self.run_relaunch()
+        self.assertEqual(self.state()["status"], "partial")
+        self.assertEqual((self.outcomes()["wsl-architecture-design"], self.outcomes()["ns2604-coop"]), ("running", "running"))
+        self.agents.write_text("[]")  # the command center and the co-op exit on purpose later in this boot
+        self.assertEqual(self.main("snapshot", boot=THIS), 0)
+        roster = json.loads((R.roster_dir(self.config) / f"roster-{THIS}.json").read_text())
+        names = {r["name"] for r in roster["sessions"]}
+        self.assertIn("trading-cc", names)
+        self.assertFalse(names & {"wsl-architecture-design", "ns2604-coop"}, names)
+
+    def test_a_lane_that_recovers_after_a_partial_run_and_then_stops_on_purpose_is_not_relaunched(self):
+        # The co-op's local review of #1141 at aedf5549 (P2, :255-256): a snapshot after a partial run only filtered a
+        # recovered session out of the carry, so once that session stopped on purpose the next snapshot carried its old
+        # row again and the next boot relaunched it (the base relaunches nothing). The snapshot saves the retirement.
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "trading-cc"}):
+            self.run_relaunch()
+        self.assertEqual(self.state()["status"], "partial")
+        self.assertIn("trading-cc", {r["name"] for r in self.state()["carry"]})
+        def snapshot(sessions, minutes):  # the timer's snapshot command, at a pinned time
+            with mock.patch.object(R, "list_sessions", return_value=sessions), \
+                    mock.patch.object(R, "now_utc", return_value=NOW + dt.timedelta(minutes=minutes)):
+                self.assertEqual(self.main("snapshot", boot=THIS), 0)
+        lanes = [row("wsl-architecture-design", "new-cc"), row("ns2604-coop", "new-coop")]
+        snapshot(lanes + [row("trading-cc", "s-by-hand")], 5)  # restored by hand after the run ended
+        snapshot([], 10)  # all three stop on purpose before the boot ends
+        end, start = NOW + dt.timedelta(minutes=11), NOW + dt.timedelta(minutes=20)
+        boots = [BOOTS[0], dict(BOOTS[1], last_entry=int(end.timestamp() * 1e6)),
+                 {"index": 0, "boot_id": NEXT, "first_entry": int(start.timestamp() * 1e6),
+                  "last_entry": int(start.timestamp() * 1e6)}]
+        decided = R.plan(self.config, boot_id=NEXT, at=start + dt.timedelta(seconds=30), boots=boots, alive_rows=[])
+        self.assertEqual(decided["action"], "none", [r.get("name") for r, _ in decided.get("launch") or []])
+        self.assertTrue(decided["reason"].startswith("no session of the roster needs a relaunch"), decided["reason"])
+        self.assertNotIn("trading-cc", {r["name"] for r in self.state()["carry"]})
+
+    def test_a_snapshot_sampled_before_the_final_publication_keeps_the_recovered_rows(self):
+        # GPT res1 of #1141 at aedf5549, follow-up 2 (:626, :179, :605): the snapshot sampled the live list before
+        # roster_lock, and the run's final publication could retire the carry in between, so the snapshot wrote an old
+        # sample (the recovered lanes not yet listed) with the new carry (them retired) and lost them for a second
+        # crash. Here the snapshot samples, the run reaches its final publication, and the snapshot writes.
+        self.crash_roster()
+        sampled, go = threading.Event(), threading.Event()
+        real_list, real_lock = R.list_sessions, R.roster_lock
+        timer_thread, runs = [], []
+
+        def listing(claude):
+            if threading.current_thread() in timer_thread:  # the timer's sample, taken before the tabs registered
+                sampled.set()
+                go.wait(10)  # until the run is at its final publication, or (without the lock there) past it
+                return []
+            rows = real_list(claude)
+            if (rows is not None and self.state() and self.state()["status"] == "in_progress"
+                    and all(e["outcome"] == "running" for e in self.state()["sessions"]) and not timer_thread):
+                timer = threading.Thread(target=lambda: runs.append(
+                    R.main(["snapshot", "--config", str(self.tmp / "config.json")])))
+                timer_thread.append(timer)
+                timer.start()  # the run's final read: the timer samples now, before the final publication
+                sampled.wait(10)
+            return rows
+
+        @contextlib.contextmanager
+        def watched_lock(config):
+            if timer_thread and threading.current_thread() not in timer_thread:
+                go.set()  # the run is at its final publication
+            with real_lock(config):
+                yield
+
+        with mock.patch.object(R, "list_sessions", side_effect=listing), \
+                mock.patch.object(R, "roster_lock", side_effect=watched_lock), \
+                mock.patch.object(R, "current_boot_id", return_value=THIS):
+            self.run_relaunch()
+            go.set()
+            timer_thread[0].join(10)
+        roster = json.loads((R.roster_dir(self.config) / f"roster-{THIS}.json").read_text())
+        self.assertLessEqual({"wsl-architecture-design", "trading-cc", "ns2604-coop"}, {r["name"] for r in roster["sessions"]})
+        self.assertEqual((runs, self.state()["status"]), ([0], "complete"))
+
+    def test_a_same_boot_rerun_does_not_reopen_lanes_that_recovered_and_then_stopped(self):
+        # GPT res1 of #1141 at aedf5549, follow-up 4 (:545, :552): after a partial run brought two lanes back and they
+        # were closed, a rerun in the same boot opened all three launchers again. A rerun opens only the unfinished one,
+        # carries only it, and refuses a --reopen of a retired lane (its own launcher starts it again).
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "trading-cc"}):
+            self.run_relaunch()
+        self.assertEqual(self.state()["status"], "partial")
+        before = len(self.ps_calls())
+        self.agents.write_text("[]")  # the command center and the co-op stop on purpose
+        refused = R.cmd_relaunch(self.config, boot_id=THIS, at=NOW + dt.timedelta(minutes=4), boots=BOOTS, dry_run=False,
+                                 reopen=frozenset({"ns2604-coop"}))
+        self.assertTrue(refused.get("refused"))
+        self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
+        self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()[before:]], ["trading-cc"])
+        self.assertEqual({r["name"] for r in self.state()["carry"]} & {"wsl-architecture-design", "ns2604-coop"}, set())
+
+    def test_a_snapshot_during_a_rerun_never_erases_a_retirement(self):
+        # The co-op's local review of #1141 at ca891398 (P2, :217-220): plan() read the relaunch state before roster.lock,
+        # so a snapshot could retire a recovered lane in between and the rerun's save erased it; once that lane stopped
+        # on purpose, a later rerun reopened it. Here the snapshot starts right after plan()'s read.
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "cc"}):  # the command center's launcher
+            self.run_relaunch()
+        self.assertEqual(self.state()["status"], "partial")
+        self.agents.write_text(json.dumps([row("wsl-architecture-design", "by-hand"), row("trading-cc", "t"),
+                                           row("ns2604-coop", "c")]))  # the command center restored by hand
+        real_plan, real_lock = R.plan, R.roster_lock
+        reached, timer_thread, holding, runs = threading.Event(), [], [], []
+
+        @contextlib.contextmanager
+        def watched_lock(config):
+            mine = threading.current_thread() not in timer_thread
+            if not mine:
+                reached.set()  # the snapshot is at roster.lock
+            with real_lock(config):
+                holding.append(mine)
+                try:
+                    yield
+                finally:
+                    holding.pop()
+
+        def plan_then_snapshot(*args, **kwargs):
+            decided = real_plan(*args, **kwargs)
+            if not timer_thread:
+                timer = threading.Thread(target=lambda: runs.append(
+                    R.main(["snapshot", "--config", str(self.tmp / "config.json")])))
+                timer_thread.append(timer)
+                timer.start()
+                if holding:
+                    reached.wait(10)  # it waits at roster.lock until this run's first save
+                else:
+                    timer.join(10)  # nothing holds roster.lock: it runs to its end now
+                self.agents.write_text(json.dumps([row("trading-cc", "t"), row("ns2604-coop", "c")]))  # stopped on purpose
+            return decided
+
+        with mock.patch.object(R, "plan", side_effect=plan_then_snapshot), \
+                mock.patch.object(R, "roster_lock", side_effect=watched_lock), \
+                mock.patch.object(R, "current_boot_id", return_value=THIS):
+            self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
+            timer_thread[0].join(10)
+        self.assertEqual(runs, [0])
+        self.assertIn("wsl-architecture-design", self.state()["retired"])
+        before = len(self.ps_calls())
+        self.run_relaunch(at=NOW + dt.timedelta(minutes=10))
+        self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()[before:]], [])
+
+    def test_a_snapshot_never_saves_over_a_refusal_record(self):
+        # The same finding's second interleaving: record_refusal() wrote without roster.lock, so a snapshot that had read
+        # the state before it saved its own copy after it, and the refusal was lost.
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "cc"}):  # the command center's launcher
+            self.run_relaunch()
+        self.agents.write_text(json.dumps([row("wsl-architecture-design", "by-hand")]))
+        real_retire, real_lock = R.retire_into, R.roster_lock
+        paused, go, timer_thread, runs = threading.Event(), threading.Event(), [], []
+
+        def slow_retire(state, names):
+            changed = real_retire(state, names)
+            if threading.current_thread() in timer_thread:
+                paused.set()  # the snapshot has read the state and holds its copy
+                go.wait(10)
+            return changed
+
+        @contextlib.contextmanager
+        def watched_lock(config):
+            if timer_thread and threading.current_thread() not in timer_thread:
+                go.set()  # the refusing run is at roster.lock
+            with real_lock(config):
+                yield
+
+        with mock.patch.object(R, "retire_into", side_effect=slow_retire), \
+                mock.patch.object(R, "roster_lock", side_effect=watched_lock), \
+                mock.patch.object(R, "current_boot_id", return_value=THIS):
+            timer = threading.Thread(target=lambda: runs.append(
+                R.main(["snapshot", "--config", str(self.tmp / "config.json")])))
+            timer_thread.append(timer)
+            timer.start()
+            self.assertTrue(paused.wait(10))
+            refused = R.cmd_relaunch(self.config, boot_id=THIS, at=NOW + dt.timedelta(minutes=5), boots=BOOTS,
+                                     dry_run=False, reopen=frozenset({"ns2604-coop"}))
+            go.set()
+            timer.join(10)
+        self.assertEqual((runs, bool(refused.get("refused"))), ([0], True))
+        self.assertEqual(len(self.state().get("refusals") or []), 1)
+        self.assertIn("wsl-architecture-design", self.state()["retired"])
+
+    def test_a_rerun_that_brings_back_every_owed_lane_completes(self):
+        # The co-op's local review of #1141 at ca891398 (P2, :647-649): after a partial run retired the command center
+        # and the co-op and they stopped on purpose, a rerun that brought back trading-cc stayed partial (they were not
+        # live), so main() exited 1 and further reruns spent the crash-loop budget.
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "trading-cc"}):
+            self.run_relaunch()
+        self.agents.write_text("[]")
+        self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
+        self.assertEqual((self.state()["status"], self.outcomes()["trading-cc"]), ("complete", "running"))
+
+    def test_a_retirement_saved_while_the_rerun_plans_is_honoured(self):
+        # GPT res2 of #1141 at ca891398 (blocker, :548/:588/:617; its retained probe
+        # test_snapshot_retirement_survives_rerun_state_publication): a snapshot that saved trading-cc's retirement while
+        # the rerun planned left the rerun's plan stale, and it reopened the lane after it stopped. On 3436a5b0 the probe's
+        # interleaving (a snapshot inside plan(), in the same thread) waits forever on the lock the run holds; this test runs
+        # the rerun in a worker thread so that shows as a failure, not a hang.
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "trading-cc"}):
+            self.run_relaunch()
+        real_plan, injected = R.plan, []
+
+        def plan_then_snapshot(*args, **kwargs):
+            decided = real_plan(*args, **kwargs)
+            if not injected:
+                injected.append(True)
+                R.snapshot_live(self.config, boot_id=THIS, at=NOW + dt.timedelta(minutes=1),
+                                sample=lambda: [row("trading-cc", "by-hand")])
+                self.agents.write_text("[]")  # the lane stops on purpose
+            return decided
+
+        self.agents.write_text("[]")
+        before, done = len(self.ps_calls()), []
+        with mock.patch.object(R, "plan", side_effect=plan_then_snapshot), \
+                contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            worker = threading.Thread(target=lambda: done.append(self.run_relaunch(at=NOW + dt.timedelta(minutes=2))),
+                                      daemon=True)
+            worker.start()
+            worker.join(30)
+        self.assertFalse(worker.is_alive(), "the rerun waited on its own roster.lock")
+        self.assertIn("trading-cc", self.state()["retired"])
+        self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()[before:]], [])
+
+    def test_a_refusal_keeps_a_retirement_saved_meanwhile(self):
+        # GPT res2 of #1141 at ca891398 (follow-up 2, :526/:532/:538; its probe
+        # test_refusal_preserves_a_concurrent_snapshot_retirement): record_refusal() called on its own rewrote the state it
+        # had read, so a retirement saved in between was lost. It now holds roster.lock and appends to the state as read
+        # at the write.
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "trading-cc"}):
+            self.run_relaunch()
+        state_path, real_read, injected = R.marker(self.config, "relaunch", PREV), Path.read_text, []
+
+        def read_then_retire(path, *args, **kwargs):
+            text = real_read(path, *args, **kwargs)
+            if path == state_path and not injected:
+                injected.append(True)
+                R.snapshot_live(self.config, boot_id=THIS, at=NOW + dt.timedelta(minutes=1),
+                                sample=lambda: [row("trading-cc", "by-hand")])
+            return text
+
+        with mock.patch.object(Path, "read_text", read_then_retire):
+            self.assertTrue(R.record_refusal(self.config, PREV, ["no-such-lane"], "synthetic refusal"))
+        self.assertIn("trading-cc", self.state()["retired"])
+        self.assertEqual(len(self.state()["refusals"]), 1)
+
+    def test_the_roster_lock_is_reentrant_in_one_thread_and_exclusive_across_threads(self):
+        held, waited = threading.Event(), []
+
+        def nested():
+            with R.roster_lock(self.config):
+                with R.roster_lock(self.config):  # a nested hold in the same thread takes no second flock
+                    held.set()
+
+        inner = threading.Thread(target=nested, daemon=True)  # on a lock that is not reentrant this waits forever
+        inner.start()
+        inner.join(10)
+        self.assertTrue(held.is_set(), "a nested hold in the same thread waited on its own lock")
+        with R.roster_lock(self.config):
+
+            def other():
+                with R.roster_lock(self.config):
+                    waited.append(time.monotonic())
+
+            started = time.monotonic()
+            worker = threading.Thread(target=other)
+            worker.start()
+            time.sleep(0.3)
+            self.assertEqual(waited, [])  # the other thread still waits while this one holds the lock
+        worker.join(10)
+        self.assertTrue(held.is_set())
+        self.assertEqual(len(waited), 1)
+        self.assertGreaterEqual(waited[0] - started, 0.3)
+
+    def test_a_boot_stop_right_after_the_state_write_still_relaunches_from_the_seed(self):
+        # GPT read of #1141 at 474cf2b6 (P2, the reviewer's retained crash case): with the state saved before the seed
+        # roster, a boot stop between the two writes left the timer's empty roster of this boot as the newest, and the
+        # next boot opened nothing. The seed roster is written first, both under roster_lock.
+        self.crash_roster()
+        at = NOW + dt.timedelta(seconds=120)  # past the timer's 90 s boot delay: it has written an empty roster
+        self.roster(THIS, at, [])
+        real = R.write_atomic
+
+        def stop_after_the_state(path, text, *args, **kwargs):
+            real(path, text, *args, **kwargs)
+            if path == R.marker(self.config, "relaunch", PREV):
+                raise Interrupted()
+
+        with mock.patch.object(R, "write_atomic", side_effect=stop_after_the_state), self.assertRaises(Interrupted):
+            self.run_relaunch(at=at)
+        self.assertEqual(self.state()["status"], "in_progress")
+        start = at + dt.timedelta(minutes=10)
+        end = at + dt.timedelta(seconds=60)
+        boots = [BOOTS[0], dict(BOOTS[1], last_entry=int(end.timestamp() * 1e6)),
+                 {"index": 0, "boot_id": NEXT, "first_entry": int(start.timestamp() * 1e6),
+                  "last_entry": int(start.timestamp() * 1e6)}]
+        self.run_relaunch(boot=NEXT, at=start + dt.timedelta(seconds=30), boots=boots)
+        self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()], ["cc", "trading-cc", "coop"])
 
     def test_a_crash_before_the_first_minute_snapshot_is_recovered_by_the_next_boot(self):
         self.crash_roster()

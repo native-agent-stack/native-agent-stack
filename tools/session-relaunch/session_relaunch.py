@@ -22,6 +22,7 @@ supervisor's service install is disabled at 2.1.299 (README.md, Sources). The to
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime as dt
 import fcntl
 import hashlib
@@ -30,6 +31,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from pathlib import Path
 
@@ -156,6 +158,87 @@ def cmd_snapshot(config: dict, *, boot_id: str, sessions: list[dict], at: dt.dat
     return target
 
 
+@contextlib.contextmanager
+def roster_lock(config: dict):
+    """An exclusive lock on roster.lock in the state directory, held by the timer's snapshot from its carry read to its
+    roster write and by a relaunch while it writes the seed roster and saves its state, so a snapshot never writes a
+    carry read before that state over the seed. Both holders are short; the relaunch's own run lock (relaunch.lock) is a
+    different lock, held for the whole run. fcntl.flock performs flock(2) on the descriptor (python/cpython v3.13.16,
+    cbc944f4, Doc/library/fcntl.rst:176-183), and the lock is released when all its descriptors are closed (Linux
+    man-pages tag man-pages-6.9.1, man/man2/flock.2:69-72), so os.close in the finally clause releases it.
+
+    Reentrant within one thread: a hold nested in the thread that already holds it takes no second flock, which would
+    wait on the thread's own lock (flock locks belong to the open file description, so a second descriptor in the same
+    process conflicts). Another thread or process still waits. A relaunch calls record_refusal() while it holds the lock."""
+    depth = getattr(_ROSTER, "depth", 0)
+    if depth:
+        _ROSTER.depth = depth + 1
+        try:
+            yield
+        finally:
+            _ROSTER.depth = depth
+        return
+    fd = os.open(state_dir(config) / "roster.lock", os.O_RDWR | os.O_CREAT, 0o600)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        _ROSTER.depth = 1
+        yield
+    finally:
+        _ROSTER.depth = 0
+        os.close(fd)
+
+
+_ROSTER = threading.local()  # roster_lock's hold depth in each thread
+
+
+def snapshot_live(config: dict, *, boot_id: str, at: dt.datetime, sample) -> Path | None:
+    """The timer's snapshot: the live sessions plus the rows a relaunch of this boot still carries. The live list is
+    sampled (`sample()`, None when the client gave none) under roster_lock, the lock a run's final publication holds,
+    so a list sampled before that publication is never written with the carry read after it (GPT res1 of #1141 at
+    aedf5549, follow-up 2). None, with nothing written, when there is no list."""
+    with roster_lock(config):
+        sessions = sample()
+        if sessions is None:
+            return None
+        retire_recovered(config, boot_id, sessions)
+        return cmd_snapshot(config, boot_id=boot_id, sessions=sessions + carried_rows(config, boot_id, sessions), at=at)
+
+
+def retired_names(state: dict | None) -> set[str]:
+    """The sessions a relaunch state has retired: seen running by a run's final read, or listed live by a snapshot after
+    the run ended. A retired session is neither carried nor opened again by a rerun of the same relaunch; a lane
+    stopped on purpose after it recovered stays stopped, and only its own launcher starts it again."""
+    return set((state or {}).get("retired") or [])
+
+
+def retire_into(state: dict, names: set[str]) -> bool:
+    """Record `names` as retired in `state` and drop their rows from its carry; True when the carry changed."""
+    carry = state.get("carry") or []
+    kept = [row for row in carry if row.get("name") not in names]
+    state["retired"] = sorted(retired_names(state) | names)
+    state["carry"] = kept
+    return len(kept) != len(carry)
+
+
+def retire_recovered(config: dict, boot_id: str, live: list[dict]) -> None:
+    """After a relaunch of this boot ended partial, a carried row whose session is listed live has recovered (a tab that
+    registered late, or a lane restored by hand). The snapshot saves its retirement to that state, as the run's final
+    read does for the sessions it sees running, so the row is not carried again once the session stops on purpose (the
+    co-op's local review of #1141 at aedf5549, P2). A state in progress is left to its run, which holds it in memory.
+    Every read-modify-write of a relaunch state holds roster_lock (held by the caller here): a run's, from plan()'s read
+    to its first save and at its final publication, and a refusal record's."""
+    names = {row.get("name") for row in live}
+    for path in Path(config["state_dir"]).glob("relaunch-*.json"):
+        try:
+            doc = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if not isinstance(doc, dict) or doc.get("status") != "partial" or doc.get("boot") != boot_id:
+            continue
+        if retire_into(doc, names & {row.get("name") for row in doc.get("carry") or []}):
+            write_atomic(path, json.dumps(doc, indent=1) + "\n")
+
+
 def previous_roster(config: dict, boot_id: str) -> dict | None:
     """The newest roster written in another boot than this one (by its own written_at)."""
     best = None
@@ -223,12 +306,13 @@ def recent_relaunches(config: dict, at: dt.datetime) -> int:
 
 
 def carried_rows(config: dict, boot_id: str, live: list[dict]) -> list[dict]:
-    """The earlier boot's rows that a relaunch running in this boot has not brought back yet (not listed live), so a
-    second crash before the relaunch ends still finds them in this boot's roster."""
+    """The earlier boot's rows that a relaunch in this boot has not brought back yet (not listed live), while it runs
+    or after it ended partial, so a second crash still finds them in this boot's roster and the next boot relaunches
+    them."""
     names = {row.get("name") for row in live}
     carried = []
     for doc in relaunch_states(config):
-        if doc.get("status") == "in_progress" and doc.get("boot") == boot_id:
+        if doc.get("status") in ("in_progress", "partial") and doc.get("boot") == boot_id:
             carried += [row for row in doc.get("carry") or [] if row.get("name") not in names]
     return carried
 
@@ -422,12 +506,14 @@ def plan(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], aliv
                 "reason": f"{config['max_relaunches']} relaunches already in the last {config['relaunch_window_s']} s"}
     profiles = {p["session_name"]: p for p in config["profiles"]}
     alive = {row.get("name") for row in alive_rows}
+    retired = retired_names(state)  # recovered once already; a rerun does not reopen them (GPT res1, follow-up 4)
     cc = config["cc_session_name"]
     order = {p["session_name"]: i for i, p in enumerate(config["profiles"])}
     launch, left, taken = [], [], set()
     for row in prev.get("sessions") or []:
         name = row.get("name")
-        if name in profiles and name not in alive and name not in taken and row.get("kind") == "interactive":
+        if (name in profiles and name not in alive and name not in taken and name not in retired
+                and row.get("kind") == "interactive"):
             launch.append((row, profiles[name]))
             taken.add(name)  # one turn per name: a second row of the name is left to the command center
         else:
@@ -457,28 +543,46 @@ def cmd_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dic
 
 
 def record_refusal(config: dict, prev_boot: str, names: list[str], reason: str) -> bool:
-    """Append a refused --reopen to the relaunch state of ``prev_boot`` (the caller holds the run lock), keeping its runs,
-    sessions and earlier refusals. A boot with no readable relaunch state keeps no record (nothing to add it to); the
-    refusal then goes to stderr only. True when a record was written."""
+    """Append a refused --reopen to the relaunch state of ``prev_boot``, keeping its runs, sessions, retirements and
+    earlier refusals. It holds roster_lock itself (reentrant, so a relaunch that already holds it goes on), and appends
+    to the state as it reads it at the write, so a retirement saved since its first read is kept (GPT res2 of #1141 at
+    ca891398, follow-up 2). A boot with no readable relaunch state keeps no record (nothing to add it to); the refusal then
+    goes to stderr only. True when a record was written."""
     path = marker(config, "relaunch", prev_boot)
-    try:
-        state = json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
-    except (OSError, ValueError):
-        return False
-    if not isinstance(state, dict):
-        return False
-    state.setdefault("refusals", []).append({"at": iso(now_utc()), "reopen": list(names), "reason": reason})
-    write_atomic(path, json.dumps(state, indent=1) + "\n")
+    with roster_lock(config):
+        if not isinstance(read_state(path), dict):
+            return False
+        state = read_state(path)  # as on disk at the write
+        if not isinstance(state, dict):
+            return False
+        state.setdefault("refusals", []).append({"at": iso(now_utc()), "reopen": list(names), "reason": reason})
+        write_atomic(path, json.dumps(state, indent=1) + "\n")
     return True
 
 
-def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], dry_run: bool,
-                    reopen: frozenset[str]) -> dict:
-    alive_rows = wait_client(config)
-    if alive_rows is None:
-        return refuse(f"claude agents --json gave no session list within {config['client_wait_s']} s, so who is running "
-                      "is unknown; nothing was written or opened")
+def read_state(path: Path):
+    """A relaunch state file's JSON, or None when it is missing or unreadable."""
+    try:
+        return json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+    except (OSError, ValueError):
+        return None
+
+
+def prepare_run(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], dry_run: bool,
+                reopen: frozenset[str], alive_rows: list[dict]) -> dict:
+    """A run's decision and its first writes, from plan()'s read of the relaunch state to its first save, with the
+    caller holding roster_lock throughout. A refusal, nothing to relaunch or a dry run returns its result; otherwise
+    {"run": ...} carries what the run goes on with."""
     decided = plan(config, boot_id=boot_id, at=at, boots=boots, alive_rows=alive_rows)
+    # Reconcile the plan with the state on disk now (GPT res2 of #1141 at ca891398, blocker): a lane retired while the
+    # plan was made (a snapshot in this thread's nested hold) is dropped from the launch, and the run goes on from the
+    # state that records it, so a stale plan never reopens a lane stopped on purpose.
+    if decided["action"] == "relaunch" and decided.get("state") is not None:
+        fresh = read_state(marker(config, "relaunch", decided["prev_boot"]))
+        newly = retired_names(fresh) - retired_names(decided["state"]) if isinstance(fresh, dict) else set()
+        if newly:
+            decided = {**decided, "state": fresh,
+                       "launch": [(row, prof) for row, prof in decided["launch"] if row.get("name") not in newly]}
     if decided["action"] != "relaunch":
         if reopen and not decided.get("refused"):
             reason = f"--reopen {', '.join(sorted(reopen))}: nothing to relaunch ({decided['reason']})"
@@ -518,10 +622,12 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
         write_atomic(handoff, text, mode=0o400)
         state = {"prev_boot": prev_boot, "handoff": str(handoff), "handoff_sha256": hashlib.sha256(text.encode()).hexdigest(),
                  "runs": [], "sessions": []}
-    # This boot's roster at once: the live sessions and the earlier boot's rows not running yet, so a crash before the
-    # timer's first snapshot still leaves them to the next boot; the timer carries them while this run is in progress.
-    carry = [row for row in decided["prev"].get("sessions") or [] if row.get("name") not in alive]
-    cmd_snapshot(config, boot_id=boot_id, sessions=alive_rows + carry, at=at)
+    if decided["state"] is not None:
+        # A rerun: a lane its last run still carried and that is listed live now has recovered since,
+        # as a snapshot after that run would record it (retire_recovered).
+        retire_into(state, alive & {row.get("name") for row in state.get("carry") or []})
+    retired = retired_names(state)
+    carry = [row for row in decided["prev"].get("sessions") or [] if row.get("name") not in alive | retired]
     earlier = {entry["session_name"]: entry for entry in state.get("sessions") or []}
     sessions, profiles, reopened = [], {}, []
     for row, profile in decided["launch"]:
@@ -544,7 +650,34 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
     state["runs"].append({"boot": boot_id, "started_at": iso(at), **({"reopened": reopened} if reopened else {})})
     state_path = marker(config, "relaunch", prev_boot)
     save = lambda: write_atomic(state_path, json.dumps(state, indent=1) + "\n")
+
+    # This boot's roster first (the live sessions and the earlier boot's rows not running yet), then the state, both
+    # under roster_lock (held by the caller): a boot stop between the two writes still leaves the seed as this boot's newest roster (an
+    # earlier timer snapshot of this boot can be empty), the timer carries the rows from the saved state afterwards,
+    # and no snapshot interleaves with the two writes.
+    cmd_snapshot(config, boot_id=boot_id, sessions=alive_rows + carry, at=at)
     save()
+    return {"run": {"decided": decided, "state": state, "sessions": sessions, "profiles": profiles,
+                    "reopened": reopened, "save": save}}
+
+
+def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], dry_run: bool,
+                    reopen: frozenset[str]) -> dict:
+    alive_rows = wait_client(config)
+    if alive_rows is None:
+        return refuse(f"claude agents --json gave no session list within {config['client_wait_s']} s, so who is running "
+                      "is unknown; nothing was written or opened")
+    # Every read-modify-write of the relaunch state holds roster_lock from its read to its save: this run's, from
+    # plan()'s read to its first save and again at its final publication, a refusal record, and a snapshot's (the
+    # co-op's local review of #1141 at ca891398, P2), so no writer saves over a change it did not read. A dry run writes
+    # nothing and takes no roster_lock.
+    with contextlib.nullcontext() if dry_run else roster_lock(config):
+        prepared = prepare_run(config, boot_id=boot_id, at=at, boots=boots, dry_run=dry_run, reopen=reopen,
+                               alive_rows=alive_rows)
+    if "run" not in prepared:
+        return prepared
+    decided, state, sessions, profiles, reopened, save = (
+        prepared["run"][key] for key in ("decided", "state", "sessions", "profiles", "reopened", "save"))
     handoff = Path(state["handoff"])
     for index, entry in enumerate(e for e in sessions if e["outcome"] == "pending"):
         if index:
@@ -558,18 +691,29 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
     # has exited, so it is absent, and its tab start is resolved (seen listed), so a rerun opens it again without a
     # --reopen. An unreadable final list leaves the run partial; a rerun reads it again.
     final = list_sessions(config["claude"])
-    if final is not None:
-        live = {row.get("name") for row in final}
-        for entry in sessions:
-            if entry["session_name"] in live:
-                entry["outcome"] = "running"
-            elif entry["outcome"] == "running":
-                entry["outcome"] = "absent"
-                entry["resolved_through"] = len(entry.get("attempts") or [])
-    complete = final is not None and all(entry["outcome"] == "running" for entry in sessions)
-    state["status"] = "complete" if complete else "partial"
-    state["runs"][-1]["ended_at"] = iso(now_utc())
-    save()
+    # The final publication (outcomes, retirement, status) is under roster_lock, the lock a timer snapshot holds from
+    # its live sample to its roster write, so no snapshot writes a sample taken before it with the carry after it.
+    with roster_lock(config):
+        retired = retired_names(state)  # recovered earlier and since stopped on purpose: satisfied, not absent
+        if final is not None:
+            live = {row.get("name") for row in final}
+            for entry in sessions:
+                if entry["session_name"] in live:
+                    entry["outcome"] = "running"
+                elif entry["outcome"] == "running" and entry["session_name"] not in retired:
+                    entry["outcome"] = "absent"
+                    entry["resolved_through"] = len(entry.get("attempts") or [])
+            # A row leaves the carry only when this final list shows its session running (the command center's FULL
+            # read of #1141 at b2755a0e, P2): seen once and then gone, it stays carried through a second crash.
+            # A session that registered and then exited (absent) is still to be brought back, so its row stays carried.
+            retire_into(state, {entry["session_name"] for entry in sessions if entry["outcome"] == "running"})
+        # A retired session counts as satisfied (the co-op's local review at ca891398, P2): a rerun that brings back
+        # every lane still owed completes, though the lanes it retired earlier have stopped on purpose.
+        complete = final is not None and all(entry["outcome"] == "running" or entry["session_name"] in retired
+                                             for entry in sessions)
+        state["status"] = "complete" if complete else "partial"
+        state["runs"][-1]["ended_at"] = iso(now_utc())
+        save()
     print(f"session_relaunch: handoff {handoff} (sha256 {state['handoff_sha256']}); {state['status']}: "
           + ", ".join(f"{entry['session_name']} {entry['outcome']}" for entry in sessions))
     return {**decided, "state": state}
@@ -588,11 +732,11 @@ def main(argv: list[str] | None = None) -> int:
     config = load_config(args.config)
     boot_id, at = current_boot_id(), now_utc()
     if args.command == "snapshot":
-        sessions = list_sessions(config["claude"])
-        if sessions is None:
+        written = snapshot_live(config, boot_id=boot_id, at=at, sample=lambda: list_sessions(config["claude"]))
+        if written is None:
             print("session_relaunch: the last good roster stays as it is", file=sys.stderr)
             return 1
-        print(cmd_snapshot(config, boot_id=boot_id, sessions=sessions + carried_rows(config, boot_id, sessions), at=at))
+        print(written)
     elif args.command == "plan-restart":
         target = marker(config, "planned", boot_id)
         state_dir(config)

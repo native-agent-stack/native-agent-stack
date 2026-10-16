@@ -51,6 +51,24 @@
    "path": ".claude/skills/claude-native-practice/reference/scheduling-supervision.md",
    "line": 13,
    "reading": "On WSL2 the timers outlast sessions and terminal closes but not the distro; after a shutdown nothing fires until the distro starts."
+  },
+  {
+   "id": "cpython-fcntl-flock",
+   "url": "https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/library/fcntl.rst",
+   "read_at": "2026-10-15T10:44:00Z",
+   "sha256": "a7d16bc2dc53c74da7352407654fa7c618738327596cc6af43e3f3f1d1ded289",
+   "lines": {
+    "176-183": "fcntl.flock performs the lock operation on file descriptor fd; see flock(2) for details (tag v3.13.16)"
+   }
+  },
+  {
+   "id": "man-pages-flock-2",
+   "url": "https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git/plain/man/man2/flock.2?h=man-pages-6.9.1",
+   "read_at": "2026-10-15T10:44:33Z",
+   "sha256": "ccd3962b92161854db7e7e163bdc00ad15d98844c6035c4c74c2c16aea15cd32",
+   "lines": {
+    "69-72": "the lock is released by an explicit LOCK_UN on any duplicate descriptor, or when all such file descriptors have been closed"
+   }
   }
  ]
 }

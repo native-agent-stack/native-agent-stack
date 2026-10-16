@@ -75,7 +75,8 @@ sha256, each run (`boot`, `started_at`, `ended_at`), and each session's tab call
 | `absent` | listed earlier in this run but missing from its final live list: it registered, then exited |
 
 The status is `in_progress` from the run's start, then `complete` when the live list read at the run's end lists
-every session, else `partial` (also when that last read fails). The
+every session that is not retired (a retired session, one that recovered and was then stopped on purpose, counts as
+satisfied), else `partial` (also when that last read fails). The
 live list is read before every tab call, and a call is made only when that read lists the session as absent. Each
 call is recorded in the state file (`in_flight`) before it is made. Its result is saved together with the provisional
 outcome (`unconfirmed` after rc 0, `uncertain` after a timeout) before the settle wait, so a run stopped while it waits
@@ -110,9 +111,26 @@ Every relaunch run, the unit's or a direct one, holds an exclusive lock on `rela
 (`fcntl.flock`). A run that finds it held is refused with exit 1 and writes and opens nothing, so a direct `--reopen` run
 never overlaps the unit's run.
 
-At its start a run writes this boot's roster as the live sessions plus the ended boot's rows not running yet, and the
-minute snapshot keeps carrying those rows while the run is `in_progress`. A second crash before the timer's first
-snapshot (90 s after boot) therefore still leaves every session to the next boot.
+At its start a run writes this boot's roster as the live sessions plus the ended boot's rows not running yet, then saves
+its state. The minute snapshot keeps carrying those rows, minus the ones listed live, while the run is `in_progress`
+and after it ends `partial`, so a second crash leaves every session the relaunch has not brought back to the next boot.
+A row leaves the carry, and its session is recorded as `retired` in the state, when the run's final live list shows
+its session running, or, once the run has ended `partial`, when a snapshot lists its session (a tab that registered
+late, or a lane restored by hand). A retired lane that later stops on purpose is neither carried again nor reopened by
+a rerun of the same relaunch (a `--reopen` of it is refused; its own launcher starts it again), and it counts as
+satisfied when a rerun completes. A rerun also retires the carried lanes it finds live at its start, as a snapshot
+would. A session that
+registered and then went missing from the final list (absent) is not retired and stays carried. The snapshot samples
+the live list under `roster.lock`, and a run publishes its final outcomes, retirement and status under the same lock,
+so a snapshot never writes a list sampled before that publication with the carry read after it. A second crash before the timer's first snapshot (90 s after boot), or between the run's two writes,
+finds the run's own roster as this boot's newest. The snapshot holds an exclusive lock on `roster.lock` in the state
+directory from its live sample to its roster write, and a run holds it from its read of the relaunch state to the
+seed roster and its first save (a refused `--reopen` is recorded inside that span), and again while it publishes its
+final state. So every read-modify-write of the state is serialized, and a snapshot never replaces the seed with a carry
+read before the state existed. A dry run writes nothing and takes no `roster.lock`. The lock is reentrant within one thread (a nested hold takes no second `flock`); another thread or process still waits. A rerun reconciles its plan with the state on disk before its first save, so a lane retired while it planned is not opened, and a refused `--reopen` is appended to the state as read at the write. Both hold it briefly; `relaunch.lock` is
+the run's own lock. Both locks are `fcntl.flock`, flock(2) on the descriptor (python/cpython v3.13.16, `cbc944f4`,
+`Doc/library/fcntl.rst:176-183`), released when the descriptor closes (Linux man-pages tag `man-pages-6.9.1`,
+`man/man2/flock.2:69-72`).
 
 The service's `TimeoutStartSec=900` bounds one run. A run stopped by it stays `in_progress` and is rerun as above; a
 call it stopped is left `in_flight`, so the rerun records that session as `uncertain` and does not open it.
