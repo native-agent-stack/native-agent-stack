@@ -17558,8 +17558,8 @@
     },
     {
       "path": "catalogs/landscape/angles/README.md",
-      "sha256": "4c588669d0d89f91f1ed09d2cdec0ea9d2ea10f1b36d1cc17d0972890954fd6a",
-      "bytes": 15543
+      "sha256": "4c783254f7522af4cd16b1836b6518d882d1166287502f8cf70d111844f5f028",
+      "bytes": 16039
     },
     {
       "path": "catalogs/landscape/angles/foundation-agent-sdks.json",
@@ -17583,8 +17583,8 @@
     },
     {
       "path": "catalogs/landscape/angles/schema.json",
-      "sha256": "e4dc3f9dd1c9c00108b33aa9cc5c378987d32da43d7b479ec2371f1e427b3055",
-      "bytes": 12820
+      "sha256": "ff2927ecd13cae7d5a3a2d8fe76f1584deb1e30c1d704d4204cb015ce5f7917a",
+      "bytes": 14128
     },
     {
       "path": "catalogs/landscape/blind-convergence.json",
@@ -17608,7 +17608,7 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "0270f74ecf6ab097a1f565f5f1848395d9690e951cde4c0216930e332292e825",
+      "sha256": "9902b83dd5b9abd6281088d9094507e01cba87f1ac412e38ae7f4775de0d1e06",
       "bytes": 339603
     },
     {
@@ -19318,8 +19318,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-a1-identity-binding.md",
-      "sha256": "de6cbec9416cb6c075d20c0333a5253ab5b3b0f06ae146d7d078ce61814f8362",
-      "bytes": 8591
+      "sha256": "69bf7ddf48908e62f96292fb6bb65670f754f65b0122122ed01cc3dba8e57639",
+      "bytes": 9577
     },
     {
       "path": "docs/decisions/2026-10-15-jev-scored-contract-corrections.md",
@@ -19355,6 +19355,11 @@
       "path": "docs/decisions/2026-10-16-nautilus-rc5-run-source-pin.md",
       "sha256": "a2ceae122b37a9df4c9fb53a53f3bf4a1eb188cc51a60a4c564cf857d4a25014",
       "bytes": 6261
+    },
+    {
+      "path": "docs/decisions/2026-10-16-preopening-receipt-ownership-v2-replay.md",
+      "sha256": "dae672b1d3f585066f98ceccec7981df9daeba13862c6f9f05062f07f3c39bfb",
+      "bytes": 6717
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -20513,8 +20518,18 @@
     },
     {
       "path": "evidence/artifacts/angle-records-a1-20261015/provider-snapshot-sources.json",
-      "sha256": "6f38a62d6abc252d304af4b559537032093ac6782f30c825e8368af19522f46e",
-      "bytes": 4783
+      "sha256": "aa09d45a9ca890ecaed85a9aaf0ddd6ec104463400fc2bd772bd64a86209cb9a",
+      "bytes": 4993
+    },
+    {
+      "path": "evidence/artifacts/angle-records-preopening-20261016/checks.json",
+      "sha256": "25422d7514939fd95412e73235b57959b19ef5373bdfd796a6df9e412589d8a1",
+      "bytes": 6077
+    },
+    {
+      "path": "evidence/artifacts/angle-records-preopening-20261016/source-checks.json",
+      "sha256": "1885320141c9d7762885abd7c674b0c21a304a363611f3fcbbb2dbfff7152bb4",
+      "bytes": 1042
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/.gitattributes",
@@ -62778,8 +62793,8 @@
     },
     {
       "path": "scripts/angle_records.py",
-      "sha256": "69c9a00ee03bc8eb952fceda50be8467db9e8f5817b22cbe879bfd933e0a9d91",
-      "bytes": 17855
+      "sha256": "2d8c872fa9cbaf2ba4d928b7989eb323b7050fe2b2f6ba59dd0309f60ee94467",
+      "bytes": 19525
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -62838,8 +62853,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "04be4e6fff7bb2bf3acb76917433ba0e5bac8f939d436b4cc494b86d26826c2d",
-      "bytes": 84078
+      "sha256": "7adcccb98f247ad53b99f91243509efa6a9e54371e7086491f52260bdc07567a",
+      "bytes": 84539
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -63588,8 +63603,8 @@
     },
     {
       "path": "tests/test_angle_records_fix1.py",
-      "sha256": "d8c7818315b90d8c9a6c83a6e0cca24f13715452fc838f904a0dacf3964e77b7",
-      "bytes": 18501
+      "sha256": "c78acffe7e8123e09bd92e8b387b0a530313fbd5409fca939af14e631b595f56",
+      "bytes": 18771
     },
     {
       "path": "tests/test_angle_records_fix3.py",
@@ -63598,8 +63613,13 @@
     },
     {
       "path": "tests/test_angle_records_identity.py",
-      "sha256": "16d9c9d2289ce6a7a38f14ccca74a03d8e3f721f0e3a743560cd42be2009e13c",
-      "bytes": 11685
+      "sha256": "dec46ed583fb4ff7a250a226d0f307d9e66bd7d07ad15c3f62f8e844c384cffb",
+      "bytes": 12494
+    },
+    {
+      "path": "tests/test_angle_records_preopening_followup.py",
+      "sha256": "80e7f457b8f2c07ef842ecb99ecba16d7e6309f425eb244bdd5798c33bf1e554",
+      "bytes": 10556
     },
     {
       "path": "tests/test_anthropic_key_health.py",
@@ -63938,8 +63958,8 @@
     },
     {
       "path": "tests/test_final_stack.py",
-      "sha256": "04cb6cfbbea6cdc22d44aa46b78441a59c793212854215f7a64dbf2168993ca1",
-      "bytes": 79674
+      "sha256": "b44fa627f9b18357f2ffa53213d51a9dfcd8a45fb040b8673d3b385f45d5fc1e",
+      "bytes": 79904
     },
     {
       "path": "tests/test_financial_data.py",

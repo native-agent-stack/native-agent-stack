@@ -40,7 +40,7 @@ MODEL_SNAPSHOTS = frozenset((
     "claude-3-7-sonnet-20250219", "claude-3-haiku-20240307", "claude-3-opus-20240229",
     "claude-3-sonnet-20240229", "claude-4-opus-20250514", "claude-4-sonnet-20250514",
     "claude-fable-5", "claude-fable-5-1", "claude-haiku-4-5-20251001", "claude-haiku-5-5",
-    "claude-mythos-5", "claude-mythos-5-1", "claude-mythos-preview",
+    "claude-mythos-5", "claude-mythos-5-1",
     "claude-opus-4-20250514", "claude-opus-4-5-20251101", "claude-opus-4-6",
     "claude-opus-4-7", "claude-opus-4-8", "claude-opus-5", "claude-opus-5-5",
     "claude-sonnet-4-20250514", "claude-sonnet-4-5-20250929", "claude-sonnet-4-6",
@@ -119,6 +119,9 @@ def effective_weights(record: dict) -> dict[str, Decimal]:
 
 def bound_a1_sources(candidate: dict, sources=None) -> list[dict]:
     """A capability citation belongs to the complete current candidate identity."""
+    if not all(isinstance(candidate.get(field), str) and candidate[field].strip()
+               for field in ("repository", "pin")):
+        return []
     angles = candidate.get("angles")
     a1 = angles.get("A1") if isinstance(angles, dict) else None
     citations = a1.get("sources") if isinstance(a1, dict) else None
@@ -133,7 +136,10 @@ def bound_a1_sources(candidate: dict, sources=None) -> list[dict]:
             receipt = sources.json(source.get("path"))
         except (OSError, ValueError, TypeError, KeyError):
             return []
-        if (not isinstance(receipt, dict) or receipt.get("repository") != candidate.get("repository")
+        if (not isinstance(receipt, dict) or receipt.get("kind") != "capability"
+            or not isinstance(candidate.get("id"), str) or not candidate["id"].strip()
+            or receipt.get("candidate_id") != candidate["id"]
+            or receipt.get("repository") != candidate.get("repository")
             or receipt.get("pin") != candidate.get("pin")):
             return []
     return [source for source in citations if isinstance(source, dict)
@@ -151,7 +157,9 @@ def resolved_a1_pin(candidate: dict) -> bool:
     if not isinstance(pin, str):
         return False
     model = (isinstance(citations, list)
-             and any(isinstance(source, dict) and source.get("pin_kind") == "model" for source in citations))
+             and any(isinstance(source, dict) and source.get("repository") == candidate.get("repository")
+                     and source.get("pin") == pin and source.get("pin_kind") == "model"
+                     for source in citations))
     return pin in MODEL_SNAPSHOTS if model else bool(RESOLVED_PIN.fullmatch(pin))
 
 
@@ -188,6 +196,20 @@ def validate_record(record: dict, schema: dict, *, label: str, sources=None) -> 
         for candidate in record["candidates"]:
             if isinstance(candidate, dict) and candidate.get("a1_screened") is True:
                 if not resolved_a1_pin(candidate):
+                    angles = candidate.get("angles")
+                    a1 = angles.get("A1") if isinstance(angles, dict) else None
+                    citations = a1.get("sources") if isinstance(a1, dict) else None
+                    old_model_binding = (isinstance(candidate.get("pin"), str)
+                        and candidate["pin"] in MODEL_SNAPSHOTS and isinstance(citations, list)
+                        and isinstance(candidate.get("repository"), str)
+                        and bool(candidate["repository"].strip())
+                        and any(isinstance(source, dict) and source.get("pin_kind") == "model"
+                                and source.get("repository") == candidate["repository"]
+                                and isinstance(source.get("pin"), str)
+                                and source.get("pin") in MODEL_SNAPSHOTS
+                                for source in citations))
+                    if old_model_binding:
+                        raise AngleRecordError(f"{label}: A1 evidence must bind its current repository and pin")
                     raise AngleRecordError(f"{label}: A1 screen requires a resolved pin identity")
         stated = timestamp(record.get("weights_stated_at"))
         validate_reads(record, stated)
@@ -257,6 +279,8 @@ def validate_comparison(sources, path: str, candidate: dict, label: str) -> None
     """Retain upstream result artifacts for at least two arms; a smoke flag cannot satisfy A6."""
     receipt = sources.json(path)
     if (not isinstance(receipt, dict) or receipt.get("kind") != "comparative"
+        or not isinstance(candidate.get("id"), str) or not candidate["id"].strip()
+        or receipt.get("candidate_id") != candidate["id"]
         or receipt.get("evidence_class") != "native_proven" or receipt.get("completed") is not True
         or receipt.get("harness") not in ("Harbor", "promptfoo", "paired")
         or receipt.get("repository") != candidate["repository"] or receipt.get("pin") != candidate["pin"]

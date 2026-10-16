@@ -1068,7 +1068,7 @@ class AngleEnforcementTests(FixtureTestCase):
                 native = f"evidence/artifacts/fixture/arm-{ident}.txt"
                 _write(root / native, "Synthetic native result stand-in.\n")
                 arms.append({"id": ident, "native_output": native})
-            _write_json(root / paired, {"kind": "comparative", "evidence_class": "native_proven",
+            _write_json(root / paired, {"kind": "comparative", "candidate_id": c["id"], "evidence_class": "native_proven",
                 "completed": True, "harness": "paired", "repository": c["repository"], "pin": c["pin"],
                 "confounds": ["Synthetic policy control, not a real measured comparison."], "arms": arms})
         wave_path = "catalogs/sota-convergence/layer-verdicts-20260922.json"
@@ -1211,7 +1211,7 @@ class AngleEnforcementTests(FixtureTestCase):
         for native in native_paths:
             _write(root / native, "Synthetic stand-in for an upstream result artifact.\n")
         _write_json(root / receipt_path, {
-            "kind": "comparative", "evidence_class": "native_proven", "completed": True,
+            "kind": "comparative", "candidate_id": c["id"], "evidence_class": "native_proven", "completed": True,
             "harness": "paired", "repository": c["repository"], "pin": c["pin"],
             "confounds": ["Synthetic policy control, not a measured comparison."],
             "arms": [{"id": ident, "native_output": native} for ident, native in zip(("a", "b"), native_paths)]})
@@ -1228,12 +1228,14 @@ class AngleEnforcementTests(FixtureTestCase):
             "kind": "receipt", "path": receipt,
             "repository": candidate["repository"], "pin": candidate["pin"],
         }]
-        _write_json(root / receipt, {"repository": candidate["repository"], "pin": candidate["pin"]})
+        _write_json(root / receipt, {"kind": "capability", "candidate_id": candidate["id"],
+                                   "repository": candidate["repository"], "pin": candidate["pin"]})
         _write_json(path, record)
         document = fs.build_document(root)
         self.assertEqual(self.layer(document, "layer-a")["angles"]["candidates"][0]["verdict"], "CONVERGED")
         self.assertIn(receipt, document["sources"])
-        _write_json(root / receipt, {"repository": candidate["repository"], "pin": COMMIT_B})
+        _write_json(root / receipt, {"kind": "capability", "candidate_id": candidate["id"],
+                                   "repository": candidate["repository"], "pin": COMMIT_B})
         with self.assertRaisesRegex(fs.FinalStackError, "A1 evidence.*current repository and pin"):
             fs.build_document(root)
 

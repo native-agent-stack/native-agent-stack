@@ -159,7 +159,19 @@ class A1IdentityTests(unittest.TestCase):
                 record = _angle_fixture()
                 source = record["candidates"][0]["angles"]["A1"]["sources"][0]
                 source.update(repository=record["candidates"][0]["repository"], pin=COMMIT_A)
+                # A wholesale old schema fails this complete positive before
+                # the negative can accidentally pass on an unknown field.
+                self.assertEqual(list(ar.Draft202012Validator(SCHEMA).iter_errors(record)), [])
+                ar.validate_record(record, SCHEMA, label="synthetic")
                 del source[missing]
+                errors = list(ar.Draft202012Validator(SCHEMA).iter_errors(record))
+                pending = list(errors)
+                dependency = False
+                while pending:
+                    error = pending.pop()
+                    dependency = dependency or error.validator == "dependentRequired"
+                    pending.extend(error.context)
+                self.assertTrue(dependency)
                 with self.assertRaisesRegex(ar.AngleRecordError, "schema failure"):
                     ar.validate_record(record, SCHEMA, label="synthetic")
 
@@ -174,7 +186,8 @@ class A1IdentityTests(unittest.TestCase):
                     "kind": "receipt", "path": path,
                     "repository": candidate["repository"], "pin": candidate["pin"],
                 }]
-                receipt = {"repository": candidate["repository"], "pin": candidate["pin"]}
+                receipt = {"kind": "capability", "candidate_id": candidate["id"],
+                           "repository": candidate["repository"], "pin": candidate["pin"]}
                 (root / "evidence").mkdir()
                 (root / path).write_text(json.dumps(receipt) + "\n")
                 ar.validate_record(record, SCHEMA, label="synthetic", sources=fs.Sources(root))

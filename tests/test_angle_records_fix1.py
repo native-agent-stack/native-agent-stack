@@ -34,7 +34,7 @@ class FinalFix1Tests(FixtureTestCase):
             native = f"evidence/artifacts/fixture/arm-{ident}.txt"
             _write(root / native, "Synthetic native-result stand-in.\n")
             arms.append({"id": ident, "native_output": native})
-        _write_json(root / paired, {"kind": "comparative", "evidence_class": "native_proven",
+        _write_json(root / paired, {"kind": "comparative", "candidate_id": c["id"], "evidence_class": "native_proven",
             "completed": True, "harness": "paired", "repository": c["repository"], "pin": c["pin"],
             "confounds": ["Synthetic control; no real candidate measurement."], "arms": arms})
         _write_json(path, record)
@@ -188,6 +188,10 @@ class FinalFix1Tests(FixtureTestCase):
         candidate.update({field: copy.deepcopy(pool[field]) for field in
                           ("id", "trial_permitted", "final_eligible", "basis", "entitlement")})
         record["final_evidence"][0]["candidate_id"] = pool["id"]
+        comparison_path = root / candidate["angles"]["A6"]["sources"][0]["path"]
+        comparison = json.loads(comparison_path.read_bytes())
+        comparison["candidate_id"] = candidate["id"]
+        _write_json(comparison_path, comparison)
         _write_json(path, record)
         self.assert_final_disabled(root)
         candidate["final_eligible"] = True

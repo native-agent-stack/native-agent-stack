@@ -1,0 +1,75 @@
+{
+  "evidence_class": "synthetic",
+  "base": "1b633d861518fa0d299279b1cfaec11d0fb47f82",
+  "production_admission_enabled": false,
+  "fail_first": [
+    {"control": "uncorroborated preview model identity", "methods": 1, "assertion_failures": 1, "errors": 0},
+    {"control": "own A1 kind/candidate and absent repository", "methods": 3, "assertion_failures": 8, "errors": 0},
+    {"control": "own A6 candidate and sibling route", "methods": 2, "assertion_failures": 3, "errors": 0},
+    {"control": "unbound model typing", "methods": 1, "assertion_failures": 2, "errors": 0},
+    {"control": "missing receipt content schema definitions", "methods": 1, "assertion_failures": 2, "errors": 0},
+    {"control": "native V2 rediscovery then substantive refutation", "methods": 1, "assertion_failures": 1, "errors": 0}
+  ],
+  "fail_first_limits": "Each control was run before its corresponding correction. No setup errors are counted. The native V2 no-rediscovery positive already passed; only rediscovery exposed the original-field replay defect.",
+  "exact_base_replay": {
+    "base": "1b633d861518fa0d299279b1cfaec11d0fb47f82",
+    "methods": 9,
+    "assertion_failures": 17,
+    "errors": 0,
+    "exit": 1,
+    "seconds": 4.705,
+    "boundary": "An isolated process loads exact base angle gate source, base receipt schema and base V2 replay helper. Final new test methods run unchanged against those inputs; no Git worktree is modified."
+  },
+  "partial_schema_causality": {
+    "wholesale_schema_revert": "51279d4f63d87b2d19de722cad786d7293417ac8",
+    "original_assertion_only_control_passed": true,
+    "strengthened_complete_positive_failures": 2,
+    "errors": 0,
+    "control_exit": 0,
+    "limits": "Test-specific causality check, not an additional production admission defect. The original negative-only test passes for an unknown-field reason; the strengthened test detects the invalid complete positive."
+  },
+  "ownership_schema_and_identity": {"tests": 23, "exit": 0, "seconds": 0.112},
+  "native_current_main_replay": {"tests": 1, "exit": 0, "seconds": 5.9},
+  "frozen_qualifier_composition": {
+    "qualifier_commit": "bd0474d3615a18f60d8b881df747a7dcc6a2e997",
+    "red": {"tests": 1, "assertion_failures": 1, "errors": 0, "exit": 1},
+    "fixed": {"tests": 1, "exit": 0, "seconds": 6.141, "status": "qualified", "admission_enabled": false},
+    "guards": {"tests": 5, "exit": 0, "seconds": 5.306},
+    "guard_controls": [
+      "test_native_v2_rediscovery_then_merit_refutation_qualifies",
+      "test_native_v2_refutation_mutations_refuse_direct_history_qualification",
+      "test_missing_native_v2_projection_is_refused_before_replay",
+      "test_post_anchor_symbolic_reopening_refuses_by_native_history_semantics",
+      "test_reused_history_reader_cannot_hide_a_changed_ledger_and_recovers"
+    ],
+    "limits": "An isolated Python process loads only the corrected helper source into the exact frozen read-only qualifier. No frozen file, Git head, production refusal or published artifact changes. This is not the final landed-current-main second-party receipt."
+  },
+  "partial_identity_control": "A complete positive precedes deletion of repository/pin; nested ValidationError.context must contain dependentRequired. Initial assertions looked only at the root oneOf error and were corrected without changing production validation.",
+  "model_diagnostic_control": "The first mixed-citation fix exposed the existing stale-model binding diagnostic test. Resolution now uses current bound typing while the diagnostic distinguishes known stale typed model evidence from an unresolved identity; no existing refusal assertion was weakened.",
+  "receipt_fixture_migration": "Existing valid synthetic A1/A6 receipts now declare their own kind and candidate_id. Their original stale identity, comparative measurement and native-output assertions remain.",
+  "pre_affected_generation": {"exit": 0, "seconds": 158.438},
+  "initial_affected_run": {
+    "tests": 660,
+    "exit": 1,
+    "failures": 28,
+    "errors": 2,
+    "seconds": 373.226,
+    "dispositions": [
+      "Three additional existing AngleEnforcementTests receipt producers lacked the new own fields. A separate trial-metadata fixture also changes the candidate id and must update its synthetic comparison's own id. Migrated those fixture payloads only, retaining all original assertions and the entire RunTests class unchanged.",
+      "The page branch-citation test compares generated records with Git HEAD, so an uncommitted regenerated artifact cannot satisfy its immutable snapshot assertion. Final affected verification runs after an unpublished candidate commit, before any push."
+    ],
+    "limits": "Fixture omissions and the dirty-generated-snapshot assertion are not counted as new production defects or fail-first controls."
+  },
+  "affected_run": {
+    "tested_immutable_candidate": "5dcb7b7dd48effd4c4b7844aa19c5bae095cd261",
+    "command": "python3 -m unittest tests.test_angle_records_preopening_followup tests.test_angle_records tests.test_angle_records_identity tests.test_angle_records_fix1 tests.test_angle_records_fix3 tests.test_final_stack tests.test_final_ordering tests.test_final_disabled tests.test_saturation_ledger tests.test_evidence_manifest tests.test_component_matrix tests.test_layer_verdicts tests.test_record_verdicts tests.test_landscape tests.test_local_pages_architecture_manifest tests.test_local_pages_architecture_layer_pages",
+    "tests": 660,
+    "exit": 0,
+    "seconds": 391.338,
+    "skipped": 0,
+    "idle_class": true,
+    "limits": "Complete bounded named-module run on an unpublished immutable candidate, including the original page HEAD-citation assertion. Final amendment changes audit records, registrations and derived output only."
+  },
+  "final_fixture_recheck": {"tests": 52, "exit": 0, "seconds": 10.362, "original_assertions_preserved": true},
+  "limits": "Synthetic fixture ownership and native history replay only; no model/provider invocation, current candidate capability measurement, default selection, licence gate or FINAL activation."
+}
