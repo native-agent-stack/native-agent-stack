@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "id": "final-native-clients-preparation-20261016",
+  "kind": "compatibility_attempt",
+  "component_ids": [
+    "claude-code",
+    "codex"
+  ],
+  "claim": "Exact-pin vendor-native installation and offline CLI readiness at Claude Code 2.1.301 and Codex 0.162.1, with retained masked native captures and a proposed F1 reconciliation. Authenticated task E2E, full tool invocation, recovery and comparative A6 remain named gaps.",
+  "evidence_class": "local_integration",
+  "classification": "Index of masked native captures and separately labelled derived analysis; not a substitute native stream",
+  "limitations": [
+    "No authenticated model task, full native tool invocation, same-session recovery or paired comparative run was performed.",
+    "No upstream unit/integration suite was run. Vendor-native installation and version/help smoke only.",
+    "All new installations remain in isolated scratch; no macOS or new-distribution activation is qualified.",
+    "The earlier normalized-only attempts have a named raw-capture gap and are not used as qualifying receipts.",
+    "F1 proposals do not change active adoption/run/verdict pins or admit FINAL.",
+    "The co-op privately reproduced the staged masked bytes; committed-head re-verification accompanies the PR handoff."
+  ],
+  "artifact_directory": "evidence/artifacts/final-native-clients-prep-20261016",
+  "native_capture_index": "evidence/artifacts/final-native-clients-prep-20261016/native/index.json",
+  "claim_sources": [
+    "evidence/artifacts/final-native-clients-prep-20261016/native/claude-native-install.stdout.txt:7",
+    "evidence/artifacts/final-native-clients-prep-20261016/native/codex-native-install.stdout.txt:9",
+    "evidence/artifacts/final-native-clients-prep-20261016/native/claude-version.stdout.txt:1",
+    "evidence/artifacts/final-native-clients-prep-20261016/native/codex-version.stdout.txt:1",
+    "evidence/artifacts/final-native-clients-prep-20261016/native/index.json:513",
+    "evidence/artifacts/final-native-clients-prep-20261016/native/index.json:988",
+    "evidence/artifacts/final-native-clients-prep-20261016/native/index.json:160",
+    "evidence/artifacts/final-native-clients-prep-20261016/native/index.json:765"
+  ],
+  "derived_records": [
+    "evidence/artifacts/final-native-clients-prep-20261016/capture-summary.json",
+    "evidence/artifacts/final-native-clients-prep-20261016/pin-reconciliation.json",
+    "evidence/artifacts/final-native-clients-prep-20261016/multi-angle-draft.json"
+  ],
+  "masker": "evidence/artifacts/final-native-clients-prep-20261016/mask_native.py",
+  "recorder": "evidence/artifacts/final-native-clients-prep-20261016/record_native.py",
+  "test": "tests/test_native_client_capture_custody.py",
+  "private_capture_group_name": "native-clients-recapture-20261016",
+  "private_reproduction_status": "PASS_REPORTED_BY_COOP",
+  "private_reproduction_record_name": "goru MASKED-REPRO CHECK PASS for foundation/native-clients",
+  "decision": "docs/decisions/2026-10-16-native-clients-final-preparation.md"
+}

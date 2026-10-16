@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "classification": "derived_analysis_of_native_captures",
+  "catalog": "foundation",
+  "layer_id": "native-clients",
+  "native_capture_index": "native/index.json",
+  "counts": {
+    "captures": 30,
+    "zero_exit_captures": 27,
+    "nonzero_exit_captures": 3
+  },
+  "count_derivation": "Count capture objects and their exit_code values in native/index.json; these aggregate counts are analysis, never stand-in native output.",
+  "measured_claims": [
+    {
+      "claim": "Claude native install at 2.1.301 completed",
+      "output_source": "native/claude-native-install.stdout.txt:7",
+      "exit_source": "native/index.json:513"
+    },
+    {
+      "claim": "Codex native install at 0.162.1 completed",
+      "output_source": "native/codex-native-install.stdout.txt:9",
+      "exit_source": "native/index.json:988"
+    },
+    {
+      "claim": "Claude version smoke reports 2.1.301",
+      "output_source": "native/claude-version.stdout.txt:1",
+      "exit_source": "native/index.json:676"
+    },
+    {
+      "claim": "Codex version smoke reports 0.162.1",
+      "output_source": "native/codex-version.stdout.txt:1",
+      "exit_source": "native/index.json:1108"
+    },
+    {
+      "claim": "Claude and Codex help commands completed without networking",
+      "output_sources": [
+        "native/claude-help.stdout.txt:1",
+        "native/codex-help.stdout.txt:1"
+      ],
+      "command_and_exit_sources": [
+        "native/index.json:78",
+        "native/index.json:160",
+        "native/index.json:689",
+        "native/index.json:765"
+      ]
+    },
+    {
+      "claim": "Vendor manifest signature verified with the published release-key fingerprint",
+      "output_sources": [
+        "native/claude-manifest-verify.stderr.txt:3",
+        "native/claude-key-fingerprint.stdout.txt:3"
+      ],
+      "exit_source": "native/index.json:418"
+    },
+    {
+      "claim": "Installed public release binaries have the reported digests",
+      "output_sources": [
+        "native/claude-installed-sha256.stdout.txt:1",
+        "native/codex-installed-sha256.stdout.txt:1"
+      ],
+      "exit_sources": [
+        "native/index.json:249",
+        "native/index.json:854"
+      ]
+    }
+  ],
+  "retained_failures": [
+    {
+      "capture": "host-claude-version",
+      "source": "native/host-claude-version.stderr.txt:1",
+      "exit_source": "native/index.json:1185",
+      "disposition": "Existing-host launcher --version needs its home setting; sanitized recorder environment omitted it. No model task was launched. A separate direct native binary --version capture succeeds."
+    }
+  ],
+  "test_controls": {
+    "classification": "synthetic custody fixtures executed through native unittest; not model/client E2E",
+    "red_sources": [
+      "native/red-recorder-control.stderr.txt:1",
+      "native/red-mask-control.stderr.txt:1"
+    ],
+    "red_exit_sources": [
+      "native/index.json:1516",
+      "native/index.json:1542"
+    ],
+    "green_source": "native/green-capture-controls.stderr.txt:9",
+    "green_result_source": "native/green-capture-controls.stderr.txt:11",
+    "green_exit_source": "native/index.json:1134"
+  },
+  "original_attempt_disposition": {
+    "status": "NAMED_CAPTURE_GAP",
+    "description": "The earlier preparation retained normalized-only streams. They do not qualify as native captures and are not substituted into this record. Two resolver-namespace setup failures and one missing-awk namespace failure remain disclosed historical observations with missing raw capture. Fresh runs are separate observations, not reconstruction.",
+    "private_history_name": "native-clients-original-normalized-attempts",
+    "close_rule": "Preserve the gap; never reconstruct original bytes from transformations."
+  },
+  "limitations": [
+    "Installation/version/help readiness only; no upstream unit/integration test suite and no authenticated model task or full native tool invocation was run.",
+    "A6 comparative evidence remains pending; the native-client role is not newly qualified.",
+    "No fresh macOS run or new-distribution activation.",
+    "No FINAL state, active run pin, route, model default, service or host installation changes."
+  ],
+  "private_reproduction": {
+    "status": "PASS_REPORTED_BY_COOP",
+    "source_record_name": "goru MASKED-REPRO CHECK PASS for foundation/native-clients",
+    "reported_scope": "Staged working copy; native streams, capture index, masker and tests unchanged for the committed-head recheck.",
+    "reported_counts": {
+      "byte_identical_files": 61,
+      "stream_hashes_and_lengths_matched": 60,
+      "staged_registration_rows_matched": 71,
+      "capture_metadata_rows_matched": 30,
+      "custody_tests_passed": 6,
+      "locator_scan_matches": 0
+    },
+    "raw_capture_group_name": "native-clients-recapture-20261016",
+    "masker": "mask_native.py",
+    "test": "tests/test_native_client_capture_custody.py",
+    "policy": "Exact commands and raw bytes remain private; published digests bind masked derivative bytes only."
+  }
+}

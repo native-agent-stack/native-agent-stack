@@ -1,0 +1,16 @@
+test_recorder_retains_unmodified_bytes_and_nonzero_exit (tests.test_native_client_capture_custody.NativeCaptureCustodyTests.test_recorder_retains_unmodified_bytes_and_nonzero_exit) ... FAIL
+
+======================================================================
+FAIL: test_recorder_retains_unmodified_bytes_and_nonzero_exit (tests.test_native_client_capture_custody.NativeCaptureCustodyTests.test_recorder_retains_unmodified_bytes_and_nonzero_exit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<SCRATCH>/red-recorder-fixture/tests/test_native_client_capture_custody.py", line 43, in test_recorder_retains_unmodified_bytes_and_nonzero_exit
+    self.assertEqual(result.returncode, 0, result.stderr.decode(errors="replace"))
+    <TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME>^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : <USER_HOME>/.local/share/mise/installs/python/3.13.16/bin/python3: can't open file '<SCRATCH>/red-recorder-fixture/evidence/artifacts/final-native-clients-prep-20261016/record_native.py': [Errno 2] No such file or directory
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.018s
+
+FAILED (failures=1)

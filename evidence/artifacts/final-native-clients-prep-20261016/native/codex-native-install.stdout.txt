@@ -1,0 +1,9 @@
+==> Installing Codex CLI
+==> Detected platform: Linux (x64)
+==> Resolved version: 0.162.1
+==> Downloading Codex CLI
+==> Installing standalone package to <USER_HOME>/.codex/packages/standalone/releases/0.162.1-x86_64-unknown-linux-musl
+==> <USER_HOME>/.local/bin is already on PATH
+==> Current terminal: codex
+==> Future terminals: open a new terminal and run: codex
+Codex CLI 0.162.1 installed successfully.

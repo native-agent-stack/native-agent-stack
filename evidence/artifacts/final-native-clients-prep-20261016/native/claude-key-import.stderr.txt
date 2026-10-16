@@ -1,0 +1,5 @@
+gpg: keybox '<SCRATCH>/gpg-keyring/pubring.kbx' created
+gpg: <SCRATCH>/gpg-keyring/trustdb.gpg: trustdb created
+gpg: key BAA929FF1A7ECACE: public key "Anthropic Claude Code Release Signing <security@anthropic.com>" imported
+gpg: Total number processed: 1
+gpg:               imported: 1

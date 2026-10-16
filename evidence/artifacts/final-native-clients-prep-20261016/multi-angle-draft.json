@@ -1,0 +1,456 @@
+{
+  "schema_version": 1,
+  "status": "DRAFT_FOR_TWO_FAMILY_READS",
+  "catalog": "foundation",
+  "layer_id": "native-clients",
+  "source_base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82",
+  "final_admission": false,
+  "rule_version": "angle-convergence/2",
+  "weights": {
+    "A1": 0.2,
+    "A2": 0.2,
+    "A3": 0.15,
+    "A4": 0.15,
+    "A5": 0.2,
+    "A6": 0.1
+  },
+  "weights_policy": "Carry the existing stated weights; do not recompute or promote scores from these readiness smokes.",
+  "resolution_inputs": [
+    "catalogs/landscape/foundation.json",
+    "catalogs/sota-convergence/layer-verdict-waves.json",
+    "catalogs/sota-convergence/layer-verdicts-20260922.json",
+    "catalogs/saturation/ledger.json",
+    "catalogs/sota-convergence/manifest-20260929.json",
+    "evidence/artifacts/landscape-sweep-20260929/returns.json",
+    "catalogs/sota-convergence/manifest-20261009.json",
+    "evidence/artifacts/landscape-sweep-20261009-pine/returns.json"
+  ],
+  "resolution": {
+    "recorded_verdict_wave": "20260922",
+    "latest_sweep_covering_layer": "landscape-sweep-20260929",
+    "latest_layer_survived_count": 0,
+    "latest_layer_clean_count": 0,
+    "later_sweep_checked": {
+      "id": "landscape-sweep-20261009-pine",
+      "discovery_layers": [
+        "backtesting-engine"
+      ],
+      "vote_layers": [
+        "backtesting-engine"
+      ],
+      "replaces_native_client_sweep": false
+    },
+    "missing_vote_carry": [
+      {
+        "repository": "https://github.com/earendil-works/pi",
+        "earlier": "The 2026-09-26 GPT fit vote is missing; absence was not a merits refutation.",
+        "later": "The retained 2026-09-29 fit votes include an actual GPT refutation and a Claude non-refutation. This is substantive disposition under the existing all-not-refuted survival rule, not two-family positive agreement.",
+        "sources": [
+          "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/2",
+          "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/native-clients/2"
+        ],
+        "value_sources": {
+          "earlier_missing_vote": "evidence/artifacts/landscape-sweep-20260926/returns.json:1954",
+          "later_gpt_refutation": "evidence/artifacts/landscape-sweep-20260929/returns.json:1342",
+          "later_claude_nonrefutation": "evidence/artifacts/landscape-sweep-20260929/returns.json:1325"
+        }
+      },
+      {
+        "repository": "https://github.com/google-gemini/gemini-cli",
+        "historical_pin": "v0.60.0",
+        "source": "catalogs/sota-convergence/manifest-20260923.json:417",
+        "ledger_source": "catalogs/saturation/ledger.json:352",
+        "disposition": "Custody sufficiency disputed; preserve the known fit-refutation excerpt and missing full-return limitation. Do not call this a returned surviving vote or silently settle it from omission.",
+        "value_sources": {
+          "fit_refutation": "catalogs/sota-convergence/manifest-20260923.json:451",
+          "retained_reason_excerpt": "catalogs/sota-convergence/manifest-20260923.json:453",
+          "full_votes_missing": "catalogs/saturation/ledger.json:322",
+          "historical_release": "catalogs/sota-convergence/manifest-20260923.json:431"
+        }
+      }
+    ],
+    "generator_command_rc": 0,
+    "packet_generation": {
+      "native_stdout": "evidence/artifacts/final-native-clients-prep-20261016/native/lane-packets.stdout.txt:1",
+      "native_command_and_rc": "evidence/artifacts/final-native-clients-prep-20261016/native/index.json:1249",
+      "private_packet_name": "foundation__native-clients.json",
+      "boundary": "The native generator ran once in fresh scratch. Full packet remains private by name. This draft carries only the existing public angle record identities and does not present an identity summary as a native receipt."
+    },
+    "value_sources": {
+      "latest_sweep_covering_layer": "catalogs/landscape/final-stack.json:6936",
+      "latest_layer_survived_count": "catalogs/landscape/final-stack.json:6941",
+      "latest_layer_clean_count": "catalogs/landscape/final-stack.json:6935",
+      "later_sweep_discovery": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json:4",
+      "later_sweep_votes": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json:95"
+    }
+  },
+  "winners": [
+    {
+      "component_id": "claude-code",
+      "proposed_run_pin": "2.1.301",
+      "pin_source": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-version.stdout.txt:1"
+    },
+    {
+      "component_id": "codex",
+      "proposed_run_pin": "0.162.1",
+      "pin_source": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-version.stdout.txt:1"
+    }
+  ],
+  "carried_angle_candidates": [
+    {
+      "id": "pi",
+      "repository": "https://github.com/earendil-works/pi",
+      "pin": "04566631c2b51fb688486bc1f040f60d1518c126",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:301",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:301",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:303",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:304",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:309"
+      }
+    },
+    {
+      "id": "oh-my-pi",
+      "repository": "https://github.com/can1357/oh-my-pi",
+      "pin": "5d0aaffaf1f987503ce129a642fb6e30339615af",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:451",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:451",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:453",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:454",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:459"
+      }
+    },
+    {
+      "id": "opencode-1x",
+      "repository": "https://github.com/anomalyco/opencode",
+      "pin": "a34961825be13a31daa76f33a8b47efcd198cfef",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:566",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:566",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:568",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:569",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:574"
+      }
+    },
+    {
+      "id": "opencode-2x",
+      "repository": "https://github.com/anomalyco/opencode",
+      "pin": "a34961825be13a31daa76f33a8b47efcd198cfef",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:681",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:681",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:683",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:684",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:689"
+      }
+    },
+    {
+      "id": "goose",
+      "repository": "https://github.com/aaif-goose/goose",
+      "pin": "4617040c7b650b37d599bdaa08d3790572c19ae8",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:796",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:796",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:798",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:799",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:804"
+      }
+    },
+    {
+      "id": "hermes-agent",
+      "repository": "https://github.com/NousResearch/hermes-agent",
+      "pin": "3569e8461ea721623fa16e6f01fb636157989fe6",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:906",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:906",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:908",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:909",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:914"
+      }
+    },
+    {
+      "id": "cline",
+      "repository": "https://github.com/cline/cline",
+      "pin": "8eba11b2703f5b12d3f415544be37ffc0ca03be1",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:1016",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:1016",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:1018",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:1019",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:1024"
+      }
+    },
+    {
+      "id": "qwen-code",
+      "repository": "https://github.com/QwenLM/qwen-code",
+      "pin": "aaf97b869dfcc4cf529ada1b036cad9b18695486",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:1131",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:1131",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:1133",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:1134",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:1139"
+      }
+    },
+    {
+      "id": "jcode",
+      "repository": "https://github.com/1jehuang/jcode",
+      "pin": "b3d4e2143670dd5aeafc81649d85eabdf1bc9d18",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:1246",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:1246",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:1248",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:1249",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:1254"
+      }
+    },
+    {
+      "id": "deepseek-harness",
+      "repository": "https://github.com/deepseek-ai/deepseek-harness",
+      "pin": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:1361",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:1361",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:1363",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:1364",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:1369"
+      }
+    },
+    {
+      "id": "kilo-code",
+      "repository": "https://github.com/Kilo-Org/kilocode",
+      "pin": "UNVERIFIED",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:1476",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:1476",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:1478",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:1479",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:1484"
+      }
+    },
+    {
+      "id": "openclaw",
+      "repository": "https://github.com/openclaw/openclaw",
+      "pin": "UNVERIFIED",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:1583",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:1583",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:1585",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:1586",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:1591"
+      }
+    },
+    {
+      "id": "openhands-cli",
+      "repository": "https://github.com/OpenHands/OpenHands-CLI",
+      "pin": "UNVERIFIED",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:1690",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:1690",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:1692",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:1693",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:1698"
+      }
+    },
+    {
+      "id": "freebuff",
+      "repository": "https://github.com/CodebuffAI/freebuff",
+      "pin": "UNVERIFIED",
+      "recorded_status": "COMPARISON_ARM",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:1797",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:1797",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:1799",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:1800",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:1805"
+      }
+    },
+    {
+      "id": "muse-code",
+      "repository": "https://dev.meta.ai/docs/muse-code",
+      "pin": "1.4.6-R6000.1",
+      "recorded_status": "TRIAL",
+      "source": "catalogs/landscape/angles/foundation-native-clients.json:1904",
+      "disposition": "Carry unchanged; no fresh screen, install, new score or promotion in this preparation.",
+      "value_sources": {
+        "id": "catalogs/landscape/angles/foundation-native-clients.json:1904",
+        "repository": "catalogs/landscape/angles/foundation-native-clients.json:1906",
+        "pin": "catalogs/landscape/angles/foundation-native-clients.json:1907",
+        "recorded_status": "catalogs/landscape/angles/foundation-native-clients.json:1912"
+      }
+    }
+  ],
+  "angles": [
+    {
+      "id": "A1",
+      "dimension": "capability at the pin",
+      "delta": "Fresh retained native captures establish two isolated vendor-native installs and offline version/help readiness. Masked derivatives preserve all bytes except explicit literal paths. This is installation/readiness only, not an authenticated task or comparison.",
+      "evidence": [
+        "evidence/artifacts/final-native-clients-prep-20261016/native/claude-native-install.stdout.txt:5",
+        "evidence/artifacts/final-native-clients-prep-20261016/native/codex-native-install.stdout.txt:9",
+        "evidence/artifacts/final-native-clients-prep-20261016/native/claude-version.stdout.txt:1",
+        "evidence/artifacts/final-native-clients-prep-20261016/native/codex-version.stdout.txt:1"
+      ],
+      "disputed": [
+        "Whether the full native account/tool/recovery role passes at these pins remains credential-gated."
+      ],
+      "new_score": null
+    },
+    {
+      "id": "A2",
+      "dimension": "upstream engineering quality",
+      "delta": "Carry the existing bounded source/CI/Scorecard record. New install integrity checks support artifact provenance only. No repository quality or security score is upgraded.",
+      "source": [
+        "catalogs/landscape/angles/foundation-native-clients.json:98",
+        "catalogs/landscape/angles/foundation-native-clients.json:234"
+      ],
+      "disputed": [
+        "Claude closed-source binary and published source tag are distinct.",
+        "Historical CI/Scorecard results are bounded and may refer to another commit."
+      ],
+      "new_score": null
+    },
+    {
+      "id": "A3",
+      "dimension": "community consensus",
+      "delta": "Carry the dated community-scale proxies; do not equate stars/forks with independent adopter consensus.",
+      "source": [
+        "catalogs/landscape/angles/foundation-native-clients.json:110",
+        "catalogs/landscape/angles/foundation-native-clients.json:246"
+      ],
+      "disputed": [
+        "Independent adopter consensus at the proposed pins is unmeasured."
+      ],
+      "new_score": null
+    },
+    {
+      "id": "A4",
+      "dimension": "net usage",
+      "delta": "Carry historical npm and opt-in traffic observations. This preparation records four offline CLI commands, not workload share or active user adoption.",
+      "source": [
+        "catalogs/landscape/angles/foundation-native-clients.json:127",
+        "catalogs/landscape/angles/foundation-native-clients.json:263"
+      ],
+      "disputed": [
+        "Download counts and opt-in app traffic measure different populations and do not establish net usage."
+      ],
+      "new_score": null
+    },
+    {
+      "id": "A5",
+      "dimension": "published evaluations",
+      "delta": "Carry the dated Terminal-Bench evidence with its original versions and model confounds. No fresh ranking or score extrapolation.",
+      "source": [
+        "catalogs/landscape/angles/foundation-native-clients.json:139",
+        "catalogs/landscape/angles/foundation-native-clients.json:275"
+      ],
+      "disputed": [
+        "Published agent/model results do not isolate client effects or establish these exact-pin outcomes."
+      ],
+      "new_score": null
+    },
+    {
+      "id": "A6",
+      "dimension": "our own measured runs",
+      "delta": "PENDING. No comparative measured run was performed; install/version/help results remain A1.",
+      "source": [
+        "catalogs/landscape/angles/foundation-native-clients.json:145",
+        "catalogs/landscape/angles/foundation-native-clients.json:281"
+      ],
+      "disputed": [
+        "Paired native task, tool and recovery outcomes need credential_run-fenced harness evidence under a CC cap."
+      ],
+      "new_score": null
+    }
+  ],
+  "named_gaps": [
+    {
+      "id": "native-clients-authenticated-task",
+      "status": "NAMED_GAP",
+      "not_run": "A native model task through each full client at the proposed run pin.",
+      "why": "Requires a credential-bearing native account; excluded from this preparation.",
+      "closes_with": "A credential_run-fenced native harness task at each proposed pin, under a CC cap, with retained command/rc/output and task oracle."
+    },
+    {
+      "id": "native-clients-full-tool-invoke",
+      "status": "NAMED_GAP",
+      "not_run": "Full native tool invocation in the measured window at the proposed pins.",
+      "why": "Version/help are offline readiness commands; exercising the full model/tool path requires credentials.",
+      "closes_with": "A credential_run-fenced full-layer harness invocation under a CC cap, with native tool event and successful effect receipts."
+    },
+    {
+      "id": "native-clients-session-recovery",
+      "status": "NAMED_GAP",
+      "not_run": "Same-session/thread interrupted-task recovery at either proposed pin.",
+      "why": "A resumable authenticated task is credential-bearing; historical recovery used other versions and bounded tool sets.",
+      "closes_with": "The existing recovery fixtures run through a credential_run-fenced native harness under a CC cap, retaining same-session/thread identity and checkpoint-once evidence."
+    },
+    {
+      "id": "native-clients-A6",
+      "status": "PENDING",
+      "not_run": "A paired same-task comparative measured run.",
+      "why": "Requires admitted credential-bearing harness arms and matching account/task/effect boundaries; CLI smokes are A1.",
+      "closes_with": "A preregistered paired run through credential_run-fenced harnesses under a CC cap, with the fixed comparison rule and public measured receipts."
+    },
+    {
+      "id": "native-clients-macos",
+      "status": "NAMED_GAP",
+      "not_run": "Either proposed pin on macOS.",
+      "why": "This bounded preparation has only Linux scratch execution.",
+      "closes_with": "Vendor-native install and smoke at the exact pins on an admitted macOS worker; authenticated portions retain the credential_run fence."
+    },
+    {
+      "id": "native-clients-gemini-custody",
+      "status": "DISPUTED_FOR_READS",
+      "not_run": "A new Gemini CLI screen or task.",
+      "why": "The 2026-09-23 manifest retains a substantive fit-refutation excerpt, but the ledger marks full per-vote returns not retained. The later native-client sweeps omit this candidate. Omission alone does not adjudicate the custody question.",
+      "closes_with": "Two-family review determines whether that retained substantive excerpt settles the carried proposal under the resolution protocol, or requests a bounded retained fact/fit adjudication at its cited pin. No re-survey is proposed."
+    },
+    {
+      "id": "native-clients-original-capture-history",
+      "status": "NAMED_GAP",
+      "not_run": "Reconstruction of earlier normalized-only execution streams.",
+      "why": "The first preparation discarded original raw streams; its normalized logs cannot qualify under the custody rule.",
+      "closes_with": "Do not reconstruct. Fresh separately retained native observations replace eligibility; the earlier three namespace setup failures remain disclosed as unqualified historical attempts."
+    }
+  ],
+  "read_request": "The co-op dispatches both families. Resolve the explicitly disputed dimensions and custody sufficiency; do not admit FINAL or change a route/default from this preparation.",
+  "derived_analysis": true,
+  "weights_sources": {
+    "A1": "catalogs/landscape/angles/foundation-native-clients.json:6",
+    "A2": "catalogs/landscape/angles/foundation-native-clients.json:7",
+    "A3": "catalogs/landscape/angles/foundation-native-clients.json:8",
+    "A4": "catalogs/landscape/angles/foundation-native-clients.json:9",
+    "A5": "catalogs/landscape/angles/foundation-native-clients.json:10",
+    "A6": "catalogs/landscape/angles/foundation-native-clients.json:11"
+  },
+  "rule_version_source": "catalogs/landscape/angles/foundation-native-clients.json:3"
+}

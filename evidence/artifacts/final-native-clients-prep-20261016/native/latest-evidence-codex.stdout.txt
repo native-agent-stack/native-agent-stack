@@ -1,0 +1,3 @@
+7742970d31e384b478a0a23af79940c6e12d9b2c 2026-10-08T12:28:06-04:00
+
+evidence/receipts/decision-record-index-20261008.json

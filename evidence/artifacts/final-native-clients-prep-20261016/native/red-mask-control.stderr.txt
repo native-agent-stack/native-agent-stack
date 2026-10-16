@@ -1,0 +1,16 @@
+test_masked_derivative_preserves_all_bytes_except_named_literals (tests.test_native_client_capture_custody.NativeCaptureCustodyTests.test_masked_derivative_preserves_all_bytes_except_named_literals) ... FAIL
+
+======================================================================
+FAIL: test_masked_derivative_preserves_all_bytes_except_named_literals (tests.test_native_client_capture_custody.NativeCaptureCustodyTests.test_masked_derivative_preserves_all_bytes_except_named_literals)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<REPOSITORY>/tests/test_native_client_capture_custody.py", line 59, in test_masked_derivative_preserves_all_bytes_except_named_literals
+    self.assertEqual(result.returncode, 0, result.stderr.decode(errors="replace"))
+    <TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME><TILDE_HOME>^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : /usr/bin/python3: can't open file '<REPOSITORY>/evidence/artifacts/final-native-clients-prep-20261016/mask_native.py': [Errno 2] No such file or directory
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.019s
+
+FAILED (failures=1)
