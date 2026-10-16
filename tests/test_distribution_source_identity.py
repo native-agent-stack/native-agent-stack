@@ -45,10 +45,15 @@ class DistributionSourceTests(unittest.TestCase):
 
     def test_native_winner_producers_preserve_distribution_identity_for_the_consumer(self):
         self.marked_package()
-        candidate = {**self.candidate, "component_id": "selected", "pin": "1", "recipe_ref": "selected-recipe"}
-        lane = {"winner_keys": ["selected"], "why_selected": "Passed the native scoped operation",
+        packet_builder = verdict_fixtures.load_module("distribution_lane_packets", "lane_packets.py")
+        packet = packet_builder.build_packet(
+            self.layer, catalog="foundation", sota_components=[], recipe_map={}, decisions_by_component={},
+            seed="20260922", checked_at="2026-09-21", root=self.root, rules=[])
+        candidate = next(row for row in packet["candidates"] if row["repository"] == self.candidate["repository"])
+        lane = {"winner_keys": [candidate["key"]], "why_selected": "Passed the native scoped operation",
                 "winner_evidence_class": "native_proven", "winner_evidence_refs": ["receipt.json"]}
-        winners = verdict_fixtures.record_verdicts.build_winners(lane, {"selected": candidate}, "foundation.json", {})
+        winners = verdict_fixtures.record_verdicts.build_winners(
+            lane, {row["key"]: row for row in packet["candidates"]}, "foundation.json", {})
         self.seal_claude_run()
         self.layer.update(self.recorded_fields(winners=winners))
         self.write("foundation.json", self.foundation)
@@ -58,6 +63,20 @@ class DistributionSourceTests(unittest.TestCase):
         for field in ("repository", "source_identity_kind", "upstream_repository"):
             self.assertEqual(winners[0][field], candidate[field])
             self.assertEqual(projected[field], candidate[field])
+
+    def test_other_packet_producers_keep_the_explicit_distribution_source_identity(self):
+        self.marked_package()
+        builder = verdict_fixtures.load_module("distribution_packet_variants", "lane_packets.py")
+        source = {**self.candidate, "id": "systemd"}
+        manifest = builder.manifest_layer_candidates(
+            {"entries": [source]}, {"systemd": {**source, "decision": "default"}}, {}, {}, self.root)
+        newcomers = builder.manifest_newcomers({"candidates": [source]}, set(), evidence_files={}, root=self.root)
+        for mode, candidates in (("manifest", manifest), ("newcomer", newcomers)):
+            with self.subTest(mode=mode):
+                self.assertEqual(len(candidates), 1)
+                self.assertEqual(candidates[0]["repository"], source["repository"])
+                self.assertEqual(catalog_decisions.catalog_identity(candidates[0]["repository"], candidates[0]),
+                                 "example/selected")
 
     def selected_package(self):
         self.marked_package()

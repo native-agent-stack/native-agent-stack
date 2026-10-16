@@ -19358,8 +19358,8 @@
     },
     {
       "path": "docs/decisions/2026-10-16-pin-source-rules.md",
-      "sha256": "0a524998d728b2834cb4a9a9047a458e3f365f45466172308719dba80b2566fa",
-      "bytes": 20339
+      "sha256": "62493962c6d29b8337c7e1d1e155f039b0b3340e6fd2903f09359a2c9c6f29b9",
+      "bytes": 27330
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -49018,8 +49018,8 @@
     },
     {
       "path": "evidence/artifacts/pin-source-rules-20261016/controls.json",
-      "sha256": "83f3849c9e0d8a009654e490516a1b7c2efebad65b37beba6a4872528fd0397b",
-      "bytes": 11121
+      "sha256": "7d2b6727c53bec14776f07387f8d64863732d755a0410480d24521813aef17ce",
+      "bytes": 17062
     },
     {
       "path": "evidence/artifacts/pin-source-rules-20261016/nautilus-tag-proof.json",
@@ -62653,8 +62653,8 @@
     },
     {
       "path": "scripts/complete_run_pins.py",
-      "sha256": "806911d8d9e811b6caecaa667bdd627e687770159585f591a9ee4b5c9b3e862a",
-      "bytes": 20053
+      "sha256": "bc3746a06e69f3c56d669628cb21c1afca4a968566a1d1f7ac7af9cb95706c77",
+      "bytes": 20936
     },
     {
       "path": "scripts/component_matrix.py",
@@ -63718,8 +63718,8 @@
     },
     {
       "path": "tests/test_distribution_source_identity.py",
-      "sha256": "3f5cc346b8224cda2a8071950a3c41128ba3c904d3454a4abe2d810556470e62",
-      "bytes": 6048
+      "sha256": "5a42c3fc016bebec3e0b2107a95deda78d0191f56dc2487da657c825a9818a16",
+      "bytes": 7403
     },
     {
       "path": "tests/test_document_ingestion.py",
@@ -64578,8 +64578,8 @@
     },
     {
       "path": "tests/test_run_pin_sources.py",
-      "sha256": "8787bc78370fb7c49773d2e515d84aedf6b55427f9b8209473386b102f88c30e",
-      "bytes": 32299
+      "sha256": "f3023665f584b2b810221e5edc9b21185d805ac2ee4c3f07eb48fab865c165cc",
+      "bytes": 39641
     },
     {
       "path": "tests/test_runtime_boot.py",
@@ -65625,6 +65625,11 @@
       "path": "tools/sota-convergence/lane-return.schema.json",
       "sha256": "2bf6d646da644cb417db663684efbdb76012a7dc3326e08e84fd49dfb90db392",
       "bytes": 7792
+    },
+    {
+      "path": "tools/sota-convergence/lane_packets.py",
+      "sha256": "166a3712872d27d221bfdd1b94b8f71d3ce2b63a3bef5f752acbc4e72c38df9a",
+      "bytes": 87613
     },
     {
       "path": "tools/sota-convergence/merge_fragments.py",

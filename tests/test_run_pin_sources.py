@@ -1,6 +1,7 @@
 """Native tag resolution and offline source fills, with no version upgrades."""
 import copy
 import ast
+import base64
 import json
 import hashlib
 import os
@@ -117,12 +118,111 @@ class TagResolutionTests(unittest.TestCase):
         self.assertIn(self.B, table)
         self.assertIn("| missing | 1.2.3 | tag_missing | gap | gap |", table)
 
+    def test_commit_object_table_never_labels_the_object_as_a_lightweight_tag(self):
+        row = {"component": "commit-only", "version": None, "kind": "git_commit_object",
+               "status": "resolved", "peeled_commit": self.A}
+        self.assertIn("| commit-only | None | commit object (no tag) | not applicable | " + self.A + " |",
+                      pins.render_table([row]))
+
 
 class OfflineApplicationTests(fixtures.FixtureTestCase):
+    def test_interrupted_second_write_can_recover_from_all_original_source_bytes(self):
+        root = self.root()
+        fixtures._fixture(root, pins_linux=[{"id": "first", "url": "https://github.com/example/first",
+                                           "version": "1.2.3"}], stack=[
+            {"id": "second", "repository": "https://github.com/example/second", "version": "1.2.3"}])
+        runs = [row for row in final_stack.build_document(root)["runs"] if row["id"] in {"first", "second"}]
+        proofs = [pins.resolve(run, Mock(return_value=Mock(returncode=0, stdout=(
+            "a" * 40 + " refs/tags/v1.2.3\n" + "b" * 40 + " refs/tags/v1.2.3^{}\n"), stderr=""))) for run in runs]
+        relative = "evidence/artifacts/source-fill-fixture/interrupted.json"
+        report = root / relative
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text(json.dumps({"rows": proofs}))
+        sources = [root / final_stack.PIN_FILES[0][1], root / final_stack.STACK]
+        original = {path: path.read_bytes() for path in sources}
+        report_before = report.read_bytes()
+        real_write = Path.write_text
+        def interrupted(path, *args, **kwargs):
+            if path == sources[1]:
+                raise OSError("synthetic second-source write interruption")
+            return real_write(path, *args, **kwargs)
+        with patch.object(Path, "write_text", interrupted):
+            with self.assertRaisesRegex(OSError, "synthetic second-source write interruption"):
+                pins.apply_report(root, relative)
+        self.assertNotEqual(sources[0].read_bytes(), original[sources[0]])
+        self.assertEqual(sources[1].read_bytes(), original[sources[1]])
+        self.assertEqual(report.read_bytes(), report_before)
+        for path, raw in original.items():
+            path.write_bytes(raw)
+        pins.apply_report(root, relative)
+        after = {row["id"]: row for row in final_stack.build_document(root)["runs"]}
+        self.assertTrue(all(final_stack.complete_final_pin("b" * 40, after[name]) for name in ("first", "second")))
+        self.assertEqual(report.read_bytes(), report_before)
+
+    def test_commit_only_cli_never_retains_an_email_bearing_object_body(self):
+        for header in ("author", "committer"):
+            with self.subTest(header=header):
+                root = self.root()
+                body = ("tree " + "a" * 40 + "\nauthor Fixture <> 0 +0000\n"
+                        "committer Fixture <> 0 +0000\n\nSynthetic privacy fixture.\n").encode()
+                body = body.replace((header + " Fixture <>").encode(),
+                                    (header + " Fixture <fixture@example.invalid>").encode())
+                commit = subprocess.run(["git", "hash-object", "-t", "commit", "--stdin"], input=body,
+                                        capture_output=True, check=True).stdout.decode().strip()
+                run = {"id": "private-object", "repository": "github.com/example/private-object", "pin": commit,
+                       "pin_parsed": {"version": None, "commit": None}, "source_commit_claim": commit,
+                       "source": final_stack.STACK + "#/components/0"}
+                output = root / final_stack.OUTPUT
+                output.parent.mkdir(parents=True, exist_ok=True)
+                output.write_text(json.dumps({"layers": [{"winners": [{"run": run["id"]}]}], "runs": [run]}))
+                real_resolve = pins.resolve
+                native = Mock(side_effect=[Mock(returncode=0, stdout=b"", stderr=b""),
+                                           Mock(returncode=0, stdout=b"", stderr=b""),
+                                           Mock(returncode=0, stdout=body, stderr=b"")])
+                relative = "evidence/artifacts/source-fill-fixture/private-object.json"
+                with patch.object(pins, "resolve", side_effect=lambda item: real_resolve(item, native)):
+                    self.assertEqual(pins.main(["--root", str(root), "--resolve", relative]), 0)
+                row = json.loads((root / relative).read_text())["rows"][0]
+                self.assertNotIn("object_base64", row)
+                self.assertEqual((row["status"], row["reason"]), ("gap", "commit_object_publication_refused"))
+                self.assertEqual(row["commit"], commit)
+                unsafe = {**row, "status": "resolved", "peeled_commit": commit,
+                          "object_base64": base64.b64encode(body).decode()}
+                self.assertIsNone(pins.verified_commit_object(unsafe, run["id"], commit, run["repository"]))
+
+    def test_resolved_runtime_engine_plan_applies_without_changing_version_or_other_fields(self):
+        for original_commit in (None, "b" * 40):
+            with self.subTest(original_commit=original_commit):
+                root = self.root()
+                fixtures._fixture(root, engine={"repository": "https://github.com/example/native-engine",
+                                              "requested_version": "v1.2.3", "source_commit": original_commit,
+                                              "fixture_note": {"unchanged": True}})
+                run = next(row for row in final_stack.build_document(root)["runs"] if row["id"] == "native-engine")
+                self.assertEqual(run["source"], final_stack.RUNTIME_TARGET + "#" + final_stack.RUNTIME_ENGINE_POINTER)
+                self.assertEqual([item["id"] for item in pins.targets({"layers": [{"winners": [{"run": run["id"]}]}],
+                                                                     "runs": [run]})], ["native-engine"])
+                proof = pins.resolve(run, Mock(return_value=Mock(returncode=0, stdout=(
+                    "a" * 40 + " refs/tags/v1.2.3\n" + "b" * 40 + " refs/tags/v1.2.3^{}\n"), stderr="")))
+                self.assertEqual(proof["status"], "resolved")
+                relative = "evidence/artifacts/source-fill-fixture/runtime-engine-report.json"
+                report = root / relative
+                report.parent.mkdir(parents=True, exist_ok=True)
+                report.write_text(json.dumps({"rows": [proof]}))
+                applied = pins.apply_report(root, relative)
+                document = json.loads((root / final_stack.RUNTIME_TARGET).read_text())
+                self.assertEqual(document["engine"], {"repository": "https://github.com/example/native-engine",
+                                 "requested_version": "v1.2.3", "source_commit": "b" * 40,
+                                 "fixture_note": {"unchanged": True}, "source_proof": relative + "#/rows/0"})
+                self.assertEqual(applied["source_updates"][0]["field"], "source_commit")
+                self.assertEqual(applied["versions_changed"], [])
+                bound = next(row for row in final_stack.build_document(root)["runs"] if row["id"] == "native-engine")
+                self.assertTrue(final_stack.complete_final_pin("b" * 40, bound))
+                self.assertNotIn("source_commit_claim", bound)
+
     def test_commit_only_pin_resolves_and_binds_a_typed_object_without_a_version(self):
         root = self.root()
-        body = ("tree " + "a" * 40 + "\nauthor Fixture <fixture@example.invalid> 0 +0000\n"
-                "committer Fixture <fixture@example.invalid> 0 +0000\n\nSynthetic commit proof.\n").encode()
+        body = ("tree " + "a" * 40 + "\nauthor Fixture <> 0 +0000\n"
+                "committer Fixture <> 0 +0000\n\nSynthetic commit proof.\n").encode()
         commit = hashlib.sha1(b"commit " + str(len(body)).encode() + b"\0" + body, usedforsecurity=False).hexdigest()
         native_oid = subprocess.run(["git", "hash-object", "-t", "commit", "--stdin"], input=body,
                                     capture_output=True, check=True).stdout.decode().strip()

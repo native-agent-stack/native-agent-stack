@@ -25,10 +25,10 @@ import tempfile
 import tomllib
 
 try:
-    from . import host_receipts
+    from . import component_matrix, host_receipts
     from .catalog_decisions import pointer, safe_file
 except ImportError:
-    import host_receipts
+    import component_matrix, host_receipts
     from catalog_decisions import pointer, safe_file
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -145,6 +145,10 @@ def verified_commit_object(proof, component: str, commit: str, repository: str) 
         return None
     if len(body) > 2 ** 20:
         return None
+    try:
+        component_matrix.assert_no_private_content(body.decode("utf-8"), reject_email=True)
+    except (UnicodeError, SystemExit):
+        return None
     actual = hashlib.sha1(b"commit " + str(len(body)).encode("ascii") + b"\0" + body,
                           usedforsecurity=False).hexdigest()
     return commit if actual == commit else None
@@ -175,6 +179,10 @@ def resolve_commit_object(row, commit, runner, environment, directory):
             return {**observed, "status": "gap", "reason": "lookup_failed"}
     if len(result.stdout) > 2 ** 20:
         return {**observed, "status": "gap", "reason": "commit_object_too_large"}
+    try:
+        component_matrix.assert_no_private_content(result.stdout.decode("utf-8"), reject_email=True)
+    except (UnicodeError, SystemExit):
+        return {**observed, "status": "gap", "reason": "commit_object_publication_refused"}
     observed.update(object_base64=base64.b64encode(result.stdout).decode("ascii"),
                     peeled_commit=commit, status="resolved")
     if verified_commit_object(observed, row["component"], commit, row["repository"]) is None:
@@ -227,6 +235,7 @@ def render_table(rows: list[dict]) -> str:
         lines.append("| " + " | ".join(str(value) for value in (
             row["component"], row["version"], row.get("tag", row.get("reason", "commit object (no tag)"
                 if row.get("kind") == "git_commit_object" and row.get("status") == "resolved" else "gap")),
+            "not applicable" if row.get("kind") == "git_commit_object" else
             row.get("tag_object") or ("lightweight" if row.get("status") == "resolved" else "gap"),
             row.get("peeled_commit", "gap"))) + " |")
     return "\n".join(lines) + "\n"
@@ -265,13 +274,17 @@ def apply_report(root: Path, relative: str) -> dict:
                 or run.get("pin_parsed", {}).get("version") != row["version"]):
             raise ValueError("resolution no longer matches the run identity or exact tag proof")
         path, _, selector = row["source"].partition("#")
-        if path not in {final_stack.LOCKFILE, final_stack.STACK, *(p for _, p in final_stack.PIN_FILES)}:
+        if path not in {final_stack.LOCKFILE, final_stack.STACK, final_stack.RUNTIME_TARGET,
+                        *(p for _, p in final_stack.PIN_FILES)}:
             raise ValueError("source path is not an allowlisted run-pin input")
+        if path == final_stack.RUNTIME_TARGET and selector != final_stack.RUNTIME_ENGINE_POINTER:
+            raise ValueError("runtime source must name the engine pointer")
         if path not in documents:
             raw = safe_file(root, path).read_text()
             documents[path] = tomllib.loads(raw) if path == final_stack.LOCKFILE else json.loads(raw)
         entry = pointer(documents[path], selector)
-        source_identity = final_stack.record_pin(entry.get("version")).get("pin_parsed", {})
+        version_field = "requested_version" if path == final_stack.RUNTIME_TARGET else "version"
+        source_identity = final_stack.record_pin(entry.get(version_field)).get("pin_parsed", {})
         if source_identity.get("version") != row["version"]:
             raise ValueError("source version changed; refuse an implicit upgrade")
         if source_identity.get("commit") and source_identity["commit"] != commit:
@@ -288,7 +301,7 @@ def apply_report(root: Path, relative: str) -> dict:
                                        "artifact_sha256": artifacts, "repository": row["repository"], "commit": commit,
                                        "source_proof": relative + "#/rows/" + str(index)}
         else:
-            field = "source_pin" if path == final_stack.STACK else "commit"
+            field = {final_stack.STACK: "source_pin", final_stack.RUNTIME_TARGET: "source_commit"}.get(path, "commit")
             previous = entry.get(field)
             if isinstance(previous, str) and OID.fullmatch(previous) and previous != commit:
                 raise ValueError("an existing source commit disagrees; adjudication required")

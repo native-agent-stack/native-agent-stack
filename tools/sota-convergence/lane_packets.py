@@ -300,6 +300,8 @@ def build_candidate(key: str, v1_candidate: dict, *, slug_index: dict, recipe_ma
         "key": key,
         "name": v1_candidate.get("name"),
         "repository": repository,
+        **{field: v1_candidate[field] for field in ("source_identity_kind", "upstream_repository")
+           if field in v1_candidate},
         "adopted": v1_candidate.get("disposition") in {"selected", "conditional"},
         "evidence_kind": v1_candidate.get("evidence_kind"),
         "evidence_refs": evidence_refs,
@@ -339,10 +341,13 @@ def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: di
             # A missing card would silently turn an incumbent into a non-adopted candidate.
             raise ValueError(f"manifest trading entry {entry['id']!r} has no domain catalog card")
         repository = entry.get("repository") or card.get("repository")
+        source_record = {**card, **entry} if card.get("repository") == repository else entry
         evidence_refs = list(card.get("evidence_refs") or [])
         candidates.append({
             "name": ledger_names_by_slug.get(github_repo_slug(repository) if repository else None) or entry["id"],
             "repository": repository,
+            **{field: source_record[field] for field in ("source_identity_kind", "upstream_repository")
+               if field in source_record},
             "adopted": card.get("decision", entry.get("decision")) in CARD_DECISION_ADOPTED,
             "evidence_kind": card.get("evidence_level"),
             "evidence_refs": evidence_refs,
@@ -481,6 +486,7 @@ def manifest_newcomers(layer: dict, seen: set, evidence_files: dict = None, root
         seen.add(slug)
         newcomers.append({
             "name": item.get("name") or item.get("id") or slug, "repository": repository, "adopted": False,
+            **{field: item[field] for field in ("source_identity_kind", "upstream_repository") if field in item},
             "evidence_kind": None,
             "evidence_refs": newcomer_evidence_refs(item, evidence_files, root, withhold)
             if evidence_files is not None else [],

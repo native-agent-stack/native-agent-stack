@@ -222,5 +222,136 @@
       "skipped": 0,
       "execution": "Native unittest in an idle-class scope; bounded source/consumer selection plus actual same-winner and pin-fallback producer round trips. Earlier broad-capture timeout is not a pass."
     }
+  },
+  "packet_runtime_application_fold": {
+    "review": "pr1209-9dbcd9ae/review_output.json",
+    "reviewed_commit": "9dbcd9ae8203a9bde69b19e4b7a57a7a19d855d3",
+    "before_reported_findings": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 2,
+      "diagnostics": [
+        "distribution source URL requires an explicit OS-distribution package marker",
+        "source path is not an allowlisted run-pin input"
+      ],
+      "sequence": "Both reported failures reproduced together before source edits."
+    },
+    "before_packet_variants": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 2,
+      "paths": [
+        "manifest/card constructor",
+        "manifest newcomer constructor"
+      ]
+    },
+    "after": {
+      "command": "python3 -m unittest tests.test_run_pin_sources tests.test_nautilus_run_pin tests.test_distribution_source_identity tests.test_catalog_decisions tests.test_landscape tests.test_final_stack.PinTests tests.test_final_stack.RunTests tests.test_final_stack.RepositoryTests tests.test_local_pages_policy_grants tests.test_record_verdicts.SameWinnerTests tests.test_record_verdicts.PinFallbackTests tests.test_lane_packets",
+      "tests": 339,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "execution": "Native unittest in an idle-class scope; full packet module plus source/consumer selection and actual producer round trips."
+    },
+    "packet_contract": "Actual marked catalog row -> native build_packet -> native build_winners -> landscape validation -> verdict projection. No manual packet candidate. Explicit source identity fields preserved through ledger, manifest/card and newcomer constructors; GitHub rows gain no fields.",
+    "runtime_contract": "Only runtime target engine pointer admitted; requested_version preserved, source_commit and consumed source_proof written, unrelated fields preserved; original-pin/source-pointer/version/commit guards and all-or-nothing planning retained.",
+    "evidence_class": "synthetic",
+    "host_effects": "No runtime-target data, version, source binding, host receipt or broker setting changed.",
+    "verification_limit": "Graph status/search/coverage transport closed; affected source paths read directly, without completeness claims."
+  },
+  "gpt_publication_fold": {
+    "review": "GPT-VERDICT-9dbcd9ae8.md",
+    "reviewed_commit": "9dbcd9ae8203a9bde69b19e4b7a57a7a19d855d3",
+    "native_gate": "scripts/component_matrix.py assert_no_private_content(decoded_body,reject_email=True), before encoding and again during offline verification",
+    "refusal_contract": "Email-bearing or other prohibited bodies become explicit body-free gaps, keeping the unchanged original OID. Conservative native gate rejects even no-reply email; never redact bytes while claiming the old hash. No personal preimage/digest published.",
+    "before_synthetic": {
+      "tests": 1,
+      "failures": 2,
+      "errors": 0,
+      "paths": [
+        "author header",
+        "committer header"
+      ]
+    },
+    "pinned_object_private_replay": [
+      {
+        "component": "lean",
+        "before": {
+          "status": "resolved",
+          "body_retained": true,
+          "prohibited_occurrences": 1
+        },
+        "after": {
+          "status": "gap",
+          "body_retained": false,
+          "prohibited_occurrences": 0
+        }
+      },
+      {
+        "component": "affaan-m/ECC",
+        "before": {
+          "status": "resolved",
+          "body_retained": true,
+          "prohibited_occurrences": 1
+        },
+        "after": {
+          "status": "gap",
+          "body_retained": false,
+          "prohibited_occurrences": 0
+        }
+      }
+    ],
+    "pinned_replay_class": "Native CLI/resolver/verification with actual local pinned commit bytes and injected Git runner results only; no network query. Temporary reports removed; counts only retained.",
+    "safe_positive": "Email-free synthetic commit body still round-trips, with independent native hash-object OID cross-check.",
+    "committed_history_audit": {
+      "commits": 4,
+      "retained_object_rows": 0,
+      "personal_email_files": 0,
+      "reserved_domain_test_files": [
+        "tests/test_final_stack.py",
+        "tests/test_run_pin_sources.py"
+      ],
+      "nonreserved_shape_matches": "Three unchanged systemd timer filenames in source_policy; zero added lines."
+    },
+    "followups": {
+      "partial_apply": "Document sequential/non-atomic writes and private original-byte backups; injected second-write failure, restore all sources and replay succeeds. No transactional guarantee claimed.",
+      "uv_citations": "simple_json.rs:443-450,501-520,576-599,626-644 at existing pinned uv; primary bytes read.",
+      "producer_citations": "record_verdicts.py:559-590 and build_verdicts.py:116-149 at80ce8d8ffbafd381c29b215bfb610921a4a8ac43.",
+      "table": {
+        "before_tests": 1,
+        "before_failures": 1,
+        "after": "commit-object tag object is not applicable; no lightweight-tag claim"
+      }
+    },
+    "combined_after": {
+      "tests": 342,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "execution": "Detached idle-class native unittest, full packet module plus affected source/consumer selection and producer round trips, with owned exit file; all exit statuses zero.",
+      "checks": {
+        "validate": {
+          "components": 71,
+          "hashed_files": 12195,
+          "profiles": 4,
+          "receipts": 240
+        },
+        "final_stack_layers": 35,
+        "frozen_verdict_check": "passed",
+        "base_trusted_gate": {
+          "status": "passed",
+          "changes": [],
+          "waves_changed": false,
+          "violations": []
+        }
+      },
+      "monitoring": {
+        "count": 354,
+        "script_counts_unchanged": true,
+        "read_shapes_unchanged": true,
+        "historical_bytes_unchanged": true,
+        "permission_change": false
+      }
+    }
   }
 }

@@ -203,9 +203,11 @@ unique observed ref supplies a commit. The sanitized native Launchpad query in
 The uv artifact fields follow `astral-sh/uv` commit
 `635500036e1705961315e86447f0fab0a8ddb309` (0.12.17):
 `crates/uv-lock/src/lock/serialize.rs:509-554` serializes `sdist` and wheel
-hashes as each hash's string; `crates/uv-pypi-types/src/simple_json.rs:626-644`
-`HashAlgorithm`, `HashDigest` and `Digest` define the algorithm and validated
-lowercase hexadecimal representation. The lock's `sha256:` strings are artifact
+hashes as each hash's string; `crates/uv-pypi-types/src/simple_json.rs:443-450`
+defines `HashAlgorithm`, `:501-520` defines `Digest` and lowercases validated
+hexadecimal text, `:576-599` defines `HashDigest` and normalizes through
+`Digest::from_hex`, and `:626-644` implements Display/FromStr. These pinned
+primary spans were read for this correction. The lock's `sha256:` strings are artifact
 identities, separate from Git source commits. No wheel-to-commit build claim is
 inferred by comparing them.
 
@@ -321,3 +323,106 @@ and `Documentation/user-manual.adoc:4090-4118` (typed object header and hash).
 These pinned primary bytes were read for this correction; the installed native
 Git reports 2.53.0. This is observation consistency, not signed provenance or
 an artifact-to-source build-equivalence claim.
+
+## Packet and runtime application corrections at the next review
+
+The local review `pr1209-9dbcd9ae/review_output.json` reproduces two remaining
+producer/application gaps. The CC routes both into one correction on
+`9dbcd9ae8203a9bde69b19e4b7a57a7a19d855d3`, without rebasing. That pinned
+repository's `tools/sota-convergence/lane_packets.py` `build_packet` and
+`build_candidate`, `record_verdicts.py` `build_winners`, and `scripts/final_stack.py`
+`run_records` are the primary contracts reused here.
+
+The earlier distribution test supplied a packet candidate directly, bypassing
+the normal packet builder. It now starts with a marked catalog row, calls
+`build_packet`, feeds that actual packet into `build_winners`, and validates
+the resulting row with the real landscape consumer and verdict projection.
+Before correction, this reproduces the missing distribution-marker error.
+`build_candidate` now conditionally carries `source_identity_kind` and
+`upstream_repository`; manifest/card and newcomer constructors preserve those
+same explicit fields too. Card metadata is used only for the chosen source
+repository. Both additional constructor controls first reproduced the same
+native consumer refusal. All three packet paths now preserve the actual package
+repository and pass without hand-editing a packet or winner. Existing GitHub
+packets gain no fields; all native packet tests continue passing.
+
+For a run whose chosen source is the runtime engine, the resolver produced a
+valid plan which offline apply then rejected as an unallowlisted source. The
+new round trip first reproduces that refusal and now applies only the confined
+runtime target's engine pointer, retaining `requested_version` text, writing
+`source_commit` and its consumed `source_proof`, and preserving unrelated fields.
+Original-pin/source-pointer freshness, normalized version and differing-commit
+refusals remain in force; all writes still wait until every plan row validates.
+The proof-backed generated runtime run can then bind the unchanged commit.
+No host runtime target, version, source binding or broker setting is changed by
+these synthetic fixtures.
+
+The exact two reported failures were reproduced together before source edits:
+two tests, two intended native errors (missing marker and apply allowlist).
+The additional packet-constructor control reproduced two native errors before
+correction. Afterward the affected source/consumer selection, same-winner and
+pin-fallback producer round trips, and full packet module pass 339 tests with
+zero failures, errors or skips. Graph status/search/coverage transport was
+closed, so the affected source paths were read directly; no graph completeness
+claim is made. There is no new protocol, dependency, runtime operation or FINAL
+admission change in this correction.
+
+## Decoded commit publication boundary and recovery
+
+The final GPT micro `GPT-VERDICT-9dbcd9ae8.md` identifies a publication defect:
+the raw commit body may contain personal identities even when encoded as
+base64. Before resolving or encoding a body, and again when consuming retained
+proof, the resolver now invokes the existing native static publication-content
+gate, `scripts/component_matrix.py` `assert_no_private_content` at
+`9dbcd9ae8203a9bde69b19e4b7a57a7a19d855d3`, with `reject_email=True`.
+This deliberately conservative gate refuses every email-bearing body, including
+no-reply addresses, and other statically prohibited content. A refused body is
+never retained: the row is `gap/commit_object_publication_refused`, with only
+safe command/exit classification and its unchanged original public OID. No
+redacted body is represented as hashing to the original commit. Offline proof
+consumption also refuses an injected unsafe body. This retains a route for
+publication-safe commit bodies; personal-email ECC/Lean objects remain explicit
+gaps pending a privacy-preserving provenance route, and cannot complete FINAL.
+
+The permanent CLI regression injects reserved-domain synthetic author and
+committer addresses; it first reproduced two publication failures and now
+retains neither body. The email-free safe-body positive still independently
+reproduces its OID with native Git. Separately, the actual pinned ECC and Lean
+objects were replayed in temporary roots through the old and corrected native
+CLI, injecting only Git runner results: each old report retained one prohibited
+email occurrence, while each corrected report is a body-free gap with zero.
+Only counts are retained; temporary reports were removed, and neither private
+identity bytes nor a digest binding them are published.
+
+Before pushing, every changed file version in all four committed PR commits
+was checked, including decoded JSON proof bodies. There are no committed proof
+body rows or personal-email files in that range. Reserved-domain fixture text
+occurs in the two existing test modules; three email-shaped source-policy
+matches are unchanged systemd timer filenames, with zero added lines. Thus the
+finding concerns generated temporary output, not a committed private preimage.
+
+Application validates the whole plan before the first write, but writes multiple
+source files sequentially: it is not crash-atomic. Before applying, preserve
+exact original bytes for every named mutable source and the lock-source
+supplement if present; also record whether each existed. Keep those backups
+private and outside tracked evidence. If a write is interrupted, stop receipt
+registration, restore ALL originals (and remove only newly created source files
+named in that plan that had no original), confirm their byte equality, then
+replay the unchanged retained report. Do not rerun resolution at the old report
+path or claim a partially applied report is complete. If originals cannot be
+restored, retain the old report, regenerate the current inventory, resolve only
+remaining targets into a new report path, and separately review that
+supersession before registering receipts. An injected failure at the second
+source write demonstrates the first changed, the second original and report
+unchanged; restoring both originals and replaying recovers proved pins. This
+tests the recovery procedure, not a new transactional-write implementation.
+
+The native producer citations for the earlier distribution correction are
+`tools/sota-convergence/record_verdicts.py:559-590` (`build_winners`) and
+`tools/sota-convergence/build_verdicts.py:116-149` (`build_verdict_row`) at
+`80ce8d8ffbafd381c29b215bfb610921a4a8ac43`. They project packet/row source
+identity into generated winners; carrying the explicit distribution marker
+and upstream repository preserves the pinned `catalog_identity` contract.
+Commit-object table rows now display `not applicable` for tag object, with no
+lightweight-tag claim. That display regression fails before the correction and
+passes afterward.
