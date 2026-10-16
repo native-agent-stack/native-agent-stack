@@ -1,0 +1,3 @@
+# Preserve native pytest traceback spacing in the captured output.
+# git/git v2.53.0 Documentation/gitattributes.adoc:1222
+outputs/core-first.log whitespace=-blank-at-eol

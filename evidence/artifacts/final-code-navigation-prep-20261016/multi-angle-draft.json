@@ -1,0 +1,614 @@
+{
+  "schema_version": 1,
+  "kind": "multi_angle_preparation_draft",
+  "catalog": "foundation",
+  "layer_id": "code-navigation",
+  "recorded_at": "2026-10-16T05:20:54Z",
+  "status": "unadjudicated",
+  "terminal_state": null,
+  "scope": "Existing Serena winner and cumulative retained survivors only. Existing alternatives retain their prior dispositions. No new landscape survey, candidate installation, comparison execution or model read was dispatched.",
+  "scoring_boundary": "This evidence draft is not a production catalogs/landscape/angles record and asserts no numerical weights, signs, derived convergence or FINAL eligibility. Its evidence and disputed dimensions are prepared for the co-op's two-family reads. Retrospective source reads and local smokes are disclosed.",
+  "packet": {
+    "generator": "tools/sota-convergence/lane_packets.py",
+    "command": "python3 tools/sota-convergence/lane_packets.py --catalog foundation --manifest catalogs/sota-convergence/manifest-20261009.json --registered-receipts --gap-receipts --checked-at 2026-10-16 --out $SCRATCH/packets",
+    "native_generator_capture_gap": "The generator was run, but its original native CLI capture was not exported. Its entered return code and total packet count are withdrawn as receipt values; retain a fresh native generator capture after the pause is lifted.",
+    "retained_layer_packet": "evidence/artifacts/final-code-navigation-prep-20261016/lane-packet.json",
+    "sha256": "36320d898c1307613133d6f62fc0ecd456fd0eb7572a0909c67844280b32620c",
+    "boundary": "Only code-navigation's packet is retained. It contains existing catalog candidates and unmatched SOTA component records; those unmatched dependencies are not new contender surveys. The generator does not join cumulative sweep survivors. resolution-inputs.json retains the covering ledger rows, the completed vote supplement and the cumulative unresolved survivor set; packet omissions do not retire survivors."
+  },
+  "resolution_inputs": "evidence/artifacts/final-code-navigation-prep-20261016/resolution-inputs.json",
+  "angle_definitions": {
+    "A1": "Capability at the pin",
+    "A2": "Upstream engineering quality",
+    "A3": "Community consensus",
+    "A4": "Net usage",
+    "A5": "Published evaluations",
+    "A6": "Our comparative measured runs"
+  },
+  "candidates": [
+    {
+      "candidate_id": "serena",
+      "role": "Existing symbol and reference navigation winner",
+      "repository": "https://github.com/oraios/serena",
+      "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "retained_status": "reopened winner; proposed deployment run identity only",
+      "angles": {
+        "A1": {
+          "state": "bounded_native_evidence",
+          "assessment": "The exact source installs in an isolated venv, 161 upstream core tests pass and the vendor health-check performs an overview, one symbol match and an empty incoming-reference result. Historical exact-pin Python/CJS native evidence supplies stronger source/reference checks. Full current cross-language completeness and edit/delete behavior remain unmeasured.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/oraios/serena",
+              "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+              "path": "README.md",
+              "line": 229
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/oraios/serena",
+              "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+              "path": "CONTRIBUTING.md",
+              "line": 59
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/core-pass.log",
+              "line": 4
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+              "line": 91
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+              "line": 99
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/receipts/foundation-native-20260920.json",
+              "line": 80
+            }
+          ]
+        },
+        "A2": {
+          "state": "bounded_source_and_test_evidence",
+          "assessment": "Pinned contributor instructions, a pytest task and the upstream CI matrix provide a maintained test path; the selected upstream tests reproduced. The full OS/language matrix, broad engineering-quality scoring and all release mechanisms were not reproduced.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/oraios/serena",
+              "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+              "path": "CONTRIBUTING.md",
+              "line": 63
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/oraios/serena",
+              "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+              "path": "pyproject.toml",
+              "line": 169
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/oraios/serena",
+              "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+              "path": ".github/workflows/pytest.yml",
+              "line": 82
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/oraios/serena",
+              "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+              "path": ".github/workflows/pytest.yml",
+              "line": 147
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/oraios/serena",
+              "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+              "path": ".github/workflows/pytest.yml",
+              "line": 776
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/core-pass.log",
+              "line": 4
+            }
+          ]
+        },
+        "A3": {
+          "state": "unverified",
+          "assessment": "The README contains agent testimonials, which do not establish independent community consensus. No new popularity or consensus ranking is asserted.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/oraios/serena",
+              "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+              "path": "README.md",
+              "line": 49
+            }
+          ]
+        },
+        "A4": {
+          "state": "unverified",
+          "assessment": "One deliberate native CLI smoke and a version observation do not measure net organic usage, adoption, maintenance burden or provider savings. An organic native-client window remains absent. A recorder-bounded UTC invocation window was not retained; that remains a named gap.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/health-check.json",
+              "line": 6
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+              "line": 102
+            }
+          ]
+        },
+        "A5": {
+          "state": "disputed",
+          "assessment": "Pinned upstream evaluations explicitly let the agent evaluate itself. The retained Harbor comparison found no cost reduction for its tested arms, but used Serena 1.7.0 from PyPI, a different pin and workload. Neither source settles this run identity's comparative value.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/oraios/serena",
+              "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+              "path": "docs/04-evaluation/000_evaluation-intro.md",
+              "line": 31
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/oraios/serena",
+              "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+              "path": "docs/04-evaluation/010_methodology.md",
+              "line": 20
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json",
+              "line": 15
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json",
+              "line": 48
+            }
+          ]
+        },
+        "A6": {
+          "state": "pending_comparison_currency",
+          "assessment": "Current measurements are upstream tests and one native fixture smoke. They are not comparative A6 evidence. The frozen W6 comparison names 1de556f71569f3acfc0743e526dd60aca40a545e and explicitly has no run; these c6fbd1c receipts cannot fill that pin's E2E requirement.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 6
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 21
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/core-pass.log",
+              "line": 4
+            }
+          ]
+        }
+      },
+      "measure_next": "Co-op adjudicates the deployment/comparison identity boundary and the disputed dimensions from these inputs. Any later run or refreeze follows the existing preregistration protocol; this preparation does neither.",
+      "pin_source": {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 5310
+      }
+    },
+    {
+      "candidate_id": "claude-plugins-official",
+      "repository": "https://github.com/anthropics/claude-plugins-official",
+      "pin": "f359d43b406057f1a8cdbc4ea93b827642c162e6",
+      "retained_sweep_source_pin": "fbe07fb6ce7d51d8e86ca6efdf050059894cdb80",
+      "role": "Native LSP distribution dependency for the client-specific control; not a standalone full-navigation winner",
+      "retained_status": "carried survivor; included in existing frozen comparison",
+      "angles": {
+        "A1": {
+          "state": "source_only",
+          "assessment": "The pinned pyright-lsp README documents installing the external Pyright binary. The frozen role is dependency qualification. Plugin presence alone does not prove exact source/reference answers or replace the full Serena interface.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anthropics/claude-plugins-official",
+              "pin": "f359d43b406057f1a8cdbc4ea93b827642c162e6",
+              "path": "plugins/pyright-lsp/README.md",
+              "line": 3
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anthropics/claude-plugins-official",
+              "pin": "f359d43b406057f1a8cdbc4ea93b827642c162e6",
+              "path": "plugins/pyright-lsp/README.md",
+              "line": 13
+            }
+          ]
+        },
+        "A2": {
+          "state": "unverified_at_frozen_pin",
+          "assessment": "No pinned upstream test/E2E recipe or execution is supplied for this dependency by this preparation. An official repository label is not an engineering-quality verdict.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 37
+            }
+          ]
+        },
+        "A3": {
+          "state": "unverified",
+          "assessment": "The retained sweep's two-family fit survival is a proposal disposition, not independent community consensus.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/landscape-sweep-20260929/anthropics-claude-plugins-official.json",
+              "line": 13
+            }
+          ]
+        },
+        "A4": {
+          "state": "unverified",
+          "assessment": "No organic invoke/cost window for this pinned plugin control was measured. This is the preparation's named evidence gap, not a global usage claim.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 6
+            }
+          ]
+        },
+        "A5": {
+          "state": "unverified",
+          "assessment": "No retained matched published evaluation settles the client-specific dependency control against this deployed Serena pin.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 6
+            }
+          ]
+        },
+        "A6": {
+          "state": "pending",
+          "assessment": "The role-specific frozen comparison remains unexecuted. Source reads are not comparative measurements.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 6
+            }
+          ]
+        }
+      },
+      "measure_next": "Retain as a dependency arm under the frozen scope; qualify its binary/interface and exact ranged-read control only when all named comparison inputs exist. Do not infer cross-client capability absence from open feature requests.",
+      "pin_source": {
+        "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+        "line": 34
+      },
+      "retained_sweep_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260929/anthropics-claude-plugins-official.json",
+        "line": 7
+      }
+    },
+    {
+      "candidate_id": "gitnexus",
+      "repository": "https://github.com/abhigyanpatwari/GitNexus",
+      "pin": "191a954bf67583447dac5c71cc8d679aabd101d8",
+      "retained_sweep_source_pin": "acb65b95b62647b19781caa60afd17d3bed23d4a",
+      "role": "Symbol/reference graph navigation and index maintenance",
+      "retained_status": "carried survivor; included in existing frozen comparison",
+      "angles": {
+        "A1": {
+          "state": "source_only",
+          "assessment": "The pinned README documents local analyze/setup commands and local embeddings as opt-in. Exact source/reference correctness, index freshness and complete costs are unmeasured here.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/abhigyanpatwari/GitNexus",
+              "pin": "191a954bf67583447dac5c71cc8d679aabd101d8",
+              "path": "README.md",
+              "line": 51
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/abhigyanpatwari/GitNexus",
+              "pin": "191a954bf67583447dac5c71cc8d679aabd101d8",
+              "path": "README.md",
+              "line": 74
+            }
+          ]
+        },
+        "A2": {
+          "state": "unverified_at_frozen_pin",
+          "assessment": "The frozen record has no upstream_test_ref for this arm, and no install or test was run. No quality inference follows from packaging claims.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 49
+            }
+          ]
+        },
+        "A3": {
+          "state": "unverified",
+          "assessment": "Existing retained source-review/survival records do not establish independent community consensus.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/landscape-sweep-20260929/abhigyanpatwari-gitnexus.json",
+              "line": 13
+            }
+          ]
+        },
+        "A4": {
+          "state": "unverified",
+          "assessment": "No native usage, index-maintenance cost or organic adoption window was measured. This is the preparation's named evidence gap, not a global usage claim.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 6
+            }
+          ]
+        },
+        "A5": {
+          "state": "unverified",
+          "assessment": "No retained matched published navigation/reference evaluation qualifies this pin against the deployed incumbent.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 6
+            }
+          ]
+        },
+        "A6": {
+          "state": "pending",
+          "assessment": "The shared authored-reference/edit/delete comparison has no run. Its retained broader impact/latency baseline also remains a boundary, not an inferred win.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 6
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 258
+            }
+          ]
+        }
+      },
+      "licence_boundary": "Licence metadata is separate from angle scoring and survivor selection. The older supplement endorsed a not_adopted proposal under its historical licence gate; the later retained survivor and frozen arm remain carried. No licence-only exclusion is performed here.",
+      "measure_next": "Retain the frozen role checks and retained broader baseline boundary. Source-pinned install/E2E and complete usage instrumentation remain named comparison inputs.",
+      "pin_source": {
+        "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+        "line": 46
+      },
+      "retained_sweep_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260929/abhigyanpatwari-gitnexus.json",
+        "line": 7
+      }
+    },
+    {
+      "candidate_id": "token-savior",
+      "repository": "https://github.com/mibayy/token-savior",
+      "pin": "0a4a2e126530ff1222b7f9c62c290e517a738328",
+      "retained_sweep_source_pin": "73e9c7f56fd7cd40ecc72cdc4b032264018f8b4f",
+      "role": "Symbol navigation, direct incoming dependencies and index maintenance",
+      "retained_status": "carried survivor; included in existing frozen comparison",
+      "angles": {
+        "A1": {
+          "state": "source_only",
+          "assessment": "The pinned tool schema explicitly exposes get_dependents for direct incoming dependencies. This is a code-level capability witness, not proof the MCP tool is exposed, invoked or correct at runtime.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/mibayy/token-savior",
+              "pin": "0a4a2e126530ff1222b7f9c62c290e517a738328",
+              "path": "src/token_savior/tool_schemas.py",
+              "line": 473
+            }
+          ]
+        },
+        "A2": {
+          "state": "unverified_at_frozen_pin",
+          "assessment": "No upstream-owned install/test receipt was produced, and the frozen record has no upstream_test_ref for this arm. The source witness alone cannot establish engineering quality.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 63
+            }
+          ]
+        },
+        "A3": {
+          "state": "unverified",
+          "assessment": "The retained fit survival is not independent community consensus.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/landscape-sweep-20260929/mibayy-token-savior.json",
+              "line": 13
+            }
+          ]
+        },
+        "A4": {
+          "state": "unverified",
+          "assessment": "No pinned native invocation trace or measured organic usage was produced. This is the preparation's named evidence gap, not a global usage claim.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 6
+            }
+          ]
+        },
+        "A5": {
+          "state": "disputed",
+          "assessment": "The pinned README reports 188/192 and token/time reductions, while stating benchmark source and fixtures are not currently published. These remain upstream claims with an unreproduced held-out evaluation boundary.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/mibayy/token-savior",
+              "pin": "0a4a2e126530ff1222b7f9c62c290e517a738328",
+              "path": "README.md",
+              "line": 17
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/mibayy/token-savior",
+              "pin": "0a4a2e126530ff1222b7f9c62c290e517a738328",
+              "path": "README.md",
+              "line": 31
+            }
+          ]
+        },
+        "A6": {
+          "state": "pending",
+          "assessment": "The retained readiness rule requires held-out source/reference evaluation and actual tool-call traces. The frozen comparison remains unexecuted.",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 6
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+              "line": 265
+            }
+          ]
+        }
+      },
+      "measure_next": "Retain source/reference and required/forbidden-reference checks, pinned upstream E2E and native call traces as readiness inputs. Do not treat the published score as a qualified result.",
+      "pin_source": {
+        "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+        "line": 60
+      },
+      "retained_sweep_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260929/mibayy-token-savior.json",
+        "line": 7
+      }
+    }
+  ],
+  "existing_alternatives": [
+    {
+      "candidate": "ast-grep",
+      "disposition": "conditional",
+      "action": "Retain the existing structural-pattern role; no resurvey or promotion.",
+      "disposition_source": {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 5194
+      }
+    },
+    {
+      "candidate": "CodeGraph",
+      "disposition": "unqualified",
+      "action": "Retain the existing disposition; no new trial.",
+      "disposition_source": {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 5200
+      }
+    },
+    {
+      "candidate": "jCodeMunch",
+      "disposition": "measured_tradeoff",
+      "action": "Retain exact-function discovery evidence and the cheaper-known-source control; no cross-pin superiority claim.",
+      "disposition_source": {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 5206
+      }
+    },
+    {
+      "candidate": "codebase-memory-mcp",
+      "disposition": "conditional",
+      "action": "Retain the scoped graph role and its static/dynamic boundary; no new qualification.",
+      "disposition_source": {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 5212
+      }
+    }
+  ],
+  "disputed_dimensions": [
+    {
+      "id": "comparison_currency",
+      "angles": [
+        "A1",
+        "A6"
+      ],
+      "status": "pending",
+      "question": "Deployment E2E and the frozen comparison refer to different full source identities. No result may transfer across that boundary."
+    },
+    {
+      "id": "source_and_reference_completeness",
+      "angles": [
+        "A1",
+        "A6"
+      ],
+      "status": "pending",
+      "question": "One vendor smoke and an empty-reference result do not settle required/forbidden references, updates, renames or deletions across target languages."
+    },
+    {
+      "id": "client_specific_dependency_role",
+      "angles": [
+        "A1",
+        "A4",
+        "A6"
+      ],
+      "status": "pending",
+      "question": "Native LSP plus ranged reads is a client-specific dependency control; keep its scoped interface separate from a standalone cross-client winner."
+    },
+    {
+      "id": "quality_and_total_cost",
+      "angles": [
+        "A4",
+        "A5",
+        "A6"
+      ],
+      "status": "disputed",
+      "question": "Self-evaluation, historical mismatched-pin Harbor data and token-savior's unpublished benchmark fixtures cannot establish current comparative savings or quality."
+    },
+    {
+      "id": "consensus_and_organic_use",
+      "angles": [
+        "A3",
+        "A4"
+      ],
+      "status": "unverified",
+      "question": "No independent consensus or organic client-usage evidence was produced; popularity and one manual invocation cannot fill these angles."
+    }
+  ],
+  "review": {
+    "dispatcher": "co-op",
+    "requested_families": [
+      "OpenAI",
+      "Anthropic"
+    ],
+    "self_dispatched": false,
+    "status": "awaiting ONE-PR review dispatch"
+  },
+  "not_claimed": [
+    "FINAL admission",
+    "a default or run-pin update",
+    "a scored converged angle record",
+    "current cross-candidate cost superiority",
+    "macOS acceptance",
+    "organic model/client adoption"
+  ],
+  "integrity": {
+    "status": "Citations tightened; metadata is unscored and unadjudicated.",
+    "masking": "evidence/artifacts/final-code-navigation-prep-20261016/masked-captures.json",
+    "missing_captures_remain_gaps": true
+  }
+}

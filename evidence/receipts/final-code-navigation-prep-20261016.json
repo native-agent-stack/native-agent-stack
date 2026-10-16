@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "id": "final-code-navigation-prep-20261016",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "serena"
+  ],
+  "claim": "At the retained deployment source identity, an isolated Serena development install passed 161 upstream core tests and one vendor native Python navigation health-check. Masked native captures retain the real commands, return codes and outputs; the preparation also reconciles run-pin drift and the three cumulative sweep survivors.",
+  "limitations": [
+    "This is bounded preparation evidence. Comparative A6, full-language and macOS coverage, organic client adoption and a recorder-bounded UTC invocation window remain unmeasured.",
+    "The vendor health-check returned one symbol match and zero incoming references for its chosen imported UserDict symbol; it does not establish exhaustive reference correctness.",
+    "The deployed Serena source pin differs from the immutable W6 comparison pin; that comparison remains unexecuted and unchanged.",
+    "Original acquisition, fixture-copy, git-diff and packet-generator native captures were not retained; their former return/count assertions were withdrawn. API date and independent uv/node/platform captures remain gaps.",
+    "The six-angle record is unscored and unadjudicated. This record changes no winner, default, run pin, platform status or FINAL marker."
+  ],
+  "path": "evidence/receipts/final-code-navigation-prep-20261016.json",
+  "evidence_class": "native_proven",
+  "catalog": "foundation",
+  "layer_id": "code-navigation",
+  "recorded_at": "2026-10-16T06:25:47Z",
+  "source_snapshot_commit": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+  "repository": "https://github.com/oraios/serena",
+  "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+  "representation": "Curated evidence index; measured results are the retained masked native captures, not this summary.",
+  "masked": true,
+  "raw_capture_name": "code-navigation-native-capture-20261016",
+  "masking_rule": "evidence/artifacts/final-code-navigation-prep-20261016/mask_capture.py",
+  "masking_test": "evidence/artifacts/final-code-navigation-prep-20261016/test_mask_capture.py",
+  "private_reproduction": "co-op private check PASS 2026-10-16",
+  "artifacts": {
+    "readme": "evidence/artifacts/final-code-navigation-prep-20261016/README.md",
+    "run_pin": "evidence/artifacts/final-code-navigation-prep-20261016/pin-reconciliation.json",
+    "upstream_e2e": "evidence/artifacts/final-code-navigation-prep-20261016/upstream-e2e.json",
+    "invoke": "evidence/artifacts/final-code-navigation-prep-20261016/invocation.json",
+    "six_angles": "evidence/artifacts/final-code-navigation-prep-20261016/multi-angle-draft.json",
+    "resolution_inputs": "evidence/artifacts/final-code-navigation-prep-20261016/resolution-inputs.json",
+    "lane_packet": "evidence/artifacts/final-code-navigation-prep-20261016/lane-packet.json",
+    "masked_captures": "evidence/artifacts/final-code-navigation-prep-20261016/masked-captures.json",
+    "masking_custody": "evidence/artifacts/final-code-navigation-prep-20261016/MASKING.md"
+  },
+  "measured_results": {
+    "upstream_core_tests": {
+      "passed": 161,
+      "failed": 0,
+      "elapsed_seconds_reported_by_pytest": 133.68,
+      "exit_code": 0,
+      "value_sources": [
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/core-pass.log",
+          "line": 4
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/core-pass.json",
+          "line": 28
+        }
+      ]
+    },
+    "vendor_native_health_check": {
+      "exit_code": 0,
+      "cli_invocations": 1,
+      "symbol_matches": 1,
+      "incoming_reference_matches": 0,
+      "value_sources": [
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/health-check.json",
+          "line": 6
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/health-check.json",
+          "line": 26
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+          "line": 84
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+          "line": 91
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+          "line": 99
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+          "line": 102
+        }
+      ]
+    },
+    "read_only_source_identity": {
+      "commit": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "sources": [
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/source-pin.txt",
+          "line": 1
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/scratch-version.txt",
+          "line": 1
+        }
+      ]
+    }
+  },
+  "source_review_results": {
+    "proposed_deployment_pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+    "frozen_comparison_pin": "1de556f71569f3acfc0743e526dd60aca40a545e",
+    "sources": [
+      {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 5310
+      },
+      {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 11228
+      },
+      {
+        "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+        "line": 21
+      }
+    ],
+    "survivor_dispositions": "evidence/artifacts/final-code-navigation-prep-20261016/resolution-inputs.json",
+    "angle_status": "unscored draft; independent two-family adjudication pending"
+  },
+  "next_action": "Co-op dispatches independent OpenAI and Anthropic reads of this one-layer preparation PR and its disputed dimensions. Existing named gaps and immutable comparison prerequisites remain explicit."
+}

@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "kind": "run_pin_reconciliation",
+  "catalog": "foundation",
+  "layer_id": "code-navigation",
+  "base_commit": "30542e70560147c19049016d19aa3f264515c92f",
+  "source_snapshot_commit": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+  "recorded_at": "2026-10-16T05:20:54Z",
+  "proposed_run": {
+    "component_id": "serena",
+    "repository": "https://github.com/oraios/serena",
+    "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+    "version": "2.0.0.dev0",
+    "commit": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+    "reason": "Use the deployed complete identity to fill its missing install/test/invoke evidence: winner, runs[], both platform pin records, the current manifest and the winner's retained exact-pin native receipt agree. A later source review or immutable comparison is a separate identity. This is a proposal for the preparation record, with no catalog/default/pin mutation."
+  },
+  "pin_sources": [
+    {
+      "role": "catalog winner",
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 5304,
+      "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "status": "agrees",
+      "version_source": {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 5305
+      }
+    },
+    {
+      "role": "final-stack runs[]",
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 11228,
+      "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "status": "agrees",
+      "version_source": {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 11226
+      }
+    },
+    {
+      "role": "landed install plan",
+      "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+      "line": 131,
+      "pin": null,
+      "component_id": "serena",
+      "status": "version_and_commit_not_stated"
+    },
+    {
+      "role": "Linux run pin",
+      "path": "adoption/pins-linux-x86_64.json",
+      "line": 340,
+      "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "status": "agrees",
+      "version_source": {
+        "path": "adoption/pins-linux-x86_64.json",
+        "line": 336
+      }
+    },
+    {
+      "role": "macOS run pin",
+      "path": "adoption/pins-macos-arm64.json",
+      "line": 347,
+      "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "status": "agrees_unexecuted_platform",
+      "version_source": {
+        "path": "adoption/pins-macos-arm64.json",
+        "line": 343
+      }
+    },
+    {
+      "role": "current component manifest",
+      "path": "catalogs/sota-convergence/manifest-20261009.json",
+      "line": 882,
+      "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "status": "agrees"
+    },
+    {
+      "role": "last exact-pin native evidence referenced by the winner",
+      "path": "evidence/receipts/foundation-native-20260920.json",
+      "line": 72,
+      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "status": "agrees",
+      "boundary": "Eight historical Python/CJS native checks; no current cross-candidate cost ranking.",
+      "boundary_source": {
+        "path": "evidence/receipts/foundation-native-20260920.json",
+        "line": 80
+      }
+    },
+    {
+      "role": "newer native invocation evidence examined",
+      "path": "evidence/receipts/ao-bounded-effect-20261008.json",
+      "line": 269,
+      "pin": null,
+      "status": "source_identity_unbound",
+      "boundary": "The October 8 receipt records a Serena list_memories call inside another component's smoke; it supplies no Serena source pin and cannot reconcile a run identity.",
+      "tool_source": {
+        "path": "evidence/receipts/ao-bounded-effect-20261008.json",
+        "line": 270
+      }
+    },
+    {
+      "role": "later source-only architecture evidence",
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/code-navigation.json",
+      "line": 11,
+      "pin": "d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809",
+      "status": "different_source_review_identity",
+      "boundary": "Source review is not an install or deployment pin."
+    },
+    {
+      "role": "last committed frozen comparison record",
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+      "line": 21,
+      "pin": "1de556f71569f3acfc0743e526dd60aca40a545e",
+      "status": "different_comparison_identity",
+      "boundary": "The record's phase says preregistered/no run. No results are available to transfer.",
+      "phase_source": {
+        "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+        "line": 6
+      }
+    },
+    {
+      "role": "already installed host, read-only",
+      "command": "serena --version",
+      "exit_code": 0,
+      "version": "2.0.0.dev0",
+      "commit": null,
+      "status": "version_agrees_commit_unverified",
+      "output": "outputs/host-version.txt",
+      "boundary": "Upstream's noneditable --version lacks a source-commit suffix; this observation cannot prove the host's full run identity.",
+      "native_capture": "host-version.capture.json",
+      "value_sources": [
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/host-version.txt",
+          "line": 1
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/host-version.json",
+          "line": 26
+        }
+      ],
+      "capture_note": "Rechecked read-only for the integrity audit; no host install."
+    },
+    {
+      "role": "isolated editable source installation",
+      "command": "env PATH=$UV_BIN:$NODE_BIN:$SCRATCH/serena/.venv/bin:$PATH SERENA_HOME=$SCRATCH/state/serena XDG_CACHE_HOME=$SCRATCH/cache XDG_CONFIG_HOME=$SCRATCH/config XDG_DATA_HOME=$SCRATCH/data UV_CACHE_DIR=$SCRATCH/cache/uv UV_PYTHON_INSTALL_DIR=$SCRATCH/python TMPDIR=$SCRATCH/tmp .venv/bin/serena --version",
+      "exit_code": 0,
+      "version": "2.0.0.dev0",
+      "commit": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "status": "exact_commit_verified",
+      "output": "outputs/scratch-version.txt",
+      "verification": "Later read-only native git rev-parse HEAD binds the current scratch checkout to the complete proposed commit. Original acquisition and git-diff command captures were not exported and remain named gaps.",
+      "native_capture": "scratch-version.capture.json",
+      "value_sources": [
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/scratch-version.txt",
+          "line": 1
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/source-pin.txt",
+          "line": 1
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/scratch-version.json",
+          "line": 26
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/source-pin.json",
+          "line": 24
+        }
+      ]
+    }
+  ],
+  "drifts": [
+    {
+      "id": "plan_missing_run_identity",
+      "source": {
+        "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+        "line": 131
+      },
+      "disposition": "Preserve the landed plan; bind this preparation to the full runs[] identity."
+    },
+    {
+      "id": "installed_host_commit_unknown",
+      "disposition": "Retain the read-only version observation without claiming an exact host commit."
+    },
+    {
+      "id": "source_review_pin_differs",
+      "source": {
+        "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/code-navigation.json",
+        "line": 11
+      },
+      "disposition": "Retain as source-only context; do not move its claims to the measured pin."
+    },
+    {
+      "id": "comparison_pin_differs",
+      "source": {
+        "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+        "line": 21
+      },
+      "disposition": "Keep the frozen comparison unchanged and unexecuted. Comparison currency is disputed/pending for adjudication. These deployment-pin receipts do not satisfy E2E at its immutable comparison pin."
+    },
+    {
+      "id": "recent_invocation_pin_unbound",
+      "source": {
+        "path": "evidence/receipts/ao-bounded-effect-20261008.json",
+        "line": 269
+      },
+      "disposition": "Use the new isolated exact-pin invocation receipt for this bounded window; do not upgrade the older unpinned call."
+    }
+  ],
+  "limitations": [
+    "The proposed deployment source differs from the frozen comparison source. Keeping it measures the current deployed identity; it does not establish the best current upstream version. Source-commit dates remain unverified without retained native API response captures.",
+    "No macOS run, organic client adoption window, frozen-comparison execution, two-family adjudication or FINAL admission is claimed."
+  ],
+  "integrity": {
+    "masked": true,
+    "representation": "Curated metadata index of masked native capture exports; captures/ and outputs/ contain the actual recorded results.",
+    "masking_rule": "evidence/artifacts/final-code-navigation-prep-20261016/mask_capture.py",
+    "masking_test": "evidence/artifacts/final-code-navigation-prep-20261016/test_mask_capture.py",
+    "capture_manifest": "evidence/artifacts/final-code-navigation-prep-20261016/masked-captures.json",
+    "raw_capture_name": "code-navigation-native-capture-20261016 (private; names only)",
+    "private_reproduction_review": "co-op private check PASS 2026-10-16"
+  },
+  "primary_commit_date_gap": {
+    "reason": "The earlier API observations have no retained native response capture; no dated commit-order claim is made here.",
+    "prerequisite": "Retain a native primary API response before asserting commit dates."
+  }
+}

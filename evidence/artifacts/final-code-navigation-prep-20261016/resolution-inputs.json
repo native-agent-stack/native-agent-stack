@@ -1,0 +1,690 @@
+{
+  "schema_version": 1,
+  "kind": "layer_resolution_input_snapshot",
+  "catalog": "foundation",
+  "layer_id": "code-navigation",
+  "source_snapshot_commit": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+  "recorded_at": "2026-10-16T06:23:11Z",
+  "evidence_class": "source_review",
+  "purpose": "Retain the protocol inputs and cumulative survivor delta. This is not a sweep, native run, new adjudication, terminal-state update or comparison refreeze.",
+  "protocol": {
+    "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
+    "line": 31
+  },
+  "catalog_snapshot": {
+    "layer_pointer": "/layers/2",
+    "status": "reopened",
+    "status_source": {
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 5242
+    },
+    "terminal_state": null,
+    "terminal_source": {
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 5260
+    },
+    "open_gaps": 5,
+    "open_gaps_source": {
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 5231
+    },
+    "verdict": {
+      "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-code-navigation-20260922.json",
+      "agreement": "disagree",
+      "comparison_id": null,
+      "date": "2026-09-22",
+      "next_review": "2026-10-22",
+      "reopened_by": [
+        {
+          "date": "2026-09-23",
+          "sweep_id": "landscape-sweep-20260923"
+        },
+        {
+          "date": "2026-09-26",
+          "sweep_id": "landscape-sweep-20260926"
+        },
+        {
+          "date": "2026-09-29",
+          "sweep_id": "landscape-sweep-20260929"
+        }
+      ],
+      "status": "recorded",
+      "wave": "20260922",
+      "wave_doc": {
+        "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+        "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+      }
+    },
+    "winner": {
+      "component_id": "serena",
+      "evidence_class": "native_proven",
+      "factors": [
+        {
+          "converged": false,
+          "host_e2e": "true",
+          "id": "serena",
+          "pin_current": "unknown",
+          "verdict_winner": "true"
+        }
+      ],
+      "pin_drift": "same",
+      "pin_parsed": {
+        "commit": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+        "version": "2.0.0.dev0"
+      },
+      "repository": "https://github.com/oraios/serena",
+      "run": "serena",
+      "run_reason": null,
+      "verdict_pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+    },
+    "source": "catalogs/landscape/foundation.json#/layers/4"
+  },
+  "covering_ledger_sweeps": [
+    {
+      "sweep_id": "landscape-sweep-20260923-attempt-1",
+      "date": "2026-09-23",
+      "status": "stopped",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260923.json",
+      "source": {
+        "path": "catalogs/saturation/ledger.json",
+        "line": 9
+      },
+      "layer_pointer": "/sweeps/0/layers/0",
+      "votes": "not_returned",
+      "votes_source": {
+        "path": "catalogs/saturation/ledger.json",
+        "line": 49
+      },
+      "returns_ref": null,
+      "survived_repositories": [],
+      "retained_reopen": []
+    },
+    {
+      "sweep_id": "landscape-sweep-20260923",
+      "date": "2026-09-23",
+      "status": "completed",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260923.json",
+      "source": {
+        "path": "catalogs/saturation/ledger.json",
+        "line": 290
+      },
+      "layer_pointer": "/sweeps/1/layers/4",
+      "votes": "not_retained",
+      "votes_source": {
+        "path": "catalogs/saturation/ledger.json",
+        "line": 632
+      },
+      "returns_ref": null,
+      "survived_repositories": [],
+      "retained_reopen": []
+    },
+    {
+      "sweep_id": "landscape-sweep-20260926",
+      "date": "2026-09-26",
+      "status": "completed",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json",
+      "source": {
+        "path": "catalogs/saturation/ledger.json",
+        "line": 2832
+      },
+      "layer_pointer": "/sweeps/3/layers/4",
+      "votes": "retained",
+      "votes_source": {
+        "path": "catalogs/saturation/ledger.json",
+        "line": 3507
+      },
+      "returns_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "survived_repositories": [],
+      "retained_reopen": [
+        {
+          "trigger": "retained_failure",
+          "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/code-navigation"
+        },
+        {
+          "trigger": "selection_changed",
+          "ref": "catalog-freshness:mcp-inspector (license None -> NOASSERTION)"
+        }
+      ]
+    },
+    {
+      "sweep_id": "landscape-sweep-20260929",
+      "date": "2026-09-29",
+      "status": "completed",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
+      "source": {
+        "path": "catalogs/saturation/ledger.json",
+        "line": 7694
+      },
+      "layer_pointer": "/sweeps/4/layers/4",
+      "votes": "retained",
+      "votes_source": {
+        "path": "catalogs/saturation/ledger.json",
+        "line": 8299
+      },
+      "returns_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+      "survived_repositories": [
+        "https://github.com/abhigyanpatwari/gitnexus",
+        "https://github.com/anthropics/claude-plugins-official",
+        "https://github.com/mibayy/token-savior"
+      ],
+      "retained_reopen": []
+    }
+  ],
+  "latest_full_covering_sweep": "landscape-sweep-20260929",
+  "latest_retained_vote_supplement": {
+    "name": "landscape-sweep-20260926-gpt6-fit-revote-20261003",
+    "scope": "Completed replacement of missing GPT-6 fit votes on the frozen September 26 proposals; not a new full landscape survey.",
+    "source": {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/README.md",
+      "line": 64
+    },
+    "ledger_append_policy": {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/README.md",
+      "line": 159
+    },
+    "sealed_record_preserved": {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/README.md",
+      "line": 165
+    },
+    "navigation_vote_rows": [
+      {
+        "index": 0,
+        "repository": "https://github.com/anthropics/claude-plugins-official",
+        "proposed_label": "targeted_candidate",
+        "facts_refuted": false,
+        "claude_fit_refuted": false,
+        "gpt6_refuted": false,
+        "survives": true,
+        "refuted_by_absence": false,
+        "row_pointer": "/rows/32",
+        "value_sources": {
+          "repository": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1449
+          },
+          "proposed_label": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1450
+          },
+          "facts_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1455
+          },
+          "claude_fit_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1456
+          },
+          "gpt6_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1476
+          },
+          "survives": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1478
+          },
+          "refuted_by_absence": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1479
+          }
+        }
+      },
+      {
+        "index": 1,
+        "repository": "https://github.com/probelabs/probe",
+        "proposed_label": "targeted_candidate",
+        "facts_refuted": false,
+        "claude_fit_refuted": true,
+        "gpt6_refuted": false,
+        "survives": false,
+        "refuted_by_absence": false,
+        "row_pointer": "/rows/33",
+        "value_sources": {
+          "repository": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1493
+          },
+          "proposed_label": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1494
+          },
+          "facts_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1499
+          },
+          "claude_fit_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1500
+          },
+          "gpt6_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1521
+          },
+          "survives": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1523
+          },
+          "refuted_by_absence": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1524
+          }
+        }
+      },
+      {
+        "index": 2,
+        "repository": "https://github.com/cocoindex-io/cocoindex-code",
+        "proposed_label": "targeted_candidate",
+        "facts_refuted": false,
+        "claude_fit_refuted": true,
+        "gpt6_refuted": false,
+        "survives": false,
+        "refuted_by_absence": false,
+        "row_pointer": "/rows/34",
+        "value_sources": {
+          "repository": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1538
+          },
+          "proposed_label": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1539
+          },
+          "facts_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1544
+          },
+          "claude_fit_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1545
+          },
+          "gpt6_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1566
+          },
+          "survives": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1568
+          },
+          "refuted_by_absence": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1569
+          }
+        }
+      },
+      {
+        "index": 3,
+        "repository": "https://github.com/bug-ops/mcpls",
+        "proposed_label": "keep_but_compare",
+        "facts_refuted": true,
+        "claude_fit_refuted": true,
+        "gpt6_refuted": false,
+        "survives": false,
+        "refuted_by_absence": false,
+        "row_pointer": "/rows/35",
+        "value_sources": {
+          "repository": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1583
+          },
+          "proposed_label": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1584
+          },
+          "facts_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1589
+          },
+          "claude_fit_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1590
+          },
+          "gpt6_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1609
+          },
+          "survives": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1611
+          },
+          "refuted_by_absence": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1612
+          }
+        }
+      },
+      {
+        "index": 4,
+        "repository": "https://github.com/zzet/gortex",
+        "proposed_label": "keep_but_compare",
+        "facts_refuted": false,
+        "claude_fit_refuted": true,
+        "gpt6_refuted": false,
+        "survives": false,
+        "refuted_by_absence": false,
+        "row_pointer": "/rows/36",
+        "value_sources": {
+          "repository": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1626
+          },
+          "proposed_label": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1627
+          },
+          "facts_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1632
+          },
+          "claude_fit_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1633
+          },
+          "gpt6_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1654
+          },
+          "survives": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1656
+          },
+          "refuted_by_absence": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1657
+          }
+        }
+      },
+      {
+        "index": 5,
+        "repository": "https://github.com/tirth8205/code-review-graph",
+        "proposed_label": "keep_but_compare",
+        "facts_refuted": false,
+        "claude_fit_refuted": true,
+        "gpt6_refuted": true,
+        "survives": false,
+        "refuted_by_absence": false,
+        "row_pointer": "/rows/37",
+        "value_sources": {
+          "repository": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1671
+          },
+          "proposed_label": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1672
+          },
+          "facts_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1677
+          },
+          "claude_fit_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1678
+          },
+          "gpt6_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1697
+          },
+          "survives": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1699
+          },
+          "refuted_by_absence": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1700
+          }
+        }
+      },
+      {
+        "index": 6,
+        "repository": "https://github.com/lemoncrow-lab/lemoncrow",
+        "proposed_label": "keep_but_compare",
+        "facts_refuted": false,
+        "claude_fit_refuted": true,
+        "gpt6_refuted": false,
+        "survives": false,
+        "refuted_by_absence": false,
+        "row_pointer": "/rows/38",
+        "value_sources": {
+          "repository": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1714
+          },
+          "proposed_label": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1715
+          },
+          "facts_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1720
+          },
+          "claude_fit_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1721
+          },
+          "gpt6_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1742
+          },
+          "survives": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1744
+          },
+          "refuted_by_absence": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1745
+          }
+        }
+      },
+      {
+        "index": 7,
+        "repository": "https://github.com/abhigyanpatwari/gitnexus",
+        "proposed_label": "not_adopted",
+        "facts_refuted": false,
+        "claude_fit_refuted": false,
+        "gpt6_refuted": false,
+        "survives": true,
+        "refuted_by_absence": false,
+        "row_pointer": "/rows/39",
+        "value_sources": {
+          "repository": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1759
+          },
+          "proposed_label": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1760
+          },
+          "facts_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1765
+          },
+          "claude_fit_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1766
+          },
+          "gpt6_refuted": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1784
+          },
+          "survives": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1786
+          },
+          "refuted_by_absence": {
+            "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+            "line": 1787
+          }
+        }
+      }
+    ],
+    "consequence": "The supplement restores Anthropic plugin and GitNexus survival; both already survive the September 29 sweep. No additional unresolved repository is created. Other proposed rows have retained substantive refutation flags, not refutation by absence.",
+    "licence_boundary": "The historical GitNexus not_adopted proposal label is retained as history. It does not retire the later retained survivor; licence metadata does not choose an angle verdict or arm here."
+  },
+  "cumulative_unresolved_survivors": [
+    {
+      "repository": "https://github.com/abhigyanpatwari/GitNexus",
+      "disposition": "retained_in_existing_frozen_comparison; unresolved for FINAL",
+      "retained_sweep_source_pin": "acb65b95b62647b19781caa60afd17d3bed23d4a",
+      "retained_sweep_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260929/abhigyanpatwari-gitnexus.json",
+        "line": 7
+      },
+      "frozen_comparison_pin": "191a954bf67583447dac5c71cc8d679aabd101d8",
+      "comparison_pin_source": {
+        "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+        "line": 46
+      },
+      "role_ids": [
+        "symbol_navigation",
+        "reference_graph_navigation",
+        "navigation_index_maintenance"
+      ],
+      "dependency": false,
+      "retirement_claimed": false
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-plugins-official",
+      "disposition": "retained_in_existing_frozen_comparison; unresolved for FINAL",
+      "retained_sweep_source_pin": "fbe07fb6ce7d51d8e86ca6efdf050059894cdb80",
+      "retained_sweep_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260929/anthropics-claude-plugins-official.json",
+        "line": 7
+      },
+      "frozen_comparison_pin": "f359d43b406057f1a8cdbc4ea93b827642c162e6",
+      "comparison_pin_source": {
+        "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+        "line": 34
+      },
+      "role_ids": [
+        "native_lsp_distribution"
+      ],
+      "dependency": true,
+      "retirement_claimed": false
+    },
+    {
+      "repository": "https://github.com/mibayy/token-savior",
+      "disposition": "retained_in_existing_frozen_comparison; unresolved for FINAL",
+      "retained_sweep_source_pin": "73e9c7f56fd7cd40ecc72cdc4b032264018f8b4f",
+      "retained_sweep_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260929/mibayy-token-savior.json",
+        "line": 7
+      },
+      "frozen_comparison_pin": "0a4a2e126530ff1222b7f9c62c290e517a738328",
+      "comparison_pin_source": {
+        "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+        "line": 60
+      },
+      "role_ids": [
+        "symbol_navigation",
+        "navigation_index_maintenance",
+        "reference_graph_navigation"
+      ],
+      "dependency": false,
+      "retirement_claimed": false
+    }
+  ],
+  "frozen_comparison": {
+    "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+    "comparison_id": "w6-foundation-code-navigation-20261011",
+    "phase": "preregistered; no run; layer terminal state SCHEDULED",
+    "phase_source": {
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+      "line": 6
+    },
+    "serena_pin": "1de556f71569f3acfc0743e526dd60aca40a545e",
+    "serena_pin_source": {
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+      "line": 21
+    },
+    "scope_boundary": "Its narrative SCHEDULED phase is the retained comparison text. The current catalog is reopened with terminal_state null. No comparison result or catalog terminal-state update is inferred.",
+    "retained_reopen_prerequisites": [
+      {
+        "kind": "ledger_reopen",
+        "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/code-navigation",
+        "trigger": "retained_failure",
+        "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "catalog-freshness:mcp-inspector (license None -> NOASSERTION)",
+        "trigger": "selection_changed",
+        "required_evidence": "Resolve retained selection_changed source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/anthropics/claude-plugins-official",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/0/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/4/candidates/0/comparison_that_would_overturn"
+        ],
+        "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/abhigyanpatwari/gitnexus",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/1/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/4/candidates/7/comparison_that_would_overturn"
+        ],
+        "required_evidence": "Exposed graph/index tools, held-out impact/baseline recipe and edit/delete traces are sealed; licence change is metadata only.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/mibayy/token-savior",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/2/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "Published held-out source/reference evaluation, actual exposed MCP tool/call traces, initialization and edit/delete recipe exist.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      }
+    ],
+    "retained_comparison_dispositions": [
+      {
+        "repository": "https://github.com/anthropics/claude-plugins-official",
+        "retained_comparison_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/4/candidates/0/comparison_that_would_overturn",
+          "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/0/comparison_that_would_overturn"
+        ],
+        "frozen_rule_reason": "Integrated native LSP is a client/dependency control on the same authored symbol/reference oracle; plugin presence alone cannot replace Serena or qualify full navigation. Retain the cross-client replacement claim as an untested boundary."
+      },
+      {
+        "repository": "https://github.com/abhigyanpatwari/gitnexus",
+        "retained_comparison_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/4/candidates/7/comparison_that_would_overturn",
+          "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/1/comparison_that_would_overturn"
+        ],
+        "frozen_rule_reason": "Common authored reference precision and index freshness qualify bounded graph correctness. The named codebase-memory-mcp impact/latency baseline is not an arm, so no superiority over it is inferred; retain that broader comparison before any such claim."
+      },
+      {
+        "repository": "https://github.com/mibayy/token-savior",
+        "retained_comparison_refs": [
+          "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/2/comparison_that_would_overturn"
+        ],
+        "frozen_rule_reason": "The shared required/forbidden-reference and edit/delete oracle separates navigation from memory/compaction. Published held-out evaluation and actual MCP invocation traces remain readiness inputs, not claimed results."
+      }
+    ],
+    "action": "Leave unchanged and unexecuted. Deployment-pin native captures do not satisfy another immutable source pin."
+  },
+  "named_gaps": [
+    {
+      "id": "older_unretained_votes",
+      "source_sweep": "landscape-sweep-20260923",
+      "reason": "The ledger records navigation votes as not_retained. Their absence is not a substantive candidate adjudication; no names are invented and no completeness claim is made from it.",
+      "prerequisite": "Retain and register the missing source/return evidence before using it for a terminal-state claim."
+    },
+    {
+      "id": "retained_reopen_inputs",
+      "reason": "The September 26 retained failure and metadata-change triggers remain preserved in the frozen comparison readiness inputs. This preparation does not clear them."
+    },
+    {
+      "id": "comparison_currency",
+      "reason": "The deployment pin and frozen comparison pin differ; independent adjudication remains pending."
+    }
+  ],
+  "bounded_next_action": "Independent two-family reads of this preparation and its disputed dimensions, dispatched by the co-op. No new survey, arm install, comparison run or model route is dispatched by this record."
+}
