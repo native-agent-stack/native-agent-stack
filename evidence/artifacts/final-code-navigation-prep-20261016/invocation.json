@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "kind": "invocation",
+  "evidence_class": "native_proven",
+  "repository": "https://github.com/oraios/serena",
+  "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+  "catalog": "foundation",
+  "layer_id": "code-navigation",
+  "calls": 1,
+  "window_start": null,
+  "window_end": null,
+  "command": "env PATH=$UV_BIN:$NODE_BIN:$SCRATCH/serena/.venv/bin:$PATH SERENA_HOME=$SCRATCH/state/serena XDG_CACHE_HOME=$SCRATCH/cache XDG_CONFIG_HOME=$SCRATCH/config XDG_DATA_HOME=$SCRATCH/data UV_CACHE_DIR=$SCRATCH/cache/uv UV_PYTHON_INSTALL_DIR=$SCRATCH/python TMPDIR=$SCRATCH/tmp .venv/bin/serena project health-check $SCRATCH/native-fixture",
+  "cwd": "$SCRATCH/serena",
+  "exit_code": 0,
+  "native_interface": "Upstream Serena CLI; headless local language-server backend on a copy of the upstream Python fixture.",
+  "sources": [
+    {
+      "kind": "repo",
+      "repository": "https://github.com/oraios/serena",
+      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "path": "src/serena/cli.py",
+      "line": 957
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/oraios/serena",
+      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "path": "src/serena/cli.py",
+      "line": 1037
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/oraios/serena",
+      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "path": "src/serena/cli.py",
+      "line": 1049
+    }
+  ],
+  "output": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+  "output_sha256": "1cfbe764ada2a6a448524583b7c27269d186ecb78cdaa8ca16c3ab2643b1744e",
+  "output_hash_scope": "Complete recorded native output under the published literal-path mask; only the published bytes are hashed publicly.",
+  "observed": {
+    "overview": true,
+    "find_symbol_matches": 1,
+    "find_referencing_symbols_matches": 0,
+    "health_check": "passed"
+  },
+  "counting_boundary": "One native CLI invocation. The three logged navigation operations are not counted as separate client/model tool calls.",
+  "not_invoked_reason": null,
+  "limitations": [
+    "The invocation is a deliberate local vendor smoke, not an organic model/client adoption measurement.",
+    "A successful empty-reference response does not prove completeness or precision of incoming references.",
+    "No comparative cost, task success, update/delete behavior or cross-host parity is inferred."
+  ],
+  "aliases_ref": "evidence/artifacts/final-code-navigation-prep-20261016/upstream-e2e.json",
+  "recorded_at": "2026-10-16T05:20:54Z",
+  "integrity": {
+    "masked": true,
+    "representation": "Curated metadata index of masked native capture exports; captures/ and outputs/ contain the actual recorded results.",
+    "masking_rule": "evidence/artifacts/final-code-navigation-prep-20261016/mask_capture.py",
+    "masking_test": "evidence/artifacts/final-code-navigation-prep-20261016/test_mask_capture.py",
+    "capture_manifest": "evidence/artifacts/final-code-navigation-prep-20261016/masked-captures.json",
+    "raw_capture_name": "code-navigation-native-capture-20261016 (private; names only)",
+    "private_reproduction_review": "co-op private check PASS 2026-10-16"
+  },
+  "native_capture": "health-check.capture.json",
+  "value_sources": {
+    "overview": {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+      "line": 84
+    },
+    "command": {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/health-check.json",
+      "line": 6
+    },
+    "exit_code": {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/health-check.json",
+      "line": 26
+    },
+    "call_count": {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/health-check.json",
+      "line": 6
+    },
+    "find_symbol_matches": {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+      "line": 91
+    },
+    "find_referencing_symbols_matches": {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+      "line": 99
+    },
+    "health_check": {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+      "line": 102
+    }
+  },
+  "window_gap": {
+    "reason": "The native command capture did not retain a recorder-bounded before/after UTC window. The previous broad preparation timestamps were not an invocation-window capture and have been removed.",
+    "prerequisite": "A later native invocation with recorder-bounded UTC observations, after the pause is lifted."
+  }
+}

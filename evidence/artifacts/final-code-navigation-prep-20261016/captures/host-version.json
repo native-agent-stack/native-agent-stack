@@ -1,0 +1,29 @@
+{
+  "format": "native-exec-tool-export/1",
+  "name": "host-version",
+  "recorder": "tools.exec_command / tools.write_stdin",
+  "command": {
+    "cmd": "serena --version",
+    "workdir": "$REPO"
+  },
+  "initial_result": {
+    "chunk_id": "f3424f",
+    "wall_time_seconds": 1.001107052,
+    "session_id": 39520,
+    "original_token_count": 5,
+    "output": "Serena 2.0.0.dev0\n"
+  },
+  "subsequent_output_chunks": [
+    ""
+  ],
+  "completion_result": {
+    "chunk_id": "fa2e39",
+    "wall_time_seconds": 0.000012401,
+    "exit_code": 0,
+    "original_token_count": 0,
+    "output": ""
+  },
+  "exit_code": 0,
+  "output": "Serena 2.0.0.dev0\n",
+  "export_boundary": "Output strings and native result metadata are preserved from the original completed tool calls. The command input is the original tool argument. This export does not recreate separate OS stdout/stderr streams."
+}

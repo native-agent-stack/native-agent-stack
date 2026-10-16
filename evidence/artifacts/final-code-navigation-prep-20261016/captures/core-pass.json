@@ -1,0 +1,31 @@
+{
+  "format": "native-exec-tool-export/1",
+  "name": "core-pass",
+  "recorder": "tools.exec_command / tools.write_stdin",
+  "command": {
+    "cmd": "env PATH=$UV_BIN:$NODE_BIN:$SCRATCH/serena/.venv/bin:$PATH SERENA_HOME=$SCRATCH/state/serena XDG_CACHE_HOME=$SCRATCH/cache XDG_CONFIG_HOME=$SCRATCH/config XDG_DATA_HOME=$SCRATCH/data UV_CACHE_DIR=$SCRATCH/cache/uv UV_PYTHON_INSTALL_DIR=$SCRATCH/python TMPDIR=$SCRATCH/tmp .venv/bin/python -m pytest test/serena/test_cli_project_commands.py test/serena/test_mcp.py test/serena/test_tool_parameter_types.py test/serena/test_symbol.py::TestSymbolNameMatching test/serena/test_symbol.py::TestSymbolDictTypes -q --tb=short",
+    "workdir": "$SCRATCH/serena"
+  },
+  "initial_result": {
+    "chunk_id": "0f32f6",
+    "wall_time_seconds": 1.001348054,
+    "session_id": 39748,
+    "original_token_count": 0,
+    "output": ""
+  },
+  "subsequent_output_chunks": [
+    "............",
+    ".",
+    "........................................................... [ 44%]\n........................................................................ [ 89%]\n.................                                                        [100%]\n161 passed in 133.68s (0:02:13)\n"
+  ],
+  "completion_result": {
+    "chunk_id": "c7360d",
+    "wall_time_seconds": 0.000016321,
+    "exit_code": 0,
+    "original_token_count": 65,
+    "output": "........................................................... [ 44%]\n........................................................................ [ 89%]\n.................                                                        [100%]\n161 passed in 133.68s (0:02:13)\n"
+  },
+  "exit_code": 0,
+  "output": "........................................................................ [ 44%]\n........................................................................ [ 89%]\n.................                                                        [100%]\n161 passed in 133.68s (0:02:13)\n",
+  "export_boundary": "Output strings and native result metadata are preserved from the original completed tool calls. The command input is the original tool argument. This export does not recreate separate OS stdout/stderr streams."
+}

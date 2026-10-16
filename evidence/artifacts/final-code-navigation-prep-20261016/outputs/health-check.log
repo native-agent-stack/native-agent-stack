@@ -1,0 +1,102 @@
+INFO  2026-10-16 01:16:31,266 serena.config.serena_config:from_config_file:1075 - Loading Serena configuration from $SCRATCH/state/serena/serena_config.yml
+INFO  2026-10-16 01:16:31,315 serena.config.serena_config:start:329 - Project configuration auto-generation starting ...
+INFO  2026-10-16 01:16:31,315 serena.config.serena_config:autogenerate:450 - Project root: $SCRATCH/native-fixture
+INFO  2026-10-16 01:16:31,315 serena.config.serena_config:_determine_project_language_servers:369 - Determining suitable language servers for the project
+INFO  2026-10-16 01:16:31,316 serena.util.file_system:start:329 - Loading of .gitignore files starting ...
+INFO  2026-10-16 01:16:31,316 serena.util.file_system:_load_gitignore_files:239 - Processing .gitignore file: $SCRATCH/native-fixture/test_repo/.gitignore
+INFO  2026-10-16 01:16:31,317 serena.util.file_system:stop:336 - Loading of .gitignore files completed in 0.001 seconds
+INFO  2026-10-16 01:16:31,318 serena.config.serena_config:_determine_project_language_servers:380 - Project composition: {<LanguageServerId.PYTHON: 'python'>: 100.0}
+INFO  2026-10-16 01:16:31,318 serena.config.serena_config:_determine_project_language_servers:416 - Using language servers: [<LanguageServerId.PYTHON: 'python'>]
+INFO  2026-10-16 01:16:31,327 serena.config.serena_config:autogenerate:471 - Saving project configuration to $SCRATCH/native-fixture/.serena/project.yml
+INFO  2026-10-16 01:16:31,331 serena.config.serena_config:stop:336 - Project configuration auto-generation completed in 0.016 seconds
+INFO  2026-10-16 01:16:31,331 serena.project:__init__:48 - Serena project data folder: $SCRATCH/native-fixture/.serena
+INFO  2026-10-16 01:16:31,332 serena.project:__init__:70 - Creating .gitignore file in $SCRATCH/native-fixture/.serena/.gitignore
+INFO  2026-10-16 01:16:31,333 serena.project:start:329 - Gathering ignore spec for project native-fixture starting ...
+INFO  2026-10-16 01:16:31,333 serena.util.file_system:start:329 - Loading of .gitignore files starting ...
+INFO  2026-10-16 01:16:31,334 serena.util.file_system:_load_gitignore_files:239 - Processing .gitignore file: $SCRATCH/native-fixture/.serena/.gitignore
+INFO  2026-10-16 01:16:31,334 sensai.util.logging:add_file_logger:161 - Logging to $SCRATCH/native-fixture/.serena/logs/health-checks/health_check_20261016-011631.log ...
+INFO  2026-10-16 01:16:31,335 serena.util.file_system:_load_gitignore_files:239 - Processing .gitignore file: $SCRATCH/native-fixture/test_repo/.gitignore
+INFO  2026-10-16 01:16:31,335 serena.cli:health_check:984 - Starting health check for project: $SCRATCH/native-fixture
+INFO  2026-10-16 01:16:31,335 serena.cli:health_check:988 - Creating SerenaAgent with disabled dashboard...
+INFO  2026-10-16 01:16:31,337 serena.util.file_system:stop:336 - Loading of .gitignore files completed in 0.004 seconds
+INFO  2026-10-16 01:16:31,337 serena.project:stop:336 - Gathering ignore spec for project native-fixture completed in 0.005 seconds
+INFO  2026-10-16 01:16:31,423 serena.config.serena_config:from_config_file:1075 - Loading Serena configuration from $SCRATCH/state/serena/serena_config.yml
+INFO  2026-10-16 01:16:31,472 serena.agent:__init__:647 - Will record tool usage statistics with token count estimator: CHAR_COUNT.
+INFO  2026-10-16 01:16:31,478 serena.agent:__init__:651 - Starting Serena server (version=2.0.0.dev0-c6fbd1c5, process id=3836355, parent process id=3333268; language backend=LSP); Python version=3.13.16, platform=Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43
+INFO  2026-10-16 01:16:31,478 serena.agent:__init__:655 - Configuration file: $SCRATCH/state/serena/serena_config.yml
+INFO  2026-10-16 01:16:31,478 serena.agent:__init__:656 - Available projects: native-fixture, tmp7kvhy47n
+INFO  2026-10-16 01:16:31,478 serena.agent:__init__:657 - Loaded tools (53): create_text_file, replace_content, replace_in_files, delete_lines, replace_lines, insert_at_line, replace_symbol_body, insert_after_symbol, insert_before_symbol, read_file, list_dir, find_file, search_for_pattern, restart_language_server, get_symbols_overview, find_symbol, find_referencing_symbols, find_implementations, find_declaration, get_diagnostics_for_file, get_diagnostics_for_symbol, rename_symbol, safe_delete_symbol, write_memory, read_memory, list_memories, delete_memory, rename_memory, edit_memory, execute_shell_command, open_dashboard, activate_project, remove_project, get_current_config, onboarding, initial_instructions, serena_info, jet_brains_find_symbol, jet_brains_move, jet_brains_safe_delete, jet_brains_inline_symbol, jet_brains_find_referencing_symbols, jet_brains_get_symbols_overview, jet_brains_type_hierarchy, jet_brains_find_declaration, jet_brains_find_implementations, jet_brains_rename, jet_brains_debug, jet_brains_run_inspections, jet_brains_list_inspections, list_queryable_projects, query_project, serena_repl
+INFO  2026-10-16 01:16:31,478 serena.config.serena_config:determine_language_backend:1565 - Using language backend from global configuration: LSP
+INFO  2026-10-16 01:16:31,478 serena.config.serena_config:determine_agent_interface:1554 - Using agent interface 'tools' (global configuration)
+INFO  2026-10-16 01:16:31,501 serena.config.serena_config:start:329 - Loading project instance for RegisteredProject[project_root=$SCRATCH/native-fixture, project_config=ProjectConfig[project_name=native-fixture]] starting ...
+INFO  2026-10-16 01:16:31,501 serena.project:__init__:48 - Serena project data folder: $SCRATCH/native-fixture/.serena
+INFO  2026-10-16 01:16:31,501 serena.project:start:329 - Gathering ignore spec for project native-fixture starting ...
+INFO  2026-10-16 01:16:31,501 serena.util.file_system:start:329 - Loading of .gitignore files starting ...
+INFO  2026-10-16 01:16:31,502 serena.config.serena_config:stop:336 - Loading project instance for RegisteredProject[project_root=$SCRATCH/native-fixture, project_config=ProjectConfig[project_name=native-fixture]] completed in 0.001 seconds
+INFO  2026-10-16 01:16:31,502 serena.agent:activate_project_from_path_or_name:1529 - Found registered project 'native-fixture' at path $SCRATCH/native-fixture
+INFO  2026-10-16 01:16:31,502 serena.agent:_activate_project:1417 - Activating native-fixture at $SCRATCH/native-fixture
+INFO  2026-10-16 01:16:31,502 serena.task_executor:issue_task:219 - Scheduling Task-1:init_project_services
+INFO  2026-10-16 01:16:31,502 serena.agent:_update_active_modes:1281 - Active modes (2): editing, interactive
+INFO  2026-10-16 01:16:31,504 serena.util.file_system:_load_gitignore_files:239 - Processing .gitignore file: $SCRATCH/native-fixture/.serena/.gitignore
+INFO  2026-10-16 01:16:31,506 serena.agent:_create_base_toolset:858 - Number of exposed tools: 29
+INFO  2026-10-16 01:16:31,518 serena.agent:__init__:708 - Number of exposed tools: 29. Exposed tools: ['activate_project', 'create_text_file', 'delete_memory', 'edit_memory', 'execute_shell_command', 'find_declaration', 'find_file', 'find_implementations', 'find_referencing_symbols', 'find_symbol', 'get_current_config', 'get_diagnostics_for_file', 'get_symbols_overview', 'initial_instructions', 'insert_after_symbol', 'insert_before_symbol', 'list_dir', 'list_memories', 'onboarding', 'read_file', 'read_memory', 'rename_memory', 'rename_symbol', 'replace_content', 'replace_in_files', 'replace_symbol_body', 'safe_delete_symbol', 'search_for_pattern', 'write_memory']
+INFO  2026-10-16 01:16:31,519 serena.agent:_update_active_tools:1304 - Active tools (29): activate_project, create_text_file, delete_memory, edit_memory, execute_shell_command, find_declaration, find_file, find_implementations, find_referencing_symbols, find_symbol, get_current_config, get_diagnostics_for_file, get_symbols_overview, initial_instructions, insert_after_symbol, insert_before_symbol, list_dir, list_memories, onboarding, read_file, read_memory, rename_memory, rename_symbol, replace_content, replace_in_files, replace_symbol_body, safe_delete_symbol, search_for_pattern, write_memory
+INFO  2026-10-16 01:16:31,520 serena.util.file_system:_load_gitignore_files:239 - Processing .gitignore file: $SCRATCH/native-fixture/test_repo/.gitignore
+INFO  2026-10-16 01:16:31,523 serena.util.file_system:stop:336 - Loading of .gitignore files completed in 0.022 seconds
+INFO  2026-10-16 01:16:31,524 serena.project:stop:336 - Gathering ignore spec for project native-fixture completed in 0.022 seconds
+INFO  2026-10-16 01:16:31,579 serena.task_executor:_process_task_queue:141 - Starting execution of Task-1:init_project_services
+INFO  2026-10-16 01:16:31,579 serena.task_executor:start:329 - Task-1:init_project_services starting ...
+INFO  2026-10-16 01:16:31,580 serena.lsp.lsp_backend:start:329 - Language server initialization starting ...
+INFO  2026-10-16 01:16:31,580 serena.project:create_language_server_manager:509 - Creating language server manager for $SCRATCH/native-fixture
+INFO  2026-10-16 01:16:31,580 sensai.util.logging:start:329 - Language server startup (ls_id=python) starting ...
+INFO  2026-10-16 01:16:31,580 serena.ls_manager:create_language_server:60 - Creating language server instance for $SCRATCH/native-fixture, language=python.
+INFO  2026-10-16 01:16:31,585 solidlsp.ls:start:3200 - Starting language server python for $SCRATCH/native-fixture
+INFO  2026-10-16 01:16:31,585 solidlsp.language_servers.pyright_server:_start_server:217 - Starting pyright-langserver server process
+INFO  2026-10-16 01:16:31,585 solidlsp.ls_process:_start:521 - Starting language server process via command: ['$UV_BIN/uvx', '-p', '3.13', '--from', 'pyright==1.1.403', 'pyright-langserver', '--stdio']
+INFO  2026-10-16 01:16:31,606 solidlsp.initialize_params:_apply_updates:63 - Workspace folders: ['$SCRATCH/native-fixture']
+INFO  2026-10-16 01:16:31,607 solidlsp.language_servers.pyright_server:_start_server:223 - Sending initialize request from LSP client to pyright server and awaiting response
+INFO  2026-10-16 01:16:31,870 serena.cli:health_check:991 - SerenaAgent created successfully
+INFO  2026-10-16 01:16:31,870 serena.cli:health_check:994 - Searching for analyzable files...
+INFO  2026-10-16 01:16:31,873 serena.cli:health_check:1003 - Found analyzable file: test_repo/custom_test/advanced_features.py
+INFO  2026-10-16 01:16:31,873 serena.cli:health_check:1014 - Testing get_symbols_overview on file: test_repo/custom_test/advanced_features.py
+INFO  2026-10-16 01:16:31,873 serena.task_executor:issue_task:219 - Scheduling Task-2:<lambda>
+INFO  2026-10-16 01:16:31,965 solidlsp.language_servers.pyright_server:window_log_message:139 - LSP: window/logMessage: Pyright language server 1.1.403 starting
+INFO  2026-10-16 01:16:31,966 solidlsp.language_servers.pyright_server:window_log_message:139 - LSP: window/logMessage: Server root directory: file://$SCRATCH/cache/uv/archive-v0/JSye4e8E7aeJkeMZ/lib/python3.13/site-packages/pyright/dist/dist
+INFO  2026-10-16 01:16:31,972 solidlsp.language_servers.pyright_server:window_log_message:139 - LSP: window/logMessage: Starting service instance "native-fixture"
+INFO  2026-10-16 01:16:31,972 solidlsp.language_servers.pyright_server:_start_server:225 - Received initialize response from pyright server: {'capabilities': {'textDocumentSync': 2, 'definitionProvider': {'workDoneProgress': True}, 'declarationProvider': {'workDoneProgress': True}, 'typeDefinitionProvider': {'workDoneProgress': True}, 'referencesProvider': {'workDoneProgress': True}, 'documentSymbolProvider': {'workDoneProgress': True}, 'workspaceSymbolProvider': {'workDoneProgress': True}, 'hoverProvider': {'workDoneProgress': True}, 'documentHighlightProvider': {'workDoneProgress': True}, 'renameProvider': {'prepareProvider': True, 'workDoneProgress': True}, 'completionProvider': {'triggerCharacters': ['.', '[', '"', "'"], 'resolveProvider': True, 'workDoneProgress': True, 'completionItem': {'labelDetailsSupport': True}}, 'signatureHelpProvider': {'triggerCharacters': ['(', ',', ')'], 'workDoneProgress': True}, 'codeActionProvider': {'codeActionKinds': ['quickfix', 'source.organizeImports'], 'workDoneProgress': True}, 'executeCommandProvider': {'commands': [], 'workDoneProgress': True}, 'callHierarchyProvider': True, 'workspace': {'workspaceFolders': {'supported': True, 'changeNotifications': True}}}}
+INFO  2026-10-16 01:16:31,973 solidlsp.language_servers.pyright_server:_start_server:237 - Waiting up to 60.0s for Pyright to complete initial workspace analysis...
+INFO  2026-10-16 01:16:32,127 solidlsp.language_servers.pyright_server:window_log_message:139 - LSP: window/logMessage: No include entries specified; assuming $SCRATCH/native-fixture
+INFO  2026-10-16 01:16:32,128 solidlsp.language_servers.pyright_server:window_log_message:139 - LSP: window/logMessage: Auto-excluding **/node_modules
+INFO  2026-10-16 01:16:32,128 solidlsp.language_servers.pyright_server:window_log_message:139 - LSP: window/logMessage: Auto-excluding **/__pycache__
+INFO  2026-10-16 01:16:32,128 solidlsp.language_servers.pyright_server:window_log_message:139 - LSP: window/logMessage: Auto-excluding **/.*
+INFO  2026-10-16 01:16:32,128 solidlsp.language_servers.pyright_server:window_log_message:139 - LSP: window/logMessage: Assuming Python version 3.13.16.final.0
+INFO  2026-10-16 01:16:32,128 solidlsp.language_servers.pyright_server:window_log_message:139 - LSP: window/logMessage: Found 18 source files
+INFO  2026-10-16 01:16:32,128 solidlsp.language_servers.pyright_server:window_log_message:144 - Pyright workspace scanning complete
+INFO  2026-10-16 01:16:32,128 solidlsp.language_servers.pyright_server:_start_server:239 - Pyright initial analysis complete, server ready
+INFO  2026-10-16 01:16:32,129 sensai.util.logging:stop:336 - Language server startup (ls_id=python) completed in 0.548 seconds
+INFO  2026-10-16 01:16:32,129 sensai.util.logging:start:329 - Initialising file change notifier (polling for baseline) starting ...
+INFO  2026-10-16 01:16:32,131 sensai.util.logging:stop:336 - Initialising file change notifier (polling for baseline) completed in 0.002 seconds
+INFO  2026-10-16 01:16:32,132 serena.lsp.lsp_backend:stop:336 - Language server initialization completed in 0.552 seconds
+INFO  2026-10-16 01:16:32,132 serena.task_executor:stop:336 - Task-1:init_project_services completed in 0.552 seconds
+INFO  2026-10-16 01:16:32,132 serena.task_executor:_process_task_queue:141 - Starting execution of Task-2:<lambda>
+INFO  2026-10-16 01:16:32,133 serena.task_executor:start:329 - Task-2:<lambda> starting ...
+INFO  2026-10-16 01:16:32,342 serena.task_executor:stop:336 - Task-2:<lambda> completed in 0.210 seconds
+INFO  2026-10-16 01:16:32,343 serena.cli:health_check:1016 - get_symbols_overview returned: {"Constant": ["T", "K", "V"], "Variable": ["UserId", "ItemId", "PathLike", "JsonDict", "ValidatedString", "PositiveInt"], "Class": ["UserDict", "Status", "Priority", "Permissions", "BaseProcessor", "DataProcessor", "Task", "Repository", "Serializable", "OuterClass", "Meta", "WithMeta", "TreeNode"], "Function": ["log_execution", "transaction_context", "advanced_search", "create_processor", "with_retry", "unreliable_operation", "process_validated_data", "main"]}
+INFO  2026-10-16 01:16:32,344 serena.cli:health_check:1031 - Using symbol for testing: UserDict (kind: Class)
+INFO  2026-10-16 01:16:32,344 serena.cli:health_check:1034 - Testing find_symbol for symbol: UserDict
+INFO  2026-10-16 01:16:32,344 serena.task_executor:issue_task:219 - Scheduling Task-3:<lambda>
+INFO  2026-10-16 01:16:32,444 serena.task_executor:_process_task_queue:141 - Starting execution of Task-3:<lambda>
+INFO  2026-10-16 01:16:32,444 serena.task_executor:start:329 - Task-3:<lambda> starting ...
+INFO  2026-10-16 01:16:32,445 serena.task_executor:stop:336 - Task-3:<lambda> completed in 0.001 seconds
+INFO  2026-10-16 01:16:32,446 serena.cli:health_check:1040 - find_symbol found 1 matches for symbol UserDict
+INFO  2026-10-16 01:16:32,446 serena.cli:health_check:1045 - Testing find_referencing_symbols for symbol: UserDict
+INFO  2026-10-16 01:16:32,446 serena.task_executor:issue_task:219 - Scheduling Task-4:<lambda>
+INFO  2026-10-16 01:16:32,546 serena.task_executor:_process_task_queue:141 - Starting execution of Task-4:<lambda>
+INFO  2026-10-16 01:16:32,546 serena.task_executor:start:329 - Task-4:<lambda> starting ...
+INFO  2026-10-16 01:16:32,547 serena.ls_manager:sync_file_system_changes:281 - Polling file system for changes to source files ...
+INFO  2026-10-16 01:16:32,549 serena.ls_manager:sync_file_system_changes:283 - File system polling complete; 0 change events sent to language servers.
+INFO  2026-10-16 01:16:34,571 serena.task_executor:stop:336 - Task-4:<lambda> completed in 2.025 seconds
+INFO  2026-10-16 01:16:34,572 serena.cli:health_check:1052 - find_referencing_symbols found 0 references for symbol UserDict
+INFO  2026-10-16 01:16:34,572 serena.cli:health_check:1061 - Health check completed successfully
+Log saved to: $SCRATCH/native-fixture/.serena/logs/health-checks/health_check_20261016-011631.log
+✅ Health check passed - All tools working correctly

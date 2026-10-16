@@ -1,0 +1,27 @@
+{
+  "format": "native-exec-tool-export/1",
+  "name": "source-pin",
+  "recorder": "tools.exec_command / tools.write_stdin",
+  "command": {
+    "cmd": "git rev-parse HEAD",
+    "workdir": "$SCRATCH/serena"
+  },
+  "initial_result": {
+    "chunk_id": "1741da",
+    "wall_time_seconds": 0.000014281,
+    "exit_code": 0,
+    "original_token_count": 11,
+    "output": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143\n"
+  },
+  "subsequent_output_chunks": [],
+  "completion_result": {
+    "chunk_id": "1741da",
+    "wall_time_seconds": 0.000014281,
+    "exit_code": 0,
+    "original_token_count": 11,
+    "output": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143\n"
+  },
+  "exit_code": 0,
+  "output": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143\n",
+  "export_boundary": "Output strings and native result metadata are preserved from the original completed tool calls. The command input is the original tool argument. This export does not recreate separate OS stdout/stderr streams."
+}

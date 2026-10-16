@@ -1,0 +1,29 @@
+{
+  "format": "native-exec-tool-export/1",
+  "name": "scratch-version",
+  "recorder": "tools.exec_command / tools.write_stdin",
+  "command": {
+    "cmd": "env PATH=$UV_BIN:$NODE_BIN:$SCRATCH/serena/.venv/bin:$PATH SERENA_HOME=$SCRATCH/state/serena XDG_CACHE_HOME=$SCRATCH/cache XDG_CONFIG_HOME=$SCRATCH/config XDG_DATA_HOME=$SCRATCH/data UV_CACHE_DIR=$SCRATCH/cache/uv UV_PYTHON_INSTALL_DIR=$SCRATCH/python TMPDIR=$SCRATCH/tmp .venv/bin/serena --version",
+    "workdir": "$SCRATCH/serena"
+  },
+  "initial_result": {
+    "chunk_id": "602afb",
+    "wall_time_seconds": 1.000312892,
+    "session_id": 67100,
+    "original_token_count": 0,
+    "output": ""
+  },
+  "subsequent_output_chunks": [
+    "Serena 2.0.0.dev0-c6fbd1c5\n"
+  ],
+  "completion_result": {
+    "chunk_id": "1b278c",
+    "wall_time_seconds": 0.00000833,
+    "exit_code": 0,
+    "original_token_count": 7,
+    "output": "Serena 2.0.0.dev0-c6fbd1c5\n"
+  },
+  "exit_code": 0,
+  "output": "Serena 2.0.0.dev0-c6fbd1c5\n",
+  "export_boundary": "Output strings and native result metadata are preserved from the original completed tool calls. The command input is the original tool argument. This export does not recreate separate OS stdout/stderr streams."
+}

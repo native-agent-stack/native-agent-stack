@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "kind": "masked_native_capture_manifest",
+  "masked": true,
+  "rule": "mask_capture.py",
+  "test": "test_mask_capture.py",
+  "source_contract": {
+    "repository": "https://github.com/native-agent-stack/native-agent-stack",
+    "pin": "30542e70560147c19049016d19aa3f264515c92f",
+    "path": "scripts/host_receipts.py",
+    "line": 1012
+  },
+  "raw_capture_custody": {
+    "name": "code-navigation-native-capture-20261016",
+    "visibility": "private",
+    "digests": "Recorded privately in RAW-SHA256SUMS; no raw capture digest is published.",
+    "export_boundary": "The session retained the completed native exec tool results. These private exports preserve their output fields verbatim. The tool exposes merged text, not separate original OS stdout/stderr streams.",
+    "co_op_reproduction": "co-op private check PASS 2026-10-16"
+  },
+  "rule_description": "Literal UTF-8 path-prefix substitutions with marked $PLACEHOLDER names, longest prefix first; all other bytes are preserved. Private alias bindings are supplied to the published script. No synthetic output, summaries, excerpts or line-ending normalization enter the measured outputs.",
+  "commands": "The exact command and cwd are in each private .capture.json. The public captures/ derivative masks those fields with marked placeholders.",
+  "captures": [
+    {
+      "name": "venv",
+      "raw_record_name": "venv.capture.json",
+      "raw_output_name": "venv.raw.txt",
+      "published_record": "evidence/artifacts/final-code-navigation-prep-20261016/captures/venv.json",
+      "published_output": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/venv.log",
+      "exit_code": 0,
+      "exit_code_source": {
+        "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/venv.json",
+        "line": 24
+      },
+      "reproduction_status": "co-op private check PASS 2026-10-16"
+    },
+    {
+      "name": "install-first",
+      "raw_record_name": "install-first.capture.json",
+      "raw_output_name": "install-first.raw.txt",
+      "published_record": "evidence/artifacts/final-code-navigation-prep-20261016/captures/install-first.json",
+      "published_output": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/install-first.log",
+      "exit_code": 1,
+      "exit_code_source": {
+        "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/install-first.json",
+        "line": 24
+      },
+      "reproduction_status": "co-op private check PASS 2026-10-16"
+    },
+    {
+      "name": "install",
+      "raw_record_name": "install.capture.json",
+      "raw_output_name": "install.raw.txt",
+      "published_record": "evidence/artifacts/final-code-navigation-prep-20261016/captures/install.json",
+      "published_output": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/install.log",
+      "exit_code": 0,
+      "exit_code_source": {
+        "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/install.json",
+        "line": 26
+      },
+      "reproduction_status": "co-op private check PASS 2026-10-16"
+    },
+    {
+      "name": "core-first",
+      "raw_record_name": "core-first.capture.json",
+      "raw_output_name": "core-first.raw.txt",
+      "published_record": "evidence/artifacts/final-code-navigation-prep-20261016/captures/core-first.json",
+      "published_output": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/core-first.log",
+      "exit_code": 1,
+      "exit_code_source": {
+        "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/core-first.json",
+        "line": 26
+      },
+      "reproduction_status": "co-op private check PASS 2026-10-16"
+    },
+    {
+      "name": "core-pass",
+      "raw_record_name": "core-pass.capture.json",
+      "raw_output_name": "core-pass.raw.txt",
+      "published_record": "evidence/artifacts/final-code-navigation-prep-20261016/captures/core-pass.json",
+      "published_output": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/core-pass.log",
+      "exit_code": 0,
+      "exit_code_source": {
+        "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/core-pass.json",
+        "line": 28
+      },
+      "reproduction_status": "co-op private check PASS 2026-10-16"
+    },
+    {
+      "name": "health-check",
+      "raw_record_name": "health-check.capture.json",
+      "raw_output_name": "health-check.raw.txt",
+      "published_record": "evidence/artifacts/final-code-navigation-prep-20261016/captures/health-check.json",
+      "published_output": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+      "exit_code": 0,
+      "exit_code_source": {
+        "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/health-check.json",
+        "line": 26
+      },
+      "reproduction_status": "co-op private check PASS 2026-10-16"
+    },
+    {
+      "name": "host-version",
+      "raw_record_name": "host-version.capture.json",
+      "raw_output_name": "host-version.raw.txt",
+      "published_record": "evidence/artifacts/final-code-navigation-prep-20261016/captures/host-version.json",
+      "published_output": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/host-version.txt",
+      "exit_code": 0,
+      "exit_code_source": {
+        "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/host-version.json",
+        "line": 26
+      },
+      "reproduction_status": "co-op private check PASS 2026-10-16"
+    },
+    {
+      "name": "scratch-version",
+      "raw_record_name": "scratch-version.capture.json",
+      "raw_output_name": "scratch-version.raw.txt",
+      "published_record": "evidence/artifacts/final-code-navigation-prep-20261016/captures/scratch-version.json",
+      "published_output": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/scratch-version.txt",
+      "exit_code": 0,
+      "exit_code_source": {
+        "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/scratch-version.json",
+        "line": 26
+      },
+      "reproduction_status": "co-op private check PASS 2026-10-16"
+    },
+    {
+      "name": "source-pin",
+      "raw_record_name": "source-pin.capture.json",
+      "raw_output_name": "source-pin.raw.txt",
+      "published_record": "evidence/artifacts/final-code-navigation-prep-20261016/captures/source-pin.json",
+      "published_output": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/source-pin.txt",
+      "exit_code": 0,
+      "exit_code_source": {
+        "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/source-pin.json",
+        "line": 24
+      },
+      "reproduction_status": "co-op private check PASS 2026-10-16"
+    }
+  ],
+  "published_files": [
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/core-first.json",
+      "bytes": 108366,
+      "sha256": "25faa44663e28415314b3eca6f7213b30d95222fdd8adb1a1e9dc20bcdc1402b"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/core-pass.json",
+      "bytes": 2178,
+      "sha256": "a63defc7021f4d019d2fa81a59ee34fc0ad5d8fec0fc239025b9a0a915b80117"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/health-check.json",
+      "bytes": 52836,
+      "sha256": "ace13edcecc7287f3d8f57762f523a884b80483a3a19e2f2359a2ee1f056de88"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/host-version.json",
+      "bytes": 876,
+      "sha256": "c870bb92d53444797192cd1be03142fa9c8d6dc64826ab7304e33d572c6457fb"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/install-first.json",
+      "bytes": 1897,
+      "sha256": "c10f2cb7237bcdcb24ff0feda106f079f2cd22ff1bdb4a0a2b63672e95440b67"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/install.json",
+      "bytes": 16342,
+      "sha256": "d5473b1d7e0e79114f1a2f6b7d14c2ea3fddfd3d667a5dcc9c1bded9883a6798"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/scratch-version.json",
+      "bytes": 1216,
+      "sha256": "624770d6136ff6be917d0ce71894f4ee04082dcf79b0deb53f873c35b68a75f8"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/source-pin.json",
+      "bytes": 961,
+      "sha256": "02059975b39db2bdff3d2fbdf4073b781845fa52aad8da46f64a66387c1292e8"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/venv.json",
+      "bytes": 1158,
+      "sha256": "ae98221caa30f41dc52e634c652bb8648fe17eb38d943313c7b41540a6ffb061"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/mask_capture.py",
+      "bytes": 2221,
+      "sha256": "7375804d0f255767ac1abba28f9ae534b61485a73675e26a220515121cdcb036"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/core-first.log",
+      "bytes": 35354,
+      "sha256": "06ae05ea25fe700ad878bd7fc82d5e55325498b243e6e4c032470cda3a8e7473"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/core-pass.log",
+      "bytes": 272,
+      "sha256": "33124fc43db2dac4d373269527ff90cef5c8da4f712be764df6bc19485cc60ed"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+      "bytes": 17048,
+      "sha256": "1cfbe764ada2a6a448524583b7c27269d186ecb78cdaa8ca16c3ab2643b1744e"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/host-version.txt",
+      "bytes": 18,
+      "sha256": "13abec14b6680dacd84831b99acc41f6c4aaa87b261cd610bb3ad13025a7028b"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/install-first.log",
+      "bytes": 284,
+      "sha256": "5cd20a83982aab842c318d8c70d30572885a77f5d8c386b89e0c7389dd49392a"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/install.log",
+      "bytes": 5156,
+      "sha256": "f92919f0efa5b6a570f0a5ac13a562599a171a4ed24ab674ad8713eb5a4eae22"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/scratch-version.txt",
+      "bytes": 27,
+      "sha256": "0cde111825a432d4c75881440c84e0ae1108be4e0ceda94206d801f02d5f1b7d"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/source-pin.txt",
+      "bytes": 41,
+      "sha256": "36819dae2fc13a4f2ef9da9199f34a50177429e92f7ed49a154906c26f46aeba"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/venv.log",
+      "bytes": 85,
+      "sha256": "e6c18d99837c574e31a85ba3c65809c1878a6effc0a1ff824c819d81b19a698f"
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/test_mask_capture.py",
+      "bytes": 2214,
+      "sha256": "833dcdd248edff8a588f5725fbc273e60ebc2433b74c10a650f6f871bd747fbc"
+    }
+  ],
+  "gaps": [
+    "Original acquisition, fixture-copy and git-diff native captures were not retained.",
+    "The health-check has no retained recorder-bounded UTC invocation window; the former broad preparation timestamps have been removed.",
+    "Primary API date, independent uv/node version and OS/platform captures are absent."
+  ]
+}

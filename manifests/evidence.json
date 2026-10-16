@@ -2,6 +2,22 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "final-code-navigation-prep-20261016",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "serena"
+      ],
+      "claim": "At the retained deployment source identity, an isolated Serena development install passed 161 upstream core tests and one vendor native Python navigation health-check. Masked native captures retain the real commands, return codes and outputs; the preparation also reconciles run-pin drift and the three cumulative sweep survivors.",
+      "limitations": [
+        "This is bounded preparation evidence. Comparative A6, full-language and macOS coverage, organic client adoption and a recorder-bounded UTC invocation window remain unmeasured.",
+        "The vendor health-check returned one symbol match and zero incoming references for its chosen imported UserDict symbol; it does not establish exhaustive reference correctness.",
+        "The deployed Serena source pin differs from the immutable W6 comparison pin; that comparison remains unexecuted and unchanged.",
+        "Original acquisition, fixture-copy, git-diff and packet-generator native captures were not retained; their former return/count assertions were withdrawn. API date and independent uv/node/platform captures remain gaps.",
+        "The six-angle record is unscored and unadjudicated. This record changes no winner, default, run pin, platform status or FINAL marker."
+      ],
+      "path": "evidence/receipts/final-code-navigation-prep-20261016.json"
+    },
+    {
       "id": "decision-record-index-20261008",
       "kind": "artifact_measurement",
       "component_ids": [
@@ -22900,6 +22916,156 @@
       "path": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
       "sha256": "45cd2b5c580d6f65aaf8eafd80d9412295e40de275dc8a5356d08f8deadb05a7",
       "bytes": 319713
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/.gitattributes",
+      "sha256": "eec0e991d53a10c28dd1d34d15ea6f20f98863e28cbea41672ff67088b63618b",
+      "bytes": 171
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/MASKING.md",
+      "sha256": "e8204cbee6f5ef544beb9aa5c72382652f8a2604973c46dc609bd4012886c5de",
+      "bytes": 3098
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/README.md",
+      "sha256": "8fbccceb0ee39d8cd57c43ea6d7734c1cb60fdf28104c49e01f7100c04776420",
+      "bytes": 5559
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/core-first.json",
+      "sha256": "25faa44663e28415314b3eca6f7213b30d95222fdd8adb1a1e9dc20bcdc1402b",
+      "bytes": 108366
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/core-pass.json",
+      "sha256": "a63defc7021f4d019d2fa81a59ee34fc0ad5d8fec0fc239025b9a0a915b80117",
+      "bytes": 2178
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/health-check.json",
+      "sha256": "ace13edcecc7287f3d8f57762f523a884b80483a3a19e2f2359a2ee1f056de88",
+      "bytes": 52836
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/host-version.json",
+      "sha256": "c870bb92d53444797192cd1be03142fa9c8d6dc64826ab7304e33d572c6457fb",
+      "bytes": 876
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/install-first.json",
+      "sha256": "c10f2cb7237bcdcb24ff0feda106f079f2cd22ff1bdb4a0a2b63672e95440b67",
+      "bytes": 1897
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/install.json",
+      "sha256": "d5473b1d7e0e79114f1a2f6b7d14c2ea3fddfd3d667a5dcc9c1bded9883a6798",
+      "bytes": 16342
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/scratch-version.json",
+      "sha256": "624770d6136ff6be917d0ce71894f4ee04082dcf79b0deb53f873c35b68a75f8",
+      "bytes": 1216
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/source-pin.json",
+      "sha256": "02059975b39db2bdff3d2fbdf4073b781845fa52aad8da46f64a66387c1292e8",
+      "bytes": 961
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/venv.json",
+      "sha256": "ae98221caa30f41dc52e634c652bb8648fe17eb38d943313c7b41540a6ffb061",
+      "bytes": 1158
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/invocation.json",
+      "sha256": "94d7c0ecc6ecf5079596a8b5d5a8bc918ccf64cfddeb55e296cafcaf16c099ee",
+      "bytes": 4670
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/lane-packet.json",
+      "sha256": "36320d898c1307613133d6f62fc0ecd456fd0eb7572a0909c67844280b32620c",
+      "bytes": 40987
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/mask_capture.py",
+      "sha256": "7375804d0f255767ac1abba28f9ae534b61485a73675e26a220515121cdcb036",
+      "bytes": 2221
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/masked-captures.json",
+      "sha256": "21557a520200baa9854cb4d3192de58a59aa5e04f26d078e8a8d168ec7b135da",
+      "bytes": 11372
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/multi-angle-draft.json",
+      "sha256": "048aa7e3674e5a1cb79ce5f118e0d1fdb3e28e615f1dbef5b3788245cacc90cd",
+      "bytes": 26680
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/core-first.log",
+      "sha256": "06ae05ea25fe700ad878bd7fc82d5e55325498b243e6e4c032470cda3a8e7473",
+      "bytes": 35354
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/core-pass.log",
+      "sha256": "33124fc43db2dac4d373269527ff90cef5c8da4f712be764df6bc19485cc60ed",
+      "bytes": 272
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+      "sha256": "1cfbe764ada2a6a448524583b7c27269d186ecb78cdaa8ca16c3ab2643b1744e",
+      "bytes": 17048
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/host-version.txt",
+      "sha256": "13abec14b6680dacd84831b99acc41f6c4aaa87b261cd610bb3ad13025a7028b",
+      "bytes": 18
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/install-first.log",
+      "sha256": "5cd20a83982aab842c318d8c70d30572885a77f5d8c386b89e0c7389dd49392a",
+      "bytes": 284
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/install.log",
+      "sha256": "f92919f0efa5b6a570f0a5ac13a562599a171a4ed24ab674ad8713eb5a4eae22",
+      "bytes": 5156
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/scratch-version.txt",
+      "sha256": "0cde111825a432d4c75881440c84e0ae1108be4e0ceda94206d801f02d5f1b7d",
+      "bytes": 27
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/source-pin.txt",
+      "sha256": "36819dae2fc13a4f2ef9da9199f34a50177429e92f7ed49a154906c26f46aeba",
+      "bytes": 41
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/venv.log",
+      "sha256": "e6c18d99837c574e31a85ba3c65809c1878a6effc0a1ff824c819d81b19a698f",
+      "bytes": 85
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/pin-reconciliation.json",
+      "sha256": "a9fbb374d91d4773e30fa80beef4b87ce9bfbb1926532e3c37eb857fc4cba392",
+      "bytes": 9872
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/resolution-inputs.json",
+      "sha256": "67ad711fdd99dda87a9345be04e19b854bc7520e21a09e9ad7bd821eb013ab19",
+      "bytes": 28685
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/test_mask_capture.py",
+      "sha256": "833dcdd248edff8a588f5725fbc273e60ebc2433b74c10a650f6f871bd747fbc",
+      "bytes": 2214
+    },
+    {
+      "path": "evidence/artifacts/final-code-navigation-prep-20261016/upstream-e2e.json",
+      "sha256": "eb8e68a9fb5df2e0ba4048ff38cbc6d2e08b7187b4119ae418c3fa67ccc85a78",
+      "bytes": 15474
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
@@ -60685,6 +60851,11 @@
       "path": "evidence/receipts/exchange-calendars-native-check-20260922.json",
       "sha256": "ee5ec2a85edf415b1c440c2704b3252c348fe3da9ff01d83a9266b711c2b9efe",
       "bytes": 3320
+    },
+    {
+      "path": "evidence/receipts/final-code-navigation-prep-20261016.json",
+      "sha256": "d130e7149a1192c477eb9c0a8b4d3ad9cb4943906be845c2ae705af74581059c",
+      "bytes": 6012
     },
     {
       "path": "evidence/receipts/foundation-catalog-ui-20260920.json",

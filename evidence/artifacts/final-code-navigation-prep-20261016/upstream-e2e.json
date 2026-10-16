@@ -1,0 +1,341 @@
+{
+  "schema_version": 1,
+  "kind": "upstream_e2e",
+  "evidence_class": "native_proven",
+  "success": true,
+  "repository": "https://github.com/oraios/serena",
+  "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+  "catalog": "foundation",
+  "layer_id": "code-navigation",
+  "recorded_at": "2026-10-16T05:20:54Z",
+  "platform": "linux-wsl2-x86_64",
+  "scope": "Bounded upstream core/CLI/MCP-schema/symbol-unit subset plus the vendor's native project health-check on a copied upstream Python fixture. No matched comparison or complete multi-language test matrix.",
+  "sources": [
+    {
+      "kind": "repo",
+      "repository": "https://github.com/oraios/serena",
+      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "path": "CONTRIBUTING.md",
+      "line": 59
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/oraios/serena",
+      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "path": "CONTRIBUTING.md",
+      "line": 63
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/oraios/serena",
+      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "path": "pyproject.toml",
+      "line": 169
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/oraios/serena",
+      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "path": "src/serena/cli.py",
+      "line": 957
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/oraios/serena",
+      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "path": "src/solidlsp/language_servers/pyright_server.py",
+      "line": 47
+    }
+  ],
+  "isolation": {
+    "prefix": "$SCRATCH",
+    "prefix_type": "disposable directory under /var/tmp",
+    "source_checkout": "$SCRATCH/serena",
+    "venv": "$SCRATCH/serena/.venv",
+    "environment": {
+      "SERENA_HOME": "$SCRATCH/state/serena",
+      "XDG_CACHE_HOME": "$SCRATCH/cache",
+      "XDG_CONFIG_HOME": "$SCRATCH/config",
+      "XDG_DATA_HOME": "$SCRATCH/data",
+      "UV_CACHE_DIR": "$SCRATCH/cache/uv",
+      "UV_PYTHON_INSTALL_DIR": "$SCRATCH/python",
+      "TMPDIR": "$SCRATCH/tmp",
+      "PATH": "$UV_BIN:$NODE_BIN:$SCRATCH/serena/.venv/bin:$PATH"
+    },
+    "python": "CPython 3.13.16 (existing interpreter, read-only)",
+    "uv": "Existing executable named by the native command; an independent uv version capture is absent.",
+    "node": "Existing executable directory named in PATH; an independent node version capture is absent.",
+    "candidate_install_outside_scratch": false,
+    "global_install": false,
+    "service_enabled": false,
+    "credential_read": false,
+    "model_call": false,
+    "retention": "Retained only inside the disposable scratch for review; no host promotion.",
+    "platform_capture_gap": "The platform label is environment context; an independent native OS/platform capture is absent.",
+    "assertion_boundary": "The issued commands target scratch. This is a command-scope statement, rather than an independent full-host change audit."
+  },
+  "commands": [
+    {
+      "phase": "install",
+      "command": "env UV_CACHE_DIR=$SCRATCH/cache/uv UV_PYTHON_INSTALL_DIR=$SCRATCH/python uv venv -p 3.13",
+      "cwd": "$SCRATCH/serena",
+      "exit_code": 0,
+      "native_capture": "venv.capture.json",
+      "output": "outputs/venv.log",
+      "value_sources": [
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/venv.json",
+          "line": 6
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/venv.json",
+          "line": 24
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/venv.log",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "phase": "install",
+      "command": "env UV_CACHE_DIR=$SCRATCH/cache/uv UV_PYTHON_INSTALL_DIR=$SCRATCH/python SERENA_HOME=$SCRATCH/state/serena XDG_CACHE_HOME=$SCRATCH/cache XDG_CONFIG_HOME=$SCRATCH/config XDG_DATA_HOME=$SCRATCH/data $UV_BIN/uv sync --extra dev",
+      "cwd": "$SCRATCH/serena",
+      "exit_code": 0,
+      "native_capture": "install.capture.json",
+      "output": "outputs/install.log",
+      "value_sources": [
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/install.json",
+          "line": 6
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/install.json",
+          "line": 26
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/install.log",
+          "line": 1
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/install.log",
+          "line": 38
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/install.log",
+          "line": 39
+        }
+      ],
+      "counts": {
+        "resolved_packages": 209,
+        "prepared_packages": 180,
+        "installed_packages": 180
+      }
+    },
+    {
+      "phase": "test",
+      "command": "env PATH=$UV_BIN:$NODE_BIN:$SCRATCH/serena/.venv/bin:$PATH SERENA_HOME=$SCRATCH/state/serena XDG_CACHE_HOME=$SCRATCH/cache XDG_CONFIG_HOME=$SCRATCH/config XDG_DATA_HOME=$SCRATCH/data UV_CACHE_DIR=$SCRATCH/cache/uv UV_PYTHON_INSTALL_DIR=$SCRATCH/python TMPDIR=$SCRATCH/tmp .venv/bin/python -m pytest test/serena/test_cli_project_commands.py test/serena/test_mcp.py test/serena/test_tool_parameter_types.py test/serena/test_symbol.py::TestSymbolNameMatching test/serena/test_symbol.py::TestSymbolDictTypes -q --tb=short",
+      "cwd": "$SCRATCH/serena",
+      "exit_code": 0,
+      "native_capture": "core-pass.capture.json",
+      "output": "outputs/core-pass.log",
+      "value_sources": [
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/core-pass.json",
+          "line": 6
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/core-pass.json",
+          "line": 28
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/core-pass.log",
+          "line": 4
+        }
+      ],
+      "counts": {
+        "passed": 161,
+        "failed": 0
+      },
+      "elapsed_seconds_reported_by_pytest": 133.68
+    },
+    {
+      "phase": "test",
+      "command": "env PATH=$UV_BIN:$NODE_BIN:$SCRATCH/serena/.venv/bin:$PATH SERENA_HOME=$SCRATCH/state/serena XDG_CACHE_HOME=$SCRATCH/cache XDG_CONFIG_HOME=$SCRATCH/config XDG_DATA_HOME=$SCRATCH/data UV_CACHE_DIR=$SCRATCH/cache/uv UV_PYTHON_INSTALL_DIR=$SCRATCH/python TMPDIR=$SCRATCH/tmp .venv/bin/serena project health-check $SCRATCH/native-fixture",
+      "cwd": "$SCRATCH/serena",
+      "exit_code": 0,
+      "native_capture": "health-check.capture.json",
+      "output": "outputs/health-check.log",
+      "value_sources": [
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/health-check.json",
+          "line": 6
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/health-check.json",
+          "line": 26
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/health-check.log",
+          "line": 102
+        }
+      ]
+    },
+    {
+      "phase": "verify_pin_read_only",
+      "command": "git rev-parse HEAD",
+      "cwd": "$SCRATCH/serena",
+      "exit_code": 0,
+      "native_capture": "source-pin.capture.json",
+      "output": "outputs/source-pin.txt",
+      "value_sources": [
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/source-pin.json",
+          "line": 6
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/source-pin.json",
+          "line": 24
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/source-pin.txt",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "phase": "verify_version_read_only",
+      "command": "env PATH=$UV_BIN:$NODE_BIN:$SCRATCH/serena/.venv/bin:$PATH SERENA_HOME=$SCRATCH/state/serena XDG_CACHE_HOME=$SCRATCH/cache XDG_CONFIG_HOME=$SCRATCH/config XDG_DATA_HOME=$SCRATCH/data UV_CACHE_DIR=$SCRATCH/cache/uv UV_PYTHON_INSTALL_DIR=$SCRATCH/python TMPDIR=$SCRATCH/tmp .venv/bin/serena --version",
+      "cwd": "$SCRATCH/serena",
+      "exit_code": 0,
+      "native_capture": "scratch-version.capture.json",
+      "output": "outputs/scratch-version.txt",
+      "value_sources": [
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/scratch-version.json",
+          "line": 6
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/scratch-version.json",
+          "line": 26
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/scratch-version.txt",
+          "line": 1
+        }
+      ]
+    }
+  ],
+  "aliases": {
+    "SCRATCH": "The owned disposable /var/tmp prefix; its host-specific suffix is omitted.",
+    "ENV": "env followed by every entry in isolation.environment, with shell expansion of the declared path aliases.",
+    "UV_BIN": "Directory returned by dirname of mise which uv; use the real executable before isolating XDG config.",
+    "NODE_BIN": "Directory returned by dirname of mise which node; read-only existing interpreter."
+  },
+  "retained_initial_failures": [
+    {
+      "phase": "install",
+      "command": "env UV_CACHE_DIR=$SCRATCH/cache/uv UV_PYTHON_INSTALL_DIR=$SCRATCH/python SERENA_HOME=$SCRATCH/state/serena XDG_CACHE_HOME=$SCRATCH/cache XDG_CONFIG_HOME=$SCRATCH/config XDG_DATA_HOME=$SCRATCH/data uv sync --extra dev",
+      "exit_code": 1,
+      "output": "outputs/install-first.log",
+      "reason": "The isolated XDG config hid mise's configured tool resolution, so the uv shim had no active tool. Resolve the installed executable with mise which uv before isolating XDG.",
+      "native_capture": "install-first.capture.json",
+      "output_scope": "Complete native recorder output with the published literal path mask; no excerpt.",
+      "value_sources": [
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/install-first.json",
+          "line": 6
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/install-first.json",
+          "line": 24
+        }
+      ]
+    },
+    {
+      "phase": "test",
+      "command": "env SERENA_HOME=$SCRATCH/state/serena XDG_CACHE_HOME=$SCRATCH/cache XDG_CONFIG_HOME=$SCRATCH/config XDG_DATA_HOME=$SCRATCH/data UV_CACHE_DIR=$SCRATCH/cache/uv .venv/bin/python -m pytest test/serena/test_cli_project_commands.py test/serena/test_mcp.py test/serena/test_tool_parameter_types.py test/serena/test_symbol.py::TestSymbolNameMatching test/serena/test_symbol.py::TestSymbolDictTypes -q --tb=short",
+      "exit_code": 1,
+      "counts": {
+        "failed": 4,
+        "passed": 157
+      },
+      "output": "outputs/core-first.log",
+      "output_scope": "Complete native recorder output with the published literal path mask; no excerpt.",
+      "reason": "The same isolated-XDG resolution issue affected upstream Pyright's uvx subprocess. Prepending the existing vendor-resolved uv/uvx and node executable directories made the unchanged upstream tests pass. No repository or vendor code was patched.",
+      "native_capture": "core-first.capture.json",
+      "value_sources": [
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/core-first.json",
+          "line": 6
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/captures/core-first.json",
+          "line": 26
+        },
+        {
+          "path": "evidence/artifacts/final-code-navigation-prep-20261016/outputs/core-first.log",
+          "line": 247
+        }
+      ]
+    }
+  ],
+  "output_policy": {
+    "files": "UTF-8 command outputs are committed beside this receipt.",
+    "transforms": [
+      "Replace only literal private path prefixes with marked aliases using mask_capture.py, longest prefix first.",
+      "Preserve all other bytes, including whitespace, line endings and final-newline presence."
+    ],
+    "hash_scope": "Hashes in the invocation receipt and evidence registry bind the published output bytes, including these disclosed path substitutions; no digest of private raw output is published."
+  },
+  "gaps": [
+    "Full upstream OS/language matrix was not run.",
+    "The health-check's chosen UserDict symbol returned zero references; this does not test nonempty reference precision/recall.",
+    "The frozen W6 comparison uses a different commit and remains unexecuted.",
+    "No credentialed service, remote model, real client session or adoption-day provider accounting was exercised.",
+    "Original acquisition, fixture-copy and git-diff native captures were not retained.",
+    "Native API date, uv/node version and platform captures were not retained."
+  ],
+  "integrity": {
+    "masked": true,
+    "representation": "Curated metadata index of masked native capture exports; captures/ and outputs/ contain the actual recorded results.",
+    "masking_rule": "evidence/artifacts/final-code-navigation-prep-20261016/mask_capture.py",
+    "masking_test": "evidence/artifacts/final-code-navigation-prep-20261016/test_mask_capture.py",
+    "capture_manifest": "evidence/artifacts/final-code-navigation-prep-20261016/masked-captures.json",
+    "raw_capture_name": "code-navigation-native-capture-20261016 (private; names only)",
+    "private_reproduction_review": "co-op private check PASS 2026-10-16"
+  },
+  "success_scope": "The retained install and bounded test commands returned success; raw native exports and their literal masks are the evidence, rather than this metadata summary.",
+  "unbound_setup_steps": [
+    {
+      "phase": "acquire",
+      "command": "git init --quiet $SCRATCH/serena",
+      "gap": "Original native capture not retained; do not use the formerly entered return code as qualification evidence."
+    },
+    {
+      "phase": "acquire",
+      "command": "git -C $SCRATCH/serena remote add origin https://github.com/oraios/serena.git",
+      "gap": "Original native capture not retained; do not use the formerly entered return code as qualification evidence."
+    },
+    {
+      "phase": "acquire",
+      "command": "git -C $SCRATCH/serena fetch --quiet --depth 1 origin c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "gap": "Original native capture not retained; do not use the formerly entered return code as qualification evidence."
+    },
+    {
+      "phase": "acquire",
+      "command": "git -C $SCRATCH/serena checkout --quiet --detach FETCH_HEAD",
+      "gap": "Original native capture not retained; do not use the formerly entered return code as qualification evidence."
+    },
+    {
+      "phase": "prepare_fixture",
+      "command": "cp -a $SCRATCH/serena/test/resources/repos/python $SCRATCH/native-fixture",
+      "gap": "Original native capture not retained; do not use the formerly entered return code as qualification evidence."
+    },
+    {
+      "phase": "verify_unmodified_source",
+      "command": "git -C $SCRATCH/serena diff --stat",
+      "gap": "Original native capture not retained; do not use the formerly entered return code as qualification evidence."
+    }
+  ]
+}
