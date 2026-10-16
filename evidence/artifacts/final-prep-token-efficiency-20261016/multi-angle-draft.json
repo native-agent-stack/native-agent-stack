@@ -91,7 +91,7 @@
         "A1": {
           "state": "SUPPORTED_WITHIN_SCOPE",
           "score": null,
-          "finding": "Pinned upstream output-filter/recovery mechanisms are documented; native fixture preview, direct-original cmp and exit-code preservation are captured. Automatic recall and live hook/agent integration were not requalified.",
+          "finding": "Pinned upstream output-filter/recovery mechanisms are documented. Traced vendor install records actual == published digest after both downloads; native fixture preview, direct-original cmp and exit-code preservation are captured. Automatic recall and live hook/agent integration remain unqualified.",
           "sources": [
             {
               "repository": "https://github.com/rtk-ai/rtk",
@@ -114,27 +114,51 @@
               "path": "captures/rtk-exit-control.typescript",
               "line": 3,
               "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
+              "line": 240,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Smoke/install results belong to A1; A6 requires a comparative outcome.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-12-angle-records-final-check.md#L240"
+            },
+            {
+              "path": "captures/rtk-install.typescript",
+              "line": 58,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/rtk-install.typescript",
+              "line": 61,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/rtk-install.typescript",
+              "line": 63,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/source-export-bindings.typescript",
+              "line": 2,
+              "evidence_class": "masked_native_capture"
             }
           ],
           "disputed_dimension": "Read/preview success is not semantic completeness or automatic recall proof."
         },
         "A2": {
-          "state": "PARTIAL",
+          "state": "GAP",
           "score": null,
-          "finding": "Vendor installer verifies the publisher checksum and exact binary version. Full upstream Rust tests were not run in this preparation.",
+          "finding": "This delta supplies no independent upstream engineering-quality assessment. Installation and bounded test/smoke results are assigned to A1 only; they do not fill A2.",
           "sources": [
             {
-              "path": "captures/rtk-install.typescript",
-              "line": 10,
-              "evidence_class": "masked_native_capture"
-            },
-            {
-              "path": "captures/rtk-install.typescript",
-              "line": 14,
-              "evidence_class": "masked_native_capture"
+              "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
+              "line": 240,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Smoke/install results belong to A1; A6 requires a comparative outcome.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-12-angle-records-final-check.md#L240"
             }
           ],
-          "disputed_dimension": "Release smoke and checksum agreement do not establish full upstream engineering quality."
+          "disputed_dimension": "A separate upstream engineering-quality assessment is still required."
         },
         "A5": {
           "state": "GAP",
@@ -152,9 +176,9 @@
           "disputed_dimension": null
         },
         "A6": {
-          "state": "PARTIAL_HISTORICAL; NEW_SIMULATION_ONLY",
+          "state": "PARTIAL_HISTORICAL",
           "score": null,
-          "finding": "Retained Harbor study reports 72 trials on narrow synthetic grep tasks, but one Codex route and uncontrolled cache limit claims. New fixture output/recovery controls are simulations, not task-quality/provider-savings comparisons.",
+          "finding": "Retained Harbor study reports 72 trials on narrow synthetic grep tasks, but one Codex route and uncontrolled cache limit claims. No new comparative task-quality/provider-use study is supplied in this preparation.",
           "sources": [
             {
               "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
@@ -178,9 +202,11 @@
               "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L18"
             },
             {
-              "path": "captures/rtk-recovery.typescript",
-              "line": 2,
-              "evidence_class": "masked_native_capture"
+              "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
+              "line": 240,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Smoke/install results belong to A1; A6 requires a comparative outcome.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-12-angle-records-final-check.md#L240"
             }
           ],
           "disputed_dimension": "Do historical bounded outcomes plus current smoke justify this role at 0.51.0 without broader semantic/provider claims?"
@@ -236,7 +262,7 @@
         "A1": {
           "state": "SUPPORTED_WITHIN_SCOPE",
           "score": null,
-          "finding": "Upstream documents inline compression and CCR originals. Current-pin installed package passes 15 upstream CCR tests; live MCP/proxy interception and production-session benefit remain untested.",
+          "finding": "Upstream documents inline compression and CCR originals. The installed wheel passes 15 pinned upstream CCR tests; the pinned seeded simulation reports 178024 to 104261 lexical tokens with the pure-Python detector. These are bounded A1 results; live MCP/proxy interception, production-session benefit and model quality remain untested.",
           "sources": [
             {
               "repository": "https://github.com/headroomlabs-ai/headroom",
@@ -249,37 +275,61 @@
               "path": "captures/headroom-ccr-tests.typescript",
               "line": 3,
               "evidence_class": "masked_native_capture"
-            }
-          ],
-          "disputed_dimension": "Recoverability fixture success does not prove the visible compressed context preserves every required fact."
-        },
-        "A2": {
-          "state": "PARTIAL",
-          "score": null,
-          "finding": "Supported uv tool installation, version readback and upstream CCR test execution are retained; optional native detector and broader suites were not exercised.",
-          "sources": [
-            {
-              "path": "captures/headroom-install.typescript",
-              "line": 25,
-              "evidence_class": "masked_native_capture"
             },
             {
-              "path": "captures/headroom-version.typescript",
+              "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
+              "line": 240,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Smoke/install results belong to A1; A6 requires a comparative outcome.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-12-angle-records-final-check.md#L240"
+            },
+            {
+              "path": "captures/headroom-benchmark.typescript",
               "line": 2,
-              "evidence_class": "masked_native_capture"
-            },
-            {
-              "path": "captures/headroom-ccr-tests.typescript",
-              "line": 3,
               "evidence_class": "masked_native_capture"
             },
             {
               "path": "captures/headroom-benchmark.typescript",
               "line": 3,
               "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/headroom-benchmark.typescript",
+              "line": 13,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/headroom-benchmark.typescript",
+              "line": 23,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/source-export-bindings.typescript",
+              "line": 4,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/source-export-bindings.typescript",
+              "line": 8,
+              "evidence_class": "masked_native_capture"
             }
           ],
-          "disputed_dimension": "Is pure-Python detector qualification sufficient for the proposed role, or must the native path be qualified first?"
+          "disputed_dimension": "Recoverability fixture success does not prove the visible compressed context preserves every required fact."
+        },
+        "A2": {
+          "state": "GAP",
+          "score": null,
+          "finding": "This delta supplies no independent upstream engineering-quality assessment. Installation and bounded test/smoke results are assigned to A1 only; they do not fill A2.",
+          "sources": [
+            {
+              "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
+              "line": 240,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Smoke/install results belong to A1; A6 requires a comparative outcome.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-12-angle-records-final-check.md#L240"
+            }
+          ],
+          "disputed_dimension": "A separate upstream engineering-quality assessment is still required."
         },
         "A5": {
           "state": "PUBLISHED_VENDOR_CLAIMS_ONLY",
@@ -311,20 +361,10 @@
           "disputed_dimension": "Self-published benchmark claims and a lexical-count replay are not independent outcome convergence."
         },
         "A6": {
-          "state": "NEW_SIMULATION_ONLY; SEMANTIC_DISPUTE_OPEN",
+          "state": "GAP_COMPARATIVE; SEMANTIC_DISPUTE_OPEN",
           "score": null,
-          "finding": "Native recorder output contains the upstream seeded 178024-to-104261 lexical-token table. This is a simulation. Earlier 0.39.0 receipts retain concerns about omission notices and detector paths; these have not been resolved by a new quality comparison at 0.40.0.",
+          "finding": "Earlier 0.39.0 receipts retain concerns about omission notices and detector paths. No comparative task-quality/provider-use study resolves those concerns at 0.40.0; the current A1 lexical simulation is not outcome evidence.",
           "sources": [
-            {
-              "path": "captures/headroom-benchmark.typescript",
-              "line": 13,
-              "evidence_class": "masked_native_capture"
-            },
-            {
-              "path": "captures/headroom-benchmark.typescript",
-              "line": 23,
-              "evidence_class": "masked_native_capture"
-            },
             {
               "path": "evidence/receipts/headroom-039-qualification-20260925.json",
               "line": 11,
@@ -338,6 +378,13 @@
               "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
               "detail": "Detector limitation",
               "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/headroom-039-qualification-20260925.json#L13"
+            },
+            {
+              "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
+              "line": 240,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Smoke/install results belong to A1; A6 requires a comparative outcome.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-12-angle-records-final-check.md#L240"
             }
           ],
           "disputed_dimension": "Measure required-fact/answer quality and full attempt-inclusive provider usage before any efficiency/default claim."
@@ -393,7 +440,7 @@
         "A1": {
           "state": "SUPPORTED_WITHIN_SCOPE",
           "score": null,
-          "finding": "Native CLI reports local usage and has an explicit offline path. The published synthetic fixture is reproduced exactly; current-host private usage files were not read.",
+          "finding": "Native CLI reports local usage and has an explicit offline path. The installed npm package reproduces the published synthetic fixture. A separate pinned source-tree Node target passes 34 tests; that source test is not a test of the installed package. Current-host private usage files were not read.",
           "sources": [
             {
               "repository": "https://github.com/ccusage/ccusage",
@@ -413,21 +460,13 @@
               "path": "captures/ccusage-fixture-report.typescript",
               "line": 33,
               "evidence_class": "masked_native_capture"
-            }
-          ],
-          "disputed_dimension": "Accounting capability is not output compression, causal saving or a subscription bill."
-        },
-        "A2": {
-          "state": "PARTIAL",
-          "score": null,
-          "finding": "Vendor npm-prefix install and exact upstream Node test command are captured, with 34 passing tests. Full Rust adapter suites and macOS execution remain outside this run.",
-          "sources": [
+            },
             {
-              "repository": "https://github.com/ccusage/ccusage",
-              "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
-              "path": "justfile",
-              "line": 52,
-              "url": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/justfile#L52"
+              "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
+              "line": 240,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Smoke/install results belong to A1; A6 requires a comparative outcome.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-12-angle-records-final-check.md#L240"
             },
             {
               "path": "captures/ccusage-node-tests.typescript",
@@ -438,9 +477,29 @@
               "path": "captures/ccusage-node-tests.typescript",
               "line": 46,
               "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/source-export-bindings.typescript",
+              "line": 6,
+              "evidence_class": "masked_native_capture"
             }
           ],
-          "disputed_dimension": "Launcher/catalog tests do not cover all native source parsers."
+          "disputed_dimension": "Accounting capability is not output compression, causal saving or a subscription bill."
+        },
+        "A2": {
+          "state": "GAP",
+          "score": null,
+          "finding": "This delta supplies no independent upstream engineering-quality assessment. Installation and bounded test/smoke results are assigned to A1 only; they do not fill A2.",
+          "sources": [
+            {
+              "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
+              "line": 240,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Smoke/install results belong to A1; A6 requires a comparative outcome.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-12-angle-records-final-check.md#L240"
+            }
+          ],
+          "disputed_dimension": "A separate upstream engineering-quality assessment is still required."
         },
         "A5": {
           "state": "GAP",
@@ -458,9 +517,9 @@
           "disputed_dimension": null
         },
         "A6": {
-          "state": "PARTIAL_HISTORICAL; NEW_SIMULATION_ONLY",
+          "state": "GAP_COMPARATIVE",
           "score": null,
-          "finding": "Historical usage-window evidence explicitly distinguishes native outputs, derived counts and pricing caveats. Current 190-token/$0.01 result is simulation input accounting only, not current spending or full attempt/child coverage.",
+          "finding": "Historical usage-window evidence distinguishes native outputs, derived counts and pricing caveats. It remains a scoped observation lead; no comparative task-quality/provider-use study or complete current attempt/child accounting is supplied here.",
           "sources": [
             {
               "path": "evidence/receipts/claude-spend-window-20261004.json",
@@ -477,14 +536,11 @@
               "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/claude-spend-window-20261004.json#L12"
             },
             {
-              "path": "captures/ccusage-fixture-report.typescript",
-              "line": 32,
-              "evidence_class": "masked_native_capture"
-            },
-            {
-              "path": "captures/ccusage-fixture-report.typescript",
-              "line": 33,
-              "evidence_class": "masked_native_capture"
+              "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
+              "line": 240,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Smoke/install results belong to A1; A6 requires a comparative outcome.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-12-angle-records-final-check.md#L240"
             }
           ],
           "disputed_dimension": "Qualify complete attempt/child/source reconciliation before accepting a whole-workflow usage claim."
@@ -656,9 +712,9 @@
       "disposition": "UNRESOLVED_CARRIED_SURVIVOR",
       "angles": {
         "A1": {
-          "state": "GAP_REVALIDATION",
+          "state": "NEGATIVE_HISTORICAL_MAINTENANCE",
           "score": null,
-          "finding": "Retained review notes inactivity and managed-account constraints; age alone is not abandonment under current policy. A source pin and route-fit adjudication remain missing.",
+          "finding": "The retained review upholds not_adopted under the sweep's 90-day maintenance rule and reports no maintained successor; current policy disqualifies abandoned projects. This delta does not supersede that negative finding. A missing GPT return leaves adjudication incomplete, not trial permission; resumed maintenance must be evidenced before reconsideration.",
           "sources": [
             {
               "path": "catalogs/landscape/final-stack.json",
@@ -673,6 +729,13 @@
               "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
               "detail": "Retained review lead; not independently revalidated in this delta",
               "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7481"
+            },
+            {
+              "path": "docs/decisions/2026-10-12-converged-candidates-only.md",
+              "line": 81,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Abandonment is a hard disqualifier.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-12-converged-candidates-only.md#L81"
             }
           ],
           "disputed_dimension": "Primary capability at a proposed run pin and both platform/account boundaries must be checked before any trial."
@@ -754,9 +817,16 @@
               "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
               "detail": "Retained review lead; not independently revalidated in this delta",
               "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7481"
+            },
+            {
+              "path": "docs/decisions/2026-10-12-converged-candidates-only.md",
+              "line": 81,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Abandonment is a hard disqualifier.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-12-converged-candidates-only.md#L81"
             }
           ],
-          "disputed_dimension": "Retained review notes inactivity and managed-account constraints; age alone is not abandonment under current policy. A source pin and route-fit adjudication remain missing."
+          "disputed_dimension": "The retained review upholds not_adopted under the sweep's 90-day maintenance rule and reports no maintained successor; current policy disqualifies abandoned projects. This delta does not supersede that negative finding. A missing GPT return leaves adjudication incomplete, not trial permission; resumed maintenance must be evidenced before reconsideration."
         },
         "A6": {
           "state": "NOT_RUN",
@@ -797,7 +867,8 @@
           "detail": "A missing return is not an adjudication",
           "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-11-layer-resolution-protocol.md#L53"
         }
-      }
+      },
+      "trial_status": "NOT_AUTHORIZED: historical maintenance rejection remains until an evidenced supersession."
     },
     {
       "id": "lockedinlabs-ai/agent-console",
@@ -1241,6 +1312,6 @@
       "Five cumulative survivors remain unresolved; missing GPT returns do not clear two of them.",
       "macOS execution and a current production adoption window remain missing."
     ],
-    "next": "Co-op private capture reproduction passed on 2026-10-16. Co-op runs both family reads on the explicit disputed dimensions and re-verifies the committed capture bytes after PR opening. No self-dispatched model read or merge."
+    "next": "Fold capture reproduction passed (#1221 FOLD PRIVATE CHECK PASS, 2026-10-16). One normal fold commit is pushed and both families review the delta under co-op pacing. No self-dispatched model read or merge."
   }
 }

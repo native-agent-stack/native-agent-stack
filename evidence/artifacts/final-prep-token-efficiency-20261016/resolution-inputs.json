@@ -113,10 +113,41 @@
     ]
   },
   "packet": {
-    "builder": "tools/sota-convergence/lane_packets.py",
-    "command_display": "python3 tools/sota-convergence/lane_packets.py --root <checkout> --out <scratch>/packets --catalog foundation --checked-at 2026-10-16 --manifest catalogs/sota-convergence/manifest-20260929.json --registered-receipts --manifest-newcomers",
+    "builder": "tools/sota-convergence/lane_packets.py at caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+    "command_source": {
+      "path": "captures/lane-packet-generation.typescript",
+      "line": 1,
+      "evidence_class": "masked_native_capture"
+    },
+    "base_source": {
+      "path": "captures/lane-packet-generation.typescript",
+      "line": 2,
+      "evidence_class": "masked_native_capture"
+    },
+    "return_code_source": {
+      "path": "captures/lane-packet-generation.typescript",
+      "line": 5,
+      "evidence_class": "masked_native_capture"
+    },
+    "native_output": "generator-token-efficiency.json",
+    "output_binding": {
+      "path": "captures/packet-output-binding.typescript",
+      "line": 2,
+      "evidence_class": "masked_native_capture"
+    },
+    "transform": "project_packet.py",
     "retained": "lane-packet.json",
-    "projection": "Builder generated the catalog's packets; only this layer's three winners and five survivors are retained in the delta projection. Projection is generated input data, not an E2E receipt. No model dispatch occurred."
+    "projection": "Explicit eight-repository selection preserves the complete candidate dictionaries, pin field and all 11/22/27 ccusage/Headroom/RTK receipts. The true generator layer output is retained for re-derivation only; its other historical candidates are not re-surveyed.",
+    "regression_before": {
+      "path": "captures/packet-regression-before.typescript",
+      "line": 22,
+      "evidence_class": "masked_native_capture"
+    },
+    "projection_and_tests": {
+      "path": "captures/packet-projection-tests.typescript",
+      "line": 2,
+      "evidence_class": "masked_native_capture"
+    }
   },
   "frozen_inputs_notice": "Base remains the current-main commit fetched at task start; other lanes' subsequent main changes do not silently change this evidence snapshot.",
   "gate_sequence": "As stated by final-wave-layer-prep.brief-20261016.md: FINAL admission remains closed pending the named gate chain. This preparation admits nothing.",

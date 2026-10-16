@@ -2,7 +2,7 @@
   "schema": "final-preparation-native-execution/3",
   "catalog": "foundation",
   "layer_id": "token-efficiency",
-  "status": "BOUNDED_NATIVE_CAPTURES_RETAINED; co-op private check PASS 2026-10-16",
+  "status": "BOUNDED_NATIVE_CAPTURES_RETAINED; #1221 FOLD PRIVATE CHECK PASS, 2026-10-16",
   "final_admission": "CLOSED",
   "masking": {
     "manifest": "masked-captures.json",
@@ -14,12 +14,13 @@
   },
   "scope": {
     "candidate_installs": "Isolated throwaway prefixes only. The capture headers contain full env/bwrap/install commands.",
-    "network": "Tests/invokes have --unshare-net in each captured command; installers only download public artifacts.",
-    "credentials": "The recorded env -i and bwrap bindings expose no host home or credential directory to candidate test/install execution. Installed-host version probes are separate read-only calls.",
+    "network": "Candidate tests/invokes have --unshare-net in each captured command; candidate installers only download public artifacts. Repository packet generation, source-custody checks and synthetic publication tests run separately as coordinator operations.",
+    "credentials": "env -i clears inherited variables. The host home is not mounted as a directory, but two specific read-only mise paths under <host-home> provide Node and uv at /bootstrap/node and /bootstrap/uv. The captured bwrap commands expose no credential directory. Installed-host version probes are separate read-only calls.",
     "host_promotion": false,
     "models_invoked": false,
     "services_enabled": false,
-    "production_usage_measured": false
+    "production_usage_measured": false,
+    "source_binding": "captures/source-export-bindings.typescript:1-12 compares complete git archive exports at all three pins to the source trees, and the entire copied Headroom tests tree. Fresh test captures bind those inputs read-only."
   },
   "pins": [
     {
@@ -35,6 +36,20 @@
         "path": "captures/installed-rtk-version.typescript",
         "line": 2,
         "evidence_class": "masked_native_capture"
+      },
+      "source_export_binding": {
+        "source": {
+          "path": "captures/source-export-bindings.typescript",
+          "line": 2,
+          "evidence_class": "masked_native_capture"
+        },
+        "tracked_files": 607,
+        "count_source": {
+          "path": "captures/source-export-bindings.typescript",
+          "line": 3,
+          "evidence_class": "masked_native_capture"
+        },
+        "method": "git archive at the stated pin followed by recursive no-dereference diff of every exported path/byte"
       }
     },
     {
@@ -50,6 +65,20 @@
         "path": "captures/installed-headroom-version.typescript",
         "line": 2,
         "evidence_class": "masked_native_capture"
+      },
+      "source_export_binding": {
+        "source": {
+          "path": "captures/source-export-bindings.typescript",
+          "line": 4,
+          "evidence_class": "masked_native_capture"
+        },
+        "tracked_files": 2573,
+        "count_source": {
+          "path": "captures/source-export-bindings.typescript",
+          "line": 5,
+          "evidence_class": "masked_native_capture"
+        },
+        "method": "git archive at the stated pin followed by recursive no-dereference diff of every exported path/byte"
       }
     },
     {
@@ -65,6 +94,20 @@
         "path": "captures/installed-ccusage-version.typescript",
         "line": 2,
         "evidence_class": "masked_native_capture"
+      },
+      "source_export_binding": {
+        "source": {
+          "path": "captures/source-export-bindings.typescript",
+          "line": 6,
+          "evidence_class": "masked_native_capture"
+        },
+        "tracked_files": 501,
+        "count_source": {
+          "path": "captures/source-export-bindings.typescript",
+          "line": 7,
+          "evidence_class": "masked_native_capture"
+        },
+        "method": "git archive at the stated pin followed by recursive no-dereference diff of every exported path/byte"
       }
     }
   ],
@@ -100,16 +143,16 @@
       "evidence_scope": "native install/version record; not production use"
     },
     {
-      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
-      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch>/ccusage/source --setenv TZ UTC /bootstrap/node/bin/node --test apps/ccusage/src/cli.test.ts nix/tools/models-dev-gen/compact.test.ts",
+      "co_op_private_reproduction": "#1221 FOLD PRIVATE CHECK PASS, 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --ro-bind <scratch>/ccusage/source <scratch>/ccusage/source --unshare-net --chdir <scratch>/ccusage/source --setenv TZ UTC /bootstrap/node/bin/node --test apps/ccusage/src/cli.test.ts nix/tools/models-dev-gen/compact.test.ts",
       "command_line": 1,
       "command_rc_custody": "native util-linux script transcript header/footer",
       "kind": "masked_native_output",
       "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
-      "published_bytes": 4311,
+      "published_bytes": 4370,
       "published_output": "captures/ccusage-node-tests.typescript",
-      "published_sha256": "e87062d7c5aea9888ef748ddb8c2d3abd9286512b6d9bc2c636b43b49afb18c2",
-      "raw_capture_name": "ccusage-node-tests.typescript",
+      "published_sha256": "32b177b0e1905c275788c5759b6d38717321403d4ad0544228dcc85d43831333",
+      "raw_capture_name": "ccusage-node-tests-bound.typescript",
       "return_code": 0,
       "return_code_line": 53,
       "evidence_scope": "SIMULATION: synthetic fixture or upstream test/seeded corpus; not production use, model-quality or provider savings"
@@ -130,31 +173,31 @@
       "evidence_scope": "native install/version record; not production use"
     },
     {
-      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
-      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch>/headroom/test-root --setenv HEADROOM_OFFLINE 1 --setenv HEADROOM_BEACON off --setenv LITELLM_LOCAL_MODEL_COST_MAP True --setenv TIKTOKEN_CACHE_DIR <scratch>/headroom/tokenizer-cache --setenv XDG_CACHE_HOME <scratch>/headroom/cache --setenv PYTHONDONTWRITEBYTECODE 1 <scratch>/recapture/headroom/tools/headroom-ai/bin/python <scratch>/headroom/source/benchmarks/index_proof_table.py --seed 20260902",
+      "co_op_private_reproduction": "#1221 FOLD PRIVATE CHECK PASS, 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --ro-bind <scratch>/headroom/source <scratch>/headroom/source --ro-bind <scratch>/headroom/test-root/tests <scratch>/headroom/test-root/tests --unshare-net --chdir <scratch>/headroom/test-root --setenv HEADROOM_OFFLINE 1 --setenv HEADROOM_BEACON off --setenv LITELLM_LOCAL_MODEL_COST_MAP True --setenv TIKTOKEN_CACHE_DIR <scratch>/headroom/tokenizer-cache --setenv XDG_CACHE_HOME <scratch>/headroom/cache --setenv PYTHONDONTWRITEBYTECODE 1 <scratch>/recapture/headroom/tools/headroom-ai/bin/python <scratch>/headroom/source/benchmarks/index_proof_table.py --seed 20260902",
       "command_line": 1,
       "command_rc_custody": "native util-linux script transcript header/footer",
       "kind": "masked_native_output",
       "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
-      "published_bytes": 2870,
+      "published_bytes": 3012,
       "published_output": "captures/headroom-benchmark.typescript",
-      "published_sha256": "cb45396b14b7a2b90619287dcffcfce1b875b68ae91eaed25a4bbfeec2101c54",
-      "raw_capture_name": "headroom-benchmark.typescript",
+      "published_sha256": "9f72bc8079e2a4140ea69d95184107001fb653ec8013994f826af4e8541983e9",
+      "raw_capture_name": "headroom-benchmark-bound.typescript",
       "return_code": 0,
       "return_code_line": 35,
       "evidence_scope": "SIMULATION: synthetic fixture or upstream test/seeded corpus; not production use, model-quality or provider savings"
     },
     {
-      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
-      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch>/headroom/test-root --setenv HEADROOM_OFFLINE 1 --setenv HEADROOM_BEACON off --setenv LITELLM_LOCAL_MODEL_COST_MAP True --setenv TIKTOKEN_CACHE_DIR <scratch>/headroom/tokenizer-cache --setenv XDG_CACHE_HOME <scratch>/headroom/cache --setenv PYTHONDONTWRITEBYTECODE 1 --setenv PYTHONPATH <scratch>/headroom/test-root <scratch>/recapture/headroom/tools/headroom-ai/bin/python -m pytest -q tests/test_ccr.py",
+      "co_op_private_reproduction": "#1221 FOLD PRIVATE CHECK PASS, 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --ro-bind <scratch>/headroom/source <scratch>/headroom/source --ro-bind <scratch>/headroom/test-root/tests <scratch>/headroom/test-root/tests --unshare-net --chdir <scratch>/headroom/test-root --setenv HEADROOM_OFFLINE 1 --setenv HEADROOM_BEACON off --setenv LITELLM_LOCAL_MODEL_COST_MAP True --setenv TIKTOKEN_CACHE_DIR <scratch>/headroom/tokenizer-cache --setenv XDG_CACHE_HOME <scratch>/headroom/cache --setenv PYTHONDONTWRITEBYTECODE 1 --setenv PYTHONPATH <scratch>/headroom/test-root <scratch>/recapture/headroom/tools/headroom-ai/bin/python -m pytest -q tests/test_ccr.py",
       "command_line": 1,
       "command_rc_custody": "native util-linux script transcript header/footer",
       "kind": "masked_native_output",
       "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
-      "published_bytes": 1329,
+      "published_bytes": 1471,
       "published_output": "captures/headroom-ccr-tests.typescript",
-      "published_sha256": "dc4cafeec14975de95b0c47d24cec6413094e7a28b9eeb0e42b2a7ba60c7a6c6",
-      "raw_capture_name": "headroom-ccr-tests.typescript",
+      "published_sha256": "ec4b5f432386e7603e4fbc77b55b3f0833987cc0af2bb3dfb5478c5424b7031d",
+      "raw_capture_name": "headroom-ccr-tests-bound.typescript",
       "return_code": 0,
       "return_code_line": 5,
       "evidence_scope": "SIMULATION: synthetic fixture or upstream test/seeded corpus; not production use, model-quality or provider savings"
@@ -188,6 +231,66 @@
       "return_code": 0,
       "return_code_line": 4,
       "evidence_scope": "native install/version record; not production use"
+    },
+    {
+      "co_op_private_reproduction": "#1221 FOLD PRIVATE CHECK PASS, 2026-10-16",
+      "command_display": "cd <scratch>/fold/base && git rev-parse HEAD && git diff --exit-code && python3 -B tools/sota-convergence/lane_packets.py --root . --out <scratch>/fold/packets --catalog foundation --checked-at 2026-10-16 --manifest catalogs/sota-convergence/manifest-20260929.json --registered-receipts --manifest-newcomers",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 1260,
+      "published_output": "captures/lane-packet-generation.typescript",
+      "published_sha256": "0057bd536277ec64cc7ba565a1bd3f3ffdd765f7bcd8228a65a51c8d62d44a60",
+      "raw_capture_name": "lane-packet-generation.typescript",
+      "return_code": 0,
+      "return_code_line": 5,
+      "evidence_scope": "Evidence-provenance operation or synthetic regression control; not candidate capability, usage or A6 outcomes."
+    },
+    {
+      "co_op_private_reproduction": "#1221 FOLD PRIVATE CHECK PASS, 2026-10-16",
+      "command_display": "cmp '<scratch>/fold/packets/packets/foundation__token-efficiency.json' '<checkout>/evidence/artifacts/final-prep-token-efficiency-20261016/generator-token-efficiency.json' && sha256sum '<checkout>/evidence/artifacts/final-prep-token-efficiency-20261016/generator-token-efficiency.json' '<checkout>/evidence/artifacts/final-prep-token-efficiency-20261016/lane-packet.json'",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 838,
+      "published_output": "captures/packet-output-binding.typescript",
+      "published_sha256": "0397be932f4f4824ae8cacbc15d07980df33ab7a19c1688651ece1c170dc4b3f",
+      "raw_capture_name": "packet-output-binding.typescript",
+      "return_code": 0,
+      "return_code_line": 5,
+      "evidence_scope": "Evidence-provenance operation or synthetic regression control; not candidate capability, usage or A6 outcomes."
+    },
+    {
+      "co_op_private_reproduction": "#1221 FOLD PRIVATE CHECK PASS, 2026-10-16",
+      "command_display": "cd '<checkout>/evidence/artifacts/final-prep-token-efficiency-20261016' && python3 -B project_packet.py --input generator-token-efficiency.json --output lane-packet.json && python3 -B -m unittest -v test_lane_packet test_mask_capture",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 2441,
+      "published_output": "captures/packet-projection-tests.typescript",
+      "published_sha256": "5c840e020a08a149573e229e22894bf6a470e3a59b5fee337d1dd6cd9b54ec7e",
+      "raw_capture_name": "packet-projection-tests.typescript",
+      "return_code": 0,
+      "return_code_line": 20,
+      "evidence_scope": "Evidence-provenance operation or synthetic regression control; not candidate capability, usage or A6 outcomes."
+    },
+    {
+      "co_op_private_reproduction": "#1221 FOLD PRIVATE CHECK PASS, 2026-10-16",
+      "command_display": "cd '<checkout>/evidence/artifacts/final-prep-token-efficiency-20261016' && python3 -B -m unittest -v test_lane_packet.LanePacketTests.test_published_candidate_rows_preserve_every_producer_field",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 1659,
+      "published_output": "captures/packet-regression-before.typescript",
+      "published_sha256": "b2af621f568d1d012b717b33821eac4f834caa52a07c00bc2f4a91465667868d",
+      "raw_capture_name": "packet-regression-before.typescript",
+      "return_code": 1,
+      "return_code_line": 24,
+      "evidence_scope": "Evidence-provenance operation or synthetic regression control; not candidate capability, usage or A6 outcomes."
     },
     {
       "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
@@ -280,18 +383,18 @@
       "evidence_scope": "SIMULATION: synthetic fixture or upstream test/seeded corpus; not production use, model-quality or provider savings"
     },
     {
-      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
-      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --chdir <scratch> --setenv RTK_INSTALL_DIR <scratch>/recapture/rtk/bin --setenv RTK_VERSION v0.51.0 --setenv RTK_TELEMETRY_DISABLED 1 sh <scratch>/rtk/source/install.sh",
+      "co_op_private_reproduction": "#1221 FOLD PRIVATE CHECK PASS, 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --ro-bind <scratch>/rtk/source <scratch>/rtk/source --chdir <scratch> --setenv RTK_INSTALL_DIR <scratch>/fold/rtk/bin --setenv RTK_VERSION v0.51.0 --setenv RTK_TELEMETRY_DISABLED 1 sh -x <scratch>/rtk/source/install.sh",
       "command_line": 1,
       "command_rc_custody": "native util-linux script transcript header/footer",
       "kind": "masked_native_output",
       "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
-      "published_bytes": 1702,
+      "published_bytes": 5728,
       "published_output": "captures/rtk-install.typescript",
-      "published_sha256": "8426ddf7e3e839997b0c6cdcb0395ae9ea4ec111a05c891cd38252f5fb0dc06f",
-      "raw_capture_name": "rtk-install.typescript",
+      "published_sha256": "05f46d65460c2323179defe3083d7bb2fa40bf1cb8790fe896fd37e50c7017ea",
+      "raw_capture_name": "rtk-install-digest-equality.typescript",
       "return_code": 0,
-      "return_code_line": 20,
+      "return_code_line": 104,
       "evidence_scope": "native install/version record; not production use"
     },
     {
@@ -338,22 +441,62 @@
       "return_code": 0,
       "return_code_line": 4,
       "evidence_scope": "native install/version record; not production use"
+    },
+    {
+      "co_op_private_reproduction": "#1221 FOLD PRIVATE CHECK PASS, 2026-10-16",
+      "command_display": "env -i PATH=/usr/bin:/bin GIT_NO_LAZY_FETCH=1 bash -c 'set -eu && set -o pipefail && git -C '\\''<host-home>/code/upstream/rtk-ai/rtk'\\'' archive '\\''e001f773f80b22b7dc4c7a79521b30e35aaef026'\\'' | tar -xf - -C '\\''<scratch>/fold/reference/rtk'\\'' && diff -qr --no-dereference '\\''<scratch>/fold/reference/rtk'\\'' '\\''<scratch>/rtk/source'\\'' && printf '\\''%s\\n'\\'' '\\''rtk source export: all paths and bytes match git archive e001f773f80b22b7dc4c7a79521b30e35aaef026'\\'' && git -C '\\''<host-home>/code/upstream/rtk-ai/rtk'\\'' ls-tree -r --name-only '\\''e001f773f80b22b7dc4c7a79521b30e35aaef026'\\'' | wc -l && git -C '\\''<host-home>/code/upstream/headroomlabs-ai/headroom'\\'' archive '\\''855390d6110e0bbb199d9b97025baac16c2f5cf3'\\'' | tar -xf - -C '\\''<scratch>/fold/reference/headroom'\\'' && diff -qr --no-dereference '\\''<scratch>/fold/reference/headroom'\\'' '\\''<scratch>/headroom/source'\\'' && printf '\\''%s\\n'\\'' '\\''headroom source export: all paths and bytes match git archive 855390d6110e0bbb199d9b97025baac16c2f5cf3'\\'' && git -C '\\''<host-home>/code/upstream/headroomlabs-ai/headroom'\\'' ls-tree -r --name-only '\\''855390d6110e0bbb199d9b97025baac16c2f5cf3'\\'' | wc -l && git -C '\\''<host-home>/code/upstream/ccusage/ccusage'\\'' archive '\\''d9821088b98aa536c7a385aa1a4579d6fa02269b'\\'' | tar -xf - -C '\\''<scratch>/fold/reference/ccusage'\\'' && diff -qr --no-dereference '\\''<scratch>/fold/reference/ccusage'\\'' '\\''<scratch>/ccusage/source'\\'' && printf '\\''%s\\n'\\'' '\\''ccusage source export: all paths and bytes match git archive d9821088b98aa536c7a385aa1a4579d6fa02269b'\\'' && git -C '\\''<host-home>/code/upstream/ccusage/ccusage'\\'' ls-tree -r --name-only '\\''d9821088b98aa536c7a385aa1a4579d6fa02269b'\\'' | wc -l && diff -qr --no-dereference '\\''<scratch>/fold/reference/headroom/tests'\\'' '\\''<scratch>/headroom/test-root/tests'\\'' && printf '\\''%s\\n'\\'' '\\''headroom test-root/tests: every copied test/support file matches pinned tests/'\\'' && find '\\''<scratch>/headroom/test-root'\\'' -mindepth 1 -maxdepth 1 -printf '\\''%f\\n'\\'''",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 2619,
+      "published_output": "captures/source-export-bindings.typescript",
+      "published_sha256": "08aa47588ce16df310ae2725644e7e197463d70df8abe4c6e2c6fd4e9f2f432e",
+      "raw_capture_name": "source-export-bindings-checked.typescript",
+      "return_code": 0,
+      "return_code_line": 12,
+      "evidence_scope": "Evidence-provenance operation or synthetic regression control; not candidate capability, usage or A6 outcomes."
     }
   ],
   "findings": [
     {
       "id": "vendor_installs",
       "class": "native installation output",
-      "details": "RTK pinned vendor installer verifies release checksum; Headroom 0.40.0 MCP extra installs in uv tool prefix; ccusage npm prefix installs its runtime package. Pin/versions are separately captured.",
+      "details": "RTK vendor install runs with shell tracing: both public downloads complete before hashing, EXPECTED and ACTUAL match, then extraction and scratch installation succeed. Headroom installs the MCP extra in a uv tool prefix; ccusage installs its runtime package in an npm prefix.",
       "sources": [
         {
           "path": "captures/rtk-install.typescript",
-          "line": 10,
+          "line": 47,
           "evidence_class": "masked_native_capture"
         },
         {
           "path": "captures/rtk-install.typescript",
-          "line": 14,
+          "line": 51,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/rtk-install.typescript",
+          "line": 58,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/rtk-install.typescript",
+          "line": 61,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/rtk-install.typescript",
+          "line": 63,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/rtk-install.typescript",
+          "line": 64,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/rtk-install.typescript",
+          "line": 90,
           "evidence_class": "masked_native_capture"
         },
         {
@@ -372,7 +515,7 @@
           "value": 0,
           "source": {
             "path": "captures/rtk-install.typescript",
-            "line": 20,
+            "line": 104,
             "evidence_class": "masked_native_capture"
           }
         },
@@ -392,7 +535,8 @@
             "evidence_class": "masked_native_capture"
           }
         }
-      ]
+      ],
+      "angle": "A1"
     },
     {
       "id": "rtk_fixture",
@@ -427,7 +571,8 @@
           "line": 3,
           "evidence_class": "masked_native_capture"
         }
-      }
+      },
+      "angle": "A1"
     },
     {
       "id": "headroom_upstream_ccr",
@@ -446,7 +591,13 @@
           "evidence_class": "masked_native_capture"
         }
       },
-      "limit": "Proves only the upstream CCR unit fixture checks at this install; not proxy/MCP wiring, live usage or quality."
+      "limit": "Pinned upstream test/support files exercise the separately installed Headroom wheel; copied tests are mounted read-only. This is a unit-fixture A1 smoke, not proxy/MCP wiring, live use, quality or A6.",
+      "angle": "A1",
+      "source_binding": {
+        "path": "captures/source-export-bindings.typescript",
+        "line": 8,
+        "evidence_class": "masked_native_capture"
+      }
     },
     {
       "id": "headroom_seeded_corpus",
@@ -481,7 +632,13 @@
           "evidence_class": "masked_native_capture"
         }
       },
-      "limit": "Lexical artifact counts only; both displayed configurations produce the same totals. No provider/model call or task-quality evaluation ran."
+      "limit": "Lexical artifact counts only; both displayed configurations produce the same totals. No provider/model call or task-quality evaluation ran.",
+      "angle": "A1",
+      "source_binding": {
+        "path": "captures/source-export-bindings.typescript",
+        "line": 4,
+        "evidence_class": "masked_native_capture"
+      }
     },
     {
       "id": "ccusage_upstream_node_tests",
@@ -514,7 +671,13 @@
           "evidence_class": "masked_native_capture"
         }
       ],
-      "limit": "Exact upstream justfile Node target only; full Rust suite not executed."
+      "limit": "The exact upstream justfile Node target executes the pinned source tree, not the npm-installed package. The installed package has separate version and offline-fixture smokes; full Rust suite was not run.",
+      "angle": "A1",
+      "source_binding": {
+        "path": "captures/source-export-bindings.typescript",
+        "line": 6,
+        "evidence_class": "masked_native_capture"
+      }
     },
     {
       "id": "ccusage_fixture_accounting",
@@ -563,10 +726,11 @@
           "evidence_class": "masked_native_capture"
         }
       ],
-      "limit": "The cost is input fixture costUSD, not an observed bill. No private session log was read."
+      "limit": "The cost is input fixture costUSD, not an observed bill. No private session log was read.",
+      "angle": "A1"
     }
   ],
-  "supersession": "Rebuilt from fresh native script captures after integrity addenda. Earlier hand-assembled command/rc summaries and selected/modified output views are withdrawn from this publication; original private files are retained for audit, not used as replacement receipts.",
+  "supersession": "The fold replaces the initial RTK install and three test/benchmark captures with traced/source-bound native reruns. Original raw captures remain private; initial published bytes remain historical in f7b24d2a. The current index cites the replacement captures. Packet projection is now an explicit published transform preserving every selected candidate field and receipt.",
   "unexecuted": [
     "Current-pin macOS arm64 E2E",
     "Complete RTK/ccusage Rust suites",

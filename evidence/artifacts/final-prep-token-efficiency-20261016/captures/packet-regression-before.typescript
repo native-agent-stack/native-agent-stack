@@ -1,0 +1,24 @@
+Script started on 2026-10-16 06:09:21-04:00 [COMMAND="cd '<checkout>/evidence/artifacts/final-prep-token-efficiency-20261016' && python3 -B -m unittest -v test_lane_packet.LanePacketTests.test_published_candidate_rows_preserve_every_producer_field" <not executed on terminal>]
+test_published_candidate_rows_preserve_every_producer_field (test_lane_packet.LanePacketTests.test_published_candidate_rows_preserve_every_producer_field) ... FAIL
+
+======================================================================
+FAIL: test_published_candidate_rows_preserve_every_producer_field (test_lane_packet.LanePacketTests.test_published_candidate_rows_preserve_every_producer_field)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/evidence/artifacts/final-prep-token-efficiency-20261016/test_lane_packet.py", line 21, in test_published_candidate_rows_preserve_every_producer_field
+    self.assertEqual(actual["candidates"], expected["candidates"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'key': 'c1', 'name': 'ccusage', 'repositor[3292 chars] []}] != [{'adopted': True, 'component_id': 'ccusage'[23768 chars]one}]
+
+First differing element 0:
+{'key': 'c1', 'name': 'ccusage', 'repositor[712 chars]d'}]}
+{'adopted': True, 'component_id': 'ccusage'[2991 chars]778}}
+
+Diff is 38579 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 1 test in 0.022s
+
+FAILED (failures=1)
+
+Script done on 2026-10-16 06:09:21-04:00 [COMMAND_EXIT_CODE="1"]

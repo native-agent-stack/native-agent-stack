@@ -1,0 +1,20 @@
+Script started on 2026-10-16 06:09:38-04:00 [COMMAND="cd '<checkout>/evidence/artifacts/final-prep-token-efficiency-20261016' && python3 -B project_packet.py --input generator-token-efficiency.json --output lane-packet.json && python3 -B -m unittest -v test_lane_packet test_mask_capture" <not executed on terminal>]
+{"registered_receipts": {"Headroom": 22, "RTK": 27, "atlassian-labs/mcp-compressor": 0, "ccusage": 11, "klavis-ai/klavis": 0, "lockedinlabs-ai/agent-console": 0, "ojuschugh1/sqz": 0, "paritok-official/paritok-4b-v1": 0}, "selected": 8}
+test_full_receipt_lists_and_pin_names_survive_projection (test_lane_packet.LanePacketTests.test_full_receipt_lists_and_pin_names_survive_projection) ... ok
+test_missing_duplicate_and_wrong_layer_inputs_fail (test_lane_packet.LanePacketTests.test_missing_duplicate_and_wrong_layer_inputs_fail) ... ok
+test_published_candidate_rows_preserve_every_producer_field (test_lane_packet.LanePacketTests.test_published_candidate_rows_preserve_every_producer_field) ... ok
+test_hash_binds_only_published_bytes_and_missing_custody_stays_gap (test_mask_capture.MaskCaptureTests.test_hash_binds_only_published_bytes_and_missing_custody_stays_gap) ... ok
+test_idempotent_without_summarization (test_mask_capture.MaskCaptureTests.test_idempotent_without_summarization) ... ok
+test_missing_native_footer_is_not_filled_in (test_mask_capture.MaskCaptureTests.test_missing_native_footer_is_not_filled_in) ... ok
+test_native_recorder_command_and_failure_survive_private_path_masking (test_mask_capture.MaskCaptureTests.test_native_recorder_command_and_failure_survive_private_path_masking) ... ok
+test_preserves_failure_counts_line_endings_and_trailing_bytes (test_mask_capture.MaskCaptureTests.test_preserves_failure_counts_line_endings_and_trailing_bytes) ... ok
+test_private_prefix_requires_marked_lowercase_placeholder (test_mask_capture.MaskCaptureTests.test_private_prefix_requires_marked_lowercase_placeholder) ... ok
+test_rejects_ambiguous_masks_and_private_capture_paths (test_mask_capture.MaskCaptureTests.test_rejects_ambiguous_masks_and_private_capture_paths) ... ok
+test_unmatched_bytes_and_empty_output_are_preserved (test_mask_capture.MaskCaptureTests.test_unmatched_bytes_and_empty_output_are_preserved) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.005s
+
+OK
+
+Script done on 2026-10-16 06:09:38-04:00 [COMMAND_EXIT_CODE="0"]

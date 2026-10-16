@@ -1,20 +1,104 @@
-Script started on 2026-10-16 02:20:39-04:00 [COMMAND="env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --chdir <scratch> --setenv RTK_INSTALL_DIR <scratch>/recapture/rtk/bin --setenv RTK_VERSION v0.51.0 --setenv RTK_TELEMETRY_DISABLED 1 sh <scratch>/rtk/source/install.sh" <not executed on terminal>]
+Script started on 2026-10-16 06:11:07-04:00 [COMMAND="env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --ro-bind <scratch>/rtk/source <scratch>/rtk/source --chdir <scratch> --setenv RTK_INSTALL_DIR <scratch>/fold/rtk/bin --setenv RTK_VERSION v0.51.0 --setenv RTK_TELEMETRY_DISABLED 1 sh -x <scratch>/rtk/source/install.sh" <not executed on terminal>]
++ set -e
++ REPO=rtk-ai/rtk
++ BINARY_NAME=rtk
++ INSTALL_DIR=<scratch>/fold/rtk/bin
++ RED=\033[0;31m
++ GREEN=\033[0;32m
++ YELLOW=\033[1;33m
++ NC=\033[0m
++ main
++ info Installing rtk...
++ printf \033[0;32m[INFO]\033[0m %s\n Installing rtk...
 [INFO] Installing rtk...
++ detect_os
++ uname -s
++ OS=linux
++ detect_arch
++ uname -m
++ ARCH=x86_64
++ get_target
++ TARGET=x86_64-unknown-linux-musl
++ [ -n v0.51.0 ]
++ VERSION=v0.51.0
++ info Using pinned version from RTK_VERSION: v0.51.0
++ printf \033[0;32m[INFO]\033[0m %s\n Using pinned version from RTK_VERSION: v0.51.0
 [INFO] Using pinned version from RTK_VERSION: v0.51.0
++ install
++ info Detected: linux x86_64
++ printf \033[0;32m[INFO]\033[0m %s\n Detected: linux x86_64
 [INFO] Detected: linux x86_64
++ info Target: x86_64-unknown-linux-musl
++ printf \033[0;32m[INFO]\033[0m %s\n Target: x86_64-unknown-linux-musl
 [INFO] Target: x86_64-unknown-linux-musl
++ info Version: v0.51.0
++ printf \033[0;32m[INFO]\033[0m %s\n Version: v0.51.0
 [INFO] Version: v0.51.0
++ DOWNLOAD_URL=https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz
++ CHECKSUMS_URL=https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt
++ mktemp -d
++ TEMP_DIR=/tmp/tmp.OdmqsG8V23
++ ARCHIVE=/tmp/tmp.OdmqsG8V23/rtk.tar.gz
++ CHECKSUMS=/tmp/tmp.OdmqsG8V23/checksums.txt
++ ASSET_NAME=rtk-x86_64-unknown-linux-musl.tar.gz
++ info Downloading from: https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz
++ printf \033[0;32m[INFO]\033[0m %s\n Downloading from: https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz
 [INFO] Downloading from: https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz
++ curl -fsSL https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz -o /tmp/tmp.OdmqsG8V23/rtk.tar.gz
++ info Downloading checksums...
++ printf \033[0;32m[INFO]\033[0m %s\n Downloading checksums...
 [INFO] Downloading checksums...
++ curl -fsSL https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt -o /tmp/tmp.OdmqsG8V23/checksums.txt
++ [ 0 = 1 ]
++ info Verifying SHA-256 checksum...
++ printf \033[0;32m[INFO]\033[0m %s\n Verifying SHA-256 checksum...
 [INFO] Verifying SHA-256 checksum...
++ grep [[:space:]]rtk-x86_64-unknown-linux-musl.tar.gz$ /tmp/tmp.OdmqsG8V23/checksums.txt
++ awk {print $1}
++ EXPECTED=5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5
++ [ -z 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5 ]
++ command -v sha256sum
++ sha256sum /tmp/tmp.OdmqsG8V23/rtk.tar.gz
++ awk {print $1}
++ ACTUAL=5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5
++ [ 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5 != 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5 ]
++ info Checksum verified.
++ printf \033[0;32m[INFO]\033[0m %s\n Checksum verified.
 [INFO] Checksum verified.
++ info Verifying archive contents...
++ printf \033[0;32m[INFO]\033[0m %s\n Verifying archive contents...
 [INFO] Verifying archive contents...
++ tar -tzf /tmp/tmp.OdmqsG8V23/rtk.tar.gz
++ grep -qE ^/|(^|/)\.\.(/|$)
++ info Extracting...
++ printf \033[0;32m[INFO]\033[0m %s\n Extracting...
 [INFO] Extracting...
-[INFO] Successfully installed rtk to <scratch>/recapture/rtk/bin/rtk
++ tar -xzf /tmp/tmp.OdmqsG8V23/rtk.tar.gz -C /tmp/tmp.OdmqsG8V23
++ mkdir -p <scratch>/fold/rtk/bin
++ mv /tmp/tmp.OdmqsG8V23/rtk <scratch>/fold/rtk/bin/
++ chmod +x <scratch>/fold/rtk/bin/rtk
++ rm -rf /tmp/tmp.OdmqsG8V23
++ info Successfully installed rtk to <scratch>/fold/rtk/bin/rtk
++ printf \033[0;32m[INFO]\033[0m %s\n Successfully installed rtk to <scratch>/fold/rtk/bin/rtk
+[INFO] Successfully installed rtk to <scratch>/fold/rtk/bin/rtk
++ verify
++ INSTALLED_BIN=<scratch>/fold/rtk/bin/rtk
++ [ -x <scratch>/fold/rtk/bin/rtk ]
++ <scratch>/fold/rtk/bin/rtk --version
++ info Verification: rtk 0.51.0
++ printf \033[0;32m[INFO]\033[0m %s\n Verification: rtk 0.51.0
 [INFO] Verification: rtk 0.51.0
++ command -v rtk
++ warn Binary installed but not in PATH. Add to your shell profile:
++ printf \033[1;33m[WARN]\033[0m %s\n Binary installed but not in PATH. Add to your shell profile:
 [WARN] Binary installed but not in PATH. Add to your shell profile:
++ warn   export PATH="$HOME/.local/bin:$PATH"
++ printf \033[1;33m[WARN]\033[0m %s\n   export PATH="$HOME/.local/bin:$PATH"
 [WARN]   export PATH="$HOME/.local/bin:$PATH"
++ echo 
 
++ info Installation complete! Run 'rtk --help' to get started.
++ printf \033[0;32m[INFO]\033[0m %s\n Installation complete! Run 'rtk --help' to get started.
 [INFO] Installation complete! Run 'rtk --help' to get started.
 
-Script done on 2026-10-16 02:20:40-04:00 [COMMAND_EXIT_CODE="0"]
+Script done on 2026-10-16 06:11:08-04:00 [COMMAND_EXIT_CODE="0"]

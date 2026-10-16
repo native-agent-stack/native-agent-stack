@@ -56,6 +56,14 @@ class MaskCaptureTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             masked_record("/private/native.log", "outputs/native.log", b"output")
 
+    def test_private_prefix_requires_marked_lowercase_placeholder(self):
+        for prefix, placeholder in ((b"", b"<host>"), (b"/", b"<host>"),
+                                    (b"/private", b"host"), (b"/private", b"<Host>"),
+                                    (b"/private", b"<host_1>"), (b"/private", b"<>")):
+            with self.subTest(prefix=prefix, placeholder=placeholder):
+                with self.assertRaises(ValueError):
+                    mask_bytes(b"/private/output", b"/scratch", ((prefix, placeholder),))
+
 
 if __name__ == "__main__":
     unittest.main()
