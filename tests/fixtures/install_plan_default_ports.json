@@ -103,7 +103,9 @@
     },
     {
       "path": "promptfoo-gateway.cjs",
-      "sha256": "57c542180e409025b80db9454ca51597a2723cb9879fb832a2dcbb926eb0db64"
+      "sha256": "57c542180e409025b80db9454ca51597a2723cb9879fb832a2dcbb926eb0db64",
+      "comparison": "native_export",
+      "superseded_reason": "Effective HTTP port correction at Node v24.21.0 doc/api/url.md:383-386 changes validator source; default exported configuration remains equal to baseline."
     },
     {
       "path": "promptfoo-gateway.yaml",

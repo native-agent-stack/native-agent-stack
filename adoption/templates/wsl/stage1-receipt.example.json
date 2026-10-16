@@ -1309,12 +1309,6 @@
     },
     {
       "step": "F8",
-      "cmd": "ss -ltnH '( sport = :21318 or sport = :29374 or sport = :21633 or sport = :28231 )'",
-      "exit": "<exit code>",
-      "output_excerpt": "<sanitized output>"
-    },
-    {
-      "step": "F8",
       "cmd": "python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/host.new-distro.json.template \"$(id -un)\" > 'adoption/hosts/<host>.json'",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
@@ -1332,6 +1326,18 @@
       "output_excerpt": "<sanitized output>"
     },
     {
+      "step": "F8",
+      "cmd": "ss -ltnH > /tmp/native-stack-port-preflight.txt",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F8",
+      "cmd": "python3 -B evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py --host-file 'adoption/hosts/<host>.json' --ss-output /tmp/native-stack-port-preflight.txt",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
       "step": "F9",
       "cmd": "cd ~/code/native-agent-stack",
       "exit": "<exit code>",
@@ -1339,13 +1345,13 @@
     },
     {
       "step": "F9",
-      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --no-start --host-file 'adoption/hosts/<host>.json'",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     },
     {
       "step": "F9",
-      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --host-file 'adoption/hosts/<host>.json'",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     },

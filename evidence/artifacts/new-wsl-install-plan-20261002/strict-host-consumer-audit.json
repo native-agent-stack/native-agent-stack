@@ -118,6 +118,17 @@
         "plan-output port_template"
       ],
       "disposition": "Generates named markers from default public dashboard output; consumes no host file and supplies no host fallback."
+    },
+    {
+      "path": "tools/adoption/runtime_acceptance.py",
+      "entry_points": [
+        "profile_environment import",
+        "check direct environment",
+        "check credential-wrapped environment"
+      ],
+      "disposition": "Compatibility caller: both direct checks and credential-wrapped native checks use current strict allocation through profile_environment. Incomplete explicit/saved allocation raises before the native fake is called; retry requires a corrected complete allocation. No production change was needed.",
+      "source": "native-agent-stack@5e3d3c2a501d5adf90891337bd70bf8bbb45d270:tools/adoption/runtime_acceptance.py:22,120,136",
+      "coverage": "tests.test_runtime_profiles.StrictHostConsumerTests.test_runtime_acceptance_uses_current_host_values_for_direct_and_credential_wrapped_checks; native calls and credential routing are faked."
     }
   ],
   "data_inputs": [
@@ -225,5 +236,15 @@
     "python3 -B -m unittest tests.test_runtime_profiles.StrictHostConsumerTests",
     "python3 -B -m unittest tests.test_runtime_profiles tests.test_task_model_routing",
     "python3 -B -m unittest tests.test_install_plan_no_start_ports tests.test_install_plan_review_wave3"
-  ]
+  ],
+  "documentation_consumers": [
+    "adoption/platforms/linux-wsl2-new-distro.md",
+    "adoption/templates/wsl/first-boot-checklist.md",
+    "adoption/templates/wsl/stage1-receipt.example.json",
+    "scripts/build_new_wsl_handbook.py",
+    "docs/new-wsl-handbook.md",
+    "docs/new-wsl-handbook.json",
+    "docs/decisions/2026-10-16-new-wsl-host-allocation-addendum.md"
+  ],
+  "fourth_wave_expansion": "GPT fix2 identified runtime_acceptance as a missed indirect caller. It is now explicitly inventoried and covered. CC identified live recipe/checklist/handbook consumers; they use the superseding addendum without rewriting historical decisions."
 }

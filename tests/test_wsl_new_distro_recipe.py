@@ -237,8 +237,8 @@ F9_PLAN = "evidence/artifacts/new-wsl-install-plan-20261002"
 PLAN_DIR = ROOT / F9_PLAN
 F9_COMMANDS = [
     CLONE,
-    f"bash {F9_PLAN}/install.sh",
-    f"bash {F9_PLAN}/accept.sh",
+    f"bash {F9_PLAN}/install.sh --no-start --host-file 'adoption/hosts/<host>.json'",
+    f"bash {F9_PLAN}/accept.sh --host-file 'adoption/hosts/<host>.json'",
     "python3 -B tools/adoption/new_wsl_client_config.py --check",
     "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'",
 ]
@@ -367,6 +367,20 @@ CHECKLIST_STEP_RE = re.compile(r"^- \[ \] \*\*(?P<step>[RPWF]\d+)\*\*", re.M)
 
 def read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+def recipe_record() -> str:
+    """Effective command evidence: retain the dated record and apply its named addendum."""
+    text = RECORD.read_text(encoding="utf-8")
+    addendum = read(ROOT / "docs/decisions/2026-10-16-new-wsl-host-allocation-addendum.md")
+    replacements = [line for line in addendum.splitlines() if line.startswith(("| F8 |", "| F9 |"))]
+    if not replacements:
+        raise AssertionError("host-allocation addendum must supply F8/F9 command rows")
+    lines = text.splitlines()
+    index = next(i for i, line in enumerate(lines) if line.startswith("| F8 |"))
+    lines = [line for line in lines if not line.startswith(("| F8 |", "| F9 |"))]
+    lines[index:index] = replacements
+    return "\n".join(lines) + "\n"
 
 
 def fenced_commands(text: str) -> list[tuple[str, str]]:
@@ -524,9 +538,17 @@ def plan_loopback_ports() -> set[int]:
     """Every loopback port the install plan's services (their ``service.port``) and configuration files use."""
     ports = {int(row["service"]["port"]) for row in plan_rows()
              if isinstance(row.get("service"), dict) and row["service"].get("port") is not None}
+    import runpy
+    renderer = PLAN_DIR / "config/observability_config.py"
+    render = runpy.run_path(str(renderer)) if renderer.is_file() else None
+    if render:
+        ports.update(render["service_ports"]().values())
     for config in sorted((PLAN_DIR / "config").rglob("*")):
         if config.is_file() and "__pycache__" not in config.parts:
-            ports.update(int(port) for port in re.findall(r"127\.0\.0\.1:(\d+)", read(config)))
+            text = read(config)
+            if render and config != renderer:
+                text = render["render_ports"](text, render["service_ports"]())
+            ports.update(int(port) for port in re.findall(r"127\.0\.0\.1:(\d+)", text))
     return ports | set(plan_collector_ports())
 
 
@@ -569,9 +591,11 @@ def host_template_errors(template: str, example: dict, recipe: str, user: str = 
         if not str(values.get(key, "")).startswith(f"/home/{user}"):
             errors.append(f"{key} is not under the new user's home")
     probes = [command for shell, command in fenced_commands(recipe) if shell == "sh" and command.startswith("ss -ltnH")]
-    probed = {int(port) for command in probes for port in re.findall(r"sport = :(\d+)", command)}
-    if probed != set(ports):
-        errors.append(f"the recipe's ss probe checks {sorted(probed)}, the template uses {sorted(ports)}")
+    if probes != ["ss -ltnH > /tmp/native-stack-port-preflight.txt"]:
+        errors.append("the recipe must capture the complete listening-port snapshot")
+    expected = "python3 -B " + F9_PLAN + "/check_plan.py --host-file 'adoption/hosts/<host>.json' --ss-output /tmp/native-stack-port-preflight.txt"
+    if ("sh", expected) not in fenced_commands(recipe):
+        errors.append("the recipe must validate the explicit allocation against the captured snapshot")
     missing = sorted(port for port in WORKSTATION_PORTS if f"`{port}`" not in recipe)
     if missing:
         errors.append(f"the recipe's exclusion set does not list {missing}")
@@ -1418,6 +1442,9 @@ class UserDataTemplateTests(unittest.TestCase):
 
 
 class HostTemplateTests(unittest.TestCase):
+    def test_collision_inventory_includes_optional_and_metrics_listeners(self):
+        self.assertTrue({21302, 21888, 21889} <= plan_loopback_ports())
+
     def test_nested_config_file_ports_remain_reserved(self):
         import tempfile
         from unittest.mock import patch
@@ -1440,7 +1467,7 @@ class HostTemplateTests(unittest.TestCase):
         mutants = {
             "workstation port": (good.replace(f"127.0.0.1:{port}", "127.0.0.1:49374"), recipe),
             "lost key": (re.sub(r'\s*"EMBED_URL": "[^"]*",?', "", good).replace('",\n}', '"\n}'), recipe),
-            "stale probe": (good, recipe.replace(f"sport = :{port}", "sport = :1")),
+            "stale probe": (good, recipe.replace("ss -ltnH > /tmp/native-stack-port-preflight.txt", "ss -ltnH '( sport = :1 )'")),
             "missing exclusion": (good, recipe.replace("`49474`", "49474")),
         }
         for name, (template, page) in mutants.items():
@@ -1502,10 +1529,10 @@ class HostTemplateTests(unittest.TestCase):
 
 class CommandTableTests(unittest.TestCase):
     def test_every_recipe_command_is_a_row_of_the_record_command_table(self):
-        self.assertEqual(command_table_errors(read(RECIPE), read(RECORD)), [])
+        self.assertEqual(command_table_errors(read(RECIPE), recipe_record()), [])
 
     def test_the_check_rejects_a_missing_row_an_extra_row_a_wrong_shell_and_a_wrong_step(self):
-        recipe, record = read(RECIPE), read(RECORD)
+        recipe, record = read(RECIPE), recipe_record()
         step, shell, command = recipe_rows(recipe)[0]
         row = next(line for line in record.splitlines()
                    if line.startswith(f"| {step} | {shell} | `{command.replace('|', chr(92) + '|')}` |"))
@@ -1522,7 +1549,7 @@ class CommandTableTests(unittest.TestCase):
                 self.assertTrue(command_table_errors(recipe, mutant))
 
     def test_the_check_rejects_each_missing_f11_row(self):
-        recipe, record = read(RECIPE), read(RECORD)
+        recipe, record = read(RECIPE), recipe_record()
         rows = [line for line in record.splitlines() if line.startswith("| F11 | sh | ")]
         self.assertTrue(rows, "the record's command table has no F11 row")
         self.assertEqual(len(rows), sum(1 for step, _, _ in recipe_rows(recipe) if step == "F11"))
@@ -1646,7 +1673,7 @@ class StageTwoTests(unittest.TestCase):
         self.assertTrue(f9_errors(recipe.replace(F9_COMMANDS[-1], F9_COMMANDS[-1] + " " + AUTHORIZATION_OPTION)))
 
     def test_the_record_and_the_receipt_example_carry_the_f9_rows_and_both_comparisons_read_them(self):
-        recipe, record = read(RECIPE), read(RECORD)
+        recipe, record = read(RECIPE), recipe_record()
         receipt = json.loads(read(RECEIPT_EXAMPLE))
         components = {component["id"] for component in json.loads(read(STACK))["components"]}
         self.assertEqual([command for step, _, command in command_table(record) if step == "F9"], F9_COMMANDS)
@@ -1682,10 +1709,10 @@ class StageTwoTests(unittest.TestCase):
 class ImageHashTests(unittest.TestCase):
     def test_the_recipe_record_receipt_example_and_checklist_pin_both_image_sha256_pairs(self):
         receipt = json.loads(read(RECEIPT_EXAMPLE))
-        self.assertEqual(sha256_errors(read(RECIPE), read(RECORD), receipt, read(CHECKLIST)), [])
+        self.assertEqual(sha256_errors(read(RECIPE), recipe_record(), receipt, read(CHECKLIST)), [])
 
     def test_the_check_rejects_a_drifted_hash(self):
-        recipe, record, checklist = read(RECIPE), read(RECORD), read(CHECKLIST)
+        recipe, record, checklist = read(RECIPE), recipe_record(), read(CHECKLIST)
         receipt = json.loads(read(RECEIPT_EXAMPLE))
         other = "0" * 64
         for release, pin in RELEASE_PINS.items():
@@ -1805,10 +1832,10 @@ class CrossFamilyReviewTests(unittest.TestCase):
     """The three findings of the 2026-10-01 GPT-6.1 Sol review of PR #569 stay fixed."""
 
     def test_the_first_launch_checks_expect_the_marker_and_read_the_retained_result(self):
-        self.assertEqual(cloud_init_status_errors(read(RECIPE), read(RECORD), read(CHECKLIST)), [])
+        self.assertEqual(cloud_init_status_errors(read(RECIPE), recipe_record(), read(CHECKLIST)), [])
 
     def test_the_status_check_rejects_status_done_and_a_missing_retained_result(self):
-        recipe, record, checklist = read(RECIPE), read(RECORD), read(CHECKLIST)
+        recipe, record, checklist = read(RECIPE), recipe_record(), read(CHECKLIST)
         row = next(line for line in record.splitlines()
                    if line.startswith("| W5 |") and line.split("|")[3].strip().endswith("cloud-init status --long`"))
         retained = "wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json\n"
@@ -1847,7 +1874,7 @@ class JCodeMunchStepTests(unittest.TestCase):
     """F11, added 2026-10-01 after the cross-family review of PR #548: the clone's per-project jCodeMunch registration."""
 
     def inputs(self):
-        return read(RECIPE), read(BOOTSTRAP), read(RECORD), read(CHECKLIST), json.loads(read(RECEIPT_EXAMPLE))
+        return read(RECIPE), read(BOOTSTRAP), recipe_record(), read(CHECKLIST), json.loads(read(RECEIPT_EXAMPLE))
 
     def test_f11_runs_the_bootstrap_registration_after_stage_2_and_records_the_outcome(self):
         self.assertEqual(jcodemunch_errors(*self.inputs()), [])
@@ -1897,7 +1924,7 @@ class FailedAttemptExportTests(unittest.TestCase):
     """Review finding 3 of PR #569: W6 preserves the failed attempt before `--unregister` deletes its disk."""
 
     def inputs(self):
-        return read(RECIPE), read(RECORD), read(CHECKLIST), json.loads(read(RECEIPT_EXAMPLE))
+        return read(RECIPE), recipe_record(), read(CHECKLIST), json.loads(read(RECEIPT_EXAMPLE))
 
     def test_w6_exports_the_failed_attempt_before_unregistering(self):
         self.assertEqual(failed_attempt_errors(*self.inputs()), [])
@@ -1932,10 +1959,10 @@ class SubordinateIdTests(unittest.TestCase):
     """F5 keeps the stage-1 range and says, with its source, when an image needs a wider one."""
 
     def test_f5_adds_65536_ids_and_cites_when_an_image_needs_more(self):
-        self.assertEqual(subordinate_id_errors(read(RECIPE), read(RECORD)), [])
+        self.assertEqual(subordinate_id_errors(read(RECIPE), recipe_record()), [])
 
     def test_the_check_rejects_a_wider_range_and_a_lost_citation(self):
-        recipe, record = read(RECIPE), read(RECORD)
+        recipe, record = read(RECIPE), recipe_record()
         f5 = section(recipe, "F5")
         self.assertIn("100000-165535", f5)
         rootless = "https://docs.docker.com/engine/security/rootless/"
@@ -1954,7 +1981,7 @@ class FollowUpCase(unittest.TestCase):
     """The 2026-10-01 follow-up's checks read the recipe, the record, the checklist and the receipt example."""
 
     def inputs(self):
-        return read(RECIPE), read(RECORD), read(CHECKLIST), json.loads(read(RECEIPT_EXAMPLE))
+        return read(RECIPE), recipe_record(), read(CHECKLIST), json.loads(read(RECEIPT_EXAMPLE))
 
     def assert_mutants_fail(self, check, mutants):
         good = self.inputs()
@@ -2288,7 +2315,7 @@ class RehearsalTests(unittest.TestCase):
     """Item G (critic item 1): R1 rehearses on a throwaway name first and removes only that name."""
 
     def inputs(self):
-        return (read(RECIPE), read(RECORD), read(CHECKLIST), json.loads(read(RECEIPT_EXAMPLE)),
+        return (read(RECIPE), recipe_record(), read(CHECKLIST), json.loads(read(RECEIPT_EXAMPLE)),
                 json.loads(read(EXPERIMENT)))
 
     def test_r1_rehearses_on_a_throwaway_name_first_and_removes_only_it(self):
@@ -2659,7 +2686,7 @@ class RehearsalRepairTests(unittest.TestCase):
         self.assertTrue(receipt_errors(old_receipt, old_page, components))
 
     def test_every_selected_image_digest_rejects_the_old_unchecked_fields(self):
-        recipe, record, checklist = read(RECIPE), read(RECORD), read(CHECKLIST)
+        recipe, record, checklist = read(RECIPE), recipe_record(), read(CHECKLIST)
         receipt = json.loads(read(RECEIPT_EXAMPLE))
         self.assertEqual(sha256_errors(recipe, record, receipt, checklist), [])
         for key in SELECTED_IMAGE_DIGEST_FIELDS:
@@ -2755,7 +2782,7 @@ class RehearsalRepairTests(unittest.TestCase):
                 self.assertTrue(storage_window_errors(page, ticks))
 
     def test_default_and_rollback_reject_the_old_symmetric_arms(self):
-        inputs = (read(RECIPE), read(RECORD), read(CHECKLIST))
+        inputs = (read(RECIPE), recipe_record(), read(CHECKLIST))
         self.assertEqual(default_image_errors(*inputs), [])
         for index, text in enumerate(inputs):
             with self.subTest(control="old symmetric image arms", file=index):
@@ -2764,7 +2791,7 @@ class RehearsalRepairTests(unittest.TestCase):
                 self.assertTrue(default_image_errors(*mutant))
 
     def test_signature_class_rejects_unretained_output_claims(self):
-        record, receipt = read(RECORD), json.loads(read(SOURCE_RECEIPT))
+        record, receipt = recipe_record(), json.loads(read(SOURCE_RECEIPT))
         self.assertEqual(signature_class_errors(record, receipt), [])
         old = record + "\nThe retained logs are each release's native-signed-sums.stdout and native-signed-sums.stderr.\n"
         self.assertTrue(signature_class_errors(old, receipt))

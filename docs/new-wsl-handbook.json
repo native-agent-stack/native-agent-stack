@@ -7887,7 +7887,7 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "d79da9e44ea865913f3dc9d78a0dcc2dc235ae02d7873ff60ed7ebcdd72d3781"
+      "sha256": "c6a9847197c06a3357930d1b45efeddcf249f954c32768103a26ffbda7f8f06d"
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
@@ -8079,8 +8079,8 @@
       "boundary": "Per-tool order is the W-PROF stage/position; missing entries block installation.",
       "commands": [
         "cd ~/code/native-agent-stack",
-        "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-        "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+        "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --no-start --host-file 'adoption/hosts/<host>.json'",
+        "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --host-file 'adoption/hosts/<host>.json'",
         "python3 -B tools/adoption/new_wsl_client_config.py --check",
         "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'"
       ],
@@ -8105,9 +8105,9 @@
       "source": "adoption/platforms/linux-wsl2-new-distro.md",
       "stage": 2,
       "steps": [
-        "Install the selected pinned profile with the first bootstrap command of F9.",
-        "Complete the native sign-ins F9 names on this host; they are never copied from another machine.",
-        "Configure the same profile with the second bootstrap command of F9; collect its native receipts."
+        "Provision selected owners with F9's no-start command and complete host file; run its post-install checks.",
+        "Configure both clients from the same host file with F9's check/apply commands before sign-in.",
+        "Complete native sign-ins, then perform separately authorized activation and listener/health acceptance on this host."
       ]
     }
   ],

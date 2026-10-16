@@ -1,6 +1,6 @@
 # New WSL install plan
 
-Current structural inventory (2026-10-15): 84 rows, 197 install commands and 113 acceptance entries (including two additional checks). D-ollama-2 carries the updated owner-approved user unit and removes the warmup asset; #713 supplies the additional rows. These counts describe the source, not host acceptance.
+Current structural inventory (2026-10-15): 84 rows, 198 install commands and 113 acceptance entries (including two additional checks). D-ollama-2 carries the updated owner-approved user unit and removes the warmup asset; #713 supplies the additional rows. These counts describe the source, not host acceptance.
 
 **Run the plan from a checkout of the repository** (step F7, "Clone origin/main", of `adoption/platforms/linux-wsl2-new-distro.md`). `worktrunk` and the convergence validators change into `repo_root`, the checkout three levels above this folder, so `install.sh` and `accept.sh` stop with a clear message when `repo_root` is not a git checkout (`install.sh --list` needs none).
 

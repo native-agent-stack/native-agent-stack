@@ -75,9 +75,13 @@ register_service_row() {
       printf 'needs_owner: existing %s differs from rendered unit; retained.\n' "$unit" >&2
       return 1
     fi
-  else
-    install -m 0600 -- "$source" "$units/$unit" || return "$?"
   fi
+  if [[ "$slot" == prometheus ]]; then
+    # Provisioning owns runtime state; the standalone unit renderer remains render-only.
+    # systemd v259 man/systemd.exec.xml:114-125,4757-4760 requires WorkingDirectory before start.
+    install -d -m 0700 -- "${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}/prometheus" || return "$?"
+  fi
+  if [[ ! -e "$units/$unit" ]]; then install -m 0600 -- "$source" "$units/$unit" || return "$?"; fi
   systemctl --user daemon-reload
 }
 selected() { [[ -z "$only" || "$only" == "$1" ]]; }
@@ -921,10 +925,12 @@ actionlint-kjanat() {
 
 dagu() {
   # Dagu | native-installer | planned
+  # Source: https://github.com/dagucloud/dagu/blob/v2.18.2/scripts/installer.sh#L1666 ; preflight custody before any configuration write/reload.
+  run_command 'unit="$HOME/.config/systemd/user/dagu.service"; if [[ -L "$unit" ]] || { [[ -e "$unit" ]] && ! cmp -s -- "$plan_dir/config/dagu.service" "$unit"; }; then printf "needs_owner: existing Dagu unit differs; retained before provisioning.\n" >&2; exit 1; fi; for drop in "$HOME/.config/systemd/user/dagu.service.d"/*.conf; do [[ -e "$drop" || -L "$drop" ]] || continue; if [[ -L "$drop" || "$drop" != "$HOME/.config/systemd/user/dagu.service.d/20-ns2604-coordinator.conf" ]] || ! cmp -s -- "$plan_dir/config/dagu-coordinator.conf" "$drop"; then printf "needs_owner: existing Dagu drop-in differs; retained before provisioning.\n" >&2; exit 1; fi; done' || return "$?"
   copy_config 'dagu-coordinator.conf' || return "$?"
   # Source: https://github.com/dagucloud/dagu/blob/v2.18.2/internal/cmn/config/loader.go#L2266
   # Source: https://github.com/systemd/systemd/blob/v259/man/systemd.unit.xml#L198
-  run_command 'mkdir -p "$HOME/.config/systemd/user/dagu.service.d"; install -m 0600 "$config_root/dagu-coordinator.conf" "$HOME/.config/systemd/user/dagu.service.d/20-ns2604-coordinator.conf"; systemctl --user daemon-reload' || return "$?"
+  run_command 'drop="$HOME/.config/systemd/user/dagu.service.d/20-ns2604-coordinator.conf"; if [[ -L "$drop" ]] || { [[ -e "$drop" ]] && ! cmp -s -- "$config_root/dagu-coordinator.conf" "$drop"; }; then printf "needs_owner: existing Dagu coordinator drop-in differs; retained.\n" >&2; exit 1; fi; mkdir -p "$HOME/.config/systemd/user/dagu.service.d"; install -m 0600 "$config_root/dagu-coordinator.conf" "$drop"; systemctl --user daemon-reload' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/README.md#L105
   run_command 'curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh | bash -s -- --version v2.18.2 --no-prompt --service "$dagu_service_mode" --service-scope user --host 127.0.0.1 --port 21080 --open-browser no' || return "$?"
   copy_config 'dagu.service' || return "$?"

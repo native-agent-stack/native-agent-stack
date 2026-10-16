@@ -73,16 +73,16 @@ Per-tool order is the W-PROF stage/position; missing entries block installation.
 
 Source: [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md).
 
-1. Install the selected pinned profile with the first bootstrap command of F9.
-2. Complete the native sign-ins F9 names on this host; they are never copied from another machine.
-3. Configure the same profile with the second bootstrap command of F9; collect its native receipts.
+1. Provision selected owners with F9's no-start command and complete host file; run its post-install checks.
+2. Configure both clients from the same host file with F9's check/apply commands before sign-in.
+3. Complete native sign-ins, then perform separately authorized activation and listener/health acceptance on this host.
 
 Commands, as the recipe page gives them:
 
 ```sh
 cd ~/code/native-agent-stack
-bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh
-bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh
+bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --no-start --host-file 'adoption/hosts/<host>.json'
+bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --host-file 'adoption/hosts/<host>.json'
 python3 -B tools/adoption/new_wsl_client_config.py --check
 python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'
 ```
@@ -2161,7 +2161,7 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | --- | --- |
 | [adoption/manifest.json](../adoption/manifest.json) | `c15d89df84e1cc346ca3efe0590a464cdcc5b2b772d3ef598739c7945778d238` (without source.release_tag, source.release_commit, updated_at) |
 | [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a` |
-| [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `d79da9e44ea865913f3dc9d78a0dcc2dc235ae02d7873ff60ed7ebcdd72d3781` |
+| [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `c6a9847197c06a3357930d1b45efeddcf249f954c32768103a26ffbda7f8f06d` |
 | [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `cddb68683ccc06101378c861a0af2bd3504d0a2ac3f070e93b66335bd3442cac` |
 | [catalogs/landscape/research-state.json](../catalogs/landscape/research-state.json) | `fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a` |
 | [catalogs/landscape/us-equities.json](../catalogs/landscape/us-equities.json) | `6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e` |

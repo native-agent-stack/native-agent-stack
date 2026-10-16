@@ -1442,7 +1442,7 @@ if (typeof topology.gateway?.endpoint !== "string" ||
   }
 const endpoint = new URL(topology.gateway?.endpoint);
 if (endpoint.protocol !== "http:" || endpoint.hostname !== "127.0.0.1" ||
-    endpoint.port !== "21128" || endpoint.pathname !== "/v1" ||
+    (endpoint.port || "80") !== "21128" || endpoint.pathname !== "/v1" ||
     endpoint.username || endpoint.password || endpoint.search || endpoint.hash) {
   throw new Error("The plan gateway endpoint must be http://127.0.0.1:21128/v1.");
   }

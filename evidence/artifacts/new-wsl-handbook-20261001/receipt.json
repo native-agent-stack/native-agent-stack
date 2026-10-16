@@ -3,11 +3,11 @@
   "kind": "new-wsl-handbook-profile-integration",
   "source_main": "86bb669ad6c81b9adafdb222d545a1bf2aa95218",
   "evidence_class": "local_integration",
-  "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+  "generator_sha256": "e8f3922837f4cb7a9ec67dab459ae60896dbae950d65c7de58d7b1a00354b496",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
-    "docs/new-wsl-handbook.json": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474"
+    "docs/new-wsl-handbook.md": "cdaf9a106f1b9ce4d2cd9e2ac514dff6b602ed09b8a5b07e4a25795acc2ea02c",
+    "docs/new-wsl-handbook.json": "f99f64e83cf425353efcfb7a7a6aec0f4423d8d7096979d3744d993e8802b28c"
   },
   "inventory": {
     "layers": 37,
@@ -1054,6 +1054,19 @@
       "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
       "evidence_class": "local_integration",
       "scope": "Regenerated through the unchanged native builder after the Harbor stack-component registration changed two hashed inputs: the adoption recipe map gained harbor, and the architecture edition's Nemotron revision citation moved from stack line 2118 to 2141 (the cited revision is unchanged). No host, model or provider acceptance."
+    },
+    {
+      "date": "2026-10-16",
+      "source_base": "5e3d3c2a501d5adf90891337bd70bf8bbb45d270",
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "e8f3922837f4cb7a9ec67dab459ae60896dbae950d65c7de58d7b1a00354b496",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "cdaf9a106f1b9ce4d2cd9e2ac514dff6b602ed09b8a5b07e4a25795acc2ea02c",
+        "docs/new-wsl-handbook.json": "f99f64e83cf425353efcfb7a7a6aec0f4423d8d7096979d3744d993e8802b28c"
+      },
+      "evidence_class": "local_integration",
+      "scope": "Current generated-byte binding for the explicit-host/no-start addendum only; no host or upstream acceptance."
     }
   ],
   "previous_outputs": [
@@ -1262,6 +1275,23 @@
         "docs/new-wsl-handbook.json": "fe0b6628bc589e59dc71a5a0fb6805ecab067e3f06043702919bf7f09ef9cba4"
       },
       "reason": "Harbor stack-component registration changes two hashed handbook inputs (adoption recipe map; architecture Nemotron stack-line citation); the previous maintained output binding is preserved as historical evidence."
+    },
+    {
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
+        "docs/new-wsl-handbook.json": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474"
+      },
+      "inventory": {
+        "layers": 37,
+        "profile_entries": 78,
+        "projected_tools": 82,
+        "canonical_package_ids": 26
+      },
+      "superseded_at_utc": "2026-10-16",
+      "source_head": "5e3d3c2a501d5adf90891337bd70bf8bbb45d270",
+      "reason": "Explicit-host/no-start F8/F9 addendum updates current stage-order instructions and generated handbook; prior history retained."
     }
   ]
 }

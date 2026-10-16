@@ -1053,9 +1053,9 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
             {"stage": 1, "source": DISTRO, "steps": stage1, "first_boot_prerequisites": first_boot,
              "boundary": "Recipe order only. The distro recipe is reference evidence; the clean-install image comparison remains open."},
             {"stage": 2, "source": DISTRO, "steps": [
-                "Install the selected pinned profile with the first bootstrap command of F9.",
-                "Complete the native sign-ins F9 names on this host; they are never copied from another machine.",
-                "Configure the same profile with the second bootstrap command of F9; collect its native receipts."],
+                "Provision selected owners with F9's no-start command and complete host file; run its post-install checks.",
+                "Configure both clients from the same host file with F9's check/apply commands before sign-in.",
+                "Complete native sign-ins, then perform separately authorized activation and listener/health acceptance on this host."],
              "commands": stage_two_commands_from_page(distro),
              "profile_order": (profile or {}).get("stage_order", []),
              "after_bootstrap": after_stage2,

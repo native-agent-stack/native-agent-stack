@@ -20,7 +20,7 @@ try {
   throw new Error('The plan gateway topology must declare its endpoint and distinct GPT/Claude model IDs.');
 }
 if (typeof endpoint !== 'string' || url.protocol !== 'http:' ||
-    url.hostname !== '127.0.0.1' || url.port !== '@PORT_GATEWAY@' ||
+    url.hostname !== '127.0.0.1' || (url.port || '80') !== '@PORT_GATEWAY@' ||
     url.pathname !== '/v1' || url.username || url.password || url.search || url.hash ||
     [gpt, claude].some(model => typeof model !== 'string' || !model.trim() ||
       ['your-gpt-model-id', 'your-claude-model-id', 'your-model-id'].includes(model) ||

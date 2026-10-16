@@ -268,8 +268,10 @@ one combined fold after the GPT read; a CC delta arriving before push joins it.
   no enable/start. The supported unit and environment mechanism remains
   [Dagu v2.18.2 installer:1666–1697](https://github.com/dagucloud/dagu/blob/v2.18.2/scripts/installer.sh#L1666),
   with [systemd v259 drop-in semantics](https://github.com/systemd/systemd/blob/v259/man/systemd.unit.xml#L198).
-- Prometheus's renderer creates its selected data/working directory before
-  publishing the unit. [systemd v259 man/systemd.exec.xml:114–125](https://github.com/systemd/systemd/blob/v259/man/systemd.exec.xml#L114)
+- Prometheus's install-time unit registration creates its selected data/working
+  directory; the standalone renderer stays render-only. This supersedes the
+  third-wave placement in the renderer, which violated its existing custody
+  contract. [systemd v259 man/systemd.exec.xml:114–125](https://github.com/systemd/systemd/blob/v259/man/systemd.exec.xml#L114)
   requires that directory; [4757–4760](https://github.com/systemd/systemd/blob/v259/man/systemd.exec.xml#L4757)
   identifies failure as `200/CHDIR`. This is a source/fixture correction, with
   native service startup still unmeasured.
@@ -344,3 +346,82 @@ The README's 8080-to-21808 correction is **source_review**. The pre-existing
 Agentsview render already used 21808, so its compatibility check passes before
 the prose edit. No prose-specific fail-first test is claimed; the failed-before
 Agentsview fixture covers conflicting-configuration custody instead.
+
+## Fourth review wave preparation
+
+The six subcases reported by the CC for Prometheus reproduce against
+`5e3d3c2a`: valid, changed_owned, edited, symlink, operator_custody and string_port
+all observe runtime state created by a render-only operation. Moving directory
+preparation into install-time unit registration restores that contract; the
+unchanged custody test and no-start registration fixture pass. No native service
+is started locally. The third-wave receipt remains historical; its renderer
+placement claim is superseded by this correction.
+
+The additional `review_output.json` finds the first-snapshot upgrade and Dagu
+drop-in issues. When a config directory already contains assets but no allocation
+snapshot exists, staging now returns `needs_owner` before any row runs. A prior
+installation's unselected allocations cannot be inferred from a requested host
+file; the operator must establish the complete installed allocation before
+migrating it. Fresh empty configuration still stages the complete explicit host
+map. Dagu checks the existing coordinator drop-in for differing bytes or a symlink
+before its first write, so a later comparison cannot conceal an earlier overwrite.
+
+The gateway allocator permits HTTP port 80. Node's WHATWG URL implementation
+normalizes a scheme's default port to an empty string
+([Node.js v24.21.0 doc/api/url.md:383–386](https://github.com/nodejs/node/blob/v24.21.0/doc/api/url.md#L383)).
+Both Promptfoo config loading and its extracted acceptance predicate now compare
+the effective HTTP port. The correct port-80 topology failed against the original
+5e3d3c2a config and passes after correction; the two distinct synthetic model
+routes are present in that control. An earlier draft control omitted the Claude
+route and failed for that independent reason; it is not the port fail-first proof.
+This validator source correction supersedes one of the 30 default byte fixtures:
+29 still compare byte-for-byte, and Promptfoo's default native exported config
+compares equal to the unchanged8053 source. The original source digest is retained
+and marked with that explicit supersession; all six dashboard bytes still match.
+
+The [host-allocation addendum](../../../docs/decisions/2026-10-16-new-wsl-host-allocation-addendum.md)
+supersedes the old F8/F9 commands and fixed Codex distro identity while preserving
+both original decisions. The recipe, checklist, current receipt example and
+generated handbook carry complete explicit host inputs. The fixture's collision
+inventory includes optional/metrics ports after marker expansion. Documentation
+and collision guards fail before the changes and pass afterwards. The frozen
+image template and experiment inputs remain unchanged.
+
+### GPT fix2 completion: publication races and direct contract sources
+
+`GPT-VERDICT-5e3d3c2a5.md` agrees on the two blockers and adds three follow-ups.
+The complete Dagu preflight now checks the main unit and every installed drop-in
+before any configuration write or reload, including the managed coordinator
+filename. A sequence fixture first exposed the remaining unknown-drop-in case:
+the row had already written/reloaded its coordinator before refusing the other
+file. That sequence now refuses without changing either file or requesting reload.
+Prometheus prepares its directory after custody validation and before placing the
+unit, retaining both the render-only and no-start contracts.
+
+Staging records a fingerprint of the prior nonsecret allocation snapshot and
+checks it again before returning. Publication takes an advisory lock, compares
+that baseline with the current snapshot, and publishes exactly the staged
+effective allocation. A changed snapshot fails with `needs_owner`; it is not
+merged into already-rendered assets. The interleaving fixture failed before this
+guard and passes after it. The lock serializes cooperating publishers through
+[CPython v3.13.16 Doc/library/fcntl.rst:176–205](https://github.com/python/cpython/blob/v3.13.16/Doc/library/fcntl.rst#L176).
+This is repository coordination policy, not a claim of whole-install rollback or
+protection from an external writer that ignores the lock. Partial asset recovery
+still follows the procedure above.
+
+The selective-allocation policy reuses the existing dispatcher at
+[native-agent-stack 58ee5cd49, install.sh:83,1284–1294,1350–1364](https://github.com/native-agent-stack/native-agent-stack/blob/58ee5cd49d6d9b19701892b072e22b47ca5889bf/evidence/artifacts/new-wsl-install-plan-20261002/install.sh#L1284):
+default/named selection, dependency dispatch and measurement-only rows. Per-owner
+allocation merging and change detection are new repository policy around that
+contract; they are not attributed to a service vendor.
+
+The runtime repair reuses
+[58ee5cd49 new_wsl_client_config.py:1106–1199](https://github.com/native-agent-stack/native-agent-stack/blob/58ee5cd49d6d9b19701892b072e22b47ca5889bf/tools/adoption/new_wsl_client_config.py#L1106),
+[the shared allocation loader at config/observability_config.py:156–175](https://github.com/native-agent-stack/native-agent-stack/blob/58ee5cd49d6d9b19701892b072e22b47ca5889bf/evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py#L156),
+and [5e3d3c2a mcp_template_drift.py:61–94](https://github.com/native-agent-stack/native-agent-stack/blob/5e3d3c2a501d5adf90891337bd70bf8bbb45d270/tools/adoption/mcp_template_drift.py#L61).
+The consumer audit now also names
+[runtime_acceptance.py:22,120,136 at5e3d3c2a](https://github.com/native-agent-stack/native-agent-stack/blob/5e3d3c2a501d5adf90891337bd70bf8bbb45d270/tools/adoption/runtime_acceptance.py#L120).
+Its direct and credential-wrapped checks use the same current profile environment;
+fixtures intercept all native/credential calls and assert the allocated endpoint
+on both paths. Invalid explicit allocation must be corrected before retry. No
+production change to that acceptance caller was needed.

@@ -70,6 +70,33 @@ class StrictHostConsumerTests(unittest.TestCase):
                 with self.assertRaisesRegex(profiles.ProfileError, "NS2604_HOST_FILE"):
                     profiles.render_wsl_mcp(root, root)
 
+    def test_runtime_acceptance_uses_current_host_values_for_direct_and_credential_wrapped_checks(self):
+        for profile in ("pi-gpt", "pi-claude"):
+            with self.subTest(profile=profile), tempfile.TemporaryDirectory() as tmp:
+                state = Path(tmp)
+                root = state / profile
+                root.mkdir()
+                (root / "profile.json").write_text(json.dumps({"pi_bin": "/fixture/pi", "mcp_server_names": ["context-mode"]}))
+                args = argparse.Namespace(state_root=state, workspace=state, out=state / "receipts",
+                                          role_scope=None, tokenizer_python=Path(sys.executable))
+                calls = []
+                def native(command, **kwargs):
+                    calls.append((command, kwargs))
+                    return 0, json.dumps({"servers": []}) if "mcp" in command else "{}"
+                with mock.patch.dict(os.environ, {"NS2604_HOST_FILE": str(self.host(state))}), \
+                        mock.patch.object(acceptance, "native", side_effect=native), \
+                        mock.patch.object(acceptance, "choose_slot", return_value="fixture-slot"), \
+                        mock.patch.object(acceptance, "discovered", return_value=[]), \
+                        mock.patch.object(acceptance, "skill_integrity", return_value={"managed_pass": True}), \
+                        redirect_stdout(io.StringIO()):
+                    acceptance.check(args, profile)
+                self.assertTrue(calls)
+                wanted = "http://127.0.0.1:31318"
+                if profile == "pi-gpt":
+                    self.assertEqual(calls[0][1]["env"]["OTEL_EXPORTER_OTLP_ENDPOINT"], wanted)
+                else:
+                    self.assertIn("OTEL_EXPORTER_OTLP_ENDPOINT=" + wanted, calls[0][0])
+
 
 def pi_events(handle, *, error=None, tokens=0, cost=0):
     """Pi --mode json events for one assistant turn: refused with `error` ("<status> <body>"), or completed."""

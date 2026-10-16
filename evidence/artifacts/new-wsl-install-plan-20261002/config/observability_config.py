@@ -10,6 +10,7 @@ adapted in ns2604-research-progress.service and .timer) into <config-root>/syste
 """
 import argparse
 import configparser
+import fcntl
 import hashlib
 import json
 import os
@@ -189,11 +190,21 @@ def installation_ports(ports, root, plan, slot=None):
     selected = {slot} if slot is not None else {name for name, row in rows.items() if row.get("installed")}
     active = root / ".service-ports.json"
     if not active.exists():
+        if root.exists() and any(path.name != ".service-ports.lock" for path in root.iterdir()):
+            raise ValueError("needs_owner: existing configuration has no allocation snapshot; establish the installed owners' complete allocation before migration")
         return ports
     previous = service_ports(json.loads(active.read_text()), require_complete=True)
     merged = {"NS_PORT_" + name: str(ports[name] if owner in selected else previous[name])
               for name, (owner, _) in SERVICE_PORTS.items()}
     return service_ports(merged, require_complete=True)
+
+
+def allocation_fingerprint(root):
+    """Compare only the nonsecret allocation snapshot; never expose its digest."""
+    path = root / ".service-ports.json"
+    if path.is_symlink():
+        raise ValueError("needs_owner: allocation snapshot is a symlink; retained")
+    return hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None
 
 
 def planned_listeners(plan, ports, slot=None, program="", enabled_optional=()):
@@ -457,14 +468,20 @@ def main():
     if args.action == "commit-ports":
         if args.host_file is None:
             raise ValueError("commit-ports requires the successful installation's candidate --host-file")
-        if args.plan_file is not None:
-            ports = installation_ports(ports, root, json.loads(args.plan_file.read_text()), args.slot)
-            if args.slot is not None and args.slot not in {owner for owner, _ in SERVICE_PORTS.values()}:
-                return 0  # An unrelated row cannot establish an initial service allocation either.
-        target = root / ".service-ports.json"
-        if target.is_symlink():
-            raise ValueError("needs_owner: active allocation is a symlink; retained")
-        atomic(target, json.dumps({"NS_PORT_" + name: str(port) for name, port in ports.items()}, indent=2) + "\n")
+        if args.slot is not None and args.slot not in {owner for owner, _ in SERVICE_PORTS.values()}:
+            return 0  # An unrelated row cannot establish an initial service allocation either.
+        baseline_path = args.host_file.parent / ".allocation-baseline.json"
+        if not baseline_path.is_file():
+            raise ValueError("commit-ports requires the baseline captured during staging")
+        baseline = json.loads(baseline_path.read_text())
+        # CPython v3.13.16 Doc/library/fcntl.rst: flock serializes cooperating publishers.
+        root.mkdir(parents=True, exist_ok=True, mode=0o700)
+        descriptor = os.open(root / ".service-ports.lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+        with os.fdopen(descriptor, "w") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            if baseline != {"sha256": allocation_fingerprint(root)}:
+                raise ValueError("needs_owner: allocation changed after staging; publication refused")
+            atomic(root / ".service-ports.json", json.dumps({"NS_PORT_" + name: str(port) for name, port in ports.items()}, indent=2) + "\n")
         return 0
     if args.action == "code-graph":
         # DeusData/codebase-memory-mcp v0.11.0 src/ui/config.c:124-157:
@@ -487,6 +504,7 @@ def main():
     if args.action == "stage":
         if args.output_root is None or args.source_root is None:
             raise ValueError("stage requires --source-root and --output-root")
+        baseline = allocation_fingerprint(root)
         if args.plan_file is not None:
             ports = installation_ports(ports, root, json.loads(args.plan_file.read_text()), args.slot)
         for path in sorted(source.rglob("*")):
@@ -496,6 +514,9 @@ def main():
                 atomic(args.output_root / path.relative_to(source),
                        text if path.name == "observability_config.py" else render_asset(path.name, text, ports))
         atomic(args.output_root / ".service-ports.json", json.dumps({"NS_PORT_" + name: str(port) for name, port in ports.items()}, indent=2) + "\n")
+        if baseline != allocation_fingerprint(root):
+            raise ValueError("needs_owner: allocation changed during staging; candidate refused")
+        atomic(args.output_root / ".allocation-baseline.json", json.dumps({"sha256": baseline}) + "\n")
         return 0
     if args.action in ("grafana", "grafana-check"):
         # CPython@v3.13.16:Lib/pathlib/_abc.py:432-437, unlike exists(),
@@ -605,9 +626,6 @@ def main():
             rendered = rendered.replace(marker, value)
         if re.search(r"@[A-Z_]+@", rendered):
             raise ValueError("unresolved Prometheus unit template marker")
-        # systemd v259 man/systemd.exec.xml:114-125,4757-4760:
-        # WorkingDirectory must exist before the service can reach its executable.
-        (data / "prometheus").mkdir(parents=True, exist_ok=True, mode=0o700)
         publish("ns2604-prometheus.service", rendered, template)
     elif args.action == "otel":
         for name in ("otelcol/queue", "collector", "sdk-receipts"):

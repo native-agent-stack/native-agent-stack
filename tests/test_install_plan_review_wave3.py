@@ -157,7 +157,8 @@ class ReviewWave3Tests(unittest.TestCase):
             self.assertNotIn("enable", result.stdout)
             self.assertNotIn("start", result.stdout)
 
-    def test_prometheus_render_provisions_its_unit_working_directory(self):
+    def test_prometheus_registration_provisions_its_unit_working_directory(self):
+        _, funcs = self.functions()
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             result = self.render("prometheus", root)
@@ -165,6 +166,15 @@ class ReviewWave3Tests(unittest.TestCase):
             unit = (root / "config/ns2604-prometheus.service").read_text()
             directory = Path(re.search(r"(?m)^WorkingDirectory=(.+)$", unit)[1])
             self.assertEqual(directory, root / "data/prometheus")
+            self.assertFalse(directory.exists(), "standalone unit rendering must not provision runtime state")
+            script = ('systemctl() { printf "FAKE %s\\n" "$*"; };\nregister_service_row() {\n'
+                      + funcs["register_service_row"] + '\n}\nregister_service_row prometheus')
+            registered = subprocess.run(["bash", "-euo", "pipefail", "-c", script],
+                env={"PATH": "/usr/bin:/bin", "HOME": tmp, "config_root": str(root / "config"),
+                     "NS2604_OBSERVABILITY_DATA": str(root / "data"), "NS2604_NO_START": "1"},
+                text=True, capture_output=True)
+            self.assertEqual(registered.returncode, 0, registered.stderr)
+            self.assertEqual(registered.stdout.strip(), "FAKE --user daemon-reload")
             self.assertTrue(directory.is_dir(), unit)
 
     def test_dagu_no_start_retains_matching_units_but_refuses_unknown_environment_dropins(self):
@@ -193,6 +203,163 @@ class ReviewWave3Tests(unittest.TestCase):
                     self.assertEqual(result.returncode, 0, result.stderr)
                     self.assertEqual(result.stdout.strip(), "FAKE --user daemon-reload")
                 self.assertEqual((units / "dagu.service").read_text(), content)
+
+
+class ReviewWave4DocumentationTests(unittest.TestCase):
+    def test_live_recipe_and_handbook_use_the_explicit_host_for_no_start(self):
+        for name in ("adoption/platforms/linux-wsl2-new-distro.md", "docs/new-wsl-handbook.md"):
+            with self.subTest(path=name):
+                text = (ROOT / name).read_text()
+                self.assertTrue("install.sh --no-start --host-file 'adoption/hosts/<host>.json'" in text, name)
+                self.assertTrue("accept.sh --host-file 'adoption/hosts/<host>.json'" in text, name)
+
+    def test_checklist_requires_complete_allocations_and_host_identity(self):
+        text = (ROOT / "adoption/templates/wsl/first-boot-checklist.md").read_text()
+        f8 = next(line for line in text.splitlines() if line.startswith("- [ ] **F8**"))
+        self.assertIn("NS_PORT_*", f8)
+        self.assertIn("WSL_DISTRO_NAME", f8)
+        self.assertNotIn("four ports", f8)
+        self.assertNotIn("nine keys", f8)
+
+    def test_addendum_supersedes_both_decisions_without_rewriting_them(self):
+        addendum = ROOT / "docs/decisions/2026-10-16-new-wsl-host-allocation-addendum.md"
+        self.assertTrue(addendum.is_file())
+        text = addendum.read_text()
+        for name in ("2026-10-01-new-wsl-distro-recipe.md", "2026-10-02-new-wsl-client-configuration.md"):
+            self.assertIn(name, text)
+            path = "docs/decisions/" + name
+            self.assertEqual((ROOT / path).read_bytes(), subprocess.check_output(["git", "show", "5e3d3c2a:" + path], cwd=ROOT))
+        self.assertIn("WSL_DISTRO_NAME", text)
+        self.assertIn("Supersedes", text)
+
+
+class ReviewWave4RuntimeTests(unittest.TestCase):
+    def test_publication_refuses_a_snapshot_changed_after_staging(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave4_concurrent_allocation")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config, staged = root / "config", root / "staged"
+            config.mkdir()
+            active = config / ".service-ports.json"
+            active.write_text(json.dumps(host_allocation({"NS_PORT_GATEWAY": "31128"})))
+            host = root / "B.json"
+            host.write_text(json.dumps(host_allocation({"NS_PORT_MEMORY": "39374"})))
+            command = [sys.executable, str(PLAN / "config/observability_config.py")]
+            env = {"PATH": "/usr/bin:/bin", "HOME": tmp}
+            stage = subprocess.run(command + ["stage", "--config-root", str(config), "--output-root", str(staged),
+                "--source-root", str(PLAN / "config"), "--host-file", str(host), "--plan-file", str(PLAN / "install-plan.json"),
+                "--slot", "memory-owner"], env=env, text=True, capture_output=True)
+            self.assertEqual(stage.returncode, 0, stage.stderr)
+            later = json.dumps(host_allocation({"NS_PORT_GATEWAY": "51128"}))
+            active.write_text(later)
+            commit = subprocess.run(command + ["commit-ports", "--config-root", str(config),
+                "--host-file", str(staged / ".service-ports.json"), "--plan-file", str(PLAN / "install-plan.json"),
+                "--slot", "memory-owner"], env=env, text=True, capture_output=True)
+            self.assertNotEqual(commit.returncode, 0)
+            self.assertIn("changed", commit.stderr)
+            self.assertEqual(active.read_text(), later)
+
+    def test_dagu_preflight_preserves_all_assets_before_any_reload(self):
+        checker = module(PLAN / "check_plan.py", "wave4_dagu_sequence")
+        funcs = checker.functions((PLAN / "install.sh").read_text())
+        commands = checker.run_commands("dagu", funcs, set())
+        selected = [c for c in commands if "installer.sh" not in c]
+        script = 'systemctl() { printf "RELOAD %s\\n" "$*"; };\n' + '\n'.join(selected)
+        for filename in ("20-ns2604-coordinator.conf", "90-operator.conf"):
+            with self.subTest(filename=filename), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                config = root / "config"
+                config.mkdir()
+                unit = "[Service]\nEnvironment=DAGU_PORT=21080\n"
+                coordinator = "[Service]\nEnvironment=DAGU_COORDINATOR_PORT=50055\n"
+                for name, text in (("dagu.service", unit), ("dagu-coordinator.conf", coordinator)):
+                    (config / name).write_text(text)
+                units = root / ".config/systemd/user"
+                (units / "dagu.service.d").mkdir(parents=True)
+                (units / "dagu.service").write_text(unit)
+                target = units / "dagu.service.d" / filename
+                original = "[Service]\nEnvironment=DAGU_PORT=31080\n"
+                target.write_text(original)
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", script],
+                    env={"PATH": "/usr/bin:/bin", "HOME": tmp, "config_root": str(config), "plan_dir": tmp,
+                         "NS2604_NO_START": "1"}, text=True, capture_output=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("needs_owner", result.stderr)
+                self.assertEqual(target.read_text(), original)
+                self.assertNotIn("RELOAD", result.stdout)
+                if filename != "20-ns2604-coordinator.conf":
+                    self.assertFalse((units / "dagu.service.d/20-ns2604-coordinator.conf").exists())
+
+    def test_promptfoo_default_export_matches_unchanged_base_source(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave4_promptfoo_default")
+        topology = {"gateway": {"endpoint": "http://127.0.0.1:21128/v1"},
+                    "pool_fallback": {"model": "fixture/gpt", "model_reasoning_effort": "max"},
+                    "promptfoo": {"claude_model": "fixture/claude"}}
+        original = subprocess.check_output(["git", "show", "8053f14e7:evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-gateway.cjs"], cwd=ROOT, text=True)
+        current = renderer.render_ports((PLAN / "config/promptfoo-gateway.cjs").read_text(), renderer.service_ports())
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "gpt-gateway-topology.json").write_text(json.dumps(topology))
+            outputs = []
+            for name, text in (("before.cjs", original), ("after.cjs", current)):
+                (root / name).write_text(text)
+                result = subprocess.run(["node", "-e", "process.stdout.write(JSON.stringify(require(process.argv[1])));", str(root / name)], text=True, capture_output=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                outputs.append(result.stdout)
+            self.assertEqual(*outputs)
+
+    def test_first_snapshot_refuses_unknown_unselected_installed_allocations(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave4_first_snapshot")
+        plan = json.loads((PLAN / "install-plan.json").read_text())
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "omniroute.service").write_text("[Service]\nEnvironment=PORT=21128\n")
+            candidate = renderer.service_ports({"NS_PORT_GATEWAY": "41128"})
+            with self.assertRaisesRegex(ValueError, "needs_owner"):
+                renderer.installation_ports(candidate, root, plan, "code-graph")
+
+    def test_dagu_coordinator_refuses_operator_bytes_before_any_write(self):
+        checker = module(PLAN / "check_plan.py", "wave4_dagu_custody")
+        funcs = checker.functions((PLAN / "install.sh").read_text())
+        command = next(c for c in checker.run_commands("dagu", funcs, set()) if '20-ns2604-coordinator.conf' in c and 'if [[ "$NS2604_NO_START"' not in c)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "config").mkdir()
+            (root / "config/dagu-coordinator.conf").write_text("[Service]\nEnvironment=DAGU_COORDINATOR_PORT=50055\n")
+            target = root / ".config/systemd/user/dagu.service.d/20-ns2604-coordinator.conf"
+            target.parent.mkdir(parents=True)
+            original = "[Service]\nEnvironment=DAGU_COORDINATOR_PORT=35055\n"
+            target.write_text(original)
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", 'systemctl() { :; };\n' + command],
+                env={"PATH": "/usr/bin:/bin", "HOME": tmp, "config_root": str(root / "config"), "plan_dir": tmp, "NS2604_NO_START": "1"},
+                text=True, capture_output=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("needs_owner", result.stderr)
+            self.assertEqual(target.read_text(), original)
+
+    def test_promptfoo_accepts_the_effective_default_http_port(self):
+        import shutil
+        node = shutil.which("node")
+        if node is None:
+            self.skipTest("node is required for the native URL parser fixture")
+        renderer = module(PLAN / "config/observability_config.py", "wave4_promptfoo_ports")
+        ports = renderer.service_ports({"NS_PORT_GATEWAY": "80"})
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ("promptfoo-gateway.cjs", "gpt-gateway-topology.json"):
+                (root / name).write_text(renderer.render_ports((PLAN / "config" / name).read_text(), ports))
+            topology = json.loads((root / "gpt-gateway-topology.json").read_text())
+            topology["promptfoo"] = {"claude_model": "fixture/claude-route"}
+            (root / "gpt-gateway-topology.json").write_text(json.dumps(topology))
+            result = subprocess.run([node, "-e", "require(process.argv[1]);", str(root / "promptfoo-gateway.cjs")], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            checker = module(PLAN / "check_plan.py", "wave4_promptfoo_acceptance")
+            body = checker.functions((PLAN / "accept.sh").read_text())["promptfoo"]
+            program = next(p for stage, _, _, p in checker.checks_of(body) if stage == "after_sign_in")
+            js = program.split("<<'JS'\n", 1)[1].split("\nJS", 1)[0]
+            result = subprocess.run([node, "-", str(root / "gpt-gateway-topology.json")],
+                input=renderer.render_command(js, ports), text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
 
 
 if __name__ == "__main__":

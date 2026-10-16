@@ -17,21 +17,21 @@
     {
       "script": "install.sh",
       "old_line": 1034,
-      "current_line": 1140,
+      "current_line": 1146,
       "status": "repinned_live",
       "anchor_sha256": "fe99ee8c563bc26042367467a6d48062634230383ee038f82413cd9e547566bf"
     },
     {
       "script": "install.sh",
       "old_line": 1036,
-      "current_line": 1142,
+      "current_line": 1148,
       "status": "repinned_live",
       "anchor_sha256": "30f513fd2f82b468003d3d8ab55683e6f55f6635f2eb267a1ed80a67107a2fa6"
     },
     {
       "script": "install.sh",
       "old_line": 1136,
-      "current_line": 1242,
+      "current_line": 1248,
       "status": "repinned_live",
       "anchor_sha256": "d90536572f912dd52347994c9852b5c98afef10316757881e13a7833f8a062f5"
     },
@@ -45,14 +45,14 @@
     {
       "script": "install.sh",
       "old_line": 327,
-      "current_line": 414,
+      "current_line": 418,
       "status": "preserved_hash_bound_history",
       "anchor_sha256": "a1c5e2b55f03f2b74f3c639ece86372a6c82b3f9e46ae531b4ace54a380a5845"
     },
     {
       "script": "install.sh",
       "old_line": 948,
-      "current_line": 1053,
+      "current_line": 1059,
       "status": "preserved_hash_bound_history",
       "anchor_sha256": "d36f4e29900bafef779ea763c681bf70ef605a5f5de16d1ccda48d63fea6e621"
     },
@@ -73,5 +73,6 @@
   ],
   "review_wave_1": "Before editing, git grep found 77 install/accept citations. runtime_profiles.py GPT_MODEL stays at line43; its other cited lines stay fixed. gpt_researcher.sh line27 stays fixed; helper resolution is below it.",
   "review_wave_2": "Pre-edit git grep inventoried install/accept/Inspector citations. Inspector substitutions and recipe freezing preserve its line count; model-helper/staging changes repin live install locators. Frozen critic bytes remain unchanged.",
-  "review_wave_3": "Pre-edit git grep inventoried77 install/accept hits across36 files. Grafana custody dispatch and selected-allocation staging shift live install locators; accept locators and frozen critic bytes are unchanged."
+  "review_wave_3": "Pre-edit git grep inventoried77 install/accept hits across36 files. Grafana custody dispatch and selected-allocation staging shift live install locators; accept locators and frozen critic bytes are unchanged.",
+  "review_wave_4": "Pre-edit git grep:77 hits/36 files. Prometheus directory provisioning moves into install-time registration; live install locators repinned. Same-line Dagu/HTTP effective-port corrections preserve accept line counts. Original decisions and frozen critic remain unchanged."
 }
