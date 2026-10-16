@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "status": "PROPOSED_RUN_PINS",
+  "catalog": "foundation",
+  "layer_id": "native-clients",
+  "source_base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82",
+  "source_policy": "All repository path:line citations refer to this base. No active adoption, verdict, angle or generated run pin changes in this PR.",
+  "winners": [
+    {
+      "component_id": "claude-code",
+      "proposed_run_pin": "2.1.301",
+      "repository": "https://github.com/anthropics/claude-code",
+      "source_tag": "v2.1.301",
+      "source_commit": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+      "reason": "The clean-install plan supersedes 2.1.300 with 2.1.301. Fresh native version output at this exact pin and vendor-native installation output support this proposed measurement pin only; older role qualification does not transfer.",
+      "sources": [
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 10497,
+          "value": "2.1.295",
+          "role": "generated run pin",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 6992,
+          "value": "2.1.278",
+          "role": "historical verdict pin",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "adoption/pins-linux-x86_64.json",
+          "line": 118,
+          "value": "minimum",
+          "role": "version-probe matching semantics",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "adoption/pins-linux-x86_64.json",
+          "line": 106,
+          "value": "2.1.295",
+          "role": "adoption version; minimum semantics cited separately",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "adoption/pins-macos-arm64.json",
+          "line": 100,
+          "value": "minimum",
+          "role": "version-probe matching semantics",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "adoption/pins-macos-arm64.json",
+          "line": 86,
+          "value": "2.1.295",
+          "role": "adoption version; minimum semantics cited separately",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 140,
+          "value": "F1/E2E/invoke gaps",
+          "role": "layer plan row",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 701,
+          "value": "2.1.300 and 2.1.301",
+          "role": "later installed-version observations",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 700,
+          "value": "2.1.295",
+          "role": "earlier plan drift",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 1027,
+          "value": "2.1.301",
+          "role": "later plan supersession",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "catalogs/landscape/angles/foundation-native-clients.json",
+          "line": 39,
+          "value": "3deb873687379f0c199a69fdaccc65f0865f7a29",
+          "role": "earlier source-review pin",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "evidence/receipts/native-sdk-role-mcp-followup-20261002.json",
+          "line": 1,
+          "value": "2.1.288",
+          "role": "latest-committed registered native CLI evidence pin; scoped staged-client/SDK evidence",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        }
+      ],
+      "drifts": [
+        "Generated run/adoption minimum is 2.1.295; the proposed measured pin is 2.1.301. A minimum floor passing is not evidence that the run occurred at the floor.",
+        "Historical verdict and role receipts at 2.1.278/2.1.288 do not qualify native tasks or recovery at 2.1.301.",
+        "Earlier angle source commit differs from the 2.1.301 public tag; carry its non-capability angles as dated evidence, not a current re-score.",
+        "No fresh macOS smoke or exact-pin macOS adoption record is supplied."
+      ],
+      "proposal_source": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-version.stdout.txt:1",
+      "public_tag_source": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-public-tag.stdout.txt:1"
+    },
+    {
+      "component_id": "codex",
+      "proposed_run_pin": "0.162.1",
+      "repository": "https://github.com/openai/codex",
+      "source_tag": "rust-v0.162.1",
+      "source_commit": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "reason": "The clean-install observation and existing angle source match release 0.162.1. Fresh vendor-native installation and version output support freezing this measurement pin; reviewed installer release labels do not freeze a future runtime.",
+      "sources": [
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 10536,
+          "value": "0.155.1",
+          "role": "separate macOS run conflict",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 10541,
+          "value": "0.160.0",
+          "role": "generated run pin",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7014,
+          "value": "0.155.1",
+          "role": "historical verdict pin",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "adoption/pins-linux-x86_64.json",
+          "line": 54,
+          "value": "0.160.0",
+          "role": "Linux adoption pin",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "adoption/pins-macos-arm64.json",
+          "line": 60,
+          "value": "0.155.1",
+          "role": "macOS adoption pin",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 140,
+          "value": "F1/E2E/invoke gaps",
+          "role": "layer plan row",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 964,
+          "value": "0.162.1 observed; native installer row unpinned",
+          "role": "clean-install observation",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "catalogs/landscape/angles/foundation-native-clients.json",
+          "line": 168,
+          "value": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+          "role": "angle source matches proposed release commit",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        {
+          "path": "evidence/receipts/codex-01592-host-finalization-20260930.json",
+          "line": 23,
+          "value": "0.159.2",
+          "role": "latest-committed registered native CLI evidence pin; not production or live provider acceptance",
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        }
+      ],
+      "drifts": [
+        "Generated/Linux run pin 0.160.0 and macOS 0.155.1 differ from the measured proposal 0.162.1.",
+        "The clean-install native-installer row has no exact version; its observed output alone does not freeze a future install.",
+        "Historical verdict 0.155.1 and native acceptance 0.159.2 do not establish full tasks or recovery on 0.162.1.",
+        "No fresh macOS execution is supplied."
+      ],
+      "proposal_source": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-version.stdout.txt:1",
+      "public_tag_source": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-public-tag.stdout.txt:2"
+    }
+  ],
+  "installed_version_observations": [
+    {
+      "component_id": "claude-code",
+      "output_source": "evidence/artifacts/final-native-clients-prep-20261016/native/host-claude-native-version.stdout.txt:1",
+      "command_and_exit_source": "evidence/artifacts/final-native-clients-prep-20261016/native/index.json:1159",
+      "observed_version": "2.1.301",
+      "exit_code": 0,
+      "boundary": "Direct native --version after the scrubbed launcher attempt returned 127; both captures retained."
+    },
+    {
+      "component_id": "codex",
+      "output_source": "evidence/artifacts/final-native-clients-prep-20261016/native/host-codex-version.stdout.txt:1",
+      "command_and_exit_source": "evidence/artifacts/final-native-clients-prep-20261016/native/index.json:1211",
+      "observed_version": "0.162.1",
+      "exit_code": 0,
+      "boundary": "Read-only existing-client version observation, not authenticated task invocation."
+    }
+  ],
+  "last_committed_registered_evidence": {
+    "path": "evidence/receipts/decision-record-index-20261008.json",
+    "line": 18,
+    "last_commit": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+    "commit_time": "2026-10-08T12:28:06-04:00",
+    "selection_method": "git log -1 --format=%H %cI --name-only -- <all receipt paths registered to each component at the base>",
+    "meaning": "The newest registered receipt commit is an artifact index, not a client-version execution record. Pin-bearing native CLI records are listed separately per winner.",
+    "native_sources": [
+      "evidence/artifacts/final-native-clients-prep-20261016/native/latest-evidence-claude-code.stdout.txt:1",
+      "evidence/artifacts/final-native-clients-prep-20261016/native/latest-evidence-codex.stdout.txt:1"
+    ]
+  },
+  "co_op_relayed_install_input": {
+    "recorded_at": "2026-10-16T05:44:38Z",
+    "classification": "Attributed F1 input, not a new install or an independent measurement by this lane",
+    "source_record_name": "HARNESS-INSTALL-STATUS-20261016.md",
+    "source_line": null,
+    "capture_status": "Original source record and exact supporting lines not supplied to this lane; retain this named citation/capture gap",
+    "rows": [
+      {
+        "component_id": "codex",
+        "reviewed_release": "rust-v0.160.0",
+        "reviewed_release_source": {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+          "line": 54,
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        "runtime_lock_exception_source": {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+          "line": 96
+        },
+        "reported_installed_version": "0.162.1",
+        "reported_install_context": "Interim stage C, 2026-10-15",
+        "reported_native_output_name": "row-codex.log",
+        "public_release_binary_name": "0.162.1-x86_64-unknown-linux-musl standalone release",
+        "reported_public_release_binary_sha256": "628e35487d888a28f0427fc37501da529dd3d81fcbad7a2c3421c1e8670d92e1",
+        "independent_scratch_binary_hash_source": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-installed-sha256.stdout.txt:1",
+        "independent_scratch_hash_boundary": "Fresh scratch binary digest matches the relayed public release digest. This does not re-observe the other host."
+      },
+      {
+        "component_id": "claude-code",
+        "reviewed_release": "v2.1.287",
+        "reviewed_release_source": {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+          "line": 13,
+          "base_commit": "1b633d861518fa0d299279b1cfaec11d0fb47f82"
+        },
+        "runtime_lock_exception_source": {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+          "line": 47
+        },
+        "reported_installed_version": "2.1.301",
+        "reported_install_context": "Decision 8 re-pin",
+        "public_release_binary_name": "Claude Code 2.1.301 Linux x64 release",
+        "reported_public_release_binary_sha256": "bc1aad9982c7b59c7d889ff92595d61cf46e0a6eae074cb551d932a989bcd222",
+        "independent_scratch_binary_hash_source": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-installed-sha256.stdout.txt:1",
+        "independent_scratch_hash_boundary": "Fresh scratch binary digest matches the relayed public release digest. This does not re-observe the other host."
+      }
+    ],
+    "boundary": "Original private source is cited by name only; no source-record digest or home path is published. The release-binary digests now also have independent fresh scratch hash captures. The other-host observation remains attributed and does not close task E2E/F2/A6."
+  },
+  "native_capture_index": "native/index.json",
+  "derived_analysis": true
+}

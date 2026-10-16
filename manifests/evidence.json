@@ -2,6 +2,24 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "final-native-clients-preparation-20261016",
+      "kind": "compatibility_attempt",
+      "component_ids": [
+        "claude-code",
+        "codex"
+      ],
+      "claim": "Exact-pin vendor-native installation and offline CLI readiness at Claude Code 2.1.301 and Codex 0.162.1, with retained masked native captures and a proposed F1 reconciliation. Authenticated task E2E, full tool invocation, recovery and comparative A6 remain named gaps.",
+      "limitations": [
+        "No authenticated model task, full native tool invocation, same-session recovery or paired comparative run was performed.",
+        "No upstream unit/integration suite was run. Vendor-native installation and version/help smoke only.",
+        "All new installations remain in isolated scratch; no macOS or new-distribution activation is qualified.",
+        "The earlier normalized-only attempts have a named raw-capture gap and are not used as qualifying receipts.",
+        "F1 proposals do not change active adoption/run/verdict pins or admit FINAL.",
+        "The co-op privately reproduced the staged masked bytes; committed-head re-verification accompanies the PR handoff."
+      ],
+      "path": "evidence/receipts/final-native-clients-preparation-20261016.json"
+    },
+    {
       "id": "decision-record-index-20261008",
       "kind": "artifact_measurement",
       "component_ids": [
@@ -19352,6 +19370,11 @@
       "bytes": 9884
     },
     {
+      "path": "docs/decisions/2026-10-16-native-clients-final-preparation.md",
+      "sha256": "c42d0cfacdfab4a48860fb80dc55dad8b0cf1ca7595d2e2348284fbe87098d5a",
+      "bytes": 13083
+    },
+    {
       "path": "docs/decisions/2026-10-16-nautilus-rc5-run-source-pin.md",
       "sha256": "a2ceae122b37a9df4c9fb53a53f3bf4a1eb188cc51a60a4c564cf857d4a25014",
       "bytes": 6261
@@ -22900,6 +22923,346 @@
       "path": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
       "sha256": "45cd2b5c580d6f65aaf8eafd80d9412295e40de275dc8a5356d08f8deadb05a7",
       "bytes": 319713
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/README.md",
+      "sha256": "f4786a142d6c629132fa39b0494d5ef30205f8777d8dd8144781c9878dc70362",
+      "bytes": 4013
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/capture-summary.json",
+      "sha256": "47c3825d6fdc5a037cda6f5db5ccc2f0dca69985f1d99eebbad40dd90de275e7",
+      "bytes": 5029
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/mask_native.py",
+      "sha256": "aa0b9a0e841ae450793603faa21bc47bbfd1da6283a4c39c720ce070b27de7d1",
+      "bytes": 5104
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/multi-angle-draft.json",
+      "sha256": "ba082d687903e88937d4d5e6b6ceab8f0721b3cdeb9a66174d25994d8d49c557",
+      "bytes": 23891
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-binary-download.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-binary-download.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-download-sha256.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-download-sha256.stdout.txt",
+      "sha256": "252ef124ee7a303e0e6dbf896397e85f52f8804f02319fa3c3a942fd127a9ade",
+      "bytes": 101
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-help.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-help.stdout.txt",
+      "sha256": "223ec71c6e89368ce9d8d4b36118ec535a3af755728b7868fd60f69f6af7c64e",
+      "bytes": 22110
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-installed-sha256.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-installed-sha256.stdout.txt",
+      "sha256": "78fc570275b6db2bfaf30ec0f94cf92f1c358b2e3505021f3d7e0a79f3147ba1",
+      "bytes": 96
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-key-download.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-key-download.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-key-fingerprint.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-key-fingerprint.stdout.txt",
+      "sha256": "be5fa29d3d73868e45063412790b3bdb3f994b845d26875d78affdf1b9f6f2e7",
+      "bytes": 284
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-key-import.stderr.txt",
+      "sha256": "bd4a0da0a030f07cbbac43dc4c6140811f9541feae76df5d67d6b33f95e9d6fb",
+      "bytes": 286
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-key-import.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-manifest-download.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-manifest-download.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-manifest-verify.stderr.txt",
+      "sha256": "aff0a010625e6c1ce7ae52ef8f317fa1a530aafd6cd78d74fe775b75ab94083c",
+      "bytes": 444
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-manifest-verify.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-native-install.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-native-install.stdout.txt",
+      "sha256": "50802111fe26e89ac0a28d640cb8b4876d4355f0e0ba4139bf30fec45aea7298",
+      "bytes": 272
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-public-tag.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-public-tag.stdout.txt",
+      "sha256": "04ff48448f712c405b30ce108581a3d295e83ceeda52cd182079205e8200cb26",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-signature-download.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-signature-download.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-version.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/claude-version.stdout.txt",
+      "sha256": "f98cef0381704b555d9188ed0ac009867d71df3478510517617c28f5a5054953",
+      "bytes": 22
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-help.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-help.stdout.txt",
+      "sha256": "12bd1d11119b01bf86b51f797f2b771418c174f74378bbab56313686d03f895a",
+      "bytes": 5780
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-installed-sha256.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-installed-sha256.stdout.txt",
+      "sha256": "5b912d25fe5e6476f2c959a266333dcaefc39e1e9417d6d47c23dbf271042f02",
+      "bytes": 95
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-installer-download.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-installer-download.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-native-install.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-native-install.stdout.txt",
+      "sha256": "b321ebf90fccecd3b9884084b95c1079b7209898d3b321d508cd11f783d4e7c1",
+      "bytes": 408
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-public-tag.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-public-tag.stdout.txt",
+      "sha256": "734e280a3b92f4fdc8c241dbb40617806fd893d89569250ac77939f5090c79ea",
+      "bytes": 133
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-version.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/codex-version.stdout.txt",
+      "sha256": "1df57fdc934f35bbd09e26308fbbd895698596f3be833ace1027c6bcfd2f81e2",
+      "bytes": 18
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/green-capture-controls.stderr.txt",
+      "sha256": "fa2809d537faccaa802dca37fd682e5f01448c8b4c690099e2ccc427aade53bc",
+      "bytes": 1252
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/green-capture-controls.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/host-claude-native-version.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/host-claude-native-version.stdout.txt",
+      "sha256": "f98cef0381704b555d9188ed0ac009867d71df3478510517617c28f5a5054953",
+      "bytes": 22
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/host-claude-version.stderr.txt",
+      "sha256": "104a4aea9a9b53691e347a6c43a69fa9433f41433343d5618a5d4fff5df39ed8",
+      "bytes": 108
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/host-claude-version.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/host-codex-version.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/host-codex-version.stdout.txt",
+      "sha256": "1df57fdc934f35bbd09e26308fbbd895698596f3be833ace1027c6bcfd2f81e2",
+      "bytes": 18
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/index.json",
+      "sha256": "93ab1c16e3743f5a2bbc15fd8080875391bda0f1ec14bff1be073e739ff3c8a3",
+      "bytes": 50512
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/lane-packets.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/lane-packets.stdout.txt",
+      "sha256": "5e1e83e4d091004a982e4e0226e0b757a432d5f87ce286dbe9e004f2d0c30bb6",
+      "bytes": 755
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/latest-evidence-claude-code.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/latest-evidence-claude-code.stdout.txt",
+      "sha256": "0023932b16248257005eceeda39d22da890fe5727748552b7fa12796e3bc7135",
+      "bytes": 122
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/latest-evidence-codex.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/latest-evidence-codex.stdout.txt",
+      "sha256": "0023932b16248257005eceeda39d22da890fe5727748552b7fa12796e3bc7135",
+      "bytes": 122
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/python-version.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/python-version.stdout.txt",
+      "sha256": "8a078b480fefb612930032cc46f81bc6d76b152bac4903485d0c5771f32219ad",
+      "bytes": 15
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/red-mask-control.stderr.txt",
+      "sha256": "24189ebd9e2c7514cb722921b484a626cc06e114a7a30b70fb77a90098f7bb3a",
+      "bytes": 1372
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/red-mask-control.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/red-recorder-control.stderr.txt",
+      "sha256": "97b169c777bff3318cad1633c5ff56468dee39897d6aafbd69de60252a3e81a0",
+      "bytes": 1414
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/red-recorder-control.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/system-python-version.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/native/system-python-version.stdout.txt",
+      "sha256": "63990b3ee50c49ab28d70e29c0f967f0c71330e39243ffeb4d3a8d5878c8a978",
+      "bytes": 14
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/pin-reconciliation.json",
+      "sha256": "0f3b0084662a1b425918b31d5f6ece0cc439a2654a42727afa2c012230183276",
+      "bytes": 13324
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/record_native.py",
+      "sha256": "885aa2cf791769afc60b7ebfc8f05d39f27779f528d2a059e1d3660de9a339a0",
+      "bytes": 2781
+    },
+    {
+      "path": "evidence/artifacts/final-native-clients-prep-20261016/upstream/claude-2.1.301-manifest.json",
+      "sha256": "8517444f8515ccb572272d6dd666999aa7115fd14ae4207631edaa25d4dfce40",
+      "bytes": 1897
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
@@ -60687,6 +61050,11 @@
       "bytes": 3320
     },
     {
+      "path": "evidence/receipts/final-native-clients-preparation-20261016.json",
+      "sha256": "98e76d6f36fedf07a5c0e8fea446e5feaa8b3bbc0fea7ec6e0337dfbbc9da8e6",
+      "bytes": 3059
+    },
+    {
       "path": "evidence/receipts/foundation-catalog-ui-20260920.json",
       "sha256": "c3d6aad4800dd2f08d6c8ea3f66ac9c174eca7e8fd5d3d11fadbee3e7974f1d9",
       "bytes": 4603
@@ -64360,6 +64728,11 @@
       "path": "tests/test_nanosecond_replay.py",
       "sha256": "50c4be832b9b7fe1dadc196fcc6dcfa854267d2b1de89eec2c95fb6cc6776b48",
       "bytes": 6756
+    },
+    {
+      "path": "tests/test_native_client_capture_custody.py",
+      "sha256": "6f0c9cfc04859126d0c6be44f6307ca64aa9b3676268e8e3a471aaac2a3ac060",
+      "bytes": 7434
     },
     {
       "path": "tests/test_native_dashboard_data.py",

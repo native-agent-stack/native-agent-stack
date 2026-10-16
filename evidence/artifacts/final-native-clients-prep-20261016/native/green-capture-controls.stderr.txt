@@ -1,0 +1,11 @@
+test_duplicate_capture_id_cannot_overwrite_an_observation (tests.test_native_client_capture_custody.NativeCaptureCustodyTests.test_duplicate_capture_id_cannot_overwrite_an_observation) ... ok
+test_masked_derivative_preserves_all_bytes_except_named_literals (tests.test_native_client_capture_custody.NativeCaptureCustodyTests.test_masked_derivative_preserves_all_bytes_except_named_literals) ... ok
+test_missing_raw_stream_is_refused_without_a_standin (tests.test_native_client_capture_custody.NativeCaptureCustodyTests.test_missing_raw_stream_is_refused_without_a_standin) ... ok
+test_recorder_retains_unmodified_bytes_and_nonzero_exit (tests.test_native_client_capture_custody.NativeCaptureCustodyTests.test_recorder_retains_unmodified_bytes_and_nonzero_exit) ... ok
+test_reproduction_is_byte_identical_and_leaves_raw_unchanged (tests.test_native_client_capture_custody.NativeCaptureCustodyTests.test_reproduction_is_byte_identical_and_leaves_raw_unchanged) ... ok
+test_tampered_raw_capture_is_refused_before_publication (tests.test_native_client_capture_custody.NativeCaptureCustodyTests.test_tampered_raw_capture_is_refused_before_publication) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 1.856s
+
+OK

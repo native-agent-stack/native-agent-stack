@@ -1,0 +1,1 @@
+<USER_HOME>/.local/share/codex-ecosystem/bin/claude: line 32: /.local/bin/claude: No such file or directory

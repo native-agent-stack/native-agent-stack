@@ -1,0 +1,12 @@
+
+Checking installation status...
+Installing Claude Code native build 2.1.301...
+Setting up launcher and shell integration...
+✔ Claude Code successfully installed!
+
+  Version: 2.1.301
+
+  Location: <TILDE_HOME>/.local/bin/claude
+
+
+  Next: Run claude --help to get started
