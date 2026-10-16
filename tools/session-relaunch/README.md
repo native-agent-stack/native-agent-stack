@@ -75,7 +75,8 @@ sha256, each run (`boot`, `started_at`, `ended_at`), and each session's tab call
 | `absent` | listed earlier in this run but missing from its final live list: it registered, then exited |
 
 The status is `in_progress` from the run's start, then `complete` when the live list read at the run's end lists
-every session, else `partial` (also when that last read fails). The
+every session that is not retired (a retired session, one that recovered and was then stopped on purpose, counts as
+satisfied), else `partial` (also when that last read fails). The
 live list is read before every tab call, and a call is made only when that read lists the session as absent. Each
 call is recorded in the state file (`in_flight`) before it is made. Its result is saved together with the provisional
 outcome (`unconfirmed` after rc 0, `uncertain` after a timeout) before the settle wait, so a run stopped while it waits
@@ -126,7 +127,7 @@ finds the run's own roster as this boot's newest. The snapshot holds an exclusiv
 directory from its live sample to its roster write, and a run holds it from its read of the relaunch state to the
 seed roster and its first save (a refused `--reopen` is recorded inside that span), and again while it publishes its
 final state. So every read-modify-write of the state is serialized, and a snapshot never replaces the seed with a carry
-read before the state existed. A dry run writes nothing and takes no `roster.lock`. Both hold it briefly; `relaunch.lock` is
+read before the state existed. A dry run writes nothing and takes no `roster.lock`. The lock is reentrant within one thread (a nested hold takes no second `flock`); another thread or process still waits. A rerun reconciles its plan with the state on disk before its first save, so a lane retired while it planned is not opened, and a refused `--reopen` is appended to the state as read at the write. Both hold it briefly; `relaunch.lock` is
 the run's own lock. Both locks are `fcntl.flock`, flock(2) on the descriptor (python/cpython v3.13.16, `cbc944f4`,
 `Doc/library/fcntl.rst:176-183`), released when the descriptor closes (Linux man-pages tag `man-pages-6.9.1`,
 `man/man2/flock.2:69-72`).

@@ -662,6 +662,89 @@ class Relaunch(Fixture):
         self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
         self.assertEqual((self.state()["status"], self.outcomes()["trading-cc"]), ("complete", "running"))
 
+    def test_a_retirement_saved_while_the_rerun_plans_is_honoured(self):
+        # GPT res2 of #1141 at ca891398 (blocker, :548/:588/:617; its retained probe
+        # test_snapshot_retirement_survives_rerun_state_publication): a snapshot that saved trading-cc's retirement while
+        # the rerun planned left the rerun's plan stale, and it reopened the lane after it stopped. On 3436a5b0 the probe's
+        # interleaving (a snapshot inside plan(), in the same thread) waits forever on the lock the run holds; this test runs
+        # the rerun in a worker thread so that shows as a failure, not a hang.
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "trading-cc"}):
+            self.run_relaunch()
+        real_plan, injected = R.plan, []
+
+        def plan_then_snapshot(*args, **kwargs):
+            decided = real_plan(*args, **kwargs)
+            if not injected:
+                injected.append(True)
+                R.snapshot_live(self.config, boot_id=THIS, at=NOW + dt.timedelta(minutes=1),
+                                sample=lambda: [row("trading-cc", "by-hand")])
+                self.agents.write_text("[]")  # the lane stops on purpose
+            return decided
+
+        self.agents.write_text("[]")
+        before, done = len(self.ps_calls()), []
+        with mock.patch.object(R, "plan", side_effect=plan_then_snapshot), \
+                contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            worker = threading.Thread(target=lambda: done.append(self.run_relaunch(at=NOW + dt.timedelta(minutes=2))),
+                                      daemon=True)
+            worker.start()
+            worker.join(30)
+        self.assertFalse(worker.is_alive(), "the rerun waited on its own roster.lock")
+        self.assertIn("trading-cc", self.state()["retired"])
+        self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()[before:]], [])
+
+    def test_a_refusal_keeps_a_retirement_saved_meanwhile(self):
+        # GPT res2 of #1141 at ca891398 (follow-up 2, :526/:532/:538; its probe
+        # test_refusal_preserves_a_concurrent_snapshot_retirement): record_refusal() called on its own rewrote the state it
+        # had read, so a retirement saved in between was lost. It now holds roster.lock and appends to the state as read
+        # at the write.
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "trading-cc"}):
+            self.run_relaunch()
+        state_path, real_read, injected = R.marker(self.config, "relaunch", PREV), Path.read_text, []
+
+        def read_then_retire(path, *args, **kwargs):
+            text = real_read(path, *args, **kwargs)
+            if path == state_path and not injected:
+                injected.append(True)
+                R.snapshot_live(self.config, boot_id=THIS, at=NOW + dt.timedelta(minutes=1),
+                                sample=lambda: [row("trading-cc", "by-hand")])
+            return text
+
+        with mock.patch.object(Path, "read_text", read_then_retire):
+            self.assertTrue(R.record_refusal(self.config, PREV, ["no-such-lane"], "synthetic refusal"))
+        self.assertIn("trading-cc", self.state()["retired"])
+        self.assertEqual(len(self.state()["refusals"]), 1)
+
+    def test_the_roster_lock_is_reentrant_in_one_thread_and_exclusive_across_threads(self):
+        held, waited = threading.Event(), []
+
+        def nested():
+            with R.roster_lock(self.config):
+                with R.roster_lock(self.config):  # a nested hold in the same thread takes no second flock
+                    held.set()
+
+        inner = threading.Thread(target=nested, daemon=True)  # on a lock that is not reentrant this waits forever
+        inner.start()
+        inner.join(10)
+        self.assertTrue(held.is_set(), "a nested hold in the same thread waited on its own lock")
+        with R.roster_lock(self.config):
+
+            def other():
+                with R.roster_lock(self.config):
+                    waited.append(time.monotonic())
+
+            started = time.monotonic()
+            worker = threading.Thread(target=other)
+            worker.start()
+            time.sleep(0.3)
+            self.assertEqual(waited, [])  # the other thread still waits while this one holds the lock
+        worker.join(10)
+        self.assertTrue(held.is_set())
+        self.assertEqual(len(waited), 1)
+        self.assertGreaterEqual(waited[0] - started, 0.3)
+
     def test_a_boot_stop_right_after_the_state_write_still_relaunches_from_the_seed(self):
         # GPT read of #1141 at 474cf2b6 (P2, the reviewer's retained crash case): with the state saved before the seed
         # roster, a boot stop between the two writes left the timer's empty roster of this boot as the newest, and the

@@ -19303,8 +19303,8 @@
     },
     {
       "path": "docs/decisions/2026-10-14-session-relaunch-after-wsl-restart.md",
-      "sha256": "8652e7756cea585d79c769d0d1655061f0bcd470b0ac8bf9f306ada6dbc7f205",
-      "bytes": 9627
+      "sha256": "0ad8fa191708626b5f2aca234b6f8395665f635ed8e59973c35b48962355de85",
+      "bytes": 10011
     },
     {
       "path": "docs/decisions/2026-10-14-stream-integrity-followups.md",
@@ -52588,7 +52588,7 @@
     },
     {
       "path": "evidence/artifacts/session-relaunch-20261014/README.md",
-      "sha256": "a8af1be73ab52b410a256051908ddcf20d871fe6b46625fa04177ead64b873d6",
+      "sha256": "5a169bbf1ef7e5dac4b838e3575466d4fd995bc8cd84ef2a6fef8eda1d19f177",
       "bytes": 2110
     },
     {
@@ -64618,8 +64618,8 @@
     },
     {
       "path": "tests/test_session_relaunch.py",
-      "sha256": "e3c5dd6513c6cdfbe2dc452850da0b796759abc599533a3621ac68bbd729b3b6",
-      "bytes": 75885
+      "sha256": "be9783e08784b3a9472b995ed14f3d86d121e210157a6c892ad5247e0e24e167",
+      "bytes": 80369
     },
     {
       "path": "tests/test_shell_parser_ci.py",
@@ -65298,8 +65298,8 @@
     },
     {
       "path": "tools/session-relaunch/README.md",
-      "sha256": "7b52eed23314a0c17c6e902550574c27fb4bab29467dfdbef5de6c49c6146c31",
-      "bytes": 16703
+      "sha256": "a42f3ba50e8264ce943a1907a82473c5eb4ddbffdb5efb115425061182e1aac7",
+      "bytes": 17132
     },
     {
       "path": "tools/session-relaunch/config.example.json",
@@ -65308,8 +65308,8 @@
     },
     {
       "path": "tools/session-relaunch/session_relaunch.py",
-      "sha256": "092759015571aae58c74be1db54e8fa703606a8b07f85bbce9e949274bc026a6",
-      "bytes": 39328
+      "sha256": "ea863ac1f6a7d16f9d9d67d92b5034806fb17935fc8a55580221b95829ba983a",
+      "bytes": 41249
     },
     {
       "path": "tools/session-relaunch/units/ns-session-relaunch.service",

@@ -31,6 +31,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from pathlib import Path
 
@@ -164,13 +165,30 @@ def roster_lock(config: dict):
     carry read before that state over the seed. Both holders are short; the relaunch's own run lock (relaunch.lock) is a
     different lock, held for the whole run. fcntl.flock performs flock(2) on the descriptor (python/cpython v3.13.16,
     cbc944f4, Doc/library/fcntl.rst:176-183), and the lock is released when all its descriptors are closed (Linux
-    man-pages tag man-pages-6.9.1, man/man2/flock.2:69-72), so os.close in the finally clause releases it."""
+    man-pages tag man-pages-6.9.1, man/man2/flock.2:69-72), so os.close in the finally clause releases it.
+
+    Reentrant within one thread: a hold nested in the thread that already holds it takes no second flock, which would
+    wait on the thread's own lock (flock locks belong to the open file description, so a second descriptor in the same
+    process conflicts). Another thread or process still waits. A relaunch calls record_refusal() while it holds the lock."""
+    depth = getattr(_ROSTER, "depth", 0)
+    if depth:
+        _ROSTER.depth = depth + 1
+        try:
+            yield
+        finally:
+            _ROSTER.depth = depth
+        return
     fd = os.open(state_dir(config) / "roster.lock", os.O_RDWR | os.O_CREAT, 0o600)
     try:
         fcntl.flock(fd, fcntl.LOCK_EX)
+        _ROSTER.depth = 1
         yield
     finally:
+        _ROSTER.depth = 0
         os.close(fd)
+
+
+_ROSTER = threading.local()  # roster_lock's hold depth in each thread
 
 
 def snapshot_live(config: dict, *, boot_id: str, at: dt.datetime, sample) -> Path | None:
@@ -525,20 +543,29 @@ def cmd_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dic
 
 
 def record_refusal(config: dict, prev_boot: str, names: list[str], reason: str) -> bool:
-    """Append a refused --reopen to the relaunch state of ``prev_boot`` (the caller holds the run lock and roster_lock,
-    so a snapshot never saves over it), keeping its runs,
-    sessions and earlier refusals. A boot with no readable relaunch state keeps no record (nothing to add it to); the
-    refusal then goes to stderr only. True when a record was written."""
+    """Append a refused --reopen to the relaunch state of ``prev_boot``, keeping its runs, sessions, retirements and
+    earlier refusals. It holds roster_lock itself (reentrant, so a relaunch that already holds it goes on), and appends
+    to the state as it reads it at the write, so a retirement saved since its first read is kept (GPT res2 of #1141 at
+    ca891398, follow-up 2). A boot with no readable relaunch state keeps no record (nothing to add it to); the refusal then
+    goes to stderr only. True when a record was written."""
     path = marker(config, "relaunch", prev_boot)
-    try:
-        state = json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
-    except (OSError, ValueError):
-        return False
-    if not isinstance(state, dict):
-        return False
-    state.setdefault("refusals", []).append({"at": iso(now_utc()), "reopen": list(names), "reason": reason})
-    write_atomic(path, json.dumps(state, indent=1) + "\n")
+    with roster_lock(config):
+        if not isinstance(read_state(path), dict):
+            return False
+        state = read_state(path)  # as on disk at the write
+        if not isinstance(state, dict):
+            return False
+        state.setdefault("refusals", []).append({"at": iso(now_utc()), "reopen": list(names), "reason": reason})
+        write_atomic(path, json.dumps(state, indent=1) + "\n")
     return True
+
+
+def read_state(path: Path):
+    """A relaunch state file's JSON, or None when it is missing or unreadable."""
+    try:
+        return json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+    except (OSError, ValueError):
+        return None
 
 
 def prepare_run(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], dry_run: bool,
@@ -547,6 +574,15 @@ def prepare_run(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict
     caller holding roster_lock throughout. A refusal, nothing to relaunch or a dry run returns its result; otherwise
     {"run": ...} carries what the run goes on with."""
     decided = plan(config, boot_id=boot_id, at=at, boots=boots, alive_rows=alive_rows)
+    # Reconcile the plan with the state on disk now (GPT res2 of #1141 at ca891398, blocker): a lane retired while the
+    # plan was made (a snapshot in this thread's nested hold) is dropped from the launch, and the run goes on from the
+    # state that records it, so a stale plan never reopens a lane stopped on purpose.
+    if decided["action"] == "relaunch" and decided.get("state") is not None:
+        fresh = read_state(marker(config, "relaunch", decided["prev_boot"]))
+        newly = retired_names(fresh) - retired_names(decided["state"]) if isinstance(fresh, dict) else set()
+        if newly:
+            decided = {**decided, "state": fresh,
+                       "launch": [(row, prof) for row, prof in decided["launch"] if row.get("name") not in newly]}
     if decided["action"] != "relaunch":
         if reopen and not decided.get("refused"):
             reason = f"--reopen {', '.join(sorted(reopen))}: nothing to relaunch ({decided['reason']})"
