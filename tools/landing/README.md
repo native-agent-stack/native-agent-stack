@@ -529,7 +529,7 @@ are `nas_land.sh`'s alone; #1075), 3 head moved, 4 change differs, 5 CI failed (
 7 merge failed, 8 blocked, 9 the Codex gate gave neither 0 nor 5: a review running or not finished since its latest trigger (its 3, after
 the 20-minute wait or at the final gate), a review that ended other than Completed or a summary last edited by another account (its
 4), a gate that failed or is missing; or a 5 without an accepted `GPT_VERDICT` (#975 P3-7 at 761810d7: the header named only some of
-these). `nas_land.sh`: 2 as above, and a `LANDING_REPO` that is not of the owner/name shape (before any call; #1061 P3), neither local
+these), 10 GitHub reports `DIRTY` during the CI wait, as in `nas_land.sh` (below; the CC's ruling of 2026-10-16). `nas_land.sh`: 2 as above, and a `LANDING_REPO` that is not of the owner/name shape (before any call; #1061 P3), neither local
 review variable nor `LOCAL_REVIEW_WAIVER` set (before any call), `LOCAL_REVIEW_ADJUDICATION` set, an empty value included, with neither
 local review variable set (before any call; #1075 P3-4), a `SQUASH_BODY_FILE` that is not a readable, non-empty regular file other than
 `-`, an empty value included, or whose content holds a NUL byte, is not UTF-8, is longer than 64 KiB or holds no text (before any call;
@@ -873,7 +873,7 @@ scripts that is neither a tracked file's, a named public artifact's nor a named 
 
 | File | As committed |
 | --- | --- |
-| `uet_land.sh` | `00a22674e6b0067d0fee1efe9ff412059db5b817fc8323c89bff4c12a74f0c0b` (444 lines) |
+| `uet_land.sh` | `5f8d2eef6b3045d46c2c25f1e6b40b74b819536c304111ec3e7e834bf8d213b2` (449 lines) |
 | `nas_land.sh` | `5b680d7086e5c7d18c74c2b2b24817840c33ff39f553c37685089e6ee50447de` (698 lines) |
 | `horizon_land.sh` | `336209b11841dd403a4f770711ddfc55965956efa845b608975cf67cc89ab81b` (824 lines) |
 | `codex_gate.py` | `7afaa831c0763dd14c584d76b17465fa50993656cd63eec9fd0c4412fddb74b2` (559 lines) |
@@ -1267,6 +1267,9 @@ errors):
   - the CC's follow-up of 2026-10-16, failing against the `nas_land.sh` this pull request first proposed, whose CI wait is main's (exit 6
     after the 25 polls, measured with the module of this change): a DIRTY pull request with a check still running stops in the CI wait with 10 before any `sleep 120`, nothing merged,
     and the landing lock free after it; the control, CLEAN with a check running, still polls and times out with 6.
+  - the CC's ruling of 2026-10-16, the same stop in `uet_land.sh`'s CI wait, failing against this pull request's earlier `uet_land.sh`
+    (6 after the 25 polls): a DIRTY pull request with `ci-gate` still running stops with 10 before any `sleep 120`, nothing merged,
+    the lock free; the control, CLEAN with it running, still times out with 6.
 
 ## Upstream sources for the #975 corrections
 

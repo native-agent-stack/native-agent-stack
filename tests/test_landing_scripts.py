@@ -3951,6 +3951,24 @@ class EndToEndTests(LandingCase):
             self.assertEqual((code, self.merge_calls(log)), (6, []), out)
             self.assertIn("sleep 120", log)
 
+    def test_a_dirty_pull_request_stops_the_uet_ci_wait_at_once_and_frees_the_lock(self):
+        # The CC's ruling of 2026-10-16 on #1229: uet_land.sh's CI wait had the same exposure as nas's (above): a DIRTY pull request
+        # (schema.docs.graphql:26528-26530) with a check still running polled 25 times and stopped with 6. Now 10 at once, as nas, before
+        # any sleep 120, nothing merged, and the lock free.
+        import fcntl
+        running = [check_run("ci-gate", status="IN_PROGRESS", conclusion=None)]
+        code, out, log = self.land(self.uet, merge_state="DIRTY", rollup=running)
+        self.assertEqual((code, self.merge_calls(log)), (10, []), out)
+        self.assertIn("GitHub reports DIRTY during the CI wait: the merge commit cannot be created cleanly; a native rebase is needed: stop", out)
+        self.assertNotIn("sleep 120", log)
+        self.assertNotIn("CI timeout", out)
+        with open(self.lock_path(self.uet), "a", encoding="utf-8") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        with self.subTest(control="CLEAN with a check still running waits and times out (6), as before"):
+            code, out, log = self.land(self.uet, merge_state="CLEAN", rollup=running)
+            self.assertEqual((code, self.merge_calls(log)), (6, []), out)
+            self.assertIn("sleep 120", log)
+
     def test_a_child_that_outlives_the_landing_does_not_keep_the_lock(self):
         # The lock is descriptor 9, and every child that can outlive the script runs with it closed (git's detached maintenance keeps
         # every other descriptor). Here gh starts a child that is still running when the landing ends; the lock must be free then.
