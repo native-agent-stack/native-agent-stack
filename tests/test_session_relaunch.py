@@ -561,6 +561,107 @@ class Relaunch(Fixture):
         self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()[before:]], ["trading-cc"])
         self.assertEqual({r["name"] for r in self.state()["carry"]} & {"wsl-architecture-design", "ns2604-coop"}, set())
 
+    def test_a_snapshot_during_a_rerun_never_erases_a_retirement(self):
+        # The co-op's local review of #1141 at ca891398 (P2, :217-220): plan() read the relaunch state before roster.lock,
+        # so a snapshot could retire a recovered lane in between and the rerun's save erased it; once that lane stopped
+        # on purpose, a later rerun reopened it. Here the snapshot starts right after plan()'s read.
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "cc"}):  # the command center's launcher
+            self.run_relaunch()
+        self.assertEqual(self.state()["status"], "partial")
+        self.agents.write_text(json.dumps([row("wsl-architecture-design", "by-hand"), row("trading-cc", "t"),
+                                           row("ns2604-coop", "c")]))  # the command center restored by hand
+        real_plan, real_lock = R.plan, R.roster_lock
+        reached, timer_thread, holding, runs = threading.Event(), [], [], []
+
+        @contextlib.contextmanager
+        def watched_lock(config):
+            mine = threading.current_thread() not in timer_thread
+            if not mine:
+                reached.set()  # the snapshot is at roster.lock
+            with real_lock(config):
+                holding.append(mine)
+                try:
+                    yield
+                finally:
+                    holding.pop()
+
+        def plan_then_snapshot(*args, **kwargs):
+            decided = real_plan(*args, **kwargs)
+            if not timer_thread:
+                timer = threading.Thread(target=lambda: runs.append(
+                    R.main(["snapshot", "--config", str(self.tmp / "config.json")])))
+                timer_thread.append(timer)
+                timer.start()
+                if holding:
+                    reached.wait(10)  # it waits at roster.lock until this run's first save
+                else:
+                    timer.join(10)  # nothing holds roster.lock: it runs to its end now
+                self.agents.write_text(json.dumps([row("trading-cc", "t"), row("ns2604-coop", "c")]))  # stopped on purpose
+            return decided
+
+        with mock.patch.object(R, "plan", side_effect=plan_then_snapshot), \
+                mock.patch.object(R, "roster_lock", side_effect=watched_lock), \
+                mock.patch.object(R, "current_boot_id", return_value=THIS):
+            self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
+            timer_thread[0].join(10)
+        self.assertEqual(runs, [0])
+        self.assertIn("wsl-architecture-design", self.state()["retired"])
+        before = len(self.ps_calls())
+        self.run_relaunch(at=NOW + dt.timedelta(minutes=10))
+        self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()[before:]], [])
+
+    def test_a_snapshot_never_saves_over_a_refusal_record(self):
+        # The same finding's second interleaving: record_refusal() wrote without roster.lock, so a snapshot that had read
+        # the state before it saved its own copy after it, and the refusal was lost.
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "cc"}):  # the command center's launcher
+            self.run_relaunch()
+        self.agents.write_text(json.dumps([row("wsl-architecture-design", "by-hand")]))
+        real_retire, real_lock = R.retire_into, R.roster_lock
+        paused, go, timer_thread, runs = threading.Event(), threading.Event(), [], []
+
+        def slow_retire(state, names):
+            changed = real_retire(state, names)
+            if threading.current_thread() in timer_thread:
+                paused.set()  # the snapshot has read the state and holds its copy
+                go.wait(10)
+            return changed
+
+        @contextlib.contextmanager
+        def watched_lock(config):
+            if timer_thread and threading.current_thread() not in timer_thread:
+                go.set()  # the refusing run is at roster.lock
+            with real_lock(config):
+                yield
+
+        with mock.patch.object(R, "retire_into", side_effect=slow_retire), \
+                mock.patch.object(R, "roster_lock", side_effect=watched_lock), \
+                mock.patch.object(R, "current_boot_id", return_value=THIS):
+            timer = threading.Thread(target=lambda: runs.append(
+                R.main(["snapshot", "--config", str(self.tmp / "config.json")])))
+            timer_thread.append(timer)
+            timer.start()
+            self.assertTrue(paused.wait(10))
+            refused = R.cmd_relaunch(self.config, boot_id=THIS, at=NOW + dt.timedelta(minutes=5), boots=BOOTS,
+                                     dry_run=False, reopen=frozenset({"ns2604-coop"}))
+            go.set()
+            timer.join(10)
+        self.assertEqual((runs, bool(refused.get("refused"))), ([0], True))
+        self.assertEqual(len(self.state().get("refusals") or []), 1)
+        self.assertIn("wsl-architecture-design", self.state()["retired"])
+
+    def test_a_rerun_that_brings_back_every_owed_lane_completes(self):
+        # The co-op's local review of #1141 at ca891398 (P2, :647-649): after a partial run retired the command center
+        # and the co-op and they stopped on purpose, a rerun that brought back trading-cc stayed partial (they were not
+        # live), so main() exited 1 and further reruns spent the crash-loop budget.
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "trading-cc"}):
+            self.run_relaunch()
+        self.agents.write_text("[]")
+        self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
+        self.assertEqual((self.state()["status"], self.outcomes()["trading-cc"]), ("complete", "running"))
+
     def test_a_boot_stop_right_after_the_state_write_still_relaunches_from_the_seed(self):
         # GPT read of #1141 at 474cf2b6 (P2, the reviewer's retained crash case): with the state saved before the seed
         # roster, a boot stop between the two writes left the timer's empty roster of this boot as the newest, and the

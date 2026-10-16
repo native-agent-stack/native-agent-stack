@@ -206,8 +206,9 @@ def retire_recovered(config: dict, boot_id: str, live: list[dict]) -> None:
     """After a relaunch of this boot ended partial, a carried row whose session is listed live has recovered (a tab that
     registered late, or a lane restored by hand). The snapshot saves its retirement to that state, as the run's final
     read does for the sessions it sees running, so the row is not carried again once the session stops on purpose (the
-    co-op's local review of #1141 at aedf5549, P2). A state in progress is left to its run, which holds it in memory;
-    a run saves its first state and its final one under roster_lock, which the caller holds here."""
+    co-op's local review of #1141 at aedf5549, P2). A state in progress is left to its run, which holds it in memory.
+    Every read-modify-write of a relaunch state holds roster_lock (held by the caller here): a run's, from plan()'s read
+    to its first save and at its final publication, and a refusal record's."""
     names = {row.get("name") for row in live}
     for path in Path(config["state_dir"]).glob("relaunch-*.json"):
         try:
@@ -524,7 +525,8 @@ def cmd_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dic
 
 
 def record_refusal(config: dict, prev_boot: str, names: list[str], reason: str) -> bool:
-    """Append a refused --reopen to the relaunch state of ``prev_boot`` (the caller holds the run lock), keeping its runs,
+    """Append a refused --reopen to the relaunch state of ``prev_boot`` (the caller holds the run lock and roster_lock,
+    so a snapshot never saves over it), keeping its runs,
     sessions and earlier refusals. A boot with no readable relaunch state keeps no record (nothing to add it to); the
     refusal then goes to stderr only. True when a record was written."""
     path = marker(config, "relaunch", prev_boot)
@@ -539,12 +541,11 @@ def record_refusal(config: dict, prev_boot: str, names: list[str], reason: str) 
     return True
 
 
-def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], dry_run: bool,
-                    reopen: frozenset[str]) -> dict:
-    alive_rows = wait_client(config)
-    if alive_rows is None:
-        return refuse(f"claude agents --json gave no session list within {config['client_wait_s']} s, so who is running "
-                      "is unknown; nothing was written or opened")
+def prepare_run(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], dry_run: bool,
+                reopen: frozenset[str], alive_rows: list[dict]) -> dict:
+    """A run's decision and its first writes, from plan()'s read of the relaunch state to its first save, with the
+    caller holding roster_lock throughout. A refusal, nothing to relaunch or a dry run returns its result; otherwise
+    {"run": ...} carries what the run goes on with."""
     decided = plan(config, boot_id=boot_id, at=at, boots=boots, alive_rows=alive_rows)
     if decided["action"] != "relaunch":
         if reopen and not decided.get("refused"):
@@ -585,6 +586,10 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
         write_atomic(handoff, text, mode=0o400)
         state = {"prev_boot": prev_boot, "handoff": str(handoff), "handoff_sha256": hashlib.sha256(text.encode()).hexdigest(),
                  "runs": [], "sessions": []}
+    if decided["state"] is not None:
+        # A rerun: a lane its last run still carried and that is listed live now has recovered since,
+        # as a snapshot after that run would record it (retire_recovered).
+        retire_into(state, alive & {row.get("name") for row in state.get("carry") or []})
     retired = retired_names(state)
     carry = [row for row in decided["prev"].get("sessions") or [] if row.get("name") not in alive | retired]
     earlier = {entry["session_name"]: entry for entry in state.get("sessions") or []}
@@ -611,12 +616,32 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
     save = lambda: write_atomic(state_path, json.dumps(state, indent=1) + "\n")
 
     # This boot's roster first (the live sessions and the earlier boot's rows not running yet), then the state, both
-    # under roster_lock: a boot stop between the two writes still leaves the seed as this boot's newest roster (an
+    # under roster_lock (held by the caller): a boot stop between the two writes still leaves the seed as this boot's newest roster (an
     # earlier timer snapshot of this boot can be empty), the timer carries the rows from the saved state afterwards,
     # and no snapshot interleaves with the two writes.
-    with roster_lock(config):
-        cmd_snapshot(config, boot_id=boot_id, sessions=alive_rows + carry, at=at)
-        save()
+    cmd_snapshot(config, boot_id=boot_id, sessions=alive_rows + carry, at=at)
+    save()
+    return {"run": {"decided": decided, "state": state, "sessions": sessions, "profiles": profiles,
+                    "reopened": reopened, "save": save}}
+
+
+def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], dry_run: bool,
+                    reopen: frozenset[str]) -> dict:
+    alive_rows = wait_client(config)
+    if alive_rows is None:
+        return refuse(f"claude agents --json gave no session list within {config['client_wait_s']} s, so who is running "
+                      "is unknown; nothing was written or opened")
+    # Every read-modify-write of the relaunch state holds roster_lock from its read to its save: this run's, from
+    # plan()'s read to its first save and again at its final publication, a refusal record, and a snapshot's (the
+    # co-op's local review of #1141 at ca891398, P2), so no writer saves over a change it did not read. A dry run writes
+    # nothing and takes no roster_lock.
+    with contextlib.nullcontext() if dry_run else roster_lock(config):
+        prepared = prepare_run(config, boot_id=boot_id, at=at, boots=boots, dry_run=dry_run, reopen=reopen,
+                               alive_rows=alive_rows)
+    if "run" not in prepared:
+        return prepared
+    decided, state, sessions, profiles, reopened, save = (
+        prepared["run"][key] for key in ("decided", "state", "sessions", "profiles", "reopened", "save"))
     handoff = Path(state["handoff"])
     for index, entry in enumerate(e for e in sessions if e["outcome"] == "pending"):
         if index:
@@ -633,19 +658,23 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
     # The final publication (outcomes, retirement, status) is under roster_lock, the lock a timer snapshot holds from
     # its live sample to its roster write, so no snapshot writes a sample taken before it with the carry after it.
     with roster_lock(config):
+        retired = retired_names(state)  # recovered earlier and since stopped on purpose: satisfied, not absent
         if final is not None:
             live = {row.get("name") for row in final}
             for entry in sessions:
                 if entry["session_name"] in live:
                     entry["outcome"] = "running"
-                elif entry["outcome"] == "running":
+                elif entry["outcome"] == "running" and entry["session_name"] not in retired:
                     entry["outcome"] = "absent"
                     entry["resolved_through"] = len(entry.get("attempts") or [])
             # A row leaves the carry only when this final list shows its session running (the command center's FULL
             # read of #1141 at b2755a0e, P2): seen once and then gone, it stays carried through a second crash.
             # A session that registered and then exited (absent) is still to be brought back, so its row stays carried.
             retire_into(state, {entry["session_name"] for entry in sessions if entry["outcome"] == "running"})
-        complete = final is not None and all(entry["outcome"] == "running" for entry in sessions)
+        # A retired session counts as satisfied (the co-op's local review at ca891398, P2): a rerun that brings back
+        # every lane still owed completes, though the lanes it retired earlier have stopped on purpose.
+        complete = final is not None and all(entry["outcome"] == "running" or entry["session_name"] in retired
+                                             for entry in sessions)
         state["status"] = "complete" if complete else "partial"
         state["runs"][-1]["ended_at"] = iso(now_utc())
         save()

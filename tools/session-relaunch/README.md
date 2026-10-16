@@ -116,14 +116,17 @@ and after it ends `partial`, so a second crash leaves every session the relaunch
 A row leaves the carry, and its session is recorded as `retired` in the state, when the run's final live list shows
 its session running, or, once the run has ended `partial`, when a snapshot lists its session (a tab that registered
 late, or a lane restored by hand). A retired lane that later stops on purpose is neither carried again nor reopened by
-a rerun of the same relaunch (a `--reopen` of it is refused; its own launcher starts it again). A session that
+a rerun of the same relaunch (a `--reopen` of it is refused; its own launcher starts it again), and it counts as
+satisfied when a rerun completes. A rerun also retires the carried lanes it finds live at its start, as a snapshot
+would. A session that
 registered and then went missing from the final list (absent) is not retired and stays carried. The snapshot samples
 the live list under `roster.lock`, and a run publishes its final outcomes, retirement and status under the same lock,
 so a snapshot never writes a list sampled before that publication with the carry read after it. A second crash before the timer's first snapshot (90 s after boot), or between the run's two writes,
 finds the run's own roster as this boot's newest. The snapshot holds an exclusive lock on `roster.lock` in the state
-directory from its live sample to its roster write, and a run holds it while it writes that roster and saves its state,
-and again while it publishes its final state,
-so a snapshot never replaces it with a carry read before the state existed. Both hold it briefly; `relaunch.lock` is
+directory from its live sample to its roster write, and a run holds it from its read of the relaunch state to the
+seed roster and its first save (a refused `--reopen` is recorded inside that span), and again while it publishes its
+final state. So every read-modify-write of the state is serialized, and a snapshot never replaces the seed with a carry
+read before the state existed. A dry run writes nothing and takes no `roster.lock`. Both hold it briefly; `relaunch.lock` is
 the run's own lock. Both locks are `fcntl.flock`, flock(2) on the descriptor (python/cpython v3.13.16, `cbc944f4`,
 `Doc/library/fcntl.rst:176-183`), released when the descriptor closes (Linux man-pages tag `man-pages-6.9.1`,
 `man/man2/flock.2:69-72`).
