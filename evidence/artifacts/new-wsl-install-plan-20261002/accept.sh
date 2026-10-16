@@ -30,7 +30,7 @@ while (( $# )); do
     *) usage; exit 2 ;;
   esac
 done
-if [[ -z "${NS2604_HOST_FILE:-}" && -f "$config_root/.service-ports.json" ]]; then export NS2604_HOST_FILE="$config_root/.service-ports.json"; fi
+if [[ -z "${NS2604_HOST_FILE:-}" && -f "$config_root/.service-ports.json" ]]; then NS2604_HOST_FILE="$config_root/.service-ports.json"; fi; if [[ -n "${NS2604_HOST_FILE:-}" ]]; then NS2604_HOST_FILE="$(realpath -- "$NS2604_HOST_FILE")"; export NS2604_HOST_FILE; fi
 case "$stage" in
   post_install|service_health|after_sign_in) ;;
   *) printf 'Unknown stage: %s\n' "$stage" >&2; usage; exit 2 ;;

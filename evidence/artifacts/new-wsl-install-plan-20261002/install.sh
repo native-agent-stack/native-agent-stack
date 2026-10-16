@@ -958,8 +958,8 @@ container-engine() {
   run_command 'docker_engine_packages' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/docker/docs/dd2797b84208848765705a1518aeee7e47907bd7/content/manuals/engine/install/ubuntu.md#L122
   run_command 'if [[ "$NS2604_NO_START" != 1 ]]; then sudo systemctl disable --now docker.service docker.socket; fi' || return "$?"
-  # Planned. Source: https://raw.githubusercontent.com/docker/docs/dd2797b84208848765705a1518aeee7e47907bd7/content/manuals/engine/install/ubuntu.md#L122
-  run_command 'if [[ "$NS2604_NO_START" != 1 && ! -f "$HOME/.config/systemd/user/docker.service" ]]; then dockerd-rootless-setuptool.sh install; fi' || return "$?"
+  # Source: https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/contrib/dockerd-rootless-setuptool.sh#L429
+  run_command 'if [[ "$NS2604_NO_START" != 1 ]]; then dockerd-rootless-setuptool.sh install; fi' || return "$?"
   copy_config 'docker.service' || return "$?"
   # Source: https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/contrib/dockerd-rootless-setuptool.sh#L334
   run_command 'if [[ "$NS2604_NO_START" == 1 && ! -e "$HOME/.config/systemd/user/docker.service" ]]; then mkdir -p "$HOME/.config/systemd/user"; install -m 0600 "$config_root/docker.service" "$HOME/.config/systemd/user/docker.service"; fi; systemctl --user daemon-reload' || return "$?"

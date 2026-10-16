@@ -44673,8 +44673,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "d68efdbea17d0f6a12f38013a57d6b5758754ed4b6d85e3588a370e274a82b33",
-      "bytes": 105854
+      "sha256": "141886fae0fe62389c9fa322dea82dc11e0ca7a510e9dec3b30ddee881aedaa6",
+      "bytes": 106597
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
@@ -44688,13 +44688,18 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "2bb4622e651a3fb21e50393854d5909a4709db982520fd3d778b19b9821af206",
-      "bytes": 201539
+      "sha256": "8baf520416c4e484d852c47a8cecb3474551823745450664838036a4fef25c18",
+      "bytes": 201658
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/activation-followup-receipt.json",
+      "sha256": "bf55de90270d0bcbec86ed5f9e2a7296947ce63e97cb50907ae13d49182674f2",
+      "bytes": 5988
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
-      "sha256": "a31e74cfea5789fd5b6a836de1d89b8364079fc5740f039540830f26ff417959",
-      "bytes": 64450
+      "sha256": "ab3ea506682cb5dff2c4073a7d50f0feed590fe60f8b10c62968d9744403ddd3",
+      "bytes": 64721
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/acceptance-execution-instructions.txt",
@@ -45178,13 +45183,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "a2c9681c87aea25ae5f42a015972951a79c113b180f89ce5ed24448b0bf2f48d",
-      "bytes": 495866
+      "sha256": "10648a8d67c6a0505f65e4e2b70e4fad1e95241d168580168a3505b03a761b19",
+      "bytes": 495812
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "abe87234bb4e66db8051d4b9691c99fb3c7c9dcf1b31c021225543860d1add56",
-      "bytes": 144778
+      "sha256": "cfd1a6e51336cb6bd661ea09d93730fd685b9c570b0772602215fb671bbf2dbd",
+      "bytes": 144702
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
