@@ -289,5 +289,153 @@ class JevPrivateRecordCustodyTests(unittest.TestCase):
                 self.assertEqual(len(DIGEST.findall(text)), 0, "private citations contain a digest")
 
 
+MODEL_ROUTES_RECORD = "evidence/artifacts/model-routes-sweep-claude-20261015"
+MODEL_ROUTES_ATTEMPTS = "evidence/artifacts/model-routes-sweep-claude-20261015-attempts"
+# The commit the run read its harness, templates, ledger rule and catalog inputs at (RUN-RECORD.md); main carries it.
+MODEL_ROUTES_PIN = "8053f14e7e0817d2502dff2bb284bfb7e1b0152f"
+DIRECTION_RECORD = "direction-cc-20261015T1912Z-new-wsl-harness-first.md"
+HEX_RUN = re.compile(r"(?<![0-9a-f])[0-9a-f]{64,}(?![0-9a-f])")
+ABBREVIATED_DIGEST = re.compile(r"(?<![0-9A-Za-z])[0-9a-f]{7,63}(?:\.\.\.|…)")
+PINNED_SOURCES = tuple(f"tools/sota-convergence/landscape-sweep/{name}" for name in (
+    "build_args.py", "codex_job.py", "make_prompt.py", "sweep_common.py", "templates.json")) + (
+    "scripts/saturation_ledger.py", "adoption/manifest.json", "adoption/skills/manifest.json")
+# Runs in a child process over PINNED_SOURCES as they were at MODEL_ROUTES_PIN, so no harness module this process loaded
+# is reused: the run's fill_build (date 2026-10-15, one layer, the skills manifest's checked_at, repository modality) and
+# prompts_sha256, and the ledger's requirement_sha256 (over stdin's fields) and platform_profiles_sha256.
+PINNED_COMPUTE = r'''
+import json, sys
+from pathlib import Path
+root = Path(sys.argv[1])
+sys.path[:0] = [str(root / "tools/sota-convergence/landscape-sweep"), str(root / "scripts")]
+import build_args, saturation_ledger, sweep_common
+skills = json.loads((root / build_args.SKILLS_MANIFEST).read_text(encoding="utf-8"))
+frozen = build_args.fill_build(build_args.load_templates(), "2026-10-15", 1, skills["checked_at"],
+                               build_args.REPOSITORY_MODALITY)
+adoption = json.loads((root / saturation_ledger.ADOPTION).read_text(encoding="utf-8"))
+print(json.dumps({"prompts_sha256": sweep_common.prompts_sha256(frozen),
+                  "requirement_sha256": saturation_ledger.requirement_sha256(json.load(sys.stdin)),
+                  "platform_profiles_sha256": saturation_ledger.platform_profiles_sha256(adoption)}))
+'''
+
+
+def git_bytes(*args: str, data: bytes | None = None) -> bytes:
+    return subprocess.run(["git", *args], cwd=ROOT, input=data, capture_output=True, check=True).stdout
+
+
+def pin_blob_digests() -> set[str]:
+    """sha256 of every blob at MODEL_ROUTES_PIN that HEAD's tree does not hold; HEAD's files are hashed from the checkout."""
+    head = {entry.split()[2] for entry in git_bytes("ls-tree", "-r", "-z", "HEAD").decode().split("\0") if entry}
+    pinned = {entry.split()[2] for entry in git_bytes("ls-tree", "-r", "-z", MODEL_ROUTES_PIN).decode().split("\0")
+              if entry and entry.split()[1] == "blob"}
+    data = git_bytes("cat-file", "--batch", data="".join(f"{oid}\n" for oid in sorted(pinned - head)).encode())
+    found, offset = set(), 0
+    while offset < len(data):
+        end = data.index(b"\n", offset)
+        header, offset = data[offset:end].split(), end + 1
+        if len(header) == 3 and header[1] == b"blob":
+            size = int(header[2])
+            found.add(hashlib.sha256(data[offset:offset + size]).hexdigest())
+            offset += size + 1
+    return found
+
+
+def pinned_computed_hashes(fields: dict) -> dict:
+    """The three hashes the record names, recomputed from tracked bytes at MODEL_ROUTES_PIN (PINNED_COMPUTE)."""
+    import sys
+    with tempfile.TemporaryDirectory() as directory:
+        for relative in PINNED_SOURCES:
+            target = Path(directory) / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(git_bytes("show", f"{MODEL_ROUTES_PIN}:{relative}"))
+        result = subprocess.run([sys.executable, "-I", "-B", "-c", PINNED_COMPUTE, directory], input=json.dumps(fields),
+                                capture_output=True, text=True, check=True)
+    return json.loads(result.stdout)
+
+
+class ModelRoutesClaudeHalfCustodyTests(unittest.TestCase):
+    """The model-routes Claude-half record publishes digests of published bytes only (CC full read of #1188, two P1s).
+
+    Its first head published the sha256 of the unmasked layer input, of the three stage scripts as run and of the merged
+    proposal list (they hold the work-directory path or pre-convert paths), and of the CC direction record, with
+    abbreviated prefixes of some of them and of a private receipt. Every 64-hex value in the record's two directories
+    must be the sha256 of a tracked file, as checked out or at the run's pin, or one of the three hashes the record names
+    and this test recomputes from tracked bytes with the harness's own functions. Private records are cited by name, and
+    no abbreviated digest stands in for a value. Findings are reported as file and count, never as a digest.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.files = {}
+        for directory in (MODEL_ROUTES_RECORD, MODEL_ROUTES_ATTEMPTS):
+            for path in sorted((ROOT / directory).iterdir()):
+                if path.is_file():
+                    cls.files[path.relative_to(ROOT).as_posix()] = path.read_text(encoding="utf-8")
+
+    def test_every_digest_hashes_published_bytes_or_recomputes_from_them(self):
+        present = subprocess.run(["git", "cat-file", "-e", f"{MODEL_ROUTES_PIN}^{{commit}}"], cwd=ROOT, capture_output=True)
+        if present.returncode != 0:
+            self.skipTest(f"{MODEL_ROUTES_PIN} is not a commit object in this clone (shallow?); validate.yml fetches it")
+        layer_input = json.loads(self.files[f"{MODEL_ROUTES_RECORD}/layer-input.json"])
+        computed = pinned_computed_hashes({"next_action": layer_input["next_action"],
+                                           "decision_ref": layer_input["decision_ref"]})
+        published = pin_blob_digests()
+        for reference in git_bytes("ls-files", "-z").decode().split("\0"):
+            path = confined_file(ROOT, ROOT, reference)
+            if path is not None:
+                published.add(hashlib.sha256(path.read_bytes()).hexdigest())
+        unresolved = {}
+        for name, text in self.files.items():
+            count = sum(1 for value in HEX_RUN.findall(text) if value not in published and value not in computed.values())
+            if count:
+                unresolved[name] = count
+        self.assertEqual(unresolved, {}, "64-hex values that hash no published bytes and recompute from none "
+                                         "(file: count); name an unpublished original without any digest")
+        discovery = json.loads(self.files[f"{MODEL_ROUTES_RECORD}/returns.json"])["discovery"]["model-routes"]
+        hashes = json.loads(self.files[f"{MODEL_ROUTES_ATTEMPTS}/hashes.json"])
+        sites = {"layer-input.json requirement_sha256": (layer_input, "requirement_sha256"),
+                 "returns.json requirement_sha256": (discovery, "requirement_sha256"),
+                 "layer-input.json platform_profiles_sha256": (layer_input, "platform_profiles_sha256"),
+                 "returns.json platform_profiles_sha256": (discovery, "platform_profiles_sha256"),
+                 "hashes.json prompts_sha256": (hashes, "prompts_sha256")}
+        self.assertEqual([site for site, (document, key) in sites.items() if document.get(key) != computed[key]], [],
+                         "named hashes that do not recompute from tracked bytes")
+
+    def test_unpublished_originals_are_named_without_a_digest(self):
+        originals = json.loads(self.files[f"{MODEL_ROUTES_ATTEMPTS}/hashes.json"]).get("unpublished_originals")
+        self.assertIsInstance(originals, list, "hashes.json names the private originals under unpublished_originals")
+        text = json.dumps(originals)
+        self.assertEqual((len(HEX_RUN.findall(text)), len(ABBREVIATED_DIGEST.findall(text))), (0, 0),
+                         "the private originals carry no digest of any kind")
+        names = " ".join(str(item.get("name")) for item in originals)
+        for original in ("inputs/model-routes.json", "claude-stage1-discover.embedded.js",
+                         "claude-stage2-refute.embedded.js", "claude-stage3-critic.embedded.js", "stage2-merged.json"):
+            self.assertIn(original, names)
+
+    def test_the_direction_record_is_cited_by_name_without_a_digest(self):
+        import ast
+        citation = re.search(r"The owner direction is recorded\b.*?(?=\n- |\n\n)",
+                             self.files[f"{MODEL_ROUTES_RECORD}/RUN-RECORD.md"], re.DOTALL)
+        self.assertIsNotNone(citation, "identify RUN-RECORD.md's citation of the CC direction record")
+        generator = ast.parse(self.files[f"{MODEL_ROUTES_ATTEMPTS}/build_input.py"])
+        sites = {
+            "RUN-RECORD.md": citation.group(0),
+            "layer-input.json decision_ref": json.loads(self.files[f"{MODEL_ROUTES_RECORD}/layer-input.json"])["decision_ref"],
+            "build_input.py decision_ref": next(
+                node.value.value for node in ast.walk(generator) if isinstance(node, ast.Assign)
+                and isinstance(node.value, ast.Constant)
+                and any(isinstance(target, ast.Name) and target.id == "decision_ref" for target in node.targets)),
+        }
+        for site, text in sites.items():
+            with self.subTest(site=site):
+                self.assertIn(DIRECTION_RECORD, text)
+                self.assertEqual(len(DIGEST.findall(text)), 0, "cite the private record by name, without a digest")
+
+    def test_the_record_holds_no_abbreviated_digest(self):
+        found = {name: len(ABBREVIATED_DIGEST.findall(self.files[f"{MODEL_ROUTES_RECORD}/{name}"]))
+                 for name in ("RUN-RECORD.md", "MERGE-PLAN.md")}
+        self.assertEqual({name: count for name, count in found.items() if count}, {},
+                         "abbreviated digests (file: count); give a published value in full or name the original")
+
+
 if __name__ == "__main__":
     unittest.main()

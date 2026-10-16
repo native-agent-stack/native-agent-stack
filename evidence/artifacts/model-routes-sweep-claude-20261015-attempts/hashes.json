@@ -1,0 +1,48 @@
+{
+ "prompts_sha256": "f8263a7b7cce54784278ac909ecb1ab5e83376411891b3e4880fd134df516a7d",
+ "prompts_sha256_rule": "tools/sota-convergence/landscape-sweep/build_args.py fill_build over templates.json at 8053f14e7 (date 2026-10-15, 1 layer, the checked_at of adoption/skills/manifest.json at 8053f14e7, modality repository), hashed by sweep_common.prompts_sha256",
+ "input_published": "63aed082dc3fccd336c75e0ba74252f371a60607d92553248761d09163ea019b",
+ "returns": "498651465682013d9e8c668b0f1aa0c9d936f51c3c7fed6612d80fb71292f5e6",
+ "unpublished_originals": [
+  {
+   "name": "inputs/model-routes.json",
+   "what": "The unmasked layer input the workers read. layer-input.json is its published copy, which masks the host worktree path and names the CC direction record without the record's digest.",
+   "custody": "Kept privately in the co-op work directory. No digest is published."
+  },
+  {
+   "name": "claude-stage1-discover.embedded.js",
+   "what": "The stage 1 (discover) Workflow script as run, written by gen_stage1.py. It embeds the staged Workflow args, which hold the work-directory path (args.S, build_args.py:574).",
+   "custody": "Kept privately in the co-op work directory. No digest is published."
+  },
+  {
+   "name": "claude-stage2-refute.embedded.js",
+   "what": "The stage 2 (facts and fit refuters) Workflow script as run, written by gen_stage2.py. It embeds the staged Workflow args (args.S) and the merged proposal list.",
+   "custody": "Kept privately in the co-op work directory. No digest is published."
+  },
+  {
+   "name": "claude-stage3-critic.embedded.js",
+   "what": "The stage 3 (critic) Workflow script as run, written by gen_stage3.py. It embeds the staged Workflow args (args.S).",
+   "custody": "Kept privately in the co-op work directory. No digest is published."
+  },
+  {
+   "name": "stage2-merged.json",
+   "what": "The merged proposal list the refuters voted on, written by gen_stage2.py, before convert.py's path redaction (convert.py:42).",
+   "custody": "Kept privately in the co-op work directory. No digest is published."
+  },
+  {
+   "name": "run-wf_424f30f4-0af.json, run-wf_27e93022-5c0.json, run-wf_d251d8c8-3b7.json",
+   "what": "The three Workflow run records that synthesize.py reads.",
+   "custody": "Kept privately in the co-op work directory. No digest is published."
+  },
+  {
+   "name": "synthesized-return.json",
+   "what": "synthesize.py's join of the three run records into the sweep.js return shape: convert.py's --workflow-output in both conversions.",
+   "custody": "Kept privately in the co-op work directory. No digest is published."
+  },
+  {
+   "name": "scope-model-routes.json, scope-model-routes-published.json",
+   "what": "The scope copies convert.py read: saturation_ledger.py --scope at 8053f14e7 plus the model-routes requirement_sha256, the workers' value in the first conversion and layer-input.json's published value in the second.",
+   "custody": "The first is kept privately in the co-op work directory and the second in the co-op scratch tree. No digest is published."
+  }
+ ]
+}
