@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "kind": "layer_packet_projection",
+  "catalog": "foundation",
+  "layer_id": "isolation",
+  "checked_at": "2026-10-16",
+  "source_base": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "generator_command": "python3 tools/sota-convergence/lane_packets.py --root ${REPO} --out ${SCRATCH}/packets --catalog foundation --checked-at 2026-10-16 --manifest catalogs/sota-convergence/manifest-20260929.json --registered-receipts --manifest-newcomers",
+  "generator_exit_code": 0,
+  "generated_packet_count": 20,
+  "projection_note": "The native generator has a catalog selector but no layer selector. Retain only foundation/isolation and only its existing winner pair plus the two carried survivors. The omitted packet candidates are not re-adjudicated. Selected fields are copied without changing their historical pin; proposed run pins are in preparation.json.",
+  "requirement": "Separate edits and apply a real filesystem/network boundary only where the selected task requires enforced restrictions.",
+  "selected_candidates": [
+    {
+      "key": "c2",
+      "name": "boxlite-ai/boxlite",
+      "component_id": null,
+      "repository": "https://github.com/boxlite-ai/boxlite",
+      "pin": null,
+      "evidence_refs": [],
+      "registered_receipts": []
+    },
+    {
+      "key": "c4",
+      "name": "Worktrunk",
+      "component_id": "worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "0.79.0",
+      "evidence_refs": [
+        "docs/token-native-saturation.md"
+      ],
+      "registered_receipts": [
+        {
+          "id": "velanext-native-quality-tools-20260920",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id",
+          "path": "blueprints/convergence-practice/wsl-native-tools/receipt.json"
+        },
+        {
+          "id": "claude-repository-evidence-20260921",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+        },
+        {
+          "id": "claude-upstream-checks-20260921",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        },
+        {
+          "id": "sota-convergence-20260922",
+          "kind": "historical_inventory",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/sota-convergence-20260922.json"
+        },
+        {
+          "id": "token-native-retained-functional-20260920",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/token-native-retained-functional-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "worktrunk-0800-qualification-20261003",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/worktrunk-0800-qualification-20261003.json"
+        },
+        {
+          "id": "worktrunk-list",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/worktrunk-list.json"
+        }
+      ]
+    },
+    {
+      "key": "c7",
+      "name": "superradcompany/microsandbox",
+      "component_id": null,
+      "repository": "https://github.com/superradcompany/microsandbox",
+      "pin": null,
+      "evidence_refs": [],
+      "registered_receipts": []
+    },
+    {
+      "key": "c8",
+      "name": "sandbox-runtime",
+      "component_id": "sandbox-runtime",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "pin": "0.0.77",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "catalogs/us-equities/hosting-source-review.json"
+      ],
+      "registered_receipts": [
+        {
+          "id": "claude-repository-evidence-20260921",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "native-sandbox-codex-binding-20261008",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json"
+        },
+        {
+          "id": "native-sandbox-network-20260920",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/native-sandbox-network-20260920.json"
+        },
+        {
+          "id": "native-sandbox-smoke-20261008",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/native-sandbox-smoke-20261008.json"
+        },
+        {
+          "id": "row70-defect-a-install-plan-20261008",
+          "kind": "artifact_measurement",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/row70-defect-a-install-plan-20261008.json"
+        },
+        {
+          "id": "row70-records-b-e-20261008",
+          "kind": "artifact_measurement",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/row70-records-b-e-20261008.json"
+        },
+        {
+          "id": "runtime-tools",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/runtime-tools.json"
+        },
+        {
+          "id": "sota-convergence-20260922",
+          "kind": "historical_inventory",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/sota-convergence-20260922.json"
+        },
+        {
+          "id": "srt-source-citations-20261008",
+          "kind": "artifact_measurement",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/srt-source-citations-20261008.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "matched_by": "component_id",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ]
+    }
+  ],
+  "omitted_existing_candidates": [
+    "https://github.com/moby/moby",
+    "https://github.com/e2b-dev/E2B",
+    "https://github.com/google/gvisor",
+    "https://github.com/podman-container-tools/podman",
+    "https://github.com/apple/container"
+  ]
+}

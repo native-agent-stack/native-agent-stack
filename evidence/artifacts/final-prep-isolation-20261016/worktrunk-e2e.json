@@ -1,0 +1,89 @@
+{
+  "kind": "upstream_e2e",
+  "repository": "https://github.com/max-sixty/worktrunk",
+  "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+  "evidence_class": "native_proven",
+  "success": true,
+  "component_id": "worktrunk",
+  "recorded_at_utc": "2026-10-16T05:16:02.155341Z",
+  "scope": "Official v0.80.0 release installer, WORKTRUNK_UNMANAGED_INSTALL in /var/tmp; native create/list/remove with hooks disabled. No shell integration or PATH modification.",
+  "upstream_sources": [
+    {
+      "kind": "repo",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "README.md",
+      "line": 107
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "README.md",
+      "line": 159
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "README.md",
+      "line": 166
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "README.md",
+      "line": 183
+    }
+  ],
+  "commands": [
+    {
+      "phase": "install",
+      "command": "env 'WORKTRUNK_UNMANAGED_INSTALL=${SCRATCH}/vendor-worktrunk' sh '${SCRATCH}/downloads/worktrunk-installer.sh'",
+      "exit_code": 0,
+      "output_receipt": "evidence/artifacts/final-prep-isolation-20261016/vendor-installer.json",
+      "command_id": "worktrunk-vendor-install"
+    },
+    {
+      "phase": "smoke",
+      "command": "'${SCRATCH}/vendor-worktrunk/wt' --version",
+      "exit_code": 0,
+      "output_receipt": "evidence/artifacts/final-prep-isolation-20261016/vendor-installer.json",
+      "command_id": "worktrunk-vendor-version"
+    },
+    {
+      "phase": "smoke",
+      "command": "'${SCRATCH}/vendor-worktrunk/wt' switch --create vendor-proof --base main --no-cd --no-hooks",
+      "exit_code": 0,
+      "output_receipt": "evidence/artifacts/final-prep-isolation-20261016/vendor-installer.json",
+      "command_id": "worktrunk-vendor-create"
+    },
+    {
+      "phase": "smoke",
+      "command": "'${SCRATCH}/vendor-worktrunk/wt' list --format=json",
+      "exit_code": 0,
+      "output_receipt": "evidence/artifacts/final-prep-isolation-20261016/vendor-installer.json",
+      "command_id": "worktrunk-vendor-list-created"
+    },
+    {
+      "phase": "smoke",
+      "command": "'${SCRATCH}/vendor-worktrunk/wt' remove vendor-proof --foreground --no-hooks",
+      "exit_code": 0,
+      "output_receipt": "evidence/artifacts/final-prep-isolation-20261016/vendor-installer.json",
+      "command_id": "worktrunk-vendor-remove"
+    },
+    {
+      "phase": "smoke",
+      "command": "'${SCRATCH}/vendor-worktrunk/wt' list --format=json",
+      "exit_code": 0,
+      "output_receipt": "evidence/artifacts/final-prep-isolation-20261016/vendor-installer.json",
+      "command_id": "worktrunk-vendor-list-after"
+    }
+  ],
+  "limitations": [
+    "Supported vendor install and documented CLI smoke only; the complete upstream test suite was not executed.",
+    "No comparative ranking, broad sandbox enforcement or FINAL admission is established."
+  ],
+  "upstream_installer": "https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-installer.sh"
+}

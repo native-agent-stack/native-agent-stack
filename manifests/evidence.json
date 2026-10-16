@@ -19347,6 +19347,11 @@
       "bytes": 9884
     },
     {
+      "path": "docs/decisions/2026-10-16-isolation-final-preparation.md",
+      "sha256": "3aa69e7c3e522953ffca94a21373ac918dbf3e6ff99b01332c2c4120df1c604b",
+      "bytes": 11514
+    },
+    {
       "path": "docs/decisions/2026-10-16-nautilus-rc5-run-source-pin.md",
       "sha256": "a2ceae122b37a9df4c9fb53a53f3bf4a1eb188cc51a60a4c564cf857d4a25014",
       "bytes": 6261
@@ -22885,6 +22890,46 @@
       "path": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
       "sha256": "45cd2b5c580d6f65aaf8eafd80d9412295e40de275dc8a5356d08f8deadb05a7",
       "bytes": 319713
+    },
+    {
+      "path": "evidence/artifacts/final-prep-isolation-20261016/angle-record-draft.json",
+      "sha256": "0745a3c515f7b1555aa6f5603ae367d326b4f0e827fa0ea7f1bee64d6deafe89",
+      "bytes": 21565
+    },
+    {
+      "path": "evidence/artifacts/final-prep-isolation-20261016/distribution-readback.json",
+      "sha256": "8199f59b498813f761a1eaa9ea90f71bc3a5307e23cd92fc96f9407f424becee",
+      "bytes": 788
+    },
+    {
+      "path": "evidence/artifacts/final-prep-isolation-20261016/lane-packet.json",
+      "sha256": "581b6059e79a3a21a35e6b2a437e1167128d229c0781e90ce23cbd5ec87c28e9",
+      "bytes": 7119
+    },
+    {
+      "path": "evidence/artifacts/final-prep-isolation-20261016/native-receipt.json",
+      "sha256": "9a93a684cb46b535c0f39ec5d1a05812112cb2c8d98f60a80a10d12169ca3c4f",
+      "bytes": 28217
+    },
+    {
+      "path": "evidence/artifacts/final-prep-isolation-20261016/preparation.json",
+      "sha256": "226a268b58170ff343892848611653003bd608bde1cff142df67e85aa72e15f6",
+      "bytes": 9256
+    },
+    {
+      "path": "evidence/artifacts/final-prep-isolation-20261016/sandbox-runtime-e2e.json",
+      "sha256": "7cefa8a776d00a1631c9127d1dc764e6202e2fd22739df1abe4970e5fd539386",
+      "bytes": 2633
+    },
+    {
+      "path": "evidence/artifacts/final-prep-isolation-20261016/vendor-installer.json",
+      "sha256": "d9ce95255380b4d82f50555a6e37c04284133261689fc4b28ca6601114da21a1",
+      "bytes": 10214
+    },
+    {
+      "path": "evidence/artifacts/final-prep-isolation-20261016/worktrunk-e2e.json",
+      "sha256": "201b4ab17c815bbfc094aa46114c02260360974537f62f4aee95ed970988197c",
+      "bytes": 3428
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",

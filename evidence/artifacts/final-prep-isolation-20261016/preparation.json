@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "kind": "final_wave_preparation",
+  "catalog": "foundation",
+  "layer_id": "isolation",
+  "source_base": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "prepared_at_utc": "2026-10-16T05:16:36Z",
+  "admission": "preparation_only",
+  "layer_status": "reopened",
+  "final_admission": "closed; no policy or catalog mutation",
+  "deliverables": {
+    "F1": "pin_reconciliation",
+    "E2E": [
+      "worktrunk-e2e.json",
+      "sandbox-runtime-e2e.json"
+    ],
+    "F2": [
+      "native-receipt.json",
+      "vendor-installer.json"
+    ],
+    "multi_angle_draft": "angle-record-draft.json"
+  },
+  "pin_reconciliation": [
+    {
+      "component_id": "worktrunk",
+      "proposed_version": "0.80.0",
+      "proposed_source_commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "reason": "Existing main run and new-install profile already select this release; fresh host readback and scratch vendor install match it. Reconcile the stale verdict in a reviewed later decision, not by changing historical sealed evidence.",
+      "sources": [
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 11392,
+          "observed": "run 0.80.0; commit b49ca7eea9b03145791a5b94eccaf9c59412ed37"
+        },
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 6263,
+          "observed": "isolation winner verdict remains 0.79.0, pin_drift differs"
+        },
+        {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 137,
+          "observed": "reopened, worktrunk + sandbox-runtime, two pin drifts; the row itself supplies no version"
+        },
+        {
+          "path": "manifests/stack.json",
+          "line": 1071,
+          "observed": "version 0.80.0; source_pin at line 1095"
+        },
+        {
+          "path": "adoption/new-wsl-profile.json",
+          "line": 807,
+          "observed": "selected 0.80.0; line 843 retains earlier observed-host 0.79.0 and UNRUN cargo-test scope"
+        },
+        {
+          "path": "evidence/receipts/worktrunk-0800-qualification-20261003.json",
+          "line": 19,
+          "observed": "0.80.0, archive install/list-only scratch qualification; last modified at d9eb68750311d5f888adec140723da174f9fe10c"
+        },
+        {
+          "path": "catalogs/landscape/foundation.json",
+          "line": 1089,
+          "observed": "winner verdict pin 0.79.0"
+        }
+      ],
+      "host_readback": {
+        "command": "wt --version",
+        "exit_code": 0,
+        "stdout": "wt v0.80.0\n",
+        "receipt": "native-receipt.json#/commands/4"
+      },
+      "drifts": [
+        "Historical verdict and generated winner row lag the main run pin by one recorded release.",
+        "New-install profile's historical observed-host sentence still says 0.79.0; this run observes 0.80.0.",
+        "Historical cargo-suite, shell-integration and crash-cleanup gaps are not closed by this native CLI smoke."
+      ]
+    },
+    {
+      "component_id": "sandbox-runtime",
+      "proposed_version": "0.0.79",
+      "proposed_source_commit": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "reason": "Existing main run, new-install profile, installed readback and fresh scratch npm route agree. Version-specific network/escape evidence must be obtained rather than borrowed from 0.0.77.",
+      "sources": [
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 11213,
+          "observed": "run 0.0.79; commit d9aac2098351ca17f3743fbaf6ecbd0051b7e00e"
+        },
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 6286,
+          "observed": "isolation winner verdict remains 0.0.77, pin_drift differs"
+        },
+        {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 137,
+          "observed": "same two-drift layer row; no independent version pin"
+        },
+        {
+          "path": "manifests/stack.json",
+          "line": 869,
+          "observed": "version 0.0.79; source_pin at line 888"
+        },
+        {
+          "path": "adoption/new-wsl-profile.json",
+          "line": 750,
+          "observed": "selected 0.0.79; supported npm prefix route at line 773"
+        },
+        {
+          "path": "evidence/receipts/native-sandbox-smoke-20261008.json",
+          "line": 19,
+          "observed": "0.0.79 imported echo; last modified at eb5fee4db9a494729deb29bdf38dbabac23ee643"
+        },
+        {
+          "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json",
+          "line": 19,
+          "observed": "later 0.0.79 native Codex echo binding; last modified at be7273a43c35f25002be8b481683c475482d661c"
+        },
+        {
+          "path": "evidence/receipts/srt-source-citations-20261008.json",
+          "line": 1,
+          "observed": "later reference-only source repair at d1df16f55b3fd253216bce485963ab3e9902161f; no new E2E"
+        },
+        {
+          "path": "catalogs/landscape/foundation.json",
+          "line": 1110,
+          "observed": "winner verdict pin 0.0.77"
+        }
+      ],
+      "host_readback": {
+        "command": "srt --version",
+        "exit_code": 0,
+        "stdout": "0.0.79\n",
+        "receipt": "native-receipt.json#/commands/5"
+      },
+      "drifts": [
+        "Historical verdict and generated winner row differ from existing run 0.0.79.",
+        "The versionless filesystem and 0.0.77 loopback network receipts do not qualify policy behavior at 0.0.79.",
+        "The new scratch run adds direct 0.0.79 echo/permit/deny-write evidence only; broader network and client integration remain gaps."
+      ]
+    }
+  ],
+  "resolution": {
+    "protocol": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
+    "verdict_wave": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+    "latest_committed_covering_sweep": "landscape-sweep-20260929",
+    "manifest": "catalogs/sota-convergence/manifest-20260929.json",
+    "returns": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/isolation",
+    "earlier_dispositions": "The stopped/missing 2026-09-23 returns do not settle candidates. The 2026-09-26 missing-fit cases carry BoxLite and microsandbox; their 2026-09-29 facts and both fit votes survive. Both remain unresolved.",
+    "newer_pending_input": "No newer retained covering sweep was supplied for this bounded preparation; this records the latest committed coverage, not an assertion about undisclosed work.",
+    "carried_survivors": [
+      {
+        "repository": "https://github.com/boxlite-ai/boxlite",
+        "source_pin": "91655df3f172812c56465f96a9dac79f9b193f9f",
+        "disposition": "carried_targeted_candidate",
+        "source": "evidence/artifacts/landscape-sweep-20260929/boxlite-ai-boxlite.json",
+        "trial_pin_gap": "The carried release discussion names v0.10.4 while its source review pins this commit. Reconcile the actual trial artifact before a future execution; no release/commit equivalence is assumed."
+      },
+      {
+        "repository": "https://github.com/superradcompany/microsandbox",
+        "source_pin": "2110af1e5cc965c57539815a432d6b055ba6a023",
+        "disposition": "carried_keep_but_compare",
+        "source": "evidence/artifacts/landscape-sweep-20260929/superradcompany-microsandbox.json",
+        "trial_pin_gap": "The carried discussion names v0.7.4; bind the future trial's release artifact to this source before execution."
+      }
+    ]
+  },
+  "named_gaps": [
+    {
+      "id": "vm-native-comparison",
+      "command": "python3 -c 'import os; print(os.access(\"/dev/kvm\", os.R_OK | os.W_OK))'",
+      "exit_code": 0,
+      "stdout": "False\n",
+      "recorded_at_utc": "2026-10-16T05:15:26.426352Z",
+      "disposition": "blocked_on_named_host_precondition",
+      "next_input": "An explicitly authorized isolated host with working KVM and a reviewed launch/cleanup context. No account/group/service changes are attempted."
+    },
+    {
+      "id": "two-family-adjudication",
+      "disposition": "pending_coop_reads",
+      "next_input": "Co-op dispatches both families on this PR's four-arm delta and explicitly disputed axes."
+    },
+    {
+      "id": "broader-enforcement",
+      "disposition": "unmeasured",
+      "next_input": "Pinned native comparison for network/filesystem denial, resource limits, hostile-workload containment and cleanup; separate scope from echo and one-file controls."
+    },
+    {
+      "id": "upstream-full-suites",
+      "disposition": "unrun",
+      "next_input": "Full Worktrunk cargo and sandbox-runtime bun suites under their supported prerequisites; smoke passes are not full-suite passes."
+    },
+    {
+      "id": "independent-angles",
+      "disposition": "unqualified",
+      "next_input": "Role- and pin-relevant A2/A3/A4/A5 evidence plus a matched A6 comparison; installation and inherited agreement do not fill these."
+    }
+  ],
+  "non_changes": [
+    "No final-stack schema, catalog winner, operational angle record, model route or default is changed.",
+    "No host-wide install, service enablement, credential use, account change or model-read dispatch.",
+    "Existing public source and historical receipt bytes retain their recorded scopes."
+  ]
+}

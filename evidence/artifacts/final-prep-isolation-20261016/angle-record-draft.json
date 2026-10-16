@@ -1,0 +1,457 @@
+{
+  "schema_version": 1,
+  "rule_version": "angle-convergence/2",
+  "catalog": "foundation",
+  "layer_id": "isolation",
+  "weights": {
+    "A1": 0.2,
+    "A2": 0.2,
+    "A3": 0.15,
+    "A4": 0.15,
+    "A5": 0.2,
+    "A6": 0.1
+  },
+  "weights_stated_at": "2026-10-16T05:16:36Z",
+  "weight_reason": "Use the existing v2 defaults for an evidence preparation draft. No comparative experiment or weight tuning is performed.",
+  "published_evaluations_available": false,
+  "disclosure": "Prepared after the bounded native smokes. This is not a preregistered comparison or an adjudicated catalog record. No independent published comparative evaluation is retained in this delta; that is a coverage gap, not proof none exists. Installs/smokes contribute to A1 and F2 only, never comparative A6. All four candidates remain INSUFFICIENT.",
+  "resolution_inputs": [
+    "catalogs/landscape/foundation.json",
+    "catalogs/landscape/final-stack.json",
+    "catalogs/sota-convergence/layer-verdict-waves.json",
+    "catalogs/sota-convergence/layer-verdicts-20260922.json",
+    "catalogs/saturation/ledger.json",
+    "catalogs/sota-convergence/manifest-20260929.json",
+    "evidence/artifacts/landscape-sweep-20260929/returns.json",
+    "evidence/artifacts/final-prep-isolation-20261016/lane-packet.json"
+  ],
+  "gaps": [
+    "FINAL admission remains closed; this draft is outside catalogs/landscape/angles and changes no generator input or gate policy.",
+    "Historical verdict pins 0.79.0/0.0.77 differ from existing run and installed pins 0.80.0/0.0.79. Proposed reconciliation needs the co-op's two-family review.",
+    "The layer has no existing angle record. A2 engineering depth, A3 independent community consensus, A4 net usage, A5 independent published comparisons and A6 matched native comparisons remain unqualified.",
+    "Sandbox-runtime network enforcement at 0.0.79 is unmeasured by this smoke; historical versionless or 0.0.77 results retain their original scope.",
+    "BoxLite and microsandbox remain cumulative survivors. /dev/kvm read/write access is false, so their native comparison is stopped without account, group or service changes.",
+    "Native invocations prove this bounded preparation window only. They do not establish continuous operational use, universal wrapping or measured net usage.",
+    "Full upstream suites, Worktrunk crash/dirty cleanup, non-Linux platforms, resource enforcement and general escape resistance are not established."
+  ],
+  "candidates": [
+    {
+      "id": "worktrunk",
+      "name": "Worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "role": "Existing winner for edit ownership; proposed existing run pin 0.80.0",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "confounds": [
+        "Different mechanisms cover different scopes: edit ownership, selected OS restrictions, and VM/resource isolation cannot be ranked by a single smoke.",
+        "Historic receipts and sweep reviews name different versions and dates; no evidence is silently transferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/max-sixty/worktrunk",
+              "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+              "path": "README.md",
+              "line": 159
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-isolation-20261016/vendor-installer.json"
+            }
+          ],
+          "note": "Pinned README create/list/remove path and a fresh unmanaged vendor install pass. Native worktree counts are 1→2→1 with clean Git status. This screens owned edit separation only."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/max-sixty/worktrunk",
+              "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+              "path": "README.md",
+              "line": 159
+            }
+          ],
+          "note": "Pinned maintained upstream source and supported distribution/test instructions were read. This bounded delta has no independent engineering-quality qualification, full-suite pass or current advisory closure for this arm."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json"
+            }
+          ],
+          "note": "Prior internal two-family survival/agreement is recorded context, not independent community consensus at this pin. No winner is selected from stars, recency or agreement alone."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-isolation-20261016/vendor-installer.json"
+            }
+          ],
+          "note": "No independent net-usage dataset is retained for this role/pin. Native preparation invocations for the winner pair are F2 evidence, not ecosystem or operational usage estimates."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/max-sixty/worktrunk",
+              "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+              "path": "README.md",
+              "line": 159
+            }
+          ],
+          "note": "No independent published matched evaluation is retained in the bounded input set. Vendor performance/architecture claims, where present, are not comparative acceptance or independently reproduced results."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-isolation-20261016/vendor-installer.json"
+            }
+          ],
+          "note": "No matched native comparison has run. Winner install/smoke receipts are A1 controls; carried VM arms remain unexecuted because the host KVM precondition fails."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": true,
+      "measure_next": "Qualify dirty/refused removal, crash cleanup and supported shell integration in owned fixtures; compare only against an eligible carried arm where the selected requirement needs a VM/resource boundary.",
+      "adoption_status": "CURRENT",
+      "final_eligible": false
+    },
+    {
+      "id": "sandbox-runtime",
+      "name": "Anthropic sandbox-runtime",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "role": "Existing conditional winner for selected OS restrictions; proposed existing run pin 0.0.79",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "Different mechanisms cover different scopes: edit ownership, selected OS restrictions, and VM/resource isolation cannot be ranked by a single smoke.",
+        "Historic receipts and sweep reviews name different versions and dates; no evidence is silently transferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anthropics/sandbox-runtime",
+              "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+              "path": "README.md",
+              "line": 168
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-isolation-20261016/native-receipt.json"
+            }
+          ],
+          "note": "Fresh npm install and the pinned README CLI echo pass. The real CLI also permits an owned write and refuses a denied write. These bounded controls do not complete the layer's filesystem/network enforcement screen at 0.0.79; historical 0.0.77 network evidence is not transferred."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anthropics/sandbox-runtime",
+              "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+              "path": "README.md",
+              "line": 168
+            }
+          ],
+          "note": "Pinned maintained upstream source and supported distribution/test instructions were read. This bounded delta has no independent engineering-quality qualification, full-suite pass or current advisory closure for this arm."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json"
+            }
+          ],
+          "note": "Prior internal two-family survival/agreement is recorded context, not independent community consensus at this pin. No winner is selected from stars, recency or agreement alone."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-isolation-20261016/native-receipt.json"
+            }
+          ],
+          "note": "No independent net-usage dataset is retained for this role/pin. Native preparation invocations for the winner pair are F2 evidence, not ecosystem or operational usage estimates."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anthropics/sandbox-runtime",
+              "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+              "path": "README.md",
+              "line": 168
+            }
+          ],
+          "note": "No independent published matched evaluation is retained in the bounded input set. Vendor performance/architecture claims, where present, are not comparative acceptance or independently reproduced results."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-isolation-20261016/native-receipt.json"
+            }
+          ],
+          "note": "No matched native comparison has run. Winner install/smoke receipts are A1 controls; carried VM arms remain unexecuted because the host KVM precondition fails."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": true,
+      "measure_next": "Run an independently reviewed 0.0.79 filesystem and network policy comparison, including teardown and unavailable/denied controls. Do not infer TLS, SOCKS, IPv6, resource-limit or escape qualification from echo.",
+      "adoption_status": "CURRENT",
+      "final_eligible": false
+    },
+    {
+      "id": "boxlite",
+      "name": "BoxLite",
+      "repository": "https://github.com/boxlite-ai/boxlite",
+      "pin": "91655df3f172812c56465f96a9dac79f9b193f9f",
+      "role": "Carried targeted survivor, not selected or installed",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "Different mechanisms cover different scopes: edit ownership, selected OS restrictions, and VM/resource isolation cannot be ranked by a single smoke.",
+        "Historic receipts and sweep reviews name different versions and dates; no evidence is silently transferred.",
+        "The carried sweep retained advisory and cleanup questions. Its source review is not a current security clearance."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/boxlite-ai/boxlite",
+              "pin": "91655df3f172812c56465f96a9dac79f9b193f9f",
+              "path": "README.md",
+              "line": 1
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/landscape-sweep-20260929/boxlite-ai-boxlite.json"
+            }
+          ],
+          "note": "The carried pinned README describes a per-box VM, OS sandboxing, resource limits and egress policy; Linux requires accessible /dev/kvm. That prerequisite is unavailable here. Source capability is not a native screen pass."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/boxlite-ai/boxlite",
+              "pin": "91655df3f172812c56465f96a9dac79f9b193f9f",
+              "path": "README.md",
+              "line": 1
+            }
+          ],
+          "note": "Pinned maintained upstream source and supported distribution/test instructions were read. This bounded delta has no independent engineering-quality qualification, full-suite pass or current advisory closure for this arm."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json"
+            }
+          ],
+          "note": "Prior internal two-family survival/agreement is recorded context, not independent community consensus at this pin. No winner is selected from stars, recency or agreement alone."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/landscape-sweep-20260929/boxlite-ai-boxlite.json"
+            }
+          ],
+          "note": "No independent net-usage dataset is retained for this role/pin. Native preparation invocations for the winner pair are F2 evidence, not ecosystem or operational usage estimates."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/boxlite-ai/boxlite",
+              "pin": "91655df3f172812c56465f96a9dac79f9b193f9f",
+              "path": "README.md",
+              "line": 1
+            }
+          ],
+          "note": "No independent published matched evaluation is retained in the bounded input set. Vendor performance/architecture claims, where present, are not comparative acceptance or independently reproduced results."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/landscape-sweep-20260929/boxlite-ai-boxlite.json"
+            }
+          ],
+          "note": "No matched native comparison has run. Winner install/smoke receipts are A1 controls; carried VM arms remain unexecuted because the host KVM precondition fails."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": true,
+      "measure_next": "On an authorized eligible host, pin the exact trial artifact to the source revision, recheck carried security/teardown concerns, and compare filesystem/network/resource enforcement, cleanup and host compatibility against the scoped incumbent.",
+      "adoption_status": "NOT_ADOPTED",
+      "final_eligible": false
+    },
+    {
+      "id": "microsandbox",
+      "name": "microsandbox",
+      "repository": "https://github.com/superradcompany/microsandbox",
+      "pin": "2110af1e5cc965c57539815a432d6b055ba6a023",
+      "role": "Carried keep-but-compare survivor, not selected or installed",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "Different mechanisms cover different scopes: edit ownership, selected OS restrictions, and VM/resource isolation cannot be ranked by a single smoke.",
+        "Historic receipts and sweep reviews name different versions and dates; no evidence is silently transferred.",
+        "The carried sweep retained advisory and cleanup questions. Its source review is not a current security clearance."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/superradcompany/microsandbox",
+              "pin": "2110af1e5cc965c57539815a432d6b055ba6a023",
+              "path": "README.md",
+              "line": 1
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/landscape-sweep-20260929/superradcompany-microsandbox.json"
+            }
+          ],
+          "note": "The carried pinned README documents Linux KVM, microVM execution, CPU/memory configuration and network allowlists. No native acceptance exists here; unavailable KVM is a host precondition gap, not a product refutation."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/superradcompany/microsandbox",
+              "pin": "2110af1e5cc965c57539815a432d6b055ba6a023",
+              "path": "README.md",
+              "line": 1
+            }
+          ],
+          "note": "Pinned maintained upstream source and supported distribution/test instructions were read. This bounded delta has no independent engineering-quality qualification, full-suite pass or current advisory closure for this arm."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json"
+            }
+          ],
+          "note": "Prior internal two-family survival/agreement is recorded context, not independent community consensus at this pin. No winner is selected from stars, recency or agreement alone."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/landscape-sweep-20260929/superradcompany-microsandbox.json"
+            }
+          ],
+          "note": "No independent net-usage dataset is retained for this role/pin. Native preparation invocations for the winner pair are F2 evidence, not ecosystem or operational usage estimates."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/superradcompany/microsandbox",
+              "pin": "2110af1e5cc965c57539815a432d6b055ba6a023",
+              "path": "README.md",
+              "line": 1
+            }
+          ],
+          "note": "No independent published matched evaluation is retained in the bounded input set. Vendor performance/architecture claims, where present, are not comparative acceptance or independently reproduced results."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:16:36Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/landscape-sweep-20260929/superradcompany-microsandbox.json"
+            }
+          ],
+          "note": "No matched native comparison has run. Winner install/smoke receipts are A1 controls; carried VM arms remain unexecuted because the host KVM precondition fails."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": true,
+      "measure_next": "Use the same eligible host, launch context, resource budget and enforcement/cleanup cases as BoxLite; verify WSL behavior and carried advisory questions rather than inferring failure from absent README wording.",
+      "adoption_status": "NOT_ADOPTED",
+      "final_eligible": false
+    }
+  ],
+  "final_evidence": [
+    {
+      "candidate_id": "worktrunk",
+      "run_pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "e2e_receipt": "evidence/artifacts/final-prep-isolation-20261016/worktrunk-e2e.json",
+      "invoke_receipt": "evidence/artifacts/final-prep-isolation-20261016/vendor-installer.json",
+      "not_invoked_reason": null
+    },
+    {
+      "candidate_id": "sandbox-runtime",
+      "run_pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "e2e_receipt": "evidence/artifacts/final-prep-isolation-20261016/sandbox-runtime-e2e.json",
+      "invoke_receipt": "evidence/artifacts/final-prep-isolation-20261016/native-receipt.json",
+      "not_invoked_reason": null
+    }
+  ]
+}

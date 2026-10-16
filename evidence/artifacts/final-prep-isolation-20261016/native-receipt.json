@@ -1,0 +1,614 @@
+{
+  "schema_version": 1,
+  "id": "foundation-isolation-final-prep-20261016",
+  "kind": "native_cli_e2e",
+  "evidence_class": "native_proven",
+  "recorded_at_utc": "2026-10-16T05:10:42.048067+00:00",
+  "component_ids": [
+    "worktrunk",
+    "sandbox-runtime"
+  ],
+  "claim": "Fresh isolated vendor installs at the existing run pins complete Worktrunk create/list/remove and the documented sandbox-runtime CLI smoke. A separate synthetic filesystem control permits an owned write and refuses a denied write. FINAL admission and broad isolation qualification remain pending.",
+  "source_base": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "pins": [
+    {
+      "id": "worktrunk",
+      "version": "0.80.0",
+      "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "install_source": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0"
+    },
+    {
+      "id": "sandbox-runtime",
+      "version": "0.0.79",
+      "commit": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "install_source": "https://registry.npmjs.org/@anthropic-ai%2Fsandbox-runtime/0.0.79"
+    }
+  ],
+  "scope": {
+    "platform": "linux-x86_64",
+    "scratch": "${SCRATCH} is one owned directory under /var/tmp",
+    "configuration": "Environment contains only tool PATH, locale, scratch XDG/TMP paths, isolated Worktrunk config paths and scratch Git fixture identity. npm uses distinct scratch user/global config paths and a scratch prefix/cache. No host configuration or services are changed.",
+    "policy": {
+      "network": {
+        "allowedDomains": [],
+        "deniedDomains": []
+      },
+      "filesystem": {
+        "denyRead": [
+          "/home",
+          "/root"
+        ],
+        "allowWrite": [
+          "."
+        ],
+        "denyWrite": [
+          "./denied.txt"
+        ]
+      }
+    }
+  },
+  "commands": [
+    {
+      "id": "host-node-version",
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "cwd": "${SCRATCH}",
+      "started_at_utc": "2026-10-16T05:10:36.495624+00:00",
+      "elapsed_seconds": 0.006,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "v24.21.0\n",
+      "stderr": "",
+      "stdout_sha256": "f2ec568164f99546161909b0189b57bb5be3e80f8e2ccd8a51a4aed8c4055a04",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "host-npm-version",
+      "argv": [
+        "npm",
+        "--version"
+      ],
+      "cwd": "${SCRATCH}",
+      "started_at_utc": "2026-10-16T05:10:36.501802+00:00",
+      "elapsed_seconds": 0.138,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "11.19.0\n",
+      "stderr": "",
+      "stdout_sha256": "005206ab803f8881d8227540b7980b37e723b69a8849edb31734a90b7e7964e2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "host-bun-version",
+      "argv": [
+        "bun",
+        "--version"
+      ],
+      "cwd": "${SCRATCH}",
+      "started_at_utc": "2026-10-16T05:10:36.639659+00:00",
+      "elapsed_seconds": 0.003,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "1.4.2\n",
+      "stderr": "",
+      "stdout_sha256": "b99b4c7cdf236f59bc9f65d963deaecae3b16a7dad87939cacb9057f7664daee",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "host-bwrap-version",
+      "argv": [
+        "bwrap",
+        "--version"
+      ],
+      "cwd": "${SCRATCH}",
+      "started_at_utc": "2026-10-16T05:10:36.642669+00:00",
+      "elapsed_seconds": 0.002,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "bubblewrap 0.11.1\n",
+      "stderr": "",
+      "stdout_sha256": "3982b5c6efde838f903123b493520814ab1b56dfb7f35ac96af62ef443eb6acc",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "host-wt-version",
+      "argv": [
+        "wt",
+        "--version"
+      ],
+      "cwd": "${SCRATCH}",
+      "started_at_utc": "2026-10-16T05:10:36.644859+00:00",
+      "elapsed_seconds": 0.018,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "wt v0.80.0\n",
+      "stderr": "",
+      "stdout_sha256": "322de99d4f0079c1e23f2078197eeab386189b25790619554c654a40a5290ff9",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "host-srt-version",
+      "argv": [
+        "srt",
+        "--version"
+      ],
+      "cwd": "${SCRATCH}",
+      "started_at_utc": "2026-10-16T05:10:36.663446+00:00",
+      "elapsed_seconds": 0.187,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "0.0.79\n",
+      "stderr": "",
+      "stdout_sha256": "8c52412b1e17f6490f8ce8a10dbe32111d809b052a85bf828b52eef9c34add77",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "worktrunk-download",
+      "argv": [
+        "curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--location",
+        "https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-x86_64-unknown-linux-musl.tar.xz",
+        "--output",
+        "${SCRATCH}/downloads/worktrunk-x86_64-unknown-linux-musl.tar.xz"
+      ],
+      "cwd": "${SCRATCH}",
+      "started_at_utc": "2026-10-16T05:10:36.851068+00:00",
+      "elapsed_seconds": 0.206,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "worktrunk-checksum-download",
+      "argv": [
+        "curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--location",
+        "https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-x86_64-unknown-linux-musl.tar.xz.sha256",
+        "--output",
+        "${SCRATCH}/downloads/worktrunk-x86_64-unknown-linux-musl.tar.xz.sha256"
+      ],
+      "cwd": "${SCRATCH}",
+      "started_at_utc": "2026-10-16T05:10:37.057041+00:00",
+      "elapsed_seconds": 0.202,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "worktrunk-checksum",
+      "argv": [
+        "sha256sum",
+        "-c",
+        "worktrunk-x86_64-unknown-linux-musl.tar.xz.sha256"
+      ],
+      "cwd": "${SCRATCH}/downloads",
+      "started_at_utc": "2026-10-16T05:10:37.258904+00:00",
+      "elapsed_seconds": 0.012,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "worktrunk-x86_64-unknown-linux-musl.tar.xz: OK\n",
+      "stderr": "",
+      "stdout_sha256": "be87cd1e143887cb74f8abc0ad1804e6d28c73b5928cb2f608008ec8000af62a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "worktrunk-install",
+      "argv": [
+        "tar",
+        "-xJf",
+        "${SCRATCH}/downloads/worktrunk-x86_64-unknown-linux-musl.tar.xz",
+        "-C",
+        "${SCRATCH}/worktrunk-prefix"
+      ],
+      "cwd": "${SCRATCH}",
+      "started_at_utc": "2026-10-16T05:10:37.285678+00:00",
+      "elapsed_seconds": 0.722,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "worktrunk-installed-version",
+      "argv": [
+        "${SCRATCH}/worktrunk-prefix/worktrunk-x86_64-unknown-linux-musl/wt",
+        "--version"
+      ],
+      "cwd": "${SCRATCH}",
+      "started_at_utc": "2026-10-16T05:10:38.007795+00:00",
+      "elapsed_seconds": 0.026,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "wt v0.80.0\n",
+      "stderr": "",
+      "stdout_sha256": "322de99d4f0079c1e23f2078197eeab386189b25790619554c654a40a5290ff9",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "fixture-init",
+      "argv": [
+        "git",
+        "init",
+        "-b",
+        "main",
+        "${SCRATCH}/smoke/recorded-repo"
+      ],
+      "cwd": "${SCRATCH}",
+      "started_at_utc": "2026-10-16T05:10:38.033457+00:00",
+      "elapsed_seconds": 0.013,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "Initialized empty Git repository in ${SCRATCH}/smoke/recorded-repo/.git/\n",
+      "stderr": "",
+      "stdout_sha256": "f86f9535e7228fc38fde46ce8d59009e6cc28c28b89e6cde0630014bf7c10ce8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "fixture-commit",
+      "argv": [
+        "git",
+        "commit",
+        "--allow-empty",
+        "-m",
+        "Initial isolated fixture"
+      ],
+      "cwd": "${SCRATCH}/smoke/recorded-repo",
+      "started_at_utc": "2026-10-16T05:10:38.046434+00:00",
+      "elapsed_seconds": 0.013,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "[main (root-commit) ${FIXTURE_OBJECT}] Initial isolated fixture\n",
+      "stderr": "",
+      "stdout_sha256": "3ef95db3f68f81fe9626707e21a1269b75e50ee153e14527f8c13c14e4775ed4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "worktrunk-list-before",
+      "argv": [
+        "${SCRATCH}/worktrunk-prefix/worktrunk-x86_64-unknown-linux-musl/wt",
+        "list",
+        "--format=json"
+      ],
+      "cwd": "${SCRATCH}/smoke/recorded-repo",
+      "started_at_utc": "2026-10-16T05:10:38.059692+00:00",
+      "elapsed_seconds": 0.093,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "{\n  \"schema\": 2,\n  \"repo\": {\n    \"default_branch\": \"main\"\n  },\n  \"collected\": {\n    \"ci\": false,\n    \"summary\": false\n  },\n  \"items\": [\n    {\n      \"branch\": \"main\",\n      \"head\": {\n        \"sha\": \"${FIXTURE_OBJECT}\",\n        \"short_sha\": \"${FIXTURE_OBJECT}\",\n        \"subject\": \"Initial isolated fixture\",\n        \"committed_at\": \"2026-10-16T05:10:38Z\"\n      },\n      \"worktree\": {\n        \"path\": \"${SCRATCH}/smoke/recorded-repo\",\n        \"main\": true,\n        \"current\": true,\n        \"previous\": false,\n        \"detached\": false,\n        \"branch_mismatch\": false,\n        \"duplicate_branch\": false,\n        \"changes\": {\n          \"staged\": false,\n          \"modified\": false,\n          \"untracked\": false,\n          \"renamed\": false,\n          \"deleted\": false,\n          \"conflicted\": false,\n          \"diff\": {\n            \"added\": 0,\n            \"deleted\": 0\n          }\n        }\n      },\n      \"display\": {\n        \"state\": \"is_main\",\n        \"symbols\": \"^\",\n        \"statusline\": \"main  \\u001b[2m^\\u001b[22m\"\n      }\n    }\n  ]\n}\n",
+      "stderr": "",
+      "stdout_sha256": "1c5da99242daa3c5ca022cabe24a29b2cf676869805db72990d1485e4464ff51",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "worktrunk-create",
+      "argv": [
+        "${SCRATCH}/worktrunk-prefix/worktrunk-x86_64-unknown-linux-musl/wt",
+        "switch",
+        "--create",
+        "isolation-proof",
+        "--base",
+        "main",
+        "--no-cd",
+        "--no-hooks"
+      ],
+      "cwd": "${SCRATCH}/smoke/recorded-repo",
+      "started_at_utc": "2026-10-16T05:10:38.152609+00:00",
+      "elapsed_seconds": 0.078,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "",
+      "stderr": "\u2713 Created branch isolation-proof from main and worktree @ ${SCRATCH}/smoke/recorded-repo.isolation-proof\n\u21b3 To customize worktree locations, run wt config create\n",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "0f6c64452663977ac7a9b8a5de8d872e4df4348cc557b5685885500da092594e",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "worktrunk-list-created",
+      "argv": [
+        "${SCRATCH}/worktrunk-prefix/worktrunk-x86_64-unknown-linux-musl/wt",
+        "list",
+        "--format=json"
+      ],
+      "cwd": "${SCRATCH}/smoke/recorded-repo",
+      "started_at_utc": "2026-10-16T05:10:38.230654+00:00",
+      "elapsed_seconds": 0.082,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "{\n  \"schema\": 2,\n  \"repo\": {\n    \"default_branch\": \"main\"\n  },\n  \"collected\": {\n    \"ci\": false,\n    \"summary\": false\n  },\n  \"items\": [\n    {\n      \"branch\": \"main\",\n      \"head\": {\n        \"sha\": \"${FIXTURE_OBJECT}\",\n        \"short_sha\": \"${FIXTURE_OBJECT}\",\n        \"subject\": \"Initial isolated fixture\",\n        \"committed_at\": \"2026-10-16T05:10:38Z\"\n      },\n      \"worktree\": {\n        \"path\": \"${SCRATCH}/smoke/recorded-repo\",\n        \"main\": true,\n        \"current\": true,\n        \"previous\": true,\n        \"detached\": false,\n        \"branch_mismatch\": false,\n        \"duplicate_branch\": false,\n        \"changes\": {\n          \"staged\": false,\n          \"modified\": false,\n          \"untracked\": false,\n          \"renamed\": false,\n          \"deleted\": false,\n          \"conflicted\": false,\n          \"diff\": {\n            \"added\": 0,\n            \"deleted\": 0\n          }\n        }\n      },\n      \"display\": {\n        \"state\": \"is_main\",\n        \"symbols\": \"^\",\n        \"statusline\": \"main  \\u001b[2m^\\u001b[22m\"\n      }\n    },\n    {\n      \"branch\": \"isolation-proof\",\n      \"head\": {\n        \"sha\": \"${FIXTURE_OBJECT}\",\n        \"short_sha\": \"${FIXTURE_OBJECT}\",\n        \"subject\": \"Initial isolated fixture\",\n        \"committed_at\": \"2026-10-16T05:10:38Z\"\n      },\n      \"worktree\": {\n        \"path\": \"${SCRATCH}/smoke/recorded-repo.isolation-proof\",\n        \"main\": false,\n        \"current\": false,\n        \"previous\": false,\n        \"detached\": false,\n        \"branch_mismatch\": false,\n        \"duplicate_branch\": false,\n        \"changes\": {\n          \"staged\": false,\n          \"modified\": false,\n          \"untracked\": false,\n          \"renamed\": false,\n          \"deleted\": false,\n          \"conflicted\": false,\n          \"diff\": {\n            \"added\": 0,\n            \"deleted\": 0\n          }\n        }\n      },\n      \"default_branch\": {\n        \"ahead\": 0,\n        \"behind\": 0,\n        \"diff\": {\n          \"added\": 0,\n          \"deleted\": 0\n        },\n        \"orphan\": false,\n        \"integration\": {\n          \"reason\": \"same_commit\"\n        },\n        \"merge_conflicts\": false\n      },\n      \"display\": {\n        \"state\": \"empty\",\n        \"symbols\": \"_\",\n        \"statusline\": \"isolation-proof  \\u001b[2m_\\u001b[22m\"\n      }\n    }\n  ]\n}\n",
+      "stderr": "",
+      "stdout_sha256": "58b50643587daca42cb7db21586bf20a736a9f37e73a433beeaa23cef23591e2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "worktrunk-remove",
+      "argv": [
+        "${SCRATCH}/worktrunk-prefix/worktrunk-x86_64-unknown-linux-musl/wt",
+        "remove",
+        "isolation-proof",
+        "--foreground",
+        "--no-hooks"
+      ],
+      "cwd": "${SCRATCH}/smoke/recorded-repo",
+      "started_at_utc": "2026-10-16T05:10:38.312486+00:00",
+      "elapsed_seconds": 0.2,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "",
+      "stderr": "\u25ce Removing isolation-proof worktree...\n\u2713 Removed isolation-proof worktree & branch (same commit as main, _) (1 file \u00b7 114 B)\n",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "75a7655a1fec573ff1c8ac2e12cb5e1b4b5dc4542612bf2c68867278a342b5ab",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "worktrunk-list-after",
+      "argv": [
+        "${SCRATCH}/worktrunk-prefix/worktrunk-x86_64-unknown-linux-musl/wt",
+        "list",
+        "--format=json"
+      ],
+      "cwd": "${SCRATCH}/smoke/recorded-repo",
+      "started_at_utc": "2026-10-16T05:10:38.512427+00:00",
+      "elapsed_seconds": 0.064,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "{\n  \"schema\": 2,\n  \"repo\": {\n    \"default_branch\": \"main\"\n  },\n  \"collected\": {\n    \"ci\": false,\n    \"summary\": false\n  },\n  \"items\": [\n    {\n      \"branch\": \"main\",\n      \"head\": {\n        \"sha\": \"${FIXTURE_OBJECT}\",\n        \"short_sha\": \"${FIXTURE_OBJECT}\",\n        \"subject\": \"Initial isolated fixture\",\n        \"committed_at\": \"2026-10-16T05:10:38Z\"\n      },\n      \"worktree\": {\n        \"path\": \"${SCRATCH}/smoke/recorded-repo\",\n        \"main\": true,\n        \"current\": true,\n        \"previous\": true,\n        \"detached\": false,\n        \"branch_mismatch\": false,\n        \"duplicate_branch\": false,\n        \"changes\": {\n          \"staged\": false,\n          \"modified\": false,\n          \"untracked\": false,\n          \"renamed\": false,\n          \"deleted\": false,\n          \"conflicted\": false,\n          \"diff\": {\n            \"added\": 0,\n            \"deleted\": 0\n          }\n        }\n      },\n      \"display\": {\n        \"state\": \"is_main\",\n        \"symbols\": \"^\",\n        \"statusline\": \"main  \\u001b[2m^\\u001b[22m\"\n      }\n    }\n  ]\n}\n",
+      "stderr": "",
+      "stdout_sha256": "dc953108ed32b24f6d1662f71d5bdab76e387add3d8fa1c4edd26ecc164b630d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "fixture-final-status",
+      "argv": [
+        "git",
+        "status",
+        "--porcelain"
+      ],
+      "cwd": "${SCRATCH}/smoke/recorded-repo",
+      "started_at_utc": "2026-10-16T05:10:38.576774+00:00",
+      "elapsed_seconds": 0.005,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "srt-install",
+      "argv": [
+        "npm",
+        "--userconfig=${SCRATCH}/config/npm-user.conf",
+        "--globalconfig=${SCRATCH}/config/npm-global.conf",
+        "--cache=${SCRATCH}/npm-cache",
+        "install",
+        "--global",
+        "--prefix",
+        "${SCRATCH}/srt-prefix",
+        "--no-fund",
+        "--no-audit",
+        "@anthropic-ai/sandbox-runtime@0.0.79"
+      ],
+      "cwd": "${SCRATCH}",
+      "started_at_utc": "2026-10-16T05:10:38.581543+00:00",
+      "elapsed_seconds": 2.246,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "\nadded 5 packages in 2s\n",
+      "stderr": "npm notice\nnpm notice New major version of npm available! 11.19.0 -> 12.2.0\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0\nnpm notice To update run: npm install -g npm@12.2.0\nnpm notice\nReshimming mise 24.21.0...\n",
+      "stdout_sha256": "c276419b8da1d51dcbd7019a01c8e0d660b4450b521251121c9eca6ff607736c",
+      "stderr_sha256": "c141cd930b6ad102b0ad62cc71c4fb657dc875ecd4ecbfe5714ed0e14c4a47c9",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "srt-installed-version",
+      "argv": [
+        "${SCRATCH}/srt-prefix/bin/srt",
+        "--version"
+      ],
+      "cwd": "${SCRATCH}",
+      "started_at_utc": "2026-10-16T05:10:40.827462+00:00",
+      "elapsed_seconds": 0.231,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "0.0.79\n",
+      "stderr": "",
+      "stdout_sha256": "8c52412b1e17f6490f8ce8a10dbe32111d809b052a85bf828b52eef9c34add77",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "srt-native-echo",
+      "argv": [
+        "${SCRATCH}/srt-prefix/bin/srt",
+        "--settings",
+        "${SCRATCH}/policy.json",
+        "--",
+        "echo",
+        "isolation-native-smoke"
+      ],
+      "cwd": "${SCRATCH}/smoke",
+      "started_at_utc": "2026-10-16T05:10:41.058541+00:00",
+      "elapsed_seconds": 0.491,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "isolation-native-smoke\n",
+      "stderr": "",
+      "stdout_sha256": "3f1181ab74fbbfcec556b9f437ed9f2a6045b49a14ea5917f5deadf0a40ae917",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "srt-allowed-write",
+      "argv": [
+        "${SCRATCH}/srt-prefix/bin/srt",
+        "--settings",
+        "${SCRATCH}/policy.json",
+        "--",
+        "sh",
+        "-c",
+        "printf allowed > allowed.txt"
+      ],
+      "cwd": "${SCRATCH}/smoke",
+      "started_at_utc": "2026-10-16T05:10:41.549640+00:00",
+      "elapsed_seconds": 0.498,
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    },
+    {
+      "id": "srt-denied-write",
+      "argv": [
+        "${SCRATCH}/srt-prefix/bin/srt",
+        "--settings",
+        "${SCRATCH}/policy.json",
+        "--",
+        "sh",
+        "-c",
+        "printf forbidden > denied.txt"
+      ],
+      "cwd": "${SCRATCH}/smoke",
+      "started_at_utc": "2026-10-16T05:10:42.048067+00:00",
+      "elapsed_seconds": 0.429,
+      "exit_code": 2,
+      "expected_exit_codes": [
+        1,
+        2
+      ],
+      "stdout": "",
+      "stderr": "sh: 1: cannot create denied.txt: Permission denied\n",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "28b4ba8ff4185034bc451a51bf59ae7ab7145ad503a0e13b217811265e738157",
+      "hash_scope": "UTF-8 bytes of the published stdout/stderr values after documented path and disposable-object substitutions"
+    }
+  ],
+  "assertions": {
+    "worktrunk_created_count": 2,
+    "allowed_write_bytes": 7,
+    "denied_write_absent": true,
+    "worktrunk_counts": [
+      {
+        "command": "worktrunk-list-before",
+        "count": 1
+      },
+      {
+        "command": "worktrunk-list-created",
+        "count": 2
+      },
+      {
+        "command": "worktrunk-list-after",
+        "count": 1
+      }
+    ],
+    "final_git_status_clean": true
+  },
+  "invoke_evidence": {
+    "scope": "Native invocations in this bounded preparation window, not an operational usage census.",
+    "command_ids": [
+      "worktrunk-create",
+      "worktrunk-list-created",
+      "worktrunk-remove",
+      "srt-native-echo"
+    ],
+    "output_hashes": "Each command binds the UTF-8 bytes of its published stdout/stderr values; those strings are retained in this receipt."
+  },
+  "harness_correction": {
+    "initial_command": "npm --userconfig=/dev/null --globalconfig=/dev/null install --global --prefix ${SCRATCH}/srt-prefix @anthropic-ai/sandbox-runtime@0.0.79",
+    "exit_code": 1,
+    "stderr": "Exit prior to config file resolving\ncause\ndouble-loading config \"/dev/null\" as \"global\", previously loaded as \"user\"\n",
+    "resolution": "Use two distinct owned scratch config paths. The failed harness configuration is not a product failure. The complete recorded run uses those corrected paths."
+  },
+  "limitations": [
+    "Vendor-documented native smoke commands were run; neither upstream's complete test suite was run.",
+    "The filesystem permit/deny commands are additional synthetic controls through the real CLI; they are not an upstream test suite.",
+    "No network-policy, TLS, SOCKS, IPv6, DNS-rebinding, hostile-workload, resource-limit, VM-boundary or escape qualification is claimed.",
+    "Worktrunk smoke uses an owned one-commit repository with hooks disabled and no remote; crash recovery, dirty removal, shell integration, LLM operations and user repositories remain outside it.",
+    "Native F2 invocations prove use in this measured window only; continued operational integration and usage remain adjudication gaps.",
+    "Scratch paths and disposable Git object identifiers are substituted before publication and hashing. No digest of unpublished raw output is retained.",
+    "Historical verdicts, gate policy, run manifest, host binaries and defaults remain unchanged."
+  ]
+}

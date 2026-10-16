@@ -1,0 +1,67 @@
+{
+  "kind": "upstream_e2e",
+  "repository": "https://github.com/anthropics/sandbox-runtime",
+  "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+  "evidence_class": "native_proven",
+  "success": true,
+  "component_id": "sandbox-runtime",
+  "recorded_at_utc": "2026-10-16T05:10:41.058541Z",
+  "scope": "Official npm global install with an owned prefix/cache and separate empty scratch config paths; README echo through explicit settings. Additional filesystem controls are separately labeled synthetic.",
+  "upstream_sources": [
+    {
+      "kind": "repo",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "path": "README.md",
+      "line": 14
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "path": "README.md",
+      "line": 168
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "path": "README.md",
+      "line": 174
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "path": "README.md",
+      "line": 312
+    }
+  ],
+  "commands": [
+    {
+      "phase": "install",
+      "command": "npm '--userconfig=${SCRATCH}/config/npm-user.conf' '--globalconfig=${SCRATCH}/config/npm-global.conf' '--cache=${SCRATCH}/npm-cache' install --global --prefix '${SCRATCH}/srt-prefix' --no-fund --no-audit @anthropic-ai/sandbox-runtime@0.0.79",
+      "exit_code": 0,
+      "output_receipt": "evidence/artifacts/final-prep-isolation-20261016/native-receipt.json",
+      "command_id": "srt-install"
+    },
+    {
+      "phase": "install",
+      "command": "'${SCRATCH}/srt-prefix/bin/srt' --version",
+      "exit_code": 0,
+      "output_receipt": "evidence/artifacts/final-prep-isolation-20261016/native-receipt.json",
+      "command_id": "srt-installed-version"
+    },
+    {
+      "phase": "smoke",
+      "command": "'${SCRATCH}/srt-prefix/bin/srt' --settings '${SCRATCH}/policy.json' -- echo isolation-native-smoke",
+      "exit_code": 0,
+      "output_receipt": "evidence/artifacts/final-prep-isolation-20261016/native-receipt.json",
+      "command_id": "srt-native-echo"
+    }
+  ],
+  "limitations": [
+    "Supported vendor install and documented CLI smoke only; the complete upstream test suite was not executed.",
+    "No comparative ranking, broad sandbox enforcement or FINAL admission is established."
+  ]
+}
