@@ -1,0 +1,2 @@
+✓ Created branch isolated from main and worktree @ <SCRATCH>/work/repo.isolated
+↳ To customize worktree locations, run wt config create

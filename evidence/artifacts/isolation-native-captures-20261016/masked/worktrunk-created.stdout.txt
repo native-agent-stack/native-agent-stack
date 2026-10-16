@@ -1,0 +1,95 @@
+{
+  "schema": 2,
+  "repo": {
+    "default_branch": "main"
+  },
+  "collected": {
+    "ci": false,
+    "summary": false
+  },
+  "items": [
+    {
+      "branch": "main",
+      "head": {
+        "sha": "<FIXTURE_OBJECT>",
+        "short_sha": "<FIXTURE_SHORT_OBJECT>",
+        "subject": "Isolated fixture",
+        "committed_at": "2026-10-16T06:21:53Z"
+      },
+      "worktree": {
+        "path": "<SCRATCH>/work/repo",
+        "main": true,
+        "current": true,
+        "previous": true,
+        "detached": false,
+        "branch_mismatch": false,
+        "duplicate_branch": false,
+        "changes": {
+          "staged": false,
+          "modified": false,
+          "untracked": false,
+          "renamed": false,
+          "deleted": false,
+          "conflicted": false,
+          "diff": {
+            "added": 0,
+            "deleted": 0
+          }
+        }
+      },
+      "display": {
+        "state": "is_main",
+        "symbols": "^",
+        "statusline": "main  \u001b[2m^\u001b[22m"
+      }
+    },
+    {
+      "branch": "isolated",
+      "head": {
+        "sha": "<FIXTURE_OBJECT>",
+        "short_sha": "<FIXTURE_SHORT_OBJECT>",
+        "subject": "Isolated fixture",
+        "committed_at": "2026-10-16T06:21:53Z"
+      },
+      "worktree": {
+        "path": "<SCRATCH>/work/repo.isolated",
+        "main": false,
+        "current": false,
+        "previous": false,
+        "detached": false,
+        "branch_mismatch": false,
+        "duplicate_branch": false,
+        "changes": {
+          "staged": false,
+          "modified": false,
+          "untracked": false,
+          "renamed": false,
+          "deleted": false,
+          "conflicted": false,
+          "diff": {
+            "added": 0,
+            "deleted": 0
+          }
+        }
+      },
+      "default_branch": {
+        "ahead": 0,
+        "behind": 0,
+        "diff": {
+          "added": 0,
+          "deleted": 0
+        },
+        "orphan": false,
+        "integration": {
+          "reason": "same_commit"
+        },
+        "merge_conflicts": false
+      },
+      "display": {
+        "state": "empty",
+        "symbols": "_",
+        "statusline": "isolated  \u001b[2m_\u001b[22m"
+      }
+    }
+  ]
+}
