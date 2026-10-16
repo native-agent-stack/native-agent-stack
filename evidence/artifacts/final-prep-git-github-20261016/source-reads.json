@@ -1,5 +1,9 @@
 {
   "schema_version": 1,
+  "record_type": "masked_source_review_locators_not_native_receipts",
+  "raw_capture_name": "git-github-source-custody-20261016",
+  "masking_script": "mask_receipts.py",
+  "masking_test": "test_mask_receipts.py",
   "reads": [
     {
       "repository": "https://github.com/max-sixty/worktrunk",
@@ -14,330 +18,339 @@
       "excerpts": [
         {
           "line": 59,
-          "text": "      <td>Switch worktrees</td>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 60,
-          "text": "      <td data-label=\"Worktrunk\"><code>wt switch feat</code></td>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 61,
-          "text": "      <td data-label=\"Plain git\"><code>cd ../repo.feat</code></td>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 62,
-          "text": "    </tr>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 64,
-          "text": "      <td>Create + start Claude</td>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 65,
-          "text": "      <td data-label=\"Worktrunk\"><code>wt switch -c -x claude feat</code></td>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 66,
-          "text": "      <td data-label=\"Plain git\"><pre><code>git worktree add -b feat ../repo.feat && \\"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 67,
-          "text": "cd ../repo.feat && \\"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 71,
-          "text": "      <td>Clean up</td>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 72,
-          "text": "      <td data-label=\"Worktrunk\"><code>wt remove</code></td>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 73,
-          "text": "      <td data-label=\"Plain git\"><pre><code>cd ../repo && \\"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 74,
-          "text": "git worktree remove ../repo.feat && \\"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 78,
-          "text": "      <td>List with status</td>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 79,
-          "text": "      <td data-label=\"Worktrunk\"><code>wt list</code></td>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 80,
-          "text": "      <td data-label=\"Plain git\"><span class=\"cmd-compare-value\"><code>git worktree list</code> (paths only)</span></td>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 81,
-          "text": "    </tr>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 93,
-          "text": "- **[Share build caches](https://worktrunk.dev/step/#wt-step-copy-ignored)** — ten worktrees get `target/`, `node_modules/`, etc without building or copying them (on APFS, btrfs, and XFS)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 94,
-          "text": "- **[`wt list --full`](https://worktrunk.dev/list/#full-mode)** — [CI status](https://worktrunk.dev/list/#ci-status) and [AI-generated summaries](https://worktrunk.dev/list/#llm-summaries) per branch"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 95,
-          "text": "- **[PR checkout](https://worktrunk.dev/switch/#pull-requests-and-merge-requests)** — `wt switch pr:123` to jump straight to a PR's branch"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 96,
-          "text": "- **[Dev server per worktree](https://worktrunk.dev/tips-patterns/#dev-server-per-worktree)** — `hash_port` template filter gives each worktree a unique port"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 97,
-          "text": "- **[Aliases](https://worktrunk.dev/extending/#aliases) & [per-branch variables](https://worktrunk.dev/config/#wt-config-state-vars)** — custom `wt <name>` commands and branch-scoped state for hook templates"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 105,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 106,
-          "text": "<!-- ⚠️ AUTO-GENERATED from docs/src/content/docs/worktrunk.md#install..next-steps — edit source to update -->"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 107,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 108,
-          "text": "## Install"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 109,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 110,
-          "text": "**Homebrew (macOS & Linux):**"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 112,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 113,
-          "text": "brew install worktrunk && wt config shell install"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 114,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 115,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 120,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 121,
-          "text": "cargo install worktrunk && wt config shell install"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 122,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 123,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 126,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 127,
-          "text": "**Windows.** `wt` defaults to Windows Terminal's command, so Winget additionally installs Worktrunk as `git-wt` to avoid the conflict:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 128,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 129,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 130,
-          "text": "winget install max-sixty.worktrunk"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 131,
-          "text": "git-wt config shell install"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 132,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 133,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 140,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 141,
-          "text": "sudo pacman -S worktrunk && wt config shell install"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 142,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 143,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 146,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 147,
-          "text": "conda install -c conda-forge worktrunk && wt config shell install"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 148,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 149,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 150,
-          "text": "Or with [Pixi](https://pixi.sh): `pixi global install worktrunk && wt config shell install`."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 151,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 152,
-          "text": "</details>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 158,
-          "text": "```console"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 159,
-          "text": "$ wt switch --create feature-auth"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 161,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 162,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 163,
-          "text": "This creates a new branch and worktree, then switches to it. Do your work, then check all worktrees with [`wt list`](https://worktrunk.dev/list/):"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 164,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 165,
-          "text": "```console"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 166,
-          "text": "$ wt list"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 167,
-          "text": "  Branch        Status      HEAD±     main↕    main…±    Remote⇅  Commit    Age  Message"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 168,
-          "text": "@ feature-auth  +   ↑      +27   -8   ↑1       +31                4bc72dc    2h  Add authenticatio…"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 182,
-          "text": "gh pr create                      # or glab mr create"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 183,
-          "text": "wt remove                         # after PR is merged"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 184,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 185,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 205,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 206,
-          "text": "wt switch -x claude -c feature-a -- 'Add user authentication'"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 207,
-          "text": "wt switch -x claude -c feature-b -- 'Fix the pagination bug'"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 208,
-          "text": "wt switch -x claude -c feature-c -- 'Write tests for the API'"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 209,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 210,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 211,
-          "text": "The `-x` flag runs a command after switching; arguments after `--` are passed to it. Configure [post-start hooks](https://worktrunk.dev/hook/#hook-types) to automate setup (install deps, start dev servers)."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 212,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 213,
-          "text": "## Next steps"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 214,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 215,
-          "text": "- Learn the core commands: [`wt switch`](https://worktrunk.dev/switch/), [`wt list`](https://worktrunk.dev/list/), [`wt merge`](https://worktrunk.dev/merge/), [`wt remove`](https://worktrunk.dev/remove/)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 216,
-          "text": "- Set up [hooks](https://worktrunk.dev/hook/) for automated setup"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 217,
-          "text": "- Explore [LLM commit messages](https://worktrunk.dev/llm-commits/), [interactive"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 678,
+        "exit_code_line": 683,
+        "stdout_line": 685
+      },
+      "fresh_public_source_sha256": "e627eb18fd1f383a0bbdc43531675fc2c93e6c8ab2290bc54c817ae23f4ad0aa",
+      "fresh_read_at": "2026-10-16T08:55:04.954946Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/max-sixty/worktrunk",
@@ -352,66 +365,75 @@
       "excerpts": [
         {
           "line": 106,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 107,
-          "text": "    # The full nextest suite (snapshots included) — CI's long-pole. The fast"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 108,
-          "text": "    # pre-merge gates (lockfile/doctest/rustdoc) live in the `fast-checks` job,"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 109,
-          "text": "    # so this job is now just the suite and can later be swapped for the"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 134,
-          "text": "        name: junit-${{ matrix.name }}"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 135,
-          "text": "        path: target/nextest/default/junit.xml"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 136,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 137,
-          "text": "    - name: 📊 Upload test results to Codecov"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 141,
-          "text": "        token: ${{ secrets.CODECOV_TOKEN }}"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 142,
-          "text": "        files: target/nextest/default/junit.xml"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 143,
-          "text": "        report_type: test_results"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 144,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 145,
-          "text": "  # The pre-merge gates that aren't the nextest suite: Cargo.lock freshness,"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 146,
-          "text": "  # doctests, and the rustdoc `-Dwarnings` build. Split out of `test` so the"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 147,
-          "text": "  # full suite (the long-pole) can later be replaced on PRs by the"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 692,
+        "exit_code_line": 697,
+        "stdout_line": 699
+      },
+      "fresh_public_source_sha256": "bd187c6d655c764c37a31d999a7aa8819645e333e22b561ad63a51c04e7b9b58",
+      "fresh_read_at": "2026-10-16T08:55:05.083194Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/cli/cli",
@@ -426,30 +448,39 @@
       "excerpts": [
         {
           "line": 181,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 182,
-          "text": "### Precompiled binaries"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 183,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 184,
-          "text": "[GitHub CLI releases](https://github.com/cli/cli/releases/latest) contain precompiled binaries for `386`, `amd64`, `arm64`, and `armv6` architectures."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 185,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 186,
-          "text": "## Community _(Unofficial)_"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 706,
+        "exit_code_line": 711,
+        "stdout_line": 713
+      },
+      "fresh_public_source_sha256": "6c54aef3c43dcfc99e6ab30dbf3f5875001997d99c2a1e3f52eba1553c793c5c",
+      "fresh_read_at": "2026-10-16T08:55:05.223282Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/cli/cli",
@@ -464,74 +495,83 @@
       "excerpts": [
         {
           "line": 1,
-          "text": "name: Unit and Integration Tests"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 2,
-          "text": "on:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 3,
-          "text": "  push:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 30,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 31,
-          "text": "      - name: Run unit and integration tests"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 32,
-          "text": "        run: go test -race -tags=integration ./..."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 33,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 34,
-          "text": "      - name: Build"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 36,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 37,
-          "text": "  integration-tests:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 38,
-          "text": "    env:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 39,
-          "text": "      GH_TOKEN: ${{ github.token }}"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 57,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 58,
-          "text": "      - name: Run attestation command set integration tests"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 59,
-          "text": "        shell: bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 60,
-          "text": "        run: |"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 61,
-          "text": "          ./test/integration/attestation-cmd/run-all-tests.sh \"${{ matrix.os }}\""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 720,
+        "exit_code_line": 725,
+        "stdout_line": 727
+      },
+      "fresh_public_source_sha256": "62af6adcecc4a334df5ec4abf19b1b673745a0d3fd1b91d5f75cb8ae5041db2c",
+      "fresh_read_at": "2026-10-16T08:55:05.387966Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/cli/cli",
@@ -546,262 +586,271 @@
       "excerpts": [
         {
           "line": 1,
-          "text": "package completion"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 2,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 3,
-          "text": "import ("
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 11,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 12,
-          "text": "func NewCmdCompletion(io *iostreams.IOStreams) *cobra.Command {"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 13,
-          "text": "\tvar shellType string"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 14,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 15,
-          "text": "\tcmd := &cobra.Command{"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 16,
-          "text": "\t\tUse:   \"completion -s <shell>\","
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 17,
-          "text": "\t\tShort: \"Generate shell completion scripts\","
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 18,
-          "text": "\t\tLong: heredoc.Docf(`"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 19,
-          "text": "\t\t\tGenerate shell completion scripts for GitHub CLI commands."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 20,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 21,
-          "text": "\t\t\tWhen installing GitHub CLI through a package manager, it's possible that"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 22,
-          "text": "\t\t\tno additional shell configuration is necessary to gain completion support. For"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 23,
-          "text": "\t\t\tHomebrew, see <https://docs.brew.sh/Shell-Completion>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 24,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 25,
-          "text": "\t\t\tIf you need to set up completions manually, follow the instructions below. The exact"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 26,
-          "text": "\t\t\tconfig file locations might vary based on your system. Make sure to restart your"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 27,
-          "text": "\t\t\tshell before testing whether completions are working."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 28,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 29,
-          "text": "\t\t\t### bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 30,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 31,
-          "text": "\t\t\tFirst, ensure that you install %[1]sbash-completion%[1]s using your package manager."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 32,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 34,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 35,
-          "text": "\t\t\t\teval \"$(gh completion -s bash)\""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 36,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 37,
-          "text": "\t\t\t### zsh"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 38,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 39,
-          "text": "\t\t\tGenerate a %[1]s_gh%[1]s completion script and put it somewhere in your %[1]s$fpath%[1]s:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 40,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 41,
-          "text": "\t\t\t\tgh completion -s zsh > /usr/local/share/zsh/site-functions/_gh"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 42,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 51,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 52,
-          "text": "\t\t\tGenerate a %[1]sgh.fish%[1]s completion script:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 53,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 55,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 56,
-          "text": "\t\t\t### PowerShell"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 64,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 65,
-          "text": "\t\t\t\tInvoke-Expression -Command $(gh completion -s powershell | Out-String)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 66,
-          "text": "\t\t`, \"`\"),"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 67,
-          "text": "\t\tRunE: func(cmd *cobra.Command, args []string) error {"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 69,
-          "text": "\t\t\t\tif io.IsStdoutTTY() {"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 70,
-          "text": "\t\t\t\t\treturn cmdutil.FlagErrorf(\"error: the value for `--shell` is required\")"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 71,
-          "text": "\t\t\t\t}"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 72,
-          "text": "\t\t\t\tshellType = \"bash\""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 73,
-          "text": "\t\t\t}"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 74,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 78,
-          "text": "\t\t\tswitch shellType {"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 79,
-          "text": "\t\t\tcase \"bash\":"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 80,
-          "text": "\t\t\t\treturn rootCmd.GenBashCompletionV2(w, true)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 81,
-          "text": "\t\t\tcase \"zsh\":"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 82,
-          "text": "\t\t\t\treturn rootCmd.GenZshCompletion(w)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 83,
-          "text": "\t\t\tcase \"powershell\":"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 84,
-          "text": "\t\t\t\treturn rootCmd.GenPowerShellCompletionWithDesc(w)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 85,
-          "text": "\t\t\tcase \"fish\":"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 86,
-          "text": "\t\t\t\treturn rootCmd.GenFishCompletion(w, true)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 87,
-          "text": "\t\t\tdefault:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 88,
-          "text": "\t\t\t\treturn fmt.Errorf(\"unsupported shell type %q\", shellType)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 94,
-          "text": "\tcmdutil.DisableAuthCheck(cmd)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 95,
-          "text": "\tcmdutil.StringEnumFlag(cmd, &shellType, \"shell\", \"s\", \"\", []string{\"bash\", \"zsh\", \"fish\", \"powershell\"}, \"Shell type\")"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 96,
-          "text": "\tcmdutil.DisableTelemetry(cmd)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 97,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 734,
+        "exit_code_line": 739,
+        "stdout_line": 741
+      },
+      "fresh_public_source_sha256": "75b78fbb28c6eec21d28a463d0192dc5f7c613e4cd14bb313ecf7b7e264d1dbf",
+      "fresh_read_at": "2026-10-16T08:55:05.528408Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/Wilfred/difftastic",
@@ -816,54 +865,63 @@
       "excerpts": [
         {
           "line": 2,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 3,
-          "text": "Difftastic can be installed as pre-built binaries or using various package managers."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 4,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 5,
-          "text": "## Pre-Built Binaries"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 6,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 7,
-          "text": "Difftastic releases are published as [GitHub"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 8,
-          "text": "releases](https://github.com/Wilfred/difftastic/releases) with"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 9,
-          "text": "pre-built binaries for Windows, macOS and Linux. Open the [latest"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 10,
-          "text": "release page](https://github.com/Wilfred/difftastic/releases/latest),"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 11,
-          "text": "download the file matching your OS and CPU architecture, and extract"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 12,
-          "text": "the `difft` executable application file."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 13,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 748,
+        "exit_code_line": 753,
+        "stdout_line": 755
+      },
+      "fresh_public_source_sha256": "a05c09aa500b683746b50832cc1d6a5f395dda794fdb7d8fb9051fa5e9d91358",
+      "fresh_read_at": "2026-10-16T08:55:05.662249Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/Wilfred/difftastic",
@@ -878,82 +936,91 @@
       "excerpts": [
         {
           "line": 12,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 13,
-          "text": "$ difft FIRST-FILE SECOND-FILE"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 14,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 15,
-          "text": "# For example:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 16,
-          "text": "$ difft sample_files/simple_1.js sample_files/simple_2.js"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 17,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 18,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 21,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 22,
-          "text": "$ difft FIRST-DIRECTORY SECOND-DIRECTORY"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 23,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 24,
-          "text": "# For example:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 41,
-          "text": "# For example:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 42,
-          "text": "$ cat sample_files/simple_1.js | difft - sample_files/simple_2.js"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 43,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 44,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 71,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 72,
-          "text": "$ difft --help"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 73,
-          "text": "..."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 74,
-          "text": "OPTIONS:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 762,
+        "exit_code_line": 767,
+        "stdout_line": 769
+      },
+      "fresh_public_source_sha256": "37a65981e8673e73ec33881e4f469e8207493778107c41f045d981144cee2b0e",
+      "fresh_read_at": "2026-10-16T08:55:05.778477Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/Wilfred/difftastic",
@@ -968,22 +1035,31 @@
       "excerpts": [
         {
           "line": 163,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 164,
-          "text": "$ difft --check-only --exit-code before.js after.js"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 165,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 166,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 776,
+        "exit_code_line": 781,
+        "stdout_line": 783
+      },
+      "fresh_public_source_sha256": "395325cdaeef69a79d2d39befd278cf24a062f1e4a91848482dcb9613bf20c8f",
+      "fresh_read_at": "2026-10-16T08:55:05.903080Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/Wilfred/difftastic",
@@ -998,22 +1074,31 @@
       "excerpts": [
         {
           "line": 60,
-          "text": "      # This runs tests that rely on the MIME database being present."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 61,
-          "text": "      - run: cargo test -- --ignored"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 62,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 63,
-          "text": "  test_linux_latest_stable:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 790,
+        "exit_code_line": 795,
+        "stdout_line": 797
+      },
+      "fresh_public_source_sha256": "a5a44da7e99bf14a317fd8ac5d0ffb0ea0cc389023c24a2a0f210a0f4425dc99",
+      "fresh_read_at": "2026-10-16T08:55:06.031361Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/Wilfred/difftastic",
@@ -1028,33 +1113,52 @@
       "excerpts": [
         {
           "line": 812,
-          "text": "        \"json\" => {"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 813,
-          "text": "            if env::var(\"DFT_UNSTABLE\").is_err() {"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 814,
-          "text": "                eprintln!(\"JSON output is an unstable feature and its format may change in future. To enable JSON output, set the environment variable DFT_UNSTABLE=yes.\");"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 815,
-          "text": "                std::process::exit(EXIT_BAD_ARGUMENTS);"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 816,
-          "text": "            }"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 804,
+        "exit_code_line": 809,
+        "stdout_line": 811
+      },
+      "fresh_public_source_sha256": "05231041e9a54f0cdf65a8bb95deaa0bc9893d7d412eca108eaa00af3877f390",
+      "fresh_read_at": "2026-10-16T08:55:06.153029Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/anthropics/claude-code-action",
       "retained_tag": "v1.0.233",
-      "resolved_commit": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
       "read_at": "2026-10-16T05:15:39.631438+00:00",
-      "role": "carried survivor; no installation or trial"
+      "role": "carried survivor; no installation or trial",
+      "proposed_source_commit": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+      "tag_resolution_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "source_resolution_status": "NATIVE_CAPTURE_RECORDED; full ref/peeled-ref output",
+      "tag_resolution_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 636,
+        "exit_code_line": 641,
+        "stdout_line": 643
+      },
+      "resolved_commit": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/anthropics/claude-code-action",
@@ -1069,74 +1173,83 @@
       "excerpts": [
         {
           "line": 10,
-          "text": "- 🤖 **Interactive Code Assistant**: Claude can answer questions about code, architecture, and programming"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 11,
-          "text": "- 🔍 **Code Review**: Analyzes PR changes and suggests improvements"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 12,
-          "text": "- ✨ **Code Implementation**: Can implement simple fixes, refactoring, and even new features"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 13,
-          "text": "- 💬 **PR/Issue Integration**: Works seamlessly with GitHub comments and PR reviews"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 14,
-          "text": "- 🛠️ **Flexible Tool Access**: Access to GitHub APIs and file operations (additional tools can be enabled via configuration)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 15,
-          "text": "- 📋 **Progress Tracking**: Visual progress indicators with checkboxes that dynamically update as Claude completes tasks"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 38,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 39,
-          "text": "- **🔍 Automatic PR Code Review** - Full review automation"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 40,
-          "text": "- **📂 Path-Specific Reviews** - Trigger on critical file changes"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 41,
-          "text": "- **👥 External Contributor Reviews** - Special handling for new contributors"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 42,
-          "text": "- **📝 Custom Review Checklists** - Enforce team standards"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 43,
-          "text": "- **🔄 Scheduled Maintenance** - Automated repository health checks"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 44,
-          "text": "- **🏷️ Issue Triage & Labeling** - Automatic categorization"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 45,
-          "text": "- **📖 Documentation Sync** - Keep docs updated with code changes"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 46,
-          "text": "- **🔒 Security-Focused Reviews** - OWASP-aligned security analysis"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 47,
-          "text": "- **📊 DIY Progress Tracking** - Create tracking comments in automation mode"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 48,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 818,
+        "exit_code_line": 823,
+        "stdout_line": 825
+      },
+      "fresh_public_source_sha256": "a381c47399445c97480d025a406f485644fdd5f4f7ffd880be0567ac2f7b4640",
+      "fresh_read_at": "2026-10-16T08:55:06.293746Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/anthropics/claude-code-action",
@@ -1151,81 +1264,100 @@
       "excerpts": [
         {
           "line": 66,
-          "text": "  # Auth configuration"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 67,
-          "text": "  anthropic_api_key:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 68,
-          "text": "    description: \"Anthropic API key (required for direct API, not needed for Bedrock/Vertex/Foundry)\""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 69,
-          "text": "    required: false"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 70,
-          "text": "  claude_code_oauth_token:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 71,
-          "text": "    description: \"Claude Code OAuth token (alternative to anthropic_api_key)\""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 72,
-          "text": "    required: false"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 73,
-          "text": "  anthropic_federation_rule_id:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 334,
-          "text": "        # Provider configuration"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 335,
-          "text": "        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key || env.ANTHROPIC_API_KEY }}"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 336,
-          "text": "        CLAUDE_CODE_OAUTH_TOKEN: ${{ inputs.claude_code_oauth_token || env.CLAUDE_CODE_OAUTH_TOKEN }}"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 337,
-          "text": "        ANTHROPIC_FEDERATION_RULE_ID: ${{ inputs.anthropic_federation_rule_id }}"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 338,
-          "text": "        ANTHROPIC_ORGANIZATION_ID: ${{ inputs.anthropic_organization_id }}"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 438,
-          "text": "        PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 439,
-          "text": "        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 440,
-          "text": "      run: |"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 441,
-          "text": "        BUN_BIN=\"${GITHUB_ACTION_PATH}/bin/bun\""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 832,
+        "exit_code_line": 837,
+        "stdout_line": 839
+      },
+      "fresh_public_source_sha256": "87b706489e63483c9c32c12af36467dd34e309becca35f7a8ead4d1e0664c4df",
+      "fresh_read_at": "2026-10-16T08:55:06.458807Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/ataraxy-labs/sem",
       "retained_tag": "v0.25.0",
-      "resolved_commit": "4cfe1374f79631b01aca5746441d826738a15448",
       "read_at": "2026-10-16T05:15:40.060532+00:00",
-      "role": "carried survivor; no installation or trial"
+      "role": "carried survivor; no installation or trial",
+      "proposed_source_commit": "4cfe1374f79631b01aca5746441d826738a15448",
+      "tag_resolution_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "source_resolution_status": "NATIVE_CAPTURE_RECORDED; full ref/peeled-ref output",
+      "tag_resolution_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 650,
+        "exit_code_line": 655,
+        "stdout_line": 657
+      },
+      "resolved_commit": "4cfe1374f79631b01aca5746441d826738a15448",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/ataraxy-labs/sem",
@@ -1240,194 +1372,203 @@
       "excerpts": [
         {
           "line": 157,
-          "text": "# JSON output (for AI agents, CI pipelines)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 158,
-          "text": "sem diff --format json"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 159,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 160,
-          "text": "# Markdown output (for PRs, reports)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 167,
-          "text": "echo '[{\"filePath\":\"src/main.rs\",\"status\":\"modified\",\"beforeContent\":\"...\",\"afterContent\":\"...\"}]' \\"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 168,
-          "text": "  | sem diff --stdin --format json"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 169,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 170,
-          "text": "# Only specific file types"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 312,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 313,
-          "text": "Local, cumulative counters: how many diffs `sem` has run in this environment and how much of that was noise filtered out. Nothing here leaves your machine (see [Telemetry](#telemetry)):"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 314,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 315,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 323,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 324,
-          "text": "sem setup"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 325,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 326,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 328,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 330,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 331,
-          "text": "To disable and go back to normal git diff (also removes the session hooks):"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 363,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 364,
-          "text": "Cloud is for what a laptop can't do. On a very large monorepo the first local graph build can take a few seconds; a shared team graph shouldn't be rebuilt per developer; and CI wants the graph without checking anything out. `sem login` connects those cases to sem cloud, which keeps a warm, pre-built graph for your registered repos and serves the heavy queries from it instead of rebuilding locally."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 365,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 366,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 367,
-          "text": "sem login                              # GitHub device flow, one time"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 368,
-          "text": "sem impact myFunc --file src/foo.rs    # served from the cloud's warm graph"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 369,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 381,
-          "text": "sem whoami          # show current cloud identity"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 382,
-          "text": "sem cloud status    # cloud + telemetry state for this repo (offline; sends nothing)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 383,
-          "text": "sem cloud enable    # turn on cloud queries for a public repo (shows what's sent first)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 384,
-          "text": "sem cloud share     # same, with extra confirmation, for a private repo"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 510,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 511,
-          "text": "sem diff --format json"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 512,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 513,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 576,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 577,
-          "text": "## Telemetry"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 578,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 579,
-          "text": "Local by default: sem counts command names (e.g. `diff`, `impact`) on your own machine only, and in that mode nothing is ever uploaded. No code, file paths, repo names, or user identity is recorded, and no network call is made."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 581,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 582,
-          "text": "sem telemetry preview   # see current mode and exactly what would be sent"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 583,
-          "text": "sem telemetry on        # opt in: also upload counts to help improve sem"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 584,
-          "text": "sem telemetry off       # record nothing at all"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 585,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 586,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 587,
-          "text": "`SEM_NO_TELEMETRY=1` or `DO_NOT_TRACK=1` force the record-nothing behavior regardless of mode. Development builds (anything run out of a `cargo build` `target/` directory) never record, so working on sem itself doesn't pollute the numbers."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 588,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 589,
-          "text": "## Contributing"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 846,
+        "exit_code_line": 851,
+        "stdout_line": 853
+      },
+      "fresh_public_source_sha256": "1fcf6533e3b0ed221538176396798eb8444601f0fd74fbb60a5555a31ed8c495",
+      "fresh_read_at": "2026-10-16T08:55:06.625718Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "component": "worktrunk",
@@ -1443,8 +1584,32 @@
         "size": 8173256,
         "download_count": 25873
       },
-      "checksum_matches": true,
-      "prefix_scope": "isolated /var/tmp scratch; no host install"
+      "prefix_scope": "isolated /var/tmp scratch; no host install",
+      "record_type": "release_metadata_source_review_projection",
+      "native_api_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "publisher_integrity_status": "NATIVE_FRESH_DOWNLOAD_DIGEST_MATCH; signature/attestation not verified",
+      "asset_digest_class": "Fresh native API/download/actual-versus-published check, after the prior smoke",
+      "native_api_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 426,
+        "exit_code_line": 431,
+        "stdout_line": 433
+      },
+      "digest_comparison_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 468,
+        "exit_code_line": 473,
+        "stdout_line": 475
+      },
+      "post_download_hash_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 454,
+        "exit_code_line": 459,
+        "stdout_line": 461
+      },
+      "actual_sha256": "532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199",
+      "published_sha256": "532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "component": "gh",
@@ -1460,8 +1625,32 @@
         "size": 15319960,
         "download_count": 614693
       },
-      "checksum_matches": true,
-      "prefix_scope": "isolated /var/tmp scratch; no host install"
+      "prefix_scope": "isolated /var/tmp scratch; no host install",
+      "record_type": "release_metadata_source_review_projection",
+      "native_api_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "publisher_integrity_status": "NATIVE_FRESH_DOWNLOAD_DIGEST_MATCH; signature/attestation not verified",
+      "asset_digest_class": "Fresh native API/download/actual-versus-published check, after the prior smoke",
+      "native_api_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 482,
+        "exit_code_line": 487,
+        "stdout_line": 489
+      },
+      "digest_comparison_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 524,
+        "exit_code_line": 529,
+        "stdout_line": 531
+      },
+      "post_download_hash_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 510,
+        "exit_code_line": 515,
+        "stdout_line": 517
+      },
+      "actual_sha256": "bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386",
+      "published_sha256": "bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "component": "difftastic",
@@ -1477,8 +1666,32 @@
         "size": 11746371,
         "download_count": 1704
       },
-      "checksum_matches": true,
-      "prefix_scope": "isolated /var/tmp scratch; no host install"
+      "prefix_scope": "isolated /var/tmp scratch; no host install",
+      "record_type": "release_metadata_source_review_projection",
+      "native_api_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "publisher_integrity_status": "NATIVE_FRESH_DOWNLOAD_DIGEST_MATCH; signature/attestation not verified",
+      "asset_digest_class": "Fresh native API/download/actual-versus-published check, after the prior smoke",
+      "native_api_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 538,
+        "exit_code_line": 543,
+        "stdout_line": 545
+      },
+      "digest_comparison_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 580,
+        "exit_code_line": 585,
+        "stdout_line": 587
+      },
+      "post_download_hash_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 566,
+        "exit_code_line": 571,
+        "stdout_line": 573
+      },
+      "actual_sha256": "0a65e6715df992b0adae012e606bd9cc74fa6cfe90eaf13bbae165a0a19b3086",
+      "published_sha256": "0a65e6715df992b0adae012e606bd9cc74fa6cfe90eaf13bbae165a0a19b3086",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/max-sixty/worktrunk",
@@ -1493,82 +1706,91 @@
       "excerpts": [
         {
           "line": 1,
-          "text": "//! Schema-2 JSON output for `wt list --format=json` and"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 2,
-          "text": "//! `wt list statusline --format=json`."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 3,
-          "text": "//!"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 99,
-          "text": "    /// One entry per row, in table order."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 100,
-          "text": "    pub items: Vec<JsonItemV2>,"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 101,
-          "text": "}"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 102,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 161,
-          "text": "    #[serde(skip_serializing_if = \"Option::is_none\")]"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 162,
-          "text": "    pub worktree: Option<JsonWorktreeV2>,"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 163,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 164,
-          "text": "    /// Relation to the default branch; absent on the default branch itself."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 229,
-          "text": "    /// Filesystem path."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 230,
-          "text": "    pub path: PathBuf,"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 231,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 232,
-          "text": "    /// This is the main worktree."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 529,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 530,
-          "text": "/// Build the schema-2 envelope."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 531,
-          "text": "///"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 532,
-          "text": "/// Vars come from the bulk config snapshot like schema 1 (see"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 860,
+        "exit_code_line": 865,
+        "stdout_line": 867
+      },
+      "fresh_public_source_sha256": "4adb0263490075a289da2985a00230a1008292e611d6137aa36cb3ca57fcae3f",
+      "fresh_read_at": "2026-10-16T08:55:06.785138Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/max-sixty/worktrunk",
@@ -1583,78 +1805,87 @@
       "excerpts": [
         {
           "line": 9,
-          "text": "ci = \"github\""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 10,
-          "text": "# The installers to generate for each app"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 11,
-          "text": "# Note: The shell/powershell scripts attempt to add the install directory to PATH by"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 12,
-          "text": "# modifying shell config files (.profile, .bashrc, etc.), which can cause \"Permission"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 13,
-          "text": "# denied\" errors on non-standard setups. This is cargo-dist's default behavior and"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 14,
-          "text": "# reasonable for most users. Users with custom shell configs can set"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 15,
-          "text": "# WORKTRUNK_NO_MODIFY_PATH=1 or use Homebrew/cargo install instead."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 16,
-          "text": "# See: https://github.com/max-sixty/worktrunk/issues/590"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 17,
-          "text": "installers = [\"shell\", \"powershell\", \"homebrew\"]"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 18,
-          "text": "# Homebrew tap repository"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 19,
-          "text": "tap = \"max-sixty/homebrew-worktrunk\""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 24,
-          "text": "# Target platforms to build apps for (Rust target-triple syntax)"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 25,
-          "text": "targets = [\"aarch64-apple-darwin\", \"x86_64-apple-darwin\", \"aarch64-unknown-linux-musl\", \"x86_64-unknown-linux-musl\", \"x86_64-pc-windows-msvc\"]"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 26,
-          "text": "# Whether to install an updater program"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 27,
-          "text": "install-updater = false"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 31,
-          "text": "features = [\"git-wt\"]"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 32,
-          "text": "# Custom success message prompting shell integration"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 33,
-          "text": "install-success-msg = \"Run 'wt config shell install' for shell integration.\""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 874,
+        "exit_code_line": 879,
+        "stdout_line": 881
+      },
+      "fresh_public_source_sha256": "790cac49d6ccdbb2bd191a5c46d4c8a6469b493980b8f96e9abc539c84f5428e",
+      "fresh_read_at": "2026-10-16T08:55:06.916128Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "repository": "https://github.com/max-sixty/worktrunk",
@@ -1669,146 +1900,155 @@
       "excerpts": [
         {
           "line": 120,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 121,
-          "text": "## Install"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 122,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 123,
-          "text": "**Homebrew (macOS & Linux):**"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 125,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 126,
-          "text": "brew install worktrunk && wt config shell install"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 127,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 128,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 133,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 134,
-          "text": "cargo install worktrunk && wt config shell install"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 135,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 136,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 139,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 140,
-          "text": "**Windows.** `wt` defaults to Windows Terminal's command, so Winget additionally installs Worktrunk as `git-wt` to avoid the conflict:"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 141,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 142,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 143,
-          "text": "winget install max-sixty.worktrunk"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 144,
-          "text": "git-wt config shell install"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 145,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 146,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 153,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 154,
-          "text": "sudo pacman -S worktrunk && wt config shell install"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 155,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 156,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 159,
-          "text": "```bash"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 160,
-          "text": "conda install -c conda-forge worktrunk && wt config shell install"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 161,
-          "text": "```"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 162,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 163,
-          "text": "Or with [Pixi](https://pixi.sh): `pixi global install worktrunk && wt config shell install`."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 164,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 165,
-          "text": "</details>"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 235,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 236,
-          "text": "The `-x` flag runs a command after switching; arguments after `--` are passed to it. Configure [post-start hooks](/hook/#hook-types) to automate setup (install deps, start dev servers)."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 237,
-          "text": ""
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "line": 238,
-          "text": "## Next steps"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 888,
+        "exit_code_line": 893,
+        "stdout_line": 895
+      },
+      "fresh_public_source_sha256": "b7b5e46c482f79d2709682fc62b6bef768f3c76a6667c24189e3813f392116fc",
+      "fresh_read_at": "2026-10-16T08:55:07.054487Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     },
     {
       "kind": "publication",
@@ -1818,29 +2058,63 @@
       "excerpts": [
         {
           "term": "Sonnet",
-          "text": "rst Principles GitHub llms.txt Agent accuracy Same questions about code changes, answered by Claude Sonnet 4.5. One gets sem diff JSON, the other gets raw git diff . Scored against ground truth across 3 commits (small, medium, large). sem diff git diff Q1: List added functions (F1) Q2: Files with modified entities (F1) Q3: Entity type counts (accuracy) Q4: Added/modified/deleted counts (exact) Overall average Why git diff fails agents Tested on 3"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "term": "24",
-          "text": "; text-decoration-color: var(--accent); } .container { max-width: 800px; margin: 0 auto; padding: 0 24px; } /* Nav */ nav { position: sticky; top: 0; background: var(--bg); z-index: 50; border-bottom: 1px solid var(--border); } nav .nav-inner { max-width: 860px; margin: 0 auto; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; } nav .logo { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; color: var"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "term": "commits",
-          "text": "net 4.5. One gets sem diff JSON, the other gets raw git diff . Scored against ground truth across 3 commits (small, medium, large). sem diff git diff Q1: List added functions (F1) Q2: Files with modified entities (F1) Q3: Entity type counts (accuracy) Q4: Added/modified/deleted counts (exact) Overall average Why git diff fails agents Tested on 3 commits from this repo. Each exposes a different failure mode when agents reason about raw line diffs."
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "term": "questions",
-          "text": " sem Agents Benchmarks Cloud Changelog Details First Principles GitHub llms.txt Agent accuracy Same questions about code changes, answered by Claude Sonnet 4.5. One gets sem diff JSON, the other gets raw git diff . Scored against ground truth across 3 commits (small, medium, large). sem diff git diff Q1: List added functions (F1) Q2: Files with modified entities (F1) Q3: Entity type counts (accuracy) Q4: Added/modified/deleted counts (exact) Over"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         },
         {
           "term": "git diff",
-          "text": "tions about code changes, answered by Claude Sonnet 4.5. One gets sem diff JSON, the other gets raw git diff . Scored against ground truth across 3 commits (small, medium, large). sem diff git diff Q1: List added functions (F1) Q2: Files with modified entities (F1) Q3: Entity type counts (accuracy) Q4: Added/modified/deleted counts (exact) Overall average Why git diff fails agents Tested on 3 commits from this repo. Each exposes a different failu"
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
         }
       ],
       "scope": "Existing carried vendor self-evaluation; live page has no demonstrated binding to the retained v0.25.0 binary, and is not a matched sem-versus-difftastic test.",
-      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "v0.80.0",
+      "url": "https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-installer.sh",
+      "read_at": "2026-10-16T08:55:04.814129Z",
+      "public_source_sha256": "53b606fa48b84169180f8881a61f5c31c770645e1d51328032aa5aeb4f2e155a",
+      "source_is_public": true,
+      "line_count": 1604,
+      "excerpts": [
+        {
+          "line": 261,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 331,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 338,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 561,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 664,
+        "exit_code_line": 669,
+        "stdout_line": 671
+      },
+      "role": "Vendor release installer selects the Linux archive and extracts it; quoted source bytes remain private",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
     }
-  ],
-  "record_type": "source_review_excerpts_not_native_receipts",
-  "capture_boundary": "Pinned public source excerpts and API projections support source review; full original HTTP response bytes were not retained in this artifact and are not presented as native receipts."
+  ]
 }

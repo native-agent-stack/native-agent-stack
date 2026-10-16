@@ -1,43 +1,33 @@
 {
   "schema_version": 1,
-  "probes": [
+  "record_type": "named_gap",
+  "gap_id": "HOST-VERSION-NATIVE-BYTE-CUSTODY",
+  "reason": "Earlier installed-version probes used text mode without retained original-byte custody. Those observations cannot be published as native receipts or measured stream hashes.",
+  "prerequisite": "A separately recorded byte-mode read-only version probe, with the raw retained privately and any masked derivative independently reproduced. No new probe is performed by this correction.",
+  "components": [
     {
       "component": "worktrunk",
-      "command": "wt --version",
-      "started_at": "2026-10-16T05:24:24.025957Z",
-      "completed_at": "2026-10-16T05:24:24.053515Z",
-      "exit_code": 0,
-      "stdout": "wt v0.80.0\n",
-      "stderr": "",
-      "stdout_sha256": "322de99d4f0079c1e23f2078197eeab386189b25790619554c654a40a5290ff9",
-      "scope": "Read-only installed-client version probe; no installed launcher path, hostname or account data retained.",
-      "hash_scope": "Exact published UTF-8 text field; original native-byte custody was not retained."
+      "status": "GAP",
+      "expected_command": "wt --version",
+      "native_capture": null,
+      "previously_reported_version": "0.80.0",
+      "value_class": "unverified historical text observation; not measured native version evidence"
     },
     {
       "component": "gh",
-      "command": "gh --version",
-      "started_at": "2026-10-16T05:24:24.053544Z",
-      "completed_at": "2026-10-16T05:24:24.144159Z",
-      "exit_code": 0,
-      "stdout": "gh version 2.102.0 (2026-09-30)\nhttps://github.com/cli/cli/releases/tag/v2.102.0\n",
-      "stderr": "",
-      "stdout_sha256": "a679442459bed23fdc13efb977dec3b17c3c923d8d48abc0d8e522182250955f",
-      "scope": "Read-only installed-client version probe; no installed launcher path, hostname or account data retained.",
-      "hash_scope": "Exact published UTF-8 text field; original native-byte custody was not retained."
+      "status": "GAP",
+      "expected_command": "gh --version",
+      "native_capture": null,
+      "previously_reported_version": "2.102.0",
+      "value_class": "unverified historical text observation; not measured native version evidence"
     },
     {
       "component": "difftastic",
-      "command": "difft --version",
-      "started_at": "2026-10-16T05:24:24.144195Z",
-      "completed_at": "2026-10-16T05:24:24.147736Z",
-      "exit_code": 0,
-      "stdout": "Difftastic 0.71.0\n\nRevision:  b7d119e 2026-09-18\nToolchain: 1.85.0\nSystem:    linux x86_64\n\n",
-      "stderr": "",
-      "stdout_sha256": "e4ab21f4a1cd6bf764172bcf15e51f75246faaca045719e5e95970040358879e",
-      "scope": "Read-only installed-client version probe; no installed launcher path, hostname or account data retained.",
-      "hash_scope": "Exact published UTF-8 text field; original native-byte custody was not retained."
+      "status": "GAP",
+      "expected_command": "difft --version",
+      "native_capture": null,
+      "previously_reported_version": "0.71.0",
+      "value_class": "unverified historical text observation; not measured native version evidence"
     }
-  ],
-  "record_type": "text_observations_with_native_raw_capture_gap",
-  "capture_gap": "The installed-version probes used subprocess text mode and retained no separate original-byte capture. Their published-text hashes reproduce; they are source observations, not verified native-byte receipts. Fresh raw probes require the co-op's resume cue."
+  ]
 }

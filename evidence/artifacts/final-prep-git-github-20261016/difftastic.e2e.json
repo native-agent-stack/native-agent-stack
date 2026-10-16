@@ -2,7 +2,6 @@
   "kind": "native_evidence_index",
   "repository": "https://github.com/Wilfred/difftastic",
   "pin": "0.71.0",
-  "resolved_commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
   "evidence_class": "derived_from_masked_native_capture",
   "scope": "Derived navigation index over the real masked native install/local-smoke capture. This index contains no tool output and is not itself an E2E receipt or an acceptance verdict.",
   "upstream_sources": [
@@ -39,9 +38,9 @@
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 100,
-        "exit_code_line": 105,
-        "stdout_line": 107
+        "line": 104,
+        "exit_code_line": 109,
+        "stdout_line": 111
       },
       "phase": "install"
     },
@@ -55,9 +54,9 @@
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 114,
-        "exit_code_line": 119,
-        "stdout_line": 121
+        "line": 118,
+        "exit_code_line": 123,
+        "stdout_line": 125
       },
       "phase": "install"
     },
@@ -71,9 +70,9 @@
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 128,
-        "exit_code_line": 133,
-        "stdout_line": 135
+        "line": 132,
+        "exit_code_line": 137,
+        "stdout_line": 139
       },
       "phase": "install"
     },
@@ -87,9 +86,9 @@
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 170,
-        "exit_code_line": 175,
-        "stdout_line": 177
+        "line": 174,
+        "exit_code_line": 179,
+        "stdout_line": 181
       },
       "phase": "smoke"
     },
@@ -103,9 +102,9 @@
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 366,
-        "exit_code_line": 371,
-        "stdout_line": 373
+        "line": 370,
+        "exit_code_line": 375,
+        "stdout_line": 377
       },
       "phase": "smoke"
     },
@@ -119,9 +118,9 @@
       "stderr_sha256": "cbe028556c24e795118d2e3146d714294ee0da74996d59671ad640fd30387742",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 380,
-        "exit_code_line": 385,
-        "stdout_line": 387
+        "line": 384,
+        "exit_code_line": 389,
+        "stdout_line": 391
       },
       "phase": "smoke"
     }
@@ -137,44 +136,159 @@
   "masking_test": "evidence/artifacts/final-prep-git-github-20261016/test_mask_receipts.py",
   "derived_counts": {
     "zero_exit_commands": 6,
-    "upstream_full_suite_tests_executed": 0
+    "upstream_full_suite_tests_executed": 0,
+    "observed_nonzero_controls": 2
   },
   "derived_count_sources": [
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 100,
-      "exit_code_line": 105,
-      "stdout_line": 107
+      "line": 104,
+      "exit_code_line": 109,
+      "stdout_line": 111
     },
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 114,
-      "exit_code_line": 119,
-      "stdout_line": 121
+      "line": 118,
+      "exit_code_line": 123,
+      "stdout_line": 125
     },
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 128,
-      "exit_code_line": 133,
-      "stdout_line": 135
+      "line": 132,
+      "exit_code_line": 137,
+      "stdout_line": 139
     },
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 170,
-      "exit_code_line": 175,
-      "stdout_line": 177
+      "line": 174,
+      "exit_code_line": 179,
+      "stdout_line": 181
     },
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 366,
-      "exit_code_line": 371,
-      "stdout_line": 373
+      "line": 370,
+      "exit_code_line": 375,
+      "stdout_line": 377
     },
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 380,
-      "exit_code_line": 385,
-      "stdout_line": 387
+      "line": 384,
+      "exit_code_line": 389,
+      "stdout_line": 391
+    }
+  ],
+  "negative_controls": [
+    {
+      "id": "difftastic-different-files",
+      "command": "<SCRATCH>/prefix/difftastic/difft --check-only --exit-code sample_files/simple_1.js sample_files/simple_2.js",
+      "started_at": "2026-10-16T05:16:50.420251+00:00",
+      "completed_at": "2026-10-16T05:16:50.441053+00:00",
+      "exit_code": 1,
+      "stdout_sha256": "64b692f92282ffc245c5ec813e0189e60be2d4d1f867bdbd193105b8ab0539ff",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 398,
+        "exit_code_line": 403,
+        "stdout_line": 405
+      }
+    },
+    {
+      "id": "difftastic-json-gate",
+      "command": "<SCRATCH>/prefix/difftastic/difft --display json sample_files/simple_1.js sample_files/simple_2.js",
+      "started_at": "2026-10-16T05:23:42.898695+00:00",
+      "completed_at": "2026-10-16T05:23:42.907715+00:00",
+      "exit_code": 2,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "3d141cf491d04cf758f68d52160a97dd7da9ef10b5680a0e7cd73d431e459add",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 412,
+        "exit_code_line": 417,
+        "stdout_line": 419
+      }
+    }
+  ],
+  "count_scope": "commands[] contains only zero-exit install/local-readiness/smoke rows; negative_controls[] separately contains the actual nonzero control observations. These are navigation indexes, not E2E acceptance.",
+  "proposed_source_commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+  "tag_resolution_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+  "source_resolution_status": "Fresh native tag-resolution capture recorded; prior smoke unchanged",
+  "publisher_integrity_status": "Fresh API/download/digest check recorded separately; prior smoke unchanged",
+  "provenance_commands": [
+    {
+      "id": "difftastic-release-api",
+      "command": "curl --fail --location --silent --show-error --proto =https https://api.github.com/repos/Wilfred/difftastic/releases/tags/0.71.0",
+      "started_at": "2026-10-16T08:55:02.993539Z",
+      "completed_at": "2026-10-16T08:55:03.294545Z",
+      "exit_code": 0,
+      "stdout_sha256": "19b63769cbbb66d4e6ef9d707636cf7086661a7b3b361ab31fc454153451d9b5",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 538,
+        "exit_code_line": 543,
+        "stdout_line": 545
+      }
+    },
+    {
+      "id": "difftastic-fresh-download",
+      "command": "curl --fail --location --silent --show-error --proto =https --output <FOLD_SCRATCH>/difft-0.71.0-x86_64-unknown-linux-musl.tar.gz https://github.com/Wilfred/difftastic/releases/download/0.71.0/difft-0.71.0-x86_64-unknown-linux-musl.tar.gz",
+      "started_at": "2026-10-16T08:55:03.297780Z",
+      "completed_at": "2026-10-16T08:55:03.632285Z",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 552,
+        "exit_code_line": 557,
+        "stdout_line": 559
+      }
+    },
+    {
+      "id": "difftastic-post-download-sha256",
+      "command": "sha256sum <FOLD_SCRATCH>/difft-0.71.0-x86_64-unknown-linux-musl.tar.gz",
+      "started_at": "2026-10-16T08:55:03.633958Z",
+      "completed_at": "2026-10-16T08:55:03.647682Z",
+      "exit_code": 0,
+      "stdout_sha256": "888c2b44efe910f6e92ac7ea6544e4f32d0fbf05ed0a177816ea60b72300cd59",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 566,
+        "exit_code_line": 571,
+        "stdout_line": 573
+      }
+    },
+    {
+      "id": "difftastic-actual-equals-published",
+      "command": "<PYTHON> <PUBLIC_WORKTREE>/evidence/artifacts/final-prep-git-github-20261016/verify_release_asset.py --release-json <PRIVATE_CUSTODY>/raw/difftastic.release.json --asset <FOLD_SCRATCH>/difft-0.71.0-x86_64-unknown-linux-musl.tar.gz",
+      "started_at": "2026-10-16T08:55:03.649519Z",
+      "completed_at": "2026-10-16T08:55:03.702813Z",
+      "exit_code": 0,
+      "stdout_sha256": "b313af0b19b9c8a35fe144669101d929ada949a775dcba9c55ef5025632ca740",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 580,
+        "exit_code_line": 585,
+        "stdout_line": 587
+      }
+    },
+    {
+      "id": "difftastic-tag-resolution",
+      "command": "git -c credential.helper= ls-remote --tags https://github.com/Wilfred/difftastic.git refs/tags/0.71.0 'refs/tags/0.71.0^{}'",
+      "started_at": "2026-10-16T08:55:04.053985Z",
+      "completed_at": "2026-10-16T08:55:04.226397Z",
+      "exit_code": 0,
+      "stdout_sha256": "1569cb7b807217eb64b16c0eb5485bfa52ad1d71251b334da72d3218301f1b32",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 622,
+        "exit_code_line": 627,
+        "stdout_line": 629
+      }
     }
   ]
 }

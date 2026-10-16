@@ -3,177 +3,429 @@
   "native_commands": {
     "worktrunk-download": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 16,
-      "exit_code_line": 21,
-      "stdout_line": 23
+      "line": 20,
+      "exit_code_line": 25,
+      "stdout_line": 27
     },
     "worktrunk-checksum": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 30,
-      "exit_code_line": 35,
-      "stdout_line": 37
+      "line": 34,
+      "exit_code_line": 39,
+      "stdout_line": 41
     },
     "worktrunk-extract": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 44,
-      "exit_code_line": 49,
-      "stdout_line": 51
+      "line": 48,
+      "exit_code_line": 53,
+      "stdout_line": 55
     },
     "gh-download": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 58,
-      "exit_code_line": 63,
-      "stdout_line": 65
+      "line": 62,
+      "exit_code_line": 67,
+      "stdout_line": 69
     },
     "gh-checksum": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 72,
-      "exit_code_line": 77,
-      "stdout_line": 79
+      "line": 76,
+      "exit_code_line": 81,
+      "stdout_line": 83
     },
     "gh-extract": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 86,
-      "exit_code_line": 91,
-      "stdout_line": 93
+      "line": 90,
+      "exit_code_line": 95,
+      "stdout_line": 97
     },
     "difftastic-download": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 100,
-      "exit_code_line": 105,
-      "stdout_line": 107
+      "line": 104,
+      "exit_code_line": 109,
+      "stdout_line": 111
     },
     "difftastic-checksum": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 114,
-      "exit_code_line": 119,
-      "stdout_line": 121
+      "line": 118,
+      "exit_code_line": 123,
+      "stdout_line": 125
     },
     "difftastic-extract": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 128,
-      "exit_code_line": 133,
-      "stdout_line": 135
+      "line": 132,
+      "exit_code_line": 137,
+      "stdout_line": 139
     },
     "worktrunk-version": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 142,
-      "exit_code_line": 147,
-      "stdout_line": 149
+      "line": 146,
+      "exit_code_line": 151,
+      "stdout_line": 153
     },
     "gh-version": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 156,
-      "exit_code_line": 161,
-      "stdout_line": 163
+      "line": 160,
+      "exit_code_line": 165,
+      "stdout_line": 167
     },
     "difftastic-version": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 170,
-      "exit_code_line": 175,
-      "stdout_line": 177
+      "line": 174,
+      "exit_code_line": 179,
+      "stdout_line": 181
     },
     "git-init": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 184,
-      "exit_code_line": 189,
-      "stdout_line": 191
+      "line": 188,
+      "exit_code_line": 193,
+      "stdout_line": 195
     },
     "git-empty-commit": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 198,
-      "exit_code_line": 203,
-      "stdout_line": 205
+      "line": 202,
+      "exit_code_line": 207,
+      "stdout_line": 209
     },
     "worktrunk-list-initial": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 212,
-      "exit_code_line": 217,
-      "stdout_line": 219
+      "line": 216,
+      "exit_code_line": 221,
+      "stdout_line": 223
     },
     "worktrunk-create": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 226,
-      "exit_code_line": 231,
-      "stdout_line": 233
+      "line": 230,
+      "exit_code_line": 235,
+      "stdout_line": 237
     },
     "worktrunk-list-created": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 240,
-      "exit_code_line": 245,
-      "stdout_line": 247
+      "line": 244,
+      "exit_code_line": 249,
+      "stdout_line": 251
     },
     "worktrunk-dirty-refusal": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 254,
-      "exit_code_line": 259,
-      "stdout_line": 261
+      "line": 258,
+      "exit_code_line": 263,
+      "stdout_line": 265
     },
     "worktrunk-remove-clean": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 268,
-      "exit_code_line": 273,
-      "stdout_line": 275
+      "line": 272,
+      "exit_code_line": 277,
+      "stdout_line": 279
     },
     "worktrunk-list-final": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 282,
-      "exit_code_line": 287,
-      "stdout_line": 289
+      "line": 286,
+      "exit_code_line": 291,
+      "stdout_line": 293
     },
     "gh-pr-review-help": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 296,
-      "exit_code_line": 301,
-      "stdout_line": 303
+      "line": 300,
+      "exit_code_line": 305,
+      "stdout_line": 307
     },
     "gh-bash-completion": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 310,
-      "exit_code_line": 315,
-      "stdout_line": 317
+      "line": 314,
+      "exit_code_line": 319,
+      "stdout_line": 321
     },
     "gh-bash-completion-parse": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 324,
-      "exit_code_line": 329,
-      "stdout_line": 331
+      "line": 328,
+      "exit_code_line": 333,
+      "stdout_line": 335
     },
     "difftastic-fetch-simple_1.js": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 338,
-      "exit_code_line": 343,
-      "stdout_line": 345
+      "line": 342,
+      "exit_code_line": 347,
+      "stdout_line": 349
     },
     "difftastic-fetch-simple_2.js": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 352,
-      "exit_code_line": 357,
-      "stdout_line": 359
+      "line": 356,
+      "exit_code_line": 361,
+      "stdout_line": 363
     },
     "difftastic-upstream-example": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 366,
-      "exit_code_line": 371,
-      "stdout_line": 373
+      "line": 370,
+      "exit_code_line": 375,
+      "stdout_line": 377
     },
     "difftastic-same-file": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 380,
-      "exit_code_line": 385,
-      "stdout_line": 387
+      "line": 384,
+      "exit_code_line": 389,
+      "stdout_line": 391
     },
     "difftastic-different-files": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 394,
-      "exit_code_line": 399,
-      "stdout_line": 401
+      "line": 398,
+      "exit_code_line": 403,
+      "stdout_line": 405
     },
     "difftastic-json-gate": {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 408,
-      "exit_code_line": 413,
-      "stdout_line": 415
+      "line": 412,
+      "exit_code_line": 417,
+      "stdout_line": 419
+    },
+    "worktrunk-release-api": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 426,
+      "exit_code_line": 431,
+      "stdout_line": 433
+    },
+    "worktrunk-fresh-download": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 440,
+      "exit_code_line": 445,
+      "stdout_line": 447
+    },
+    "worktrunk-post-download-sha256": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 454,
+      "exit_code_line": 459,
+      "stdout_line": 461
+    },
+    "worktrunk-actual-equals-published": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 468,
+      "exit_code_line": 473,
+      "stdout_line": 475
+    },
+    "gh-release-api": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 482,
+      "exit_code_line": 487,
+      "stdout_line": 489
+    },
+    "gh-fresh-download": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 496,
+      "exit_code_line": 501,
+      "stdout_line": 503
+    },
+    "gh-post-download-sha256": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 510,
+      "exit_code_line": 515,
+      "stdout_line": 517
+    },
+    "gh-actual-equals-published": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 524,
+      "exit_code_line": 529,
+      "stdout_line": 531
+    },
+    "difftastic-release-api": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 538,
+      "exit_code_line": 543,
+      "stdout_line": 545
+    },
+    "difftastic-fresh-download": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 552,
+      "exit_code_line": 557,
+      "stdout_line": 559
+    },
+    "difftastic-post-download-sha256": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 566,
+      "exit_code_line": 571,
+      "stdout_line": 573
+    },
+    "difftastic-actual-equals-published": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 580,
+      "exit_code_line": 585,
+      "stdout_line": 587
+    },
+    "worktrunk-tag-resolution": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 594,
+      "exit_code_line": 599,
+      "stdout_line": 601
+    },
+    "gh-tag-resolution": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 608,
+      "exit_code_line": 613,
+      "stdout_line": 615
+    },
+    "difftastic-tag-resolution": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 622,
+      "exit_code_line": 627,
+      "stdout_line": 629
+    },
+    "claude-code-action-tag-resolution": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 636,
+      "exit_code_line": 641,
+      "stdout_line": 643
+    },
+    "sem-tag-resolution": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 650,
+      "exit_code_line": 655,
+      "stdout_line": 657
+    },
+    "worktrunk-release-installer-source": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 664,
+      "exit_code_line": 669,
+      "stdout_line": 671
+    },
+    "pinned-source-0": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 678,
+      "exit_code_line": 683,
+      "stdout_line": 685
+    },
+    "pinned-source-1": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 692,
+      "exit_code_line": 697,
+      "stdout_line": 699
+    },
+    "pinned-source-2": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 706,
+      "exit_code_line": 711,
+      "stdout_line": 713
+    },
+    "pinned-source-3": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 720,
+      "exit_code_line": 725,
+      "stdout_line": 727
+    },
+    "pinned-source-4": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 734,
+      "exit_code_line": 739,
+      "stdout_line": 741
+    },
+    "pinned-source-5": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 748,
+      "exit_code_line": 753,
+      "stdout_line": 755
+    },
+    "pinned-source-6": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 762,
+      "exit_code_line": 767,
+      "stdout_line": 769
+    },
+    "pinned-source-7": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 776,
+      "exit_code_line": 781,
+      "stdout_line": 783
+    },
+    "pinned-source-8": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 790,
+      "exit_code_line": 795,
+      "stdout_line": 797
+    },
+    "pinned-source-9": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 804,
+      "exit_code_line": 809,
+      "stdout_line": 811
+    },
+    "pinned-source-11": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 818,
+      "exit_code_line": 823,
+      "stdout_line": 825
+    },
+    "pinned-source-12": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 832,
+      "exit_code_line": 837,
+      "stdout_line": 839
+    },
+    "pinned-source-14": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 846,
+      "exit_code_line": 851,
+      "stdout_line": 853
+    },
+    "pinned-source-18": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 860,
+      "exit_code_line": 865,
+      "stdout_line": 867
+    },
+    "pinned-source-19": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 874,
+      "exit_code_line": 879,
+      "stdout_line": 881
+    },
+    "pinned-source-20": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 888,
+      "exit_code_line": 893,
+      "stdout_line": 895
+    },
+    "fold-masking-tests": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 902,
+      "exit_code_line": 907,
+      "stdout_line": 909
+    },
+    "fold-evidence-claim-tests": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 916,
+      "exit_code_line": 921,
+      "stdout_line": 923
+    },
+    "fold-digest-helper-tests": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 930,
+      "exit_code_line": 935,
+      "stdout_line": 937
+    },
+    "fold-angle-schema-validator": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 944,
+      "exit_code_line": 949,
+      "stdout_line": 951
+    },
+    "fold-publication-validator": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 958,
+      "exit_code_line": 963,
+      "stdout_line": 965
+    },
+    "fold-publication-validator-runtime": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 972,
+      "exit_code_line": 977,
+      "stdout_line": 979
+    },
+    "fold-final-angle-schema-validator": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 986,
+      "exit_code_line": 991,
+      "stdout_line": 993
+    },
+    "fold-final-evidence-boundary-tests": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 1000,
+      "exit_code_line": 1005,
+      "stdout_line": 1007
     }
   },
   "angle_cells": [
@@ -182,7 +434,7 @@
       "angle": "A1",
       "value": "+",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 56,
+      "line": 60,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [
         {
@@ -190,14 +442,14 @@
           "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json"
         }
       ],
-      "note": "Capability at the resolved pin reproduced only within the receipt's documented local smoke scope; full layer requirements remain bounded by its named gaps. Native masked source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:226; the per-component .e2e.json file is a derived navigation index."
+      "note": "Native local behavior at the binary's observed release string, bounded to the scratch fixture; full-suite and adoption capability remain unestablished. Source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:230. Fresh full tag resolution is recorded separately after that smoke."
     },
     {
       "candidate": "worktrunk",
       "angle": "A2",
-      "value": "+",
+      "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 67,
+      "line": 71,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [
         {
@@ -208,14 +460,14 @@
           "line": 107
         }
       ],
-      "note": "Source-review judgment only: the pinned CI source documents a nextest suite (worktrunk) or an explicit native test command (gh/difftastic). No native CI result or fresh full-suite execution is inferred."
+      "note": "The pinned CI definition is source-review evidence only. The repository's A2 basis also needs Scorecard and release/CI snapshots; no Scorecard result was retained here. One CI line cannot establish a positive engineering score."
     },
     {
       "candidate": "worktrunk",
       "angle": "A3",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 81,
+      "line": 85,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "No retained pin-specific independent community convergence measurement in this delta."
@@ -225,7 +477,7 @@
       "angle": "A4",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 87,
+      "line": 91,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "Release download counts and task-triggered smoke invocations do not measure net production usage."
@@ -235,7 +487,7 @@
       "angle": "A5",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 93,
+      "line": 97,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "No pin-bound published evaluation retained for this winner. The carried sem vendor self-report is scored separately; A5 weight stays at its stated value."
@@ -245,7 +497,7 @@
       "angle": "A6",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 99,
+      "line": 103,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "No matched comparative run at these proposed pins; local smokes are A1, not A6."
@@ -253,9 +505,9 @@
     {
       "candidate": "gh",
       "angle": "A1",
-      "value": "+",
+      "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 123,
+      "line": 127,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [
         {
@@ -263,14 +515,14 @@
           "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json"
         }
       ],
-      "note": "Capability at the resolved pin reproduced only within the receipt's documented local smoke scope; full layer requirements remain bounded by its named gaps. Native masked source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:310; the per-component .e2e.json file is a derived navigation index."
+      "note": "Only native local CLI readiness was captured; no PR-automation capability was measured, so A1 stays U and the screen stays false. Source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:314. Fresh full tag resolution is recorded separately after that smoke."
     },
     {
       "candidate": "gh",
       "angle": "A2",
-      "value": "+",
+      "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 134,
+      "line": 138,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [
         {
@@ -281,14 +533,14 @@
           "line": 32
         }
       ],
-      "note": "Source-review judgment only: the pinned CI source documents a nextest suite (worktrunk) or an explicit native test command (gh/difftastic). No native CI result or fresh full-suite execution is inferred."
+      "note": "The pinned CI definition is source-review evidence only. The repository's A2 basis also needs Scorecard and release/CI snapshots; no Scorecard result was retained here. One CI line cannot establish a positive engineering score."
     },
     {
       "candidate": "gh",
       "angle": "A3",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 148,
+      "line": 152,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "No retained pin-specific independent community convergence measurement in this delta."
@@ -298,7 +550,7 @@
       "angle": "A4",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 154,
+      "line": 158,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "Release download counts and task-triggered smoke invocations do not measure net production usage."
@@ -308,7 +560,7 @@
       "angle": "A5",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 160,
+      "line": 164,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "No pin-bound published evaluation retained for this winner. The carried sem vendor self-report is scored separately; A5 weight stays at its stated value."
@@ -318,7 +570,7 @@
       "angle": "A6",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 166,
+      "line": 170,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "No matched comparative run at these proposed pins; local smokes are A1, not A6."
@@ -328,7 +580,7 @@
       "angle": "A1",
       "value": "+",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 190,
+      "line": 194,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [
         {
@@ -336,14 +588,14 @@
           "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json"
         }
       ],
-      "note": "Capability at the resolved pin reproduced only within the receipt's documented local smoke scope; full layer requirements remain bounded by its named gaps. Native masked source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:366; the per-component .e2e.json file is a derived navigation index."
+      "note": "Native local behavior at the binary's observed release string, bounded to the scratch fixture; full-suite and adoption capability remain unestablished. Source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:370. Fresh full tag resolution is recorded separately after that smoke."
     },
     {
       "candidate": "difftastic",
       "angle": "A2",
-      "value": "+",
+      "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 201,
+      "line": 205,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [
         {
@@ -354,14 +606,14 @@
           "line": 61
         }
       ],
-      "note": "Source-review judgment only: the pinned CI source documents a nextest suite (worktrunk) or an explicit native test command (gh/difftastic). No native CI result or fresh full-suite execution is inferred."
+      "note": "The pinned CI definition is source-review evidence only. The repository's A2 basis also needs Scorecard and release/CI snapshots; no Scorecard result was retained here. One CI line cannot establish a positive engineering score."
     },
     {
       "candidate": "difftastic",
       "angle": "A3",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 215,
+      "line": 219,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "No retained pin-specific independent community convergence measurement in this delta."
@@ -371,7 +623,7 @@
       "angle": "A4",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 221,
+      "line": 225,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "Release download counts and task-triggered smoke invocations do not measure net production usage."
@@ -381,7 +633,7 @@
       "angle": "A5",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 227,
+      "line": 231,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "No pin-bound published evaluation retained for this winner. The carried sem vendor self-report is scored separately; A5 weight stays at its stated value."
@@ -391,7 +643,7 @@
       "angle": "A6",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 233,
+      "line": 237,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "No matched comparative run at these proposed pins; local smokes are A1, not A6."
@@ -401,7 +653,7 @@
       "angle": "A1",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 257,
+      "line": 261,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [
         {
@@ -419,7 +671,7 @@
       "angle": "A2",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 271,
+      "line": 275,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "Unverified for this carried survivor in the bounded delta."
@@ -429,7 +681,7 @@
       "angle": "A3",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 277,
+      "line": 281,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "Unverified for this carried survivor in the bounded delta."
@@ -439,7 +691,7 @@
       "angle": "A4",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 283,
+      "line": 287,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "Unverified for this carried survivor in the bounded delta."
@@ -449,7 +701,7 @@
       "angle": "A5",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 289,
+      "line": 293,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "Unverified for this carried survivor in the bounded delta."
@@ -459,7 +711,7 @@
       "angle": "A6",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 295,
+      "line": 299,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "Unverified for this carried survivor in the bounded delta."
@@ -469,7 +721,7 @@
       "angle": "A1",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 319,
+      "line": 323,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [
         {
@@ -487,7 +739,7 @@
       "angle": "A2",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 333,
+      "line": 337,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "Unverified for this carried survivor in the bounded delta."
@@ -497,7 +749,7 @@
       "angle": "A3",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 339,
+      "line": 343,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "Unverified for this carried survivor in the bounded delta."
@@ -507,7 +759,7 @@
       "angle": "A4",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 345,
+      "line": 349,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "Unverified for this carried survivor in the bounded delta."
@@ -517,207 +769,462 @@
       "angle": "A5",
       "value": "0",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 351,
+      "line": 355,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [
         {
-          "kind": "url",
-          "url": "https://ataraxy-labs.github.io/sem/agents.html",
-          "read_at": "2026-10-16T05:23:42.990875Z"
+          "kind": "repo",
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "pin": "30542e70560147c19049016d19aa3f264515c92f",
+          "path": "catalogs/sota-convergence/manifest-20260926.json",
+          "line": 11337
         }
       ],
-      "note": "Known vendor self-evaluation over 3 commits, 4 questions and 24 API calls using Claude Sonnet 4.5 versus raw git diff. It is not independent, not a difftastic comparison, and has no demonstrated binding to retained sem v0.25.0. Neutral evidence only; not run here."
+      "note": "Retained source-review report at the cited manifest line explicitly records 3 commits, 4 questions, Claude Sonnet 4.5 and 24 API calls versus raw git diff. The old live-page excerpt matched CSS and does not support those numbers; it is not used as their source. No independent replication or difftastic arm, and no demonstrated retained-release binding. Neutral source review only."
     },
     {
       "candidate": "sem",
       "angle": "A6",
       "value": "U",
       "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
-      "line": 363,
+      "line": 369,
       "classification": "source-review judgment or named unverified gap; not a measured numeric result",
       "support": [],
       "note": "Unverified for this carried survivor in the bounded delta."
     }
   ],
   "native_count_derivation": {
-    "all_observations": 29,
-    "zero_exits": 26,
+    "all_observations": 71,
+    "zero_exits": 67,
+    "historical_component_observations": 29,
     "source_refs": [
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 16,
-        "exit_code_line": 21,
-        "stdout_line": 23
+        "line": 20,
+        "exit_code_line": 25,
+        "stdout_line": 27
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 30,
-        "exit_code_line": 35,
-        "stdout_line": 37
+        "line": 34,
+        "exit_code_line": 39,
+        "stdout_line": 41
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 44,
-        "exit_code_line": 49,
-        "stdout_line": 51
+        "line": 48,
+        "exit_code_line": 53,
+        "stdout_line": 55
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 58,
-        "exit_code_line": 63,
-        "stdout_line": 65
+        "line": 62,
+        "exit_code_line": 67,
+        "stdout_line": 69
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 72,
-        "exit_code_line": 77,
-        "stdout_line": 79
+        "line": 76,
+        "exit_code_line": 81,
+        "stdout_line": 83
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 86,
-        "exit_code_line": 91,
-        "stdout_line": 93
+        "line": 90,
+        "exit_code_line": 95,
+        "stdout_line": 97
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 100,
-        "exit_code_line": 105,
-        "stdout_line": 107
+        "line": 104,
+        "exit_code_line": 109,
+        "stdout_line": 111
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 114,
-        "exit_code_line": 119,
-        "stdout_line": 121
+        "line": 118,
+        "exit_code_line": 123,
+        "stdout_line": 125
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 128,
-        "exit_code_line": 133,
-        "stdout_line": 135
+        "line": 132,
+        "exit_code_line": 137,
+        "stdout_line": 139
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 142,
-        "exit_code_line": 147,
-        "stdout_line": 149
+        "line": 146,
+        "exit_code_line": 151,
+        "stdout_line": 153
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 156,
-        "exit_code_line": 161,
-        "stdout_line": 163
+        "line": 160,
+        "exit_code_line": 165,
+        "stdout_line": 167
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 170,
-        "exit_code_line": 175,
-        "stdout_line": 177
+        "line": 174,
+        "exit_code_line": 179,
+        "stdout_line": 181
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 184,
-        "exit_code_line": 189,
-        "stdout_line": 191
+        "line": 188,
+        "exit_code_line": 193,
+        "stdout_line": 195
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 198,
-        "exit_code_line": 203,
-        "stdout_line": 205
+        "line": 202,
+        "exit_code_line": 207,
+        "stdout_line": 209
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 212,
-        "exit_code_line": 217,
-        "stdout_line": 219
+        "line": 216,
+        "exit_code_line": 221,
+        "stdout_line": 223
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 226,
-        "exit_code_line": 231,
-        "stdout_line": 233
+        "line": 230,
+        "exit_code_line": 235,
+        "stdout_line": 237
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 240,
-        "exit_code_line": 245,
-        "stdout_line": 247
+        "line": 244,
+        "exit_code_line": 249,
+        "stdout_line": 251
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 254,
-        "exit_code_line": 259,
-        "stdout_line": 261
+        "line": 258,
+        "exit_code_line": 263,
+        "stdout_line": 265
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 268,
-        "exit_code_line": 273,
-        "stdout_line": 275
+        "line": 272,
+        "exit_code_line": 277,
+        "stdout_line": 279
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 282,
-        "exit_code_line": 287,
-        "stdout_line": 289
+        "line": 286,
+        "exit_code_line": 291,
+        "stdout_line": 293
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 296,
-        "exit_code_line": 301,
-        "stdout_line": 303
+        "line": 300,
+        "exit_code_line": 305,
+        "stdout_line": 307
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 310,
-        "exit_code_line": 315,
-        "stdout_line": 317
+        "line": 314,
+        "exit_code_line": 319,
+        "stdout_line": 321
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 324,
-        "exit_code_line": 329,
-        "stdout_line": 331
+        "line": 328,
+        "exit_code_line": 333,
+        "stdout_line": 335
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 338,
-        "exit_code_line": 343,
-        "stdout_line": 345
+        "line": 342,
+        "exit_code_line": 347,
+        "stdout_line": 349
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 352,
-        "exit_code_line": 357,
-        "stdout_line": 359
+        "line": 356,
+        "exit_code_line": 361,
+        "stdout_line": 363
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 366,
-        "exit_code_line": 371,
-        "stdout_line": 373
+        "line": 370,
+        "exit_code_line": 375,
+        "stdout_line": 377
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 380,
-        "exit_code_line": 385,
-        "stdout_line": 387
+        "line": 384,
+        "exit_code_line": 389,
+        "stdout_line": 391
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 394,
-        "exit_code_line": 399,
-        "stdout_line": 401
+        "line": 398,
+        "exit_code_line": 403,
+        "stdout_line": 405
       },
       {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 408,
-        "exit_code_line": 413,
-        "stdout_line": 415
+        "line": 412,
+        "exit_code_line": 417,
+        "stdout_line": 419
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 426,
+        "exit_code_line": 431,
+        "stdout_line": 433
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 440,
+        "exit_code_line": 445,
+        "stdout_line": 447
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 454,
+        "exit_code_line": 459,
+        "stdout_line": 461
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 468,
+        "exit_code_line": 473,
+        "stdout_line": 475
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 482,
+        "exit_code_line": 487,
+        "stdout_line": 489
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 496,
+        "exit_code_line": 501,
+        "stdout_line": 503
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 510,
+        "exit_code_line": 515,
+        "stdout_line": 517
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 524,
+        "exit_code_line": 529,
+        "stdout_line": 531
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 538,
+        "exit_code_line": 543,
+        "stdout_line": 545
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 552,
+        "exit_code_line": 557,
+        "stdout_line": 559
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 566,
+        "exit_code_line": 571,
+        "stdout_line": 573
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 580,
+        "exit_code_line": 585,
+        "stdout_line": 587
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 594,
+        "exit_code_line": 599,
+        "stdout_line": 601
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 608,
+        "exit_code_line": 613,
+        "stdout_line": 615
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 622,
+        "exit_code_line": 627,
+        "stdout_line": 629
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 636,
+        "exit_code_line": 641,
+        "stdout_line": 643
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 650,
+        "exit_code_line": 655,
+        "stdout_line": 657
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 664,
+        "exit_code_line": 669,
+        "stdout_line": 671
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 678,
+        "exit_code_line": 683,
+        "stdout_line": 685
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 692,
+        "exit_code_line": 697,
+        "stdout_line": 699
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 706,
+        "exit_code_line": 711,
+        "stdout_line": 713
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 720,
+        "exit_code_line": 725,
+        "stdout_line": 727
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 734,
+        "exit_code_line": 739,
+        "stdout_line": 741
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 748,
+        "exit_code_line": 753,
+        "stdout_line": 755
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 762,
+        "exit_code_line": 767,
+        "stdout_line": 769
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 776,
+        "exit_code_line": 781,
+        "stdout_line": 783
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 790,
+        "exit_code_line": 795,
+        "stdout_line": 797
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 804,
+        "exit_code_line": 809,
+        "stdout_line": 811
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 818,
+        "exit_code_line": 823,
+        "stdout_line": 825
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 832,
+        "exit_code_line": 837,
+        "stdout_line": 839
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 846,
+        "exit_code_line": 851,
+        "stdout_line": 853
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 860,
+        "exit_code_line": 865,
+        "stdout_line": 867
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 874,
+        "exit_code_line": 879,
+        "stdout_line": 881
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 888,
+        "exit_code_line": 893,
+        "stdout_line": 895
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 902,
+        "exit_code_line": 907,
+        "stdout_line": 909
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 916,
+        "exit_code_line": 921,
+        "stdout_line": 923
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 930,
+        "exit_code_line": 935,
+        "stdout_line": 937
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 944,
+        "exit_code_line": 949,
+        "stdout_line": 951
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 958,
+        "exit_code_line": 963,
+        "stdout_line": 965
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 972,
+        "exit_code_line": 977,
+        "stdout_line": 979
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 986,
+        "exit_code_line": 991,
+        "stdout_line": 993
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 1000,
+        "exit_code_line": 1005,
+        "stdout_line": 1007
       }
     ]
   },
-  "masked_reproduction": "The co-op independently checks the name-only private capture with the published rule; no private digest belongs in this map."
+  "masked_reproduction": "New private co-op reproduction required for this fold; raw bytes held privately in horizon and named only publicly."
 }

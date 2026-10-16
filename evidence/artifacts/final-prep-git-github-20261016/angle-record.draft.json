@@ -37,7 +37,11 @@
     "Both cumulative survivors remain unresolved: claude-code-action and sem. Neither was installed or trialled.",
     "Full upstream suites, authenticated PR lifecycle, organic-session use and macOS execution remain unmeasured in this preparation.",
     "The per-component E2E files are derived indexes, not native receipts. Native install/local-smoke capture exists, but a FINAL-qualifying E2E receipt/disposition remains pending co-op review; final_evidence.e2e_receipt stays null.",
-    "Installed-version original-byte capture and separate native dirty-file-preservation capture are missing; text probes and driver assertions do not fill those gaps."
+    "Installed-version original-byte capture and separate native dirty-file-preservation capture are missing; text probes and driver assertions do not fill those gaps.",
+    "The host version rows are named GAPs without native captures or stream hashes; earlier reported text strings are not measured evidence.",
+    "gh A1 is U and its capability screen is false: help/completion readiness does not establish GitHub PR capability.",
+    "A2 is U for all three winners: Scorecard coverage and engineering convergence remain missing despite pinned CI/release sources.",
+    "Formal invoke receipt fields are null with explicit adoption-invoke gaps; raw scratch command arrays cannot satisfy the invocation schema."
   ],
   "candidates": [
     {
@@ -54,18 +58,18 @@
       "angles": {
         "A1": {
           "score": "+",
-          "read_at": "2026-10-16T05:24:24.150009Z",
+          "read_at": "2026-10-16T07:29:58.193812Z",
           "sources": [
             {
               "kind": "receipt",
               "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json"
             }
           ],
-          "note": "Capability at the resolved pin reproduced only within the receipt's documented local smoke scope; full layer requirements remain bounded by its named gaps. Native masked source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:226; the per-component .e2e.json file is a derived navigation index."
+          "note": "Native local behavior at the binary's observed release string, bounded to the scratch fixture; full-suite and adoption capability remain unestablished. Source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:230. Fresh full tag resolution is recorded separately after that smoke."
         },
         "A2": {
-          "score": "+",
-          "read_at": "2026-10-16T05:24:24.150009Z",
+          "score": "U",
+          "read_at": "2026-10-16T09:04:58.433430Z",
           "sources": [
             {
               "kind": "repo",
@@ -75,7 +79,7 @@
               "line": 107
             }
           ],
-          "note": "Source-review judgment only: the pinned CI source documents a nextest suite (worktrunk) or an explicit native test command (gh/difftastic). No native CI result or fresh full-suite execution is inferred."
+          "note": "The pinned CI definition is source-review evidence only. The repository's A2 basis also needs Scorecard and release/CI snapshots; no Scorecard result was retained here. One CI line cannot establish a positive engineering score."
         },
         "A3": {
           "score": "U",
@@ -113,26 +117,26 @@
       "repository": "https://github.com/cli/cli",
       "pin": "2.102.0",
       "role": "Existing winner: GitHub CLI; local completion smoke only",
-      "a1_screened": true,
+      "a1_screened": false,
       "a6_comparative": false,
       "confounds": [
         "One Linux x86_64 scratch; manual task-triggered smoke; no paired challenger, full suite or macOS run."
       ],
       "angles": {
         "A1": {
-          "score": "+",
-          "read_at": "2026-10-16T05:24:24.150009Z",
+          "score": "U",
+          "read_at": "2026-10-16T07:29:58.193812Z",
           "sources": [
             {
               "kind": "receipt",
               "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json"
             }
           ],
-          "note": "Capability at the resolved pin reproduced only within the receipt's documented local smoke scope; full layer requirements remain bounded by its named gaps. Native masked source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:310; the per-component .e2e.json file is a derived navigation index."
+          "note": "Only native local CLI readiness was captured; no PR-automation capability was measured, so A1 stays U and the screen stays false. Source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:314. Fresh full tag resolution is recorded separately after that smoke."
         },
         "A2": {
-          "score": "+",
-          "read_at": "2026-10-16T05:24:24.150009Z",
+          "score": "U",
+          "read_at": "2026-10-16T09:04:58.433430Z",
           "sources": [
             {
               "kind": "repo",
@@ -142,7 +146,7 @@
               "line": 32
             }
           ],
-          "note": "Source-review judgment only: the pinned CI source documents a nextest suite (worktrunk) or an explicit native test command (gh/difftastic). No native CI result or fresh full-suite execution is inferred."
+          "note": "The pinned CI definition is source-review evidence only. The repository's A2 basis also needs Scorecard and release/CI snapshots; no Scorecard result was retained here. One CI line cannot establish a positive engineering score."
         },
         "A3": {
           "score": "U",
@@ -188,18 +192,18 @@
       "angles": {
         "A1": {
           "score": "+",
-          "read_at": "2026-10-16T05:24:24.150009Z",
+          "read_at": "2026-10-16T07:29:58.193812Z",
           "sources": [
             {
               "kind": "receipt",
               "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json"
             }
           ],
-          "note": "Capability at the resolved pin reproduced only within the receipt's documented local smoke scope; full layer requirements remain bounded by its named gaps. Native masked source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:366; the per-component .e2e.json file is a derived navigation index."
+          "note": "Native local behavior at the binary's observed release string, bounded to the scratch fixture; full-suite and adoption capability remain unestablished. Source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:370. Fresh full tag resolution is recorded separately after that smoke."
         },
         "A2": {
-          "score": "+",
-          "read_at": "2026-10-16T05:24:24.150009Z",
+          "score": "U",
+          "read_at": "2026-10-16T09:04:58.433430Z",
           "sources": [
             {
               "kind": "repo",
@@ -209,7 +213,7 @@
               "line": 61
             }
           ],
-          "note": "Source-review judgment only: the pinned CI source documents a nextest suite (worktrunk) or an explicit native test command (gh/difftastic). No native CI result or fresh full-suite execution is inferred."
+          "note": "The pinned CI definition is source-review evidence only. The repository's A2 basis also needs Scorecard and release/CI snapshots; no Scorecard result was retained here. One CI line cannot establish a positive engineering score."
         },
         "A3": {
           "score": "U",
@@ -349,15 +353,17 @@
         },
         "A5": {
           "score": "0",
-          "read_at": "2026-10-16T05:24:24.150009Z",
+          "read_at": "2026-10-16T09:04:58.433430Z",
           "sources": [
             {
-              "kind": "url",
-              "url": "https://ataraxy-labs.github.io/sem/agents.html",
-              "read_at": "2026-10-16T05:23:42.990875Z"
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "30542e70560147c19049016d19aa3f264515c92f",
+              "path": "catalogs/sota-convergence/manifest-20260926.json",
+              "line": 11337
             }
           ],
-          "note": "Known vendor self-evaluation over 3 commits, 4 questions and 24 API calls using Claude Sonnet 4.5 versus raw git diff. It is not independent, not a difftastic comparison, and has no demonstrated binding to retained sem v0.25.0. Neutral evidence only; not run here."
+          "note": "Retained source-review report at the cited manifest line explicitly records 3 commits, 4 questions, Claude Sonnet 4.5 and 24 API calls versus raw git diff. The old live-page excerpt matched CSS and does not support those numbers; it is not used as their source. No independent replication or difftastic arm, and no demonstrated retained-release binding. Neutral source review only."
         },
         "A6": {
           "score": "U",
@@ -377,22 +383,22 @@
       "candidate_id": "worktrunk",
       "run_pin": "0.80.0",
       "e2e_receipt": null,
-      "invoke_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "not_invoked_reason": null
+      "invoke_receipt": null,
+      "not_invoked_reason": "Scratch qualification commands were invoked and retained in native-commands.json, but no FINAL-compatible adoption invocation receipt binds a reconciled canonical pin and measured adoption window. The raw command array is not the kind:invocation contract required by scripts/final_stack.py:944-947,974-976. Role remains active; adoption-invoke qualification is a named gap."
     },
     {
       "candidate_id": "gh",
       "run_pin": "2.102.0",
       "e2e_receipt": null,
-      "invoke_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "not_invoked_reason": null
+      "invoke_receipt": null,
+      "not_invoked_reason": "Scratch qualification commands were invoked and retained in native-commands.json, but no FINAL-compatible adoption invocation receipt binds a reconciled canonical pin and measured adoption window. The raw command array is not the kind:invocation contract required by scripts/final_stack.py:944-947,974-976. Role remains active; adoption-invoke qualification is a named gap."
     },
     {
       "candidate_id": "difftastic",
       "run_pin": "0.71.0",
       "e2e_receipt": null,
-      "invoke_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "not_invoked_reason": null
+      "invoke_receipt": null,
+      "not_invoked_reason": "Scratch qualification commands were invoked and retained in native-commands.json, but no FINAL-compatible adoption invocation receipt binds a reconciled canonical pin and measured adoption window. The raw command array is not the kind:invocation contract required by scripts/final_stack.py:944-947,974-976. Role remains active; adoption-invoke qualification is a named gap."
     }
   ],
   "terminal_state": "NON_TERMINAL"

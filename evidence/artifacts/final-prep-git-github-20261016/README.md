@@ -1,237 +1,202 @@
 # FINAL preparation: foundation/git-github-automation
 
-This working draft proposes one run pin for each existing winner, retains a
-deterministic masked derivative of real vendor install/smoke captures, and
-supplies a five-candidate angle-record draft. It prepares the layer for the
-co-op's two-family review. The per-component E2E files and invoke file are
-explicitly derived navigation indexes, not native receipts. A FINAL-qualifying
-E2E receipt/disposition remains pending; the draft's E2E receipt fields are null.
-Every draft verdict re-derives as **INSUFFICIENT**; the layer remains
-**NON_TERMINAL**. No active angle record, catalog verdict, portable pin, default
-or FINAL admission changes in this PR.
+This is evidence preparation for one layer. It proposes run pins, retains
+bounded native scratch execution and its private custody, and records a
+five-candidate angle draft. All five verdicts remain **INSUFFICIENT** and the
+layer is **NON_TERMINAL**. Formal E2E and adoption-invoke receipt fields are
+null with named gaps. No canonical pin, sealed verdict, default or FINAL
+admission is changed.
 
-The base is main revision `30542e70560147c19049016d19aa3f264515c92f`.
-The coordination input is `final-wave-layer-prep.brief-20261016.md`, cited by
-name only. This preparation is SINGLE-FAMILY GPT. Both families' reads are
-pending co-op dispatch; no model comparison or adjudication was self-dispatched.
+The base is `30542e70560147c19049016d19aa3f264515c92f`. The correction follows
+the CC's `MICRO-full-f62f2e82` ruling on the initial head, cited by name only.
+Preparation is SINGLE-FAMILY GPT; the co-op dispatches both families' reads
+after the one correction fold. No model comparison was self-dispatched.
 
-## F1: reconcile the run pins
+## F1: proposed pins and their supporting records
 
-| Winner | Sealed verdict | Canonical run | Install-plan script | Installed version | Proposed run |
+| Winner | Sealed verdict | Canonical run | Executable install plan | Native host-version custody | Proposed run |
 | --- | --- | --- | --- | --- | --- |
-| worktrunk | 0.79.0 | 0.80.0 | 0.80.0 | 0.80.0 | **0.80.0** |
-| GitHub CLI (`candidate:cli-cli`, run id `gh`) | unpinned | 2.101.0 | 2.102.0 | 2.102.0 | **2.102.0** |
-| difftastic | 0.71.0 | 0.71.0 | 0.71.0 | 0.71.0 | **0.71.0** |
+| worktrunk | 0.79.0 | 0.80.0 | 0.80.0 | GAP | **0.80.0** |
+| gh (`candidate:cli-cli`) | unpinned | 2.101.0 | 2.102.0 | GAP | **2.102.0** |
+| difftastic | 0.71.0 | 0.71.0 | 0.71.0 | GAP | **0.71.0** |
 
-[pin-reconciliation.json](pin-reconciliation.json) cites each source on the
-base revision by path and line: the final-stack winner and `runs[]` rows, the
-clean-install decision's layer row and installed-client citation, the executable
-install-plan rows, the underlying stack/portable pin records, and the last
-linked pin-specific evidence consumed. [host-versions.json](host-versions.json)
-retains the text of read-only version probes. Those probes used text mode and
-lack separate original-byte captures: that gap is explicit, and they are not
-labelled native-byte receipts. The evidence search is bounded to the linked
-records; it does not claim an exhaustive history of every host report or
-documentary relabel.
+[pin-reconciliation.json](pin-reconciliation.json) gives each consumed
+base-revision source at its actual supporting path and line: final-stack winner
+and run rows, the clean-install decision, its executable plan, portable/stack
+pins and linked historical qualification. The plan's layer row names the
+components and outstanding work; it does not supply all versions.
 
-The worktrunk proposal follows the current run, stack, plan and prior 0.80.0
-qualification, with fresh lifecycle evidence below. Its sealed 0.79.0 winner
-remains a drift requiring adjudication. The gh proposal follows the plan,
-installed client and previously committed unchanged-upstream test/build
-qualification at 2.102.0. Both portable pin files and final-stack still use
-2.101.0; the sealed winner is unpinned. These are explicit unresolved drifts.
-Difftastic has no version drift; its version-only run record is supplemented by
-the resolved source identity below.
+Worktrunk's proposal follows its run/stack/plan 0.80.0 and linked qualification;
+the sealed 0.79.0 verdict remains drift. Gh's proposal follows plan 2.102.0 and
+the existing committed upstream qualification; portable and canonical 2.101.0
+pins remain drift, and the sealed verdict remains unpinned. Difftastic's
+release versions agree. [host-versions.json](host-versions.json) is a named
+GAP, with no host stream hash or native receipt: earlier text-mode observations
+had no original-byte custody and do not establish installed-host qualification.
 
-| Component | Proposed release | Resolved upstream source |
+| Repository | Release tag | Full source identity |
 | --- | --- | --- |
-| worktrunk | v0.80.0 | `b49ca7eea9b03145791a5b94eccaf9c59412ed37` |
-| gh | v2.102.0 | `fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd` |
-| difftastic | 0.71.0 | `b7d119e90ac9f972f03f69508da765dacd302c0c` |
+| max-sixty/worktrunk | v0.80.0 | `b49ca7eea9b03145791a5b94eccaf9c59412ed37` |
+| cli/cli | v2.102.0 | `fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd` |
+| Wilfred/difftastic | 0.71.0 | `b7d119e90ac9f972f03f69508da765dacd302c0c` |
 
-## E2E and F2: fresh bounded execution
+The correction now retains native `git ls-remote --tags` commands and exits for
+all three winners and both survivors, including annotated-tag peeling for
+claude-code-action. Their exact output locators are in the pin/source records
+and [integrity-source-map.json](integrity-source-map.json). These are fresh
+resolution observations after the original smoke, not reconstructed historical
+API responses.
 
-All three tools were downloaded from their vendor's own GitHub release assets,
-checked against the release API's published asset digest, and unpacked into
-isolated scratch prefixes under `/var/tmp`. Configuration and Git fixtures also
-belong to that scratch. No package manager, shell integration, plugin install,
-profile edit, service or unit was used. The scratch binaries remain only inside
-the scratch. These are Linux x86_64 vendor-binary smokes, without a complete
-source build/test suite or another platform's acceptance.
+## Native execution and the scope of the indexes
 
-| Derived navigation index | Fresh local behavior | Derived zero-exit install/smoke count | Derived native invoke count |
+[native-commands.json](native-commands.json) is a deterministic masked derivative
+of real recorder captures. The original component qualification has **29 rows**:
+26 zero exits, difftastic changed-file detection exit 1, worktrunk dirty-removal
+refusal exit 1, and the difftastic unstable-JSON gate exit 2. Exactly 27 rows had
+declared expected exits and matched them. The latter refusal/gate probes had
+null expected-exit fields: their nonzero exits were observed, not predeclared
+expected outcomes. Dirty-file preservation was asserted by the private driver
+without a separate native filesystem capture and remains a named gap.
+
+| Derived index | Zero-exit rows in `commands[]` | Observed nonzero rows in `negative_controls[]` | Native component calls |
 | --- | --- | --- | --- |
-| [worktrunk.e2e.json](worktrunk.e2e.json) | create/list/remove; two disposable worktrees return to one; dirty removal refused; separate preservation-capture gap | 9 | 6 |
-| [gh.e2e.json](gh.e2e.json) | native PR-review help and Bash-completion generation; generated completion accepted by `bash -n` | 7 | 2 |
-| [difftastic.e2e.json](difftastic.e2e.json) | upstream JavaScript sample pair; same/different exit controls; separate native JSON-gate probe | 6 | 4 |
+| [worktrunk.e2e.json](worktrunk.e2e.json) | 9: install/version, create/list/remove | dirty refusal, exit 1 | 6 |
+| [gh.e2e.json](gh.e2e.json) | 7: install/version, help/completion and Bash parse | none | 2 |
+| [difftastic.e2e.json](difftastic.e2e.json) | 6: install/version, upstream sample diff and same-file check | changed files, exit 1; JSON gate, exit 2 | 4 |
 
-[native-commands.json](native-commands.json) retains all **29 command
-observations**, including installation and fixture setup. There are 26 zero
-exits and three expected nonzero outcomes: worktrunk dirty-removal refusal
-(`1`), difftastic changed-file detection (`1`), and the documented unstable-JSON
-gate without `DFT_UNSTABLE` (`2`). The 27 commands with a declared expected exit
-matched it. These counts are derived arithmetic over the captured command
-records; [integrity-source-map.json](integrity-source-map.json) gives the
-supporting command, exit-code and output lines. Dirty-file preservation was a
-private-driver assertion without a separate native filesystem capture. That
-missing capture is a named gap, not a passed native preservation test. Full
-upstream suite tests executed in this preparation: **0**. No credentialed
-GitHub operation was attempted.
+These files and [invokes.json](invokes.json) are navigation indexes, not native
+receipts or E2E acceptance objects. Their counts are derived from native rows.
+The 12 component calls are deliberate scratch qualification; they do not
+establish organic-session use or adoption-wide usage. Formal invoke fields
+remain null because the command array does not satisfy the separate
+`kind: invocation`, matching pin, positive calls and measured-window contract
+in `scripts/final_stack.py:944-947,974-976`. Their non-invocation reasons explain
+the missing adoption receipt without denying the observed scratch activity.
 
-[invokes.json](invokes.json) is a derived index binding 12 task-triggered
-component invocations to the real masked capture's commands, pin, timestamps,
-exits, output hashes and source lines. It contains no tool output and is not
-itself an invoke receipt. These are deliberate qualification invocations of
-the scratch binaries. They do not establish organic fresh-session adoption or
-an adoption-wide invocation census.
+Every tool was unpacked only into an isolated `/var/tmp` prefix. No global
+install, shell/plugin setup, service, credentialed GitHub operation or full
+upstream suite was run. Worktrunk's release installer is now the install-path
+source: at v0.80.0, `worktrunk-installer.sh:338` extracts the archive and `:561`
+selects the Linux archive. The receipt distinguishes the observed direct
+scratch extraction from running that installer; it does not claim a literal
+vendor installer invocation.
 
-The native receipt is [native-commands.json](native-commands.json), labelled
-`masked_derivative_of_native_capture`. Each output hash covers the exact
-**published** UTF-8 stdout or stderr field. The literal masking rules in
-[mask_receipts.py](mask_receipts.py) replace the scratch root with `<SCRATCH>`
-and the disposable Git commit identity with `<FIXTURE_COMMIT>` in commands,
-working directories and output. The script first verifies the original private
-stream hashes, then computes hashes of the published streams. It never copies
-private stream digests into provenance metadata.
+The correction adds fresh native release-API requests and fresh downloads,
+followed by post-download `sha256sum` and an actual-versus-published check.
+[verify_release_asset.py](verify_release_asset.py) reads the digest from the
+captured API response and computes the downloaded file's digest at execution
+time. Its native output includes both public values and
+`actual_equals_published=true`, with exit 0. This is a local integrity check,
+not a signature check, attestation check, upstream suite or replacement for the
+earlier command result. Additional source and validator observations are
+separate supplemental rows; the source map gives their command/exit/output
+lines. Total-row arithmetic does not turn provenance requests into component
+invocations.
 
-The private capture is named `git-github-native-command-capture-20261016`;
-its locator was supplied to the co-op privately, without a digest. The co-op's
-`MASKED-REPRO CHECK PASS` records byte-identical reproduction (`cmp` exit 0),
-seven masking/custody tests OK and zero private-locator scan hits; that private
-check is cited by name only. [test_mask_receipts.py](test_mask_receipts.py)
-checks deterministic masking, byte preservation, negative exits, tampering and
-private-capture reproduction. Its synthetic unit fixtures are explicitly test
-data and never presented as E2E or invoke output. The private-capture test
-failed against the old projection and passed after regeneration. A separate
-public native log of those utility tests was not retained; that capture gap is
-recorded in [adjudication.json](adjudication.json).
+## Private source custody and public masking
 
-From this artifact directory, the reproduction commands use marked private
-input placeholders:
+The complete generated Bash completion, PR-help text, source files and release
+API bodies stay in a private **horizon custody worktree**. Public records cite
+the custody by name only: `git-github-native-command-capture-20261016`,
+`git-github-fold-native-capture-20261016` and
+`git-github-source-custody-20261016`. No private locator or private raw digest is
+a publication source.
 
-```sh
-python3 mask_receipts.py --raw '<PRIVATE_NATIVE_CAPTURE>' --out native-commands.json
-python3 test_mask_receipts.py --raw '<PRIVATE_NATIVE_CAPTURE>' --published native-commands.json
-```
+[mask_receipts.py](mask_receipts.py) verifies the private stream hashes and then
+replaces private paths/fixture identities with marked placeholders. It also
+withholds complete generated/help/HTTP output behind
+`<UPSTREAM_GENERATED_COMPLETION_WITHHELD>`, `<UPSTREAM_HELP_TEXT_WITHHELD>` or
+`<UPSTREAM_HTTP_RESPONSE_WITHHELD>`. Source excerpts become
+`<UPSTREAM_SOURCE_TEXT_WITHHELD>`; URL, pin, public-source SHA-256 and original
+line citations remain in [source-reads.json](source-reads.json). Hashes attached
+to published native streams cover the exact **published derivative bytes**.
+Public-source checksums identify openly served upstream material; they are
+distinct from forbidden digests of unpublished private input.
 
-No original-stream digest or digest of the unshared fixture commit is published.
-The Git inputs were a disposable synthetic fixture; the component outputs are
-real native executions against it. Release/source checksums refer to public
-upstream bytes. Checksumming an asset against its release API digest is the
-recorded integrity check; signature/attestation verification is not claimed.
+The historical source projection is retained privately. Fresh pinned source
+reads have separate native commands and timestamps, and match the retained
+public-source checksums. They are not passed off as historical HTTP captures.
 
-The collector's initial assertion treated Worktrunk JSON as a bare array.
-Native `wt list` itself exited zero. The retained output and pinned
-[schema-2 implementation](https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/src/commands/list/json_v2.rs#L1)
-show the `items[].worktree.path` envelope; the resumed smoke used that shape.
-The lookup and orchestration corrections are retained in
-[adjudication.json](adjudication.json). No upstream defect or production code
-fix is claimed.
+[test_mask_receipts.py](test_mask_receipts.py) reads the actual committed
+derivative in public tests, verifies its stream hashes and enforces withholding
+of generated/source text. Its optional private checks reproduce both public
+native and source derivatives. Synthetic unit fixtures are labelled test data,
+not E2E results. [test_evidence_claims.py](test_evidence_claims.py) guards against
+host-gap hashes, unsupported A1/A2 upgrades, incorrect tag/digest claims,
+nonzero-control count confusion, invalid formal invoke pointers and the sem
+citation error. The regression checks failed before the corrections.
 
-## Resolution inputs and the five-candidate delta
+The native utility captures record 11 masking/custody tests, eight evidence
+boundary checks, two digest-helper tests and a successful call to the current
+angle validator. Their outputs are supplemental native rows, not driver
+acceptance flags. A later rerun does not change those captured timestamps.
 
-The recorded verdict is wave `20260922`, with the foundation layer at
-`catalogs/landscape/foundation.json:5043`. The latest covering sweep is
-`landscape-sweep-20260929` (`catalogs/saturation/ledger.json:7694`, layer at
-`:10776`), with its manifest and retained returns. The 20260923 and 20260926
-manifest/return evidence is also consumed. The September 23 return has no
-retained per-vote return, as the ledger records; its retained survivor artifact
-and manifest votes remain the available evidence. September 26 retains a
-critic web-search-cap failure. September 29's pin-moved reopen references are
-historical sweep observations, not claims about this smoke.
+The old co-op reproduction PASS applied to the initial derivative. The changed
+masking rule and supplemental data require a **new private co-op PASS before
+the one fold is pushed**. The native validator/test commands and return codes
+are retained as supplemental capture rows; the public metadata is not a
+stand-in for those commands.
 
-Both cumulative unresolved survivors remain in scope:
+## Resolution inputs and the five-candidate angle draft
 
-- `anthropics/claude-code-action`, retained tag v1.0.233, resolved to
-  `8cf3482550831fb35a4fc3fbf7ca139cf8028b4c`;
-- `ataraxy-labs/sem`, retained tag v0.25.0, resolved to
-  `4cfe1374f79631b01aca5746441d826738a15448`.
+The verdict wave is 20260922. The latest covering sweep is 20260929, with its
+manifest and retained returns; 20260923 and 20260926 sources preserve the
+cumulative unresolved survivors. The missing September 23 per-vote return and
+September 26 capped critic search remain historical limitations. The generated
+packet projection carries only the three winners and both survivors, using
+the older generated packet for the action survivor omitted by the latest one.
+Candidate keys remain scoped to their source manifest; no blind-comparison seal
+is asserted by the projection.
 
-[packet-projection.json](packet-projection.json) comes from successful
-`tools/sota-convergence/lane_packets.py` runs using manifests 20260929 and
-20260923, `--registered-receipts`, `--manifest-newcomers` and
-`--withhold-labels`. The latest packet alone omits the earlier action survivor.
-The projection carries that row from the older generated packet and retains
-only the three winners and these two survivors. Generator candidate keys are
-scoped to their manifest; this projection asserts no common blind-comparison
-seal. The supported CLI rejected `--gap-receipts` combined with withheld labels
-(exit 2); successful generation omitted the winner-bearing gap receipts.
+- claude-code-action v1.0.233 resolves to
+  `8cf3482550831fb35a4fc3fbf7ca139cf8028b4c`; no runner trial was performed.
+- sem v0.25.0 resolves to `4cfe1374f79631b01aca5746441d826738a15448`;
+  no sem install, setup, login or native survivor trial was performed.
 
-[angle-record.draft.json](angle-record.draft.json) follows the existing
-`angle-convergence/2` schema and default weights. Its statement time is the
-observed scratch weight-record modification time, preceding the fresh source
-reads and scoring. Prior verdicts and source leads were visible: this is
-disclosed re-verification. The repository's current validator and derivation
-accept the draft and re-derive all five rows as INSUFFICIENT.
+[angle-record.draft.json](angle-record.draft.json) uses the existing schema and
+default weights, with disclosed prior exposure to the sealed verdict/source
+leads. It is re-verification, not a blind or preregistered comparative trial.
 
-| Angle | Evidence in this delta | Disposition |
-| --- | --- | --- |
-| A1 capability at pin | winner vendor installs/local smokes; source reads at the two survivor pins | three narrowly positive winner scores; survivor screens unverified |
-| A2 upstream engineering | native test/CI definitions at each winner's exact source commit | positive process evidence; no fresh full-suite or CI-outcome claim |
-| A3 community consensus | no pin-specific independent consensus measurement retained | U |
-| A4 net usage | release downloads and qualification invokes are available, without production net-usage accounting | U; downloads are not substituted for usage |
-| A5 published evaluations | carried sem vendor self-evaluation: 3 commits, 4 questions, 24 API calls, Claude Sonnet 4.5 versus raw git diff | sem neutral `0`; no demonstrated v0.25.0 binding, independent replication or difftastic arm; other rows U |
-| A6 our comparative runs | no new matched challenger run | U; local smokes remain A1 |
+| Angle | Current disposition and limit |
+| --- | --- |
+| A1 capability | Worktrunk/difftastic retain bounded local positives. Gh stays U with its capability screen false: help/completion does not establish PR automation. Survivor screens stay unverified. |
+| A2 engineering | U for all winners. A CI definition alone does not establish the documented Scorecard + release + CI basis; Scorecard coverage remains a gap. |
+| A3 community consensus | U; no independent pin-specific consensus measurement. |
+| A4 net usage | U; download counts and deliberate qualification invokes are not net usage. |
+| A5 published evaluation | Sem is neutral `0`; the explicit 3-commit/4-question/24-call vendor self-report is sourced to `catalogs/sota-convergence/manifest-20260926.json:11337` at the base, not the old CSS excerpt. No independent replication, difftastic arm or proven release binding. Other rows stay U. |
+| A6 comparative runs | U; no new matched challenger run. Local smokes remain A1. |
 
-The known vendor evaluation is available, so its A5 weight stays at the stated
-value; no unavailable-evaluation weight transfer is applied. Its numbers are
-published self-report, not measurements made by this preparation. Every angle
-value is a source-review judgment or a named unverified gap, not a measured
-numeric score; [integrity-source-map.json](integrity-source-map.json) retains
-each value's draft line and supporting source. The A2 locators point to the
-actual relevant CI source, including worktrunk's nextest-suite comment at
-`ci.yaml:107`, gh's command at `go.yml:32` and difftastic's command at
-`test.yml:61`.
+Known vendor evaluation availability preserves the stated A5 weight; no
+unavailable-evaluation transfer is applied. All five candidate verdicts
+re-derive as INSUFFICIENT. Each value and supporting source is indexed at its
+actual draft/source line in `integrity-source-map.json`.
 
-## Disputed dimensions and named gaps
-
-[adjudication.json](adjudication.json) is the co-op handoff. It names gh's
-2.101.0/2.102.0 drift, worktrunk's 0.79.0/0.80.0 verdict drift, sem's stable
-machine-readable diff claim against difftastic's reproduced JSON gate, and the
-action's unattended PR-review role versus the local CLI smoke scope.
-
-The retained 20-file structural-coverage and agent surfacing comparison rule
-remains the next measurement for sem versus difftastic and plain git diff. The
-prior returns' 15/20 and 3/4 observations are historical evidence; neither that
-fixture nor the survivor arm was rerun here. Sem was not installed, configured,
-logged in or invoked. The action was source-reviewed at its carried pin and
-was not installed or connected to a live runner. Its credentialed disposable
-PR-review comparison remains a named gap.
-
-Full upstream Rust/Go suites, authenticated GitHub PR lifecycle, organic
-fresh-session use, cross-host coverage and the remaining A3-A6 evidence require
-their own authorized isolated runs or sourced dispositions. Co-op two-family
-reads and the closed FINAL admission gate remain prerequisites beyond this
-evidence preparation.
+[adjudication.json](adjudication.json) retains the disputed pin dimensions,
+formal E2E/invoke gaps, host byte-custody and preservation gaps, credentialed PR
+lifecycle, full suites, organic-session/cross-host use and survivor comparisons.
+The fresh provenance correction does not close those unrelated gaps. No
+host-installed version is inferred from a scratch version string.
 
 ## SOTA sources
 
-- [max-sixty/worktrunk v0.80.0](https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0),
-  commit `b49ca7eea9b03145791a5b94eccaf9c59412ed37`: `README.md`,
-  `dist-workspace.toml`, `.github/workflows/ci.yaml`, and
-  `src/commands/list/json_v2.rs`.
-- [cli/cli v2.102.0](https://github.com/cli/cli/releases/tag/v2.102.0),
-  commit `fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd`: `docs/install_linux.md`,
-  `pkg/cmd/completion/completion.go`, `.github/workflows/go.yml`.
-- [Wilfred/difftastic 0.71.0](https://github.com/Wilfred/difftastic/releases/tag/0.71.0),
-  commit `b7d119e90ac9f972f03f69508da765dacd302c0c`:
-  `manual/src/installation.md`, `manual/src/usage.md`, `README.md`,
-  `sample_files/simple_1.js`, `sample_files/simple_2.js`,
-  `.github/workflows/test.yml`, `src/options.rs`.
-- [anthropics/claude-code-action v1.0.233](https://github.com/anthropics/claude-code-action/tree/8cf3482550831fb35a4fc3fbf7ca139cf8028b4c):
-  `README.md` and `action.yml`, source review only.
-- [ataraxy-labs/sem v0.25.0](https://github.com/Ataraxy-Labs/sem/tree/4cfe1374f79631b01aca5746441d826738a15448):
-  `README.md`, source review only; the carried
-  [vendor agent evaluation](https://ataraxy-labs.github.io/sem/agents.html)
-  has a separate live-page provenance boundary.
+- [max-sixty/worktrunk v0.80.0](https://github.com/max-sixty/worktrunk/tree/b49ca7eea9b03145791a5b94eccaf9c59412ed37):
+  `dist-workspace.toml`, `.github/workflows/ci.yaml`,
+  `src/commands/list/json_v2.rs` and the vendor release's
+  `worktrunk-installer.sh:338,561`.
+- [cli/cli v2.102.0](https://github.com/cli/cli/tree/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd):
+  `docs/install_linux.md`, `pkg/cmd/completion/completion.go` and
+  `.github/workflows/go.yml`.
+- [Wilfred/difftastic 0.71.0](https://github.com/Wilfred/difftastic/tree/b7d119e90ac9f972f03f69508da765dacd302c0c):
+  `manual/src/installation.md`, `manual/src/usage.md`, the two upstream
+  JavaScript samples, `src/options.rs` and `.github/workflows/test.yml`.
+- The carried [action](https://github.com/anthropics/claude-code-action/tree/8cf3482550831fb35a4fc3fbf7ca139cf8028b4c)
+  and [sem](https://github.com/Ataraxy-Labs/sem/tree/4cfe1374f79631b01aca5746441d826738a15448)
+  source identities above, without a survivor trial.
+- GNU coreutils `sha256sum`, Git's `ls-remote --tags`, curl's HTTPS request/
+  output path, CPython JSON/SHA-256 and the repository's current
+  `scripts/angle_records.py:109` validator are used directly. No new framework
+  or upstream fork is introduced.
 
-[source-reads.json](source-reads.json) retains URL, exact source identity,
-read time, selected public source lines and public upstream checksums. It is
-source review, not a native HTTP receipt: full original HTTP response bytes
-were not retained in this artifact. The integrity changes follow
-`final-wave-layer-prep.brief-20261016.addendum-01.md` and
-`final-wave-layer-prep.brief-20261016.addendum-02.md`, cited by name only. The
-masking utility uses CPython's standard-library JSON and SHA-256 interfaces;
-no upstream component behavior or default changes.
-Artifact registration uses `scripts/host_receipts.py:register_file`; the PR
-records registration and the required `python3 scripts/validate.py` result.
+Artifact registration uses the existing `host_receipts.register_file` helper.
+Required repository validation and the one-fold publication remain subject to
+the co-op's fresh reproduction check and ruling.

@@ -17,6 +17,8 @@ from mask_receipts import mask_capture, stream_digest
 
 PRIVATE_CAPTURE: Path | None = None
 PUBLISHED_CAPTURE: Path | None = None
+SUPPLEMENT_CAPTURE: Path | None = None
+PRIVATE_SOURCES: Path | None = None
 
 
 def unit_fixture() -> list[dict]:
@@ -35,6 +37,26 @@ def unit_fixture() -> list[dict]:
 
 
 class MaskReceiptTests(unittest.TestCase):
+    def test_committed_derivative_has_valid_published_stream_hashes(self) -> None:
+        published = json.loads((Path(__file__).parent / "native-commands.json").read_text())
+        self.assertEqual(published["record_type"], "masked_derivative_of_native_capture")
+        self.assertTrue(published["commands"])
+        for row in published["commands"]:
+            for stream in ("stdout", "stderr"):
+                self.assertEqual(row[stream + "_sha256"], stream_digest(row[stream]))
+
+    def test_committed_derivative_withholds_generated_upstream_text(self) -> None:
+        published = json.loads((Path(__file__).parent / "native-commands.json").read_text())
+        rows = {row["id"]: row for row in published["commands"]}
+        self.assertTrue(rows["gh-bash-completion"]["stdout"] == "<UPSTREAM_GENERATED_COMPLETION_WITHHELD>\n", "Generated completion must remain private")
+        self.assertTrue(rows["gh-pr-review-help"]["stdout"] == "<UPSTREAM_HELP_TEXT_WITHHELD>\n", "Help text must remain private")
+
+    def test_committed_source_record_retains_locators_without_source_quotations(self) -> None:
+        sources = json.loads((Path(__file__).parent / "source-reads.json").read_text())
+        for source in sources["reads"]:
+            for excerpt in source.get("excerpts", []):
+                self.assertEqual(excerpt["text"], "<UPSTREAM_SOURCE_TEXT_WITHHELD>")
+
     def test_deterministic_and_input_unchanged(self) -> None:
         raw = unit_fixture()
         prior = copy.deepcopy(raw)
@@ -79,13 +101,24 @@ class MaskReceiptTests(unittest.TestCase):
         raw = json.loads(PRIVATE_CAPTURE.read_text(encoding="utf-8"))
         published = json.loads(PUBLISHED_CAPTURE.read_text(encoding="utf-8"))
         # Never include private instances or their digests in a failed assertion.
-        self.assertTrue(mask_capture(raw) == published, "Published derivative does not reproduce under the declared rule")
+        supplement = json.loads(SUPPLEMENT_CAPTURE.read_text()) if SUPPLEMENT_CAPTURE else None
+        self.assertTrue(mask_capture(raw, supplement) == published, "Published derivative does not reproduce under the declared rule")
+
+    def test_private_source_locator_derivative_reproduces(self) -> None:
+        if PRIVATE_SOURCES is None:
+            self.skipTest("Private source projection not supplied")
+        from mask_receipts import mask_source_reads
+        published = json.loads((Path(__file__).parent / "source-reads.json").read_text())
+        self.assertTrue(mask_source_reads(json.loads(PRIVATE_SOURCES.read_text())) == published, "Source locator derivative does not reproduce")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--raw", type=Path)
     parser.add_argument("--published", type=Path)
+    parser.add_argument("--supplement", type=Path)
+    parser.add_argument("--source-raw", type=Path)
     args, remaining = parser.parse_known_args()
     PRIVATE_CAPTURE, PUBLISHED_CAPTURE = args.raw, args.published
+    SUPPLEMENT_CAPTURE, PRIVATE_SOURCES = args.supplement, args.source_raw
     unittest.main(argv=["test_mask_receipts.py", *remaining])

@@ -18,9 +18,9 @@
           "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "native_source": {
             "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-            "line": 212,
-            "exit_code_line": 217,
-            "stdout_line": 219
+            "line": 216,
+            "exit_code_line": 221,
+            "stdout_line": 223
           }
         },
         {
@@ -33,9 +33,9 @@
           "stderr_sha256": "7cd405da26c16e5d13e3d457c1df17abf18e39c62bb7b5c565ce42078185f4f3",
           "native_source": {
             "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-            "line": 226,
-            "exit_code_line": 231,
-            "stdout_line": 233
+            "line": 230,
+            "exit_code_line": 235,
+            "stdout_line": 237
           }
         },
         {
@@ -48,9 +48,9 @@
           "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "native_source": {
             "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-            "line": 240,
-            "exit_code_line": 245,
-            "stdout_line": 247
+            "line": 244,
+            "exit_code_line": 249,
+            "stdout_line": 251
           }
         },
         {
@@ -63,9 +63,9 @@
           "stderr_sha256": "149fcdd0383e2fab33002f94cb06c3eb9f81c62dba47af32e0c86cd1bc86cfc0",
           "native_source": {
             "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-            "line": 254,
-            "exit_code_line": 259,
-            "stdout_line": 261
+            "line": 258,
+            "exit_code_line": 263,
+            "stdout_line": 265
           }
         },
         {
@@ -78,9 +78,9 @@
           "stderr_sha256": "c139df59762c53f98e282f3a239d5be4ffa83a3050f8ca029da5bdc910133681",
           "native_source": {
             "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-            "line": 268,
-            "exit_code_line": 273,
-            "stdout_line": 275
+            "line": 272,
+            "exit_code_line": 277,
+            "stdout_line": 279
           }
         },
         {
@@ -93,9 +93,9 @@
           "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "native_source": {
             "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-            "line": 282,
-            "exit_code_line": 287,
-            "stdout_line": 289
+            "line": 286,
+            "exit_code_line": 291,
+            "stdout_line": 293
           }
         }
       ],
@@ -111,13 +111,13 @@
           "started_at": "2026-10-16T05:16:49.680743+00:00",
           "completed_at": "2026-10-16T05:16:49.859954+00:00",
           "exit_code": 0,
-          "stdout_sha256": "2206514450875b7d549831ab08162ae0e54baaa3c3c8a02f94902a29d9774bcf",
+          "stdout_sha256": "d25ae0aedf8df8ece59feebb4af23db5fc9c86c79b8380c26a5b34f7c71609cf",
           "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "native_source": {
             "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-            "line": 296,
-            "exit_code_line": 301,
-            "stdout_line": 303
+            "line": 300,
+            "exit_code_line": 305,
+            "stdout_line": 307
           }
         },
         {
@@ -126,13 +126,13 @@
           "started_at": "2026-10-16T05:16:49.860765+00:00",
           "completed_at": "2026-10-16T05:16:49.996740+00:00",
           "exit_code": 0,
-          "stdout_sha256": "bedb7a78703840afe96a17e60b4c717ffc638aa5cf5760dc262ea337f580ecf5",
+          "stdout_sha256": "7592335d3c93b578dd6697a6e61e16d8a22bd0981b04b9477e4dd0f5cc03c60c",
           "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "native_source": {
             "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-            "line": 310,
-            "exit_code_line": 315,
-            "stdout_line": 317
+            "line": 314,
+            "exit_code_line": 319,
+            "stdout_line": 321
           }
         }
       ],
@@ -152,9 +152,9 @@
           "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "native_source": {
             "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-            "line": 366,
-            "exit_code_line": 371,
-            "stdout_line": 373
+            "line": 370,
+            "exit_code_line": 375,
+            "stdout_line": 377
           }
         },
         {
@@ -167,9 +167,9 @@
           "stderr_sha256": "cbe028556c24e795118d2e3146d714294ee0da74996d59671ad640fd30387742",
           "native_source": {
             "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-            "line": 380,
-            "exit_code_line": 385,
-            "stdout_line": 387
+            "line": 384,
+            "exit_code_line": 389,
+            "stdout_line": 391
           }
         },
         {
@@ -182,9 +182,9 @@
           "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "native_source": {
             "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-            "line": 394,
-            "exit_code_line": 399,
-            "stdout_line": 401
+            "line": 398,
+            "exit_code_line": 403,
+            "stdout_line": 405
           }
         },
         {
@@ -197,9 +197,9 @@
           "stderr_sha256": "3d141cf491d04cf758f68d52160a97dd7da9ef10b5680a0e7cd73d431e459add",
           "native_source": {
             "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-            "line": 408,
-            "exit_code_line": 413,
-            "stdout_line": 415
+            "line": 412,
+            "exit_code_line": 417,
+            "stdout_line": 419
           }
         }
       ],

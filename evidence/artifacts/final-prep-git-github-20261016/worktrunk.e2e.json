@@ -2,17 +2,9 @@
   "kind": "native_evidence_index",
   "repository": "https://github.com/max-sixty/worktrunk",
   "pin": "0.80.0",
-  "resolved_commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
   "evidence_class": "derived_from_masked_native_capture",
   "scope": "Derived navigation index over the real masked native install/local-smoke capture. This index contains no tool output and is not itself an E2E receipt or an acceptance verdict.",
   "upstream_sources": [
-    {
-      "kind": "repo",
-      "repository": "https://github.com/max-sixty/worktrunk",
-      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
-      "path": "README.md",
-      "line": 59
-    },
     {
       "kind": "repo",
       "repository": "https://github.com/max-sixty/worktrunk",
@@ -32,9 +24,9 @@
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 16,
-        "exit_code_line": 21,
-        "stdout_line": 23
+        "line": 20,
+        "exit_code_line": 25,
+        "stdout_line": 27
       },
       "phase": "install"
     },
@@ -48,9 +40,9 @@
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 30,
-        "exit_code_line": 35,
-        "stdout_line": 37
+        "line": 34,
+        "exit_code_line": 39,
+        "stdout_line": 41
       },
       "phase": "install"
     },
@@ -64,9 +56,9 @@
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 44,
-        "exit_code_line": 49,
-        "stdout_line": 51
+        "line": 48,
+        "exit_code_line": 53,
+        "stdout_line": 55
       },
       "phase": "install"
     },
@@ -80,9 +72,9 @@
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 142,
-        "exit_code_line": 147,
-        "stdout_line": 149
+        "line": 146,
+        "exit_code_line": 151,
+        "stdout_line": 153
       },
       "phase": "smoke"
     },
@@ -96,9 +88,9 @@
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 212,
-        "exit_code_line": 217,
-        "stdout_line": 219
+        "line": 216,
+        "exit_code_line": 221,
+        "stdout_line": 223
       },
       "phase": "smoke"
     },
@@ -112,9 +104,9 @@
       "stderr_sha256": "7cd405da26c16e5d13e3d457c1df17abf18e39c62bb7b5c565ce42078185f4f3",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 226,
-        "exit_code_line": 231,
-        "stdout_line": 233
+        "line": 230,
+        "exit_code_line": 235,
+        "stdout_line": 237
       },
       "phase": "smoke"
     },
@@ -128,9 +120,9 @@
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 240,
-        "exit_code_line": 245,
-        "stdout_line": 247
+        "line": 244,
+        "exit_code_line": 249,
+        "stdout_line": 251
       },
       "phase": "smoke"
     },
@@ -144,9 +136,9 @@
       "stderr_sha256": "c139df59762c53f98e282f3a239d5be4ffa83a3050f8ca029da5bdc910133681",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 268,
-        "exit_code_line": 273,
-        "stdout_line": 275
+        "line": 272,
+        "exit_code_line": 277,
+        "stdout_line": 279
       },
       "phase": "smoke"
     },
@@ -160,9 +152,9 @@
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "native_source": {
         "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-        "line": 282,
-        "exit_code_line": 287,
-        "stdout_line": 289
+        "line": 286,
+        "exit_code_line": 291,
+        "stdout_line": 293
       },
       "phase": "smoke"
     }
@@ -178,62 +170,177 @@
   "masking_test": "evidence/artifacts/final-prep-git-github-20261016/test_mask_receipts.py",
   "derived_counts": {
     "zero_exit_commands": 9,
-    "upstream_full_suite_tests_executed": 0
+    "upstream_full_suite_tests_executed": 0,
+    "observed_nonzero_controls": 1
   },
   "derived_count_sources": [
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 16,
-      "exit_code_line": 21,
-      "stdout_line": 23
+      "line": 20,
+      "exit_code_line": 25,
+      "stdout_line": 27
     },
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 30,
-      "exit_code_line": 35,
-      "stdout_line": 37
+      "line": 34,
+      "exit_code_line": 39,
+      "stdout_line": 41
     },
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 44,
-      "exit_code_line": 49,
-      "stdout_line": 51
+      "line": 48,
+      "exit_code_line": 53,
+      "stdout_line": 55
     },
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 142,
-      "exit_code_line": 147,
-      "stdout_line": 149
+      "line": 146,
+      "exit_code_line": 151,
+      "stdout_line": 153
     },
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 212,
-      "exit_code_line": 217,
-      "stdout_line": 219
+      "line": 216,
+      "exit_code_line": 221,
+      "stdout_line": 223
     },
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 226,
-      "exit_code_line": 231,
-      "stdout_line": 233
+      "line": 230,
+      "exit_code_line": 235,
+      "stdout_line": 237
     },
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 240,
-      "exit_code_line": 245,
-      "stdout_line": 247
+      "line": 244,
+      "exit_code_line": 249,
+      "stdout_line": 251
     },
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 268,
-      "exit_code_line": 273,
-      "stdout_line": 275
+      "line": 272,
+      "exit_code_line": 277,
+      "stdout_line": 279
     },
     {
       "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
-      "line": 282,
-      "exit_code_line": 287,
-      "stdout_line": 289
+      "line": 286,
+      "exit_code_line": 291,
+      "stdout_line": 293
     }
-  ]
+  ],
+  "negative_controls": [
+    {
+      "id": "worktrunk-dirty-refusal",
+      "command": "<SCRATCH>/prefix/worktrunk/worktrunk-x86_64-unknown-linux-musl/wt --config <SCRATCH>/config/worktrunk.toml remove smoke-feature --foreground --no-hooks",
+      "started_at": "2026-10-16T05:16:49.354814+00:00",
+      "completed_at": "2026-10-16T05:16:49.404465+00:00",
+      "exit_code": 1,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "149fcdd0383e2fab33002f94cb06c3eb9f81c62dba47af32e0c86cd1bc86cfc0",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 258,
+        "exit_code_line": 263,
+        "stdout_line": 265
+      }
+    }
+  ],
+  "count_scope": "commands[] contains only zero-exit install/local-readiness/smoke rows; negative_controls[] separately contains the actual nonzero control observations. These are navigation indexes, not E2E acceptance.",
+  "proposed_source_commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+  "tag_resolution_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+  "source_resolution_status": "Fresh native tag-resolution capture recorded; prior smoke unchanged",
+  "publisher_integrity_status": "Fresh API/download/digest check recorded separately; prior smoke unchanged",
+  "provenance_commands": [
+    {
+      "id": "worktrunk-release-api",
+      "command": "curl --fail --location --silent --show-error --proto =https https://api.github.com/repos/max-sixty/worktrunk/releases/tags/v0.80.0",
+      "started_at": "2026-10-16T08:55:01.701502Z",
+      "completed_at": "2026-10-16T08:55:02.017024Z",
+      "exit_code": 0,
+      "stdout_sha256": "19b63769cbbb66d4e6ef9d707636cf7086661a7b3b361ab31fc454153451d9b5",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 426,
+        "exit_code_line": 431,
+        "stdout_line": 433
+      }
+    },
+    {
+      "id": "worktrunk-fresh-download",
+      "command": "curl --fail --location --silent --show-error --proto =https --output <FOLD_SCRATCH>/worktrunk-x86_64-unknown-linux-musl.tar.xz https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-x86_64-unknown-linux-musl.tar.xz",
+      "started_at": "2026-10-16T08:55:02.018400Z",
+      "completed_at": "2026-10-16T08:55:02.318678Z",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 440,
+        "exit_code_line": 445,
+        "stdout_line": 447
+      }
+    },
+    {
+      "id": "worktrunk-post-download-sha256",
+      "command": "sha256sum <FOLD_SCRATCH>/worktrunk-x86_64-unknown-linux-musl.tar.xz",
+      "started_at": "2026-10-16T08:55:02.320116Z",
+      "completed_at": "2026-10-16T08:55:02.333789Z",
+      "exit_code": 0,
+      "stdout_sha256": "2d77ac839b95c8fac2e07faf0b93934debe617f3710f39ac88ebf213a6c5e195",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 454,
+        "exit_code_line": 459,
+        "stdout_line": 461
+      }
+    },
+    {
+      "id": "worktrunk-actual-equals-published",
+      "command": "<PYTHON> <PUBLIC_WORKTREE>/evidence/artifacts/final-prep-git-github-20261016/verify_release_asset.py --release-json <PRIVATE_CUSTODY>/raw/worktrunk.release.json --asset <FOLD_SCRATCH>/worktrunk-x86_64-unknown-linux-musl.tar.xz",
+      "started_at": "2026-10-16T08:55:02.334656Z",
+      "completed_at": "2026-10-16T08:55:02.405861Z",
+      "exit_code": 0,
+      "stdout_sha256": "3df9ff22218ab78fe0bea631d6304c5379d3b318a1f43e19783084287208feea",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 468,
+        "exit_code_line": 473,
+        "stdout_line": 475
+      }
+    },
+    {
+      "id": "worktrunk-tag-resolution",
+      "command": "git -c credential.helper= ls-remote --tags https://github.com/max-sixty/worktrunk.git refs/tags/v0.80.0 'refs/tags/v0.80.0^{}'",
+      "started_at": "2026-10-16T08:55:03.704836Z",
+      "completed_at": "2026-10-16T08:55:03.871416Z",
+      "exit_code": 0,
+      "stdout_sha256": "32870ce2316d1c0cf24fcc5ef5a8ab0f1109d39cd8475dfa997c60914bce81c6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 594,
+        "exit_code_line": 599,
+        "stdout_line": 601
+      }
+    }
+  ],
+  "install_path_source": {
+    "kind": "url",
+    "url": "https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-installer.sh",
+    "pin": "v0.80.0",
+    "line": 338,
+    "archive_selection_line": 561,
+    "public_source_sha256": "53b606fa48b84169180f8881a61f5c31c770645e1d51328032aa5aeb4f2e155a",
+    "native_source": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 664,
+      "exit_code_line": 669,
+      "stdout_line": 671
+    },
+    "note": "Vendor release installer extracts the archive at line 338 and selects Linux x86_64 musl archive at line 561; local prefix/safety flags preserve isolation and are not a literal shell-installer execution."
+  }
 }
