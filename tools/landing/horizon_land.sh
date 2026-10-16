@@ -75,7 +75,10 @@ hz_name() {  # <path> : rc 0 when the path's last part is a file name of that fo
 [ -n "${LOCAL_CI_RECEIPTS:-}" ] && [[ "$LOCAL_CI_RECEIPTS" != *$'\n'* ]] \
   || { echo "#$N LOCAL_CI_RECEIPTS must name the local CI receipts, colon-separated (README): stop, nothing merged"; exit 2; }
 # An empty field is refused before the split (#1194's local review, P2): read -a drops a trailing empty field, so "a:" (a receipt variable
-# that expanded to nothing) read as "a" alone, and the receipt left out was never asked for.
+# that expanded to nothing) read as "a" alone, and the receipt left out was never asked for. The installed bash 5.3 (5.3-2ubuntu1) bash(1),
+# EXPANSION, Word Splitting, says why: the shell uses each IFS character "as field terminators", and "adjacent non-IFS-whitespace delimiters
+# produce a null field", so "a::b" would keep its null field and "a:" ends at its terminator with none; read splits words the same way
+# (SHELL BUILTIN COMMANDS, read). A leading, trailing or doubled ':' is therefore refused as a string, before any split.
 [[ "$LOCAL_CI_RECEIPTS" != :* && "$LOCAL_CI_RECEIPTS" != *: && "$LOCAL_CI_RECEIPTS" != *::* ]] \
   || { echo "#$N LOCAL_CI_RECEIPTS holds an empty name (a leading, trailing or doubled ':'): stop, nothing merged"; exit 2; }
 RF=()
@@ -482,7 +485,9 @@ codeowners_gate() {  # <main>
   b=${BASH_REMATCH[2]}
   sz=$($G cat-file -s "$b" 2>/dev/null); [[ "$sz" =~ ^[0-9]+$ ]] && [ "$sz" -lt 3000000 ] \
     || { echo "#$N $CO_PATH on main ${m:0:8} is unreadable or of 3 MB or more, which GitHub does not load: stop, nothing merged"; exit 8; }
-  # Each read of the blob fails closed as well: a pipeline's status is its first failure (pipefail, in that read's own subshell).
+  # Each read of the blob fails closed as well: with pipefail (set in that read's own subshell), "the pipeline's return status is the value
+  # of the last (rightmost) command to exit with a non-zero status, or zero if all commands exit successfully" (the installed bash 5.3 bash(1),
+  # SHELL GRAMMAR, Pipelines), so the read is non-zero when any stage fails; only zero against non-zero matters here.
   nul=$(set -o pipefail; $G cat-file blob "$b" 2>/dev/null | tr -dc '\000' | wc -c) && nul=${nul//[[:space:]]/} && [ "$nul" = 0 ] \
     || { echo "#$N $CO_PATH on main ${m:0:8} holds a NUL byte or is unreadable: stop, nothing merged"; exit 8; }
   CO_SHA=$(set -o pipefail; $G cat-file blob "$b" 2>/dev/null | sha256sum | cut -d' ' -f1) && [[ "$CO_SHA" =~ ^[0-9a-f]{64}$ ]] \
@@ -513,7 +518,7 @@ codeowners_gate() {  # <main>
 # state of any status check" (github/docs@be38ec5d available-rules-for-rulesets.md:178), so the ruleset is the backstop and the checks
 # above are the gate (the required local workflow, above).
 CTX_CI=lander/local-ci; CTX_CLAUDE=lander/verdict-claude; CTX_GPT=lander/verdict-gpt
-HZ_POSTED=; HZ_MERGED=
+HZ_POSTED=; HZ_MERGED=; HZ_KEEP=
 # The POST (POST /repos/{owner}/{repo}/statuses/{sha}, "Create a commit status": state, description and context in the body,
 # github/rest-api-description@58b1e0c0 api.github.com.json:79150-79214; gh api -f adds "static string parameters to the request payload" and
 # then the method is POST, cli v2.102.0 pkg/cmd/api/api.go:104-110, :293, :295, :329-331). Its output is dropped: nothing gh returned is
@@ -533,7 +538,7 @@ hz_post() {  # <context> <description>
 hz_revoke() {
   trap '' HUP INT TERM
   local c
-  [ -n "$HZ_POSTED" ] && [ -z "$HZ_MERGED" ] || return 0
+  [ -n "$HZ_POSTED" ] && [ -z "$HZ_MERGED" ] && [ -z "$HZ_KEEP" ] || return 0
   for c in "$CTX_CI" "$CTX_CLAUDE" "$CTX_GPT"; do
     if gh api "repos/$R/statuses/$EF" --method POST -f state=failure -f context="$c" -f description="revoked: the landing stopped before its merge" >/dev/null 2>&1; then
       echo "#$N $c revoked at ${EF:0:8} (failure posted)"
@@ -751,10 +756,31 @@ BODY="${mb:+$mb$nl$nl}$TRAILERS"
 # COMMANDS, trap). Before, a signal pending as the merge call finished exited before HZ_MERGED=1 and revoked a merged head's statuses, and one
 # during the sleep after it exited with no receipt. A signal up to final_gate still stops the landing and revokes; after the report, the exit
 # traps are back.
+# A failed merge call is reconciled before anything is revoked (#1194's local review at 4fad2736, P2): GitHub can commit the merge and the
+# reply be lost (a reset connection, say), so gh exits non-zero for a pull request that is merged, and revoking would post failures for a
+# merged head and leave no landing receipt. The state is read three times, two seconds apart, since GitHub's views can lag (the uet#58
+# measurement, above): MERGED at the read head on any read continues as a landing (HZ_MERGED, the receipt and the report); OPEN or CLOSED
+# at the read head on all three is exit 7, and the EXIT trap revokes; anything else (a read that fails, another head, a mix) is exit 17:
+# the outcome is unknown, so the statuses are kept (HZ_KEEP), nothing is revoked and the pull request is checked by hand.
+hz_merge_outcome() {
+  local i o unmerged=0
+  for i in 1 2 3; do
+    [ "$i" = 1 ] || sleep 2
+    o=$(gh pr view "$N" -R "$R" --json state,headRefOid --jq '.state + " " + .headRefOid' 2>/dev/null) || o=
+    case "$o" in
+      "MERGED $EF") echo "#$N the merge call failed, but the pull request is merged at ${EF:0:8}: the landing continues"; return 0 ;;
+      "OPEN $EF" | "CLOSED $EF") unmerged=$((unmerged + 1)) ;;
+    esac
+  done
+  [ "$unmerged" != 3 ] || exit 7
+  HZ_KEEP=1
+  echo "#$N the merge call failed and its outcome could not be read: the statuses are kept and nothing is revoked; check the pull request by hand"
+  exit 17
+}
 ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
 final_gate "$EF"
 trap '' HUP INT TERM
-out=$(gh pr merge "$N" -R "$R" --squash --body "$BODY" --match-head-commit "$EF" -A "$ae" 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
+out=$(gh pr merge "$N" -R "$R" --squash --body "$BODY" --match-head-commit "$EF" -A "$ae" 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; hz_merge_outcome; }
 HZ_MERGED=1
 sleep 4
 # After the merge (#1194's GPT read, P3: the reply of the view was echoed unchecked): the merge commit is read with the call's exit code

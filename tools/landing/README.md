@@ -342,7 +342,7 @@ files' digests are not published at all ("The statuses", below). In order:
    slow step", above), and no Codex review waits on a ready event here;
 7. the three statuses posted (below; exit 15 when a POST fails), the EXIT trap set right before the first;
 8. the merge state polled until CLEAN (below), the squash body and its trailers (below), the no-reply author address (exit 11), the final
-   gate (below), the squash merge pinned with `--match-head-commit` (exit 7), the merge commit read (exit 12; nothing of the reply printed but
+   gate (below), the squash merge pinned with `--match-head-commit` (a failed call reconciled first: below; exit 7 or 17), the merge commit read (exit 12; nothing of the reply printed but
    its typed id), the landing receipt written (exit 16) and the author check (exit 12).
 
 **The statuses (`horizon_land.sh`).** Each is posted at the head as `gh api repos/<owner>/<name>/statuses/<head> --method POST -f
@@ -563,10 +563,13 @@ the no-reply address; 13 not up to date
 (origin/main not an ancestor of the head, or GitHub BEHIND or DIRTY), origin/main unreadable, or moved (final gate), or a base other than
 main (before any post and at the final gate; #1194's GPT read, P2); 15 a status POST failed; 16 merged, but the landing receipt could not be
 written (its place was free and writable before the posts; the statuses are kept), and when 12 applies too, 12 is the exit (the receipt's
-line is printed either way; #1194's delta reads); 129 a hangup, 130 an interrupt and 143 a termination signal (128 and the signal's number):
+line is printed either way; #1194's delta reads); 17 the merge call failed and the pull request's state could not be read as merged or
+unmerged at the read head on three reads two seconds apart: the statuses are kept, nothing is revoked, and the pull request is checked by
+hand (a failed call whose pull request reads MERGED at the head continues as a landing; one that reads OPEN or CLOSED there on all three
+reads is 7; #1194's local review at 4fad2736, P2); 129 a hangup, 130 an interrupt and 143 a termination signal (128 and the signal's number):
 before the merge call nothing is merged and the statuses posted are revoked, from the merge call until the receipt is written and the merge
 reported the three are ignored, and during the author check after that the pull request is merged and its receipt and statuses are kept;
-11 and 14 as above. Every code after the first POST, but 0, 12, 16 and a signal during the author check, revokes the three statuses (the
+11 and 14 as above. Every code after the first POST, but 0, 12, 16, 17 and a signal during the author check, revokes the three statuses (the
 EXIT trap, "The statuses", above).
 `codex_gate.py`: 0, 3, 4 and 5 as above; a gate that fails itself exits 4, which both scripts stop on with 9. With a local review set
 ("Local reviews"): 0 (every file a review of the read head or of a head with its change, every `codex-review` completed with `patch is
@@ -858,7 +861,7 @@ scripts that is neither a tracked file's, a named public artifact's nor a named 
 | --- | --- |
 | `uet_land.sh` | `95a4e1634b6a53b14d7736d2d40a3f0058a15aec9c9178e528ca44cfb74324ce` (441 lines) |
 | `nas_land.sh` | `1ca0dabc6c535a08fb45f6956cf4549cc956ca6b25e798bb60c6a95cd398f511` (690 lines) |
-| `horizon_land.sh` | `7ba9a06aacbff4e50111266891ac9d2f7ae8c305824a65f4181045fa04f22ee2` (772 lines) |
+| `horizon_land.sh` | `21c635cea5bc06d4dfa0b0e4a069a21af9d56b357246fc273915e67f8b67591c` (798 lines) |
 | `codex_gate.py` | `7afaa831c0763dd14c584d76b17465fa50993656cd63eec9fd0c4412fddb74b2` (559 lines) |
 | `review_normalize.py` | `b553d9cb67ca196bd587e980e01295e28e8ea0e2bcb3d0015fc5d040735a1594` (348 lines) |
 

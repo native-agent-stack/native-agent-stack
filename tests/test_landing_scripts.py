@@ -585,6 +585,8 @@ PUBLIC_DIGESTS = {
         "https://github.com/native-agent-stack/native-agent-stack/blob/34add43827b7516de8f8b19d8cb92f473e374849/tools/landing/horizon_land.sh",
     "133dab4cfd8da99a695753c9aea2e40f9f1c582bda6d2ee158cbb39c8d96a9a2": "native-agent-stack/native-agent-stack@b4489b15:tools/landing/horizon_land.sh, "
         "https://github.com/native-agent-stack/native-agent-stack/blob/b4489b15b307d81e4bb9f1a43c2348aed22b697b/tools/landing/horizon_land.sh",
+    "7ba9a06aacbff4e50111266891ac9d2f7ae8c305824a65f4181045fa04f22ee2": "native-agent-stack/native-agent-stack@4fad2736:tools/landing/horizon_land.sh, "
+        "https://github.com/native-agent-stack/native-agent-stack/blob/4fad2736c45469362a376c791296eacf1c87fe47/tools/landing/horizon_land.sh",
 }
 
 
@@ -626,6 +628,8 @@ PUBLIC_COMMITS = {
     # read on GitHub on 2026-10-16 the same way (#1194's delta reads cite the head they read)
     "b4489b15b307d81e4bb9f1a43c2348aed22b697b": "native-agent-stack/native-agent-stack: #1194's second head (fold 1), "
                                                 "https://github.com/native-agent-stack/native-agent-stack/commit/b4489b15b307d81e4bb9f1a43c2348aed22b697b",
+    "4fad2736c45469362a376c791296eacf1c87fe47": "native-agent-stack/native-agent-stack: #1194's third head (fold 2), "
+                                                "https://github.com/native-agent-stack/native-agent-stack/commit/4fad2736c45469362a376c791296eacf1c87fe47",
 }
 HEX_FULL = re.compile(r"(?<![0-9A-Fa-f])[0-9A-Fa-f]{64}(?![0-9A-Fa-f])")
 HEX_MARKED = re.compile(r"(?<![0-9A-Fa-f])([0-9A-Fa-f]{6,})…")  # a prefix written `<hex>…`
@@ -4762,7 +4766,7 @@ class HorizonEndToEndTests(LandingCase):
             git(self.repo, "update-ref", "refs/remotes/origin/main", self.main)
 
     def land(self, *, head=None, read=None, args=None, merge_state="CLEAN", draft=False, statuses=None, claude=None, gpt=None, muse=None,
-             receipts=None, unset=(), main=None, base="main", coord=None, **extra):
+             receipts=None, unset=(), main=None, base="main", coord=None, pr_state="MERGED", **extra):
         """Run horizon_land.sh; returns (exit code, stdout+stderr, the fake commands' log lines, the run directory). The verdicts and the
         receipt default to accepted ones for the read head (default: the head served); `unset` names inputs to leave out, `main` is
         origin's main for the run and `base` the pull request's base. LANDING_COORD is the run's own (`coord` overrides it), since a merged
@@ -4772,7 +4776,7 @@ class HorizonEndToEndTests(LandingCase):
         head = head or self.head
         read = read or head
         (run / "prview.json").write_text(json.dumps({"headRefOid": head, "baseRefName": base, "isDraft": draft, "mergeStateStatus": merge_state,
-                                                     "statusCheckRollup": [], "state": "MERGED", "mergeCommit": {"oid": "f" * 40},
+                                                     "statusCheckRollup": [], "state": pr_state, "mergeCommit": {"oid": "f" * 40},
                                                      "mergedAt": "2026-10-15T00:00:00Z"}), encoding="utf-8")
         (run / "statuses.json").write_text(json.dumps(statuses or []), encoding="utf-8")
         files = {"claude.md": f"# Claude read\n\nFamily: claude\nVerdict: PASS at {read}\n" if claude is None else claude,
@@ -5515,7 +5519,8 @@ class HorizonEndToEndTests(LandingCase):
         self.assertEqual(self.revoked(log), HZ_REVOKED)
 
     def test_a_failed_merge_stops_with_7_and_revokes_and_a_merged_landing_keeps_its_statuses(self):
-        code, out, log, run = self.land(FAKE_MERGE_RC="1", FAKE_MERGE_STDERR=f"GraphQL: Pull request is not mergeable ({ADDRESS})")
+        code, out, log, run = self.land(FAKE_MERGE_RC="1", FAKE_MERGE_STDERR=f"GraphQL: Pull request is not mergeable ({ADDRESS})",
+                                        pr_state="OPEN")
         self.assertEqual(code, 7, out)
         self.assertIn("merge failed (class: not_mergeable)", out)
         self.assertNotIn(ADDRESS, out)
@@ -5523,6 +5528,27 @@ class HorizonEndToEndTests(LandingCase):
         code, out, log, run = self.land(FAKE_COMMIT_EMAIL="another@example.invalid")
         self.assertEqual((code, len(self.merges(log))), (12, 1), out)
         self.assertEqual(self.revoked(log), [], "the merge succeeded: exit 12 revokes nothing")
+
+    def test_a_failed_merge_call_is_reconciled_before_any_revocation(self):
+        """#1194's local review at 4fad2736 (P2): a merge call can fail after GitHub committed the merge (its reply lost). The lander reads
+        the state before revoking: MERGED at the head continues as a landing, OPEN or CLOSED there on three reads is 7 and revokes, and an
+        unreadable outcome is 17 with the statuses kept."""
+        code, out, log, run = self.land(FAKE_MERGE_RC="1", FAKE_MERGE_STDERR="connection reset by peer")
+        self.assertEqual(code, 0, out)
+        self.assertIn("the merge call failed, but the pull request is merged", out)
+        self.assertEqual(self.revoked(log), [], "a merged head keeps its statuses")
+        self.assertTrue((run / "coord/horizon-landings" / f"{PR}-{self.head[:12]}.json").is_file(), "the landing receipt is written")
+        for state in ("OPEN", "CLOSED"):
+            with self.subTest(state=state):
+                code, out, log, run = self.land(FAKE_MERGE_RC="1", FAKE_MERGE_STDERR="connection reset by peer", pr_state=state)
+                self.assertEqual(code, 7, out)
+                self.assertEqual(self.revoked(log), HZ_REVOKED)
+                self.assertEqual(len([l for l in log if "--json state,headRefOid" in l]), 3, "three reads before revoking")
+        code, out, log, run = self.land(FAKE_MERGE_RC="1", FAKE_MERGE_STDERR="connection reset by peer",
+                                        FAKE_FAIL="pr view * state,headRefOid *")
+        self.assertEqual(code, 17, out)
+        self.assertIn("its outcome could not be read: the statuses are kept and nothing is revoked", out)
+        self.assertEqual(self.revoked(log), [], "an unknown outcome revokes nothing")
 
 
 # ---------------------------------------------------------------------------------------------- 8. review_normalize.py
