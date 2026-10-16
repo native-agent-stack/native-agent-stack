@@ -1,0 +1,12 @@
+Using Python 3.12.3 environment at: <fold-scratch>/venv
+Resolved 11 packages in 197ms
+Downloading hypothesis (1.1MiB)
+ Downloaded hypothesis
+Prepared 6 packages in 63ms
+Installed 6 packages in 50ms
+ + execnet==2.1.2
+ + hypothesis==6.170.0
+ + py-cpuinfo2==10.1.1
+ + pytest-benchmark==5.3.0
+ + pytest-xdist==3.8.0
+ + sortedcontainers==2.4.0

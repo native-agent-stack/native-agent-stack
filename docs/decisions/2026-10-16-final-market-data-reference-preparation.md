@@ -1,6 +1,6 @@
 # Market data/reference FINAL preparation (2026-10-16)
 
-Status: **PREPARATION / GAP draft; private reproduction passed**. No FINAL
+Status: **PREPARATION / GAP draft; both families folded and full private check passed**. No FINAL
 admission, runtime/default change, entitlement or order authority is granted.
 
 All main-path citations below refer to
@@ -56,16 +56,16 @@ historical publication time. Actual pinned-source and installed-wheel
 hashes are in edgar-source-wheel-hashes.log; the three pairs at :4/:12,
 :5/:13 and :6/:14 match.
 
-The 16 native command captures have 32 published derivatives. Each JSON
+The initial capture family has 16 native commands and 32 published derivatives. Each JSON
 receipt is labelled `masked_native_capture`; its exact private command,
 original stdout/stderr bytes and original recorder metadata remain private
 by name only. Public commands use marked placeholders. Both the log and
 receipt reproduce through the published
 [mask_capture.py](../../blueprints/us-equities/final-market-data-reference-20261016/mask_capture.py).
 All unmapped bytes, line endings and trailing whitespace are preserved.
-Only published-byte hashes appear publicly. The co-op privately confirmed all
-32 derivatives reproduce from 16 retained captures, all 33 inventory hashes/sizes
-match, and all 16 command/return-code bindings match. It reran the 5 masker
+Only published-byte hashes appear publicly. The co-op's initial check confirmed all
+32 initial derivatives reproduce from 16 retained captures, all 33 initial
+inventory hashes/sizes match, and all 16 initial command/return-code bindings match. It reran the 5 masker
 tests; it did not rerun the 2 recorder custody tests, whose published log
 reproduces from its original capture.
 
@@ -119,7 +119,8 @@ superiority or new default are inferred from successful capability smokes.
 
 Live SEC/vendor acquisition, licensed as-known universes, correction clocks,
 delistings, ticker reuse and original availability remain unqualified.
-Alpaca/calendar invokes do not substitute for fresh full upstream E2E.
+The fold now supplies upstream Alpaca/calendar suites; their offline results
+do not qualify live service, credentials, broker state or historical data.
 Provider comparisons and a matched Arctic workload require separately
 specified inputs; production storage rights need a disposition. The 5.62
 screen and canonical projection updates remain separate work.
@@ -141,3 +142,100 @@ FINAL, places orders, enables a service or self-dispatches a model read.
 - [ArcticDB release LMDB example](https://github.com/man-group/ArcticDB/blob/e620d8572a1e62c9ec07df8cbc8f5c432cd84325/README.md#L103)
   and [license condition](https://github.com/man-group/ArcticDB/blob/e620d8572a1e62c9ec07df8cbc8f5c432cd84325/README.md#L26).
 - [Layer-resolution protocol](2026-10-11-layer-resolution-protocol.md).
+
+## Scope-locked review fold
+
+The CC record is cited by name: MICRO-full-7d740ccb.md. The reviewed head
+was held fixed until GPT ACK was relayed; both families' findings are
+combined in this one correction. This fold still admits no FINAL/default.
+Its machine record is
+[fold-review-corrections.json](../../blueprints/us-equities/final-market-data-reference-20261016/fold-review-corrections.json).
+
+Every carried survivor now points to its exact reviewed_commit value at
+landscape-sweep-20260926/{databento-databento-python,hydrosquall-tiingo-python,
+man-group-arcticdb,massive-com-client-python}.json:7. Databento's carried
+25eef4ee source pyproject.toml:3 says 0.87.0; data-research.json:65 and
+lane-packet.json:42 retain 0.86.0/e675ef30. Massive's carried 481e5c27 differs
+from the 2.8.0/3c247d78 identity at data-research.json:112 and packet :14.
+The ledger preserves these scopes and makes no version inference at the
+Massive carried commit. Arctic A1 at carried 7d30a6ee is source-only; the
+6.26.0/e620d857 run is explicitly a separate release capability record.
+
+All three proposed run commits now have native official tag records and
+complete native PyPI release records under fold-v1/. Each selected release
+wheel SHA256 equals its accepted runtime-lock wheel entry; native uv
+`--no-deps --require-hashes` installed those exact wheels in fresh scratch.
+Alpaca's pinned pyproject.toml:4 is a dynamic 0.0.0 placeholder, with backend
+at :44 and dynamic versioning at :51. Version evidence comes from the
+official tag, PyPI wheel record and hash-pinned installation instead.
+This is release identity, not a bit-for-bit source rebuild.
+
+The deterministic original/fold/final closure audits retain every installed
+package comparison. For example, recapture-v1/install.log:50 reports
+numpy 2.5.4 versus accepted uv.lock:1553's 2.5.3; :57 reports pydantic 2.14.1
+versus uv.lock:1915's 2.13.5. Other deltas are retained. Package execution
+pins agree; these resolved closures are not locked runtime migrations.
+
+The upstream Alpaca suite now reports **320 passed, 19 skipped, 2 warnings**
+at fold-v1/alpaca-upstream-tests-fold.log:39. Its :20 through :38 individually
+name all 19 upstream live cases and the need for `--run-live` or
+`ALPACA_RUN_LIVE=1`; pinned tests/live/conftest.py:100 supports that live
+service/credential/broker reason. The mock fixture is tests/conftest.py:21;
+the vendor command is Makefile:22 and test dependencies pyproject.toml:30,
+:31 and :32. No live flag or real credential was supplied. An initial
+collection failure from isolating upstream flat helper imports is retained;
+default upstream collection with the installed wheel preloaded succeeded.
+
+The full exchange-calendars CI target at pinned .github/workflows/main.yml:51
+reports **10042 passed, 1 xfailed, 2497 warnings**, exit 0, at
+fold-v1/calendar-upstream-tests.log:255. Pytest reports 707.37 seconds, inside
+the native 15-minute process bound. The whole upstream tests/ target ran
+with two local workers and its test dependency group at pyproject.toml:42.
+No subset fallback was needed. Warning categories at log :225 and :235
+remain disclosed: deprecated class-scoped fixture methods and NumPy generic
+timedeltas. This is offline calendar code evidence, not market-data history.
+
+A nonremovable Python audit hook stops before socket/DNS; the negative
+control at network-guard-calendar.log:3 and matching recorder exit 86 proves
+refusal. Upstream broker/order fixtures remain mocks. The suites cannot
+reach a real broker; no account or order state changes.
+
+The fold publishes 35 further command captures and 70 further derivatives.
+Together with the initial family, the current publication contains **51
+capture pairs / 102 masked derivatives**, plus the packet: 103 inventory
+outputs. There are 52 privately retained originals: one earlier help capture
+is private-only because it included an unmasked generic home-path example.
+Its native replacement uses the declared example-home placeholder; no old
+output was reconstructed or silently normalized.
+Three command exits 1 retain failing-before regressions or the collection
+setup failure; three exits 86 are expected network-refusal controls.
+The other 45 commands exited 0. No failed run is relabelled as a pass.
+
+New synthetic regressions first failed for JSON-escaped non-ASCII, quote and
+backslash literals, then passed with explicit encoded aliases. The current
+masker has 7 cases; custody has 2. All untouched bytes remain exact; no JSON
+parsing, reserialization or whitespace normalization is used to mask output.
+The original 32 derivatives locally reproduce unchanged, but the changed
+masker and all 102 derivatives passed the new private co-op reproduction check.
+The historical uncaptured setup exits 128 and 1 are explicitly reported
+observations, not independently verifiable native evidence.
+
+Native installed-client help documents uv pip at uv-pip-install-help.log:3,
+`--no-deps` at :35 and `--require-hashes` at :38. Pytest's override form is
+pytest-override-help-final.log:173; the pinned Edgar environment configuration is
+pyproject.toml:415. Thus `-o env=` suppresses the upstream contact assignment.
+The co-op relayed GPT ACK and privately reproduced all 102 current derivatives
+from 51 public capture pairs, verified all 103 output bindings and private raw
+integrity, and reran 7 masker plus 2 custody tests. The separate sequential
+actual-wheel-digest check also passed. All three private hashed requirements
+match the native PyPI release records captured before the successful
+require-hashes installation; uv verified the downloaded wheels against those
+published digests. One normal fold commit/push is released.
+
+GPT's two P3s remain explicit follow-ups: support the dotted module runner for
+test_mask_capture.py, and record private completion for process-launch OSError
+before broader recorder reuse. The verified standalone/discovery import and
+current launch-failure behavior remain as checked. A failed launch creates no
+successful public receipt. Neither deferred change is presented as implemented
+or tested in this fold. The private verdict is cited by name only:
+GPT-VERDICT-7d740ccb6.md.

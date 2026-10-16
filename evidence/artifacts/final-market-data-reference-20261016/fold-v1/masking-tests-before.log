@@ -1,0 +1,30 @@
+test_conflicting_json_escape_aliases_are_rejected (test_mask_capture.MaskCaptureTests.test_conflicting_json_escape_aliases_are_rejected) ... FAIL
+test_json_encoded_private_literals_are_masked (test_mask_capture.MaskCaptureTests.test_json_encoded_private_literals_are_masked) ... FAIL
+test_longest_match_wins_independent_of_rule_order (test_mask_capture.MaskCaptureTests.test_longest_match_wins_independent_of_rule_order) ... ok
+test_no_rules_or_no_matches_leave_bytes_exact (test_mask_capture.MaskCaptureTests.test_no_rules_or_no_matches_leave_bytes_exact) ... ok
+test_preserves_all_unmapped_bytes_and_line_endings (test_mask_capture.MaskCaptureTests.test_preserves_all_unmapped_bytes_and_line_endings) ... ok
+test_rejects_ambiguous_or_unmarked_rules (test_mask_capture.MaskCaptureTests.test_rejects_ambiguous_or_unmarked_rules) ... ok
+test_replacements_are_not_reprocessed (test_mask_capture.MaskCaptureTests.test_replacements_are_not_reprocessed) ... ok
+
+======================================================================
+FAIL: test_conflicting_json_escape_aliases_are_rejected (test_mask_capture.MaskCaptureTests.test_conflicting_json_escape_aliases_are_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 24, in test_conflicting_json_escape_aliases_are_rejected
+    with self.assertRaises(ValueError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_json_encoded_private_literals_are_masked (test_mask_capture.MaskCaptureTests.test_json_encoded_private_literals_are_masked)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_json_encoded_private_literals_are_masked
+    self.assertEqual(mask_bytes(raw, rules), expected)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\n[16 chars]    "caf\\u00e9",\n    "quoted\\"path",\n    "[18 chars]]\n}' != b'{\n[16 chars]    "<unicode>",\n    "<quote>",\n    "<backslash>"\n  ]\n}'
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.001s
+
+FAILED (failures=2)

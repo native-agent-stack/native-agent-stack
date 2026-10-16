@@ -1,0 +1,135 @@
+{
+  "schema": "market-data-preparation-review-fold/1",
+  "reviewed_head": "7d740ccb66a9e2f041ea9b34ee1585996f859560",
+  "status": "BOTH_FAMILIES_FOLDED_FULL_PRIVATE_PASS_RELEASED",
+  "review_records": {
+    "CC": "MICRO-full-7d740ccb.md",
+    "GPT": "GPT-VERDICT-7d740ccb6.md"
+  },
+  "corrections": {
+    "survivor_sources": {
+      "record": "survivors.json",
+      "scope": "Four exact sweep reviewed_commit locators and separate older catalog/packet pin drift; no survivor retirement or adoption."
+    },
+    "release_wheels": {
+      "record": "run-pins.json",
+      "source_audit": "fold-v1/wheel-release-bindings.log",
+      "installation": "fold-v1/install-hashed-winners.json",
+      "scope": "Official tag-to-commit identity plus PyPI release wheel SHA256, accepted lock wheel equality, and native require-hashes install; not a bit-for-bit source build."
+    },
+    "closure_drift": {
+      "original_audit": "fold-v1/original-closure-audit.log",
+      "alpaca_test_audit": "fold-v1/fold-closure-audit.log",
+      "final_audit": "fold-v1/fold-final-closure-audit.log",
+      "scope": "Every native freeze package is compared deterministically to the accepted lock; the fresh closures are not locked runtime migrations."
+    },
+    "alpaca_upstream": {
+      "native_output": "fold-v1/alpaca-upstream-tests-fold.log",
+      "result_line": 39,
+      "skip_reason_lines": [
+        20,
+        38
+      ],
+      "scope": "320 passed, 19 upstream live-service/credential/broker cases skipped, 2 warnings; no live flags or real credentials, fail-stop audit guard active."
+    },
+    "calendar_upstream": {
+      "native_output": "fold-v1/calendar-upstream-tests.log",
+      "result_line": 255,
+      "scope": "Full upstream CI test target10042passed/1xfailed/2497warnings, rc0 in707.37seconds within15minute native bound; no subset fallback used.",
+      "source": {
+        "repository": "https://github.com/gerrymanoim/exchange_calendars",
+        "pin": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+        "path": ".github/workflows/main.yml",
+        "line": 51
+      }
+    },
+    "json_escaping": {
+      "baseline_masker": "mask_capture.py at reviewed_head",
+      "before": [
+        "fold-v1/masking-tests-before.log",
+        "fold-v1/recorder-tests-before.log"
+      ],
+      "after": [
+        "fold-v1/masking-tests-after.log",
+        "fold-v1/recorder-tests-after.log"
+      ],
+      "scope": "Native failing/passing synthetic regressions for Unicode, quote and backslash JSON literals; deterministic escaped aliases preserve unmapped bytes and reject collisions."
+    },
+    "uncaptured_setup_exits": {
+      "record": "receipt.json#/setup_failures",
+      "scope": "128 and 1 are explicitly reported historical observations without retained captures; no native evidence or independent verification claimed."
+    },
+    "arctic_pin_scope": {
+      "record": "multi-angle.draft.json",
+      "scope": "A1 at carried 7d30a6ee is source-only; the native 6.26.0/e620d857 diagnostic remains a separately pinned release trial."
+    },
+    "supported_invocations": {
+      "uv_pip_source": "fold-v1/uv-pip-install-help.log",
+      "pytest_override_source": "fold-v1/pytest-override-help-final.log",
+      "edgar_identity_config": "dgunning/edgartools@7338aa335f6442c52dfa0695422cf1cd27e946e0:pyproject.toml:415",
+      "scope": "Native installed-client help documents uv pip and -o override syntax; -o env= suppresses upstream test identity assignment."
+    },
+    "help_example_privacy": {
+      "private_only_retired_capture": "pytest-override-help",
+      "replacement": "fold-v1/pytest-override-help-final.json",
+      "scope": "Native privacy scanner found a generic upstream home-path example; original retained privately and correct declared masking applied to a new native capture, not reconstructed output."
+    }
+  },
+  "gpt_follow_ups": [
+    {
+      "priority": "P3",
+      "status": "DEFERRED_FOLLOW_UP",
+      "path": "test_mask_capture.py",
+      "scope": "Support the repository dotted-module runner as well as the currently verified standalone/targeted-discovery entry points. The current import requires the blueprint directory on sys.path."
+    },
+    {
+      "priority": "P3",
+      "status": "DEFERRED_FOLLOW_UP",
+      "path": "native_capture.py",
+      "scope": "Before broader recorder reuse, record explicit private completion on process-launch OSError and add a transition regression. Current launch failure leaves spec/stdout only and creates no successful public receipt."
+    }
+  ],
+  "private_custody": "Original recapture-v1 and new fold-v1 captures remain private by name. Co-op reproduced all 102 current derivatives from 51 public capture pairs and reran 7 masker plus 2 custody tests. No test/recorder source change is folded for the two deferred GPT P3s. Sequential actual-wheel-digest check passed: native require-hashes installation followed the published release records and verified all three downloaded wheels against the published hashes.",
+  "admission": "PREPARATION_ONLY_NO_FINAL_OR_DEFAULT",
+  "capture_counts": {
+    "original": 16,
+    "fold": 35,
+    "total": 51,
+    "derivatives": 102,
+    "inventory_outputs": 103,
+    "private_originals_total": 52,
+    "private_only_retired": 1
+  },
+  "sequential_wheel_digest_verification": {
+    "status": "COOP_FULL_PRIVATE_PASS",
+    "scope": "All three private hashed requirements match published SHA256 values in the retained PyPI release records. Successful native uv --require-hashes install occurred afterwards and verified downloaded wheel bytes. This is not an independent source rebuild.",
+    "published_release_capture_sources": [
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-alpaca.json",
+        "line": 22
+      },
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-edgar.json",
+        "line": 22
+      },
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-calendar.json",
+        "line": 22
+      }
+    ],
+    "install_started_source": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+      "line": 31
+    },
+    "install_finished_source": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+      "line": 21
+    },
+    "install_exit_source": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+      "line": 20
+    },
+    "private_original_digests_published": false,
+    "verification_authority": "Co-op full private check 2026-10-16; no private review fingerprint published."
+  }
+}

@@ -5,6 +5,7 @@ The native recorder must retain those privately before calling this helper.
 
 Reference: CPython 3.12 re.escape/re.sub with a bytes pattern and callable
 replacement: https://docs.python.org/3.12/library/re.html#re.sub
+JSON escaping: https://docs.python.org/3.12/library/json.html#json.dumps
 Repository source check found secret/proxy redactors, not this byte-preserving
 capture transform. No generic redactor or new dependency is introduced.
 """
@@ -16,13 +17,18 @@ import re
 
 
 def mask_bytes(raw: bytes, rules: list[dict[str, str]]) -> bytes:
-    """Replace original literals once, longest first; preserve other bytes.
+    """Replace UTF-8/JSON-escaped private literals once; preserve other bytes.
 
     Rules stay private. Each rule has an exact UTF-8 source and a marked public
     placeholder, for example {"source": "private path", "placeholder": "<scratch>"}.
+    JSON forms are the literal's encoded contents from json.dumps with either
+    ensure_ascii setting. This masks metadata serialized before substitution,
+    including non-ASCII characters, quotes and backslashes. It does not parse,
+    normalize or reserialize the captured byte stream.
     This is a declared literal mapping, not a secret detector or privacy proof.
     """
     replacements = {}
+    sources = set()
     for rule in rules:
         if set(rule) != {"source", "placeholder"}:
             raise ValueError("each rule needs source and placeholder only")
@@ -33,10 +39,19 @@ def mask_bytes(raw: bytes, rules: list[dict[str, str]]) -> bytes:
             r"<[a-z][a-z0-9_-]*>", placeholder
         ):
             raise ValueError("placeholder must be an explicit marked token")
-        key = source.encode("utf-8")
-        if key in replacements:
+        if source in sources:
             raise ValueError("duplicate source")
-        replacements[key] = placeholder.encode("ascii")
+        sources.add(source)
+        aliases = {
+            source.encode("utf-8"),
+            json.dumps(source, ensure_ascii=True)[1:-1].encode("utf-8"),
+            json.dumps(source, ensure_ascii=False)[1:-1].encode("utf-8"),
+        }
+        replacement = placeholder.encode("ascii")
+        for key in aliases:
+            if key in replacements and replacements[key] != replacement:
+                raise ValueError("conflicting encoded source aliases")
+            replacements[key] = replacement
     if not replacements:
         return raw
     keys = sorted(replacements, key=lambda key: (-len(key), key))

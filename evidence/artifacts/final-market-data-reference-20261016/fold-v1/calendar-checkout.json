@@ -1,0 +1,30 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Scope-locked fold setup or explicitly synthetic masking/custody regression; no broker calls or model adjudication.",
+  "command": [
+    "/usr/bin/git",
+    "-C",
+    "<fold-scratch>/calendar-source",
+    "checkout",
+    "--detach",
+    "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a"
+  ],
+  "cwd": "<fold-scratch>",
+  "declared_inputs": {
+    "alpaca-py": "0.44.0",
+    "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T07:58:42.548089+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "output": "calendar-checkout.log",
+  "output_sha256": "4b64707b810ab29b6873c50cdcc484ebe3ef2c7179607b28faa0b0de388ffb8f",
+  "private_capture_name": "calendar-checkout",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T07:58:41.062490+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

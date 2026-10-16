@@ -43,3 +43,30 @@ original recorder use the documented CPython 3.12 interfaces:
 <https://docs.python.org/3.12/library/re.html#re.sub> and
 <https://docs.python.org/3.12/library/subprocess.html#subprocess.run>.
 No dependency or service is installed for the recorder.
+
+## Combined fold and encoded literals
+
+The original family's private PASS applies to its original 16 captures and
+32 derivatives. This scope-locked fold publishes 35 more capture pairs / 70
+derivatives: the present publication total is 51 / 102, with 103 inventory
+outputs including the packet. Private originals total 52: the first help
+capture is retained privately only after a scanner found an unmasked generic
+upstream home-path example. Its separately retained native replacement uses
+the declared example-home placeholder. No old original was reconstructed.
+The original derivative bytes remain unchanged, but the changed masker and
+all 102 current derivatives passed the new private co-op reproduction check. The sequential three-wheel digest check also passed.
+
+Native recorder metadata is serialized before masking. Therefore the masker
+matches each private literal's original UTF-8 bytes and the exact JSON-escaped
+contents produced by CPython json.dumps under either ensure_ascii setting.
+It substitutes those byte literals once, longest first. Conflicting encoded
+aliases are rejected. No native stream is parsed, normalized or reserialized.
+Reference: https://docs.python.org/3.12/library/json.html#json.dumps
+
+Two new synthetic masking cases exercise escaped Unicode, quote/backslash
+values and ambiguous aliases; the custody test also exercises an escaped cwd.
+Current native results are fold-v1/masking-tests-after.log:10 (7 cases) and
+recorder-tests-after.log:5 (2). Before-fix failing native runs are retained
+beside them. Native network guard controls deliberately return 86; the initial
+upstream helper-collection failure returns 1. These are not passing E2E
+receipts. Every command retains its actual return code and original bytes.

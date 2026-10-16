@@ -1,0 +1,35 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Scope-locked fold setup or explicitly synthetic masking/custody regression; no broker calls or model adjudication.",
+  "command": [
+    "<fold-scratch>/venv/bin/python",
+    "-P",
+    "-m",
+    "pytest",
+    "-p",
+    "alpaca_offline_guard",
+    "--import-mode=importlib",
+    "<fold-scratch>/alpaca-source/tests",
+    "-q",
+    "--tb=short",
+    "-x"
+  ],
+  "cwd": "<fold-scratch>",
+  "declared_inputs": {
+    "alpaca-py": "0.44.0",
+    "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+  },
+  "exit_code": 1,
+  "finished_utc": "2026-10-16T07:53:39.146888+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "output": "alpaca-upstream-tests.log",
+  "output_sha256": "82f2ff9a1fbfdc64f810a7f681c684dab2708ef048c50422810db1710010fb5d",
+  "private_capture_name": "alpaca-upstream-tests",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T07:53:32.540145+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

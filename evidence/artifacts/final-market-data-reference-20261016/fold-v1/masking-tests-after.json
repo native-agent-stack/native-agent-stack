@@ -1,0 +1,33 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Scope-locked fold setup or explicitly synthetic masking/custody regression; no broker calls or model adjudication.",
+  "command": [
+    "/usr/bin/python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "<repository>/blueprints/us-equities/final-market-data-reference-20261016",
+    "-p",
+    "test_mask_capture.py",
+    "-v"
+  ],
+  "cwd": "<fold-scratch>",
+  "declared_inputs": {
+    "alpaca-py": "0.44.0",
+    "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T07:45:59.153398+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "output": "masking-tests-after.log",
+  "output_sha256": "f69f450668b57cab61a35f00704df20dcf1a6656dd82120f30d1514909378d16",
+  "private_capture_name": "masking-tests-after",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T07:45:59.034435+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

@@ -1,0 +1,31 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Scope-locked fold setup or explicitly synthetic masking/custody regression; no broker calls or model adjudication.",
+  "command": [
+    "<uv-0-12-22>",
+    "pip",
+    "install",
+    "--python",
+    "<fold-scratch>/venv/bin/python",
+    "--group",
+    "test"
+  ],
+  "cwd": "<fold-scratch>/calendar-source",
+  "declared_inputs": {
+    "exchange-calendars": "4.13.2",
+    "source_commit": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T08:00:25.174548+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "output": "calendar-test-install.log",
+  "output_sha256": "69506be65a41978ac78bbc7ff26d5326487bd5fa4d281d5c7be335ccbbb6d20d",
+  "private_capture_name": "calendar-test-install",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T08:00:24.813176+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

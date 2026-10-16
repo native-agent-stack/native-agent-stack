@@ -14,11 +14,15 @@ class NativeCaptureTests(unittest.TestCase):
             root = Path(temporary)
             private = root / "private"
             public = root / "public"
+            private_cwd = root / 'caf\u00e9"back\\slash'
+            private_cwd.mkdir()
             command = [sys.executable, "-I", "-c",
                 "import sys;sys.stdout.buffer.write(b'\\xff original \\r\\n');sys.exit(7)"]
             spec = {"label": "failed-child", "argv": command,
-                "cwd": str(root), "environment": {},
-                "masking_rules": [{"source": "original", "placeholder": "<private>"}],
+                "cwd": str(private_cwd), "environment": {},
+                "masking_rules": [
+                    {"source": "original", "placeholder": "<private>"},
+                    {"source": str(private_cwd), "placeholder": "<scratch>"}],
                 "claim_scope": "SYNTHETIC recorder regression fixture only"}
             specfile = root / "spec.json"
             specfile.write_text(json.dumps(spec))
@@ -32,6 +36,9 @@ class NativeCaptureTests(unittest.TestCase):
             metadata = json.loads((capture / "receipt.raw.json").read_bytes())
             self.assertEqual(metadata["command"], command)
             self.assertEqual(metadata["exit_code"], 7)
+            self.assertEqual(metadata["cwd"], str(private_cwd))
+            published_metadata = json.loads((public / "failed-child.json").read_bytes())
+            self.assertEqual(published_metadata["cwd"], "<scratch>")
             self.assertEqual(json.loads((capture / "integrity.private.json").read_bytes())["raw_bytes"], 13)
             self.assertNotIn(b"raw_sha256", (public / "failed-child.json").read_bytes())
 

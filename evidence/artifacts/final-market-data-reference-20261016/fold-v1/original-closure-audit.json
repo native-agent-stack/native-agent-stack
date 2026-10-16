@@ -1,0 +1,30 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Scope-locked fold setup or explicitly synthetic masking/custody regression; no broker calls or model adjudication.",
+  "command": [
+    "/usr/bin/python3",
+    "<repository>/blueprints/us-equities/final-market-data-reference-20261016/closure_audit.py",
+    "--freeze",
+    "<repository>/evidence/artifacts/final-market-data-reference-20261016/recapture-v1/installed-freeze.log",
+    "--runtime-lock",
+    "<repository>/blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
+  ],
+  "cwd": "<fold-scratch>",
+  "declared_inputs": {
+    "alpaca-py": "0.44.0",
+    "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T07:54:20.170477+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "output": "original-closure-audit.log",
+  "output_sha256": "95c27b89f7b274f0f3d3dec1d200eac0d369dc0a123ea644b207c407fbcf0952",
+  "private_capture_name": "original-closure-audit",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T07:54:19.970970+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

@@ -25,20 +25,36 @@
       "disposition": "Retain role provisionally; no FINAL admission.",
       "angles": {
         "capability_at_pin": {
-          "state": "BOUNDED_NATIVE_SDK_DIAGNOSTIC",
-          "note": "Native StockBarsRequest object returned offline; no client, acquisition or broker call. This is SDK diagnostic evidence, not a full upstream E2E suite.",
+          "state": "UPSTREAM_MOCK_SUITE_PASS_LIVE_CASES_SKIPPED",
+          "note": "Pinned upstream mock suite completed320passed/19skipped/2warnings;19live cases explicitly require service/credential/broker flags. Installed wheel hash bound to official tag/PyPI/lock; network guard active.",
           "sources": [
             {
-              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.json",
-              "line": 17
+              "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+              "line": 39
             },
             {
-              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
-              "line": 2
+              "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.json",
+              "line": 22
             },
             {
-              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
-              "line": 5
+              "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+              "line": 20
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+              "line": 38
+            },
+            {
+              "repository": "https://github.com/alpacahq/alpaca-py",
+              "pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+              "path": "tests/conftest.py",
+              "line": 21
+            },
+            {
+              "repository": "https://github.com/alpacahq/alpaca-py",
+              "pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+              "path": "tests/live/conftest.py",
+              "line": 100
             }
           ]
         },
@@ -153,28 +169,22 @@
       "disposition": "Retain role provisionally; no FINAL admission.",
       "angles": {
         "capability_at_pin": {
-          "state": "BOUNDED_NATIVE_SDK_DIAGNOSTIC",
-          "note": "Native XNYS is_session/early-close returned values, with assertions. Bounded SDK diagnostic only, not a full upstream test suite.",
+          "state": "UPSTREAM_CI_TEST_TARGET_PASS",
+          "note": "Full upstream tests/ CI target completed10042passed/1xfailed/2497warnings, rc0 within15minute bound. Source/tag/installed wheel4.13.2 matched; no network, comparative A6 or historical-data qualification.",
           "sources": [
             {
-              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.json",
-              "line": 17
+              "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-upstream-tests.log",
+              "line": 255
             },
             {
-              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
-              "line": 3
+              "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-upstream-tests.json",
+              "line": 32
             },
             {
-              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
-              "line": 6
-            },
-            {
-              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
-              "line": 7
-            },
-            {
-              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
-              "line": 8
+              "repository": "https://github.com/gerrymanoim/exchange_calendars",
+              "pin": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+              "path": ".github/workflows/main.yml",
+              "line": 51
             }
           ]
         },
@@ -326,8 +336,8 @@
       "disposition": "Defer adjudication; carried unresolved with named gaps.",
       "angles": {
         "capability_at_pin": {
-          "state": "SOURCE_SCREEN_PLUS_SEPARATE_RELEASE_DIAGNOSTIC",
-          "note": "Carried README26 supports paid production/service license and103 local LMDB. Separate6.26.0release install and synthetic local-LMDB native diagnostic exit0; no matched comparison or deployment-rights conclusion.",
+          "state": "SOURCE_SCREEN_ONLY_AT_CARRIED_PIN",
+          "note": "At carried7d30a6ee only pinned README source review was performed; no run at this commit is claimed. README26 supports production/service license, README103 local LMDB.",
           "sources": [
             {
               "repository": "https://github.com/man-group/arcticdb",
@@ -340,23 +350,6 @@
               "pin": "7d30a6eefe709e5379f1dd7f38b03074750cf1be",
               "path": "README.md",
               "line": 103
-            },
-            {
-              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.json",
-              "line": 14
-            },
-            {
-              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
-              "line": 1
-            },
-            {
-              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
-              "line": 16
-            },
-            {
-              "path": "catalogs/us-equities/data-research.json",
-              "line": 327,
-              "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
             }
           ]
         },
@@ -395,6 +388,30 @@
         "version": "6.26.0",
         "commit": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
         "status": "SEPARATE_BOUNDED_RELEASE_TRIAL_NOT_ADOPTION"
+      },
+      "separate_release_trial": {
+        "pin": {
+          "version": "6.26.0",
+          "commit": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+          "status": "SEPARATE_BOUNDED_RELEASE_TRIAL_NOT_ADOPTION"
+        },
+        "capability": "Bounded local native SDK diagnostic on explicitly synthetic data at6.26.0/e620d857 only; not capability execution at the carried7d30a6ee source pin.",
+        "sources": [
+          {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
+            "line": 1
+          },
+          {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
+            "line": 16
+          },
+          {
+            "repository": "https://github.com/man-group/arcticdb",
+            "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+            "path": "README.md",
+            "line": 103
+          }
+        ]
       }
     },
     {
@@ -458,7 +475,7 @@
     }
   ],
   "adjudication_request": "Co-op two-family maximum-setting reads of this bounded delta. No model read self-dispatched; require a recorded GAP disposition or converged evidence before any FINAL admission.",
-  "publication_status": "READY_FOR_ONE_PR_AND_COOP_FAMILY_READS",
+  "publication_status": "FULL_PRIVATE_PASS_RELEASED_ONE_NORMAL_FOLD",
   "blinding_contract": {
     "path": "tools/sota-convergence/blind_checkout.py",
     "line": 56,

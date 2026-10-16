@@ -1,0 +1,9 @@
+Using Python 3.12.3 environment at: venv
+Resolved 3 packages in 118ms
+Downloading edgartools (3.4MiB)
+ Downloaded edgartools
+Prepared 3 packages in 208ms
+Installed 3 packages in 68ms
+ + alpaca-py==0.44.0
+ + edgartools==5.61.1
+ + exchange-calendars==4.13.2

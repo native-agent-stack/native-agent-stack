@@ -23082,6 +23082,356 @@
       "bytes": 167
     },
     {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-checkout.json",
+      "sha256": "dd02c322353f171301c3e80c64c2c02c4b3f929d9b03cf8876fbd6345044974f",
+      "bytes": 1143
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-checkout.log",
+      "sha256": "651990fac018e9797de7b4d4ff3ebf50dfae28c93c122d2fbbefaa47b9684528",
+      "bytes": 83
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-clone.json",
+      "sha256": "bcc0bde39f55b6e130dd786bedb79567b141e9bff7e72ed861832938879da0b3",
+      "bytes": 1156
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-clone.log",
+      "sha256": "d4617979dcbbd15086c34c386d5b0b8a11d7e64abb85287300c5975bd25a069c",
+      "bytes": 47
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-import-location.json",
+      "sha256": "5d6803f54dd2c8d87bf266fd220a20663b37399291d9669b6a617fd26eb2ea86",
+      "bytes": 1182
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-import-location.log",
+      "sha256": "8e1c1b44ed2530af93a2486c4e6fa0bc02f30e75fd95a3cf5ffa9ec5cd847642",
+      "bytes": 75
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-release-tag.json",
+      "sha256": "2aff823ea1a32b29ea7d427907518bdd20e2e0f1c1bf69c7cd6bbeabf118d34a",
+      "bytes": 1193
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-release-tag.log",
+      "sha256": "87b9c71363ac5d5bfe04abbb4d382f604ebbddfd68c054354f0b6945598beee4",
+      "bytes": 59
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-test-install.json",
+      "sha256": "976f3cf5d1f9ca787e5599370629c3c72285ca7c55415ef754aa664b87dff71b",
+      "bytes": 1283
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-test-install.log",
+      "sha256": "4749a5af724b0c9b8cbbc0a9aa1b78b8247423443eed4442258600e5f6c4ecb8",
+      "bytes": 1676
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-detailed.json",
+      "sha256": "5ac42e4e0e9c9d81a0b85130304e246863f4442b7dbfc75ddf2365234960844a",
+      "bytes": 1228
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-detailed.log",
+      "sha256": "9d42b84c26025687cef9781796884d8ba9f24521a0d748a0fe673868538600a2",
+      "bytes": 3587
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-final.json",
+      "sha256": "86ee78bc2eee8a7d5815f7de79d2413c9c337cd9e5898cd74574936dfc368c3f",
+      "bytes": 1211
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-final.log",
+      "sha256": "daa4c03cb831e22f298d8163fa53600cd7b8443157082855464ea4168ae12e9f",
+      "bytes": 1390
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.json",
+      "sha256": "410f8018b52c398551751319fefb65ac3cff81638837abb7081ae6c43d1b185d",
+      "bytes": 1220
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+      "sha256": "8893923a86b7e5219841a43b3055cd9be9182c3849006a3e9236baac6e2ded07",
+      "bytes": 3667
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests.json",
+      "sha256": "20c770be82d4fdd70dfc0ee90a7137fe6f83fb855c843aeb77dcffcbb2c13547",
+      "bytes": 1230
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests.log",
+      "sha256": "82f2ff9a1fbfdc64f810a7f681c684dab2708ef048c50422810db1710010fb5d",
+      "bytes": 1260
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-checkout.json",
+      "sha256": "e6c7527d4d9f964474c269766a4b04dd44e83f0704e4cbebd3b811ecc0e0dec5",
+      "bytes": 1149
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-checkout.log",
+      "sha256": "4b64707b810ab29b6873c50cdcc484ebe3ef2c7179607b28faa0b0de388ffb8f",
+      "bytes": 70
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-clone.json",
+      "sha256": "fda5edd3d4d18ca122eb6413b82b251328b1ae9f472905cb7bcebe6a1e7b89f7",
+      "bytes": 1174
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-clone.log",
+      "sha256": "b4b9903d530cfb4a70745be2b3a5023c8d90f90cbbc9b3d472a24b0b989405bd",
+      "bytes": 49
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-release-tag.json",
+      "sha256": "c2d8c7182777b425bc423988b60601bc5ae574113a9ee57310dd236d6243db5f",
+      "bytes": 1209
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-release-tag.log",
+      "sha256": "be61c2dbdaf9ec6bea20469ab71c3f264a9c8d057d75e2c5e36e0da4b5b1f72f",
+      "bytes": 58
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-test-install.json",
+      "sha256": "225674e09b0e618bac9c04419cbe29baa9cc0ccf21f3d34bdba32569105b24eb",
+      "bytes": 1161
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-test-install.log",
+      "sha256": "69506be65a41978ac78bbc7ff26d5326487bd5fa4d281d5c7be335ccbbb6d20d",
+      "bytes": 339
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-upstream-tests.json",
+      "sha256": "627dd306fe79129d6c835bd30375eed62e7fbf80f063ae29ef60861cfdb29738",
+      "bytes": 1417
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-upstream-tests.log",
+      "sha256": "b88f82c077c6cd0b7961901984516ac48dec86f336c27a022884c771539c3925",
+      "bytes": 17605
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/create-venv.json",
+      "sha256": "e1dae4aa9f02a5e8bb7dcf873b041c31065c5ca5231de6f2f151c63d7bc9c136",
+      "bytes": 1078
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/create-venv.log",
+      "sha256": "ea266639a24dc474e6483f152086236119223aa91cb4759637ecd2a600da3b2e",
+      "bytes": 179
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/edgar-release-tag.json",
+      "sha256": "906879ff58695b8548000d98b8d55420b2e95182cb35c1bc495a37abd5a84f8e",
+      "bytes": 1141
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/edgar-release-tag.log",
+      "sha256": "56fccd4522c1c8ce9bf10a50c43c9b92b262325520809438b3d5d0b19d3db081",
+      "bytes": 59
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-closure-audit.json",
+      "sha256": "d8ba86f2c59b6ca21467251a0f2d6ccfc60333826d4bbd2262ac102bc2122565",
+      "bytes": 1347
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-closure-audit.log",
+      "sha256": "b785eb0519000c78bbe94cbc8fef171f890091bc0da294c118866cb35722c130",
+      "bytes": 11464
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-closure-audit.json",
+      "sha256": "810b6a75a1d78015789767a93daefce095c56d129d0a008c37c737d0b1388e8c",
+      "bytes": 1365
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-closure-audit.log",
+      "sha256": "5a6cc852a1616b683313fed724398510e7c18a0ef934b54ad6c39a899335109b",
+      "bytes": 12643
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-freeze.json",
+      "sha256": "71a6ba9d51ce64bd0c4271768088cdf82796704746ff4be85af29668ccb4b23a",
+      "bytes": 1100
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-freeze.log",
+      "sha256": "bab444c7629e42d565e3f6e8bdc100d49511092d638e960daf839109e52be503",
+      "bytes": 1246
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-freeze.json",
+      "sha256": "497c91e1be5c46ff2712b4f9dee3148e58f8f3e25ddbacc1c1fab1e0e80b0796",
+      "bytes": 1088
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-freeze.log",
+      "sha256": "bfcee7e415c4499618b0f15368c89f15de4d98a38df0299df98636f3c070f9ad",
+      "bytes": 1123
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+      "sha256": "bc71018edd4a696a81f49ab90b1905dd6acd22bc69dc5eef352b2ee658b0400d",
+      "bytes": 1209
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.log",
+      "sha256": "42826dd7785d76e60a758db533857304e12d923bf0e23aded458532a6f4a9017",
+      "bytes": 256
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/masking-tests-after.json",
+      "sha256": "8bc8b839d4ab9a99f82a1e44957959d701938e4c3da736d78c2798bff1a9415a",
+      "bytes": 1209
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/masking-tests-after.log",
+      "sha256": "f69f450668b57cab61a35f00704df20dcf1a6656dd82120f30d1514909378d16",
+      "bytes": 1050
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/masking-tests-before.json",
+      "sha256": "fedebff59b3b1ae4b37460ff42f3d1440a3d6e728c62cfa61b06ba0e42658929",
+      "bytes": 1211
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/masking-tests-before.log",
+      "sha256": "d716dc9b1e46ffa5657affc836cc19b75be71f6320b685180e46f7d19c9c3288",
+      "bytes": 2432
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-calendar.json",
+      "sha256": "ac43ead230586463d8d8a9ac879766aee7231e0c578e6dbaf54084733d2d12f1",
+      "bytes": 1163
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-calendar.log",
+      "sha256": "b099f4765a34c694d36cab865a50efc00eadb1b7251594ac85cd7e530f945e10",
+      "bytes": 200
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-control.json",
+      "sha256": "e6b0d75a71065219f3759416a21ab67369c3f642dfe85c6c84f2488aa887ebd9",
+      "bytes": 1161
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-control.log",
+      "sha256": "0ec7ba0e9acd0bb91bb1161f13f827748afc777f102ba60947ec41de0fc9d604",
+      "bytes": 52
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-final.json",
+      "sha256": "b2a5fc17b6618a64d0f8f4bb3afae6437c90a0ea4455866de77561f40794c83e",
+      "bytes": 1157
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-final.log",
+      "sha256": "b011798ae0ff1358ec06a15a929b6f7e00308a507c1f04eb0eefffb5c3fc96dd",
+      "bytes": 120
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/original-closure-audit.json",
+      "sha256": "43139595558beb067c2440603bf58ebbb63b4b2dbea93e3a170337af6d2181d4",
+      "bytes": 1365
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/original-closure-audit.log",
+      "sha256": "95c27b89f7b274f0f3d3dec1d200eac0d369dc0a123ea644b207c407fbcf0952",
+      "bytes": 14331
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-alpaca.json",
+      "sha256": "b4a0ab9780ba72a01553b4bca34023faf0f5486ec9f859376be95c13637c0d9c",
+      "bytes": 1192
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-alpaca.log",
+      "sha256": "b8eab274444faa542d39326472bb6db310e49141b1cba9346b676e666f29ae6a",
+      "bytes": 15412
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-calendar.json",
+      "sha256": "8367ad4b5101b99c15bca5def2bc31bf6be236e31ce109c39c701ae13c49e6d4",
+      "bytes": 1205
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-calendar.log",
+      "sha256": "bf7334409e2e15a191bea7c7d1b7ae40900769ab104f72e6221593f10abff77c",
+      "bytes": 28842
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-edgar.json",
+      "sha256": "b8f0ff507916e74481c27a93c1ca958826a6772457d827680484059032e6eedf",
+      "bytes": 1191
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-edgar.log",
+      "sha256": "a1a6e9717241cb89b463dc387abd8ce4fd20d0aed69de6ae9095beb6afc04028",
+      "bytes": 20384
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pytest-override-help-final.json",
+      "sha256": "d92e8b745d04959451490bea45f03f3abd866e06ccec333aab3c5a9aa45c060c",
+      "bytes": 1090
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pytest-override-help-final.log",
+      "sha256": "883418d0e17bb53f328378005d921e4efd27e1873905382dc133633036ca737e",
+      "bytes": 30517
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/recorder-tests-after.json",
+      "sha256": "50911f4e809dd7749899972a7afb260f4a7c64ca26e31e356c5bef4ce63fde77",
+      "bytes": 1213
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/recorder-tests-after.log",
+      "sha256": "bf9b7d24fffbafd09f80297fa1c84667d4a6c7b25c5874347bdfe03f7b41743c",
+      "bytes": 440
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/recorder-tests-before.json",
+      "sha256": "010a58816239db9fd0bd1f24f863c642bca73a30e98de8b5ef1feff1899780b7",
+      "bytes": 1215
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/recorder-tests-before.log",
+      "sha256": "1059f0594d0f5d483f71030b5bce8a2b5f2fd62a801608c1ff9db2742892b259",
+      "bytes": 1265
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/uv-pip-install-help.json",
+      "sha256": "69959d014a9dd32b83006d7da0cb1c0b13b1af8f5de18928d2b04dc5e294a1c1",
+      "bytes": 1065
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/uv-pip-install-help.log",
+      "sha256": "eb770df4eede6f58ad927391fb205f367bd74ca0971208311b6d4e1259149645",
+      "bytes": 12530
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/wheel-release-bindings.json",
+      "sha256": "c28e59f6d1b494b52f0e928d4c546e22824736ea41decf5e712d94bc3d2431d6",
+      "bytes": 1422
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/wheel-release-bindings.log",
+      "sha256": "b2f845d768a08ce925f28d6a890f28ea720359f3877c24c04d97267957ffcdbe",
+      "bytes": 2755
+    },
+    {
       "path": "evidence/artifacts/final-market-data-reference-20261016/lane-packet.json",
       "sha256": "59c1b6ddca1e53299006e93decfb6e755ce83bd33de2c8e557fdf677de082309",
       "bytes": 27280

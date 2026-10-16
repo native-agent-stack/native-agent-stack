@@ -1,11 +1,29 @@
-"""Meaningful masking checks prepared locally; execution awaits pause release."""
+"""Byte/JSON masking regressions using explicitly synthetic private literals."""
 
+import json
 import unittest
 
 from mask_capture import mask_bytes
 
 
 class MaskCaptureTests(unittest.TestCase):
+    def test_json_encoded_private_literals_are_masked(self):
+        literals = ["caf\u00e9", 'quoted"path', "back\\slash"]
+        tokens = ["<unicode>", "<quote>", "<backslash>"]
+        rules = [{"source": source, "placeholder": token}
+                 for source, token in zip(literals, tokens)]
+        raw = json.dumps({"command": literals}, indent=2, sort_keys=True).encode()
+        expected = json.dumps({"command": tokens}, indent=2, sort_keys=True).encode()
+        self.assertEqual(mask_bytes(raw, rules), expected)
+
+    def test_conflicting_json_escape_aliases_are_rejected(self):
+        rules = [
+            {"source": "caf\u00e9", "placeholder": "<unicode>"},
+            {"source": "caf\\u00e9", "placeholder": "<literal>"},
+        ]
+        with self.assertRaises(ValueError):
+            mask_bytes(b"caf\\u00e9", rules)
+
     def test_preserves_all_unmapped_bytes_and_line_endings(self):
         raw = b"\xff\x00 /private/scratch/file\r\npass  \n"
         rules = [{"source": "/private/scratch", "placeholder": "<scratch>"}]

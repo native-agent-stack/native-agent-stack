@@ -1,0 +1,34 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Scope-locked fold setup or explicitly synthetic masking/custody regression; no broker calls or model adjudication.",
+  "command": [
+    "/usr/bin/curl",
+    "--fail",
+    "--silent",
+    "--show-error",
+    "--location",
+    "--connect-timeout",
+    "10",
+    "--max-time",
+    "45",
+    "https://pypi.org/pypi/edgartools/5.61.1/json"
+  ],
+  "cwd": "<fold-scratch>",
+  "declared_inputs": {
+    "alpaca-py": "0.44.0",
+    "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T07:49:50.444584+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "output": "pypi-edgar.log",
+  "output_sha256": "a1a6e9717241cb89b463dc387abd8ce4fd20d0aed69de6ae9095beb6afc04028",
+  "private_capture_name": "pypi-edgar",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T07:49:50.366669+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

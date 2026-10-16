@@ -102,7 +102,51 @@
           }
         }
       ],
-      "drift": []
+      "drift": [],
+      "wheel_binding": {
+        "wheel": "alpaca_py-0.44.0-py3-none-any.whl",
+        "wheel_sha256": "b54673f967c0c814a5e0223cbb0211a5d9d75a8d107e792872b14e5bae957c03",
+        "official_release_tag_refs": [
+          "refs/tags/v0.44.0"
+        ],
+        "official_tag_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-release-tag.log",
+          "line": 1
+        },
+        "pypi_release_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-alpaca.log",
+          "line": 1
+        },
+        "binding_sha256_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/wheel-release-bindings.log",
+          "line": 21
+        },
+        "hash_pinned_install_receipt": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+        "scope": "Official tag resolves to declared commit; PyPI release wheel hash equals accepted lock wheel. Fresh isolated install requires that hash; bit-for-bit source rebuild not performed."
+      },
+      "source_version_rule": {
+        "note": "Upstream pyproject0.0.0 is a dynamic-versioning placeholder, not release evidence. Official v0.44.0 tag, PyPI release/wheel hash and native hash-pinned installation bind the proposed run.",
+        "sources": [
+          {
+            "repository": "https://github.com/alpacahq/alpaca-py",
+            "pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+            "path": "pyproject.toml",
+            "line": 4
+          },
+          {
+            "repository": "https://github.com/alpacahq/alpaca-py",
+            "pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+            "path": "pyproject.toml",
+            "line": 44
+          },
+          {
+            "repository": "https://github.com/alpacahq/alpaca-py",
+            "pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+            "path": "pyproject.toml",
+            "line": 51
+          }
+        ]
+      }
     },
     {
       "component_id": "data-edgartools",
@@ -262,7 +306,28 @@
           "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
           "line": 12
         }
-      ]
+      ],
+      "wheel_binding": {
+        "wheel": "edgartools-5.61.1-py3-none-any.whl",
+        "wheel_sha256": "8229753d3fb4dfdc865291bf7fd684d11297094b88ec724c919630cf21e81037",
+        "official_release_tag_refs": [
+          "refs/tags/v5.61.1"
+        ],
+        "official_tag_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/edgar-release-tag.log",
+          "line": 1
+        },
+        "pypi_release_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-edgar.log",
+          "line": 1
+        },
+        "binding_sha256_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/wheel-release-bindings.log",
+          "line": 42
+        },
+        "hash_pinned_install_receipt": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+        "scope": "Official tag resolves to declared commit; PyPI release wheel hash equals accepted lock wheel. Fresh isolated install requires that hash; bit-for-bit source rebuild not performed."
+      }
     },
     {
       "component_id": "data-exchange-calendars",
@@ -360,12 +425,70 @@
           }
         }
       ],
-      "drift": []
+      "drift": [],
+      "wheel_binding": {
+        "wheel": "exchange_calendars-4.13.2-py3-none-any.whl",
+        "wheel_sha256": "fc5a2ad0d61b5c3a6539a3061cd4cbb55c59f4a903455cec7926e4b798919996",
+        "official_release_tag_refs": [
+          "refs/tags/4.13.2"
+        ],
+        "official_tag_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-release-tag.log",
+          "line": 1
+        },
+        "pypi_release_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-calendar.log",
+          "line": 1
+        },
+        "binding_sha256_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/wheel-release-bindings.log",
+          "line": 63
+        },
+        "hash_pinned_install_receipt": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+        "scope": "Official tag resolves to declared commit; PyPI release wheel hash equals accepted lock wheel. Fresh isolated install requires that hash; bit-for-bit source rebuild not performed."
+      }
     }
   ],
   "unresolved_pin_tasks": [
     "Resolve wider generated projections through the shared pin/admission gate chain; this PR does not rewrite historical verdicts or another lane runtime."
   ],
   "scope": "Each winner gets one proposed run pin; survivor pins remain their carried source-review commits, not adopted runtime pins.",
-  "citation_status": "Exact-value references at stated base; host observations and source bindings refer to fresh retained native captures. Co-op private reproduction passed for 16 captures and 32 derivatives."
+  "citation_status": "Exact-value references at stated base plus retained official-tag/PyPI-wheel/require-hashes/closure captures. Combined fold received GPT ACK and full private reproduction/sequential-digest PASS; one normal correction is released.",
+  "closure_reconciliation": {
+    "scope": "Execution pins match, freshly resolved closures do not equal the accepted runtime lock; no locked migration or production acceptance.",
+    "original_full_audit": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/original-closure-audit.log",
+    "alpaca_run_closure_audit": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-closure-audit.log",
+    "explicit_deltas": [
+      {
+        "package": "numpy",
+        "observed": "2.5.4",
+        "locked": "2.5.3",
+        "observed_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/install.log",
+          "line": 50
+        },
+        "locked_source": {
+          "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+          "line": 1553,
+          "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        }
+      },
+      {
+        "package": "pydantic",
+        "observed": "2.14.1",
+        "locked": "2.13.5",
+        "observed_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/install.log",
+          "line": 57
+        },
+        "locked_source": {
+          "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+          "line": 1915,
+          "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        }
+      }
+    ],
+    "final_test_environment_audit": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-closure-audit.log",
+    "final_native_freeze": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-freeze.log"
+  }
 }

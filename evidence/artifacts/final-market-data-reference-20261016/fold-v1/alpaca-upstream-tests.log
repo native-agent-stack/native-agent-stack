@@ -1,0 +1,19 @@
+
+==================================== ERRORS ====================================
+_____________ ERROR collecting tests/common/test_common_models.py ______________
+ImportError while importing test module '<fold-scratch>/alpaca-source/tests/common/test_common_models.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+alpaca-source/tests/common/test_common_models.py:30: in <module>
+    from factories import create_dummy_order
+E   ModuleNotFoundError: No module named 'factories'
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/websockets/legacy/__init__.py:6
+  <fold-scratch>/venv/lib/python3.12/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR alpaca-source/tests/common/test_common_models.py
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 warning, 1 error in 0.53s

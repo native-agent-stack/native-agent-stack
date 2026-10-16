@@ -23,7 +23,34 @@
       "e2e": "NOT_RUN",
       "gap": "VENDOR_KEY_AND_MATCHED_PIT_RIGHTS_GAP",
       "survivor_remains": true,
-      "no_install_reason": "Delta is source-screened only; no completed full screen or matched comparison authorizes a survivor trial/default."
+      "no_install_reason": "Vendor acquisition needs authorized key/rights per the pinned README; no such acquisition was authorized or performed.",
+      "carried_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260926/databento-databento-python.json",
+        "line": 7,
+        "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+      },
+      "carried_version": "0.87.0",
+      "carried_version_source": {
+        "repository": "https://github.com/databento/databento-python",
+        "pin": "25eef4ee8e66559e2370166a57c20925ce244d49",
+        "path": "pyproject.toml",
+        "line": 3
+      },
+      "pin_drift": {
+        "previous_version": "0.86.0",
+        "previous_source_commit": "e675ef30369f5ee9f68b04606080c519adf3be69",
+        "prior_catalog_source": {
+          "path": "catalogs/us-equities/data-research.json",
+          "line": 65,
+          "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        },
+        "packet_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/lane-packet.json",
+          "line": 42,
+          "at_commit": "7d740ccb66a9e2f041ea9b34ee1585996f859560"
+        },
+        "scope": "Carried source review is newer than the older catalog/packet release identity; both scopes retained, no adoption or retirement inferred."
+      }
     },
     {
       "repository": "https://github.com/hydrosquall/tiingo-python",
@@ -44,7 +71,12 @@
       "e2e": "NOT_RUN",
       "gap": "VENDOR_KEY_AND_MATCHED_PIT_RIGHTS_GAP",
       "survivor_remains": true,
-      "no_install_reason": "Delta is source-screened only; no completed full screen or matched comparison authorizes a survivor trial/default."
+      "no_install_reason": "Vendor acquisition needs authorized key/rights per the pinned README; no such acquisition was authorized or performed.",
+      "carried_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260926/hydrosquall-tiingo-python.json",
+        "line": 7,
+        "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+      }
     },
     {
       "repository": "https://github.com/man-group/arcticdb",
@@ -68,7 +100,7 @@
         }
       ],
       "status": "CARRIED_UNRESOLVED",
-      "e2e": "BOUNDED_LOCAL_NATIVE_SDK_DIAGNOSTIC_EXIT_0",
+      "e2e": "NOT_RUN_AT_CARRIED_SOURCE_PIN",
       "gap": "LOCAL_STORE_MATCHED_WORKLOAD_AND_PRODUCTION_LICENSE_GAP",
       "survivor_remains": true,
       "proposed_trial_pin": {
@@ -81,49 +113,66 @@
         }
       },
       "pin_scope": "carried_pin is historical sweep source identity; proposed_trial_pin is a separate release already named on main. No survivor identity is silently overwritten.",
-      "trial_sources": [
-        {
-          "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-install.json",
-          "line": 19
+      "carried_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260926/man-group-arcticdb.json",
+        "line": 7,
+        "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+      },
+      "separate_release_trial": {
+        "pin": {
+          "version": "6.26.0",
+          "commit": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+          "main_source": {
+            "path": "catalogs/us-equities/data-research.json",
+            "line": 327,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
         },
-        {
-          "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.json",
-          "line": 14
-        },
-        {
-          "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
-          "line": 1
-        },
-        {
-          "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
-          "line": 16
-        },
-        {
-          "repository": "https://github.com/man-group/arcticdb",
-          "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
-          "path": "README.md",
-          "line": 77
-        },
-        {
-          "repository": "https://github.com/man-group/arcticdb",
-          "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
-          "path": "README.md",
-          "line": 103
-        },
-        {
-          "repository": "https://github.com/man-group/arcticdb",
-          "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
-          "path": "README.md",
-          "line": 126
-        },
-        {
-          "repository": "https://github.com/man-group/arcticdb",
-          "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
-          "path": "README.md",
-          "line": 127
-        }
-      ],
-      "trial_scope": "Real local native SDK roundtrip on explicitly synthetic 100000x10 frame; no performance comparison, vendor data, production license or default inferred."
+        "e2e": "BOUNDED_LOCAL_NATIVE_SDK_DIAGNOSTIC_EXIT_0",
+        "sources": [
+          {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-install.json",
+            "line": 19
+          },
+          {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.json",
+            "line": 14
+          },
+          {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
+            "line": 1
+          },
+          {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
+            "line": 16
+          },
+          {
+            "repository": "https://github.com/man-group/arcticdb",
+            "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+            "path": "README.md",
+            "line": 77
+          },
+          {
+            "repository": "https://github.com/man-group/arcticdb",
+            "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+            "path": "README.md",
+            "line": 103
+          },
+          {
+            "repository": "https://github.com/man-group/arcticdb",
+            "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+            "path": "README.md",
+            "line": 126
+          },
+          {
+            "repository": "https://github.com/man-group/arcticdb",
+            "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+            "path": "README.md",
+            "line": 127
+          }
+        ],
+        "scope": "Real local native SDK roundtrip on explicitly synthetic 100000x10 frame; no performance comparison, vendor data, production license or default inferred."
+      }
     },
     {
       "repository": "https://github.com/massive-com/client-python",
@@ -150,7 +199,27 @@
       "e2e": "NOT_RUN",
       "gap": "VENDOR_KEY_AND_MATCHED_PIT_RIGHTS_GAP",
       "survivor_remains": true,
-      "no_install_reason": "Delta is source-screened only; no completed full screen or matched comparison authorizes a survivor trial/default."
+      "no_install_reason": "Vendor acquisition needs authorized key/rights per the pinned README; no such acquisition was authorized or performed.",
+      "carried_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260926/massive-com-client-python.json",
+        "line": 7,
+        "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+      },
+      "pin_drift": {
+        "previous_version": "2.8.0",
+        "previous_source_commit": "3c247d78c603fc13d274fda1aa26749e7c8c3710",
+        "prior_catalog_source": {
+          "path": "catalogs/us-equities/data-research.json",
+          "line": 112,
+          "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        },
+        "packet_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/lane-packet.json",
+          "line": 14,
+          "at_commit": "7d740ccb66a9e2f041ea9b34ee1585996f859560"
+        },
+        "scope": "Carried source commit differs from catalog/packet release; version at the carried source is not inferred from the older2.8.0record."
+      }
     }
   ],
   "new_discovery": false,
