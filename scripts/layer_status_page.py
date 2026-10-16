@@ -7,8 +7,11 @@ docs/decisions/2026-10-11-layer-resolution-protocol.md, "Terminal states and evi
 the FINAL predicate (scripts/final_stack.py, enforce_final):
 - a recorded verdict;
 - per winner, a run pin whose pin_drift is "same" and whose complete identity matches the verdict pin;
-- per winner, an E2E receipt bound in the layer's angle record (final_evidence) at that run pin;
-- invoke evidence, which final-stack.json does not record, so every non-FINAL layer lists it.
+- per winner, an E2E receipt bound in the layer's angle record (final_evidence) at that run pin, validated by
+  final_stack.check_condition_3: the file exists, binds native_proven evidence to the repository at the complete pin,
+  matches the upstream_e2e schema and records a successful install and test with pinned citations;
+- per winner, invoke evidence in that same binding, validated by final_stack.check_condition_4: an invocation receipt
+  with positive calls in a measured window, or a recorded not_invoked_reason.
 It also lists the missing multi-angle record and the carried survivors. Rows come in the FINAL wave's order, each with
 its tier: T1-trading (the layers that carry the owner's trading capabilities), then T1-harness, then the rest (T3).
 
@@ -81,6 +84,12 @@ def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def unknown_tier_layers(stack: dict) -> set[str]:
+    """TIERS keys that name no layer of final-stack.json, so a renamed layer is reported instead of falling into T3."""
+    layers = {f'{item["catalog"]}/{item["layer_id"]}' for item in stack.get("layers") or []}
+    return {key for _, keys in TIERS for key in keys} - layers
+
+
 def _state(item: dict) -> str:
     if item.get("terminal_state") == "FINAL":
         return "FINAL"
@@ -99,23 +108,39 @@ def _run_pin_gap(w: dict, run: dict | None) -> str | None:
     return None
 
 
-def _e2e_bound(w: dict, run: dict | None, record: dict | None) -> bool:
-    """Condition 3's input in enforce_final: the angle record's final_evidence entry for the winner's candidate at its
-    complete run pin, naming an e2e_receipt. Whether that receipt validates is final_stack.py's check."""
+def _bound_evidence(w: dict, run: dict | None, record: dict | None) -> dict | None:
+    """The angle record's final_evidence entry for the winner, bound as enforce_final binds it: exactly one candidate
+    for the winner's repository at its complete run pin (final_stack.final_candidates), and an entry for that candidate
+    whose run_pin is the complete run pin. None otherwise."""
     if run is None or not record:
-        return False
-    repository = host_receipts.normalize_repository(w.get("repository"))
+        return None
+    try:
+        candidates = final_stack.final_candidates(record, host_receipts.normalize_repository(w.get("repository")), run)
+    except (KeyError, TypeError):
+        return None
+    if len(candidates) != 1:
+        return None
     bound = {e.get("candidate_id"): e for e in record.get("final_evidence") or [] if isinstance(e, dict)}
-    for c in record.get("candidates") or []:
-        if (isinstance(c, dict) and host_receipts.normalize_repository(c.get("repository")) == repository
-                and final_stack.complete_final_pin(c.get("pin"), run)):
-            evidence = bound.get(c.get("id")) or {}
-            if evidence.get("e2e_receipt") and final_stack.complete_final_pin(evidence.get("run_pin"), run):
-                return True
-    return False
+    evidence = bound.get(candidates[0].get("id"))
+    if not evidence or not final_stack.complete_final_pin(evidence.get("run_pin"), run):
+        return None
+    return evidence
 
 
-def _missing(item: dict, runs: dict, record: dict | None = None) -> list[str]:
+def _condition_holds(check, root: Path | None, w: dict, run: dict | None, record: dict | None) -> bool:
+    """Run one of final_stack's condition checks (check_condition_3 or check_condition_4) on the winner's bound
+    evidence, reading receipts under root. A missing, failed or wrong-pin receipt fails it."""
+    evidence = _bound_evidence(w, run, record)
+    if evidence is None or root is None:
+        return False
+    try:
+        check(final_stack.Sources(root), evidence, host_receipts.normalize_repository(w.get("repository")), run)
+    except final_stack.FinalStackError:
+        return False
+    return True
+
+
+def _missing(item: dict, runs: dict, record: dict | None = None, root: Path | None = None) -> list[str]:
     if item.get("status") == "unswept":
         return ["no completed sweep"]
     if item.get("terminal_state") == "FINAL":
@@ -128,10 +153,14 @@ def _missing(item: dict, runs: dict, record: dict | None = None) -> list[str]:
     pin_gaps = [g for g in (_run_pin_gap(w, runs.get(w.get("run"))) for w in winners) if g]
     if pin_gaps:
         missing.append("run pin: " + "; ".join(pin_gaps))
-    no_e2e = [w.get("component_id") for w in winners if not _e2e_bound(w, runs.get(w.get("run")), record)]
+    no_e2e = [w.get("component_id") for w in winners if not _condition_holds(final_stack.check_condition_3, root, w, runs.get(w.get("run")), record)]
     if no_e2e:
         missing.append("E2E at run pin: " + ", ".join(no_e2e))
-    missing.append("invoke evidence")
+    no_invoke = [w.get("component_id") for w in winners if not _condition_holds(final_stack.check_condition_4, root, w, runs.get(w.get("run")), record)]
+    if not winners:
+        missing.append("invoke evidence")
+    elif no_invoke:
+        missing.append("invoke evidence: " + ", ".join(no_invoke))
     if (item.get("angles") or {}).get("status") != "recorded":
         missing.append("multi-angle record")
     survivors = {s.get("repository") if isinstance(s, dict) else str(s) for s in (item.get("survivors") or [])}
@@ -150,7 +179,7 @@ def angle_records(stack: dict, root: Path) -> dict:
     return records
 
 
-def build_rows(stack: dict, records: dict | None = None) -> list[dict]:
+def build_rows(stack: dict, records: dict | None = None, root: Path | None = None) -> list[dict]:
     runs = {run["id"]: run for run in stack.get("runs") or []}
     records = records or {}
     rows = []
@@ -167,7 +196,7 @@ def build_rows(stack: dict, records: dict | None = None) -> list[dict]:
                            else "close the missing FINAL conditions")
         record = records.get((item.get("angles") or {}).get("path"))
         rows.append({"layer": key, "status": item.get("status"), "state": _state(item), "winners": winners,
-                     "missing": _missing(item, runs, record), "next_action": next_action})
+                     "missing": _missing(item, runs, record, root), "next_action": next_action})
     rank, tier = {}, {}
     for name, keys in TIERS:
         for key in keys:
@@ -182,8 +211,8 @@ def _cell(text: str) -> str:
     return text.replace("|", "\\|").replace("\n", " ")
 
 
-def render(stack: dict, records: dict | None = None) -> str:
-    rows = build_rows(stack, records)
+def render(stack: dict, records: dict | None = None, root: Path | None = None) -> str:
+    rows = build_rows(stack, records, root)
     counts = {state: sum(r["state"] == state for r in rows) for state in ("FINAL", "TRIAL", "GAP")}
     lines = [
         "# Layer status",
@@ -219,7 +248,7 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--write", action="store_true", help="rebuild and write the page")
     args = parser.parse_args(argv)
     stack = load(args.root / SOURCE)
-    built = render(stack, angle_records(stack, args.root))
+    built = render(stack, angle_records(stack, args.root), args.root)
     output = args.root / OUTPUT
     if args.write:
         output.write_text(built, encoding="utf-8")

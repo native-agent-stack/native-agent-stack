@@ -57,7 +57,7 @@ class StateTests(unittest.TestCase):
         self.assertEqual(len(run_pin), 1)
         self.assertIn("c (no run pin)", run_pin[0])
         self.assertIn("E2E at run pin: b, c", missing)
-        self.assertIn("invoke evidence", missing)
+        self.assertIn("invoke evidence: b, c", missing)
         self.assertIn("multi-angle record", missing)
         self.assertIn("2 carried survivors", missing)
         self.assertEqual(self.rows["foundation/model-routes"]["missing"], ["no completed sweep"])
@@ -169,27 +169,108 @@ class FinalConditionTests(unittest.TestCase):
         run_pin = [m for m in self.row["missing"] if m.startswith("run pin: ")]
         self.assertEqual(run_pin, ["run pin: drifted (verdict 0.49.0, run 0.51.0)"])
 
-    def test_condition_3_needs_an_e2e_receipt_bound_at_the_run_pin(self):
-        # drifted's receipt is bound at its run pin, so only condition 2 fails for it; unbound has no final_evidence.
-        self.assertIn("E2E at run pin: unbound", self.row["missing"])
+    def test_condition_3_without_a_readable_receipt_is_missing(self):
+        # No root, so no bound receipt can be read and validated: a binding alone never clears condition 3.
+        self.assertIn("E2E at run pin: bound, drifted, unbound", self.row["missing"])
 
     def test_pins_print_whole(self):
         self.assertEqual(self.row["winners"],
                          ["bound@2.1.300", "drifted@0.51.0", "unbound@985ef30 with patches"])
 
 
+PINS = {"valid": "a" * 40, "missing": "b" * 40, "failed": "c" * 40, "otherpin": "d" * 40}
+
+
+def _receipt(name, pin, **fields):
+    return {"evidence_class": "native_proven", "repository": f"https://github.com/x/{name}", "pin": pin, **fields}
+
+
+def _e2e(name, pin, test_exit=0):
+    return _receipt(name, pin, kind="upstream_e2e", success=test_exit == 0,
+                    upstream_sources=[{"kind": "repo", "repository": f"https://github.com/x/{name}", "pin": pin,
+                                       "path": "README.md", "line": 1}],
+                    commands=[{"phase": "install", "command": "install", "exit_code": 0},
+                              {"phase": "test", "command": "test", "exit_code": test_exit}])
+
+
+RECEIPT_STACK = {
+    "checked_at": "2026-10-16",
+    "runs": [{"id": f"r-{n}", "pin": c, "pin_parsed": {"commit": c, "version": None}} for n, c in PINS.items()],
+    "layers": [{
+        **layer("foundation", "workers", "reopened"),
+        "angles": {"status": "recorded", "path": "angles.json"},
+        "winners": [{**winner(n, f"r-{n}"), "repository": f"https://github.com/x/{n}", "verdict_pin": c,
+                     "pin_drift": "same"} for n, c in PINS.items()],
+    }],
+}
+RECEIPT_RECORDS = {"angles.json": {
+    "candidates": [{"id": f"c-{n}", "repository": f"https://github.com/x/{n}", "pin": c} for n, c in PINS.items()],
+    "final_evidence": [
+        {"candidate_id": "c-valid", "run_pin": PINS["valid"], "e2e_receipt": "r/valid-e2e.json",
+         "invoke_receipt": "r/valid-invoke.json"},
+        {"candidate_id": "c-missing", "run_pin": PINS["missing"], "e2e_receipt": "r/absent.json",
+         "not_invoked_reason": "no lane calls it yet"},
+        {"candidate_id": "c-failed", "run_pin": PINS["failed"], "e2e_receipt": "r/failed-e2e.json"},
+        {"candidate_id": "c-otherpin", "run_pin": PINS["otherpin"], "e2e_receipt": "r/otherpin-e2e.json",
+         "invoke_receipt": "r/otherpin-invoke.json"},
+    ],
+}}
+RECEIPT_FILES = {
+    "r/valid-e2e.json": _e2e("valid", PINS["valid"]),
+    "r/valid-invoke.json": _receipt("valid", PINS["valid"], kind="invocation", calls=3,
+                                    window_start="2026-10-15T00:00:00Z", window_end="2026-10-16T00:00:00Z"),
+    "r/failed-e2e.json": _e2e("failed", PINS["failed"], test_exit=1),
+    "r/otherpin-e2e.json": _e2e("otherpin", "e" * 40),
+    "r/otherpin-invoke.json": _receipt("otherpin", PINS["otherpin"], kind="invocation", calls=0,
+                                       window_start="2026-10-15T00:00:00Z", window_end="2026-10-16T00:00:00Z"),
+}
+
+
+class ReceiptValidationTests(unittest.TestCase):
+    """A bound receipt counts only when it exists, passed and sits at the winner's complete run pin, and condition 4
+    reads the same bound final_evidence: a valid invocation receipt or a recorded not_invoked_reason
+    (scripts/final_stack.py enforce_final, conditions 3 and 4)."""
+
+    def setUp(self):
+        import json
+        import tempfile
+        self.tmp = tempfile.TemporaryDirectory()
+        root = Path(self.tmp.name)
+        for rel, body in RECEIPT_FILES.items():
+            (root / rel).parent.mkdir(parents=True, exist_ok=True)
+            (root / rel).write_text(json.dumps(body), encoding="utf-8")
+        schema = Path("catalogs/landscape/angles/schema.json")  # check_condition_3 validates against it
+        (root / schema).parent.mkdir(parents=True, exist_ok=True)
+        (root / schema).write_bytes((ROOT / schema).read_bytes())
+        self.missing = page.build_rows(RECEIPT_STACK, RECEIPT_RECORDS, root=root)[0]["missing"]
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_condition_3_needs_an_existing_passed_receipt_at_the_run_pin(self):
+        self.assertIn("E2E at run pin: missing, failed, otherpin", self.missing)
+
+    def test_condition_4_reads_invocation_receipts_and_non_invocation_reasons(self):
+        self.assertIn("invoke evidence: failed, otherpin", self.missing)
+
+
 class TierInventoryTests(unittest.TestCase):
     def test_every_tier_layer_exists_in_final_stack(self):
+        self.assertEqual(page.unknown_tier_layers(page.load(ROOT / page.SOURCE)), set())
+
+    def test_a_renamed_layer_is_reported_not_silently_t3(self):
+        # Control: rename one tiered layer in a copy of final-stack.json; the check must name the old key.
         stack = page.load(ROOT / page.SOURCE)
-        layers = {f'{item["catalog"]}/{item["layer_id"]}' for item in stack["layers"]}
-        named = {key for _, keys in page.TIERS for key in keys}
-        self.assertEqual(named - layers, set())
+        renamed = [dict(item) for item in stack["layers"]]
+        target = next(item for item in renamed if (item["catalog"], item["layer_id"]) == ("us-equities", "portfolio-risk"))
+        target["layer_id"] = "portfolio-risk-renamed"
+        self.assertEqual(page.unknown_tier_layers({**stack, "layers": renamed}), {"us-equities/portfolio-risk"})
 
 
 class FreshnessTests(unittest.TestCase):
     def test_checked_in_page_matches_final_stack(self):
         stack = page.load(ROOT / page.SOURCE)
-        built = page.render(stack, page.angle_records(stack, ROOT))
+        built = page.render(stack, page.angle_records(stack, ROOT), ROOT)
         self.assertEqual((ROOT / page.OUTPUT).read_text(encoding="utf-8"), built)
 
 
