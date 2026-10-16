@@ -186,7 +186,7 @@ print(json.dumps(result))
                          'explicit installed-client and toolchain model-free probe')
     def test_native_echo_probe_with_installed_toolchain(self):
         directory = Path.home() / '.local/share/mise/installs/go/1.25.12'
-        runtime = Path.home() / f'.local/bin/muse-bin-{fence_module.VERSION}'
+        runtime = fence_module.DEFAULT_RUNTIME
         fence = fence_module.Fence(self.work, self.brief, self.log, runtime,
                                    self.auth, toolchain_dirs=[directory])
         argv = fence_module.native_argv(fence_module.DEFAULT_LANE, runtime,
