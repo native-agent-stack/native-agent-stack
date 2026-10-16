@@ -974,3 +974,110 @@ Executed since, on 2026-10-15 (receipts in the lane's private run directory, by 
   successor.
 - Plugin scopes, from the installed clients' help on 2026-10-15: Claude Code 2.1.301 `claude plugin install`, `enable`
   and `disable` (`--scope user|project|local`); codex-cli 0.162.1 `codex plugin add`.
+
+## Addendum (2026-10-16): the FINAL wave's tiers, FINAL-only rows, NativeHorizonNY on 2.1.301, and later directions
+
+This addendum supersedes the parts it names. The text above stays as decided. Like the rest of this record, it ships no
+executable change, so it carries no fail-first test of its own.
+
+### Every layer through the FINAL wave, and FINAL-only rows
+
+- The owner's direction of 2026-10-15, 20:07 ET, recorded by the CC as addendum-10 to its 19:46Z direction: every one
+  of the 35 layers converges and finalizes from upstream repositories, and the new distribution's manifest admits FINAL
+  rows only. FINAL keeps the protocol's four conditions: a recorded verdict, a run pin, an upstream E2E at that pin, and
+  invoke evidence ([the protocol](2026-10-11-layer-resolution-protocol.md)).
+- **This supersedes "The full stack" above in one respect.** Every row the install plan installs is TRIAL until its
+  layer is FINAL. A TRIAL row is measurement input for its layer's convergence; it is never a default and never counts
+  as the clean start. The install rule is unchanged: the same bytes, from the vendor's path, at the plan's pin. The
+  installers of this plan and its follow-up PRs land as installers, and their rows join the manifest only at FINAL.
+- The owner's trading capabilities are the criteria that the trading layers' convergence measures candidates against:
+  portfolio utilization with dynamic sizing, fast reaction, early entry, fast exit, and re-buy templates. trading-cc's
+  spec carries them. Each strategy template is a per-lane handbook item and stays a PROPOSAL until both families' reads
+  and measured runs converge.
+
+### Wave order, superseded
+
+The CC's sequencing ruling of 2026-10-16 (00:11Z) replaces the "Wave order" section above. It rests on the 19:12Z
+direction (the harness layers in T1) with its addendum-03 (which names the harness layers) and on the 20:07 ET
+direction's trading focus.
+
+- **T1-trading**, the layers that carry the owner's trading capabilities, in this order:
+  1. `us-equities/execution-broker` (fast exit, fast reaction);
+  2. `us-equities/backtesting-engine` (strategy templates);
+  3. `us-equities/portfolio-risk` (dynamic sizing, utilization);
+  4. `us-equities/market-data-reference` (fast reaction);
+  5. `us-equities/research-factors-ml` (early-entry signals);
+  6. `us-equities/catalysts-sentiment` (early entry; unswept, so an initial sweep comes first);
+  7. a TradingView initial sweep (the owner's 15:46 ET direction, Decision 4): its MCP servers, alerts and webhooks
+     into the deterministic order gate, Pine strategies and the strategy tester, and strategy templates. It has no
+     layer row yet; the protocol decides which rows its candidates enter (the CC's gap-routing record of
+     2026-10-16, 01:08Z).
+- **T1-harness**: the fourteen harness layers of the section above, plus `foundation/mcp-surfaces`,
+  `quality-evaluation`, `scheduling-supervision` and `web-research`, and `us-equities/observability-hosting` after
+  `observation-inference` (god-view work, by the same gap-routing record).
+- **T2** is empty: its one layer, `market-data-reference`, moved into T1-trading.
+- **T3**: every other layer, including `us-equities/judgment-features` (Jev is off the order path and its value is
+  open, Decision 4), and the 13 skills layers.
+- Within each block, a layer's first runnable step goes first. Survivor adjudication and the multi-angle record come
+  before the upstream E2E at the converged pin, because adjudication can change the winner; invoke evidence comes last.
+- The generated status page carries this order in a Tier column (#1175, `scripts/layer_status_page.py`).
+
+### Decision 8: NativeHorizonNY on Claude Code 2.1.301
+
+- On the CC's GO, NativeHorizonNY moved from 2.1.300 to 2.1.301 on 2026-10-15 at 22:27Z. It was one native-installer
+  step (`install.sh`, then `bash -s 2.1.301`) inside a capped `systemd-run --user --scope`, and `claude --version` now
+  reads 2.1.301. This replaces Decision 8's statement that NativeHorizonNY ran 2.1.300 and would update after the
+  sign-ins.
+- The vendor's binary-integrity check (code.claude.com/docs/en/setup, "Binary integrity and code signing", read
+  2026-10-15T22:26Z) passed:
+  - the release key's fingerprint is `31DD DE24 DDFA B679 F42D 7BD2 BAA9 29FF 1A7E CACE`;
+  - `gpg --verify` reports a good signature from Anthropic Claude Code Release Signing on the 2.1.301 manifest;
+  - the manifest's linux-x64 checksum, `bc1aad9982c7b59c7d889ff92595d61cf46e0a6eae074cb551d932a989bcd222` for
+    267,955,384 bytes, equals the installed binary's.
+- Inverse: relink `~/.local/bin/claude` to `~/.local/share/claude/versions/2.1.300`, which the installer kept.
+- The receipt stays on NativeHorizonNY (private, by name).
+
+### Later directions, as PROPOSAL rows routed to the protocol
+
+The owner's direction of 2026-10-15, 18:16 ET (the CC's addendum-06 to its 19:46Z direction) gives NativeHorizonNY's
+stages these rows. They stay PROPOSALS until they converge; this plan adopts none of their numbers.
+- **A sim/backtest lane, first-class beside the paper lanes**, with its compute and data stages. It does
+  historical-first tuning with holdout and multiplicity control under the preregistration standard, and it feeds the
+  compounding manifest and each lane's handbook. Its stages wait for the backtesting-engine verdict (T1-trading) and the
+  market-data rows' history class.
+- **Rate-budget telemetry per account**: each account's trade-rate budget and its use, measured and reported, with
+  exit headroom reserved.
+  - Each budget cites the broker's dated limit. The owner's figures and the documented limits go through trading-cc's
+    spec.
+  - Where a documented limit sits below the owner's figure, the gap is an owner item: a plan, or the broker's
+    approval.
+- **The activity mandate**: no paper account sits idle in an open session. trading-cc's spec carries it, along with the
+  exit order type as a tuned paper factor inside the order-safety invariants. LIVE stays owner-gated.
+
+### The research-campaign harness, and every lane through the FINAL wave
+
+The owner's directions of 2026-10-15, 21:13 and 21:15 ET, recorded by the CC as addendum-11 to its 19:46Z direction,
+ask for two things.
+
+- **The research-campaign harness is a NativeHorizonNY component.** Research convergence runs as a campaign across
+  several research runtimes and model families, and that capability is installed on the new distribution. It covers:
+  - the landscape-sweep workflow's Claude and GPT halves (`tools/sota-convergence/landscape-sweep/`);
+  - Muse Code as a TRIAL family;
+  - DeerFlow and GPT Researcher (the install plan's `research-harnesses` row);
+  - the merge, the critics and the blind judges (`.claude/agents/blind-judge.md`).
+  Each part installs in horizon by its vendor's own path, with a receipt, and is runnable there. The campaign enters
+  the FINAL wave through its layers, `foundation/web-research`, `workers`, `agent-sdks` and `quality-evaluation`, and
+  no recommendation is taken from anything but a sealed campaign result. Its composition is a PROPOSAL routed to the
+  protocol until those layers converge.
+- **Every lane resolves through the FINAL wave.** That covers paper accounts A, B and C and IBKR paper, the
+  sim/backtest lane, and the research, harness and reader lanes. No lane runs on an unconverged default.
+
+### Between stages D and S: the service-dependent probes
+
+This follows the CC's adjudication addendum-02 of 2026-10-15, disposition 2, on the local review of this record.
+- Until stage S, the clients' service-dependent pieces have no service to reach: OTLP export to the collector, the
+  ai-memory hooks, and HTTP MCP servers. A client launched in that window, including the owner's sign-ins at stage E,
+  can log export failures and hook errors. Those are expected, and no stage D or E check counts a service-dependent
+  result.
+- The service-dependent probes run in stage S, after activation and the ownership check, as its after-sign-in checks.
+- Whether a hook blocks a client session while its service is down is measured at stage E, not assumed.
