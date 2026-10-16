@@ -1,6 +1,6 @@
 # MCP (`mcp-surfaces`)
 
-Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
+Client 2.1.302, checked 2026-10-16. Index: [slots.md](slots.md).
 
 ## mcp-config-tool-search
 
@@ -9,8 +9,8 @@ Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
 - **Route:** User-scope registrations; `alwaysLoad: true` only for a small server used on every turn; `ENABLE_TOOL_SEARCH=true` behind a non-first-party base URL
 - **Alternatives, ranked:** 1. modelcontextprotocol/inspector 2.10.1 for inspection (overlap with mcporter to resolve)
 - **Rejected:** `ENABLE_TOOL_SEARCH=auto:N`; Disabling tool search; Raising `MAX_MCP_OUTPUT_TOKENS` globally
-- **Evidence:** mcp.md tool search and output limits; mcp-O2, O3, O4, O5, O6, O7
-- **Notes:** Registrations drift between host and template (qmd stdio versus HTTP, ports, a server key): G6b. Verified: on user-scope registrations `alwaysLoad: true` loads every tool of that server upfront (the per-tool opt-out works only for --mcp-config, SDK and plugin servers); image results stay under MAX_MCP_OUTPUT_TOKENS; the upfront fallback behind a non-first-party base URL dates from 2.1.70.
+- **Evidence:** mcp.md tool search and output limits; mcp-O2, O3, O4, O5, O6, O7; CHANGELOG@v2.1.302 L469 (2.1.296, up-front description and instruction limit 4,096 characters); L377 (2.1.299, first-party server descriptions reach Claude in full); L142 (2.1.300, automatic tool search no longer turns off mid-conversation)
+- **Notes:** Registrations drift between host and template (qmd stdio versus HTTP, ports, a server key): G6b. Verified: on user-scope registrations `alwaysLoad: true` loads every tool of that server upfront (the per-tool opt-out works only for --mcp-config, SDK and plugin servers); image results stay under MAX_MCP_OUTPUT_TOKENS; the upfront fallback behind a non-first-party base URL dates from 2.1.70. Since 2.1.296 the limit on MCP tool descriptions sent up front and on server instructions is 4,096 characters, up from 2,048 (CHANGELOG@v2.1.302 L469). Owed: measuring this host's up-front context at the new limit.
 - **Supersedes:** topic: MCP tool loading (native deferral converged)
 - **Overturn when:** A measured context or quality gap from deferral, or a release changes tool-search defaults.
 - **Primary sources** (read 2026-10-09; 6 of 9 practices the refuters kept, measured first; fetch time and sha256 of the bytes read in the record's reading file):
