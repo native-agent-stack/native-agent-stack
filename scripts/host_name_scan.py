@@ -31,9 +31,28 @@ SYSTEM_PROFILE_DIRECTORIES = frozenset({"all users", "default", "default user", 
 class HostNameScanError(Exception):
     """A value-free failure message safe to show to the caller."""
 
+    # A fixed code for a named refusal; None for every other failure.
+    reason: str | None = None
+
 
 class PublicationEntryTooLarge(HostNameScanError):
     """The serialized record exceeds the proven native single-fragment bound."""
+
+
+class WslDistroNameMissing(HostNameScanError):
+    """A WSL kernel without WSL_DISTRO_NAME: refused instead of scanned with fewer sources."""
+
+    reason = "wsl_distro_name_missing"
+
+
+def _wsl_kernel() -> bool:
+    """Whether the kernel release (uname(2), the field /proc/sys/kernel/osrelease shows) is WSL's."""
+    # systemd@b3d8fc43 (v259.5) src/basic/virt.c:655-662 detects WSL by "Microsoft" or
+    # "WSL" in the release. WSL 2's kernel config appends "-microsoft-standard-WSL2"
+    # (WSL2-Linux-Kernel@d504d40a arch/x86/configs/config-wsl:34); the casefolded
+    # "microsoft" also matches WSL 1 and the earlier "-microsoft-standard" WSL 2 releases.
+    release = os.uname().release if hasattr(os, "uname") else ""
+    return "microsoft" in release.casefold() or "WSL" in release
 
 
 def _command(argv: list[str], *, root: Path,
@@ -55,6 +74,14 @@ def host_names(root: Path) -> tuple[str, ...]:
         if not isinstance(names, list) or not names:
             raise HostNameScanError("invalid synthetic name override")
     else:
+        # WSL init exports WSL_DISTRO_NAME only to the sessions it starts
+        # (microsoft/WSL@15ea3b38 src/linux/init/config.cpp:885-892, init.cpp:623-632).
+        # Without it the public distro label below reads as a private hostname and the
+        # Windows sources stop being required: refuse by name, never scan weaker.
+        if "WSL_DISTRO_NAME" not in os.environ and _wsl_kernel():
+            raise WslDistroNameMissing(
+                "wsl_distro_name_missing: WSL kernel without WSL_DISTRO_NAME; rerun from a shell "
+                "WSL started, or pass WSL_DISTRO_NAME through (Codex: shell_environment_policy.set)")
         identity = _command(["id", "-un"], root=root)
         if identity.returncode or not identity.stdout.strip():
             raise HostNameScanError("host-name source unavailable")

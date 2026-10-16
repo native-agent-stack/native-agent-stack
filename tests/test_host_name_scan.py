@@ -6,12 +6,21 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
 
 from scripts import host_name_scan
+
+LINUX_RELEASE = "6.8.0-45-generic"
+WSL2_RELEASE = "6.6.87.2-microsoft-standard-WSL2"
+
+
+def _uname(release):
+    """A uname(2) result with a fixture kernel release; no other field is read."""
+    return os.uname_result(("Linux", "fixture-node", release, "#1 SMP", "x86_64"))
 
 
 class HostNameSourceTests(unittest.TestCase):
@@ -22,6 +31,10 @@ class HostNameSourceTests(unittest.TestCase):
         patch.start()
         self.addCleanup(patch.stop)
         patch = mock.patch.object(host_name_scan.shutil, "which", return_value=None)
+        patch.start()
+        self.addCleanup(patch.stop)
+        # The suite can run on a WSL kernel; each test names the release it means.
+        patch = mock.patch.object(host_name_scan.os, "uname", return_value=_uname(LINUX_RELEASE))
         patch.start()
         self.addCleanup(patch.stop)
 
@@ -201,6 +214,100 @@ class HostNameSourceTests(unittest.TestCase):
             with self.assertRaises(host_name_scan.HostNameScanError) as caught:
                 host_name_scan.host_names(Path.cwd())
             self.assertNotIn("fixtureagent", str(caught.exception))
+
+    def test_wsl_kernel_without_distro_name_refuses_by_name_before_any_source(self):
+        # A Codex shell under inherit = "none" has a WSL kernel but no WSL_DISTRO_NAME.
+        # Scanning on would treat the public distro label as a private hostname and
+        # stop requiring the Windows sources, so the scan refuses with a named reason.
+        for release in (WSL2_RELEASE, "5.10.16.3-microsoft-standard", "4.4.0-19041-Microsoft"):
+            results = [subprocess.CompletedProcess([], 0, "fixtureagent\n", ""),
+                       subprocess.CompletedProcess([], 0, "fixture-distro\n", ""),
+                       subprocess.CompletedProcess([], 1, "", "")]
+            with self.subTest(release=release), \
+                    mock.patch.object(host_name_scan.os, "uname", return_value=_uname(release)), \
+                    mock.patch.object(host_name_scan, "PROFILE_ROOT") as profiles, \
+                    mock.patch.object(host_name_scan, "_command", side_effect=results) as command:
+                profiles.iterdir.return_value = []
+                with self.assertRaises(host_name_scan.HostNameScanError) as caught:
+                    host_name_scan.host_names(Path.cwd())
+                self.assertEqual(caught.exception.reason, "wsl_distro_name_missing")
+                self.assertIn("WSL_DISTRO_NAME", str(caught.exception))
+                self.assertNotIn("fixture", str(caught.exception))
+                command.assert_not_called()
+                profiles.iterdir.assert_not_called()
+
+    def test_validate_scan_exits_2_with_the_named_reason_and_a_one_line_remedy(self):
+        from scripts import validate
+        results = [subprocess.CompletedProcess([], 0, "fixtureagent\n", ""),
+                   subprocess.CompletedProcess([], 0, "fixturehostname\n", ""),
+                   subprocess.CompletedProcess([], 1, "", "")]
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary) / "synthetic.txt"
+            target.write_text("clean\n", encoding="utf-8")
+            with mock.patch.object(host_name_scan.os, "uname", return_value=_uname(WSL2_RELEASE)), \
+                    mock.patch.object(host_name_scan, "PROFILE_ROOT") as profiles, \
+                    mock.patch.object(host_name_scan, "_command", side_effect=results), \
+                    mock.patch.object(sys, "argv", ["validate.py", "--root", temporary,
+                                                    "--scan-file", str(target)]), \
+                    contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                profiles.iterdir.return_value = []
+                status = validate.main()
+        self.assertEqual(status, 2)
+        self.assertEqual(json.loads(stdout.getvalue()),
+                         {"status": "error", "reason": "wsl_distro_name_missing",
+                          "source": "host", "scanned_files": 1})
+        remedy = stderr.getvalue()
+        self.assertEqual(remedy.count("\n"), 1)
+        self.assertIn("wsl_distro_name_missing", remedy)
+        self.assertIn("WSL_DISTRO_NAME", remedy)
+        self.assertNotIn("fixture", stdout.getvalue() + remedy)
+
+    def test_non_wsl_kernel_without_distro_name_keeps_every_linux_source(self):
+        # Generic, cloud and Darwin releases are not WSL: no refusal, same sources as before.
+        for release in (LINUX_RELEASE, "6.8.0-1014-azure", "6.8.0-1015-aws", "24.6.0"):
+            results = [subprocess.CompletedProcess([], 0, "fixtureagent\n", ""),
+                       subprocess.CompletedProcess([], 0, "fixturehostname\n", ""),
+                       subprocess.CompletedProcess([], 0, "fixturemail@example.invalid\n", "")]
+            with self.subTest(release=release), \
+                    mock.patch.object(host_name_scan.os, "uname", return_value=_uname(release)), \
+                    mock.patch.object(host_name_scan, "PROFILE_ROOT") as profiles, \
+                    mock.patch.object(host_name_scan, "_command", side_effect=results) as command:
+                profiles.iterdir.return_value = []
+                self.assertEqual(host_name_scan.host_names(Path.cwd()),
+                                 ("fixtureagent", "fixturehostname", "fixturemail"))
+                self.assertEqual([call.args[0] for call in command.call_args_list],
+                                 [["id", "-un"], ["uname", "-n"],
+                                  ["git", "config", "--get", "user.email"]])
+
+    def test_wsl_kernel_with_distro_name_keeps_the_label_exemption_and_windows_sources(self):
+        results = [subprocess.CompletedProcess([], 0, "fixtureagent\n", ""),
+                   subprocess.CompletedProcess([], 0, "FIXTURE-DISTRO\n", ""),
+                   subprocess.CompletedProcess([], 0, json.dumps({
+                       "computer": "fixturecomputer", "profiles": []}), ""),
+                   subprocess.CompletedProcess([], 1, "", "")]
+        with mock.patch.dict(os.environ, {"WSL_DISTRO_NAME": "fixture-distro"}), \
+                mock.patch.object(host_name_scan.os, "uname", return_value=_uname(WSL2_RELEASE)), \
+                mock.patch.object(host_name_scan.shutil, "which", return_value="powershell.exe"), \
+                mock.patch.object(host_name_scan, "PROFILE_ROOT") as profiles, \
+                mock.patch.object(host_name_scan, "_command", side_effect=results):
+            profiles.iterdir.return_value = []
+            self.assertEqual(host_name_scan.host_names(Path.cwd()), ("fixtureagent", "fixturecomputer"))
+        # Without a Windows source, the existing unnamed refusal stays as it was.
+        with mock.patch.dict(os.environ, {"WSL_DISTRO_NAME": "fixture-distro"}), \
+                mock.patch.object(host_name_scan.os, "uname", return_value=_uname(WSL2_RELEASE)), \
+                mock.patch.object(host_name_scan, "_command", return_value=
+                                  subprocess.CompletedProcess([], 0, "fixtureagent\n", "")):
+            with self.assertRaises(host_name_scan.HostNameScanError) as caught:
+                host_name_scan.host_names(Path.cwd())
+            self.assertIsNone(getattr(caught.exception, "reason", None))
+            self.assertNotIn("fixtureagent", str(caught.exception))
+
+    def test_synthetic_override_still_replaces_sources_on_a_wsl_kernel(self):
+        with mock.patch.dict(os.environ, {host_name_scan.OVERRIDE: '["fixtureagent"]'}), \
+                mock.patch.object(host_name_scan.os, "uname", return_value=_uname(WSL2_RELEASE)), \
+                mock.patch.object(host_name_scan, "_command", side_effect=AssertionError("source used")):
+            self.assertEqual(host_name_scan.host_names(Path.cwd()), ("fixtureagent",))
 
 
 @unittest.skipUnless(shutil.which("betterleaks"), "native Betterleaks unavailable")

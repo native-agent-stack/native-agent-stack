@@ -864,10 +864,16 @@ def main() -> int:
                     raise OSError  # A second read failed; no fabricated finding location.
                 locators.update(safe_locator(path, line, root=args.root, names=names)
                                 for line in private_lines)
-        except (HostNameScanError, OSError, subprocess.SubprocessError):
-            # Native diagnostic/config text and exception values are private.
-            print(json.dumps({"status": "error", "source": source,
-                              "scanned_files": len(paths)}, sort_keys=True))
+        except (HostNameScanError, OSError, subprocess.SubprocessError) as error:
+            # Native diagnostic/config text and exception values are private. Only a
+            # named scanner refusal adds its fixed code and value-free one-line remedy.
+            status = {"status": "error", "source": source, "scanned_files": len(paths)}
+            reason = getattr(error, "reason", None) if isinstance(error, HostNameScanError) else None
+            if reason:
+                status["reason"] = reason
+            print(json.dumps(status, sort_keys=True))
+            if reason:
+                print(f"Host-name scan refused: {error}", file=sys.stderr)
             return 2
         print(json.dumps({"status": "failed" if locators else "passed",
                           "source": source, "scanned_files": len(paths),

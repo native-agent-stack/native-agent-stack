@@ -63053,8 +63053,8 @@
     },
     {
       "path": "scripts/host_name_scan.py",
-      "sha256": "a09a351de8fcd334938c7dd3f938e01b4e54cfd535c4f965e8ebe8b96f2c24ec",
-      "bytes": 21365
+      "sha256": "79ff8ea499dd06f3339b0492224e61c652c12fa647fc832cbf32312b512b85ee",
+      "bytes": 22894
     },
     {
       "path": "scripts/host_receipts.py",
@@ -63163,8 +63163,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "a68c189c56bef41b0d3d8a5069920e15db45249818054c444988abad1e8f8477",
-      "bytes": 49157
+      "sha256": "7853863521f111e1833ce93d6c70afa074c4f124fb43274aca06371de20ef51f",
+      "bytes": 49524
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -64253,8 +64253,8 @@
     },
     {
       "path": "tests/test_host_name_scan.py",
-      "sha256": "0dbe4b3dd42e9a6c5b3dc53111fa9fda0a960d0ca723fed9d331d6394c2488f8",
-      "bytes": 27564
+      "sha256": "b191a80485af10612e5327e1c3c6adc44025ed160e1c75e4b8ecbde6cdfc93d5",
+      "bytes": 34823
     },
     {
       "path": "tests/test_host_receipts.py",
