@@ -34,10 +34,12 @@ historical evidence. No age or generation cutoff is applied. Unverified
 provider identities remain unscreened until their provider source is admitted;
 a name's numeric shape grants no resolution.
 
-The currency separation follows an operator decision, recorded privately,
-using the existing [basis convention at 1b633d86, schema.json:475-478](https://github.com/native-agent-stack/native-agent-stack/blob/1b633d861518fa0d299279b1cfaec11d0fb47f82/catalogs/landscape/angles/schema.json#L475-L478).
-The [model-currency decision](2026-09-27-model-currency.md) tracks maintenance
-and evaluation gates separately from identity recognition.
+The currency separation is recorded by the
+[2026-10-16 clarification](2026-10-16-preopening-receipt-ownership-v2-replay.md#snapshot-recognition-and-currency),
+attributed to the privately recorded operator decision using the existing
+[basis convention at 1b633d86, schema.json:475-478](https://github.com/native-agent-stack/native-agent-stack/blob/1b633d861518fa0d299279b1cfaec11d0fb47f82/catalogs/landscape/angles/schema.json#L475-L478).
+The [2026-09-27 model-currency decision](2026-09-27-model-currency.md) supplies
+historical configuration and maintenance background.
 
 The OpenAI identities are present in
 [`openai/openai-python` v3.31.0 at 86cae50785fb7b7bf2a5d2383370b214b304acd2, chat_model.py:8-96](https://github.com/openai/openai-python/blob/86cae50785fb7b7bf2a5d2383370b214b304acd2/src/openai/types/shared/chat_model.py#L8-L96)

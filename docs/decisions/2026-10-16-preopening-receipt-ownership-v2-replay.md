@@ -22,8 +22,11 @@ The supported content contract is now explicit. A1 requires own
 `kind: comparative`, native output arms, completion and confounds, and adds
 own `candidate_id`. Each id equals `candidate.id`. Generic citation objects
 continue to use `kind: receipt` to identify the file; a citation label cannot
-replace the content checks. The schema's two receipt definitions document
-these producer contracts. Required-field validation reuses
+replace the content checks. The schema's two receipt definitions are
+test-only producer contracts, loaded by the standalone contract tests.
+Runtime enforcement uses `bound_a1_sources` and `validate_comparison` for
+receipt contents and the existing native result checks. Required-field
+validation in the schema controls reuses
 [`jsonschema` 4.26.0 at a7277432b0f7bcd0551f6e589d30457017125df4, _keywords.py:304-309](https://github.com/python-jsonschema/jsonschema/blob/a7277432b0f7bcd0551f6e589d30457017125df4/jsonschema/_keywords.py#L304-L309).
 The fresh [source check](../../evidence/artifacts/angle-records-preopening-20261016/source-checks.json)
 confirms that exact function matches the installed package.
@@ -45,11 +48,13 @@ cited provider versioning contract. The corrected audit covers 83 documented
 identities. Current and historical exact snapshots remain accepted, including
 dated and documented dateless identities. No age or generation cutoff is added.
 
-Currency separation follows an operator decision, recorded privately, using
-the existing [schema basis convention at :475-478](https://github.com/native-agent-stack/native-agent-stack/blob/1b633d861518fa0d299279b1cfaec11d0fb47f82/catalogs/landscape/angles/schema.json#L475-L478).
-The [model-currency decision](2026-09-27-model-currency.md) tracks maintenance
-and evaluation gates. This correction changes identity recognition and receipt
-ownership; it makes no model-capability or availability claim.
+Currency separation is a 2026-10-16 clarification in this correction,
+attributed to the privately recorded operator decision using the existing
+[schema basis convention at :475-478](https://github.com/native-agent-stack/native-agent-stack/blob/1b633d861518fa0d299279b1cfaec11d0fb47f82/catalogs/landscape/angles/schema.json#L475-L478).
+The [2026-09-27 model-currency decision](2026-09-27-model-currency.md) supplies
+historical configuration and maintenance background. This dated clarification
+records the separation rule. The correction changes identity recognition and
+receipt ownership; it makes no model-capability or availability claim.
 
 ## Replay the member that native discovery actually screened
 
@@ -86,6 +91,32 @@ emits `receipt_staleness:`, and
 emits `catalog-freshness:`. These are the qualification correction's two
 symbolic namespaces. Other references remain confined file dependencies;
 post-anchor symbolic reopening still refuses under native history policy.
+
+## Shared qualification fixtures carry generated source proof
+
+PIN-RULES reads source commits through the native
+[`proof_backed_record_pin` at 37609bd9:410-422](https://github.com/native-agent-stack/native-agent-stack/blob/37609bd9c9bad6a72cea9cdc1514dd548ee1a23d/scripts/final_stack.py#L410-L422).
+The shared `AngleEnforcementTests.prepare` producer therefore supplies a
+`source_proof` reference for its synthetic widget and writes the generated
+artifact into the fixture root. The data producer calls native
+[`complete_run_pins.resolve`:115-147](https://github.com/native-agent-stack/native-agent-stack/blob/37609bd9c9bad6a72cea9cdc1514dd548ee1a23d/scripts/complete_run_pins.py#L115-L147)
+with mocked exact tag output. Native
+[`tag_names`:44-54](https://github.com/native-agent-stack/native-agent-stack/blob/37609bd9c9bad6a72cea9cdc1514dd548ee1a23d/scripts/complete_run_pins.py#L44-L54)
+constructs the full tag query. No proof helper or parser is copied, and the
+fixture producer and data explicitly identify their synthetic provenance.
+
+In the composed qualification/PIN/follow-up tree, the native
+`NativeHistoryQualificationTests.test_full_native_evidence_qualifies_without_enabling_admission`
+positive requires this proof-backed fixture. The paired qualification control
+removes its proof reference, requires refusal, then restores the same bytes
+and requires recovery. These controls exercise fixture binding and read-only
+qualification; the mocked proof authenticates no external repository.
+
+The later PIN correction's
+[`complete_final_pin` at 9dbcd9ae:924-936](https://github.com/native-agent-stack/native-agent-stack/blob/9dbcd9ae8203a9bde69b19e4b7a57a7a19d855d3/scripts/final_stack.py#L924-L936)
+refuses any receipt while `source_commit_claim` is present or
+`source_proof_status` is `not_verified`. The composed checks and the later
+activation rebase preserve this guard and same-repository component identity.
 
 ## Evidence and activation prerequisite
 

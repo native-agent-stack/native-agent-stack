@@ -19318,8 +19318,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-a1-identity-binding.md",
-      "sha256": "69bf7ddf48908e62f96292fb6bb65670f754f65b0122122ed01cc3dba8e57639",
-      "bytes": 9577
+      "sha256": "f21fab86ce9f4097ef07f81fccad03fb2fce17d88c0bde30115645042e3d802e",
+      "bytes": 9712
     },
     {
       "path": "docs/decisions/2026-10-15-jev-scored-contract-corrections.md",
@@ -19358,8 +19358,8 @@
     },
     {
       "path": "docs/decisions/2026-10-16-preopening-receipt-ownership-v2-replay.md",
-      "sha256": "dae672b1d3f585066f98ceccec7981df9daeba13862c6f9f05062f07f3c39bfb",
-      "bytes": 6717
+      "sha256": "6beb8680efea65d7de0695bdbbb1d27f1aca09d1e934ad43ce45893cf7859644",
+      "bytes": 8973
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -63107,6 +63107,11 @@
       "bytes": 3117
     },
     {
+      "path": "tests/fixtures/generate_widget_source_proof.py",
+      "sha256": "d33c47be1773d8b3d831f883833ba2572adca93e61d37e1317cdd7f0df214ced",
+      "bytes": 1370
+    },
+    {
       "path": "tests/fixtures/guard_685/README.md",
       "sha256": "8da7b72ab0497df025dab2bce5534ae6b2c92276233477ed710352362de35ca6",
       "bytes": 1032
@@ -63310,6 +63315,11 @@
       "path": "tests/fixtures/verify_sources/review-corrections.json",
       "sha256": "276036c784700b4e05abcccb779821f07d209b3f47aaedfa3f57fb32f520dfbf",
       "bytes": 1130
+    },
+    {
+      "path": "tests/fixtures/widget-source-proof.json",
+      "sha256": "e7c9de6c0df9e12d3334f8ebd118ff06174e4a7138df1d522927dd0159d6e529",
+      "bytes": 923
     },
     {
       "path": "tests/fixtures/workflow-security/unsafe.yml.txt",
@@ -63618,8 +63628,8 @@
     },
     {
       "path": "tests/test_angle_records_preopening_followup.py",
-      "sha256": "80e7f457b8f2c07ef842ecb99ecba16d7e6309f425eb244bdd5798c33bf1e554",
-      "bytes": 10556
+      "sha256": "c00ff3c9ea345932a09e1eec5fc2589dd3a3ea7356ccd98aab61ed2f21f63429",
+      "bytes": 11861
     },
     {
       "path": "tests/test_anthropic_key_health.py",
@@ -63958,8 +63968,8 @@
     },
     {
       "path": "tests/test_final_stack.py",
-      "sha256": "b44fa627f9b18357f2ffa53213d51a9dfcd8a45fb040b8673d3b385f45d5fc1e",
-      "bytes": 79904
+      "sha256": "612fca3a95578ae63ed95ca6807a789516bd7fa1a8422ab5b5668effa4dfaa0f",
+      "bytes": 80482
     },
     {
       "path": "tests/test_financial_data.py",

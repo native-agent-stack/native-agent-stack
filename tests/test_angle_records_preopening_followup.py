@@ -14,6 +14,29 @@ from tests import test_saturation_ledger as native_helpers
 ROOT = Path(__file__).resolve().parents[1]
 
 
+class ContractDocumentationTests(unittest.TestCase):
+    """Keep the published policy attribution and receipt contract limits explicit."""
+
+    def test_currency_separation_has_a_dated_clarification(self):
+        for name in ("2026-10-15-a1-identity-binding.md",
+                     "2026-10-16-preopening-receipt-ownership-v2-replay.md"):
+            with self.subTest(decision=name):
+                text = (ROOT / "docs/decisions" / name).read_text()
+                paragraph = next(part for part in text.split("\n\n")
+                                 if "currency separation" in part.casefold())
+                self.assertIn("2026-10-16", paragraph)
+                self.assertIn("clarification", paragraph.casefold())
+                self.assertIn("background", paragraph.casefold())
+
+    def test_receipt_definitions_are_described_as_test_only_producer_contracts(self):
+        text = (ROOT / "docs/decisions/2026-10-16-preopening-receipt-ownership-v2-replay.md").read_text()
+        contract = " ".join(text.split("## Snapshot recognition and currency")[0].split())
+        self.assertIn("test-only producer contracts", contract)
+        self.assertIn("Runtime enforcement", contract)
+        self.assertIn("bound_a1_sources", contract)
+        self.assertIn("validate_comparison", contract)
+
+
 class ReceiptOwnershipTests(unittest.TestCase):
     record = identity_helpers.A1IdentityTests.record
 
