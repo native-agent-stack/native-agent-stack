@@ -44,6 +44,18 @@ dependency dispatch inherits the same no-start flag as the selected row.
 package installation, rootless setup, unit registration/reload and activation
 steps, including their no-start behavior.
 
+After no-start provisioning, the authorized normal `--only container-engine`
+installation pass completes Docker's native rootless setup even though the
+unit already exists. That setup creates and selects the rootless CLI context,
+so ordinary `docker` and `docker compose` commands select the rootless socket.
+Starting the unit alone does not complete this configuration. Normal reruns
+use the upstream setup command; no-start reruns continue to skip it.
+
+Acceptance resolves inherited `NS2604_HOST_FILE` paths relative to its invocation
+directory, before any check changes directories. This matches `--host-file`
+handling and keeps research checks on the selected host allocation. A path
+canonicalization failure stops before check dispatch.
+
 Allocate ports in the same nonsecret host JSON used by client configuration.
 `NS_PORT_*` keys select listeners and their client/scrape targets; `AI_MEMORY_URL`
 remains the canonical memory endpoint. Explicit host files, saved allocations and

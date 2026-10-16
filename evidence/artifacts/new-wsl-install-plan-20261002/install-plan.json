@@ -3555,7 +3555,7 @@
         "docker_repository",
         "docker_engine_packages",
         "if [[ \"$NS2604_NO_START\" != 1 ]]; then sudo systemctl disable --now docker.service docker.socket; fi",
-        "if [[ \"$NS2604_NO_START\" != 1 && ! -f \"$HOME/.config/systemd/user/docker.service\" ]]; then dockerd-rootless-setuptool.sh install; fi",
+        "if [[ \"$NS2604_NO_START\" != 1 ]]; then dockerd-rootless-setuptool.sh install; fi",
         "if [[ \"$NS2604_NO_START\" == 1 && ! -e \"$HOME/.config/systemd/user/docker.service\" ]]; then mkdir -p \"$HOME/.config/systemd/user\"; install -m 0600 \"$config_root/docker.service\" \"$HOME/.config/systemd/user/docker.service\"; fi; systemctl --user daemon-reload",
         "activate_user_unit docker.service"
       ],

@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-16",
+  "base": "21c61a51a77fe8e4970ac47772c0afb179368614",
+  "branch": "codex/install-plan-activation-followup-20261016",
+  "authorization_events": [199407, 204381],
+  "review_name": "review_output.json",
+  "reviewed_predecessor": "6315ebbfbbe78c4a64f5585b85bc7adb2fdd9fa9",
+  "evidence_class": "synthetic",
+  "execution_prefix": "systemd-run --user --scope -p CPUWeight=idle -p MemoryMax=14G -p MemorySwapMax=0 --quiet --",
+  "execution_lifecycle": "Detached scopes inherit the native caller context automatically. Each check has its own log and exit file; no identity selector is manually set.",
+  "before": {
+    "source": "Unchanged21c61a51 install.sh and accept.sh",
+    "command": "python3 -B /tmp/install-nostart-safe-tests-velo.py tests.test_install_plan_activation_followup",
+    "log_name": "install-nostart-activation-before-velo.log",
+    "exit_file_name": "install-nostart-activation-before-velo.exit.json",
+    "tests": 2,
+    "failures": 2,
+    "errors": 0,
+    "skips": 0,
+    "exit_code": 1,
+    "cases": [
+      "No-start creates docker.service, then the normal extracted row skips native setup and leaves the fixture CLI context at default",
+      "Inherited relative host selection resolves before the research directory change and fails afterward"
+    ]
+  },
+  "changes": {
+    "rootless_setup": "Normal installation always delegates to dockerd-rootless-setuptool.sh install. The pinned upstream preserves an existing unit and still creates/selects its CLI context. No-start skips that command and only registers/reloads the unit. A native setup failure propagates before later row activation.",
+    "acceptance_selector": "Resolve inherited or saved host selectors with the same realpath operation already used for --host-file, before check dispatch. Assign before export so a canonicalization failure is not hidden. Explicit CLI input retains precedence.",
+    "checker": "The service audit requires the normal-only setup command and rejects an unguarded call, an extra unguarded call, or the old unit-existence guard.",
+    "plan_sync": "install-plan.json records the same rootless setup command as install.sh."
+  },
+  "after": {
+    "initial_two_regressions": {"tests": 2, "failures": 0, "errors": 0, "skips": 0, "exit_code": 0},
+    "focused": {
+      "command": "python3 -B /tmp/install-nostart-safe-tests-velo.py tests.test_install_plan_activation_followup tests.test_install_plan_no_start_ports tests.test_install_plan_review_wave3 tests.test_install_plan_review_wave5 tests.test_install_plan_review_wave6 tests.test_install_plan_review_wave7 tests.test_harbor_currency_contracts tests.test_research_entry",
+      "log_name": "install-nostart-activation-focused-velo.log",
+      "exit_file_name": "install-nostart-activation-focused-velo.exit.json",
+      "tests": 132,
+      "new_tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 0
+    },
+    "controls": [
+      "No-start followed by normal setup selects the fixture rootless context without replacing the staged unit",
+      "Fresh and repeated normal setup use the native entrypoint",
+      "Repeated no-start registers/reloads without native setup or enable/start",
+      "Setup failure37 prevents later activation",
+      "Checker rejects missing/extra guards and the old incomplete setup condition",
+      "Relative inherited paths, including spaces, survive a research-directory change",
+      "Explicit input overrides inherited input",
+      "Absolute inherited and saved allocations retain their endpoints",
+      "An invalid parent path fails before the first check",
+      "No selector retains the default gateway"
+    ],
+    "check_plan": {"rows": 84, "commands": 198, "acceptance_entries": 113, "exit_code": 0}
+  },
+  "citation_audit": {
+    "pre_edit_inventory_name": "install-nostart-followup-citations-before-velo.txt",
+    "pre_edit_git_grep_matches": 79,
+    "pre_edit_files": 29,
+    "install_lines_before_and_after": 1396,
+    "accept_lines_before_and_after": 2879,
+    "existing_anchor_hashes_matching": 8,
+    "shifted_locators": 0
+  },
+  "sources": [
+    {
+      "repository": "https://github.com/moby/moby",
+      "pin": "8af9fe3a36bab3e039862a2ab1cef1880c9b4d03",
+      "file": "contrib/dockerd-rootless-setuptool.sh",
+      "lines": "334-338,429-459",
+      "mechanism": "Unit reuse and native CLI context creation/selection are distinct setup steps."
+    },
+    {
+      "repository": "https://github.com/uutils/coreutils",
+      "pin": "0.10.0",
+      "file": "src/uu/realpath/src/realpath.rs",
+      "lines": "93-99,269,297-298",
+      "mechanism": "Native canonicalization; default mode requires all but the final component to exist. Both the shell and fixture /usr/bin/realpath report0.10.0."
+    },
+    {
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "pin": "21c61a51a77fe8e4970ac47772c0afb179368614",
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "lines": "29-33",
+      "mechanism": "Existing explicit --host-file canonicalization extended to inherited input before directory-changing checks"
+    }
+  ],
+  "required_before_commit": "Run python3 scripts/validate.py after native evidence registration; final validation and full push-gate outcomes are recorded in the PR body and lane log.",
+  "local_execution_boundary": "Extracted container-engine/activation helpers with fake package, sudo, systemctl, setup and Docker commands; extracted acceptance option/selector setup and the real offline gateway loader in disposable directories. No full install.sh/accept.sh, native installer, real daemon, model download, credential store or listener activation was run.",
+  "native_target_boundary": "NativeHorizonNY owns actual Docker setup/context and acceptance checks after this follow-up lands. This source-backed fixture evidence does not establish native Docker/Compose connectivity or target activation success."
+}

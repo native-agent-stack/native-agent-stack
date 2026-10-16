@@ -161,8 +161,11 @@ def no_start_contract(rows, funcs, text, bad):
             bad("no-start", f"{slot}: native daemon start bypasses --no-start")
         if slot == "dagu" and '--service "$dagu_service_mode"' not in body:
             bad("no-start", "dagu: installer must use its documented SERVICE_MODE=no")
-        if slot == "container-engine" and '"$NS2604_NO_START" != 1 &&' not in body:
-            bad("no-start", "container-engine: rootless setup starts Docker and must be skipped")
+        if slot == "container-engine":
+            setup_commands = [command for command in run_commands(slot, funcs, set())
+                              if "dockerd-rootless-setuptool.sh install" in command]
+            if setup_commands != ['if [[ "$NS2604_NO_START" != 1 ]]; then dockerd-rootless-setuptool.sh install; fi']:
+                bad("no-start", "container-engine: rootless setup must run in normal mode and be skipped in no-start mode")
     if 'if [[ "${NS2604_NO_START:-0}" == 1 ]]; then\n    sudo systemctl mask docker.service docker.socket containerd.service' not in funcs.get("docker_engine_packages", ""):
         bad("no-start", "container-engine: package postinst activation must be blocked")
     graph = funcs.get("code-graph", "")
