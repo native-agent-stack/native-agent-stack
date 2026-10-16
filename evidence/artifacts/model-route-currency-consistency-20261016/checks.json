@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "date": "2026-10-16",
+  "tests_command": "python3 -B -m unittest tests.test_currency_due -q",
+  "execution_mode": "Detached user systemd unit at CPUWeight=idle; private raw stdout/stderr and an explicit exit file retained by the lane runner.",
+  "observed_test_count": 105,
+  "result": "passed",
+  "cache_identity_and_parser_depth_followup": {
+    "base": "4107f379529411c87e4cd5568d4ee57139a582c3",
+    "review": "review_output.json (private review cited by name only)",
+    "fail_first": {"tests": 2, "assertion_failures": 3, "errors": 1, "error_class": "RecursionError"},
+    "cases": [
+      "Two fixture checkouts share state; foreign, absent and malformed cached root identities must not carry model findings into the second checkout.",
+      "The existing 200,000-level malformed-JSON pattern must become an inventory coverage gap while unrelated stale-receipt counts are persisted."
+    ],
+    "focused_green": {"tests": 4, "exit_code": 0, "scope": "Both new cases plus existing same-checkout retention and unavailable-history controls."},
+    "full_currency_suite": {"tests": 105, "exit_code": 0},
+    "private_logs": ["cache-depth-red2/stdout.log", "cache-depth-red2/stderr.log", "cache-depth-red2/exit", "cache-depth-green/stderr.log", "cache-depth-suite/stderr.log", "cache-depth-suite/exit"],
+    "custody": "Private logs are named only; no log or process-metadata digest is published. No host/model qualification is claimed."
+  },
+  "notice_budget_followup": {
+    "base": "1b62f8e7d501846abb974622c89111f6f794ae9b",
+    "review": "MICRO-delta-1b62f8e7.md; matching local review_output.json (names only)",
+    "fail_first": "Six-test run: the three-gap unit case raised CheckError; long-path CLI, two unreadable/invalid-prior cases and retained-origin rendering produced four assertion failures. The route-binding and PyPI negative controls passed baseline.",
+    "after": "All 153 currency/route tests passed. Summary budgeting compacts coverage before omitting an inline command and never prevents writing. Unavailable prior history does not block current known counts; retained origins appear in text.",
+    "existing_guard_coverage": "Seven invalid binding kind/identity shapes and seven PyPI mismatch/URL-shape cases fail closed without traceback. No baseline defect is claimed for these guards.",
+    "scope": "One normal commit, no rebase; no host run, model call or timer change."
+  },
+  "round_3": {
+    "base": "94b4ba5515da5159c3b50d8b7edef40b7c4bbbc2",
+    "commit_policy": "one normal commit; no rebase",
+    "fail_first": [
+      "Gateway proposal incorrectly accepted as a registered model route",
+      "Both PyPI case and punctuation equivalents incorrectly rejected",
+      "Unknown inventory plus one stale receipt drops the previously persisted model count/finding",
+      "Nonzero summary counts omit the inventory gap, including the truncation/pointer case"
+    ],
+    "existing_correct_guard": "Five malformed/unknown C2 package-row controls pass baseline and fixed code; these are added coverage, not baseline failures.",
+    "public_source_packet": "UPSTREAM-PINS-round3.json and SHA256SUMS, supplied through the co-op",
+    "remaining_gap": "F5-G-ACTIVE-MODEL-FAILURE-CATEGORY"
+  },
+  "review_round": {
+    "closure_table": "review-closure.md",
+    "integrated_main": "30542e70560147c19049016d19aa3f264515c92f",
+    "private_reviews": ["MICRO-full-a943dd3a.md", "GPT-VERDICT-a943dd3ae.md", "review_output.json"],
+    "privacy_red_green": "Two new tests first produced three assertion failures (counts/field locations only), then passed after name-only citation cleanup.",
+    "behavior_red_green": [
+      "Equivalent GitHub URL/case/suffix normalization, both imported and CLI validator paths",
+      "Component-only C2 proposal bound to a package row",
+      "Unregistered C2 route rejected even with an inline inventory row",
+      "Persisted inventory-age count with exit 0, unreadable and malformed inventory coverage gaps",
+      "Current guide describes maintenance reporting and held Haiku 5.5 proposal"
+    ],
+    "existing_guard_mutations": {
+      "baseline": "passed; no claim of fail-first production defects",
+      "expected_assertion_failures": {"duplicate_binding": 1, "duplicate_source": 1, "duplicate_repository": 1, "gpt_layer_count": 2, "malformed_binding": 3, "malformed_source": 3},
+      "unexpected_errors": 0
+    },
+    "integration_regression": "First merged-tree run: 275/276 passed. The custody helper skipped an original public pinned blob because HEAD still held it while the pending merge changed the checkout. A synthetic regression failed first; the helper now includes modified checkout paths in its pinned reads. Six focused controls passed, followed by all 278 affected tests. No evidence digest allowlist was added.",
+    "primary_captures": "UPSTREAM-PINS-20261016.json",
+    "follow_up": "active-model-coverage-followup.json; nonblocking, underlying failure subtype not retained"
+  },
+  "related_consumer_checks": {
+    "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 -B -m unittest tests.test_model_currency tests.test_validate tests.test_currency_due tests.test_model_currency_propose -q",
+    "tests": 237,
+    "result": "passed",
+    "model_currency_module_tests_at_that_run": 33,
+    "final_scope_check": "After the 237-test consumer run, the final 120-test publication/currency run also covers the new component-identity guard; the currency module then has 34 tests."
+  },
+  "fail_first": [
+    {
+      "case": "C2 component identity",
+      "before": "A model route could be mislabeled as an unrelated package while preserving proposal coverage.",
+      "after": "Component declarations must match the referenced package's canonical source identity."
+    },
+    {
+      "case": "Publication age report and step-summary visibility",
+      "before": "The stale inventory CLI case returned 1; the first report-only implementation then failed the step-summary visibility assertion.",
+      "after": "The CLI returns 0, retains the due row in model_currency_notices and appends it to the step summary. Malformed JSON, structural, date-format, source and future-date failures still return 1."
+    },
+    {
+      "case": "Missing inventory row",
+      "before": "CLI returned 0 with a nonexistent row reference.",
+      "after": "CLI returns 1 and names the broken join."
+    },
+    {
+      "case": "Older model generation",
+      "before": "CLI returned no route observation or notice.",
+      "after": "CLI returns 0 and a nonblocking selected-model/inventory-model notice."
+    },
+    {
+      "case": "GPT half consumption",
+      "before": "The retained manifest was ignored.",
+      "after": "The explicit candidate model is checked through the stable-ID binding."
+    },
+    {
+      "case": "C2 table presence and proposal coverage",
+      "before": "Missing or empty join table passed beside retained proposals.",
+      "after": "CLI rejects incomplete consistency input; model age is not a rejection."
+    },
+    {
+      "case": "Binding removal",
+      "before": "Removing the binding declaration disabled the checker.",
+      "after": "A present route source requires its binding declaration."
+    },
+    {
+      "case": "Background-Haiku refresh proposal",
+      "before": "The real inventory row retained the older model.",
+      "after": "The row names the current Haiku generation as held for normal refresh."
+    }
+  ],
+  "not_measured": [
+    "No model inference, credential lookup, Muse command or runtime application.",
+    "No quality comparison or entitlement qualification.",
+    "The 42-day and seven-day maintenance windows remain. Publication reports their age findings; it does not perform refreshes or model changes."
+  ]
+}

@@ -1,5 +1,7 @@
 # Model currency enforcement — 2026-10-07
 
+Publication age failures are superseded by the [2026-10-16 reporting decision](2026-10-16-model-route-currency-consistency.md#supersession-of-publication-age-enforcement). The 42-day and seven-day windows remain maintenance windows; structural, date-format and source validation continue. The record below preserves the original enforcement and its evidence.
+
 ## Decision
 
 Keep the current-model record in `catalogs/foundation/model-currency.json` and
@@ -98,8 +100,8 @@ for subsequent checks.
 
 ## Amendment (2026-10-07): ruled partial fill and current carriers
 
-The command center's model refresh was ruled at 2026-10-07T01:35Z. Its verified
-source-record SHA-256 is `44679fd1d26dfec36b3b57cdbde2df4290d1b068118562cb8811bf3eb7cd6941`.
+The command center's model refresh was ruled at 2026-10-07T01:35Z. Its private source record is
+`model-currency-wf_5053494c-265.json` (the initial October 7 refresh), cited by name only.
 The current catalog now declares 20 strict artifact/model-consumer rows and seven
 primary package snapshots. It stays pending: [the new source-review record](../../evidence/artifacts/model-currency-enforcement-20261007/fill-source-review.json)
 preserves date/revision bases, corrections and eight unresolved groups. The
@@ -195,10 +197,10 @@ read October 7. A Haiku 5.x ID reopens the slot; newer Sonnet/Opus releases do
 not themselves justify a heavier assignment. Sol/Astra and the other rows remain
 unchanged by this ruling.
 
-The later living source record has SHA-256
-`941c0061085c030d1484809a5726088fa584e83ce2b336ac9d1bf106efcd74cb`,
-with `owner_decision_20261007T0415Z` and apply item 1 marked reverted. The earlier
-44679 source hash and recorded source observations remain immutable. The CC
+The later living source record is
+`model-currency-wf_5053494c-265.json`, with its October 7 04:15Z amendment
+and apply item 1 marked reverted. The earlier recorded source observations
+remain historical evidence; private record digests and their prefixes are omitted. The CC
 reports removing the background override; this lane neither inspects its user
 settings nor claims a new background request. The current inventory has 21 rows
 and remains pending for the same unresolved groups. The original installer

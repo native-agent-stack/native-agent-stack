@@ -189,6 +189,7 @@ class Checkout:
         self.script.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / "scripts/currency_due.py", self.script)
         shutil.copyfile(ROOT / "scripts/sweep_policy.py", self.script.parent / "sweep_policy.py")
+        shutil.copyfile(ROOT / "scripts/validate.py", self.script.parent / "validate.py")
         self.set(STALENESS, staleness_report())
         self.set(PINNED, pinned_report())
         self.set(SATURATION, saturation_report([("foundation/workers", False, "sweep-a")]))
@@ -409,6 +410,220 @@ class CountTests(unittest.TestCase):
         code, stdout, stderr = checkout.run("--dry-run", "--json", *extra)
         self.assertEqual(code, 0, stderr)
         return json.loads(stdout)
+
+    def test_inventory_age_is_persisted_and_does_not_fail_the_run(self):
+        checkout = Checkout(self)
+        path = checkout.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps({
+            "schema_version": 1, "inventory_status": "complete",
+            "policy": {"max_release_age_days": 42, "max_landscape_age_days": 7, "refresh_lead_days": 2},
+            "packages": [], "models": [{
+                "id": "reader", "role": "document reading", "consumer": "fixture", "model_id": "vendor/model",
+                "revision": "a" * 40, "release_date": "2026-08-01", "checked_at": "2026-09-30",
+                "release_source": "https://huggingface.co/vendor/model", "status": "in_use",
+                "release_line": {"kind": "huggingface", "repository": "vendor/model", "ref": "main"},
+            }],
+        }), encoding="utf-8")
+        code, stdout, stderr = checkout.run("--json")
+        self.assertEqual(code, 0, stderr)
+        document = json.loads(stdout)
+        self.assertEqual(document["due"].get("models_past_window"), 1)
+        self.assertTrue(checkout.due_file.is_file())
+        self.assertEqual(json.loads(checkout.due_file.read_text())["due"]["models_past_window"], 1)
+        findings = [item["finding"] for item in document["details"] if item["kind"] == "model_past_window"]
+        self.assertEqual(len(findings), 1)
+        self.assertIn("reader: release older than 42 days", findings[0])
+        self.assertIn("1 model past its currency window", document["summary_line"])
+        self.assertIn(findings[0], cd.render_text(document))
+
+        previous = checkout.due_file.read_bytes()
+        path.write_text("{", encoding="utf-8")
+        code, stdout, stderr = checkout.run("--json")
+        self.assertEqual(code, 0, stderr)
+        document = json.loads(stdout)
+        self.assertEqual(document["due"]["models_past_window"], 1)
+        self.assertEqual(document["details"][-1]["model_inventory_findings"], "retained from the last readable inventory")
+        self.assertEqual(document["details"][-1]["model_inventory"], "unknown")
+        self.assertIn("model inventory unreadable", document["summary_line"])
+        saved = json.loads(checkout.due_file.read_text())
+        self.assertEqual(saved["due"]["models_past_window"], 1)
+        self.assertEqual([item["finding"] for item in saved["details"] if item["kind"] == "model_past_window"], findings)
+        self.assertEqual(saved["details"][-1]["model_inventory"], "unknown")
+        self.assertIn("model inventory unreadable", saved["summary_line"])
+
+    def test_structurally_invalid_inventory_is_a_gap_not_zero_due(self):
+        checkout = Checkout(self)
+        path = checkout.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        for content in ('{"schema_version":1,"models":null}', '[]'):
+            with self.subTest(content=content):
+                path.write_text(content, encoding="utf-8")
+                document = self.document(checkout)
+                self.assertNotIn("models_past_window", document["due"])
+                self.assertEqual(document["details"][-1].get("model_inventory"), "unknown")
+                self.assertIn("model inventory unreadable", cd.gaps_of(document))
+
+    def test_unknown_inventory_with_other_due_counts_preserves_prior_findings(self):
+        checkout = Checkout(self)
+        path = checkout.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps({
+            "schema_version": 1, "inventory_status": "complete",
+            "policy": {"max_release_age_days": 42, "max_landscape_age_days": 7, "refresh_lead_days": 2},
+            "packages": [], "models": [{
+                "id": "reader", "role": "document reading", "consumer": "fixture", "model_id": "vendor/model",
+                "revision": "a" * 40, "release_date": "2026-08-01", "checked_at": "2026-09-30",
+                "release_source": "https://huggingface.co/vendor/model", "status": "in_use",
+                "release_line": {"kind": "huggingface", "repository": "vendor/model", "ref": "main"},
+            }],
+        }))
+        code, stdout, stderr = checkout.run("--json")
+        self.assertEqual(code, 0, stderr)
+        self.assertEqual(json.loads(stdout)["due"]["models_past_window"], 1)
+        previous = checkout.due_file.read_bytes()
+        path.write_text("{")
+        checkout.set(STALENESS, staleness_report(("codex", ["stale"])))
+        code, stdout, stderr = checkout.run("--json")
+        self.assertEqual(code, 0, stderr)
+        current = json.loads(stdout)
+        self.assertEqual(current["due"]["stale_receipts"], 1)
+        self.assertEqual(current["details"][-1]["model_inventory"], "unknown")
+        saved = json.loads(checkout.due_file.read_text())
+        old = json.loads(previous)
+        self.assertEqual(saved["due"].get("models_past_window"), 1)
+        self.assertEqual(saved["due"]["stale_receipts"], 1)
+        self.assertEqual([row["finding"] for row in saved["details"] if row["kind"] == "model_past_window"],
+                         [row["finding"] for row in old["details"] if row["kind"] == "model_past_window"])
+        self.assertEqual(saved["details"][-1]["model_inventory"], "unknown")
+        self.assertIn("model inventory unreadable", saved["summary_line"])
+        self.assertIn("retained from " + old["generated_at"], cd.render_text(saved))
+
+    def test_nonzero_counts_show_inventory_gap_in_session_notice(self):
+        due = dict.fromkeys(cd.DUE_KEYS, 0)
+        due["stale_receipts"] = 1
+        line = cd.summary_line(due, "python3 scripts/currency_due.py --dry-run", gaps=("model inventory unreadable",))
+        self.assertIn("1 stale receipt", line)
+        self.assertIn("model inventory unreadable", line)
+        self.assertIn("; details:", line)
+        self.assertLessEqual(len(line), cd.SUMMARY_LIMIT)
+
+    def test_three_gaps_compact_before_the_xdg_pointer_budget_is_exhausted(self):
+        due = dict.fromkeys(cd.DUE_KEYS, 0)
+        due["stale_receipts"] = 1
+        line = cd.summary_line(due, "python3 " + "x" * 150,
+                               pointers=["cat " + "y" * 150, cd.XDG_POINTER],
+                               gaps=("surface watch unreadable", "model check incomplete", "model inventory unreadable"))
+        self.assertIn("surface", line)
+        self.assertIn("models", line)
+        self.assertIn("inventory", line)
+        self.assertTrue(line.endswith("; details: " + cd.XDG_POINTER))
+        self.assertLessEqual(len(line), cd.SUMMARY_LIMIT)
+
+    def test_three_gaps_do_not_block_writing_known_counts_with_long_paths(self):
+        checkout = Checkout(self, "c" * 110)
+        checkout.state = checkout.state.parent / ("s" * 140)
+        surface = checkout.state / cd.SURFACE_DIR / cd.SURFACE_FILE
+        surface.parent.mkdir(parents=True)
+        surface.write_text("{")
+        path = checkout.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        path.write_text("{")
+        checkout.set(cd.ACTIVE_MODELS[0], {"schema_version": 1, "status": "unknown", "stale_count": 0,
+                                          "findings": [], "errors": ["synthetic unavailable check"]})
+        checkout.set(STALENESS, staleness_report(("codex", ["stale"])))
+        code, stdout, stderr = checkout.run("--json")
+        self.assertEqual(code, 0, stderr)
+        saved = json.loads(checkout.due_file.read_text())
+        self.assertEqual(saved["due"]["stale_receipts"], 1)
+        self.assertEqual(saved["details"][-1]["model_inventory"], "unknown")
+        self.assertEqual(saved["details"][-1]["active_models"], "unknown")
+        self.assertIn("surface watch unreadable", cd.gaps_of(saved))
+        self.assertLessEqual(len(saved["summary_line"]), cd.SUMMARY_LIMIT)
+
+    def test_unreadable_prior_inventory_file_does_not_block_current_known_counts(self):
+        checkout = Checkout(self)
+        path = checkout.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        path.write_text("{")
+        checkout.state.mkdir()
+        checkout.set(STALENESS, staleness_report(("codex", ["stale"])))
+        for previous in ("{", json.dumps({"due": {"models_past_window": 1}, "details": []})):
+            with self.subTest(previous_kind="json" if previous.endswith("}") else "malformed"):
+                checkout.due_file.write_text(previous)
+                code, stdout, stderr = checkout.run("--json")
+                self.assertEqual(code, 0, stderr)
+                self.assertNotEqual(checkout.due_file.read_text(), previous,
+                                    "known current counts must be persisted even when prior findings cannot be recovered")
+                saved = json.loads(checkout.due_file.read_text())
+                self.assertEqual(saved["due"]["stale_receipts"], 1)
+                self.assertEqual(saved["details"][-1]["model_inventory_findings"], "prior findings unavailable")
+                self.assertNotIn("models_past_window", saved["due"])
+
+    def test_cached_inventory_must_be_bound_to_the_current_checkout(self):
+        first = Checkout(self, "first")
+        path = first.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps({
+            "schema_version": 1, "inventory_status": "complete",
+            "policy": {"max_release_age_days": 42, "max_landscape_age_days": 7, "refresh_lead_days": 2},
+            "packages": [], "models": [{
+                "id": "reader", "role": "document reading", "consumer": "fixture", "model_id": "vendor/model",
+                "revision": "a" * 40, "release_date": "2026-08-01", "checked_at": "2026-09-30",
+                "release_source": "https://huggingface.co/vendor/model", "status": "in_use",
+                "release_line": {"kind": "huggingface", "repository": "vendor/model", "ref": "main"},
+            }],
+        }))
+        code, stdout, stderr = first.run("--json")
+        self.assertEqual(code, 0, stderr)
+        previous = json.loads(first.due_file.read_text())
+        self.assertEqual(previous["due"]["models_past_window"], 1)
+        second = Checkout(self, "second")
+        second.state = first.state
+        path = second.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        path.write_text("{")
+        second.set(STALENESS, staleness_report(("codex", ["stale"])))
+        for cached_root in (previous["root"], None, []):
+            with self.subTest(root_kind=type(cached_root).__name__):
+                cached = {**previous, "root": cached_root}
+                if cached_root is None:
+                    cached.pop("root")
+                second.due_file.write_text(json.dumps(cached))
+                code, stdout, stderr = second.run("--json")
+                self.assertEqual(code, 0, stderr)
+                saved = json.loads(second.due_file.read_text())
+                self.assertEqual(saved["root"], str(second.root))
+                self.assertEqual(saved["due"]["stale_receipts"], 1)
+                self.assertNotIn("models_past_window", saved["due"])
+                self.assertFalse(any(item["kind"] == "model_past_window" for item in saved["details"]))
+                self.assertEqual(saved["details"][-1]["model_inventory_findings"],
+                                 "prior findings not bound to this checkout")
+
+    def test_inventory_parser_depth_failure_is_a_gap_and_preserves_other_counts(self):
+        checkout = Checkout(self)
+        path = checkout.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        # Match the existing read_record parser-depth control. The C decoder can
+        # exceed Python's recursion limit before reaching its own stack guard.
+        depth = 200000
+        path.write_text('{"schema_version":1,"models":' + "[" * depth + "0" + "]" * depth + "}")
+        checkout.set(STALENESS, staleness_report(("codex", ["stale"])))
+        code, stdout, stderr = checkout.run("--json")
+        self.assertEqual(code, 0, stderr)
+        self.assertNotIn("Traceback", stderr)
+        saved = json.loads(checkout.due_file.read_text())
+        self.assertEqual(saved["due"]["stale_receipts"], 1)
+        self.assertEqual(saved["details"][-1]["model_inventory"], "unknown")
+        self.assertIn("model inventory unreadable", cd.gaps_of(saved))
+
+    def test_gap_remains_visible_when_counts_need_truncation(self):
+        line = cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 10 ** 20),
+                               "python3 " + "x" * 90, pointers=["cat /x"],
+                               gaps=("model inventory unreadable",))
+        self.assertIn("model inventory unreadable", line)
+        self.assertTrue(line.endswith("; details: cat /x"))
+        self.assertLessEqual(len(line), cd.SUMMARY_LIMIT)
 
     def test_layers_are_due_once_the_monthly_sweep_cadence_has_passed(self):
         # recipes/saturation-sweep.md: "Sweep only the due layers, at most monthly ..., or sooner when a
@@ -835,9 +1050,8 @@ class DetailsCommandTests(unittest.TestCase):
         self.assertTrue(line.endswith(f"; details: {cd.XDG_POINTER}"), line)
         self.assertLessEqual(len(line), 160)
         self.assertEqual(cd.XDG_POINTER, 'cat "$XDG_STATE_HOME"/native-agent-stack/currency-due.json')
-        # With nothing runnable that fits, the run fails rather than emit a non-runnable or over-long line.
-        with self.assertRaises(cd.CheckError):
-            cd.summary_line(due, too_long, pointers=[long_pointer])
+        # Without a real short pointer the notice omits the command; collection must still proceed.
+        self.assertEqual(cd.summary_line(due, too_long, pointers=[long_pointer]), "stack currency: 1 pin behind")
         # Nothing due never needs a command.
         self.assertEqual(cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 0), too_long, pointers=[long_pointer]),
                          "stack currency: nothing due")
@@ -879,10 +1093,8 @@ class DetailsCommandTests(unittest.TestCase):
                         document["summary_line"])
         self.assertEqual(self.reproduced(checkout, document)["due"], document["due"])
 
-    def test_no_runnable_command_at_all_fails_the_due_run_and_still_clears_a_stale_notice(self):
-        # A long checkout path with a long explicit state directory: nothing runnable fits the line, so a run with
-        # something due fails (exit 2, nothing written) instead of emitting a non-runnable line, while a run with
-        # nothing due still removes an obsolete due-file.
+    def test_no_short_command_still_writes_due_counts_and_clears_a_stale_notice(self):
+        # Long explicit paths may omit the inline command; the saved report retains its full runnable command.
         checkout = Checkout(self, "c" * 110)
         base = checkout.state.parent / ("s" * 140)
         base.mkdir(mode=0o700)
@@ -892,9 +1104,11 @@ class DetailsCommandTests(unittest.TestCase):
         self.assertFalse((base / "currency-due.json").exists())
         checkout.something_due()
         code, _, stderr = checkout.run("--state-dir", str(base))
-        self.assertEqual(code, 2, stderr)
-        self.assertIn("no runnable details command fits", stderr)
-        self.assertFalse((base / "currency-due.json").exists())
+        self.assertEqual(code, 0, stderr)
+        saved = json.loads((base / "currency-due.json").read_text())
+        self.assertEqual(saved["due"]["stale_receipts"], 2)
+        self.assertTrue(saved["details_command"])
+        self.assertLessEqual(len(saved["summary_line"]), cd.SUMMARY_LIMIT)
 
     def test_the_next_step_points_at_what_is_due(self):
         # A skill pin that drifted is not something scripts/adoption_status.py --pinned-versions can report.
@@ -1600,7 +1814,7 @@ class ThisCheckoutTests(unittest.TestCase):
             document = json.loads(result.stdout)
             self.assertEqual(list(document), ["generated_at", "root", "due", "summary_line", "details_command",
                                           "details"])
-            self.assertEqual(list(document["due"]), list(cd.DUE_KEYS))
+            self.assertEqual([key for key in document["due"] if key != cd.INVENTORY_KEY], list(cd.DUE_KEYS))
             self.assertEqual(document["details"][-1]["active_models"], "current")
             self.assertTrue(all(isinstance(value, int) and value >= 0 for value in document["due"].values()))
             self.assertLessEqual(len(document["summary_line"]), 160)

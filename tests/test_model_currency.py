@@ -3,6 +3,7 @@
 import copy
 import hashlib
 import json
+import os
 from datetime import date
 from pathlib import Path
 import subprocess
@@ -51,41 +52,36 @@ def package_bound_inventory():
 
 
 class ModelCurrencyTests(unittest.TestCase):
-    def test_background_haiku_records_sourced_successor_and_triggered_review(self):
-        """Guard the corrected real row, independently of date/shape validation.
+    def test_user_guide_matches_report_only_age_policy(self):
+        root = Path(__file__).resolve().parents[1]
+        guide = (root / "docs/model-currency.md").read_text()
+        self.assertTrue("model_currency_notices" in guide, "Document the publication maintenance report.")
+        self.assertTrue("models_past_window" in guide, "Document the persisted daily age count.")
+        self.assertTrue("2026-10-16-model-route-currency-consistency.md" in guide, "Link the reporting supersession.")
+        self.assertFalse("A release more than 42 days old fails" in guide, "Remove the superseded age-failure claim.")
+        self.assertFalse("an older release fails\non day eight" in guide, "Day eight is maintenance, not a publication failure.")
+        self.assertFalse("slot retains Haiku 4.5" in guide, "The held Haiku 5.5 proposal supersedes the staging exception.")
+        active_guide = (root / "docs/active-model-currency.md").read_text()
+        self.assertTrue("eight possible counts" in active_guide, "Include the inventory-age maintenance count.")
 
-        The old no-successor judgment passes the generic schema with fresh dates;
-        it must not silently return after the October 15 primary-source review.
-        """
+    def test_background_haiku_is_a_current_normal_refresh_proposal(self):
         path = Path(__file__).resolve().parents[1] / "catalogs/foundation/model-currency.json"
-        data = json.loads(path.read_text())
-        row = next(model for model in data["models"] if model["id"] == "background-haiku")
-        check = row["landscape_check"]
-        candidates = {candidate["model_id"]: candidate for candidate in check["newer_candidates"]}
-        self.assertIn("claude-haiku-5-5", candidates)
-        successor = candidates["claude-haiku-5-5"]
-        self.assertEqual(successor["revision"], "claude-haiku-5-5")
-        self.assertEqual(successor["source"],
-                         "https://platform.claude.com/docs/en/models/haiku-5-5/overview")
-        self.assertIn(successor["source"], check["sources"])
-        self.assertIn("2026-10-07", successor["reason"])
-        self.assertIn("overturn condition is met", successor["reason"])
-        self.assertIn("supersedes the October 7 no-newer-Haiku claim", check["reason"])
-        self.assertIn("Triggered", row["overturn"])
-        self.assertIn("Haiku 5.5 is available", row["overturn"])
-        self.assertIn("Migration-review owner: command center (CC)", row["overturn"])
-        self.assertIn("#haiku-background-migration-review", row["overturn"])
-        self.assertIn("Paired Haiku 4.5/5.5", row["overturn"])
-        self.assertIn("Claude Code headless", row["overturn"])
-        self.assertIn("never a bare API call from a Codex lane", row["overturn"])
-        self.assertIn("Active (legacy)", check["reason"])
-        self.assertIn("not sooner than 2026-10-15", check["reason"])
-        self.assertIn("at least 60 days' notice", check["reason"])
-        self.assertIn("review", row["overturn"])
-        self.assertIn("authorized application", row["overturn"])
-        # A detected successor is a review gate, not a silent deployed-pin change.
-        self.assertEqual((row["model_id"], row["revision"], row["status"]),
-                         ("claude-haiku-4-5-20251001", "claude-haiku-4-5-20251001", "in_use"))
+        row = next(model for model in json.loads(path.read_text())["models"] if model["id"] == "background-haiku")
+        self.assertEqual(row["model_id"], "claude-haiku-5-5")
+        self.assertEqual(row["revision"], "claude-haiku-5-5")
+        self.assertEqual(row["status"], "held")
+        self.assertIn("normal refresh", row["consumer"])
+        self.assertIn("No runtime configuration", row["consumer"])
+
+    def test_background_refresh_retains_primary_source_and_measured_boundary(self):
+        path = Path(__file__).resolve().parents[1] / "catalogs/foundation/model-currency.json"
+        row = next(model for model in json.loads(path.read_text())["models"] if model["id"] == "background-haiku")
+        self.assertEqual(row["release_date"], "2026-10-07")
+        self.assertEqual(row["release_source"],
+                         "https://platform.claude.com/docs/en/release-notes/overview#october-7-2026")
+        self.assertIn("not a measured reason", row["landscape_check"]["reason"])
+        self.assertIn("normal refresh", row["landscape_check"]["reason"])
+        self.assertEqual(row["landscape_check"]["newer_candidates"], [])
 
     def assert_valid(self, document):
         self.assertEqual(model_currency_problems(document, TODAY), [])
@@ -341,7 +337,7 @@ class ModelCurrencyTests(unittest.TestCase):
         data["models"][0]["release_source"] = None
         self.assertTrue(model_currency_problems(data, TODAY, enforce_age=False))
 
-    def test_existing_validate_cli_enforces_the_inventory_at_an_injected_date(self):
+    def test_publication_reports_inventory_age_but_rejects_invalid_dates(self):
         fixture = publication_fixtures.PublicationValidationTests(methodName="runTest")
         fixture.setUp()
         self.addCleanup(fixture.doCleanups)
@@ -353,15 +349,434 @@ class ModelCurrencyTests(unittest.TestCase):
         fixture.evidence["files"].append({"path": path, "sha256": hashlib.sha256(content).hexdigest(), "bytes": len(content)})
         fixture.save()
         script = Path(__file__).resolve().parents[1] / "scripts/validate.py"
+        step_summary = fixture.root / "step-summary.md"
+        step_summary.write_text("Existing summary\n")
         result = subprocess.run([sys.executable, str(script), "--root", str(fixture.root), "--today", "2026-10-07"],
-                                capture_output=True, text=True)
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("older than 42", result.stdout)
+                                capture_output=True, text=True,
+                                env={**os.environ, "GITHUB_STEP_SUMMARY": str(step_summary)})
+        self.assertEqual(result.returncode, 0, result.stdout)
+        summary = json.loads(result.stdout.splitlines()[0])
+        self.assertTrue(any("older than 42" in notice for notice in summary["model_currency_notices"]))
+        self.assertTrue(step_summary.is_file(), "Stale findings must remain visible in the CI step summary.")
+        self.assertIn("model currency model reader", step_summary.read_text())
+        self.assertIn("older than 42", step_summary.read_text())
+        self.assertTrue(step_summary.read_text().startswith("Existing summary\n"))
         result = subprocess.run([sys.executable, str(script), "--root", str(fixture.root), "--today", "2026-09-01"],
                                 capture_output=True, text=True)
         # A past clock cannot silently accept future checked_at or release evidence.
         self.assertEqual(result.returncode, 1)
         self.assertIn("future date", result.stdout)
+
+
+class ModelRouteCurrencyTests(unittest.TestCase):
+    """Exercise the publication CLI: broken joins fail, freshness is a notice."""
+
+    def setUp(self):
+        self.fixture = publication_fixtures.PublicationValidationTests(methodName="runTest")
+        self.fixture.setUp()
+        self.addCleanup(self.fixture.doCleanups)
+        self.write_registered("catalogs/foundation/model-currency.json", inventory())
+        self.write_registered("catalogs/landscape/angles/foundation-model-routes.json", {
+            "schema_version": 1, "candidates": [{"id": "test-route", "pin": "vendor/model"}],
+        })
+
+    def write_registered(self, path, value):
+        if path == "catalogs/foundation/model-route-bindings.json":
+            for row in value.get("routes", []):
+                if isinstance(row, dict):
+                    row.setdefault("kind", "route")
+                    row.setdefault("repositories", ["https://example.org/model#route"])
+        self.fixture.write_json(path, value)
+        raw = (self.fixture.root / path).read_bytes()
+        self.fixture.evidence["files"] = [row for row in self.fixture.evidence["files"] if row["path"] != path]
+        self.fixture.evidence["files"].append({
+            "path": path, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw),
+        })
+        self.fixture.save()
+
+    def run_validator(self):
+        script = Path(__file__).resolve().parents[1] / "scripts/validate.py"
+        return subprocess.run([sys.executable, str(script), "--root", str(self.fixture.root),
+                               "--today", "2026-10-07"], capture_output=True, text=True)
+
+    def bind_routes(self, rows):
+        self.write_registered("catalogs/foundation/model-route-bindings.json", {"schema_version": 1, "routes": rows})
+
+    def write_c2(self, proposed, routes):
+        root = "evidence/artifacts/model-routes-sweep-merge-20261015/"
+        self.write_registered(root + "returns.json", {"discovery": {"model-routes": {"proposed": proposed}}})
+        self.write_registered(root + "route-currency.json", {"schema_version": 1, "routes": routes})
+
+    def test_duplicate_route_binding_is_rejected(self):
+        row = {"route_id": "test-route", "model_currency_id": "reader"}
+        self.bind_routes([row, row])
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("duplicate route binding", result.stdout)
+
+    def test_duplicate_source_route_is_rejected(self):
+        self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader"}])
+        row = {"id": "test-route", "pin": "vendor/model"}
+        self.write_registered("catalogs/landscape/angles/foundation-model-routes.json", {
+            "schema_version": 1, "candidates": [row, row],
+        })
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("duplicate route test-route", result.stdout)
+
+    def test_duplicate_c2_repository_is_rejected(self):
+        self.bind_routes([{"route_id": identifier, "model_currency_id": "reader"}
+                          for identifier in ("test-route", "merged-one", "merged-two")])
+        repository = "https://example.org/model#route"
+        self.write_c2([repository], [{"repository": repository, "route_id": identifier,
+                                     "model_id": "vendor/model", "model_currency_id": "reader"}
+                                    for identifier in ("merged-one", "merged-two")])
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("C2 repositories must be nonempty and unique", result.stdout)
+
+    def test_gpt_manifest_requires_exactly_one_target_layer(self):
+        self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader"}])
+        source = "evidence/artifacts/model-routes-sweep-20261015/sweep-manifest.json"
+        layer = {"catalog": "foundation", "layer_id": "model-routes", "candidates": [
+            {"candidate_id": "test-route", "model": "vendor/model"},
+        ]}
+        for layers in ([], [layer, layer]):
+            with self.subTest(layer_count=len(layers)):
+                self.write_registered(source, {"schema_version": 1, "layers": layers})
+                result = self.run_validator()
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn("exactly one foundation/model-routes layer", result.stdout)
+
+    def test_malformed_binding_rows_fail_without_a_traceback(self):
+        for row in (None, [], "not-an-object"):
+            with self.subTest(row_type=type(row).__name__):
+                self.bind_routes([row])
+                result = self.run_validator()
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn("expected route objects", result.stdout)
+                self.assertNotIn("Traceback", result.stderr)
+
+    def test_malformed_source_rows_fail_without_a_traceback(self):
+        self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader"}])
+        for row in (None, [], "not-an-object"):
+            with self.subTest(row_type=type(row).__name__):
+                self.write_registered("catalogs/landscape/angles/foundation-model-routes.json", {
+                    "schema_version": 1, "candidates": [row],
+                })
+                result = self.run_validator()
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn("expected route objects", result.stdout)
+                self.assertNotIn("Traceback", result.stderr)
+
+    def test_c2_row_must_agree_with_its_registered_binding(self):
+        data = inventory()
+        other = copy.deepcopy(data["models"][0])
+        other["id"] = "other-reader"
+        data["models"].append(other)
+        self.write_registered("catalogs/foundation/model-currency.json", data)
+        self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader"}])
+        self.write_c2(["https://example.org/model#route"], [{
+            "repository": "https://example.org/model#route", "route_id": "test-route",
+            "model_id": "vendor/model", "model_currency_id": "other-reader",
+        }])
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("does not match the registered route binding", result.stdout)
+
+    def test_missing_inventory_row_fails_publication(self):
+        self.write_registered("catalogs/foundation/model-route-bindings.json", {
+            "schema_version": 1,
+            "routes": [{"route_id": "test-route", "model_currency_id": "missing"}],
+        })
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("unknown model-currency row", result.stdout)
+
+    def test_structure_date_format_and_source_errors_still_fail(self):
+        self.write_registered("catalogs/foundation/model-route-bindings.json", {
+            "schema_version": 1,
+            "routes": [{"route_id": "test-route", "model_currency_id": "reader"}],
+        })
+        for field, value, expected in [
+                ("model_id", None, "expected nonempty string"),
+                ("release_date", "2026/10/01", "release_date"),
+                ("release_source", "http://example.org/release", "expected primary HTTPS source URL")]:
+            with self.subTest(field=field):
+                data = inventory()
+                data["models"][0][field] = value
+                self.write_registered("catalogs/foundation/model-currency.json", data)
+                result = self.run_validator()
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn(expected, result.stdout)
+        path = "catalogs/foundation/model-currency.json"
+        raw = b'{"schema_version":'
+        (self.fixture.root / path).write_bytes(raw)
+        entry = next(row for row in self.fixture.evidence["files"] if row["path"] == path)
+        entry.update(sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw))
+        self.fixture.save()
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("invalid JSON", result.stdout)
+
+    def test_older_generation_is_reported_without_failing_publication(self):
+        data = inventory()
+        data["models"][0]["model_id"] = "gpt-6.1-sol"
+        self.write_registered("catalogs/foundation/model-currency.json", data)
+        self.write_registered("catalogs/landscape/angles/foundation-model-routes.json", {
+            "schema_version": 1, "candidates": [{"id": "test-route", "pin": "gpt-5.6-sol"}],
+        })
+        self.write_registered("catalogs/foundation/model-route-bindings.json", {
+            "schema_version": 1,
+            "routes": [{"route_id": "test-route", "model_currency_id": "reader"}],
+        })
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 0, result.stdout)
+        report = json.loads(result.stdout.splitlines()[0])["model_route_currency"]
+        self.assertEqual(report["checked_routes"], 1)
+        self.assertEqual(len(report["notices"]), 1)
+        self.assertEqual(report["notices"][0]["selected_model"], "gpt-5.6-sol")
+        self.assertEqual(report["notices"][0]["inventory_model"], "gpt-6.1-sol")
+
+    def test_gpt_sweep_model_is_checked_against_its_named_row(self):
+        self.write_registered("catalogs/foundation/model-route-bindings.json", {
+            "schema_version": 1,
+            "routes": [{"route_id": "test-route", "model_currency_id": "reader"}],
+        })
+        source = "evidence/artifacts/model-routes-sweep-20261015/sweep-manifest.json"
+        self.write_registered(source, {"schema_version": 1, "layers": [{"catalog": "foundation", "layer_id": "model-routes", "candidates": [
+            {"candidate_id": "test-route", "model": "vendor/older-model"},
+        ]}]})
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 0, result.stdout)
+        report = json.loads(result.stdout.splitlines()[0])["model_route_currency"]
+        self.assertEqual(report["checked_routes"], 2)
+        self.assertEqual(report["notices"][0]["source"], source)
+
+    def test_c2_requires_explicit_currency_rows_before_publication(self):
+        self.write_registered("catalogs/foundation/model-route-bindings.json", {
+            "schema_version": 1,
+            "routes": [{"route_id": "test-route", "model_currency_id": "reader"}],
+        })
+        self.write_registered("evidence/artifacts/model-routes-sweep-merge-20261015/returns.json", {})
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("C2 route-currency.json is required", result.stdout)
+
+    def test_c2_cannot_omit_a_proposed_route_from_the_join(self):
+        self.write_registered("catalogs/foundation/model-route-bindings.json", {
+            "schema_version": 1,
+            "routes": [{"route_id": "test-route", "model_currency_id": "reader"}],
+        })
+        root = "evidence/artifacts/model-routes-sweep-merge-20261015/"
+        self.write_registered(root + "returns.json", {
+            "discovery": {"model-routes": {"proposed": ["https://example.org/model#route"]}},
+        })
+        self.write_registered(root + "route-currency.json", {"schema_version": 1, "routes": []})
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("C2 inventory coverage differs", result.stdout)
+
+    def test_removing_the_binding_file_cannot_disable_the_check(self):
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("route bindings are required", result.stdout)
+
+    def test_an_observed_route_needs_its_own_binding(self):
+        self.write_registered("catalogs/foundation/model-route-bindings.json", {
+            "schema_version": 1,
+            "routes": [{"route_id": "different-route", "model_currency_id": "reader"}],
+        })
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("test-route: missing or unknown model-currency row", result.stdout)
+
+    def test_c2_stale_model_and_current_component_pass_with_a_notice(self):
+        data = inventory()
+        data["packages"] = [{"id": "gateway", "latest_version": "1.0", "release_date": "2026-10-01",
+                             "release_source": "https://example.org/release", "checked_at": "2026-10-07",
+                             "release_line": {"kind": "github_release", "repository": "example/gateway"}}]
+        self.write_registered("catalogs/foundation/model-currency.json", data)
+        self.write_registered("catalogs/foundation/model-route-bindings.json", {
+            "schema_version": 1,
+            "routes": [{"route_id": "test-route", "model_currency_id": "reader"},
+                       {"route_id": "merged-route", "model_currency_id": "reader"}],
+        })
+        root = "evidence/artifacts/model-routes-sweep-merge-20261015/"
+        self.write_registered(root + "returns.json", {"discovery": {"model-routes": {
+            "proposed": ["https://example.org/model#route", "https://github.com/example/gateway"],
+        }}})
+        self.write_registered(root + "route-currency.json", {"schema_version": 1, "routes": [{
+            "repository": "https://example.org/model#route", "route_id": "merged-route",
+            "model_id": "vendor/older-model", "model_currency_id": "reader",
+        }], "components": [{"repository": "https://github.com/example/gateway", "package_currency_id": "gateway"}]})
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 0, result.stdout)
+        report = json.loads(result.stdout.splitlines()[0])["model_route_currency"]
+        self.assertEqual(report["checked_routes"], 2)
+        self.assertEqual(len(report["notices"]), 1)
+        self.assertIs(report["notices"][0]["blocking"], False)
+
+    def test_c2_cannot_disguise_a_model_route_as_a_package(self):
+        data = inventory()
+        data["packages"] = [{"id": "gateway", "latest_version": "1.0", "release_date": "2026-10-01",
+                             "release_source": "https://github.com/example/gateway/releases/tag/v1.0",
+                             "checked_at": "2026-10-07",
+                             "release_line": {"kind": "github_release", "repository": "example/gateway"}}]
+        self.write_registered("catalogs/foundation/model-currency.json", data)
+        self.write_registered("catalogs/foundation/model-route-bindings.json", {
+            "schema_version": 1,
+            "routes": [{"route_id": "test-route", "model_currency_id": "reader"}],
+        })
+        root = "evidence/artifacts/model-routes-sweep-merge-20261015/"
+        self.write_registered(root + "returns.json", {"discovery": {"model-routes": {
+            "proposed": ["https://example.org/model#route"],
+        }}})
+        self.write_registered(root + "route-currency.json", {"schema_version": 1, "routes": [], "components": [{
+            "repository": "https://example.org/model#route", "package_currency_id": "gateway",
+        }]})
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("component identity does not match", result.stdout)
+
+    def test_c2_component_case_matches_without_rewriting_retained_identity(self):
+        data = inventory()
+        data["packages"] = [{"id": "gateway", "latest_version": "1.0", "release_date": "2026-10-01",
+                             "release_source": "https://github.com/Example/GateWay/releases/tag/v1.0",
+                             "checked_at": "2026-10-07",
+                             "release_line": {"kind": "github_release", "repository": "Example/GateWay"}}]
+        self.write_registered("catalogs/foundation/model-currency.json", data)
+        self.write_registered("catalogs/foundation/model-route-bindings.json", {
+            "schema_version": 1,
+            "routes": [{"route_id": "test-route", "model_currency_id": "reader"}],
+        })
+        root = "evidence/artifacts/model-routes-sweep-merge-20261015/"
+        for repository in ("https://github.com/example/gateway",
+                           "https://WWW.GitHub.com/eXample/gATEway.git/tree/main"):
+            with self.subTest(repository=repository):
+                self.write_registered(root + "returns.json", {"discovery": {"model-routes": {
+                    "proposed": [repository],
+                }}})
+                self.write_registered(root + "route-currency.json", {"schema_version": 1, "routes": [],
+                    "components": [{"repository": repository, "package_currency_id": "gateway"}]})
+                result = self.run_validator()
+                self.assertEqual(result.returncode, 0, result.stdout)
+                from scripts.validate import validate
+                self.assertEqual(validate(self.fixture.root, today=TODAY)["model_route_currency"]["checked_routes"], 1)
+
+    def test_c2_inline_row_cannot_bypass_the_route_binding_registry(self):
+        self.write_registered("catalogs/foundation/model-route-bindings.json", {
+            "schema_version": 1,
+            "routes": [{"route_id": "test-route", "model_currency_id": "reader"}],
+        })
+        root = "evidence/artifacts/model-routes-sweep-merge-20261015/"
+        self.write_registered(root + "returns.json", {"discovery": {"model-routes": {
+            "proposed": ["https://example.org/model#route"],
+        }}})
+        self.write_registered(root + "route-currency.json", {"schema_version": 1, "routes": [{
+            "repository": "https://example.org/model#route", "route_id": "merged-route",
+            "model_id": "vendor/model", "model_currency_id": "reader",
+        }]})
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("registered route binding required", result.stdout)
+
+    def test_c2_component_only_proposal_uses_its_package_row(self):
+        data = inventory()
+        data["packages"] = [{"id": "gateway", "latest_version": "1.0", "release_date": "2026-10-01",
+                             "release_source": "https://github.com/Example/Gateway/releases/tag/v1.0",
+                             "checked_at": "2026-10-07",
+                             "release_line": {"kind": "github_release", "repository": "Example/Gateway"}}]
+        self.write_registered("catalogs/foundation/model-currency.json", data)
+        self.write_registered("catalogs/foundation/model-route-bindings.json", {
+            "schema_version": 1,
+            "routes": [{"route_id": "test-route", "model_currency_id": "reader"}],
+        })
+        root = "evidence/artifacts/model-routes-sweep-merge-20261015/"
+        self.write_registered(root + "returns.json", {"discovery": {"model-routes": {
+            "proposed": ["https://github.com/example/gateway"],
+        }}})
+        self.write_registered(root + "route-currency.json", {"schema_version": 1, "components": [{
+            "repository": "https://github.com/example/gateway", "package_currency_id": "gateway",
+        }]})
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_c2_cannot_relabel_gateway_proposal_as_a_bound_model_route(self):
+        self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader"}, {
+            "route_id": "codex-omniroute-gpt-6-1-sol", "model_currency_id": "reader",
+            "kind": "route", "repositories": [
+                "https://developers.openai.com/codex/models#codex-omniroute-gpt-6-1-sol"],
+        }])
+        self.write_c2(["https://github.com/diegosouzapw/omniroute"], [{
+            "repository": "https://github.com/diegosouzapw/omniroute",
+            "route_id": "codex-omniroute-gpt-6-1-sol", "model_id": "vendor/model",
+            "model_currency_id": "reader",
+        }])
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("repository does not match registered route identity", result.stdout)
+
+    def test_c2_pypi_component_uses_pep503_identity_and_exact_proposal_coverage(self):
+        self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader"}])
+        root = "evidence/artifacts/model-routes-sweep-merge-20261015/"
+        for package, slug in (("SpeechRecognition", "speechrecognition"), ("Speech._Recognition", "speech-recognition")):
+            with self.subTest(package=package):
+                data = inventory()
+                data["packages"] = [{"id": "speech", "latest_version": "1.0", "release_date": "2026-10-01",
+                    "release_source": "https://pypi.org/project/" + package, "checked_at": "2026-10-07",
+                    "release_line": {"kind": "pypi", "package": package}}]
+                self.write_registered("catalogs/foundation/model-currency.json", data)
+                repository = "https://pypi.org/project/" + slug
+                self.write_c2([repository], [])
+                self.write_registered(root + "route-currency.json", {"schema_version": 1, "components": [{
+                    "repository": repository, "package_currency_id": "speech"}]})
+                result = self.run_validator()
+                self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_c2_malformed_and_unknown_package_rows_fail_without_traceback(self):
+        self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader"}])
+        root = "evidence/artifacts/model-routes-sweep-merge-20261015/"
+        for row in (None, [], {}, {"repository": "https://example.org/tool", "package_currency_id": []},
+                    {"repository": "https://example.org/tool", "package_currency_id": "missing"}):
+            with self.subTest(row=row):
+                self.write_c2(["https://example.org/tool"], [])
+                self.write_registered(root + "route-currency.json", {"schema_version": 1, "components": [row]})
+                result = self.run_validator()
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("unknown package-currency row", result.stdout)
+                self.assertNotIn("Traceback", result.stderr)
+
+    def test_route_kind_and_repository_identity_shape_are_required(self):
+        for change in ({"kind": "component"}, {"kind": None}, {"repositories": None},
+                       {"repositories": []}, {"repositories": [""]}, {"repositories": [None]},
+                       {"repositories": "https://example.org/model#route"}):
+            with self.subTest(change=change):
+                self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader", **change}])
+                result = self.run_validator()
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("route kind and repository identities are required", result.stdout)
+                self.assertNotIn("Traceback", result.stderr)
+
+    def test_c2_pypi_identity_mismatches_fail_after_name_normalization(self):
+        self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader"}])
+        data = inventory()
+        data["packages"] = [{"id": "speech", "latest_version": "1.0", "release_date": "2026-10-01",
+            "release_source": "https://pypi.org/project/SpeechRecognition", "checked_at": "2026-10-07",
+            "release_line": {"kind": "pypi", "package": "SpeechRecognition"}}]
+        self.write_registered("catalogs/foundation/model-currency.json", data)
+        for repository in ("https://pypi.org/project/unrelated", "https://example.org/project/speechrecognition",
+                           "http://pypi.org/project/speechrecognition", "https://pypi.org/project/speechrecognition/1.0",
+                           "https://pypi.org/project/speechrecognition?query=1", "https://pypi.org/project/speechrecognition#route",
+                           "https://[invalid/project/speechrecognition"):
+            with self.subTest(repository=repository):
+                self.write_c2([repository], [])
+                self.write_registered("evidence/artifacts/model-routes-sweep-merge-20261015/route-currency.json", {
+                    "schema_version": 1, "components": [{"repository": repository, "package_currency_id": "speech"}]})
+                result = self.run_validator()
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("component identity does not match", result.stdout)
+                self.assertNotIn("Traceback", result.stderr)
 
 
 if __name__ == "__main__":

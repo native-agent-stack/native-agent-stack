@@ -66,6 +66,10 @@ class InvalidPublication(ValueError):
 
 
 MODEL_CURRENCY_PATH = "catalogs/foundation/model-currency.json"
+MODEL_ROUTE_BINDINGS_PATH = "catalogs/foundation/model-route-bindings.json"
+MODEL_ROUTE_ANGLE_PATH = "catalogs/landscape/angles/foundation-model-routes.json"
+MODEL_ROUTE_GPT_PATH = "evidence/artifacts/model-routes-sweep-20261015/sweep-manifest.json"
+MODEL_ROUTE_MERGE_ROOT = "evidence/artifacts/model-routes-sweep-merge-20261015"
 MODEL_MAX_RELEASE_AGE_DAYS = 42
 MODEL_MAX_LANDSCAPE_AGE_DAYS = 7
 
@@ -249,6 +253,13 @@ def model_currency_problems(document, today: date | None = None, *, enforce_age=
     return errors
 
 
+def model_currency_due(document, today: date | None = None) -> list[str]:
+    """Project age findings for publication and the daily maintenance notice."""
+    today = today if today is not None else datetime.now(timezone.utc).date()
+    structural = set(model_currency_problems(document, today, enforce_age=False))
+    return [problem for problem in model_currency_problems(document, today) if problem not in structural]
+
+
 def _json_without_duplicates(pairs):
     result = {}
     for key, value in pairs:
@@ -354,6 +365,170 @@ class Validator:
     def error(self, message: str) -> None:
         self.errors.append(message)
 
+    def check_model_route_currency(self, inventory: dict) -> dict | None:
+        """Check route references offline; model freshness is informational."""
+        if not (self.root / MODEL_ROUTE_BINDINGS_PATH).exists():
+            if any((self.root / path).exists() for path in (
+                    MODEL_ROUTE_ANGLE_PATH, MODEL_ROUTE_GPT_PATH, f"{MODEL_ROUTE_MERGE_ROOT}/returns.json")):
+                self.error("model-route currency: route bindings are required when route sources exist")
+            return None
+        document = self.load(MODEL_ROUTE_BINDINGS_PATH)
+        if document.get("schema_version") != 1:
+            self.error("model-route currency: expected schema_version 1")
+        model_rows = inventory.get("models")
+        models = {row["id"]: row for row in (model_rows if isinstance(model_rows, list) else [])
+                  if isinstance(row, dict) and isinstance(row.get("id"), str)}
+        bindings = {}
+        route_identities = {}
+        for row in self.sequence(document.get("routes"), "model-route currency routes", nonempty=True):
+            if not isinstance(row, dict):
+                self.error("model-route currency: expected route objects")
+                continue
+            route_id, currency_id = row.get("route_id"), row.get("model_currency_id")
+            if not self.text(route_id, "model-route currency route_id"):
+                continue
+            if route_id in bindings:
+                self.error(f"model-route currency {route_id}: duplicate route binding")
+            if not self.text(currency_id, f"model-route currency {route_id}.model_currency_id"):
+                continue
+            if currency_id not in models:
+                self.error(f"model-route currency {route_id}: unknown model-currency row {currency_id}")
+            bindings[route_id] = currency_id
+            identities = row.get("repositories")
+            if row.get("kind") != "route" or not isinstance(identities, list) or not identities \
+                    or any(not isinstance(identity, str) or not identity.strip() for identity in identities):
+                self.error(f"model-route currency {route_id}: route kind and repository identities are required")
+            else:
+                route_identities[route_id] = set(identities)
+        report = {"bindings": len(bindings), "checked_routes": 0, "notices": []}
+
+        def inspect_routes(rows, source, id_key, model_key, *, inline_bindings=False):
+            seen = set()
+            for row in self.sequence(rows, f"model-route currency {source}"):
+                if not isinstance(row, dict):
+                    self.error(f"model-route currency {source}: expected route objects")
+                    continue
+                route_id, selected = row.get(id_key), row.get(model_key)
+                if not self.text(route_id, f"model-route currency {source}.{id_key}"):
+                    continue
+                if route_id in seen:
+                    self.error(f"model-route currency {source}: duplicate route {route_id}")
+                seen.add(route_id)
+                if not self.text(selected, f"model-route currency {source}.{model_key}"):
+                    continue
+                currency_id = bindings.get(route_id)
+                if not isinstance(currency_id, str) or currency_id not in models:
+                    self.error(f"model-route currency {source} {route_id}: missing or unknown model-currency row; "
+                               "registered route binding required")
+                    continue
+                if inline_bindings and row.get("model_currency_id") != currency_id:
+                    self.error(f"model-route currency {source} {route_id}: model_currency_id does not match "
+                               "the registered route binding")
+                    continue
+                if inline_bindings and (not isinstance(row.get("repository"), str)
+                                        or row["repository"] not in route_identities.get(route_id, set())):
+                    self.error(f"model-route currency {source} {route_id}: repository does not match registered route identity")
+                    continue
+                report["checked_routes"] += 1
+                normalized = selected
+                # OmniRoute v3.8.51, c1e30b7676975feb298b49eff6ff58923c04b89e:
+                # open-sse/config/providers/registry/{codex,muse-code}/index.ts declares
+                # these provider IDs and aliases. This comparison does not prove route availability.
+                for prefix in ("cx/", "codex/", "mc/", "muse-code/"):
+                    if normalized.startswith(prefix):
+                        normalized = normalized[len(prefix):]
+                        break
+                current = models[currency_id].get("model_id")
+                if normalized != current:
+                    report["notices"].append({
+                        "source": source, "route_id": route_id, "model_currency_id": currency_id,
+                        "selected_model": selected, "inventory_model": current,
+                        "status": "differs_from_inventory", "blocking": False,
+                    })
+
+        angle_path = MODEL_ROUTE_ANGLE_PATH
+        if not (self.root / angle_path).is_file():
+            self.error(f"model-route currency: source missing: {angle_path}")
+        else:
+            inspect_routes(self.load(angle_path).get("candidates"), angle_path, "id", "pin")
+        gpt_path = MODEL_ROUTE_GPT_PATH
+        if (self.root / gpt_path).exists():
+            matching_layers = 0
+            for layer in self.sequence(self.load(gpt_path).get("layers"), f"model-route currency {gpt_path}.layers"):
+                if isinstance(layer, dict) and (layer.get("catalog"), layer.get("layer_id")) == ("foundation", "model-routes"):
+                    matching_layers += 1
+                    inspect_routes(layer.get("candidates"), gpt_path, "candidate_id", "model")
+            if matching_layers != 1:
+                self.error("model-route currency: GPT manifest must contain exactly one foundation/model-routes layer")
+        merge_root = MODEL_ROUTE_MERGE_ROOT
+        merge_path = f"{merge_root}/route-currency.json"
+        returns_path = f"{merge_root}/returns.json"
+        if (self.root / returns_path).exists() and not (self.root / merge_path).is_file():
+            self.error("model-route currency: C2 route-currency.json is required alongside its returns")
+        elif (self.root / merge_path).exists():
+            merged = self.load(merge_path)
+            route_rows = self.sequence(merged.get("routes", []), f"model-route currency {merge_path}.routes")
+            inspect_routes(route_rows, merge_path, "route_id", "model_id", inline_bindings=True)
+            component_rows = self.sequence(merged.get("components", []), f"model-route currency {merge_path}.components")
+            package_rows = inventory.get("packages")
+            packages = {row["id"]: row for row in (package_rows if isinstance(package_rows, list) else [])
+                        if isinstance(row, dict) and isinstance(row.get("id"), str)}
+            for row in component_rows:
+                if not isinstance(row, dict) or not isinstance(row.get("package_currency_id"), str) \
+                        or row["package_currency_id"] not in packages:
+                    self.error("model-route currency: C2 component has an unknown package-currency row")
+                    continue
+                release = packages[row["package_currency_id"]].get("release_line")
+                identity = None
+                if isinstance(release, dict):
+                    if release.get("kind") == "github_release" and isinstance(release.get("repository"), str):
+                        identity = "https://github.com/" + release["repository"]
+                    elif release.get("kind") == "pypi" and isinstance(release.get("package"), str):
+                        identity = "https://pypi.org/project/" + release["package"]
+                repository = row.get("repository")
+                matches = identity is not None and isinstance(repository, str)
+                if matches and release.get("kind") == "github_release":
+                    # Import lazily: host_receipts imports this module's PRIVATE_CONTENT.
+                    try:
+                        from .host_receipts import normalize_repository
+                    except ImportError:  # running scripts/validate.py directly
+                        from host_receipts import normalize_repository
+                    matches = normalize_repository(repository) == normalize_repository(identity)
+                elif matches:
+                    # PEP 503, Normalized Names: reuse the repository's existing normalizer.
+                    # https://peps.python.org/pep-0503/#normalized-names (read 2026-10-16).
+                    try:
+                        from .starred_protected import package_name
+                    except ImportError:
+                        from starred_protected import package_name
+                    try:
+                        parsed = urlsplit(repository)
+                        match = re.fullmatch(r"/project/([A-Za-z0-9._-]+)/?", parsed.path)
+                        matches = (parsed.scheme == "https" and parsed.netloc.lower() == "pypi.org"
+                                   and not parsed.query and not parsed.fragment and match is not None
+                                   and package_name(match.group(1)) == package_name(release["package"]))
+                    except ValueError:
+                        matches = False
+                if not matches:
+                    self.error("model-route currency: C2 component identity does not match its package source")
+            declared = [row.get("repository") for row in [*route_rows, *component_rows] if isinstance(row, dict)]
+            if any(not isinstance(value, str) or not value for value in declared) or len(declared) != len(set(
+                    value for value in declared if isinstance(value, str))):
+                self.error("model-route currency: C2 repositories must be nonempty and unique")
+            if not (self.root / returns_path).is_file():
+                self.error("model-route currency: C2 retained returns are missing")
+            else:
+                retained = self.load(returns_path, check_schema_version=False)
+                discovery = retained.get("discovery")
+                layer = discovery.get("model-routes") if isinstance(discovery, dict) else None
+                proposed = layer.get("proposed") if isinstance(layer, dict) else None
+                if not isinstance(proposed, list) or any(not isinstance(value, str) for value in proposed):
+                    self.error("model-route currency: C2 retained discovery proposals must be an array of identities")
+                elif len(set(proposed)) != len(proposed) or set(proposed) != set(
+                        value for value in declared if isinstance(value, str)):
+                    self.error("model-route currency: C2 inventory coverage differs from retained proposals")
+        return report
+
     def text(self, value, label: str) -> bool:
         valid = isinstance(value, str) and bool(value.strip())
         if not valid:
@@ -412,7 +587,7 @@ class Validator:
             return None
         return current
 
-    def load(self, relative_path: str) -> dict:
+    def load(self, relative_path: str, *, check_schema_version: bool = True) -> dict:
         path = self.path(relative_path, relative_path)
         if path is None:
             return {}
@@ -424,7 +599,7 @@ class Validator:
         if not isinstance(result, dict):
             self.error(f"{relative_path}: expected JSON object")
             return {}
-        if result.get("schema_version") != 1 or isinstance(result.get("schema_version"), bool):
+        if check_schema_version and (result.get("schema_version") != 1 or isinstance(result.get("schema_version"), bool)):
             self.error(f"{relative_path}: unsupported schema_version")
         return result
 
@@ -684,8 +859,19 @@ class Validator:
             for receipt_id in self.identifiers(model.get("evidence_ids", []), "model.evidence_ids"):
                 if receipt_id not in receipts:
                     self.error(f"model: unknown evidence {receipt_id}")
+        route_currency = None
+        currency_notices = []
         if (self.root / MODEL_CURRENCY_PATH).exists():
-            self.errors.extend(model_currency_problems(self.load(MODEL_CURRENCY_PATH), self.today))
+            inventory = self.load(MODEL_CURRENCY_PATH)
+            currency_today = self.today if self.today is not None else datetime.now(timezone.utc).date()
+            structural = model_currency_problems(inventory, currency_today, enforce_age=False)
+            self.errors.extend(structural)
+            currency_notices = model_currency_due(inventory, currency_today)
+            route_currency = self.check_model_route_currency(inventory)
+        elif any((self.root / path).exists() for path in (
+                MODEL_ROUTE_BINDINGS_PATH, MODEL_ROUTE_ANGLE_PATH, MODEL_ROUTE_GPT_PATH,
+                f"{MODEL_ROUTE_MERGE_ROOT}/returns.json")):
+            self.error("model-route currency: model-currency inventory is missing")
         starred_path = "catalogs/convergence-practice/public-starred.json"
         if (self.root / starred_path).exists():
             try:
@@ -706,10 +892,15 @@ class Validator:
         self.scan_publication(files)
         if self.errors:
             raise InvalidPublication("\n".join(self.errors))
-        return {"components": len(components), "profiles": len(profiles), "receipts": len(receipts), "hashed_files": len(files)}
+        summary = {"components": len(components), "profiles": len(profiles), "receipts": len(receipts), "hashed_files": len(files)}
+        if route_currency is not None:
+            summary["model_route_currency"] = route_currency
+        if currency_notices:
+            summary["model_currency_notices"] = currency_notices
+        return summary
 
 
-def validate(root: Path, *, today: date | None = None) -> dict[str, int]:
+def validate(root: Path, *, today: date | None = None) -> dict:
     return Validator(root, today=today).validate()
 
 
@@ -886,6 +1077,18 @@ def main() -> int:
         print(f"Publication validation failed:\n{error}")
         return 1
     print(json.dumps({"status": "passed", **summary}, sort_keys=True))
+    notices = summary.get("model_currency_notices", [])
+    step_summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    if notices and step_summary:
+        try:
+            with Path(step_summary).open("a", encoding="utf-8") as report:
+                report.write("\n## Model currency maintenance\n\n")
+                for notice in notices:
+                    report.write("- " + notice.replace("\n", " ") + "\n")
+                report.write("\nAge findings are maintenance notices; publication validation passed.\n")
+        except OSError:
+            print("Model currency notices remain in the JSON output; the job summary could not be written.",
+                  file=sys.stderr)
     print("Integrity and scope checks only; no live provider or GPU execution.")
     return 0
 

@@ -11568,8 +11568,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "1d617390cb65971935836b0a5732155ca7748f9ff79fe1223bbb9480d512fad8",
-      "bytes": 1256
+      "sha256": "e4bd91b86d2d6cfe56e0c9a07de5a6bf2141c9c1f717bcb00760bf4c55ea6613",
+      "bytes": 1364
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11635,6 +11635,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261014-pr1094-rebase-delta.json",
       "sha256": "5f81fe355c0fc06bff935047a6ea27ef16588917a9a537710d7692a0e1ec5872",
       "bytes": 16981
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261016-pr1201-delta.json",
+      "sha256": "81539f7995c93ad9f413918021f2f81721454e7bf3a2ed360eb74da439a9448a",
+      "bytes": 55094
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -17513,13 +17518,18 @@
     },
     {
       "path": "catalogs/foundation/model-currency.json",
-      "sha256": "3c5a2d3665aefab02aef36770de4dd0f7f191e534b2c83535405894a62d2932a",
-      "bytes": 41958
+      "sha256": "d232b69436f2cdbb2ddff8cd0d8e011c91fdc9788ff15a27e78a1d8a854fcfbe",
+      "bytes": 44753
     },
     {
       "path": "catalogs/foundation/model-currency.schema.json",
       "sha256": "d7d830f80078db3ba33409a5fde55fe8fc2af45bb7ae5418ca19ea1cc4a231e1",
       "bytes": 9709
+    },
+    {
+      "path": "catalogs/foundation/model-route-bindings.json",
+      "sha256": "1c0b74bcce508c054c9a00a50164c557b1efd6f2c0aff6795ae0278ad5924770",
+      "bytes": 6415
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
@@ -18138,8 +18148,8 @@
     },
     {
       "path": "docs/active-model-currency.md",
-      "sha256": "8649c77be086124b4afe0f742158d78b4c736fa50b87aa7111d574ddb2bb86a5",
-      "bytes": 17195
+      "sha256": "e02269d4d1454356d1f303a1fd1ccd6da186f91215f915d6cb564167158739e1",
+      "bytes": 17837
     },
     {
       "path": "docs/automation-upgrade-evidence.json",
@@ -18963,8 +18973,8 @@
     },
     {
       "path": "docs/decisions/2026-10-07-model-currency-enforcement.md",
-      "sha256": "b1454ff36b35030f12ad7d853386bf8b0e92b52f7e509251870ab10c75e05335",
-      "bytes": 18041
+      "sha256": "6e912ad4271711c2ca4277037d67028f6b8765cfd2c5420a2c767a5e5e6ad5a2",
+      "bytes": 18419
     },
     {
       "path": "docs/decisions/2026-10-07-qmd-instruction-landing-composition.md",
@@ -19352,6 +19362,11 @@
       "bytes": 9884
     },
     {
+      "path": "docs/decisions/2026-10-16-model-route-currency-consistency.md",
+      "sha256": "4c732a16736c63aaad79051d00cf67610b69047226897b370b63537378580d58",
+      "bytes": 16385
+    },
+    {
       "path": "docs/decisions/2026-10-16-nautilus-rc5-run-source-pin.md",
       "sha256": "a2ceae122b37a9df4c9fb53a53f3bf4a1eb188cc51a60a4c564cf857d4a25014",
       "bytes": 6261
@@ -19648,8 +19663,8 @@
     },
     {
       "path": "docs/model-currency.md",
-      "sha256": "76e7aa43d641b89ffeea1fbfbaceb803d800e5ea384e613863e5bd767c023f01",
-      "bytes": 9777
+      "sha256": "cc02df169b2748963bec0afadb8bf5d3c815b30848d2a419f6dfa8f034c8f941",
+      "bytes": 11597
     },
     {
       "path": "docs/native-dashboard-data.md",
@@ -41668,8 +41683,8 @@
     },
     {
       "path": "evidence/artifacts/model-currency-enforcement-20261007/fill-source-review.json",
-      "sha256": "a2311337948337fc03393a27463ed11b2624904ffc4224336685d966e3bdef7e",
-      "bytes": 28346
+      "sha256": "ea31eafb7a1ad14fdeefd4a4b2baf41dba75a3798fe3b9b7863c1ab8ca027ef1",
+      "bytes": 28428
     },
     {
       "path": "evidence/artifacts/model-currency-enforcement-20261007/handbook-projection-landing-prep-20261007T113834Z.json",
@@ -41683,13 +41698,58 @@
     },
     {
       "path": "evidence/artifacts/model-currency-enforcement-20261007/j826-checks.json",
-      "sha256": "e187cd3bfdda7c765cea796e4ba76693c3279745afe7892a23a6963cffbd94f8",
-      "bytes": 6392
+      "sha256": "b099d8647c9f283f7971ea4b15ac55e69324734f6e53149bd6965b36c05943b7",
+      "bytes": 6467
     },
     {
       "path": "evidence/artifacts/model-landscape-check-20261014/receipt.json",
       "sha256": "073e9bcfca252553e5df59ee671d71e6b0518393beb6ac628aec0b1e982b6249",
       "bytes": 3552
+    },
+    {
+      "path": "evidence/artifacts/model-route-currency-consistency-20261016/UPSTREAM-PINS-20261016.json",
+      "sha256": "3e758f05fb0490af646e919f019fd0a39f78714f1a860a1d953d33f09899a648",
+      "bytes": 4213
+    },
+    {
+      "path": "evidence/artifacts/model-route-currency-consistency-20261016/UPSTREAM-SRC-anthropic.md",
+      "sha256": "55c49194e70691185adb5cf6187ed45a17f78bf25b40b20b035ff204b061d3ae",
+      "bytes": 1109
+    },
+    {
+      "path": "evidence/artifacts/model-route-currency-consistency-20261016/UPSTREAM-SRC-meta.md",
+      "sha256": "e11dd9cdb063bf2be2e4084052519f05640c6b9d300634ac28414c18788b7a22",
+      "bytes": 2336
+    },
+    {
+      "path": "evidence/artifacts/model-route-currency-consistency-20261016/UPSTREAM-SRC-native-full.md",
+      "sha256": "24089f036f8810338edf7354074fbd33540f35ab8ed10fae7d4a21b282626b86",
+      "bytes": 1149
+    },
+    {
+      "path": "evidence/artifacts/model-route-currency-consistency-20261016/UPSTREAM-SRC-openai.md",
+      "sha256": "c10dba119f5b74ec732d443271931acae9e21d933ccf576fbeb60d8321dfb338",
+      "bytes": 1161
+    },
+    {
+      "path": "evidence/artifacts/model-route-currency-consistency-20261016/active-model-coverage-followup.json",
+      "sha256": "ffe1723c8c93693cdd7c1c42678b4778e94e01765b7925c94a1eb1a6353930b0",
+      "bytes": 2094
+    },
+    {
+      "path": "evidence/artifacts/model-route-currency-consistency-20261016/checks.json",
+      "sha256": "419a050222ddfa7afe1c9211ff196dec63cdf6dcf0a7b8e25a20269779b24e45",
+      "bytes": 7826
+    },
+    {
+      "path": "evidence/artifacts/model-route-currency-consistency-20261016/review-closure.md",
+      "sha256": "b006f90046f934d08816646b1b6ae0dc4530af9565d2132585b846c59485c074",
+      "bytes": 7864
+    },
+    {
+      "path": "evidence/artifacts/model-route-currency-consistency-20261016/sources.json",
+      "sha256": "866798be3c254cbb6674f0597d83e2cc9c99442b9d2404df78ef9ae06a4f9d0a",
+      "bytes": 5351
     },
     {
       "path": "evidence/artifacts/model-routes-sweep-20261015/GAPS.md",
@@ -63008,8 +63068,8 @@
     },
     {
       "path": "scripts/currency_due.py",
-      "sha256": "4a97f4f396c44a42ea8e16862435601a1d446ce2a65e0a7b63306e28d47834e9",
-      "bytes": 57356
+      "sha256": "b2182c78aca3f2a53a729224af816e3f23bffd1fb0ce3e8a45c4bdd10a4bbd00",
+      "bytes": 62704
     },
     {
       "path": "scripts/env_freshness.py",
@@ -63163,8 +63223,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "a68c189c56bef41b0d3d8a5069920e15db45249818054c444988abad1e8f8477",
-      "bytes": 49157
+      "sha256": "7b9e399eb949109082926259f7908c262ca776e7dfaf39bc753c87796284b9f6",
+      "bytes": 62731
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -63193,8 +63253,8 @@
     },
     {
       "path": "scripts/verdict_review_gate.py",
-      "sha256": "e93527dc1ecb9a67c90254d5f6a21293e36e7aa5a1e1dee45b7e42a4eaba5db7",
-      "bytes": 100431
+      "sha256": "8e9b5f66dbc6a26b494f3411ddf953ea58ba0cc47a6bc5d3e54fb9c054e69d90",
+      "bytes": 100463
     },
     {
       "path": "scripts/verify_nautilus_ci.py",
@@ -64048,8 +64108,8 @@
     },
     {
       "path": "tests/test_currency_due.py",
-      "sha256": "ce3848b2b311cfafadde5be1ae6073b319bbcfd28497740199807cd7ca8253aa",
-      "bytes": 104033
+      "sha256": "b1e4fa1502541fa4a12af2cb098065e1bebe54c034b9cb9f3270a1d85cf63eb0",
+      "bytes": 117062
     },
     {
       "path": "tests/test_delisting_coverage.py",
@@ -64473,8 +64533,8 @@
     },
     {
       "path": "tests/test_model_currency.py",
-      "sha256": "0d5b98a3894c1d5f39484e0f6be87f8cc48452be3b831501e6b42e4d43651b54",
-      "bytes": 18945
+      "sha256": "08cb36c1197370f8e330a3ba1811bc62847d99264191cbfb23988daa85edf8f9",
+      "bytes": 44439
     },
     {
       "path": "tests/test_model_currency_propose.py",
@@ -64818,8 +64878,8 @@
     },
     {
       "path": "tests/test_provenance_digest_custody.py",
-      "sha256": "7229f97fb51bef1d384ea7db134556fbc1fa517a69c76fad2a26c8bd1e9b69c8",
-      "bytes": 25250
+      "sha256": "1ed0782822acb96bda54cb30e7330448024b75bc7fe3f7911ae00ad7b07c284c",
+      "bytes": 28958
     },
     {
       "path": "tests/test_public_starred.py",
