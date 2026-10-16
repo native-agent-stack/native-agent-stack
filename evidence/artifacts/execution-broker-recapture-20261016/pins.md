@@ -25,4 +25,8 @@ is inferred from a source commit.
 All entries remain carried/unresolved. No snapshot is silently advanced.
 This is source accounting, not a new survey or a completed comparison.
 The dated review's claim fields, limitations and metadata remain dated;
-archive status, retirement wording and license cannot alone decide this layer.
+The `abandoned`/`missing_capability` hard-disqualifier rule at
+`catalogs/landscape/angles/README.md:46-47` must be adjudicated, not bypassed:
+IBC's retirement/archive, nautilus_ibapi's archive, and ibflex's explicitly
+non-trading role are DISPUTED hard-disqualifier questions in `angles.md`.
+These source proposals do not decide those questions or select a winner.

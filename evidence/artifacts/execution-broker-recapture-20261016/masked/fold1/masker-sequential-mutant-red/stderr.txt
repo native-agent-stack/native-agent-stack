@@ -1,0 +1,25 @@
+F..F
+======================================================================
+FAIL: test_cli_preserves_bytes_except_exact_private_path_substitutions (__main__.CaptureMask.test_cli_preserves_bytes_except_exact_private_path_substitutions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<FOLD_SCRATCH>/mutant/tests/test_execution_broker_capture_mask.py", line 25, in test_cli_preserves_bytes_except_exact_private_path_substitutions
+    self.assertEqual(output.read_bytes(), b'<SUBTREE>/a\r\nrc=2\x00\xff <WORKTREE>\n')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'<WORKTREE>/sub/a\r\nrc=2\x00\xff <WORKTREE>\n' != b'<SUBTREE>/a\r\nrc=2\x00\xff <WORKTREE>\n'
+
+======================================================================
+FAIL: test_literal_engine_does_not_rescan_inserted_replacement_bytes (__main__.CaptureMask.test_literal_engine_does_not_rescan_inserted_replacement_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<FOLD_SCRATCH>/mutant/tests/test_execution_broker_capture_mask.py", line 44, in test_literal_engine_does_not_rescan_inserted_replacement_bytes
+    self.assertEqual(module.replace_literals(b'/a /b untouched', {b'/a': b'/b', b'/b': b'<B>'}),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     b'/b <B> untouched')
+                     ^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'<B> <B> untouched' != b'/b <B> untouched'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.084s
+
+FAILED (failures=2)

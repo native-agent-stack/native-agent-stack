@@ -35,15 +35,25 @@ class CaptureMask(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertFalse(output.exists())
 
-    def test_replacement_is_one_pass_and_no_input_is_deleted(self):
+    def test_literal_engine_does_not_rescan_inserted_replacement_bytes(self):
         spec = importlib.util.spec_from_file_location('capture_mask', SCRIPT)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        # A replacement containing another key is never recursively rewritten.
-        self.assertEqual(module.mask_bytes(b'/a /b untouched', {'/a': '<A>', '/b': '<B>'}),
-                         b'<A> <B> untouched')
+        # Deliberately insert the second key. A sequential replacer would
+        # incorrectly produce '<B> <B> untouched' instead of '/b <B> untouched'.
+        self.assertEqual(module.replace_literals(b'/a /b untouched', {b'/a': b'/b', b'/b': b'<B>'}),
+                         b'/b <B> untouched')
         self.assertEqual(module.mask_bytes(b'unchanged\r\n\x00\xff', {'/a': '<A>'}),
                          b'unchanged\r\n\x00\xff')
+
+    def test_declared_unpublished_build_digest_is_masked_without_summarizing_stream(self):
+        spec = importlib.util.spec_from_file_location('capture_mask_digest', SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        digest = '1' * 64  # Synthetic digest, never a real artifact fingerprint.
+        raw = b'Created wheel: sha256=' + digest.encode() + b'\nSuccessfully built example\n'
+        self.assertEqual(module.mask_bytes(raw, {digest: '<UNPUBLISHED_BUILD_SHA256>'}),
+                         b'Created wheel: sha256=<UNPUBLISHED_BUILD_SHA256>\nSuccessfully built example\n')
 
 
 if __name__ == '__main__':

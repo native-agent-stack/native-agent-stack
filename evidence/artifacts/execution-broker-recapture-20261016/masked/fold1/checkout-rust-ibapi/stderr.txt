@@ -1,0 +1,1 @@
+HEAD is now at be449c8 market_data: remove Trade.tick_type (#844)

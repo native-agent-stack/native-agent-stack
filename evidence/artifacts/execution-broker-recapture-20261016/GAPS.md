@@ -17,12 +17,13 @@ two-family disposition of the carried survivors, then a recorded winner pin.
 
 ## E2E — GAP-NO-SELECTED-PIN / GAP-PAPER-SESSION
 
-NOT_RUN. No install command, suite command, return code or test-count result
-is supplied. Prerequisites: adjudicated pin, upstream-supported isolated
-scratch install/test route, and a separately authorized owner/co-op paper
-window with credentials outside sessions and approved cap. This lane cannot
-connect a broker, obtain credentials or run that comparison. An offline test
-would have to remain distinct from broker acceptance. No host installation.
+Layer-selected/broker acceptance remains NOT_RUN. Cheap upstream offline
+suites do not need a paper window: this fold runs ibflex and Kumo at their
+carried commits in separate throwaway environments, with native install/test
+captures cited in `OFFLINE.md`. Those are partial offline evidence, not a
+winner or broker acceptance. The remaining per-survivor suite gaps and actual
+prerequisites are named there. Only a broker-connected phase needs the
+separately authorized owner/co-op paper window and credentials outside sessions.
 
 ## F2 — GAP-NO-ROLE-INVOKE
 
@@ -32,21 +33,24 @@ and a separately authorized co-op/trading-owner paper invocation window.
 The Python version capture and packet builder are preparation tools, not
 execution-broker use. Historical receipts cannot fill a new measured window.
 
-## Installed component versions — GAP-NO-NATIVE-VERSION-CAPTURE
+## Closed-runtime component inventory — GAP-NO-NATIVE-VERSION-CAPTURE
 
 The old PR's package metadata transcript is rejected and is not reused.
-No broker-package version command was rerun; no installed Nautilus/Alpaca,
-ibapi or ib_async version or absence is claimed in this rebuild. The only
-fresh version output is the native Python interpreter `--version` capture,
-which is not a broker component. Prerequisite: a supported read-only native
-version command with retained raw command/cwd/rc/streams, if later needed.
+No broker-package version inventory of the closed trading runtime was rerun.
+The fold's scratch package/dependency installs and Python/uv tool captures
+are separate, explicitly scoped evidence in `OFFLINE.md` and `CAPTURES.md`;
+they are not an all-host inventory or a claim about that closed runtime.
+Prerequisite for this inventory gap: a supported read-only native version
+command with retained raw command/cwd/rc/streams, if later needed.
 
 ## COMMUNITY — GAP-COMMUNITY
 
 No community-consensus result is offered for any survivor. Scope is the
 carried-source delta, not a new survey. Prerequisite: retained independent
 community evidence at the candidate pin, then two-family adjudication.
-Historical model fit votes and popularity counters do not satisfy this angle.
+The exclusion of popularity as sole admission evidence follows
+`catalogs/landscape/angles/README.md:71`: usage and popularity cannot admit
+a candidate alone. No independent community measurement is supplied here.
 
 ## USAGE — GAP-USAGE
 
@@ -62,19 +66,22 @@ inputs and results at identified pins; no claim that none exists elsewhere.
 
 ## QUALITY — GAP-QUALITY
 
-Pinned source descriptions and historical source-review limitations are
-carried, but no new unchanged upstream suite or engineering-quality score
-is offered for any survivor. Prerequisite: reviewed vendor-supported scratch
-installation and tests at an adjudicated comparison pin, plus maintenance/
-failure evidence. Archive or license metadata alone cannot settle this angle.
+Pinned source descriptions and historical source-review limitations remain.
+`OFFLINE.md` adds two native executions of unchanged upstream offline suites;
+neither is an engineering-quality score or comparative winner. Other suite
+gaps are stated by candidate. The hard-disqualifier rule at
+`catalogs/landscape/angles/README.md:46-47` makes IBC retirement, nautilus_ibapi
+archive status and ibflex's missing execution role DISPUTED questions requiring
+the co-op's disposition; there is no uncited carry exception to that rule.
 
 ## CAPABILITY/RUNS — GAP-LIFECYCLE
 
-Capability entries are source claims with precise locators, not measured
-acceptance. No new survivor install, test or execution-role run is offered.
-Prerequisites: same-task comparison after phase2 inputs and separately scoped
-broker lifecycle acceptance where required. An auxiliary parser's useful role
-does not establish that it replaces an execution adapter. No automatic winner.
+Capability entries are source claims with precise locators, plus the bounded
+offline suite observations in `OFFLINE.md`. No execution-role invocation or
+broker lifecycle acceptance is offered. A same-task comparison and separately
+scoped broker acceptance remain missing; offline suites themselves need no
+paper session. ibflex's non-trading role is a DISPUTED `missing_capability`
+question under `catalogs/landscape/angles/README.md:46-47`, despite parser tests.
 
 ## Historical capture — GAP-OLD-CUSTODY
 

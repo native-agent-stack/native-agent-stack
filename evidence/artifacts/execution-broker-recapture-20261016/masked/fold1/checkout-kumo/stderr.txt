@@ -1,0 +1,1 @@
+HEAD is now at cdc698c docs(readme): disclaimer — research software, not advice, live orders at the host's own risk, no warranty
