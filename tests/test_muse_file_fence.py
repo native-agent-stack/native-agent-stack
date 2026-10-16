@@ -201,15 +201,21 @@ else:
         malformed.write_text('invalid JSON')
         linked = self.root / 'settings-link.json'
         linked.symlink_to(self.settings)
-        for name, path in (('absent', self.root / 'absent.json'),
-                           ('malformed', malformed), ('symlink', linked), ('directory', home)):
+        cases = (
+            ('absent', self.root / 'absent.json', ValueError, '^required directory/file is absent$'),
+            ('malformed', malformed, json.JSONDecodeError, '^Expecting value:'),
+            ('symlink', linked, ValueError, '^symlink or noncanonical path refused$'),
+            ('directory', home, ValueError, '^required directory/file is absent$'),
+        )
+        for name, path, error_type, message in cases:
             explicit_logs = self.root / ('explicit-' + name + '-logs')
             explicit = argv[:-1] + [str(explicit_logs), '--settings', str(path)]
             with self.subTest(explicit=name), \
                     mock.patch('pathlib.Path.home', return_value=home), \
+                    mock.patch('tools.muse_file_fence.RUNTIME_SHA256', hashlib.sha256(runtime.read_bytes()).hexdigest()), \
                     mock.patch('sys.argv', explicit), \
                     mock.patch('tools.muse_file_fence.native_argv', return_value=plan), \
-                    self.assertRaises(ValueError):
+                    self.assertRaisesRegex(error_type, message):
                 main()
             if (explicit_logs / 'muse-exec.jsonl').exists():
                 self.assertEqual((explicit_logs / 'muse-exec.jsonl').stat().st_size, 0)
