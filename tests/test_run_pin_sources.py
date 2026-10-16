@@ -215,6 +215,34 @@ class OfflineApplicationTests(fixtures.FixtureTestCase):
                      if row["id"] == "widget")
         self.assertTrue(final_stack.complete_final_pin("b" * 40, after))
 
+    def test_adoption_alias_fill_round_trip_accepts_only_same_repository_run_ids(self):
+        root = self.root()
+        repository = "https://github.com/alphaXiv/OpenResearch"
+        fixtures._fixture(root, pins_linux=[{"id": "orx", "url": repository, "version": "0.2.15"}], stack=[
+            {"id": "openresearch", "repository": repository, "version": "0.2.15"},
+            {"id": "foreign-run", "repository": "https://github.com/example/foreign", "version": "0.2.15"}])
+        before = next(row for row in final_stack.build_document(root)["runs"] if row["id"] == "openresearch")
+        self.assertEqual(before["source"], final_stack.PIN_FILES[0][1] + "#/tools/0")
+        self.assertFalse(final_stack.complete_final_pin("b" * 40, before))
+        proof = pins.resolve(before, Mock(return_value=Mock(returncode=0, stdout=(
+            "a" * 40 + " refs/tags/v0.2.15\n" + "b" * 40 + " refs/tags/v0.2.15^{}\n"), stderr="")))
+        self.assertEqual(proof["component"], "openresearch")
+        relative = "evidence/artifacts/source-fill-fixture/adoption-alias-report.json"
+        report = root / relative
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text(json.dumps({"rows": [proof]}))
+        pins.apply_report(root, relative)
+        tool = json.loads((root / final_stack.PIN_FILES[0][1]).read_text())["tools"][0]
+        self.assertEqual((tool["id"], tool["version"], tool["commit"], tool["source_proof"]),
+                         ("orx", "0.2.15", "b" * 40, relative + "#/rows/0"))
+        after = next(row for row in final_stack.build_document(root)["runs"] if row["id"] == "openresearch")
+        self.assertTrue(final_stack.complete_final_pin("b" * 40, after))
+        proof["component"] = "foreign-run"
+        report.write_text(json.dumps({"rows": [proof]}))
+        foreign = next(row for row in final_stack.build_document(root)["runs"] if row["id"] == "openresearch")
+        self.assertFalse(final_stack.complete_final_pin("b" * 40, foreign))
+        self.assertEqual(foreign["pin_parsed"]["version"], "0.2.15")
+
     def test_an_implicit_version_upgrade_is_refused_without_writing(self):
         root, relative, proof = self.prepare()
         path = root / final_stack.STACK

@@ -62683,8 +62683,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "3feb1fd3dabdf950f89f6c39d93e1fed49fff2645a2ae8474de5435f69f69b82",
-      "bytes": 87655
+      "sha256": "2659d17c156b2404407276427f197ffccd7af24b5631c4e60de5880c0f150a8a",
+      "bytes": 87923
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -64578,8 +64578,8 @@
     },
     {
       "path": "tests/test_run_pin_sources.py",
-      "sha256": "b90345769f29181c73f70ef74048ba2d0529d7a924f9f0452fb19a542c699c16",
-      "bytes": 21894
+      "sha256": "b8cfeccac193458c9a4b83dd81ffcbdb72951092aca88e38e740f2d87fa89c50",
+      "bytes": 23962
     },
     {
       "path": "tests/test_runtime_boot.py",

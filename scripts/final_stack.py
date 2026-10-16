@@ -407,7 +407,7 @@ def lock_source_proof(sources: Sources, binding: dict, *, component_ids=()) -> s
         host_receipts.normalize_repository(binding.get("repository")))
 
 
-def proof_backed_record_pin(sources: Sources, text, commit, *, component, repository, reference):
+def proof_backed_record_pin(sources: Sources, text, commit, *, component, repository, reference, component_ids=()):
     """Keep an unproved commit as information, never as a receipt-binding commit."""
     parsed = record_pin(text, commit)
     identity = parsed.get("pin_parsed")
@@ -416,7 +416,7 @@ def proof_backed_record_pin(sources: Sources, text, commit, *, component, reposi
     claimed = identity["commit"]
     binding = {"package": component, "version": identity.get("version"),
                "repository": repository, "source_proof": reference}
-    if reference is not None and lock_source_proof(sources, binding) == claimed:
+    if reference is not None and lock_source_proof(sources, binding, component_ids=component_ids) == claimed:
         return parsed
     return {**parsed, "pin_parsed": {**identity, "commit": None},
             "source_commit_claim": claimed, "source_proof_status": "not_verified"}
@@ -494,7 +494,9 @@ def run_records(sources: Sources) -> list[dict]:
             records.append({"rank": 1 + platform_order, "id": tool["id"], "repository": repository,
                             "pin": tool.get("version"), "parsed": proof_backed_record_pin(
                                 sources, tool.get("version"), tool.get("commit"), component=tool["id"],
-                                repository=repository, reference=tool.get("source_proof")),
+                                repository=repository, reference=tool.get("source_proof"), component_ids=(
+                                    component["id"] for component in stack_components
+                                    if host_receipts.normalize_repository(component.get("repository")) == repository)),
                             "source": f"{relative}#/tools/{index}", "platform": platform})
 
     for index, component in enumerate(stack_components):
