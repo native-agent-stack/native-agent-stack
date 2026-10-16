@@ -59,6 +59,29 @@ def private_path(text: str, home: str) -> str:
     return text.replace(root.replace("/", "-") + "-", "-~-") if root else text
 
 
+def private_text(text: str, home: str) -> str:
+    """Any text a receipt keeps: an absolute path as private_path shows it, and the home directory inside it as ~."""
+    if text.startswith("/"):
+        return private_path(text, home)
+    root = home.rstrip("/")
+    return private_path(text.replace(root + "/", "~/"), home) if root else text
+
+
+SECRET_KEY = re.compile(r"env|key|token|secret|password|credential|auth", re.IGNORECASE)
+
+
+def sanitized(value, home: str, redact: bool = False):
+    """A settings value as a receipt may keep it: every value under a key that can hold a credential or an environment
+    value (env, apiKeyHelper, ...) is <redacted> with its key kept, and every other string goes through private_text."""
+    if isinstance(value, dict):
+        return {key: sanitized(item, home, redact or bool(SECRET_KEY.search(key))) for key, item in value.items()}
+    if isinstance(value, list):
+        return [sanitized(item, home, redact) for item in value]
+    if redact:
+        return "<redacted>"
+    return private_text(value, home) if isinstance(value, str) else value
+
+
 def parse(result: str, home: str = "") -> dict:
     """The /context report's tables: total, model, categories, and the per-item tables with their tokens."""
     report = {"model": None, "total_tokens": None, "window_tokens": None}
@@ -111,17 +134,49 @@ def installer():
     return module
 
 
-def mcp_config(names: list[str], directory: Path) -> Path:
+def plugin_servers(plugin: str) -> dict:
+    """The MCP servers an installed plugin declares, loaded as Claude Code loads them: the plugin root's .mcp.json
+    first, then each shape of `mcpServers` in .claude-plugin/plugin.json in order (a .json file path or an inline map,
+    or an array of either), a later name replacing an earlier one; an MCP bundle (.mcpb, .dxt) is refused. The install
+    path comes from ~/.claude/plugins/installed_plugins.json and renders ${CLAUDE_PLUGIN_ROOT}. --strict-mcp-config
+    loads no MCP server outside --mcp-config, a plugin's included, so a plugin variant passes its plugin's servers
+    there (README, "The launch")."""
+    installed = json.loads((Path.home() / ".claude" / "plugins" / "installed_plugins.json").read_text(encoding="utf-8"))
+    entries = (installed.get("plugins") or {}).get(plugin) or []
+    if not entries:
+        raise SystemExit(f"startup_context: plugin {plugin} is not installed")
+    root = Path(entries[0]["installPath"])
+
+    def from_file(relative: str) -> dict:
+        if relative.endswith((".mcpb", ".dxt")):
+            raise SystemExit(f"startup_context: plugin {plugin} ships an MCP bundle, which this tool does not unpack")
+        source = json.loads((root / relative).read_text(encoding="utf-8"))
+        return source.get("mcpServers", source)
+
+    servers = from_file(".mcp.json") if (root / ".mcp.json").exists() else {}
+    declared = json.loads((root / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8")).get("mcpServers")
+    for shape in declared if isinstance(declared, list) else [declared] if declared else []:
+        servers.update(from_file(shape) if isinstance(shape, str) else shape)
+    return json.loads(json.dumps(servers).replace("${CLAUDE_PLUGIN_ROOT}", str(root)))
+
+
+def mcp_config(names: list[str], directory: Path, plugin: str | None = None) -> Path:
     """An --mcp-config file holding only the named servers from the repository's template (no secrets there), with its
-    ${HOME} and ${ECO_ROOT} placeholders rendered as the installer renders them (render_servers, default_eco_root)."""
+    ${HOME} and ${ECO_ROOT} placeholders rendered as the installer renders them (render_servers, default_eco_root),
+    plus the MCP servers of `plugin` when given (plugin_servers)."""
     data = json.loads(MCP_TEMPLATE.read_text(encoding="utf-8"))
     tool, home = installer(), Path.home()
     servers = tool.render_servers(data, home, tool.default_eco_root(home))
     missing = sorted(set(names) - set(servers))
     if missing:
         raise SystemExit(f"startup_context: servers not in the MCP template {MCP_TEMPLATE.name}: {', '.join(missing)}")
-    path = directory / f"mcp-{'-'.join(sorted(names)) or 'none'}.json"
-    path.write_text(json.dumps({"mcpServers": {name: servers[name] for name in names}}, indent=1), encoding="utf-8")
+    chosen = {name: servers[name] for name in names}
+    extra = plugin_servers(plugin) if plugin else {}
+    if set(extra) & set(chosen):
+        raise SystemExit(f"startup_context: plugin {plugin} declares a server the variant already lists")
+    chosen.update(extra)
+    path = directory / f"mcp-{'-'.join(sorted(chosen)) or 'none'}.json"
+    path.write_text(json.dumps({"mcpServers": chosen}, indent=1), encoding="utf-8")
     os.chmod(path, 0o600)
     return path
 
@@ -131,7 +186,8 @@ def variant_argv(variant: dict, scratch: Path) -> list[str]:
     `settings`, then `flags` as given."""
     argv = []
     if "mcp_servers" in variant:
-        argv += ["--strict-mcp-config", "--mcp-config", str(mcp_config(variant["mcp_servers"], scratch))]
+        argv += ["--strict-mcp-config", "--mcp-config",
+                 str(mcp_config(variant["mcp_servers"], scratch, variant.get("plugin")))]
     if "settings" in variant:
         argv += ["--settings", json.dumps(variant["settings"], sort_keys=True)]
     return argv + list(variant.get("flags") or [])
@@ -168,13 +224,20 @@ def client_version(claude: str) -> str:
 
 
 def shown_flags(argv: list[str], home: str) -> list[str]:
-    """Flags as a receipt may show them: a generated --mcp-config file by its server set, home paths shortened."""
+    """Flags as a receipt may show them: a generated --mcp-config file by its server set, inline --settings sanitized
+    (sanitized), every other value through private_text."""
     shown = []
     for index, flag in enumerate(argv):
-        if index and argv[index - 1] == "--mcp-config":
+        previous = argv[index - 1] if index else None
+        if previous == "--mcp-config":
             shown.append(Path(flag).name)
+        elif previous == "--settings":
+            try:
+                shown.append(json.dumps(sanitized(json.loads(flag), home), sort_keys=True))
+            except ValueError:
+                shown.append(private_text(flag, home))
         else:
-            shown.append(private_path(flag, home) if flag.startswith("/") else flag)
+            shown.append(private_text(flag, home))
     return shown
 
 
@@ -206,15 +269,28 @@ def measure(launch: dict, out: Path, claude: str, home: str) -> dict:
 
 
 def loaded_component(variant: dict, receipt: dict) -> bool | None:
-    """Whether the variant's component loaded: an MCP server connected, or a plugin in the init event's list. None for
-    the control. A delta is reported only for a component that loaded."""
+    """Whether the variant's component loaded: its MCP server connected, and its plugin (when the variant names one)
+    in the init event's list; a component without a server loads when it is listed as a plugin. None for the control.
+    A delta is reported only for a component that loaded."""
     component = variant.get("component")
     if component is None:
         return None
     statuses = {s["name"]: s["status"] for s in receipt["mcp_servers"]}
+    plugin = (variant.get("plugin") or "").split("@")[0]
     if component in statuses:
-        return statuses[component] == "connected"
-    return component in receipt["plugins"]
+        return statuses[component] == "connected" and (not plugin or plugin in receipt["plugins"])
+    return (plugin or component) in receipt["plugins"]
+
+
+def baseline_differs(variant: dict, receipt: dict, control: dict) -> list[str]:
+    """What the variant and the control do not share in the same state, its own component and plugin aside: a server
+    connected in one run only, or a plugin listed in one run only. A delta over the control needs this empty."""
+    own = {variant.get("component"), (variant.get("plugin") or "").split("@")[0]}
+    base = {s["name"]: s["status"] for s in control["mcp_servers"]}
+    mine = {s["name"]: s["status"] for s in receipt["mcp_servers"]}
+    servers = sorted(name for name in (set(base) | set(mine)) - own if base.get(name) != mine.get(name))
+    plugins = sorted((set(control["plugins"]) ^ set(receipt["plugins"])) - own)
+    return servers + [f"plugin {name}" for name in plugins]
 
 
 def summary(launch: dict, receipts: dict, out: Path) -> dict:
@@ -225,10 +301,12 @@ def summary(launch: dict, receipts: dict, out: Path) -> dict:
         report = receipt["report"]
         failed = sorted(s["name"] for s in receipt["mcp_servers"] if s["status"] != "connected")
         loaded = loaded_component(kinds[variant_id], receipt)
+        differs = baseline_differs(kinds[variant_id], receipt, receipts["control"])
         rows.append({"variant": variant_id, "component": receipt.get("component"), "total_tokens": report["total_tokens"],
-                     "servers_not_connected": failed, "component_loaded": loaded,
-                     "over_control": None if variant_id == "control" or not loaded or report["total_tokens"] is None
-                     or control["total_tokens"] is None else report["total_tokens"] - control["total_tokens"],
+                     "servers_not_connected": failed, "component_loaded": loaded, "baseline_differs": differs,
+                     "over_control": None if variant_id == "control" or not loaded or differs
+                     or report["total_tokens"] is None or control["total_tokens"] is None
+                     else report["total_tokens"] - control["total_tokens"],
                      "mcp_tokens_by_server": report["mcp_tokens_by_server"],
                      "mcp_tools_deferred": report["mcp_tools_deferred"]})
     doc = {"schema": "startup-context-summary/1", "role_id": launch["role_id"], "family": launch.get("family", "claude-code"),

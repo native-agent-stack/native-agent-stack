@@ -42,7 +42,13 @@ servers = []
 if "--mcp-config" in argv:
     servers = sorted(json.load(open(argv[argv.index("--mcp-config") + 1]))["mcpServers"])
 failed = set(os.environ.get("FAKE_FAILED", "").split(","))
-init = {"type": "system", "subtype": "init", "plugins": [{"name": "fixture-plugin"}],
+only_in, _, name = os.environ.get("FAKE_FAILED_IN", "").partition(":")
+if only_in and only_in in servers:
+    failed.add(name)
+enabled = []
+if "--settings" in argv:
+    enabled = [k.split("@")[0] for k, v in json.loads(argv[argv.index("--settings") + 1]).get("enabledPlugins", {}).items() if v]
+init = {"type": "system", "subtype": "init", "plugins": [{"name": n} for n in ["fixture-plugin", *enabled]],
         "mcp_servers": [{"name": n, "status": "failed" if n in failed else "connected"} for n in servers]}
 text = open(os.environ["FAKE_REPORT_DIR"] + "/" + ("extra" if "extra" in servers else "base")).read()
 print(json.dumps(init))
@@ -129,6 +135,86 @@ class Measure(unittest.TestCase):
         launch = dict(self.launch, variants=self.launch["variants"][::-1])
         with self.assertRaises(SystemExit):
             S.measure(launch, self.tmp / "out", str(self.claude), HOME)
+
+    def test_inline_settings_are_shown_without_environment_values_or_absolute_paths(self):
+        # The co-op's local review of #1203 at 71b3fde3 (P1, :173-177): an inline --settings value was copied into the
+        # receipt unchanged, so an environment value and a home path survived. Synthetic values only.
+        secret = "synthetic-" + "v" * 24
+        settings = {"env": {"FIXTURE_API_KEY": secret, "FIXTURE_DIR": HOME + "/data"},
+                    "enabledPlugins": {"p@m": True}, "statusLine": {"command": HOME + "/bin/status"},
+                    "apiKeyHelper": "/srv/elsewhere/helper"}
+        launch = dict(self.launch, variants=[dict(self.launch["variants"][0], settings=settings)])
+        S.measure(launch, self.tmp / "out", str(self.claude), HOME)
+        text = (self.tmp / "out" / "fixture-role.control.json").read_text()
+        self.assertNotIn(secret, text)
+        self.assertNotIn(HOME, text)
+        self.assertNotIn("/srv/elsewhere", text)
+        shown = json.loads(json.loads(text)["flags"][json.loads(text)["flags"].index("--settings") + 1])
+        self.assertEqual(shown["env"], {"FIXTURE_API_KEY": "<redacted>", "FIXTURE_DIR": "<redacted>"})
+        self.assertEqual(shown["enabledPlugins"], {"p@m": True})
+        self.assertEqual(shown["statusLine"], {"command": "~/bin/status"})
+        self.assertEqual(shown["apiKeyHelper"], "<redacted>")
+
+    def test_a_delta_needs_the_shared_servers_connected_in_both_runs(self):
+        # The co-op's local review of #1203 at 71b3fde3 (P2, :226-231): a shared server that failed in one run moved its
+        # tokens into the component's delta.
+        with mock.patch.dict(os.environ, {"FAKE_FAILED_IN": "extra:fixture"}):
+            doc = S.measure(self.launch, self.tmp / "out", str(self.claude), HOME)
+        row = doc["rows"][1]
+        self.assertEqual((row["component_loaded"], row["over_control"]), (True, None))
+        self.assertEqual(row["baseline_differs"], ["fixture"])
+        # A plugin listed in both runs is shared, even when the component has its name.
+        same = {"mcp_servers": [], "plugins": ["x", "y"]}
+        self.assertEqual(S.baseline_differs({"component": "x"}, same, same), [])
+        self.assertEqual(S.baseline_differs({"component": "x"}, {"mcp_servers": [], "plugins": ["x"]}, same), ["plugin y"])
+
+    def test_a_plugin_mcp_server_is_measured_with_its_plugin(self):
+        # The co-op's local review of #1203 at 71b3fde3 (P2, launches/CC.json:95-100): --strict-mcp-config suppressed the
+        # plugin's own MCP server, so the plugin variant measured its hooks and skills only and still reported a delta.
+        home = self.tmp / "home"
+        root = home / ".claude" / "plugins" / "cache" / "m" / "p" / "1.0.0"
+        (root / ".claude-plugin").mkdir(parents=True)
+        (root / ".claude-plugin" / "plugin.json").write_text(json.dumps(
+            {"name": "p", "mcpServers": {"extra": {"command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/start.mjs"]}}}))
+        (home / ".claude" / "plugins" / "installed_plugins.json").write_text(json.dumps(
+            {"version": 2, "plugins": {"p@m": [{"scope": "user", "installPath": str(root), "version": "1.0.0"}]}}))
+        launch = dict(self.launch, variants=[self.launch["variants"][0],
+                                             {"id": "+p", "component": "extra", "plugin": "p@m", "mcp_servers": ["fixture"],
+                                              "settings": {"enabledPlugins": {"p@m": True}}}])
+        with mock.patch.object(S.Path, "home", return_value=home):
+            doc = S.measure(launch, self.tmp / "out", str(self.claude), str(home))
+        config = [json.loads(line) for line in self.log.read_text().splitlines()][1]
+        self.assertIn("mcp-extra-fixture.json", [Path(flag).name for flag in config])
+        row = doc["rows"][1]
+        self.assertEqual((row["component_loaded"], row["over_control"]), (True, 600))
+        with mock.patch.object(S.Path, "home", return_value=home), mock.patch.dict(os.environ, {"FAKE_FAILED": "extra"}):
+            row = S.measure(launch, self.tmp / "out2", str(self.claude), str(home))["rows"][1]
+        self.assertEqual((row["component_loaded"], row["over_control"]), (False, None))
+
+    def test_plugin_servers_load_in_the_documented_order(self):
+        # plugins-reference.md:301-317: .mcp.json first, then each declared shape in order; a later name replaces an
+        # earlier one; a bundle is refused here.
+        home = self.tmp / "home2"
+        root = home / "plugin"
+        (root / ".claude-plugin").mkdir(parents=True)
+        (root / ".mcp.json").write_text(json.dumps({"mcpServers": {"a": {"command": "one"}, "b": {"command": "one"}}}))
+        (root / "more.json").write_text(json.dumps({"mcpServers": {"b": {"command": "two"}}}))
+        (root / ".claude-plugin" / "plugin.json").write_text(json.dumps(
+            {"name": "q", "mcpServers": ["./more.json", {"c": {"command": "${CLAUDE_PLUGIN_ROOT}/c"}}]}))
+        (home / ".claude" / "plugins").mkdir(parents=True)
+        (home / ".claude" / "plugins" / "installed_plugins.json").write_text(json.dumps(
+            {"version": 2, "plugins": {"q@m": [{"installPath": str(root)}]}}))
+        with mock.patch.object(S.Path, "home", return_value=home):
+            self.assertEqual(S.plugin_servers("q@m"), {"a": {"command": "one"}, "b": {"command": "two"},
+                                                       "c": {"command": str(root) + "/c"}})
+            (root / ".claude-plugin" / "plugin.json").write_text(json.dumps({"name": "q", "mcpServers": "./x.mcpb"}))
+            with self.assertRaises(SystemExit):
+                S.plugin_servers("q@m")
+
+    def test_the_committed_context_mode_variant_loads_its_plugin_server(self):
+        launch = json.loads((ROOT / "tools" / "startup-context" / "launches" / "CC.json").read_text())
+        variant = next(v for v in launch["variants"] if v["id"] == "+context-mode")
+        self.assertEqual(variant["plugin"], "context-mode@context-mode")
 
     def test_a_server_outside_the_template_is_refused(self):
         launch = dict(self.launch, variants=[{"id": "control", "mcp_servers": ["unknown"]}])

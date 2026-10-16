@@ -18,7 +18,9 @@ python3 tools/startup-context/startup_context.py parse <saved stream result>
 - **What loaded:** each run uses `--output-format stream-json --verbose`, whose `system/init` event lists every MCP server
   with its `status` and the loaded plugins (`headless.md:253-255`, `:279`, fetched 2026-10-15T20:05:20Z, sha256
   `fe8a1d507c57c816`). A component's tokens over the control are reported only when it loaded (its server `connected`, or
-  its plugin listed); otherwise the summary says it did not load.
+  its plugin listed); otherwise the summary says it did not load. A delta also needs every server and plugin the
+  variant shares with the control in the same state in both runs; otherwise the row lists them in `baseline_differs`
+  and gives no delta.
 - **What counts:** the report's total is the start-up context. MCP tool definitions are deferred under tool search: their
   names are listed and their schemas load on demand (`context-window.md:43-47`, sha256 `78bf25a505d7563d`), so the per-server
   tool tokens are recorded but are outside the total.
@@ -26,12 +28,21 @@ python3 tools/startup-context/startup_context.py parse <saved stream result>
   the installer renders it (`tools/adoption/install_claude_profile.py`, `render_servers` and `default_eco_root`), written to a
   scratch file and passed with `--strict-mcp-config --mcp-config`. Plugins are switched with `--settings`
   (`enabledPlugins`). User and project settings, hooks and other plugins are the same in every variant.
+- **A plugin's own MCP servers:** `--strict-mcp-config` uses only the servers in `--mcp-config` and ignores every other
+  MCP configuration (`cli-reference.md:131`, fetched 2026-10-16T04:50:27Z, sha256 `0acf910e96c4a9f4`), a plugin's
+  included. So a variant that names a `plugin` adds that plugin's servers to its `--mcp-config`, loaded as Claude Code
+  loads them: the plugin root's `.mcp.json` first, then each `mcpServers` shape in `plugin.json` in order, with a later
+  name replacing an earlier one and `${CLAUDE_PLUGIN_ROOT}` rendered to the install path
+  (`plugins-reference.md:152`, `:301-317`, fetched 2026-10-16T04:50:27Z, sha256 `16b6dafd91d4a258`). An MCP bundle
+  (`.mcpb`, `.dxt`) is refused. Such a component loads when its server connects and its plugin is listed.
 
 ## What a receipt holds
 
 Names, token counts, each server's status, the loaded plugins and the variant's flags. Never an absolute home path (a
-path under home is shown as `~/...`, the dash-encoded home in a project directory as `-~-`), an environment value or a
-host name. Values of 1,000 tokens and more are the client's own rounding to the nearest 100.
+path under home is shown as `~/...`, the dash-encoded home in a project directory as `-~-`, any other absolute path as
+`<absolute path outside home>`), an environment value or a host name. Inline `--settings` are kept with every value
+under a key that can hold a credential or an environment value (`env`, `apiKeyHelper`, any key with key, token,
+secret, password, credential or auth in its name) shown as `<redacted>`. Values of 1,000 tokens and more are the client's own rounding to the nearest 100.
 
 ## Tests
 

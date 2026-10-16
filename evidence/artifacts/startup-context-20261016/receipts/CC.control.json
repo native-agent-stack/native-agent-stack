@@ -4,7 +4,7 @@
  "family": "claude-code",
  "variant": "control",
  "component": null,
- "measured_at": "2026-10-16T03:07:56Z",
+ "measured_at": "2026-10-16T04:45:07Z",
  "client_version": "2.1.301",
  "cwd": ".",
  "flags": [
@@ -37,12 +37,12 @@
  ],
  "report": {
   "model": "claude-opus-5-5",
-  "total_tokens": 24800,
+  "total_tokens": 25100,
   "window_tokens": 1000000,
   "categories": [
    {
     "category": "System prompt",
-    "tokens": 2500
+    "tokens": 2700
    },
    {
     "category": "System tools",
@@ -58,7 +58,7 @@
    },
    {
     "category": "System tools (deferred)",
-    "tokens": 14000
+    "tokens": 14200
    },
    {
     "category": "Custom agents",
@@ -66,7 +66,7 @@
    },
    {
     "category": "Memory files",
-    "tokens": 10200
+    "tokens": 10300
    },
    {
     "category": "Skills",
@@ -78,7 +78,7 @@
    },
    {
     "category": "Free space",
-    "tokens": 942200
+    "tokens": 941900
    },
    {
     "category": "Autocompact buffer",

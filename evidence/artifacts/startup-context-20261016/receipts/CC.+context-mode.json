@@ -4,13 +4,13 @@
  "family": "claude-code",
  "variant": "+context-mode",
  "component": "context-mode",
- "measured_at": "2026-10-16T03:12:11Z",
+ "measured_at": "2026-10-16T04:49:24Z",
  "client_version": "2.1.301",
  "cwd": ".",
  "flags": [
   "--strict-mcp-config",
   "--mcp-config",
-  "mcp-serena.json",
+  "mcp-context-mode-serena.json",
   "--settings",
   "{\"enabledPlugins\": {\"context-mode@context-mode\": true}}",
   "--model",
@@ -21,6 +21,10 @@
  "mcp_servers": [
   {
    "name": "serena",
+   "status": "connected"
+  },
+  {
+   "name": "context-mode",
    "status": "connected"
   }
  ],
@@ -38,12 +42,12 @@
  ],
  "report": {
   "model": "claude-opus-5-5",
-  "total_tokens": 26600,
+  "total_tokens": 26800,
   "window_tokens": 1000000,
   "categories": [
    {
     "category": "System prompt",
-    "tokens": 2500
+    "tokens": 2700
    },
    {
     "category": "System tools",
@@ -55,11 +59,11 @@
    },
    {
     "category": "MCP tools (deferred)",
-    "tokens": 8700
+    "tokens": 19600
    },
    {
     "category": "System tools (deferred)",
-    "tokens": 14000
+    "tokens": 14200
    },
    {
     "category": "Custom agents",
@@ -67,7 +71,7 @@
    },
    {
     "category": "Memory files",
-    "tokens": 10200
+    "tokens": 10300
    },
    {
     "category": "Skills",
@@ -79,7 +83,7 @@
    },
    {
     "category": "Free space",
-    "tokens": 940400
+    "tokens": 940200
    },
    {
     "category": "Autocompact buffer",
@@ -88,29 +92,84 @@
   ],
   "mcp_tools": [
    {
+    "tool": "mcp__context-mode__ctx_batch_execute",
+    "server": "context-mode",
+    "tokens": 1700
+   },
+   {
+    "tool": "mcp__context-mode__ctx_doctor",
+    "server": "context-mode",
+    "tokens": 136
+   },
+   {
+    "tool": "mcp__context-mode__ctx_execute",
+    "server": "context-mode",
+    "tokens": 1900
+   },
+   {
+    "tool": "mcp__context-mode__ctx_execute_file",
+    "server": "context-mode",
+    "tokens": 1200
+   },
+   {
+    "tool": "mcp__context-mode__ctx_fetch_and_index",
+    "server": "context-mode",
+    "tokens": 1400
+   },
+   {
+    "tool": "mcp__context-mode__ctx_index",
+    "server": "context-mode",
+    "tokens": 1200
+   },
+   {
+    "tool": "mcp__context-mode__ctx_insight",
+    "server": "context-mode",
+    "tokens": 209
+   },
+   {
+    "tool": "mcp__context-mode__ctx_purge",
+    "server": "context-mode",
+    "tokens": 913
+   },
+   {
+    "tool": "mcp__context-mode__ctx_search",
+    "server": "context-mode",
+    "tokens": 1700
+   },
+   {
+    "tool": "mcp__context-mode__ctx_stats",
+    "server": "context-mode",
+    "tokens": 129
+   },
+   {
+    "tool": "mcp__context-mode__ctx_upgrade",
+    "server": "context-mode",
+    "tokens": 165
+   },
+   {
     "tool": "mcp__serena__delete_memory",
     "server": "serena",
-    "tokens": 111
+    "tokens": 114
    },
    {
     "tool": "mcp__serena__edit_memory",
     "server": "serena",
-    "tokens": 453
+    "tokens": 465
    },
    {
     "tool": "mcp__serena__find_declaration",
     "server": "serena",
-    "tokens": 522
+    "tokens": 536
    },
    {
     "tool": "mcp__serena__find_implementations",
     "server": "serena",
-    "tokens": 494
+    "tokens": 507
    },
    {
     "tool": "mcp__serena__find_referencing_symbols",
     "server": "serena",
-    "tokens": 432
+    "tokens": 443
    },
    {
     "tool": "mcp__serena__find_symbol",
@@ -120,62 +179,62 @@
    {
     "tool": "mcp__serena__get_diagnostics_for_file",
     "server": "serena",
-    "tokens": 450
+    "tokens": 462
    },
    {
     "tool": "mcp__serena__get_symbols_overview",
     "server": "serena",
-    "tokens": 420
+    "tokens": 431
    },
    {
     "tool": "mcp__serena__initial_instructions",
     "server": "serena",
-    "tokens": 150
+    "tokens": 154
    },
    {
     "tool": "mcp__serena__insert_after_symbol",
     "server": "serena",
-    "tokens": 264
+    "tokens": 271
    },
    {
     "tool": "mcp__serena__insert_before_symbol",
     "server": "serena",
-    "tokens": 315
+    "tokens": 323
    },
    {
     "tool": "mcp__serena__list_memories",
     "server": "serena",
-    "tokens": 88
+    "tokens": 90
    },
    {
     "tool": "mcp__serena__onboarding",
     "server": "serena",
-    "tokens": 111
+    "tokens": 114
    },
    {
     "tool": "mcp__serena__open_dashboard",
     "server": "serena",
-    "tokens": 70
+    "tokens": 72
    },
    {
     "tool": "mcp__serena__read_memory",
     "server": "serena",
-    "tokens": 117
+    "tokens": 120
    },
    {
     "tool": "mcp__serena__rename_memory",
     "server": "serena",
-    "tokens": 203
+    "tokens": 209
    },
    {
     "tool": "mcp__serena__rename_symbol",
     "server": "serena",
-    "tokens": 295
+    "tokens": 303
    },
    {
     "tool": "mcp__serena__replace_content",
     "server": "serena",
-    "tokens": 702
+    "tokens": 721
    },
    {
     "tool": "mcp__serena__replace_in_files",
@@ -185,17 +244,17 @@
    {
     "tool": "mcp__serena__replace_symbol_body",
     "server": "serena",
-    "tokens": 340
+    "tokens": 349
    },
    {
     "tool": "mcp__serena__safe_delete_symbol",
     "server": "serena",
-    "tokens": 206
+    "tokens": 212
    },
    {
     "tool": "mcp__serena__write_memory",
     "server": "serena",
-    "tokens": 300
+    "tokens": 308
    }
   ],
   "custom_agents": [
@@ -710,7 +769,8 @@
    }
   ],
   "mcp_tokens_by_server": {
-   "serena": 8743
+   "context-mode": 10652,
+   "serena": 8904
   },
   "mcp_tools_deferred": true
  }

@@ -7,9 +7,10 @@
   {
    "variant": "control",
    "component": null,
-   "total_tokens": 24800,
+   "total_tokens": 25100,
    "servers_not_connected": [],
    "component_loaded": null,
+   "baseline_differs": [],
    "over_control": null,
    "mcp_tokens_by_server": {
     "serena": 8743
@@ -19,11 +20,12 @@
   {
    "variant": "+ai-memory",
    "component": "ai-memory",
-   "total_tokens": 24800,
+   "total_tokens": 25100,
    "servers_not_connected": [
     "ai-memory"
    ],
    "component_loaded": false,
+   "baseline_differs": [],
    "over_control": null,
    "mcp_tokens_by_server": {
     "serena": 8743
@@ -33,10 +35,11 @@
   {
    "variant": "+qmd",
    "component": "qmd",
-   "total_tokens": 25400,
+   "total_tokens": 25600,
    "servers_not_connected": [],
    "component_loaded": true,
-   "over_control": 600,
+   "baseline_differs": [],
+   "over_control": 500,
    "mcp_tokens_by_server": {
     "qmd": 2308,
     "serena": 8872
@@ -46,11 +49,12 @@
   {
    "variant": "+socraticode",
    "component": "socraticode",
-   "total_tokens": 24800,
+   "total_tokens": 25100,
    "servers_not_connected": [
     "socraticode"
    ],
    "component_loaded": false,
+   "baseline_differs": [],
    "over_control": null,
    "mcp_tokens_by_server": {
     "serena": 8743
@@ -60,9 +64,10 @@
   {
    "variant": "+headroom",
    "component": "headroom",
-   "total_tokens": 24800,
+   "total_tokens": 25100,
    "servers_not_connected": [],
    "component_loaded": true,
+   "baseline_differs": [],
    "over_control": 0,
    "mcp_tokens_by_server": {
     "headroom": 480,
@@ -73,12 +78,14 @@
   {
    "variant": "+context-mode",
    "component": "context-mode",
-   "total_tokens": 26600,
+   "total_tokens": 26800,
    "servers_not_connected": [],
    "component_loaded": true,
-   "over_control": 1800,
+   "baseline_differs": [],
+   "over_control": 1700,
    "mcp_tokens_by_server": {
-    "serena": 8743
+    "context-mode": 10652,
+    "serena": 8904
    },
    "mcp_tools_deferred": true
   }
