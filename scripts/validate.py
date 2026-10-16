@@ -379,6 +379,7 @@ class Validator:
         models = {row["id"]: row for row in (model_rows if isinstance(model_rows, list) else [])
                   if isinstance(row, dict) and isinstance(row.get("id"), str)}
         bindings = {}
+        route_identities = {}
         for row in self.sequence(document.get("routes"), "model-route currency routes", nonempty=True):
             if not isinstance(row, dict):
                 self.error("model-route currency: expected route objects")
@@ -393,6 +394,12 @@ class Validator:
             if currency_id not in models:
                 self.error(f"model-route currency {route_id}: unknown model-currency row {currency_id}")
             bindings[route_id] = currency_id
+            identities = row.get("repositories")
+            if row.get("kind") != "route" or not isinstance(identities, list) or not identities \
+                    or any(not isinstance(identity, str) or not identity.strip() for identity in identities):
+                self.error(f"model-route currency {route_id}: route kind and repository identities are required")
+            else:
+                route_identities[route_id] = set(identities)
         report = {"bindings": len(bindings), "checked_routes": 0, "notices": []}
 
         def inspect_routes(rows, source, id_key, model_key, *, inline_bindings=False):
@@ -417,6 +424,10 @@ class Validator:
                 if inline_bindings and row.get("model_currency_id") != currency_id:
                     self.error(f"model-route currency {source} {route_id}: model_currency_id does not match "
                                "the registered route binding")
+                    continue
+                if inline_bindings and (not isinstance(row.get("repository"), str)
+                                        or row["repository"] not in route_identities.get(route_id, set())):
+                    self.error(f"model-route currency {source} {route_id}: repository does not match registered route identity")
                     continue
                 report["checked_routes"] += 1
                 normalized = selected
@@ -484,7 +495,20 @@ class Validator:
                         from host_receipts import normalize_repository
                     matches = normalize_repository(repository) == normalize_repository(identity)
                 elif matches:
-                    matches = repository.rstrip("/") == identity.rstrip("/")
+                    # PEP 503, Normalized Names: reuse the repository's existing normalizer.
+                    # https://peps.python.org/pep-0503/#normalized-names (read 2026-10-16).
+                    try:
+                        from .starred_protected import package_name
+                    except ImportError:
+                        from starred_protected import package_name
+                    try:
+                        parsed = urlsplit(repository)
+                        match = re.fullmatch(r"/project/([A-Za-z0-9._-]+)/?", parsed.path)
+                        matches = (parsed.scheme == "https" and parsed.netloc.lower() == "pypi.org"
+                                   and not parsed.query and not parsed.fragment and match is not None
+                                   and package_name(match.group(1)) == package_name(release["package"]))
+                    except ValueError:
+                        matches = False
                 if not matches:
                     self.error("model-route currency: C2 component identity does not match its package source")
             declared = [row.get("repository") for row in [*route_rows, *component_rows] if isinstance(row, dict)]

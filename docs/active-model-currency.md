@@ -181,8 +181,9 @@ and any existing due notice. The collector writes known nonzero counts and
 otherwise retains the prior due-file when a requested check cannot answer.
 It exits 0 for a coverage-only gap and 1 when known stale model selectors exist;
 the model CLI itself still returns 2 for an incomplete comparison. The
-collector has seven possible counts: its five base counts, the conditional
-`surface_unreviewed` count and `stale_models`. An unknown model comparison
+collector has eight possible counts: its five base counts, the conditional
+`surface_unreviewed` count, `stale_models`, and inventory-age `models_past_window`.
+An unknown model comparison
 adds the coverage message `model check incomplete`, preserving known counts
 and any earlier due-file.
 

@@ -17523,8 +17523,8 @@
     },
     {
       "path": "catalogs/foundation/model-route-bindings.json",
-      "sha256": "00cd71396b5162a54c2ac1f7e192ddc3d997d3f4dfdd1c97f610e10a52b2e2c8",
-      "bytes": 2593
+      "sha256": "1c0b74bcce508c054c9a00a50164c557b1efd6f2c0aff6795ae0278ad5924770",
+      "bytes": 6415
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
@@ -18143,8 +18143,8 @@
     },
     {
       "path": "docs/active-model-currency.md",
-      "sha256": "8649c77be086124b4afe0f742158d78b4c736fa50b87aa7111d574ddb2bb86a5",
-      "bytes": 17195
+      "sha256": "0b683b5e38614ede7327ab21e6b37c0bfe34287842f03e10f6849c1fe77014db",
+      "bytes": 17232
     },
     {
       "path": "docs/automation-upgrade-evidence.json",
@@ -19353,8 +19353,8 @@
     },
     {
       "path": "docs/decisions/2026-10-16-model-route-currency-consistency.md",
-      "sha256": "a485e9e26d1fc843c90c69a2ce23bb225a06c087becfa97cd86ca1cf6ade289e",
-      "bytes": 12880
+      "sha256": "e5cfe1991bade82347161b4ff5681a04b86ebd3efd7d8d046d76052a9635204d",
+      "bytes": 14132
     },
     {
       "path": "docs/decisions/2026-10-16-nautilus-rc5-run-source-pin.md",
@@ -19653,8 +19653,8 @@
     },
     {
       "path": "docs/model-currency.md",
-      "sha256": "6f40ea5ad59fd24a65b776c925338bdb931455e7a4ca9c838269b8d72e1c2394",
-      "bytes": 10650
+      "sha256": "47777bd791df37ff0339c96d1e0d53ee763e1bfbe019edfd08f073c53d71e670",
+      "bytes": 10932
     },
     {
       "path": "docs/native-dashboard-data.md",
@@ -41508,8 +41508,8 @@
     },
     {
       "path": "evidence/artifacts/model-route-currency-consistency-20261016/UPSTREAM-PINS-20261016.json",
-      "sha256": "c182c111b28c1aa669cc6f6e4bc0964004850a7d074a399c957a65f04e8e34b8",
-      "bytes": 3853
+      "sha256": "3e758f05fb0490af646e919f019fd0a39f78714f1a860a1d953d33f09899a648",
+      "bytes": 4213
     },
     {
       "path": "evidence/artifacts/model-route-currency-consistency-20261016/UPSTREAM-SRC-anthropic.md",
@@ -41533,18 +41533,18 @@
     },
     {
       "path": "evidence/artifacts/model-route-currency-consistency-20261016/active-model-coverage-followup.json",
-      "sha256": "947ab74ffe3b1f9b5b5444780e7685b6c19db7e9e1f95d2a7334e35937c06cdd",
-      "bytes": 1841
+      "sha256": "ffe1723c8c93693cdd7c1c42678b4778e94e01765b7925c94a1eb1a6353930b0",
+      "bytes": 2094
     },
     {
       "path": "evidence/artifacts/model-route-currency-consistency-20261016/checks.json",
-      "sha256": "e4ae44715692d57d7445f275f3a3f5bfd74785a227db51339b29e366bfe75534",
-      "bytes": 4922
+      "sha256": "67072e7af3c2e4a6eb2663cfda58a9cdac0d7ce08a62ecd7045ab419ee158bf6",
+      "bytes": 5703
     },
     {
       "path": "evidence/artifacts/model-route-currency-consistency-20261016/review-closure.md",
-      "sha256": "22109ca7ec692230b6c27f6d46fcc108779f17c104587b949c8d5d41fdaa6558",
-      "bytes": 4140
+      "sha256": "79d5244f0163594251fedbceedc39f66a553355dde6736f305404f323f2702cd",
+      "bytes": 6645
     },
     {
       "path": "evidence/artifacts/model-route-currency-consistency-20261016/sources.json",
@@ -62868,8 +62868,8 @@
     },
     {
       "path": "scripts/currency_due.py",
-      "sha256": "fa27820caff62b525a73ed135b3acc24238b4d4eb6c3ed0d7486a8f9abaabb8b",
-      "bytes": 59916
+      "sha256": "33ee27cec41a1fdf15bf91125e44a15537819dec72b2ca74eae946181a8a090c",
+      "bytes": 61819
     },
     {
       "path": "scripts/env_freshness.py",
@@ -63023,8 +63023,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "5fe66c97e87898d860774d10f502121ae1662b088863baaa2ae84e14a400c2c1",
-      "bytes": 61038
+      "sha256": "7b9e399eb949109082926259f7908c262ca776e7dfaf39bc753c87796284b9f6",
+      "bytes": 62731
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -63903,8 +63903,8 @@
     },
     {
       "path": "tests/test_currency_due.py",
-      "sha256": "49487bdb2ec45000ffddfdfec264b103e0a6ab56e365c84ab0b5588bcaf96cff",
-      "bytes": 107020
+      "sha256": "ef6ddc07a40c424f3c2d4e22eff75659e85ad6761f84b9612759d15178e35afb",
+      "bytes": 110506
     },
     {
       "path": "tests/test_delisting_coverage.py",
@@ -64328,8 +64328,8 @@
     },
     {
       "path": "tests/test_model_currency.py",
-      "sha256": "5da4cc6b1b480615bb2da57bbef160f37124878152b24a4c7c0954c882ea4199",
-      "bytes": 38491
+      "sha256": "2c3a63bb7208dd87fde8ed14faab84cf449cbace3f1444e61d834ae4600e90d0",
+      "bytes": 42118
     },
     {
       "path": "tests/test_model_currency_propose.py",

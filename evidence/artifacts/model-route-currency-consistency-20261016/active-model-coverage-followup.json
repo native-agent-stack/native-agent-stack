@@ -2,6 +2,8 @@
   "schema_version": 1,
   "status": "follow_up",
   "id": "active-model-host-coverage",
+  "named_gap": "F5-G-ACTIVE-MODEL-FAILURE-CATEGORY",
+  "round_3_disposition": "Host cause remains unverified; co-op accepted this named gap. No prior failure category can be recovered from the retained receipt and no new host run was authorized here.",
   "evidence_class": "local_integration",
   "read_at": "2026-10-16",
   "source_receipt": "stack-currency-timer-receipt-20261016.md",

@@ -1,6 +1,13 @@
 {
   "schema_version": 1,
   "read_at": "2026-10-16",
+  "independent_review_packet": {
+    "directory_name": "pr1201-public-upstream",
+    "index": "UPSTREAM-PINS-round3.json",
+    "checksums": "SHA256SUMS",
+    "content_files": 14,
+    "delivery": "Co-op confirmed attachment to the next GPT and CC micro packets. Any file excluded by packet privacy scans remains an explicitly named unmirrored-source gap."
+  },
   "evidence_class": "source_review",
   "capture_method": "Unkeyed public HTTP reads; bounded vendor wording retained separately from the findings. The native receipt is read from its published Git object.",
   "custody": "Register only the retained capture files. No hash of an unretained page, private direction, review, packet or command log is retained.",

@@ -6,79 +6,173 @@
   "routes": [
     {
       "route_id": "muse-code-wonder-full",
-      "model_currency_id": "muse-wonder-full-1.0"
+      "model_currency_id": "muse-wonder-full-1.0",
+      "kind": "route",
+      "repositories": [
+        "https://dev.meta.ai/docs/muse-code#muse-code-wonder-full",
+        "https://dev.meta.ai/docs/muse-code#route=muse-code-wonder-full"
+      ]
     },
     {
       "route_id": "muse-code-wonder-api",
-      "model_currency_id": "muse-wonder-1.0"
+      "model_currency_id": "muse-wonder-1.0",
+      "kind": "route",
+      "repositories": [
+        "https://dev.meta.ai/docs/models#muse-code-wonder-api",
+        "https://dev.meta.ai/docs/models#route=muse-code-wonder-api"
+      ]
     },
     {
       "route_id": "codex-wonder-api",
-      "model_currency_id": "muse-wonder-1.0"
+      "model_currency_id": "muse-wonder-1.0",
+      "kind": "route",
+      "repositories": [
+        "https://dev.meta.ai/docs/models#codex-wonder-api",
+        "https://dev.meta.ai/docs/models#route=codex-wonder-api"
+      ]
     },
     {
       "route_id": "opencode-wonder-api",
-      "model_currency_id": "muse-wonder-1.0"
+      "model_currency_id": "muse-wonder-1.0",
+      "kind": "route",
+      "repositories": [
+        "https://dev.meta.ai/docs/models#opencode-wonder-api",
+        "https://dev.meta.ai/docs/models#route=opencode-wonder-api"
+      ]
     },
     {
       "route_id": "claude-code-wonder-api",
-      "model_currency_id": "muse-wonder-1.0"
+      "model_currency_id": "muse-wonder-1.0",
+      "kind": "route",
+      "repositories": [
+        "https://dev.meta.ai/docs/models#claude-code-wonder-api",
+        "https://dev.meta.ai/docs/models#route=claude-code-wonder-api"
+      ]
     },
     {
       "route_id": "harness-spark-api",
-      "model_currency_id": "muse-spark-1.3"
+      "model_currency_id": "muse-spark-1.3",
+      "kind": "route",
+      "repositories": [
+        "https://dev.meta.ai/docs/models#harness-spark-api",
+        "https://dev.meta.ai/docs/models#route=harness-spark-api"
+      ]
     },
     {
       "route_id": "muse-subscription-foreign-harness",
-      "model_currency_id": "muse-wonder-full-1.0"
+      "model_currency_id": "muse-wonder-full-1.0",
+      "kind": "route",
+      "repositories": [
+        "https://dev.meta.ai/docs/models#muse-subscription-foreign-harness",
+        "https://dev.meta.ai/docs/models#route=muse-subscription-foreign-harness"
+      ]
     },
     {
       "route_id": "codex-gpt-6-1-sol",
-      "model_currency_id": "gpt-6-1-sol"
+      "model_currency_id": "gpt-6-1-sol",
+      "kind": "route",
+      "repositories": [
+        "https://developers.openai.com/codex/models#codex-gpt-6-1-sol",
+        "https://developers.openai.com/codex/models#route=codex-gpt-6-1-sol"
+      ]
     },
     {
       "route_id": "codex-gpt-6-astra",
-      "model_currency_id": "gpt-6-astra"
+      "model_currency_id": "gpt-6-astra",
+      "kind": "route",
+      "repositories": [
+        "https://developers.openai.com/codex/models#codex-gpt-6-astra",
+        "https://developers.openai.com/codex/models#route=codex-gpt-6-astra"
+      ]
     },
     {
       "route_id": "codex-gpt-6-luna",
-      "model_currency_id": "gpt-6-luna"
+      "model_currency_id": "gpt-6-luna",
+      "kind": "route",
+      "repositories": [
+        "https://developers.openai.com/codex/models#codex-gpt-6-luna",
+        "https://developers.openai.com/codex/models#route=codex-gpt-6-luna"
+      ]
     },
     {
       "route_id": "claude-code-claude-opus-5-5",
-      "model_currency_id": "claude-opus-5-5"
+      "model_currency_id": "claude-opus-5-5",
+      "kind": "route",
+      "repositories": [
+        "https://code.claude.com/docs/en/model-config#claude-code-claude-opus-5-5",
+        "https://code.claude.com/docs/en/model-config#route=claude-code-claude-opus-5-5"
+      ]
     },
     {
       "route_id": "claude-code-claude-sonnet-5-5",
-      "model_currency_id": "claude-sonnet-5-5"
+      "model_currency_id": "claude-sonnet-5-5",
+      "kind": "route",
+      "repositories": [
+        "https://code.claude.com/docs/en/model-config#claude-code-claude-sonnet-5-5",
+        "https://code.claude.com/docs/en/model-config#route=claude-code-claude-sonnet-5-5"
+      ]
     },
     {
       "route_id": "claude-code-claude-haiku-5-5",
-      "model_currency_id": "claude-haiku-5-5"
+      "model_currency_id": "claude-haiku-5-5",
+      "kind": "route",
+      "repositories": [
+        "https://code.claude.com/docs/en/model-config#claude-code-claude-haiku-5-5",
+        "https://code.claude.com/docs/en/model-config#route=claude-code-claude-haiku-5-5"
+      ]
     },
     {
       "route_id": "openai-pool-foreign-harness",
-      "model_currency_id": "gpt-6-1-sol"
+      "model_currency_id": "gpt-6-1-sol",
+      "kind": "route",
+      "repositories": [
+        "https://developers.openai.com/codex/models#openai-pool-foreign-harness",
+        "https://developers.openai.com/codex/models#route=openai-pool-foreign-harness"
+      ]
     },
     {
       "route_id": "anthropic-api-claude-fable-5-1",
-      "model_currency_id": "claude-fable-5-1"
+      "model_currency_id": "claude-fable-5-1",
+      "kind": "route",
+      "repositories": [
+        "https://platform.claude.com/docs/en/models/fable-5-1/overview#route=anthropic-api-claude-fable-5-1"
+      ]
     },
     {
       "route_id": "claude-code-claude-fable-5-1",
-      "model_currency_id": "claude-fable-5-1"
+      "model_currency_id": "claude-fable-5-1",
+      "kind": "route",
+      "repositories": [
+        "https://code.claude.com/docs/en/model-config#claude-code-claude-fable-5-1"
+      ]
     },
     {
       "route_id": "anthropic-api-claude-opus-5-5",
-      "model_currency_id": "claude-opus-5-5"
+      "model_currency_id": "claude-opus-5-5",
+      "kind": "route",
+      "repositories": [
+        "https://platform.claude.com/docs/en/about-claude/models/overview#anthropic-api-claude-opus-5-5"
+      ]
     },
     {
       "route_id": "muse-code-spark-subscription",
-      "model_currency_id": "muse-spark-1.3"
+      "model_currency_id": "muse-spark-1.3",
+      "kind": "route",
+      "repositories": [
+        "https://dev.meta.ai/docs/models#muse-code-spark-subscription"
+      ]
     },
     {
       "route_id": "codex-omniroute-gpt-6-1-sol",
-      "model_currency_id": "gpt-6-1-sol"
+      "model_currency_id": "gpt-6-1-sol",
+      "kind": "route",
+      "repositories": [
+        "https://developers.openai.com/codex/models#codex-omniroute-gpt-6-1-sol"
+      ]
     }
+  ],
+  "identity_sources": [
+    "evidence/artifacts/model-routes-sweep-20261015/candidate-identity-map.json",
+    "evidence/artifacts/model-routes-sweep-claude-20261015/returns.json discovery.model-routes.proposed"
   ]
 }

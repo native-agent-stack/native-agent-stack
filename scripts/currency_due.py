@@ -435,9 +435,10 @@ def summary_line(due: dict, command: str = DETAILS_COMMAND, complete: bool = Tru
         suffix = f"; details: {command}"
         return text + suffix if len(text) + len(suffix) <= SUMMARY_LIMIT else text[:SUMMARY_LIMIT]
     prefix = "stack currency: "
+    gap_text = ", " + ", ".join(gaps) if gaps else ""
     for candidate in (command, *pointers):
         suffix = f"; details: {candidate}"
-        room = SUMMARY_LIMIT - len(prefix) - len(suffix)
+        room = SUMMARY_LIMIT - len(prefix) - len(suffix) - len(gap_text)
         if room >= MIN_COUNTS_ROOM:
             break
     else:
@@ -447,7 +448,7 @@ def summary_line(due: dict, command: str = DETAILS_COMMAND, complete: bool = Tru
     counts = ", ".join(parts)
     if len(counts) > room:
         counts = counts[:room - 3] + "..."
-    return prefix + counts + suffix
+    return prefix + counts + gap_text + suffix
 
 
 def due_file_pointers(due_file: Path | None, from_xdg: bool) -> list[str]:
@@ -912,6 +913,31 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def retain_inventory_findings(document: dict, due_file: Path, from_xdg: bool) -> bool:
+    """Keep last known inventory findings while reporting the current gap. False protects an unreadable prior file."""
+    coverage = document["details"][-1]
+    if coverage.get("model_inventory") != "unknown" or not due_file.exists():
+        return True
+    previous = read_record(due_file)
+    if "error" in previous or not isinstance(previous.get("due"), dict) or not isinstance(previous.get("details"), list):
+        return False
+    count = previous["due"].get(INVENTORY_KEY, 0)
+    rows = [item for item in previous["details"] if isinstance(item, dict) and item.get("kind") == "model_past_window"]
+    if not isinstance(count, int) or isinstance(count, bool) or count < 0 or count != len(rows) \
+            or any(not isinstance(item.get("finding"), str) for item in rows):
+        return False
+    if count:
+        document["due"][INVENTORY_KEY] = count
+        document["details"][-1:-1] = [{"kind": "model_past_window", "finding": item["finding"],
+                                      "retained_from": item.get("retained_from", previous.get("generated_at"))}
+                                     for item in rows]
+        coverage["model_inventory_findings"] = "retained from the last readable inventory"
+        gaps = tuple(gap for gap in gaps_of(document) if gap != "the skill check was incomplete")
+        document["summary_line"] = summary_line(document["due"], document["details_command"],
+            coverage.get("skills_complete") is not False, due_file_pointers(due_file, from_xdg), gaps)
+    return True
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -935,9 +961,12 @@ def main(argv: list[str] | None = None) -> int:
     try:
         document = aggregate(collect(root, now_text, args.network, state), now, now_text, args.sweep_cadence_days,
                              root, state / DUE_FILE, from_xdg)
+        writable = retain_inventory_findings(document, state / DUE_FILE, from_xdg)
         action = "dry run"
         if not args.dry_run:
-            if any(document["due"].values()):
+            if not writable:
+                action = f"kept {state / DUE_FILE}; prior inventory findings unreadable"
+            elif any(document["due"].values()):
                 action = f"wrote {write_due_file(state, document)}" + "".join(
                     f"; {gap}" for gap in gaps_of(document))
             elif incomplete(document):

@@ -60,6 +60,9 @@ class ModelCurrencyTests(unittest.TestCase):
         self.assertTrue("2026-10-16-model-route-currency-consistency.md" in guide, "Link the reporting supersession.")
         self.assertFalse("A release more than 42 days old fails" in guide, "Remove the superseded age-failure claim.")
         self.assertFalse("an older release fails\non day eight" in guide, "Day eight is maintenance, not a publication failure.")
+        self.assertFalse("slot retains Haiku 4.5" in guide, "The held Haiku 5.5 proposal supersedes the staging exception.")
+        active_guide = (root / "docs/active-model-currency.md").read_text()
+        self.assertTrue("eight possible counts" in active_guide, "Include the inventory-age maintenance count.")
 
     def test_background_haiku_is_a_current_normal_refresh_proposal(self):
         path = Path(__file__).resolve().parents[1] / "catalogs/foundation/model-currency.json"
@@ -378,6 +381,11 @@ class ModelRouteCurrencyTests(unittest.TestCase):
         })
 
     def write_registered(self, path, value):
+        if path == "catalogs/foundation/model-route-bindings.json":
+            for row in value.get("routes", []):
+                if isinstance(row, dict):
+                    row.setdefault("kind", "route")
+                    row.setdefault("repositories", ["https://example.org/model#route"])
         self.fixture.write_json(path, value)
         raw = (self.fixture.root / path).read_bytes()
         self.fixture.evidence["files"] = [row for row in self.fixture.evidence["files"] if row["path"] != path]
@@ -693,6 +701,51 @@ class ModelRouteCurrencyTests(unittest.TestCase):
         }]})
         result = self.run_validator()
         self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_c2_cannot_relabel_gateway_proposal_as_a_bound_model_route(self):
+        self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader"}, {
+            "route_id": "codex-omniroute-gpt-6-1-sol", "model_currency_id": "reader",
+            "kind": "route", "repositories": [
+                "https://developers.openai.com/codex/models#codex-omniroute-gpt-6-1-sol"],
+        }])
+        self.write_c2(["https://github.com/diegosouzapw/omniroute"], [{
+            "repository": "https://github.com/diegosouzapw/omniroute",
+            "route_id": "codex-omniroute-gpt-6-1-sol", "model_id": "vendor/model",
+            "model_currency_id": "reader",
+        }])
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("repository does not match registered route identity", result.stdout)
+
+    def test_c2_pypi_component_uses_pep503_identity_and_exact_proposal_coverage(self):
+        self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader"}])
+        root = "evidence/artifacts/model-routes-sweep-merge-20261015/"
+        for package, slug in (("SpeechRecognition", "speechrecognition"), ("Speech._Recognition", "speech-recognition")):
+            with self.subTest(package=package):
+                data = inventory()
+                data["packages"] = [{"id": "speech", "latest_version": "1.0", "release_date": "2026-10-01",
+                    "release_source": "https://pypi.org/project/" + package, "checked_at": "2026-10-07",
+                    "release_line": {"kind": "pypi", "package": package}}]
+                self.write_registered("catalogs/foundation/model-currency.json", data)
+                repository = "https://pypi.org/project/" + slug
+                self.write_c2([repository], [])
+                self.write_registered(root + "route-currency.json", {"schema_version": 1, "components": [{
+                    "repository": repository, "package_currency_id": "speech"}]})
+                result = self.run_validator()
+                self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_c2_malformed_and_unknown_package_rows_fail_without_traceback(self):
+        self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader"}])
+        root = "evidence/artifacts/model-routes-sweep-merge-20261015/"
+        for row in (None, [], {}, {"repository": "https://example.org/tool", "package_currency_id": []},
+                    {"repository": "https://example.org/tool", "package_currency_id": "missing"}):
+            with self.subTest(row=row):
+                self.write_c2(["https://example.org/tool"], [])
+                self.write_registered(root + "route-currency.json", {"schema_version": 1, "components": [row]})
+                result = self.run_validator()
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("unknown package-currency row", result.stdout)
+                self.assertNotIn("Traceback", result.stderr)
 
 
 if __name__ == "__main__":

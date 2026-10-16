@@ -58,8 +58,11 @@ remain inside the maintenance windows; future or malformed dates, malformed
 records and invalid or missing source URLs still fail publication validation.
 
 An unreadable or structurally invalid inventory is a `model inventory unreadable`
-coverage gap in the daily collector. It preserves any previous due file and does
-not claim that nothing is due. The timer's existing model-currency proposal step
+coverage gap in the daily collector. It carries forward the last readable
+inventory's count and findings, marked as retained, alongside any new known
+counts. The session notice shows the gap beside the counts; it does not claim
+that retained findings were freshly verified. If the previous due file cannot
+be read safely, its bytes stay unchanged. The timer's existing model-currency proposal step
 continues to produce refresh requests before the collector writes the notice.
 
 A `package_bound` model joins `package.id` and `package.version` to a package
@@ -78,8 +81,9 @@ exception field cannot be ignored. Primary source URLs must be HTTPS without
 credentials, whitespace or control characters, and their ports must parse.
 
 Currency follows the newest release within a model's own line. The background
-slot retains Haiku 4.5 as a dated exception for simple work; currency alone does
-not promote it to Sonnet or Opus. A published Haiku 5.x ID reopens that selection.
+slot now records a held Haiku 5.5 proposal for normal refresh, superseding the
+earlier Haiku 4.5 staging exception. This inventory change does not apply a
+runtime setting or promote the slot to Sonnet or Opus.
 
 ## Daily review proposals
 

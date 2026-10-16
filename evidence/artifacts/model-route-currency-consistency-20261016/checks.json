@@ -2,9 +2,22 @@
   "schema_version": 1,
   "evidence_class": "local_integration",
   "date": "2026-10-16",
-  "tests_command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 -B -m unittest tests.test_model_currency tests.test_validate tests.test_currency_due tests.test_model_currency_propose tests.test_provenance_digest_custody -q",
-  "observed_test_count": 278,
+  "tests_command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 -B -m unittest tests.test_model_currency tests.test_currency_due tests.test_validate tests.test_provenance_digest_custody -q",
+  "observed_test_count": 261,
   "result": "passed",
+  "round_3": {
+    "base": "94b4ba5515da5159c3b50d8b7edef40b7c4bbbc2",
+    "commit_policy": "one normal commit; no rebase",
+    "fail_first": [
+      "Gateway proposal incorrectly accepted as a registered model route",
+      "Both PyPI case and punctuation equivalents incorrectly rejected",
+      "Unknown inventory plus one stale receipt drops the previously persisted model count/finding",
+      "Nonzero summary counts omit the inventory gap, including the truncation/pointer case"
+    ],
+    "existing_correct_guard": "Five malformed/unknown C2 package-row controls pass baseline and fixed code; these are added coverage, not baseline failures.",
+    "public_source_packet": "UPSTREAM-PINS-round3.json and SHA256SUMS, supplied through the co-op",
+    "remaining_gap": "F5-G-ACTIVE-MODEL-FAILURE-CATEGORY"
+  },
   "review_round": {
     "closure_table": "review-closure.md",
     "integrated_main": "30542e70560147c19049016d19aa3f264515c92f",

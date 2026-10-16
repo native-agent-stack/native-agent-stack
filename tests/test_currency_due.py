@@ -442,10 +442,15 @@ class CountTests(unittest.TestCase):
         code, stdout, stderr = checkout.run("--json")
         self.assertEqual(code, 0, stderr)
         document = json.loads(stdout)
-        self.assertNotIn("models_past_window", document["due"])
+        self.assertEqual(document["due"]["models_past_window"], 1)
+        self.assertEqual(document["details"][-1]["model_inventory_findings"], "retained from the last readable inventory")
         self.assertEqual(document["details"][-1]["model_inventory"], "unknown")
         self.assertIn("model inventory unreadable", document["summary_line"])
-        self.assertEqual(checkout.due_file.read_bytes(), previous)
+        saved = json.loads(checkout.due_file.read_text())
+        self.assertEqual(saved["due"]["models_past_window"], 1)
+        self.assertEqual([item["finding"] for item in saved["details"] if item["kind"] == "model_past_window"], findings)
+        self.assertEqual(saved["details"][-1]["model_inventory"], "unknown")
+        self.assertIn("model inventory unreadable", saved["summary_line"])
 
     def test_structurally_invalid_inventory_is_a_gap_not_zero_due(self):
         checkout = Checkout(self)
@@ -458,6 +463,57 @@ class CountTests(unittest.TestCase):
                 self.assertNotIn("models_past_window", document["due"])
                 self.assertEqual(document["details"][-1].get("model_inventory"), "unknown")
                 self.assertIn("model inventory unreadable", cd.gaps_of(document))
+
+    def test_unknown_inventory_with_other_due_counts_preserves_prior_findings(self):
+        checkout = Checkout(self)
+        path = checkout.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps({
+            "schema_version": 1, "inventory_status": "complete",
+            "policy": {"max_release_age_days": 42, "max_landscape_age_days": 7, "refresh_lead_days": 2},
+            "packages": [], "models": [{
+                "id": "reader", "role": "document reading", "consumer": "fixture", "model_id": "vendor/model",
+                "revision": "a" * 40, "release_date": "2026-08-01", "checked_at": "2026-09-30",
+                "release_source": "https://huggingface.co/vendor/model", "status": "in_use",
+                "release_line": {"kind": "huggingface", "repository": "vendor/model", "ref": "main"},
+            }],
+        }))
+        code, stdout, stderr = checkout.run("--json")
+        self.assertEqual(code, 0, stderr)
+        self.assertEqual(json.loads(stdout)["due"]["models_past_window"], 1)
+        previous = checkout.due_file.read_bytes()
+        path.write_text("{")
+        checkout.set(STALENESS, staleness_report(("codex", ["stale"])))
+        code, stdout, stderr = checkout.run("--json")
+        self.assertEqual(code, 0, stderr)
+        current = json.loads(stdout)
+        self.assertEqual(current["due"]["stale_receipts"], 1)
+        self.assertEqual(current["details"][-1]["model_inventory"], "unknown")
+        saved = json.loads(checkout.due_file.read_text())
+        old = json.loads(previous)
+        self.assertEqual(saved["due"].get("models_past_window"), 1)
+        self.assertEqual(saved["due"]["stale_receipts"], 1)
+        self.assertEqual([row["finding"] for row in saved["details"] if row["kind"] == "model_past_window"],
+                         [row["finding"] for row in old["details"] if row["kind"] == "model_past_window"])
+        self.assertEqual(saved["details"][-1]["model_inventory"], "unknown")
+        self.assertIn("model inventory unreadable", saved["summary_line"])
+
+    def test_nonzero_counts_show_inventory_gap_in_session_notice(self):
+        due = dict.fromkeys(cd.DUE_KEYS, 0)
+        due["stale_receipts"] = 1
+        line = cd.summary_line(due, "python3 scripts/currency_due.py --dry-run", gaps=("model inventory unreadable",))
+        self.assertIn("1 stale receipt", line)
+        self.assertIn("model inventory unreadable", line)
+        self.assertIn("; details:", line)
+        self.assertLessEqual(len(line), cd.SUMMARY_LIMIT)
+
+    def test_gap_remains_visible_when_counts_need_truncation(self):
+        line = cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 10 ** 20),
+                               "python3 " + "x" * 90, pointers=["cat /x"],
+                               gaps=("model inventory unreadable",))
+        self.assertIn("model inventory unreadable", line)
+        self.assertTrue(line.endswith("; details: cat /x"))
+        self.assertLessEqual(len(line), cd.SUMMARY_LIMIT)
 
     def test_layers_are_due_once_the_monthly_sweep_cadence_has_passed(self):
         # recipes/saturation-sweep.md: "Sweep only the due layers, at most monthly ..., or sooner when a
