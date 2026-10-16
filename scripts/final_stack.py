@@ -867,6 +867,89 @@ def complete_final_pin(text, run: dict) -> bool:
     return all(canonical.get(key) == value for key, value in parsed.items() if value is not None)
 
 
+def final_candidates(record: dict, repository: str | None, run: dict) -> list[dict]:
+    """The angle record's candidates for a winner's repository at its complete FINAL pin identity."""
+    return [c for c in record["candidates"]
+            if host_receipts.normalize_repository(c["repository"]) == repository
+            and complete_final_pin(c["pin"], run)]
+
+
+def final_candidate(record: dict, repository: str | None, run: dict) -> dict:
+    """The one angle-record candidate that qualifies a winner for FINAL: the only candidate for its repository at its
+    complete FINAL pin identity, final-eligible, with its entitlement verified, CONVERGED, non-provisional and with
+    comparative A6. Raises FinalStackError with enforce_final's reason otherwise."""
+    candidates = final_candidates(record, repository, run)
+    if len(candidates) != 1:
+        raise FinalStackError("winner requires one CONVERGED angle verdict at its complete FINAL pin identity")
+    candidate = candidates[0]
+    if candidate.get("final_eligible") is False:
+        raise FinalStackError("final_eligible is false for this winner")
+    if (candidate.get("entitlement") or {}).get("status") in ("pending", "unverified"):
+        raise FinalStackError("entitlement remains unverified for this winner")
+    if candidate["verdict"] != "CONVERGED":
+        raise FinalStackError("winner requires one CONVERGED angle verdict at its run pin")
+    if candidate["provisional"] or not candidate["a6_comparative"]:
+        raise FinalStackError("winner requires NON-provisional CONVERGED evidence with comparative A6")
+    return candidate
+
+
+def final_evidence_receipt(sources: Sources, evidence: dict, field: str, condition: int,
+                           repository: str | None, run: dict) -> dict:
+    """The receipt a FINAL evidence binding names in field: an existing JSON file under the root that binds
+    native_proven evidence to repository at the complete run pin. Raises FinalStackError naming the condition."""
+    path = evidence.get(field)
+    if not path:
+        raise FinalStackError(f"condition {condition} requires {field}")
+    try:
+        value = sources.json(path)
+    except FinalStackError:
+        raise FinalStackError(f"condition {condition} receipt is unavailable") from None
+    if (not isinstance(value, dict) or value.get("evidence_class") != "native_proven"
+        or host_receipts.normalize_repository(value.get("repository")) != repository
+        or not complete_final_pin(value.get("pin"), run)):
+        raise FinalStackError(f"condition {condition} receipt must bind native evidence to repository and complete FINAL pin identity")
+    return value
+
+
+def check_condition_3(sources: Sources, evidence: dict, repository: str | None, run: dict) -> None:
+    """Condition 3: the bound e2e_receipt is a schema-valid, successful upstream install and test at the run pin, with
+    pinned upstream citations. Raises FinalStackError."""
+    e2e = final_evidence_receipt(sources, evidence, "e2e_receipt", 3, repository, run)
+    schema = sources.json(angle_records.SCHEMA)
+    contract = {"$schema": schema["$schema"], "$defs": schema["$defs"],
+                "$ref": "#/$defs/upstream_e2e"}
+    validator = angle_records.Draft202012Validator(contract)
+    if next(validator.iter_errors(e2e), None) is not None:
+        raise FinalStackError("condition 3 receipt has invalid commands or citations")
+    phases = {c.get("phase") for c in _dicts(e2e.get("commands"))
+              if c.get("command") and type(c.get("exit_code")) is int and c["exit_code"] == 0}
+    cited = e2e.get("upstream_sources") or []
+    upstream = [s for s in _dicts(cited) if s.get("kind") == "repo" and s.get("path") and s.get("line")
+                and host_receipts.normalize_repository(s.get("repository")) == repository
+                and complete_final_pin(s.get("pin"), run)]
+    if (e2e.get("kind") != "upstream_e2e" or e2e.get("success") is not True
+        or not {"install", "test"}.issubset(phases) or not upstream
+        or any(c.get("exit_code") != 0 for c in _dicts(e2e.get("commands")))):
+        raise FinalStackError("condition 3 requires successful upstream install and test commands with pinned citations")
+
+
+def check_condition_4(sources: Sources, evidence: dict, repository: str | None, run: dict) -> None:
+    """Condition 4: the bound invoke_receipt counts positive calls in a measured window, or the binding records a
+    non-invocation reason. Raises FinalStackError."""
+    if evidence.get("invoke_receipt"):
+        invoke = final_evidence_receipt(sources, evidence, "invoke_receipt", 4, repository, run)
+        try:
+            start, end = (angle_records.timestamp(invoke[k]) for k in ("window_start", "window_end"))
+            valid_window = start.tzinfo is not None and end.tzinfo is not None and start < end
+        except (KeyError, TypeError, ValueError):
+            valid_window = False
+        if (invoke.get("kind") != "invocation" or not valid_window
+            or type(invoke.get("calls")) is not int or invoke["calls"] <= 0):
+            raise FinalStackError("condition 4 requires positive invocation calls in a measured window")
+    elif not (evidence.get("not_invoked_reason") or "").strip():
+        raise FinalStackError("condition 4 requires invoke evidence or a recorded non-invocation reason")
+
+
 def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_inputs: dict) -> None:
     """Refuse every explicit FINAL claim while admission is under redesign.
 
@@ -915,67 +998,18 @@ def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_
                 fail("condition 2 winner requires a matching run pin in runs[]")
             if not complete_final_pin(winner["verdict_pin"], run):
                 fail("condition 2 requires a complete FINAL pin identity in runs[]")
-            candidates = [c for c in record["candidates"]
-                          if host_receipts.normalize_repository(c["repository"]) == repository
-                          and complete_final_pin(c["pin"], run)]
-            if len(candidates) != 1:
-                fail("winner requires one CONVERGED angle verdict at its complete FINAL pin identity")
-            candidate = candidates[0]
-            if candidate.get("final_eligible") is False:
-                fail("final_eligible is false for this winner")
-            if (candidate.get("entitlement") or {}).get("status") in ("pending", "unverified"):
-                fail("entitlement remains unverified for this winner")
-            if candidate["verdict"] != "CONVERGED":
-                fail("winner requires one CONVERGED angle verdict at its run pin")
-            if candidate["provisional"] or not candidate["a6_comparative"]:
-                fail("winner requires NON-provisional CONVERGED evidence with comparative A6")
+            try:
+                candidate = final_candidate(record, repository, run)
+            except FinalStackError as error:
+                fail(str(error))
             evidence = bound.get(candidate["id"]) or {}
             if not complete_final_pin(evidence.get("run_pin"), run):
                 fail("FINAL evidence requires the complete FINAL pin identity")
-
-            def receipt(field, condition):
-                path = evidence.get(field)
-                if not path:
-                    fail(f"condition {condition} requires {field}")
-                try:
-                    value = sources.json(path)
-                except FinalStackError:
-                    fail(f"condition {condition} receipt is unavailable")
-                if (not isinstance(value, dict) or value.get("evidence_class") != "native_proven"
-                    or host_receipts.normalize_repository(value.get("repository")) != repository
-                    or not complete_final_pin(value.get("pin"), run)):
-                    fail(f"condition {condition} receipt must bind native evidence to repository and complete FINAL pin identity")
-                return value
-
-            e2e = receipt("e2e_receipt", 3)
-            schema = sources.json(angle_records.SCHEMA)
-            contract = {"$schema": schema["$schema"], "$defs": schema["$defs"],
-                        "$ref": "#/$defs/upstream_e2e"}
-            validator = angle_records.Draft202012Validator(contract)
-            if next(validator.iter_errors(e2e), None) is not None:
-                fail("condition 3 receipt has invalid commands or citations")
-            phases = {c.get("phase") for c in _dicts(e2e.get("commands"))
-                      if c.get("command") and type(c.get("exit_code")) is int and c["exit_code"] == 0}
-            cited = e2e.get("upstream_sources") or []
-            upstream = [s for s in _dicts(cited) if s.get("kind") == "repo" and s.get("path") and s.get("line")
-                        and host_receipts.normalize_repository(s.get("repository")) == repository
-                        and complete_final_pin(s.get("pin"), run)]
-            if (e2e.get("kind") != "upstream_e2e" or e2e.get("success") is not True
-                or not {"install", "test"}.issubset(phases) or not upstream
-                or any(c.get("exit_code") != 0 for c in _dicts(e2e.get("commands")))):
-                fail("condition 3 requires successful upstream install and test commands with pinned citations")
-            if evidence.get("invoke_receipt"):
-                invoke = receipt("invoke_receipt", 4)
-                try:
-                    start, end = (angle_records.timestamp(invoke[k]) for k in ("window_start", "window_end"))
-                    valid_window = start.tzinfo is not None and end.tzinfo is not None and start < end
-                except (KeyError, TypeError, ValueError):
-                    valid_window = False
-                if (invoke.get("kind") != "invocation" or not valid_window
-                    or type(invoke.get("calls")) is not int or invoke["calls"] <= 0):
-                    fail("condition 4 requires positive invocation calls in a measured window")
-            elif not (evidence.get("not_invoked_reason") or "").strip():
-                fail("condition 4 requires invoke evidence or a recorded non-invocation reason")
+            try:
+                check_condition_3(sources, evidence, repository, run)
+                check_condition_4(sources, evidence, repository, run)
+            except FinalStackError as error:
+                fail(str(error))
 
 
 def build_document(root: Path) -> dict:

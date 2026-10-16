@@ -2098,6 +2098,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/layer_status_page.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/local_pages_policy_grants.py"
     },
     {
