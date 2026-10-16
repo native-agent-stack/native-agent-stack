@@ -64163,8 +64163,8 @@
     },
     {
       "path": "tests/test_landing_scripts.py",
-      "sha256": "69c4b163654625b252cf605836ac3ef4012a4762778f1876df94b895f6830973",
-      "bytes": 494265
+      "sha256": "52abc41a67138a137d04858520d5f21fb07ce14fc35a2246861eee31c6052bb8",
+      "bytes": 495786
     },
     {
       "path": "tests/test_landscape.py",
@@ -65418,8 +65418,8 @@
     },
     {
       "path": "tools/landing/README.md",
-      "sha256": "91b274abf07125fa649009ccee52f5c76198ceaadec3643e5a65222c42488cca",
-      "bytes": 191823
+      "sha256": "94ceb2524480c2443c930c7395a3c2be887c00033801319b7cc2b41f3ca3dd53",
+      "bytes": 192585
     },
     {
       "path": "tools/landing/codex_gate.py",
@@ -65433,8 +65433,8 @@
     },
     {
       "path": "tools/landing/nas_land.sh",
-      "sha256": "c8c1489aff66c2238d6b4a332919b47df4969b3a1588e321898ef781743ca32f",
-      "bytes": 62475
+      "sha256": "5b680d7086e5c7d18c74c2b2b24817840c33ff39f553c37685089e6ee50447de",
+      "bytes": 63181
     },
     {
       "path": "tools/landing/review_normalize.py",

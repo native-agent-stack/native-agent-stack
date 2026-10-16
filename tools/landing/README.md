@@ -542,7 +542,10 @@ failing (also at the final gate), 6 timeout, 7 merge failed, or the squash body 
 (the body GitHub offers), or `SQUASH_BODY_FILE`'s content, read when the squash body is built and again at the final gate, cannot be read,
 holds a NUL byte, is not UTF-8, is longer than 64 KiB or holds no text, or changed after the body was built (nothing merged), 8
 blocked by policy, 9 as above (an adjudication that the gate does not accept is its 4), but a 5 proceeds (it is reachable only under a
-waiver), and a 3 before the validation stops too, 10 the merge onto current `origin/main` fails `scripts/validate.py` or does not merge cleanly, 13 origin/main moved
+waiver), and a 3 before the validation stops too, 10 the merge onto current `origin/main` fails `scripts/validate.py` or does not merge cleanly, or GitHub reports `DIRTY` during the CI
+wait ("The merge commit cannot be cleanly created.", `schema.docs.graphql:26528-26530`): it stops at once instead of waiting for checks a
+DIRTY pull request never completes (the CC's follow-up of 2026-10-16: #1167 and #1180 each held the lock about 45-50 minutes, #1180
+ending with 6), 13 origin/main moved
 after each of three validations, moved after the last validation (read at the final gate) or could not be read, so nothing is merged
 (#975, new in round 3). The three scripts also exit 11 when the no-reply author address cannot be formed (nothing is merged), 12 when the
 merge landed but its commit's author is not that address or the commit could not be read (CC correction #148), and 14 when another
@@ -871,7 +874,7 @@ scripts that is neither a tracked file's, a named public artifact's nor a named 
 | File | As committed |
 | --- | --- |
 | `uet_land.sh` | `00a22674e6b0067d0fee1efe9ff412059db5b817fc8323c89bff4c12a74f0c0b` (444 lines) |
-| `nas_land.sh` | `c8c1489aff66c2238d6b4a332919b47df4969b3a1588e321898ef781743ca32f` (693 lines) |
+| `nas_land.sh` | `5b680d7086e5c7d18c74c2b2b24817840c33ff39f553c37685089e6ee50447de` (698 lines) |
 | `horizon_land.sh` | `336209b11841dd403a4f770711ddfc55965956efa845b608975cf67cc89ab81b` (824 lines) |
 | `codex_gate.py` | `7afaa831c0763dd14c584d76b17465fa50993656cd63eec9fd0c4412fddb74b2` (559 lines) |
 | `review_normalize.py` | `b553d9cb67ca196bd587e980e01295e28e8ea0e2bcb3d0015fc5d040735a1594` (348 lines) |
@@ -1261,6 +1264,9 @@ errors):
     noclobber texts, exit 17 in the header and the unknown outcome in both revocation summaries, the merge outcome's sources and the
     three reads named a local policy, and the corrected Word Splitting and pipefail texts (these three fail against `horizon_land.sh` at
     4fad2736, where the text test fails 12 times).
+  - the CC's follow-up of 2026-10-16, failing against the `nas_land.sh` this pull request first proposed, whose CI wait is main's (exit 6
+    after the 25 polls, measured with the module of this change): a DIRTY pull request with a check still running stops in the CI wait with 10 before any `sleep 120`, nothing merged,
+    and the landing lock free after it; the control, CLEAN with a check running, still polls and times out with 6.
 
 ## Upstream sources for the #975 corrections
 

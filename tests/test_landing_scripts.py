@@ -3932,6 +3932,25 @@ class EndToEndTests(LandingCase):
                 self.assertIn("the landing lock cannot be opened (path withheld): stop, nothing merged", out)
                 self.assertNotIn("/home/example", out)
 
+    def test_a_dirty_pull_request_stops_the_nas_ci_wait_at_once_and_frees_the_lock(self):
+        # The CC's follow-up of 2026-10-16 (#1167 and #1180 each held the landing lock about 45-50 minutes, and #1180's lander stopped
+        # with 6, a CI timeout): a DIRTY pull request runs only a few checks, so the CI wait never ended. GitHub's DIRTY is "The merge
+        # commit cannot be cleanly created." (schema.docs.graphql:26528-26530), so the loop stops at once with 10, the exit of a merge that
+        # does not apply cleanly, before any sleep, and the lock is free.
+        import fcntl
+        running = [nas_run("validate", "2026-10-10T10:00:00Z", status="in_progress")]
+        code, out, log = self.land(self.nas, merge_state="DIRTY", checkruns=running)
+        self.assertEqual((code, self.merge_calls(log)), (10, []), out)
+        self.assertIn("GitHub reports DIRTY during the CI wait: the merge commit cannot be created cleanly; a native rebase is needed: stop", out)
+        self.assertNotIn("sleep 120", log)
+        self.assertNotIn("CI timeout", out)
+        with open(self.lock_path(self.nas), "a", encoding="utf-8") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        with self.subTest(control="CLEAN with checks still running waits and times out (6), as before"):
+            code, out, log = self.land(self.nas, merge_state="CLEAN", checkruns=running)
+            self.assertEqual((code, self.merge_calls(log)), (6, []), out)
+            self.assertIn("sleep 120", log)
+
     def test_a_child_that_outlives_the_landing_does_not_keep_the_lock(self):
         # The lock is descriptor 9, and every child that can outlive the script runs with it closed (git's detached maintenance keeps
         # every other descriptor). Here gh starts a child that is still running when the landing ends; the lock must be free then.
