@@ -6,7 +6,9 @@ Hub API for a model repository; no model calls).
                     [--fit-models "Claude Opus 5.5 and GPT-6-Astra"] [--skills-yaml <dir>] > OUT/reviews.json
 
 The shape follows evidence/artifacts/landscape-sweep-20260923/*.json: schema_version, id, kind, evidence_class,
-repository, reviewed_commit, readme_path, license, layers, claim, observed, documentation_excerpts. A repository
+repository, reviewed_commit, readme_path, license, layers, claim, observed, documentation_excerpts. An excerpt's
+contact address is written as <public-contact-omitted> under the sweep publication email rule (CONTACT_LITERAL), and
+such a review ends with publication_redaction: the count and the rule. A repository
 surviving in several layers gets one review listing every layer. Prints [{repository, path, layers}] (make_result.py
 --reviews reads it). A review is named <owner>-<repo>.json, lowercased with every other character run as "-", like
 the 2026-09-23 reviews; when two reviews share that name (acme/a-b and acme-a/b, or one skill that survived at two
@@ -223,6 +225,39 @@ def excerpts_from(text: str, source: str) -> list:
     paragraphs = [re.sub(r"\s+", " ", part).strip() for part in re.split(r"\n\s*\n", text)]
     paragraphs = [part for part in paragraphs if len(part) > 60 and not part.startswith(("<", "[![", "![", "|"))]
     return [{"source": source, "text": part[:500]} for part in paragraphs[:3]]
+
+
+# The sweep publication email rule: the private-email rule that convert.py's native publication scan applies
+# (scripts/host_name_scan.py at 5bab63233:159-167, Betterleaks 1.9.0 with reject_email=True), with that scanner's
+# boundary filter (:144-150: no Unicode letter or number before the match, other than the letter of a \n, \r or \t
+# escape, and none after it). Python's [^\W_] stands for the rule's [\p{L}\p{N}]. A README's contact address is
+# public upstream text, so a review keeps the excerpt and omits each address with a count instead of refusing it.
+CONTACT_LITERAL = re.compile(r"(?:(?<![^\W_])|(?<=\\[nrt]))(?:[^\W_]|[.!#$%&'*+/=?^_`{|}~-])+"
+                             r"@(?:[^\W_]|[.-])+\.[A-Za-z]{2,}(?![^\W_])")
+CONTACT_MARKER = "<public-contact-omitted>"
+CONTACT_BOUNDARY = ("Upstream public README contact strings omitted from excerpts by source_reviews.py under the "
+                    "sweep publication email rule (the private-email rule convert.py's native scan applies, "
+                    "scripts/host_name_scan.py at 5bab63233:159-167). Reviewed commit/path and all non-contact "
+                    "observations are unchanged; no private input authentication is added.")
+
+
+def omit_contact_literals(doc: dict) -> dict:
+    """The review with each contact address in its documentation excerpts written as CONTACT_MARKER and, only when
+    one was omitted, a last publication_redaction field with the count and the rule (#1073 round 2, P2-C)."""
+    count = 0
+
+    def omit(text):
+        nonlocal count
+        text, omitted = CONTACT_LITERAL.subn(CONTACT_MARKER, text)
+        count += omitted
+        return text
+
+    excerpts = [dict(item, text=omit(item["text"])) if isinstance(item, dict) and isinstance(item.get("text"), str)
+                else item for item in doc.get("documentation_excerpts") or []]
+    if not count:
+        return doc
+    return {**doc, "documentation_excerpts": excerpts,
+            "publication_redaction": {"public_contact_literals_omitted": count, "boundary": CONTACT_BOUNDARY}}
 
 
 def hub_license(meta: dict) -> str:
@@ -1324,6 +1359,7 @@ def main(argv=None) -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     for key, doc in sorted(docs.items()):
         doc["id"] = f"source-review-{stems[key]}"
+        doc = omit_contact_literals(doc)
         path = args.out / f"{stems[key]}.json"
         if path.is_file():
             try:

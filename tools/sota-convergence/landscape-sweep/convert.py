@@ -77,13 +77,24 @@ revision/path/query/fragment. This applies to
 all emitted documents and the stdout summary, including dictionary keys; collisions refuse publication.
 Pinned owner/repo@sha:path citation locators for this same repository are normalized as well, with
 the revision and path unchanged; other owners, repository names and enclosing slugs are not aliases.
-The exact plain owner/repo spelling in prose is also a reference to this transferred repository.
+The exact plain owner/repo spelling in prose is also a reference to this transferred repository,
+including before a sentence-ending period, "#", "/", a backtick or a quote.
+A V2 publication keeps these spellings: field_sha256 binds its repository identities when the field
+is frozen, so an alias can only be canonicalized where the field is frozen, never after conversion.
 Raw workflow inputs and the GPT-6 byte-copy check remain unchanged.
 The native hostname (CPython os.uname().nodename) and optional WSL_DISTRO_NAME installation label
 become <host-installation> through the same recursive rewrite path, including keys and the summary.
 This includes a WSL label the native scanner treats as public; source collection failures refuse publication.
+The native synthetic name override replaces both sources, as it replaces every host source in
+host_name_scan.host_names. A label matches only where that scanner's boundary filter would (no Unicode
+letter or number on either side), so a "dev" label never rewrites "effort_deviations" or "developit".
+A label inside a URL refuses publication instead of rewriting the URL. After every rewrite, each V2
+field_sha256 binding must still recompute, or publication refuses.
 Per-call prompt_sha256 fields and copies of their digests (including prefixes of seven or more hex
-characters) are omitted from publication. The original run/cache inputs remain private and unchanged.
+characters) are omitted from publication. A copy is a whole hex run that a private value prefixes or
+that prefixes it, with no same-case hex character glued on its left. A private prefix inside another
+hex run, such as a public digest, is kept, unless 16 or more of its characters match a private digest,
+which refuses publication. The original run/cache inputs remain private and unchanged.
 The public frozen-template prompts_sha256 and public schema hashes remain distinct and are retained.
 """
 
@@ -776,10 +787,13 @@ def normalize_repository_urls(value):
     do not treat other owners or similarly named repositories as redirects.
     """
     former_owner = "seathatflowsinourveins"
+    # A sentence-ending period closes a reference; a period followed by a name character
+    # (.github.io, .git outside a URL) belongs to another name.
+    period = r"\.(?![A-Za-z0-9_-])"
     pattern = re.compile(r"(https?://(?:github\.com/|api\.github\.com/repos/))" + re.escape(former_owner)
-                         + r"/native-agent-stack(\.git)?(?=$|[^A-Za-z0-9_.-])", re.I)
+                         + r"/native-agent-stack(\.git)?(?=$|[^A-Za-z0-9_.-]|" + period + ")", re.I)
     locator = re.compile(r"(?<![\w/.-])" + re.escape(former_owner)
-                         + r"/native-agent-stack(?=@|$|[)\],;:!?\s])", re.I)
+                         + r"/native-agent-stack(?=@|$|[)\],;:!?\s#/`'\"]|" + period + ")", re.I)
 
     def fix(text):
         text = pattern.sub(lambda match: match[1] + "native-agent-stack/native-agent-stack"
@@ -789,27 +803,70 @@ def normalize_repository_urls(value):
     return rewrite_strings(value, fix)
 
 
+# scripts/host_name_scan.py's native boundary filter (5bab63233:144-150): a host-local name
+# matches only with no Unicode letter or number before it, other than the letter of a \n, \r or
+# \t escape, and none after it. Python's [^\W_] is a Unicode letter or number.
+NAME_BOUNDARY_BEFORE, NAME_BOUNDARY_AFTER = r"(?:(?<![^\W_])|(?<=\\[nrt]))", r"(?![^\W_])"
+URL_TOKEN = re.compile(r"[A-Za-z][A-Za-z0-9+.-]*://[^\s\"'<>`]+")
+
+
+class HostLabelInURL(ValueError):
+    """A host installation label occurs inside a URL, where a rewrite could corrupt a public reference."""
+
+
+class AmbiguousPromptCommitment(ValueError):
+    """A private prompt digest is glued inside another hex run, so no rewrite can separate it."""
+
+
 def host_installation_names():
     """Collect the installation labels without publishing or logging their values.
 
     CPython 3.13 os.uname().nodename reads the same native source as
-    scripts/host_name_scan.py at 7dcbe9a58:60-66 (uname -n). That scanner excludes
+    scripts/host_name_scan.py at 5bab63233:60-66 (uname -n). That scanner excludes
     a hostname equal to WSL_DISTRO_NAME; #1073 P2-2 still requires its redaction.
-    Keep the scanner's refusal behavior and validate these sources locally.
+    Its synthetic override (5bab63233:50-56) replaces every host source, so it
+    replaces both labels here too. Keep the scanner's refusal behavior and
+    validate these sources locally.
     """
-    names = [os.uname().nodename.strip()]
-    if os.environ.get("WSL_DISTRO_NAME"):
-        names.append(os.environ["WSL_DISTRO_NAME"])
-    if any(not name or len(name) > 512 or any(ord(char) < 32 or ord(char) == 127
-                                           or 0xD800 <= ord(char) <= 0xDFFF for char in name) for name in names):
+    if host_name_scan.OVERRIDE in os.environ:
+        try:
+            names = json.loads(os.environ[host_name_scan.OVERRIDE])
+        except (ValueError, TypeError):
+            raise host_name_scan.HostNameScanError("invalid synthetic name override") from None
+        if not isinstance(names, list) or not names:
+            raise host_name_scan.HostNameScanError("invalid synthetic name override")
+    else:
+        names = [os.uname().nodename.strip()]
+        if os.environ.get("WSL_DISTRO_NAME"):
+            names.append(os.environ["WSL_DISTRO_NAME"])
+    if any(not isinstance(name, str) or not name or len(name) > 512
+           or any(ord(char) < 32 or ord(char) == 127 or 0xD800 <= ord(char) <= 0xDFFF for char in name)
+           for name in names):
         raise host_name_scan.HostNameScanError("invalid host installation source")
     return tuple(dict.fromkeys(names))
 
 
 def redact_host_installation(value, names):
-    """Replace literal installation labels case-insensitively; collisions refuse."""
-    pattern = re.compile("|".join(re.escape(name) for name in sorted(names, key=len, reverse=True)), re.I)
-    return rewrite_strings(value, lambda text: pattern.sub("<host-installation>", text))
+    """Replace bounded installation labels case-insensitively; collisions refuse.
+
+    #1073 round 2 (P2-A): only occurrences the native boundary filter would report
+    are rewritten, so a label never rewrites part of a longer identifier, key or
+    repository name. A label inside a URL raises HostLabelInURL: rewriting it can
+    corrupt a public reference, and keeping it can publish a private one.
+    """
+    pattern = re.compile(NAME_BOUNDARY_BEFORE + "(?:" + "|".join(
+        re.escape(name) for name in sorted(names, key=len, reverse=True)) + ")" + NAME_BOUNDARY_AFTER, re.I)
+
+    def fix(text):
+        matches = list(pattern.finditer(text))
+        if not matches:
+            return text
+        urls = [url.span() for url in URL_TOKEN.finditer(text)]
+        if any(start < match.end() and match.start() < end for match in matches for start, end in urls):
+            raise HostLabelInURL()
+        return pattern.sub("<host-installation>", text)
+
+    return rewrite_strings(value, fix)
 
 
 def omit_private_prompt_commitments(value):
@@ -819,17 +876,24 @@ def omit_private_prompt_commitments(value):
     make_prompt.py:63 embeds the private layer/proposal input. Retain that local
     producer/cache identity, but never publish it as authentication of private
     bytes. Collect first, then prune fields and rewrite copies in keys/values
-    through native rewrite_strings, with its collision refusal. No word boundary
-    excludes glued prefixes. The plural prompts_sha256 authenticates the frozen
-    public template and is not this per-call seal.
+    through native rewrite_strings, with its collision refusal. A copy may be
+    glued to other text, such as SHA<digest>tail. The plural prompts_sha256
+    authenticates the frozen public template and is not this per-call seal.
+
+    #1073 round 2 (P3-1): a copy is a whole hex run of one letter case that a
+    private value prefixes, or that prefixes a private value, with no hex
+    character of that case glued on its left. A private 7-hex prefix inside
+    another hex run, such as a public digest, is kept unchanged. When 16 or
+    more of its characters match a private digest (a coincidence near 2**-64),
+    it is a glued copy that no rewrite can separate: AmbiguousPromptCommitment.
     """
-    prefixes = set()
+    private = set()
 
     def collect(item):
         if isinstance(item, dict):
             for key, child in item.items():
                 if key == "prompt_sha256" and isinstance(child, str) and re.fullmatch(r"[0-9a-f]{7,64}", child, re.I):
-                    prefixes.add(child[:7].lower())
+                    private.add(child.lower())
                 collect(child)
         elif isinstance(item, list):
             for child in item:
@@ -844,13 +908,82 @@ def omit_private_prompt_commitments(value):
 
     collect(value)
     pruned = prune(value)
-    if not prefixes:
+    if not private:
         return pruned
-    # Cover a complete digest or any shortened prefix without keeping an alias
-    # of the private input seal. Match pasted/glued spellings as well as tokens.
-    pattern = re.compile("(?:" + "|".join(re.escape(prefix) for prefix in sorted(prefixes))
-                         + r")[0-9a-f]{0,57}", re.I)
-    return rewrite_strings(pruned, lambda text: pattern.sub("<private-prompt-commitment-omitted>", text))
+    starts = re.compile("|".join(re.escape(digest[:7]) for digest in sorted(private)), re.I)
+    lower, upper = frozenset("0123456789abcdef"), frozenset("0123456789ABCDEF")
+    either = lower | upper
+
+    def matching(text, start):
+        best = 0
+        for digest in private:
+            length = 0
+            while length < len(digest) and start + length < len(text) and text[start + length].lower() == digest[length]:
+                length += 1
+            best = max(best, length)
+        return best
+
+    def fix(text):
+        out, position, cursor = [], 0, 0
+        while (match := starts.search(text, cursor)) is not None:
+            start = end = match.start()
+            while end < len(text) and text[end] in either:
+                end += 1
+            letters = {char for char in text[start:end] if char.isalpha()}
+            hexes = lower if letters <= set("abcdef") else upper if letters <= set("ABCDEF") else either
+            end = start
+            while end < len(text) and text[end] in hexes:
+                end += 1
+            run = text[start:end].lower()
+            glued = start > 0 and text[start - 1] in hexes
+            if len(run) >= 7 and not glued and any(digest.startswith(run) or run.startswith(digest)
+                                                   for digest in private):
+                out.append(text[position:start])
+                out.append("<private-prompt-commitment-omitted>")
+                position = cursor = end
+                continue
+            if matching(text, start) >= 16:
+                raise AmbiguousPromptCommitment()
+            cursor = start + 1
+        out.append(text[position:])
+        return "".join(out)
+
+    return rewrite_strings(pruned, fix)
+
+
+V2_SCOPE_KEYS = ("contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256")
+
+
+def v2_bindings_intact(documents) -> bool:
+    """Whether every V2 field_sha256 still recomputes after the publication rewrites.
+
+    #1073 round 2 (P2-B): convert_v2 binds identities before publication (above, the
+    discovery and frozen source field hashes); saturation_ledger.v2_field_sha256 is the
+    binding the ledger recomputes. A rewrite that moves a candidate_key or repository
+    in a discovery, its source field, a layer, a lane copy or a survivor refuses.
+    """
+    led = ledger_module(REPO_ROOT)
+    try:
+        discovery = documents["returns"]["discovery"]
+        for row in discovery.values():
+            if led.v2_field_sha256(row) != row["field_sha256"]:
+                return False
+            if led.v2_field_sha256(row["source_field"]) != row["source_field"]["field_sha256"]:
+                return False
+        lane_layers = [layer for lane in documents["lanes"]["lanes"] for layer in lane["result"]["layers"]]
+        for layer in [*documents["layers"], *lane_layers]:
+            bound = {**{key: discovery[layer["layer_id"]][key] for key in V2_SCOPE_KEYS},
+                     "eligible_field": layer["eligible_field"]}
+            if led.v2_field_sha256(bound) != layer["field_sha256"]:
+                return False
+        members = {(row["candidate_key"], row["repository"]) for row in discovery_members(discovery)}
+        return all((row["candidate_key"], row["repository"]) in members for row in documents["survivors"])
+    except (KeyError, TypeError, AttributeError):
+        return False
+
+
+def discovery_members(discovery):
+    return [row for layer in discovery.values() for row in layer["eligible_field"]]
 
 
 def main(argv=None) -> int:
@@ -891,6 +1024,9 @@ def main(argv=None) -> int:
         summary["warning"] = f"the run record's status is {meta.get('status')!r}, not completed"
     documents = {}
     name = "publication"
+    # A V2 field binds candidate_key and repository by field_sha256 (convert_v2 above), so the
+    # cosmetic repository-transfer rewrite applies to V1 publications only.
+    v2 = out["returns"].get("contract_version") == 2
     try:
         # Process the whole publication together: a copied seal in a different
         # document or the stdout summary must not escape its original field.
@@ -898,9 +1034,9 @@ def main(argv=None) -> int:
             {name: summary if name == "summary" else out[name]
              for name in ("returns", "lanes", "layers", "survivors", "summary")})
         for name in ("returns", "lanes", "layers", "survivors", "summary"):
-            value = publication[name]
-            documents[name] = normalize_repository_urls(redact_host_installation(
-                redact_project_dirs(sanitize(value, replacements), work, repo_root), installation_names))
+            value = redact_host_installation(
+                redact_project_dirs(sanitize(publication[name], replacements), work, repo_root), installation_names)
+            documents[name] = value if v2 else normalize_repository_urls(value)
         # Percent-encoding is representation, not anonymity. Check values AND keys after all URL decoding
         # layers, without publishing that view or changing source citations. Collisions also refuse.
         def url_decoded(text):
@@ -916,6 +1052,19 @@ def main(argv=None) -> int:
         pointer = "/" + "/".join(pointer_token(part) for part in error.path)
         location = "printed summary" if name == "summary" else f"{name}.json"
         print(f"convert.py: {location}#{pointer}: redaction key collision (no artifacts written)", file=sys.stderr)
+        return EXIT_PRIVATE
+    except HostLabelInURL:
+        location = "printed summary" if name == "summary" else f"{name}.json"
+        print(f"refusing to publish: a host installation label occurs inside a URL in {location} "
+              "(no artifacts written; text not shown)", file=sys.stderr)
+        return EXIT_PRIVATE
+    except AmbiguousPromptCommitment:
+        print("refusing to publish: a private prompt commitment is glued inside another hex run "
+              "(no artifacts written; text not shown)", file=sys.stderr)
+        return EXIT_PRIVATE
+    if v2 and not v2_bindings_intact(documents):
+        print("refusing to publish: a publication rewrite would change a V2 field_sha256 binding "
+              "(no artifacts written)", file=sys.stderr)
         return EXIT_PRIVATE
     emitted = {name: json_text(document) for name, document in documents.items()}
     findings = []

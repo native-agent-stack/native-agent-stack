@@ -4056,6 +4056,18 @@ class ConvertTests(unittest.TestCase):
         res["first"][0]["claude_discover"]["notes"] = {former: "first", current: "second"}
         self.assert_cli_key_collision(work, res, r"(?:/<key-\d+>){5}", [former, current])
 
+    def convert_in_process(self, work, res, environment, *extra, run_id="wf_fixture-1"):
+        """convert.main in this process with environment added; (code, stdout, stderr)."""
+        run_file = write_json(work / "run.json", {"runId": run_id, "status": "completed", "result": res})
+        write_json(work / "scope.json", scope_for())
+        write_codex_files(work, res)
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.dict(os.environ, environment), contextlib.redirect_stdout(stdout), \
+                contextlib.redirect_stderr(stderr):
+            code = convert.main(["--workflow-output", str(run_file), "--work-dir", str(work),
+                                 "--out", str(work / "out"), *extra])
+        return code, stdout.getvalue(), stderr.getvalue()
+
     def test_cli_redacts_host_installation_in_values_keys_and_summary(self):
         work = temp_dir(self)
         hostname, distro = "fixture-installation", "fixture-distro-label"
@@ -4066,9 +4078,9 @@ class ConvertTests(unittest.TestCase):
         write_json(work / "scope.json", scope_for())
         write_codex_files(work, res)
         stdout, stderr = io.StringIO(), io.StringIO()
-        with mock.patch.object(os, "uname", return_value=mock.Mock(nodename=hostname)), \
-                mock.patch.dict(os.environ, {"WSL_DISTRO_NAME": distro,
-                                            convert.host_name_scan.OVERRIDE: json.dumps(["fixture-scanner-control"])}), \
+        # The native synthetic override replaces every host source (host_name_scan.host_names), so
+        # both labels come from it and the scan never reads the real host.
+        with mock.patch.dict(os.environ, {convert.host_name_scan.OVERRIDE: json.dumps([hostname, distro])}), \
                 contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
             code = convert.main(["--workflow-output", str(run_file), "--work-dir", str(work),
                                  "--out", str(work / "out"), "--limit", note])
@@ -4093,7 +4105,7 @@ class ConvertTests(unittest.TestCase):
         run_file = write_json(work / "run.json", {"status": "completed", "result": res})
         scope = write_json(work / "scope.json", scope_for())
         stdout, stderr = io.StringIO(), io.StringIO()
-        with mock.patch.object(os, "uname", return_value=mock.Mock(nodename=hostname)), \
+        with mock.patch.dict(os.environ, {convert.host_name_scan.OVERRIDE: json.dumps([hostname])}), \
                 contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
             code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
                                  "--out", str(work / "out")])
@@ -4108,8 +4120,10 @@ class ConvertTests(unittest.TestCase):
         run_file = write_json(work / "run.json", {"status": "completed", "result": healthy_result()})
         scope = write_json(work / "scope.json", scope_for())
         stdout, stderr = io.StringIO(), io.StringIO()
-        with mock.patch.object(os, "uname", side_effect=OSError("fixture-private-source-detail")), \
+        with mock.patch.dict(os.environ), \
+                mock.patch.object(os, "uname", side_effect=OSError("fixture-private-source-detail")), \
                 contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            os.environ.pop(convert.host_name_scan.OVERRIDE, None)
             code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
                                  "--out", str(work / "out")])
         self.assertEqual(code, 3)
@@ -4117,6 +4131,113 @@ class ConvertTests(unittest.TestCase):
                          "refusing to publish: host installation source unavailable (no artifacts written)\n")
         self.assertEqual(stdout.getvalue(), "")
         self.assertFalse((work / "out").exists())
+
+    def test_host_installation_names_follow_the_native_synthetic_override(self):
+        # #1073 round 2 (P2-A): host_name_scan.host_names' synthetic override (5bab63233:50-56) replaces
+        # every host source; the installation labels follow it and never read the real host.
+        with mock.patch.object(os, "uname", side_effect=AssertionError("the real host was read")), \
+                mock.patch.dict(os.environ, {convert.host_name_scan.OVERRIDE: json.dumps(["fixture-a", "fixture-b"]),
+                                             "WSL_DISTRO_NAME": "fixture-distro"}):
+            self.assertEqual(convert.host_installation_names(), ("fixture-a", "fixture-b"))
+        for bad in ("not json", "[]", '"fixture"', "[1]", '[""]'):
+            with self.subTest(bad=bad), mock.patch.dict(os.environ, {convert.host_name_scan.OVERRIDE: bad}):
+                with self.assertRaises(convert.host_name_scan.HostNameScanError):
+                    convert.host_installation_names()
+        with mock.patch.dict(os.environ, {"WSL_DISTRO_NAME": "fixture-distro"}), \
+                mock.patch.object(os, "uname", return_value=mock.Mock(nodename="fixture-host\n")):
+            os.environ.pop(convert.host_name_scan.OVERRIDE, None)
+            self.assertEqual(convert.host_installation_names(), ("fixture-host", "fixture-distro"))
+
+    def test_cli_host_installation_redaction_keeps_unrelated_identifiers(self):
+        # #1073 round 2 (P2-A, the local review at 1e5ceb91): a "dev" label rewrote the summary key
+        # effort_deviations and a survivor's developit URL. Only labels the native boundary filter
+        # (scripts/host_name_scan.py at 5bab63233:144-150) would report are rewritten now.
+        work = temp_dir(self)
+        res = healthy_result()
+        notes = {"effort_deviations": "a public field name", "survivor": "https://github.com/developit/mitt",
+                 "glued": "FixtureStack2604 and devtools", "dev": "a key that is a label",
+                 "prose": "the paper Gateway on dev at 127.0.0.1:4002, built on FixtureStack."}
+        res["first"][0]["claude_discover"]["notes"] = notes
+        with mock.patch.object(os, "uname", return_value=mock.Mock(nodename="dev")):
+            code, stdout, stderr = self.convert_in_process(work, res, {
+                convert.host_name_scan.OVERRIDE: json.dumps(["dev", "FixtureStack"]), "WSL_DISTRO_NAME": ""})
+        self.assertEqual(code, 0, stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], {
+            "effort_deviations": "a public field name", "survivor": "https://github.com/developit/mitt",
+            "glued": "FixtureStack2604 and devtools", "<host-installation>": "a key that is a label",
+            "prose": "the paper Gateway on <host-installation> at 127.0.0.1:4002, built on <host-installation>."})
+        self.assertIn("effort_deviations", json.loads(stdout))
+
+    def test_cli_host_installation_inside_a_url_refuses_before_writing(self):
+        # #1073 round 2 (P2-A): a label inside a URL is neither rewritten (it may be a public reference)
+        # nor kept (it may be a private one).
+        for url in ("https://ubuntu.com/download", "https://github.com/ubuntu/ubuntu-make"):
+            with self.subTest(url=url):
+                work = temp_dir(self)
+                res = healthy_result()
+                res["first"][0]["claude_discover"]["notes"] = f"images from {url} for the release"
+                with mock.patch.object(os, "uname", return_value=mock.Mock(nodename="Ubuntu")):
+                    code, stdout, stderr = self.convert_in_process(work, res, {
+                        convert.host_name_scan.OVERRIDE: json.dumps(["Ubuntu"]), "WSL_DISTRO_NAME": ""})
+                self.assertEqual(code, 3, stderr)
+                self.assertIn("inside a URL", stderr)
+                self.assertNotIn("buntu", stderr)
+                self.assertEqual(stdout, "")
+                self.assertFalse((work / "out").exists())
+
+    def test_cli_keeps_public_digests_that_share_a_private_prefix(self):
+        # #1073 round 2 (P3-1): the 7-hex prefix rewrite also consumed public digests that only shared it.
+        work = temp_dir(self)
+        res = healthy_result()
+        private = hashlib.sha256(b"synthetic withheld prompt shared prefix").hexdigest()
+        notes = {"wheel": "sha256:" + "0" * 20 + private[:7] + "1" * 37, "attestation": "2" * 57 + private[:7],
+                 "copy": "SHA" + private[:9] + "tail"}
+        res["first"][0]["gpt6_discover"]["inputs"] = {"prompt_sha256": private}
+        res["first"][0]["claude_discover"]["notes"] = notes
+        with mock.patch.dict(os.environ, {convert.host_name_scan.OVERRIDE: json.dumps(["fixture-scanner-control"])}):
+            done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        text = (work / "out/returns.json").read_text()
+        self.assertEqual(json.loads(text)["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         dict(notes, copy="SHA<private-prompt-commitment-omitted>tail"))
+        self.assertNotIn('"prompt_sha256"', text)
+
+    def test_cli_refuses_a_private_digest_glued_inside_another_hex_run(self):
+        # #1073 round 2 (P3-1): a copy glued to other hex characters cannot be cut out cleanly, so
+        # publication refuses instead of keeping it or rewriting part of the run.
+        work = temp_dir(self)
+        res = healthy_result()
+        private = hashlib.sha256(b"synthetic withheld prompt glued copy").hexdigest()
+        res["first"][0]["gpt6_discover"]["inputs"] = {"prompt_sha256": private}
+        res["first"][0]["claude_discover"]["notes"] = "trace cafe" + private + " end"
+        with mock.patch.dict(os.environ, {convert.host_name_scan.OVERRIDE: json.dumps(["fixture-scanner-control"])}):
+            done = self.cli(work, res)
+        self.assertEqual(done.returncode, 3, done.stderr)
+        self.assertIn("glued inside another hex run", done.stderr)
+        self.assertNotIn(private[:7], done.stderr + done.stdout)
+        self.assertEqual(done.stdout, "")
+        self.assertFalse((work / "out").exists())
+
+    def test_cli_normalizes_this_repository_before_sentence_and_markup_punctuation(self):
+        # #1073 round 2 (P3-2): a sentence-ending period, "#", "/", a backtick or a quote ended a
+        # reference that the earlier lookaheads skipped; other names stay untouched.
+        work = temp_dir(self)
+        former = "seathatflowsinourveins" + "/native-agent-stack"
+        current = "native-agent-stack/native-agent-stack"
+        url = "https://github.com/"
+        cases = [former + ".", former + "#12", former + "/blob/main/README.md", "`" + former + "`",
+                 "'" + former + "'", '"' + former + '"', url + former + ".", url + former + ".git."]
+        unrelated = [former + ".github.io", former + "-tools.", url + former + ".github.io", url + former + "-tools."]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {"cases": ["see " + case for case in cases],
+                                                       "unrelated": unrelated}
+        with mock.patch.dict(os.environ, {convert.host_name_scan.OVERRIDE: json.dumps(["fixture-scanner-control"])}):
+            done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"cases": ["see " + case.replace(former, current) for case in cases], "unrelated": unrelated})
 
     def test_cli_omits_private_prompt_commitments_and_glued_prefixes(self):
         work = temp_dir(self)
@@ -5800,6 +5921,44 @@ class SourceReviewTests(unittest.TestCase):
                          ("source-review-o-alpha-one", "f" * 40, "MIT"))
         self.assertIn(f"Survived the {LANE} facts refuter and both fit refuters", review["claim"])
         self.assertEqual(review["documentation_excerpts"][0]["source"], f"README.md@{'f' * 40}")
+
+    def test_contact_addresses_in_excerpts_are_omitted_with_a_count(self):
+        # #1073 round 2 (P2-C): the producer applies the sweep publication email rule itself, so a review
+        # with an upstream contact address is reproducible instead of hand-edited after the run.
+        work, bin_dir = temp_dir(self), temp_dir(self)
+        address = "support" + "@" + "example.org"
+        contact = ("- **Docs**: <https://example.org/docs/> - **Support**: "
+                   f"[{address}](mailto:{address}) for questions about alpha one and its releases.")
+        readmes = {"o/alpha-one": "# Alpha\n\n" + contact + "\n\n" + "Another long enough paragraph about alpha one. " * 2,
+                   "o/beta-two": "# Beta\n\n" + "A long enough paragraph about what beta two does, with no contact. " * 2}
+        answers = {}
+        for full, readme in readmes.items():
+            answers[f"repos/{full}"] = {"full_name": full, "default_branch": "main", "license": {"spdx_id": "MIT"},
+                                        "description": "", "stargazers_count": 1, "pushed_at": "2026-10-20",
+                                        "archived": False}
+            answers[f"repos/{full}/commits/main"] = {"sha": "d" * 40}
+            answers[f"repos/{full}/readme?ref={'d' * 40}"] = {
+                "path": "README.md", "content": base64.b64encode(readme.encode()).decode()}
+        gh = bin_dir / "gh"
+        gh.write_text(FAKE_GH.format(python=sys.executable, answers=repr(answers)), encoding="utf-8")
+        gh.chmod(0o755)
+        survivors = write_json(work / "survivors.json", [
+            {"layer_id": "alpha", "repository": "https://github.com/o/alpha-one"},
+            {"layer_id": "alpha", "repository": "https://github.com/o/beta-two"}])
+        env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ.get('PATH', '')}"}
+        done = run([sys.executable, HARNESS / "source_reviews.py", "--survivors", survivors, "--out", work / "reviews",
+                    "--lane", LANE], env=env)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        alpha_text = (work / "reviews/o-alpha-one.json").read_text()
+        alpha = json.loads(alpha_text)
+        self.assertEqual(alpha["documentation_excerpts"][0]["text"], contact.replace(address, "<public-contact-omitted>"))
+        self.assertEqual(list(alpha)[-1], "publication_redaction")
+        self.assertEqual(alpha["publication_redaction"]["public_contact_literals_omitted"], 2)
+        self.assertIn("scripts/host_name_scan.py", alpha["publication_redaction"]["boundary"])
+        self.assertNotIn(address, alpha_text)
+        beta = json.loads((work / "reviews/o-beta-two.json").read_text())
+        self.assertNotIn("publication_redaction", beta)
+        self.assertNotIn("<public-contact-omitted>", json.dumps(beta))
 
     def test_repositories_sharing_a_readable_name_get_distinct_files_and_none_is_overwritten(self):
         work, bin_dir = temp_dir(self), temp_dir(self)

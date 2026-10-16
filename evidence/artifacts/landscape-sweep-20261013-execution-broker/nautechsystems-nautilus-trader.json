@@ -33,6 +33,6 @@
  ],
  "publication_redaction": {
   "public_contact_literals_omitted": 2,
-  "boundary": "Upstream public README contact strings omitted from excerpts under the publication literal rule. Reviewed commit/path and all non-contact observations are unchanged; no private input authentication is added."
+  "boundary": "Upstream public README contact strings omitted from excerpts by source_reviews.py under the sweep publication email rule (the private-email rule convert.py's native scan applies, scripts/host_name_scan.py at 5bab63233:159-167). Reviewed commit/path and all non-contact observations are unchanged; no private input authentication is added."
  }
 }

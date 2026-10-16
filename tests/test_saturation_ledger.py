@@ -23,6 +23,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1270,6 +1271,47 @@ class V2PendingCliTests(FixtureCase):
         self.assertTrue(all(row["material"] and row["evidence_key"] == key for key, row in pending.items()))
         self.assertEqual(converted["layers"][0]["refuted"], [])
         self.assertEqual(converted["survivors"], [])
+
+    def test_former_owner_v2_identity_keeps_its_field_binding(self):
+        # #1073 round 2 (P2-B, the local review at 1e5ceb91): the repository-transfer rewrite moved a V2
+        # repository after field_sha256 had bound it, so the ledger refused the record. A V2 publication
+        # keeps its hash-bound identities.
+        former = "https://github.com/" + "seathatflowsinourveins" + "/native-agent-stack"
+        repository, key = sl.v2_identity("foundation", "alpha", former)
+        member = dict(self.field_input["eligible_field"][0], candidate_key=key, repository=repository,
+                      evidence_key=key)
+        self.field_input = dict(self.field_input, eligible_field=[member, self.field_input["eligible_field"][1]])
+        self.field_input["field_sha256"] = sl.v2_field_sha256(self.field_input)
+        write(self.work, "inputs/alpha.json", self.field_input)
+        with mock.patch.dict(os.environ, {"NATIVE_AGENT_HOST_NAMES_JSON": json.dumps(["fixture-scanner-control"])}):
+            converted = self.convert_cli(self.screen_run(copies=2))
+        discovery = converted["returns"]["discovery"]["alpha"]
+        self.assertEqual(sl.v2_field_sha256(discovery), discovery["field_sha256"])
+        self.assertIn((key, repository), {(row["candidate_key"], row["repository"]) for row in discovery["eligible_field"]})
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        checked = self.ledger_cli("--check")
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+
+    def test_the_v2_binding_guard_detects_a_moved_identity(self):
+        # #1073 round 2 (P2-B): convert.py refuses publication when a rewrite moves a bound identity.
+        with mock.patch.dict(os.environ, {"NATIVE_AGENT_HOST_NAMES_JSON": json.dumps(["fixture-scanner-control"])}):
+            converted = self.convert_cli(self.screen_run(copies=2))
+        sys.path.insert(0, str(ROOT / "tools/sota-convergence/landscape-sweep"))
+        import convert
+        self.assertTrue(convert.v2_bindings_intact(converted))
+        for move in ("discovery", "source", "layer", "survivor"):
+            with self.subTest(move=move):
+                moved = json.loads(json.dumps(converted))
+                if move == "discovery":
+                    moved["returns"]["discovery"]["alpha"]["eligible_field"][0]["repository"] += "-moved"
+                elif move == "source":
+                    moved["returns"]["discovery"]["alpha"]["source_field"]["eligible_field"][0]["candidate_key"] += "-x"
+                elif move == "layer":
+                    moved["layers"][0]["eligible_field"][0]["repository"] += "-moved"
+                else:
+                    moved["survivors"][0]["repository"] += "-moved"
+                self.assertFalse(convert.v2_bindings_intact(moved))
 
     def test_unsupported_discovery_identity_stays_pending_and_later_layer_converts(self):
         scope = sl.scope_hashes(self.root)
