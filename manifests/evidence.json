@@ -5007,18 +5007,18 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/observation-inference.md",
-      "sha256": "91404b6304d2ba7daf85ac611a7d1279c34a5225f4469094a8bdaa09ed617e59",
-      "bytes": 3965
+      "sha256": "bc27287c938f7edd1a7e8ed85758821bfd2f775010574e2e94be5ae8cf0d54af",
+      "bytes": 5892
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/scheduling-supervision.md",
-      "sha256": "4167a5654f18ce60c04517404401a52b38f9481eef58f442474fea4490eccbe5",
-      "bytes": 2126
+      "sha256": "fb474f58722acec5aed64380d46c299d2396e387750a0ee3e089745851565d2f",
+      "bytes": 3527
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "fb2247d2d0fb1e8201489cc7467c7918fffb91aeb236ab67684eef6e4869bc01",
-      "bytes": 156141
+      "sha256": "42ab98129d3b86c1dda4ce5a23e4e7b3aacf0ede5a3b03e76bb492f43b1c5f06",
+      "bytes": 159469
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5782,8 +5782,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "7c83c567e7fadbae5cc67008fb508d71727579c3f23a6a712bce222afe63a92e",
-      "bytes": 13856
+      "sha256": "dd39aee7815e52aed292ee3c0e9c6c0e232e6be3c5aef943bb78237b6e81cb99",
+      "bytes": 13903
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -17548,8 +17548,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "43cae953c5ad6d348bb25ad81202b585316b4eb7b4e49a66f9e591fd298a18e4",
-      "bytes": 192783
+      "sha256": "d5fd7bacdb28191027aa2305d875434bf1915b0ae607baea970d27d46615504d",
+      "bytes": 193410
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -18578,8 +18578,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "be8a467cd2070d715a820213ab47fd35c49d727fdb7dabd1f4f01b1cbec7c5ef",
-      "bytes": 149798
+      "sha256": "43cc2ff82481dbf509418b036aabbe868b52812c78870c587eeaadfc64c23490",
+      "bytes": 150626
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -21768,7 +21768,7 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "b50222fb4fb34e40b9dc444e39b5518f0eda2d6e32ff5bb65bdaa13239429e47",
+      "sha256": "188b04230fab2abcc3d473b11d28069a8150666ff077c8482d01c856364fbbec",
       "bytes": 238162
     },
     {
@@ -22625,6 +22625,11 @@
       "path": "evidence/artifacts/currency-wave-w1b-20261003/review-decisions.json",
       "sha256": "b163526176d933371fb64c3fd15adef9fb4851838bdf5fa1fd2ad3ef267ac5fc",
       "bytes": 32284
+    },
+    {
+      "path": "evidence/artifacts/d4-bg-trial-20261015/scheduled-task-carry.json",
+      "sha256": "64b52561f91c2576863a779ad29bba24e6f1148fc531cefc1d11447e1825030a",
+      "bytes": 1116
     },
     {
       "path": "evidence/artifacts/dashboard-gap-resolution-20260921/resolution.json",
@@ -62158,8 +62163,8 @@
     },
     {
       "path": "observability/collector/claude-settings.json.example",
-      "sha256": "999c727fdd05c698c14182665bb1ea8d0964927785728797b12bfcbdb72391df",
-      "bytes": 771
+      "sha256": "5493dc616874176b1fd328d159f065c891fda8a4436c675b593312c5abf3f982",
+      "bytes": 818
     },
     {
       "path": "observability/collector/codex-identity-launcher.sh.example",
@@ -64025,6 +64030,11 @@
       "path": "tests/test_native_practice_doc_corrections.py",
       "sha256": "04410b557212f2cd75a0ac37a5d6fd0addd9920d7f8caaf8a057a8d0ba9432e1",
       "bytes": 3900
+    },
+    {
+      "path": "tests/test_native_practice_ledger_obs_sched.py",
+      "sha256": "938d50f20658f9dbd9d28ae09c5c89a164e8041b272957308fe1de89cd39217e",
+      "bytes": 8275
     },
     {
       "path": "tests/test_native_practice_ledger_rows_1.py",
