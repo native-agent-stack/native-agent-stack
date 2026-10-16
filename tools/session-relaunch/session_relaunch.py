@@ -599,10 +599,8 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
                 entry["resolved_through"] = len(entry.get("attempts") or [])
         # A row leaves the carry only when this final list shows its session running (the command center's FULL read
         # of #1141 at b2755a0e, P2): seen once and then gone, it stays carried through a second crash.
+        # A session that registered and then exited (absent) is still to be brought back, so its row stays carried.
         retire({entry["session_name"] for entry in sessions if entry["outcome"] == "running"})
-        # A session that registered and then exited is still to be brought back, so its row is carried again.
-        absent = {entry["session_name"] for entry in sessions if entry["outcome"] == "absent"}
-        state["carry"] += [row for row in carry if row.get("name") in absent and row not in state["carry"]]
     complete = final is not None and all(entry["outcome"] == "running" for entry in sessions)
     state["status"] = "complete" if complete else "partial"
     state["runs"][-1]["ended_at"] = iso(now_utc())

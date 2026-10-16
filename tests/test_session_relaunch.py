@@ -371,7 +371,9 @@ class Relaunch(Fixture):
     def test_a_session_that_registers_and_then_exits_is_carried_again(self):
         # Rebase resolution of #1141 onto #1145 (main's completion rule meets #1141's carry retirement): a session seen
         # running and then missing from the final list is absent and still to be brought back, so a second crash in this
-        # boot finds its row in this boot's roster.
+        # boot finds its row in this boot's roster. It guards the retire rule: a row leaves the carry only when the final
+        # list shows its session running, and the test fails when an absent session's row is retired too (GPT fix2 of
+        # #1141 at 07ea5674: the separate re-carry line it once guarded had become redundant and is removed).
         self.crash_roster()
         os.environ["FAKE_PS_KILL"] = json.dumps({"trading-cc": "wsl-architecture-design"})
         try:

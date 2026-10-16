@@ -64618,8 +64618,8 @@
     },
     {
       "path": "tests/test_session_relaunch.py",
-      "sha256": "cab6fc404f805a3b7660c92f46f23383a2393bc05aa7fb3c429878d10f08d1c8",
-      "bytes": 63146
+      "sha256": "b215e9fe917a4a16b25e8f4836a9187b630fc679f39171359b61587cb8833e29",
+      "bytes": 63444
     },
     {
       "path": "tests/test_shell_parser_ci.py",
@@ -65308,8 +65308,8 @@
     },
     {
       "path": "tools/session-relaunch/session_relaunch.py",
-      "sha256": "55ed8fad07b9e726f615158fc0240aaebc68760f7b89d9993ad4a664094572a2",
-      "bytes": 34422
+      "sha256": "dddd9f79d7f456e7e536c917fa4c42c18f3f4d71730fa078d4bb924e1a02b58f",
+      "bytes": 34225
     },
     {
       "path": "tools/session-relaunch/units/ns-session-relaunch.service",
