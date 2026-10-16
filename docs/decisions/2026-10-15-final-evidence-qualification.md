@@ -67,6 +67,74 @@ record, and provides no current admission result.
 
 ## Receipt and source boundaries
 
+The qualification fold corrects three defects in the implementation at
+`425c4367a4db640b0bc4074f48e3990663416bee`. Native reopening identifiers are
+not uniformly file references: the native
+[`external_triggers` producer](https://github.com/native-agent-stack/native-agent-stack/blob/425c4367a4db640b0bc4074f48e3990663416bee/scripts/saturation_ledger.py#L1463-L1468)
+emits symbolic `receipt_staleness:` identifiers, and the
+[`check_layer` contract](https://github.com/native-agent-stack/native-agent-stack/blob/425c4367a4db640b0bc4074f48e3990663416bee/scripts/saturation_ledger.py#L1091-L1094)
+accepts nonempty reopening references. The qualifier retains confined files
+when an identifier actually names a file, while leaving symbolic events to
+the native history contract. The fail-first control is
+`test_symbolic_reopening_identifier_is_not_a_file_dependency`.
+
+Native integrity can faithfully retain failed discovery. Its
+[`check_v2_layer` failure reconciliation](https://github.com/native-agent-stack/native-agent-stack/blob/425c4367a4db640b0bc4074f48e3990663416bee/scripts/saturation_ledger.py#L1171-L1178)
+requires the matching failure marker; it does not assert successful discovery.
+A consumed baseline with a retained discovery failure now refuses unless a
+later covering sweep repairs it. That sweep must independently satisfy the
+existing completed, retained, unchanged-scope, no-reopen and no-material-pending
+requirements. `test_unrepaired_consumed_discovery_failure_refuses_qualification`
+fails before this guard and covers successful recovery through the native
+later sweep.
+
+Each qualification call now uses a new native `Sources(root)` reader. The
+[memoization at 425c4367:222-231](https://github.com/native-agent-stack/native-agent-stack/blob/425c4367a4db640b0bc4074f48e3990663416bee/scripts/final_stack.py#L222-L231)
+is useful within one read, but a caller can retain that object after the files
+change. Reusing it as the current-evidence authority was incorrect. Both
+qualification entry points now follow the existing
+[`build_document` fresh-reader pattern at 425c4367:1087-1092](https://github.com/native-agent-stack/native-agent-stack/blob/425c4367a4db640b0bc4074f48e3990663416bee/scripts/final_stack.py#L1087-L1092).
+They retain successful source fingerprints for the caller without trusting
+its parsed JSON cache. The same-reader regressions change angle evidence,
+run pins, the recorded catalog, wave registration, an E2E receipt and a native
+ledger, assert refusal, then restore the files and qualify again. These are
+current-input and recovery controls, not currency checks.
+
+The symbolic-reference controls cover a consumed anchor, an unrelated layer,
+and a later covering reopening. The later event still refuses by native
+history policy; its symbolic identifier is not interpreted as a missing file.
+The reference contract is the same native check_layer/external_triggers
+contract cited above.
+
+Fresh runs alone do not authenticate a retained winner's run association.
+Qualification now recomputes that association through the existing
+[`build_winner` repository/ID join](https://github.com/native-agent-stack/native-agent-stack/blob/425c4367a4db640b0bc4074f48e3990663416bee/scripts/final_stack.py#L564-L594).
+`test_current_run_with_another_repository_cannot_qualify_a_retained_winner`
+fails before this correction even with freshly rebuilt runs and unchanged
+ID/pin. `test_current_run_without_a_repository_retains_the_native_id_join`
+preserves the native same-ID fallback. These controls qualify synthetic
+evidence only; production admission remains disabled.
+
+The bounded ordering oracle now also rejects `list.sort` with a date key.
+Its [prior call-shape boundary at 425c4367:88-93](https://github.com/native-agent-stack/native-agent-stack/blob/425c4367a4db640b0bc4074f48e3990663416bee/tests/test_final_history_ordering.py#L88-L93)
+recognized sorted/min/max while missing that mutation. Direct native V1
+controls cover winner and alternative dispositions with missing, unknown,
+earlier, same and later ledger bindings; the last clean sweep's omission does
+not settle an earlier survivor. Direct V2 controls refuse six refutation
+identity/vote mutations through the native integrity prerequisite. These
+exercise qualification rather than relying only on the disabled CLI.
+
+Historical FINAL aliases retain their recorded text and host-E2E fields in
+the matrix and desk, while their layer and winner display statuses remain
+unreported. The existing
+[`layer_status` rule at 425c4367:58-60](https://github.com/native-agent-stack/native-agent-stack/blob/425c4367a4db640b0bc4074f48e3990663416bee/tools/local-pages/architecture_manifest.py#L58-L60)
+already makes that distinction; the
+[matrix and desk call sites at :142 and :277](https://github.com/native-agent-stack/native-agent-stack/blob/425c4367a4db640b0bc4074f48e3990663416bee/tools/local-pages/architecture_manifest.py#L142)
+now preserve it for the winners and visible verdict item too. The regression
+restores explicit desk assertions. The current/converged page-state admission
+item remains assigned to the separate activation change; this fold does not
+enable that path.
+
 Every E2E repository URI passes the supported direct RFC 3986 validator,
 including additional citations beyond the one binding the winner. This follows
 [jsonschema 4.26.0's pinned URI mechanism](https://github.com/python-jsonschema/jsonschema/blob/a7277432b0f7bcd0551f6e589d30457017125df4/jsonschema/_format.py#L303-L313)

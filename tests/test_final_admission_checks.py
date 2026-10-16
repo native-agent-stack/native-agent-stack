@@ -132,6 +132,90 @@ class NativeHistoryQualificationTests(FixtureTestCase):
                 with self.assertRaisesRegex(fs.FinalStackError, "current (run pins|angle evidence)"):
                     fs.qualify_final_requirements(fs.Sources(root), document["layers"], document["runs"], angles)
 
+    def test_reused_reader_cannot_hide_changed_current_qualification_inputs(self):
+        for changed in ("angle", "run", "catalog", "registry", "receipt"):
+            with self.subTest(changed=changed):
+                root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+                source, document, angles = self.qualification_packet(root)
+                self.assertEqual(fs.qualify_final_requirements(
+                    source, document["layers"], document["runs"], angles)[0]["status"], "qualified")
+                if changed == "angle":
+                    path = root / angles[("foundation", "alpha")]["path"]
+                    data = json.loads(path.read_bytes())
+                    data["candidates"][0].update(a6_comparative=False, provisional=True)
+                    data["candidates"][0]["angles"]["A6"].update(score="U", sources=[])
+                elif changed == "run":
+                    path = root / fs.STACK
+                    data = json.loads(path.read_bytes())
+                    next(c for c in data["components"] if c["id"] == "widget")["source_pin"] = "b" * 40
+                elif changed == "catalog":
+                    path = root / "catalogs/landscape/foundation.json"
+                    data = json.loads(path.read_bytes())
+                    data["layers"][0]["winners"][0]["pin"] = "b" * 40
+                elif changed == "registry":
+                    path = root / fs.WAVE_REGISTRY
+                    data = json.loads(path.read_bytes())
+                    data["waves"][0]["sha256"] = "b" * 64
+                else:
+                    path = root / angles[("foundation", "alpha")]["record"]["final_evidence"][0]["e2e_receipt"]
+                    data = json.loads(path.read_bytes())
+                    data["success"] = False
+                original = path.read_bytes()
+                path.write_text(json.dumps(data) + "\n")
+                with self.assertRaises(fs.FinalStackError):
+                    fs.qualify_final_requirements(source, document["layers"], document["runs"], angles)
+                path.write_bytes(original)
+                result = fs.qualify_final_requirements(source, document["layers"], document["runs"], angles)
+                self.assertEqual(result[0]["status"], "qualified")
+                self.assertIs(result[0]["admission_enabled"], False)
+
+    def test_reused_history_reader_cannot_hide_a_changed_ledger_and_recovers(self):
+        root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+        source = fs.Sources(root)
+        ledger = source.json(fs.LEDGER)
+        row = source.json("catalogs/landscape/foundation.json")["layers"][0]
+        consumed = ledger["sweeps"][0]["manifest_ref"]
+        self.assertEqual(fs.qualify_final_history(source, ("foundation", "alpha"), consumed, row)["status"],
+                         "qualified")
+        path = root / fs.LEDGER
+        original = path.read_bytes()
+        current = json.loads(original)
+        current["sweeps"][-1].update(status="stopped", lower_bound_usage=True)
+        current = sl_rechain(current)
+        path.write_text(json.dumps(current) + "\n")
+        self.assertEqual(sl.check_ledger(root, current), [])
+        with self.assertRaisesRegex(fs.FinalStackError, "incomplete, changed or pending"):
+            fs.qualify_final_history(source, ("foundation", "alpha"), consumed, row)
+        path.write_bytes(original)
+        self.assertEqual(fs.qualify_final_history(source, ("foundation", "alpha"), consumed, row)["status"],
+                         "qualified")
+
+    def test_current_run_with_another_repository_cannot_qualify_a_retained_winner(self):
+        root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+        _, document, angles = self.qualification_packet(root)
+        path = root / fs.STACK
+        stack = json.loads(path.read_bytes())
+        next(component for component in stack["components"] if component["id"] == "widget")[
+            "repository"] = "https://github.com/example/unrelated"
+        path.write_text(json.dumps(stack) + "\n")
+        source = fs.Sources(root)
+        current_runs = fs.build_runs(fs.run_records(source))
+        with self.assertRaisesRegex(fs.FinalStackError, "condition 2.*winner.*run"):
+            fs.qualify_final_requirements(source, document["layers"], current_runs, angles)
+
+    def test_current_run_without_a_repository_retains_the_native_id_join(self):
+        root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+        _, document, angles = self.qualification_packet(root)
+        path = root / fs.STACK
+        stack = json.loads(path.read_bytes())
+        next(component for component in stack["components"] if component["id"] == "widget").pop("repository")
+        path.write_text(json.dumps(stack) + "\n")
+        source = fs.Sources(root)
+        current_runs = fs.build_runs(fs.run_records(source))
+        result = fs.qualify_final_requirements(source, document["layers"], current_runs, angles)
+        self.assertEqual(result[0]["status"], "qualified")
+        self.assertIs(result[0]["admission_enabled"], False)
+
     def test_malformed_uri_in_an_additional_e2e_citation_is_refused(self):
         root = self.native_fixture("requirement_sha256", "completed", refutation=True)
         source, document, angles = self.qualification_packet(root)
@@ -167,6 +251,50 @@ class NativeHistoryQualificationTests(FixtureTestCase):
         self.assertEqual(len(result["checked_sweeps"]), 2)
         self.assert_final_disabled(root)
 
+    def test_symbolic_reopening_identifier_is_not_a_file_dependency(self):
+        root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+        ledger = json.loads((root / fs.LEDGER).read_bytes())
+        ledger["sweeps"][0]["layers"][0]["reopen"].append({
+            "trigger": "stale_receipt", "ref": "receipt_staleness:fixture-platform/widget",
+        })
+        ledger = sl_rechain(ledger)
+        (root / fs.LEDGER).write_text(json.dumps(ledger) + "\n")
+        self.assertEqual(sl.check_ledger(root, ledger), [])
+        result = self.qualification(root)
+        self.assertEqual(result["status"], "qualified")
+        self.assertIs(result["admission_enabled"], False)
+
+    def test_unrelated_layer_symbolic_reference_does_not_block_qualified_history(self):
+        native = ledger_helpers.FixtureCase()
+        native.setUp()
+        self.addCleanup(native.tearDown)
+        result = ledger_helpers.result()
+        result["layers"][1]["reopen"] = [{
+            "trigger": "stale_receipt", "ref": "receipt_staleness:fixture-platform/unrelated-component",
+        }]
+        ledger = native.appended(result)
+        (native.root / fs.LEDGER).write_text(json.dumps(ledger) + "\n")
+        self.assertEqual(sl.check_ledger(native.root, ledger), [])
+        row = {"catalog": "foundation", "layer_id": "alpha", "alternatives": [],
+               "winners": [{"repository": ledger_helpers.SURV,
+                            "evidence_refs": [fs.LEDGER + "#/sweeps/0"]}]}
+        qualified = fs.qualify_final_history(fs.Sources(native.root), ("foundation", "alpha"),
+                                             ledger["sweeps"][0]["manifest_ref"], row)
+        self.assertEqual(qualified["status"], "qualified")
+        self.assertIs(qualified["admission_enabled"], False)
+
+    def test_post_anchor_symbolic_reopening_refuses_by_native_history_semantics(self):
+        root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+        ledger = json.loads((root / fs.LEDGER).read_bytes())
+        ledger["sweeps"][-1]["layers"][0]["reopen"].append({
+            "trigger": "stale_receipt", "ref": "receipt_staleness:fixture-platform/widget",
+        })
+        ledger = sl_rechain(ledger)
+        (root / fs.LEDGER).write_text(json.dumps(ledger) + "\n")
+        self.assertEqual(sl.check_ledger(root, ledger), [])
+        with self.assertRaisesRegex(fs.FinalStackError, "incomplete, changed or pending"):
+            self.qualification(root)
+
     def test_missing_native_v2_projection_is_refused_before_replay(self):
         for field in ("eligible_field", "pending", "proposed", "manifest_ref"):
             with self.subTest(field=field):
@@ -179,6 +307,20 @@ class NativeHistoryQualificationTests(FixtureTestCase):
                 (root / fs.LEDGER).write_text(json.dumps(sl_rechain(ledger)) + "\n")
                 with self.assertRaisesRegex(fs.FinalStackError, "native ledger integrity"):
                     self.qualification(root)
+
+    def test_unrepaired_consumed_discovery_failure_refuses_qualification(self):
+        root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+        path = root / fs.LEDGER
+        complete = path.read_bytes()
+        ledger = json.loads(complete)
+        ledger["sweeps"] = ledger["sweeps"][:1]
+        ledger = sl_rechain(ledger)
+        path.write_text(json.dumps(ledger) + "\n")
+        self.assertEqual(sl.check_ledger(root, ledger), [])
+        with self.assertRaisesRegex(fs.FinalStackError, "unresolved.*discovery"):
+            self.qualification(root)
+        path.write_bytes(complete)
+        self.assertEqual(self.qualification(root)["status"], "qualified")
 
     def test_retained_raw_failure_cannot_be_hidden_by_valid_looking_projection(self):
         root = self.native_fixture("requirement_sha256", "completed", refutation=True)
@@ -214,6 +356,72 @@ class NativeHistoryQualificationTests(FixtureTestCase):
         result = fs.qualify_final_history(fs.Sources(native.root), ("foundation", "alpha"), consumed, row)
         self.assertEqual(result["status"], "qualified")
         self.assertIs(result["admission_enabled"], False)
+
+    def test_native_v1_dispositions_bind_same_or_later_covering_ledger_events(self):
+        native = ledger_helpers.FixtureCase()
+        native.setUp()
+        self.addCleanup(native.tearDown)
+        ledger = native.ledger()
+        for ident in ("fx-1", "fx-2", "fx-3"):
+            result = ledger_helpers.result(ident, ledger_helpers.SWEEP_DAYS[ident])
+            if ident == "fx-3":
+                manifest_ref, _, returns_ref = ledger_helpers.paths(ident)
+                manifest = json.loads((native.root / manifest_ref).read_bytes())
+                manifest["foundation"][0]["candidates"] = []
+                ledger_helpers.write(native.root, manifest_ref, manifest)
+                returned = json.loads((native.root / returns_ref).read_bytes())
+                returned["discovery"]["alpha"]["proposed"] = []
+                ledger_helpers.write(native.root, returns_ref, returned)
+                result["layers"][0].update(proposed=[], survived=[], refuted=[])
+                ledger_helpers.register(native.root)
+            ledger = sl.append(native.root, ledger, result)
+        ledger_helpers.write(native.root, fs.LEDGER, ledger)
+        self.assertEqual(sl.check_ledger(native.root, ledger), [])
+        consumed = ledger["sweeps"][0]["manifest_ref"]
+        # fx-2 retains the last survival; fx-3's complete empty discovery
+        # cannot settle it by omission. Only a same/later disposition can.
+        for role in ("winners", "alternatives"):
+            for binding, accepted in ((None, False), (0, False), (99, False), (1, True), (2, True)):
+                with self.subTest(role=role, binding=binding):
+                    entry = {"repository": ledger_helpers.SURV,
+                             "evidence_refs": [] if binding is None else [fs.LEDGER + f"#/sweeps/{binding}"]}
+                    if role == "alternatives":
+                        entry.update(disposition="out_of_scope", why_not_default="Outside the frozen role.")
+                    row = {"catalog": "foundation", "layer_id": "alpha", "winners": [], "alternatives": [],
+                           role: [entry]}
+                    if accepted:
+                        result = fs.qualify_final_history(fs.Sources(native.root), ("foundation", "alpha"),
+                                                           consumed, row)
+                        self.assertEqual(result["status"], "qualified")
+                        self.assertIs(result["admission_enabled"], False)
+                    else:
+                        reason = "retained evidence" if binding == 99 else "unresolved survivors"
+                        with self.assertRaisesRegex(fs.FinalStackError, reason):
+                            fs.qualify_final_history(fs.Sources(native.root), ("foundation", "alpha"), consumed, row)
+
+    def test_native_v2_refutation_mutations_refuse_direct_history_qualification(self):
+        for mutation in ("unknown_vote", "missing_reference", "wrong_identity", "wrong_evidence_key",
+                         "wrong_repository", "wrong_outcome"):
+            with self.subTest(mutation=mutation):
+                root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+                self.assertEqual(self.qualification(root)["status"], "qualified")
+                ledger = json.loads((root / fs.LEDGER).read_bytes())
+                entry = ledger["sweeps"][-1]["layers"][0]["refuted"][0]
+                if mutation == "unknown_vote":
+                    entry["fit"]["vote"] = "unrecognized"
+                elif mutation == "missing_reference":
+                    entry["fit"]["ref"] = "evidence/artifacts/fixture/missing-vote.json"
+                elif mutation == "wrong_identity":
+                    entry["candidate_key"] = "foundation/alpha/wrong/identity"
+                elif mutation == "wrong_evidence_key":
+                    entry["evidence_key"] = "foundation/alpha/wrong/evidence"
+                elif mutation == "wrong_repository":
+                    entry["repo"] = "https://github.com/example/wrong-refutation-target"
+                else:
+                    entry["material"] = True
+                ledger_helpers.write(root, fs.LEDGER, sl_rechain(ledger))
+                with self.assertRaisesRegex(fs.FinalStackError, "native ledger integrity"):
+                    self.qualification(root)
 
     def test_native_stopped_or_changed_history_never_qualifies(self):
         for field in ("requirement_sha256", "platform_profiles_sha256"):

@@ -19328,8 +19328,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-final-evidence-qualification.md",
-      "sha256": "aa9a049a8789bcbcbd5c7dfc389c660495e36b87aa929f065dc7ca900d0eb92b",
-      "bytes": 6484
+      "sha256": "e83166d9027f003c365e3707b388cb8b8bde4d071446ca3c0b23d34ba0c2e135",
+      "bytes": 11642
     },
     {
       "path": "docs/decisions/2026-10-15-jev-scored-contract-corrections.md",
@@ -23093,8 +23093,8 @@
     },
     {
       "path": "evidence/artifacts/final-evidence-qualification-20261015/checks.json",
-      "sha256": "47cded4eaadedd11eda3ace5248cb53b9c7433a3c5ac64d756f3fe541a56297e",
-      "bytes": 3659
+      "sha256": "260bd290a101e970be0846d7fdb24b83e8d1c2297fbcbf3a9a98c44ed265ba45",
+      "bytes": 6908
     },
     {
       "path": "evidence/artifacts/final-evidence-qualification-20261015/source-reads.json",
@@ -63038,8 +63038,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "6045f1d0ce3d5b912496c291b21aa04d449209bf5879eb17c46aa6dbf2b62a6a",
-      "bytes": 92923
+      "sha256": "bbaa4f40241b95e37c2c2d0b496a249e557eb296e58658400bbbafe959f0f764",
+      "bytes": 94458
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -64123,8 +64123,8 @@
     },
     {
       "path": "tests/test_final_admission_checks.py",
-      "sha256": "3f27140fee40444ec1d2c65c7143e8a77cfb1aa76b41579149259751dd6caa27",
-      "bytes": 17689
+      "sha256": "9ed7e373079291d40d51c86f42c0a086542f61168e99e802e78666d09be88e88",
+      "bytes": 30405
     },
     {
       "path": "tests/test_final_disabled.py",
@@ -64133,8 +64133,8 @@
     },
     {
       "path": "tests/test_final_history_ordering.py",
-      "sha256": "37680d4f678cd84b02d320792a4876c2583ce1673b6e6377285ef5dccd9ae821",
-      "bytes": 7875
+      "sha256": "8c5a5c0a79cffe8f52211ad314e65c1fe833f00e028727c63b8c71921587eb4f",
+      "bytes": 8351
     },
     {
       "path": "tests/test_final_ordering.py",
@@ -64443,8 +64443,8 @@
     },
     {
       "path": "tests/test_local_pages_architecture_manifest.py",
-      "sha256": "8024c909974e7bcb8b6f84efe65a86e6eb4ff814d29586b411471ecb453b01f0",
-      "bytes": 28470
+      "sha256": "f8cec8980cdabdccfadb9ed790de259f65e01c0381b460a3b4b93720b1890c64",
+      "bytes": 29029
     },
     {
       "path": "tests/test_local_pages_architecture_sources.py",
@@ -65668,8 +65668,8 @@
     },
     {
       "path": "tools/local-pages/architecture_manifest.py",
-      "sha256": "96585cd6f67f1baaf59a33a84c8f08b66fe6c4b8f2607156ec2d8659b37c7d3b",
-      "bytes": 54212
+      "sha256": "0d96be3fbe49df8bf2153cbfea19e268bbc149cb570f318b7253e4497afb2d3d",
+      "bytes": 54269
     },
     {
       "path": "tools/local-pages/architecture_mapping.json",

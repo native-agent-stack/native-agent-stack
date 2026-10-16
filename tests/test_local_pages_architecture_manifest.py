@@ -159,6 +159,13 @@ class ManifestProjectionTests(ManifestFixture):
         self.assertEqual(MANIFEST.layer_status("FINAL"), "unreported")
         self.assertEqual(after["views"]["matrix"]["rows"][1]["status"], "unreported")
         self.assertEqual(after["views"]["matrix"]["rows"][0], before["views"]["matrix"]["rows"][0])
+        self.assertTrue(all(winner["status"] == "unreported"
+                            for winner in after["views"]["matrix"]["rows"][1]["winners"]))
+        items = [item for stage in after["views"]["desk"]["stages"] for item in stage["items"]
+                 if item["layer"] == "market-data-reference"]
+        self.assertTrue(any(item["kind"] == "verdict FINAL" and item["status"] == "unreported"
+                            for item in items))
+        self.assertTrue(all(item["status"] == "unreported" for item in items if item["kind"] == "winner"))
 
     def test_absent_records_leave_views_unreported_without_reading(self):
         for relative in PATHS.values():

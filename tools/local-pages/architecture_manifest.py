@@ -139,7 +139,8 @@ class _Projector:
                 platform = platforms.get(PLATFORM) if isinstance(platforms.get(PLATFORM), dict) else {}
                 state = self.ident(platform.get("e2e_state"))
                 winners.append({"id": identity, "pin": self.text(winner.get("pin"), 200),
-                                "host_e2e": state, "status": winner_status(state)})
+                                "host_e2e": state,
+                                "status": "unreported" if verdict == "FINAL" else winner_status(state)})
             projected.append({"key": f"{catalog}:{layer_id}", "catalog": catalog, "layer_id": layer_id,
                               "title": self.text(row.get("title"), 120) or layer_id,
                               "verdict_status": self.ident(verdict) or "unreported",
@@ -274,7 +275,7 @@ def _desk(matrix: dict | None, gates: dict | None, runtime: dict | None) -> dict
         result = []
         for layer_id in layer_ids:
             row = rows.get(layer_id)
-            if row and row["verdict_status"] not in ("recorded", "FINAL"):
+            if row and row["verdict_status"] != "recorded":
                 result.append({"name": row["title"], "kind": "verdict " + row["verdict_status"].replace("_", " "), "status": row["status"], "layer": layer_id})
             for winner in (row or {}).get("winners", []):
                 result.append({"name": winner["id"], "kind": "winner", "status": winner["status"], "layer": layer_id, "host_e2e": winner["host_e2e"]})

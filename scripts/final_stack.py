@@ -693,10 +693,9 @@ def final_reopened_by(sources: Sources, key: tuple[str, str], later: list[dict],
             if not isinstance(markers, list):
                 raise FinalStackError("FINAL reopening requires retained change evidence")
             for marker in markers:
-                if not isinstance(marker, dict) or marker.get("trigger") not in saturation_ledger.REOPEN_TRIGGERS:
+                if (not isinstance(marker, dict) or marker.get("trigger") not in saturation_ledger.REOPEN_TRIGGERS
+                    or not isinstance(marker.get("ref"), str) or not marker["ref"].strip()):
                     raise FinalStackError("FINAL reopening requires retained change evidence")
-                retained_final_reference(sources, marker.get("ref"),
-                                         "FINAL reopening requires retained change evidence")
             admitted = admitted and all(isinstance(row.get(field), str)
                 and saturation_ledger.HEX64.fullmatch(row[field])
                 and row[field] == baseline_row[field] for field in fields)
@@ -735,6 +734,8 @@ def qualify_final_history(sources: Sources, key: tuple[str, str], consumed_manif
     Native integrity precedes interpretation of any projected field. Every
     covering ledger event participates; dates are retained only as metadata.
     """
+    supplied_sources = sources
+    sources = Sources(supplied_sources.root)
     ledger = sources.json(LEDGER)
     try:
         problems = saturation_ledger.check_ledger(sources.root, ledger)
@@ -748,6 +749,15 @@ def qualify_final_history(sources: Sources, key: tuple[str, str], consumed_manif
         if isinstance(value, dict):
             for name, child in value.items():
                 if isinstance(child, str) and (name.endswith("_ref") or name in ("ref", "source_review")):
+                    if name == "ref" and value.get("trigger") in saturation_ledger.REOPEN_TRIGGERS:
+                        # Native reopen refs can be symbolic event identifiers
+                        # (saturation_ledger.external_triggers), not file paths.
+                        try:
+                            path = sources.path(child.partition("#")[0])
+                        except FinalStackError:
+                            continue
+                        if not path.is_file():
+                            continue
                     sources.read_bytes(child.partition("#")[0])
                 retain(child)
         elif isinstance(value, list):
@@ -769,9 +779,13 @@ def qualify_final_history(sources: Sources, key: tuple[str, str], consumed_manif
     later = [sweep for sweep in covering if sweep["ledger_index"] > baseline["ledger_index"]]
     if final_reopened_by(sources, key, later, baseline):
         raise FinalStackError("FINAL history contains an incomplete, changed or pending covering sweep")
+    if not later and any(marker.get("trigger") == "retained_failure"
+                         for marker in baseline_rows[0].get("reopen", [])):
+        raise FinalStackError("FINAL baseline has unresolved retained discovery failures")
     survivors = final_unresolved_survivors(sources, {**row, "catalog": key[0]}, covering)
     if survivors:
         raise FinalStackError("FINAL history has cumulative unresolved survivors")
+    supplied_sources.hashes.update(sources.hashes)
     return {"status": "qualified", "admission_enabled": False,
             "baseline_sweep": baseline["sweep_id"],
             "checked_sweeps": [sweep["sweep_id"] for sweep in covering], "survivors": survivors}
@@ -1035,6 +1049,8 @@ def qualify_final_requirements(sources: Sources, layers: list[dict], runs: list[
     """Evaluate native evidence without authorizing or publishing FINAL admission."""
     if not any(layer.get("terminal_state") == "FINAL" for layer in layers):
         return []
+    supplied_sources = sources
+    sources = Sources(supplied_sources.root)
     angle_records = angle_validator()
     try:
         current_angles = angle_records.load_records(sources)
@@ -1045,6 +1061,7 @@ def qualify_final_requirements(sources: Sources, layers: list[dict], runs: list[
     if build_runs(run_records(sources)) != runs:
         raise FinalStackError("FINAL requires current run pins, not a retained qualification packet")
     by_run = {run["id"]: run for run in runs}
+    by_repository = {run["repository"]: run for run in runs if run["repository"]}
     qualified = []
     for layer in layers:
         if layer["terminal_state"] != "FINAL":
@@ -1081,6 +1098,12 @@ def qualify_final_requirements(sources: Sources, layers: list[dict], runs: list[
                      for winner in layer["winners"]]
         if raw_row.get("verdict_status") not in ("recorded", "FINAL") or actual != projected:
             fail("requires the current recorded winners")
+        held = (isinstance(raw_row.get("current_adoption_status"), str)
+                and raw_row["current_adoption_status"].startswith("held"))
+        for raw_winner, winner in zip(_dicts(raw_row.get("winners")), layer["winners"]):
+            current = build_winner(raw_winner, {}, by_repository, by_run, held)
+            if (winner.get("run"), winner.get("pin_drift")) != (current["run"], current["pin_drift"]):
+                fail("condition 2 requires the current winner-to-run association")
         if any(value not in (None, "FINAL") for value in
                (raw_row.get("terminal_state"), entry["record"].get("terminal_state"))):
             fail("conflicting terminal-state claims")
@@ -1127,6 +1150,7 @@ def qualify_final_requirements(sources: Sources, layers: list[dict], runs: list[
             except FinalStackError as error:
                 fail(str(error))
         qualified.append({"catalog": key[0], "layer_id": key[1], **history})
+    supplied_sources.hashes.update(sources.hashes)
     return qualified
 
 

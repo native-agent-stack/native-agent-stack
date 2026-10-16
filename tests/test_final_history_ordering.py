@@ -85,8 +85,9 @@ def event_date_violations(trees):
         for node in ast.walk(function):
             if isinstance(node, ast.Compare) and date_value(node):
                 failures.append((key, node.lineno))
-            if (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
-                and node.func.id in ("sorted", "min", "max")):
+            if (isinstance(node, ast.Call)
+                and ((isinstance(node.func, ast.Name) and node.func.id in ("sorted", "min", "max"))
+                     or (isinstance(node.func, ast.Attribute) and node.func.attr == "sort"))):
                 keys = [keyword.value for keyword in node.keywords if keyword.arg == "key"]
                 values = keys or node.args
                 if any(date_value(value) for value in values):
@@ -154,3 +155,10 @@ class QualificationOrderingOracleTests(unittest.TestCase):
                              if not isinstance(node, ast.FunctionDef) or node.name != "qualify_final_history"]
         with self.assertRaisesRegex(AssertionError, "entry point must exist"):
             event_date_violations(trees)
+
+    def test_oracle_rejects_list_sort_by_event_date(self):
+        trees = source_trees()
+        target = next(n for n in trees["fs"].body if isinstance(n, ast.FunctionDef)
+                      and n.name == "final_reopened_by")
+        target.body.extend(ast.parse('later.sort(key=lambda sweep: sweep.get("date"))').body)
+        self.assertTrue(event_date_violations(trees))
