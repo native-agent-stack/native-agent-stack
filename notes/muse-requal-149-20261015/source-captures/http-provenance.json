@@ -1,0 +1,121 @@
+{
+  "schema": "muse-public-source-refetch/1",
+  "method": "Fresh anonymous HTTPS requests with Cache-Control: no-cache, independent of the installer and earlier retained snapshots; not a second-reviewer attestation.",
+  "sources": [
+    {
+      "requested_url": "https://dev.meta.ai/install.sh",
+      "response_url": "https://dev.meta.ai/install.sh",
+      "http_status": 200,
+      "read_utc": "2026-10-15T22:27:28.660378+00:00",
+      "headers": {
+        "Date": "Thu, 15 Oct 2026 22:27:28 GMT",
+        "Content-Type": "text/plain; charset=utf-8",
+        "ETag": "\"5369de5c2c7a2dbb59382c61f601cd4b\"",
+        "Last-Modified": "Thu, 15 Oct 2026 22:09:00 GMT"
+      },
+      "matches_prior_snapshot": true,
+      "capture_format": "private vendor snapshot; SHA256 identifies stored UTF-8 representation with one terminal newline, not an independently preserved HTTP byte stream",
+      "capture_sha256": "5196d820127a241211c96cf38f0b2e30cff8506a82e9da9508cd5f826632a0ca",
+      "private_custody": "seathatflowsinourveins/horizon:vendor/muse-code/1.4.9-R6297.1/install.sh"
+    },
+    {
+      "requested_url": "https://api.meta.ai/muse-launcher.sh",
+      "response_url": "https://api.meta.ai/muse-launcher.sh",
+      "http_status": 200,
+      "read_utc": "2026-10-15T22:27:28.634426+00:00",
+      "headers": {
+        "Date": "Thu, 15 Oct 2026 22:27:28 GMT",
+        "Content-Type": "application/octet-stream",
+        "X-Content-SHA256": "c6db294799a190ca380da274beb3b9c0e160e0da9681a3d364ce8b0e5fa3a4bc"
+      },
+      "matches_prior_snapshot": true,
+      "capture_format": "private vendor snapshot; SHA256 identifies stored UTF-8 representation with one terminal newline, not an independently preserved HTTP byte stream",
+      "capture_sha256": "c6db294799a190ca380da274beb3b9c0e160e0da9681a3d364ce8b0e5fa3a4bc",
+      "private_custody": "seathatflowsinourveins/horizon:vendor/muse-code/1.4.9-R6297.1/muse-launcher.sh"
+    },
+    {
+      "requested_url": "https://api.meta.ai/muse-code/channels/muse-stable",
+      "response_url": "https://api.meta.ai/muse-code/channels/muse-stable",
+      "http_status": 200,
+      "read_utc": "2026-10-15T22:27:28.729271+00:00",
+      "headers": {
+        "Date": "Thu, 15 Oct 2026 22:27:28 GMT",
+        "Content-Type": "application/json"
+      },
+      "matches_prior_snapshot": true,
+      "capture_format": "verbatim public response, terminal newline normalized",
+      "capture_sha256": "5cd61c6c7768db4efecd6d551be921a453a9160953bc05a77dbf4e6bb5b10648",
+      "capture_path": "notes/muse-requal-149-20261015/vendor/stable.json"
+    },
+    {
+      "requested_url": "https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=1.4.9-R6297.1&file=manifest.json",
+      "response_url": "https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=1.4.9-R6297.1&file=manifest.json",
+      "http_status": 200,
+      "read_utc": "2026-10-15T22:27:28.707361+00:00",
+      "headers": {
+        "Date": "Thu, 15 Oct 2026 22:27:28 GMT",
+        "Content-Type": "application/json",
+        "ETag": "7471045108421188569"
+      },
+      "matches_prior_snapshot": true,
+      "capture_format": "verbatim public response, terminal newline normalized",
+      "capture_sha256": "d14533656d1c15377630e1b032a3f8dd517621f14e403dcde17d5fac0486acb4",
+      "capture_path": "notes/muse-requal-149-20261015/vendor/manifest-149.json"
+    },
+    {
+      "requested_url": "https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=1.4.7-R6101.1&file=manifest.json",
+      "response_url": "https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=1.4.7-R6101.1&file=manifest.json",
+      "http_status": 200,
+      "read_utc": "2026-10-15T22:27:28.761632+00:00",
+      "headers": {
+        "Date": "Thu, 15 Oct 2026 22:27:28 GMT",
+        "Content-Type": "application/json",
+        "ETag": "2273596437534799575"
+      },
+      "matches_prior_snapshot": true,
+      "capture_format": "verbatim public response, terminal newline normalized",
+      "capture_sha256": "4b157c4922ba954979ea8c255e13049bdfa46c89575341febf275763e114a207",
+      "capture_path": "notes/muse-requal-149-20261015/vendor/manifest-147.json"
+    },
+    {
+      "requested_url": "https://dev.meta.ai/docs/muse-code",
+      "response_url": "https://dev.meta.ai/docs/muse-code",
+      "http_status": 200,
+      "read_utc": "2026-10-15T22:27:28.971669+00:00",
+      "headers": {
+        "Date": "Thu, 15 Oct 2026 22:27:28 GMT",
+        "Content-Type": "text/html; charset=utf-8"
+      },
+      "capture_format": "full overview HTML text extraction, scripts/styles excluded; SHA256 identifies stored text with one terminal newline, not HTTP bytes",
+      "capture_sha256": "d9a80d31b162c8019f58d0249ab2273e3ed0789b336d82f3374aabc68a348840",
+      "capture_path": "notes/muse-requal-149-20261015/source-captures/overview.txt"
+    },
+    {
+      "requested_url": "https://dev.meta.ai/docs/muse-code/configuration",
+      "response_url": "https://dev.meta.ai/docs/muse-code/configuration",
+      "http_status": 200,
+      "read_utc": "2026-10-15T22:27:28.959651+00:00",
+      "headers": {
+        "Date": "Thu, 15 Oct 2026 22:27:28 GMT",
+        "Content-Type": "text/html; charset=utf-8"
+      },
+      "capture_format": "full configuration HTML text extraction, scripts/styles excluded; SHA256 identifies stored text with one terminal newline, not HTTP bytes",
+      "capture_sha256": "cb1f15a68b9eb97d6df2a733e001c1e2b04d46da182cdb4e6ec426bc1e2e0246",
+      "capture_path": "notes/muse-requal-149-20261015/source-captures/configuration.txt"
+    },
+    {
+      "requested_url": "https://dev.meta.ai/docs/muse-code/changelog",
+      "response_url": "https://dev.meta.ai/docs/muse-code/changelog",
+      "http_status": 200,
+      "read_utc": "2026-10-15T22:27:29.091862+00:00",
+      "headers": {
+        "Date": "Thu, 15 Oct 2026 22:27:29 GMT",
+        "Content-Type": "text/html; charset=utf-8"
+      },
+      "matches_prior_release_items": true,
+      "capture_format": "release-note items scoped to 1.4.8 and 1.4.9; SHA256 identifies extracted stored text with one terminal newline, not HTTP bytes",
+      "capture_sha256": "805c24d67454b721e4598b4cdd2ef1b6b5bec4d0a22761cb771ae5de15b41954",
+      "capture_path": "notes/muse-requal-149-20261015/source-captures/release-notes.txt"
+    }
+  ]
+}

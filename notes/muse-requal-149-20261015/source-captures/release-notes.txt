@@ -1,0 +1,93 @@
+01 | 1.4.9 | --disable-request-user-input (TUI, muse exec, muse serve) withholds request_user_input from the main conversation (side chats keep it), so an unattended run never stops to wait on a question; a call naming it gets an unavailable-tool error instead. --yolo implies the flag on the TUI and muse exec
+02 | 1.4.9 | Every MCP tools/call Muse sends carries the model's tool-call id in _meta.callId (and the idempotency key when set), so an MCP server can correlate it with the session's tool-call item and dedupe retries
+03 | 1.4.9 | Session-protocol clients receive an approval/reviewing view event while the built-in Auto-review reviewer holds an approval, so a UI can show that the request is under review without asking the user to decide it
+04 | 1.4.9 | Tool-call items in muse serve sessions carry the words a tool declares for the call, with running, done and neutral forms, so apps can say what a call does instead of showing the tool name
+05 | 1.4.9 | Session-protocol clients: view cursors are now minted in the v4: spelling; a cursor in the previous v3: spelling is refused once with the standard "reopen without a cursor" guidance, and a view cache saved under the previous generation is rebuilt on first use, so no client silently skips events now that the Auto-review hold folds its own approval/reviewing event into older sessions
+06 | 1.4.9 | Sapling commands now work inside the sandboxed shell on EdenFS checkouts
+07 | 1.4.9 | Clear interrupt status when the interrupted run ends
+08 | 1.4.9 | Long sessions no longer summarize the same history again at every turn when a context checkpoint cannot be saved
+09 | 1.4.9 | Long sessions with an active goal that start more than one subagent compact their context again, instead of retrying a summary on every turn that never takes effect
+10 | 1.4.9 | Contributor-mode requests with no served model list yet now consistently carry the contributor signal
+11 | 1.4.9 | When muse serve starts without a saved model list and the provider rejects your saved key or sign-in, turns now fail with a sign-in-required error that apps can act on, and reloading the session works once the key is fixed, with no restart
+12 | 1.4.9 | On a muse serve host running the native Auto-review reviewer, an approval the reviewer was holding is handed to the human client when the turn ends before the reviewer decides, and one recovered after a host restart is presented instead of staying hidden; a request the reviewer hands over says so (judgeEscalated)
+13 | 1.4.9 | Rechecks conversation history and restored context before applying a background summary
+14 | 1.4.9 | When a skill you named cannot load, the agent now stops and asks instead of improvising
+15 | 1.4.9 | Hooks and MCP servers now receive PROVENANCE_PROVIDER_SCOPE when the app that launched the session set it
+16 | 1.4.9 | Allow one more attempt to clear old tool results after reopening a session whose required compaction failed
+17 | 1.4.9 | muse serve now closes the open approval of a subagent that has no session log of its own (for example one started by an earlier version) when a session that has not been compacted is resumed after a crash, so a late decision on it reports that it is already resolved instead of not found
+18 | 1.4.9 | A /goal replace question now appears even while a run waits for admission, instead of the submit being silently dropped
+19 | 1.4.9 | muse serve answers plugin/install and the plugin/marketplace* methods for an existing session it has not loaded with sessionNotLoaded, sessionInUse or sessionAmbiguous instead of sessionNotFound, so a client no longer treats a stored session as gone
+20 | 1.4.9 | After a compaction whose history clean-up was refused, the next model step no longer fails with "Origin read requires valid checkpoint-suffix ..."
+21 | 1.4.9 | While idle, muse serve no longer rewrites the lock file of every old empty session it has to keep, or re-reads most sessions it cannot list, every few seconds
+22 | 1.4.9 | Typing stays responsive in long sessions with many subagents
+23 | 1.4.9 | muse serve answers a session/resume that carries a known cursor by reading only the events after that cursor, instead of the whole session history. This includes a cursor taken from a streaming delta, which now resumes after the event it streams from. Such a resume of a session whose history exceeds the 64 MiB read limit now gets its new events instead of noneReason: projectionReadLimit
+24 | 1.4.8 | Pick the permission profile when resuming a served session with the permissionProfile member of session/resume (and the SDK resume option); an id the host does not offer is refused before anything is written
+25 | 1.4.8 | Muse now saves a note when cleanup after a finished turn keeps failing; an older Muse build cannot open a chat that contains this note, so update the app to open it (other chats are unaffected)
+26 | 1.4.8 | The Linux sandbox helper plants in-namespace loopback listeners for listed local ports and bridges them to host loopback (delivery half of network.local_ports; the profile verdict map itself lands with the agent side)
+27 | 1.4.8 | Session protocol now serves the model's narration between tool calls as agentMessage items, and every completed agentMessage says whether it is commentary or the final answer (messagePhase); the Python wire-types package has the matching typed field; view cursors saved by an earlier version are refused (-32011 with reason missingAnchor; the resume guide covers the reopen)
+28 | 1.4.8 | --preset empty starts a session with no built-in tools; the model gets only the tools of MCP servers you configured
+29 | 1.4.8 | Apps connected to muse serve can follow a running subagent live by subscribing to its session, and unsubscribing from a subagent session no longer fails
+30 | 1.4.8 | Monitor feed lines are recorded as monitorFeed items; builds older than this change cannot open a chat containing one (updating fixes it)
+31 | 1.4.8 | skill/list rows include an optional title with the name a skill declares for people to read, beside the unchanged displayName
+32 | 1.4.8 | When a plugin hook finishes, helper processes it left running in the background are stopped so the plugin's installed files can be released; hooks configured in settings keep their existing background-helper behavior
+33 | 1.4.8 | SessionStart hooks report clear and compact as their source on the runtime's own /clear and compaction boundaries, so a hook that matches only startup no longer runs there
+34 | 1.4.8 | A permission-profile change made over the session protocol records the client's name on the durable audit fact and in the experimental session/permissionProfileChanged notification; a forked session's own fork entry carries no name until the child records a change of its own, and the fork is refused when the parent's retained history and live state disagree on the recorded name; an older Muse build cannot open a chat whose permission profile a newer build changed, so update the app to open it (other chats are unaffected)
+35 | 1.4.8 | Auto-review now hands an action to you for approval once the reviewer has used 15 steps without reaching a decision, instead of letting a single review run for dozens of steps and use many tokens
+36 | 1.4.8 | muse serve sessions started after the startup model list finishes loading, or after a login, use the sandbox the server checked at startup instead of checking it again for every session
+37 | 1.4.8 | Repeated status lines between commands no longer flood the transcript; the commands fold into one row
+38 | 1.4.8 | Resuming a session after its latest run was interrupted keeps the earlier title and history readable
+39 | 1.4.8 | Resuming a session keeps earlier run history readable after a later run replaces it
+40 | 1.4.8 | Paging through a large tool output in a muse serve client no longer re-reads the whole session for every later page while the session log is unchanged
+41 | 1.4.8 | Resuming a session again in the same muse serve process after its earlier load ended without a clean shutdown now reports the session as in use instead of risking a damaged session log
+42 | 1.4.8 | Forking a session with no turns yet no longer fails when background cleanup runs at the same moment
+43 | 1.4.8 | A question asked during goal-carried work without its own timeout now times out after 5 minutes (recorded as timed_out; no answer is chosen for you) instead of parking the run indefinitely; touching the prompt still cancels that safety deadline, and ordinary interactive questions keep waiting with no deadline
+44 | 1.4.8 | Claude plugins whose command files are up to 256 KiB now install
+45 | 1.4.8 | The verify reminder no longer pushes the agent past a question it asked you; it nudges only when the agent calls work done without running it
+46 | 1.4.8 | Sessions keep the selected model's output limit after model changes and reloads
+47 | 1.4.8 | Resuming a session keeps compaction usable after a later run takes over
+48 | 1.4.8 | Over muse serve, a session that lost saved records now opens with the rest of its history instead of failing with "projection unavailable"
+49 | 1.4.8 | The startup trust prompt no longer times out under terminals that report the cursor slowly, such as Zellij
+50 | 1.4.8 | Preserve measured context usage when resuming a session
+51 | 1.4.8 | After Muse restarts, a Workflow agent call whose saved start record is missing or incomplete, or whose agent definition is gone or no longer matches how the call started, now fails on its own with a result that says what happened and what to do next, instead of failing the whole Workflow
+52 | 1.4.8 | Running plugin hooks and MCP servers keep their original installed files available through completion and child cleanup when a newer plugin version is installed
+53 | 1.4.8 | Workflow subagents that pick their own model keep working when you resume a session with --model and later resume it without the flag (sessions resumed with --model on an earlier version are not repaired)
+54 | 1.4.8 | Startup notices for MCP servers the managed policy does not admit now appear even when a required MCP server fails to start
+55 | 1.4.8 | sl and hg commands that use globs or braces, such as sl status *.rs, now ask for approval like git commands do
+56 | 1.4.8 | Read-only Sapling commands such as sl status, sl log and hg diff are now treated like their git equivalents
+57 | 1.4.8 | Resuming a workflow after tbh stopped no longer fails the whole run when an agent call was still waiting for a free agent slot; that call now starts normally
+58 | 1.4.8 | muse resume no longer refuses a session whose journal head was pruned when a checkpoint anchors the suffix; the no-anchor case names the recovery
+59 | 1.4.8 | Sessions that muse serve recorded under the old muse provider label keep their reasoning after a model change and a restart, instead of dropping it or failing every turn once compacted
+60 | 1.4.8 | Resuming a workflow no longer requires repeating its name
+61 | 1.4.8 | Runtime-owned child runs (branches, side chats, subagents) no longer re-fire the root session's SessionStart hooks
+62 | 1.4.8 | Prompt hints and away recaps wait for a session's SessionStart hooks to finish before they run
+63 | 1.4.8 | Fix completed workflows reappearing as running after resuming a compacted session
+64 | 1.4.8 | Plan files under .agents/plans/ no longer raise an approval card — the directory is an ordinary writable workspace path, while the rest of .agents stays protected
+65 | 1.4.8 | When Muse resumes a Workflow after a restart and the script finishes without waiting for an agent call that Muse held back, Muse now tells you which call did not run, why, and what to do next, instead of reporting plain success
+66 | 1.4.8 | When a chat is stuck retrying a save that failed, ! shell commands, /compact and new turns over muse serve now fail at once with the "saving failed … retrying automatically" message instead of a busy answer
+67 | 1.4.8 | muse serve now re-asks a pending approval with approval/request when a multi-stage approval moves on to its next stage, and when a client replays its session/start after a host restart, so session protocol clients see the prompt instead of a turn that waits forever
+68 | 1.4.8 | muse exec waits for context compaction to finish before exiting, so resumed sessions keep their compacted summary
+69 | 1.4.8 | On Windows, renaming a session now fails with a plain "not supported on this platform" error (session/rename is not supported on this platform) instead of an internal one, and a client that requests the new sessionRename capability at connect time learns that rename is unavailable there. CapabilityName gains a SessionRename variant; exhaustive matches on it need a new arm
+70 | 1.4.8 | A session whose MCP startup could not be audited (its open record was missing or unreadable) now shows one startup notice for each MCP server the managed policy did not admit, beside the audit-failed notice; a session whose every server was refused, which showed nothing before, now shows those notices too
+71 | 1.4.8 | /goal changes no longer freeze the TUI on long sessions; repeat Goal edits now re-read only newly committed run records instead of rescanning every run stream
+72 | 1.4.8 | Compacting a session keeps the request detail the summary needs, so manual compaction rebuilds the exact prefix instead of falling back to a bounded summary
+73 | 1.4.8 | Startup selection now skips a PATH-discovered system Bubblewrap copy that does not advertise every required capability and uses the embedded copy instead; an explicit override missing one fails closed naming the flag
+74 | 1.4.8 | Resending a request after a restart returns the original result instead of running it twice
+75 | 1.4.8 | With contributor mode ON, requests route to the family's -contributor model as soon as a fresh served catalog shows it — including mid-session logins, background refreshes, and late-appearing siblings — instead of sticking to the base model on a stale list
+76 | 1.4.8 | A session whose saved images or videos have wider folder or file permissions than the app creates now resumes, and its videos still send
+77 | 1.4.8 | tbh serve -c settings such as endpoint_transport.base_url now reach the model provider instead of being silently ignored
+78 | 1.4.8 | Opening the transcript link of a memory-only reminder helper, while its chat is open and the helper ran since the chat was opened, now says the helper kept no transcript and names its chat, instead of "session not found"
+79 | 1.4.8 | Explain context compaction failures in plain language
+80 | 1.4.8 | Over muse serve, retrying turn/start with the same command id but a different message or options while that turn is still parked (replacing a running turn, waiting for the running turn to finish, or waiting behind a reminder) now fails with command_id_conflict instead of being treated as the original turn
+81 | 1.4.8 | Sessions named more than once (an automatic name counts) open with their full history every time instead of sometimes showing an empty transcript
+82 | 1.4.8 | Keep /side and /btw progress visible while a side chat is starting
+83 | 1.4.8 | SessionStart hook runs no longer appear as hookRun items in the session view stream
+84 | 1.4.8 | Concurrent resumes of a muse serve session no longer run its SessionStart hooks twice
+85 | 1.4.8 | Turning off Contributor mode in settings now fully opts out, including background requests
+86 | 1.4.8 | Keep pending results from an earlier turn intact when the next model response is cut off
+87 | 1.4.8 | A compacted chat whose saved history file was damaged or deleted shows its full history again after the next resume instead of staying empty; a forked chat in that state now says why it cannot resume instead of opening with no history
+88 | 1.4.8 | The permission-profile refusal announced early in the 1.4.6 notes takes effect in this release: profiles the live session cannot enforce are now refused when chosen at launch (--permission-profile or the configured default) instead of silently collapsing to read-only; the refusal names each offending rule with the reason and a remedy (remove or adjust it, or set the temporary escape hatch to run with it unenforced and a warning). Profiles that keep a built-in profile's filesystem rules, :unrestricted included, keep working; profiles that add or change filesystem rules (deny rules included), add workspace_roots, or add Unix-socket rules are refused — most users can delete those rules and relaunch
+89 | 1.4.8 | Long sessions no longer spend more time on every frame keeping the session token totals up to date
+90 | 1.4.8 | Large batches of parallel tool calls now land their results without rescanning the transcript for each one
+91 | 1.4.8 | Bash command results no longer repeat the command back to the model, so a long inline script takes up context once instead of twice
+92 | 1.4.8 | Task panel refreshes stay fast in long sessions with many finished tasks
+93 | 1.4.8 | Opening a long older session for the first time now rebuilds its history many times faster

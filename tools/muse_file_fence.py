@@ -22,7 +22,10 @@ import tempfile
 
 
 MODEL = "muse-wonder-full-1.0"
-VERSION = "1.4.7-R6101.1"
+VERSION = "1.4.9-R6297.1"
+RUNTIME_SHA256 = 'a228010021276e112aa8422eb56ae82c0375405701950f6529bed4c9fe8abe05'
+DEFAULT_RUNTIME = (Path.home() / '.local/share/native-agent-stack/muse-fence/runtimes'
+                   / VERSION / 'muse-bin')
 DEFAULT_LANE = Path.home() / ".local/state/native-agent-stack/coordination/command-center/cc-tools/muse_lane.sh"
 SYSTEM_FILES = ("/etc/resolv.conf", "/etc/hosts", "/etc/nsswitch.conf",
                 "/etc/passwd", "/etc/group", "/etc/localtime")
@@ -120,6 +123,21 @@ def sanitized_settings(source):
             raise ValueError("invalid disclosure preference")
         result[key] = doc[key]
     return result
+
+
+def verify_runtime_identity(runtime):
+    """Check the vendor artifact before any runtime startup or credential bind.
+
+    Identity pin: versioned Meta x86_linux manifest, 1.4.9-R6297.1.
+    CPython 3.13 hashlib.file_digest and os.open supply the native interfaces.
+    Concurrent hostile host mutation remains outside the fence's threat scope.
+    """
+    fd = os.open(runtime, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC)
+    with os.fdopen(fd, 'rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    if digest != RUNTIME_SHA256:
+        raise ValueError('runtime sha256 mismatch')
+    return digest
 
 
 def clean_env(home, logdir):
@@ -472,7 +490,7 @@ print(json.dumps(facts))
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--lane', type=Path, default=DEFAULT_LANE)
-    parser.add_argument('--runtime', type=Path, default=Path.home() / f'.local/bin/muse-bin-{VERSION}')
+    parser.add_argument('--runtime', type=Path, default=DEFAULT_RUNTIME)
     parser.add_argument('--auth', type=Path, default=Path.home() / '.config/muse/auth.json')
     parser.add_argument('--settings', type=Path,
                         help='explicit settings file (must exist); absent default uses inert defaults')
@@ -498,6 +516,7 @@ def main():
             settings = default_settings
     fence = Fence(options.worktree, options.brief, options.logdir, options.runtime,
                   options.auth, settings, options.input, options.toolchain_dir)
+    runtime_sha256 = verify_runtime_identity(fence.runtime)
     lane = checked_path(options.lane)
     lane_sha256 = hashlib.sha256(lane.read_bytes()).hexdigest()
     argv = native_argv(lane, fence.runtime, fence.worktree, fence.brief,
@@ -522,7 +541,7 @@ def main():
                        runtime_version=version.stdout.strip(), started_utc=start,
                        finished_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
                        network='shared host network; no egress allowlist',
-                       argv=argv, lane_sha256=lane_sha256)
+                       argv=argv, lane_sha256=lane_sha256, runtime_sha256=runtime_sha256)
         receipt['toolchain_directories'] = [str(p) for p in fence.toolchain_dirs]
         write_json(fence.artifacts['receipt.json'], receipt)
     print(json.dumps({k: receipt[k] for k in ('exit_code', 'event_count', 'models', 'terminal_counts')}))

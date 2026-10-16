@@ -19327,6 +19327,11 @@
       "bytes": 10680
     },
     {
+      "path": "docs/decisions/2026-10-15-muse-149-requalification.md",
+      "sha256": "f2f1fd2a554eeee2ef99c99005389d68fabec9a8441843f20181d9c3d18a50dc",
+      "bytes": 12956
+    },
+    {
       "path": "docs/decisions/2026-10-15-muse-toolchain-directory-grants.md",
       "sha256": "dbf4d10683700b5455de14e535abdfbc119e8a97b179563d8591cfc1575ec5f6",
       "bytes": 4356
@@ -61857,6 +61862,56 @@
       "bytes": 4900
     },
     {
+      "path": "notes/muse-requal-149-20261015/receipt.md",
+      "sha256": "d7faddf87cc2e95dcf9808de413eeaa577c94687e092dcb5781f0a2472d46152",
+      "bytes": 13374
+    },
+    {
+      "path": "notes/muse-requal-149-20261015/release-notes.txt",
+      "sha256": "2d42853484171c147b026af7aa7ca137a3d67b21c46eb51d64fd3636dac64b79",
+      "bytes": 17351
+    },
+    {
+      "path": "notes/muse-requal-149-20261015/screen.md",
+      "sha256": "1764797382cc502059e47943ec8afefe5a1456e15a0a44e70f7135edd6890fbe",
+      "bytes": 4989
+    },
+    {
+      "path": "notes/muse-requal-149-20261015/source-captures/configuration.txt",
+      "sha256": "cb1f15a68b9eb97d6df2a733e001c1e2b04d46da182cdb4e6ec426bc1e2e0246",
+      "bytes": 9489
+    },
+    {
+      "path": "notes/muse-requal-149-20261015/source-captures/http-provenance.json",
+      "sha256": "5429bdfe8c2a0535f47b8140bb762fafce2502964dc140968646d126312f1644",
+      "bytes": 6355
+    },
+    {
+      "path": "notes/muse-requal-149-20261015/source-captures/overview.txt",
+      "sha256": "d9a80d31b162c8019f58d0249ab2273e3ed0789b336d82f3374aabc68a348840",
+      "bytes": 6041
+    },
+    {
+      "path": "notes/muse-requal-149-20261015/source-captures/release-notes.txt",
+      "sha256": "805c24d67454b721e4598b4cdd2ef1b6b5bec4d0a22761cb771ae5de15b41954",
+      "bytes": 17118
+    },
+    {
+      "path": "notes/muse-requal-149-20261015/vendor/manifest-147.json",
+      "sha256": "4b157c4922ba954979ea8c255e13049bdfa46c89575341febf275763e114a207",
+      "bytes": 1853
+    },
+    {
+      "path": "notes/muse-requal-149-20261015/vendor/manifest-149.json",
+      "sha256": "d14533656d1c15377630e1b032a3f8dd517621f14e403dcde17d5fac0486acb4",
+      "bytes": 1853
+    },
+    {
+      "path": "notes/muse-requal-149-20261015/vendor/stable.json",
+      "sha256": "5cd61c6c7768db4efecd6d551be921a453a9160953bc05a77dbf4e6bb5b10648",
+      "bytes": 255
+    },
+    {
       "path": "notes/muse-toolchain-directory-grants-20261015/controls.json",
       "sha256": "2eabe024a485cbfff5f68841d6e7a8a2f6c5324a895c1fb398c1e8b7819db711",
       "bytes": 1748
@@ -64068,13 +64123,18 @@
     },
     {
       "path": "tests/test_muse_file_fence.py",
-      "sha256": "b3c3a56e4468d0bd17f79629f89cda5110c5cdbbdf414c46b7149bfc3f4c7970",
-      "bytes": 33547
+      "sha256": "12e498dc0c7c0d04b9553326e29c73d618d39bd82fc3a9860f69e50295e18edb",
+      "bytes": 34078
+    },
+    {
+      "path": "tests/test_muse_runtime_currency.py",
+      "sha256": "2a2baaa2884474cb67f628de9b947a72753ba462a2ce7796b35893a40ed07cb9",
+      "bytes": 6070
     },
     {
       "path": "tests/test_muse_toolchain_dirs.py",
-      "sha256": "37ed35b0035545c4b1ef284ee1152c4706bacd969cdb6ad25a396d72c88e9ec0",
-      "bytes": 10422
+      "sha256": "fa8664c64db1ed6c15628b220fffc193ff0a9269d1649f80875605d6595f48db",
+      "bytes": 10391
     },
     {
       "path": "tests/test_nanosecond_replay.py",
@@ -65193,8 +65253,8 @@
     },
     {
       "path": "tools/muse_file_fence.py",
-      "sha256": "d3a23639b61d409504088da0625e9fc721097aed78e881a6ffe06023c1922d11",
-      "bytes": 28268
+      "sha256": "0d8ad38a46ddd595f5a3b79d9789ece1c25c3b4c0e860b638cd4ef8805df9a17",
+      "bytes": 29177
     },
     {
       "path": "tools/omniroute/gateway_record.py",
