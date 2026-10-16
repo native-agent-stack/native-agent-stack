@@ -1,0 +1,4 @@
+nautilus_trader=2.0.0rc5
+alpaca-py=0.44.0
+ibapi=NOT_INSTALLED_IN_PROBED_RUNTIME
+ib_async=NOT_INSTALLED_IN_PROBED_RUNTIME

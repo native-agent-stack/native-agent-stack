@@ -1,0 +1,479 @@
+{
+  "schema_version": 1,
+  "catalog": "us-equities",
+  "layer_id": "execution-broker",
+  "status": "DRAFT_FOR_COOP_TWO_FAMILY_ADJUDICATION",
+  "winner_set": [],
+  "no_single_angle_decides": true,
+  "latest_committed_sweep": "landscape-sweep-20260926",
+  "ledger_ref": "catalogs/saturation/ledger.json:6776",
+  "returns_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker",
+  "retained_reopen": [
+    {
+      "trigger": "retained_failure",
+      "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/execution-broker"
+    }
+  ],
+  "scope_limit": "Delta only: nine carried survivors. No new candidate intake, new winner/default, current-community survey or model dispatch. No claim about unnamed private completed sweeps.",
+  "candidates": [
+    {
+      "repository": "https://github.com/ib-api-reloaded/ib_async",
+      "source_commit": "ab629f34c1823ea4c1542f32f07377208a86bdfd",
+      "disposition": "carried_unresolved",
+      "six_angles": {
+        "capability_at_pin": {
+          "status": "source_review_only",
+          "observation": "Python TWS/Gateway client abstraction; same-task recovery and package-to-Git provenance remain unqualified.",
+          "evidence_refs": [
+            "https://github.com/ib-api-reloaded/ib_async/blob/ab629f34c1823ea4c1542f32f07377208a86bdfd/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/ib-api-reloaded-ib-async.json"
+          ],
+          "disputed": true
+        },
+        "upstream_engineering_quality": {
+          "status": "incomplete_source_review",
+          "observation": "Pinned README and retained source review only; no fresh unchanged upstream suite or runtime failure comparison.",
+          "evidence_refs": [
+            "https://github.com/ib-api-reloaded/ib_async/blob/ab629f34c1823ea4c1542f32f07377208a86bdfd/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/ib-api-reloaded-ib-async.json"
+          ],
+          "disputed": true
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No independent community assessment supplied for this pin; historical model votes and popularity counters are not community consensus."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No operational usage or adoption/retention measurement supplied at this pin; popularity is not net usage."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No comparable published evaluation supplied on the required equity/order/recovery contract."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "new_e2e_runs": 0,
+          "new_role_invocations": 0,
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No broker-side install, test or role invocation in this preparation; source retrieval and version inventory do not qualify this candidate."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/csingley/ibflex",
+      "source_commit": "dad9fd3c1edf133c4a4394cdc3c57bae82d466a3",
+      "disposition": "carried_unresolved",
+      "six_angles": {
+        "capability_at_pin": {
+          "status": "source_review_only",
+          "observation": "Flex XML statement parser; auxiliary reconciliation role, not a direct execution replacement.",
+          "evidence_refs": [
+            "https://github.com/csingley/ibflex/blob/dad9fd3c1edf133c4a4394cdc3c57bae82d466a3/README.rst",
+            "evidence/artifacts/landscape-sweep-20260926/csingley-ibflex.json"
+          ],
+          "disputed": true
+        },
+        "upstream_engineering_quality": {
+          "status": "incomplete_source_review",
+          "observation": "Pinned README and retained source review only; no fresh unchanged upstream suite or runtime failure comparison.",
+          "evidence_refs": [
+            "https://github.com/csingley/ibflex/blob/dad9fd3c1edf133c4a4394cdc3c57bae82d466a3/README.rst",
+            "evidence/artifacts/landscape-sweep-20260926/csingley-ibflex.json"
+          ],
+          "disputed": true
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No independent community assessment supplied for this pin; historical model votes and popularity counters are not community consensus."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No operational usage or adoption/retention measurement supplied at this pin; popularity is not net usage."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No comparable published evaluation supplied on the required equity/order/recovery contract."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "new_e2e_runs": 0,
+          "new_role_invocations": 0,
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No broker-side install, test or role invocation in this preparation; source retrieval and version inventory do not qualify this candidate."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/wboayue/rust-ibapi",
+      "source_commit": "be449c84efd1b52e4a296751d3d6edba2ca53552",
+      "disposition": "carried_unresolved",
+      "six_angles": {
+        "capability_at_pin": {
+          "status": "source_review_only",
+          "observation": "Independent Rust TWS API client; broker lifecycle and integration with the selected engine are unmeasured here.",
+          "evidence_refs": [
+            "https://github.com/wboayue/rust-ibapi/blob/be449c84efd1b52e4a296751d3d6edba2ca53552/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/wboayue-rust-ibapi.json"
+          ],
+          "disputed": true
+        },
+        "upstream_engineering_quality": {
+          "status": "incomplete_source_review",
+          "observation": "Pinned README and retained source review only; no fresh unchanged upstream suite or runtime failure comparison.",
+          "evidence_refs": [
+            "https://github.com/wboayue/rust-ibapi/blob/be449c84efd1b52e4a296751d3d6edba2ca53552/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/wboayue-rust-ibapi.json"
+          ],
+          "disputed": true
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No independent community assessment supplied for this pin; historical model votes and popularity counters are not community consensus."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No operational usage or adoption/retention measurement supplied at this pin; popularity is not net usage."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No comparable published evaluation supplied on the required equity/order/recovery contract."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "new_e2e_runs": 0,
+          "new_role_invocations": 0,
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No broker-side install, test or role invocation in this preparation; source retrieval and version inventory do not qualify this candidate."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/nautechsystems/nautilus_ibapi",
+      "source_commit": "0496bf2b66b65661f39e085e4c5c28b6e5ef87a3",
+      "disposition": "carried_unresolved",
+      "six_angles": {
+        "capability_at_pin": {
+          "status": "source_review_only",
+          "observation": "Historical ibapi mirror and installation guide; do not equate with the selected rc5 native adapter or official vendor acceptance.",
+          "evidence_refs": [
+            "https://github.com/nautechsystems/nautilus_ibapi/blob/0496bf2b66b65661f39e085e4c5c28b6e5ef87a3/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/nautechsystems-nautilus-ibapi.json"
+          ],
+          "disputed": true
+        },
+        "upstream_engineering_quality": {
+          "status": "incomplete_source_review",
+          "observation": "Pinned README and retained source review only; no fresh unchanged upstream suite or runtime failure comparison. Retained review reports an archived mirror; it is not the official vendor distribution.",
+          "evidence_refs": [
+            "https://github.com/nautechsystems/nautilus_ibapi/blob/0496bf2b66b65661f39e085e4c5c28b6e5ef87a3/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/nautechsystems-nautilus-ibapi.json"
+          ],
+          "disputed": true
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No independent community assessment supplied for this pin; historical model votes and popularity counters are not community consensus."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No operational usage or adoption/retention measurement supplied at this pin; popularity is not net usage."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No comparable published evaluation supplied on the required equity/order/recovery contract."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "new_e2e_runs": 0,
+          "new_role_invocations": 0,
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No broker-side install, test or role invocation in this preparation; source retrieval and version inventory do not qualify this candidate."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+      "source_commit": "8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10",
+      "disposition": "carried_unresolved",
+      "six_angles": {
+        "capability_at_pin": {
+          "status": "source_review_only",
+          "observation": "Gateway/TWS/IBC container wrapper; a source commit is not a frozen container or signed-in paper session.",
+          "evidence_refs": [
+            "https://github.com/gnzsnz/ib-gateway-docker/blob/8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/gnzsnz-ib-gateway-docker.json"
+          ],
+          "disputed": true
+        },
+        "upstream_engineering_quality": {
+          "status": "incomplete_source_review",
+          "observation": "Pinned README and retained source review only; no fresh unchanged upstream suite or runtime failure comparison.",
+          "evidence_refs": [
+            "https://github.com/gnzsnz/ib-gateway-docker/blob/8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/gnzsnz-ib-gateway-docker.json"
+          ],
+          "disputed": true
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No independent community assessment supplied for this pin; historical model votes and popularity counters are not community consensus."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No operational usage or adoption/retention measurement supplied at this pin; popularity is not net usage."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No comparable published evaluation supplied on the required equity/order/recovery contract."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "new_e2e_runs": 0,
+          "new_role_invocations": 0,
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No broker-side install, test or role invocation in this preparation; source retrieval and version inventory do not qualify this candidate."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/IbcAlpha/IBC",
+      "source_commit": "fc6d917d56715ebf79a39a10b5d77fd7b701d992",
+      "disposition": "carried_unresolved",
+      "six_angles": {
+        "capability_at_pin": {
+          "status": "source_review_only",
+          "observation": "TWS/Gateway automation helper; the pinned README announces project retirement, but no survivor disposition changes here.",
+          "evidence_refs": [
+            "https://github.com/IbcAlpha/IBC/blob/fc6d917d56715ebf79a39a10b5d77fd7b701d992/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/ibcalpha-ibc.json"
+          ],
+          "disputed": true
+        },
+        "upstream_engineering_quality": {
+          "status": "incomplete_source_review",
+          "observation": "Pinned README and retained source review only; no fresh unchanged upstream suite or runtime failure comparison. Pinned README announces retirement; that single angle does not retire the survivor.",
+          "evidence_refs": [
+            "https://github.com/IbcAlpha/IBC/blob/fc6d917d56715ebf79a39a10b5d77fd7b701d992/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/ibcalpha-ibc.json"
+          ],
+          "disputed": true
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No independent community assessment supplied for this pin; historical model votes and popularity counters are not community consensus."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No operational usage or adoption/retention measurement supplied at this pin; popularity is not net usage."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No comparable published evaluation supplied on the required equity/order/recovery contract."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "new_e2e_runs": 0,
+          "new_role_invocations": 0,
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No broker-side install, test or role invocation in this preparation; source retrieval and version inventory do not qualify this candidate."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/extrange/ibkr-docker",
+      "source_commit": "917c4de1d3b024dbea2eb7afcb8a30c8e3ae738c",
+      "disposition": "carried_unresolved",
+      "six_angles": {
+        "capability_at_pin": {
+          "status": "source_review_only",
+          "observation": "Gateway/TWS container wrapper; runtime image, login, failure and ownership behavior are not qualified here.",
+          "evidence_refs": [
+            "https://github.com/extrange/ibkr-docker/blob/917c4de1d3b024dbea2eb7afcb8a30c8e3ae738c/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/extrange-ibkr-docker.json"
+          ],
+          "disputed": true
+        },
+        "upstream_engineering_quality": {
+          "status": "incomplete_source_review",
+          "observation": "Pinned README and retained source review only; no fresh unchanged upstream suite or runtime failure comparison.",
+          "evidence_refs": [
+            "https://github.com/extrange/ibkr-docker/blob/917c4de1d3b024dbea2eb7afcb8a30c8e3ae738c/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/extrange-ibkr-docker.json"
+          ],
+          "disputed": true
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No independent community assessment supplied for this pin; historical model votes and popularity counters are not community consensus."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No operational usage or adoption/retention measurement supplied at this pin; popularity is not net usage."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No comparable published evaluation supplied on the required equity/order/recovery contract."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "new_e2e_runs": 0,
+          "new_role_invocations": 0,
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No broker-side install, test or role invocation in this preparation; source retrieval and version inventory do not qualify this candidate."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "source_commit": "cd417b801942c9753f70024be11f078d940ccf99",
+      "disposition": "carried_unresolved",
+      "six_angles": {
+        "capability_at_pin": {
+          "status": "source_review_only",
+          "observation": "Engine/adapter research snapshot; differs from the rc5 component run pin and does not inherit its historical offline receipt.",
+          "evidence_refs": [
+            "https://github.com/nautechsystems/nautilus_trader/blob/cd417b801942c9753f70024be11f078d940ccf99/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/nautechsystems-nautilus-trader.json"
+          ],
+          "disputed": true
+        },
+        "upstream_engineering_quality": {
+          "status": "incomplete_source_review",
+          "observation": "Pinned README and retained source review only; no fresh unchanged upstream suite or runtime failure comparison.",
+          "evidence_refs": [
+            "https://github.com/nautechsystems/nautilus_trader/blob/cd417b801942c9753f70024be11f078d940ccf99/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/nautechsystems-nautilus-trader.json"
+          ],
+          "disputed": true
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No independent community assessment supplied for this pin; historical model votes and popularity counters are not community consensus."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No operational usage or adoption/retention measurement supplied at this pin; popularity is not net usage."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No comparable published evaluation supplied on the required equity/order/recovery contract."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "new_e2e_runs": 0,
+          "new_role_invocations": 0,
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No broker-side install, test or role invocation in this preparation; source retrieval and version inventory do not qualify this candidate."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/FALK-BRAUER/kumo-nautilus-alpaca-adapter",
+      "source_commit": "cdc698c2db289c230b7ab3bc9133e78b0d5312e5",
+      "disposition": "carried_unresolved",
+      "six_angles": {
+        "capability_at_pin": {
+          "status": "source_review_only",
+          "observation": "Third-party Alpaca data/execution adapter advertising Nautilus1.229.0 and Python3.13; compatibility differs from recorded rc5/Python3.12.3.",
+          "evidence_refs": [
+            "https://github.com/FALK-BRAUER/kumo-nautilus-alpaca-adapter/blob/cdc698c2db289c230b7ab3bc9133e78b0d5312e5/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/falk-brauer-kumo-nautilus-alpaca-adapter.json"
+          ],
+          "disputed": true
+        },
+        "upstream_engineering_quality": {
+          "status": "incomplete_source_review",
+          "observation": "Pinned README and retained source review only; no fresh unchanged upstream suite or runtime failure comparison.",
+          "evidence_refs": [
+            "https://github.com/FALK-BRAUER/kumo-nautilus-alpaca-adapter/blob/cdc698c2db289c230b7ab3bc9133e78b0d5312e5/README.md",
+            "evidence/artifacts/landscape-sweep-20260926/falk-brauer-kumo-nautilus-alpaca-adapter.json"
+          ],
+          "disputed": true
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No independent community assessment supplied for this pin; historical model votes and popularity counters are not community consensus."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No operational usage or adoption/retention measurement supplied at this pin; popularity is not net usage."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No comparable published evaluation supplied on the required equity/order/recovery contract."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "new_e2e_runs": 0,
+          "new_role_invocations": 0,
+          "evidence_refs": [],
+          "disputed": true,
+          "reason": "No broker-side install, test or role invocation in this preparation; source retrieval and version inventory do not qualify this candidate."
+        }
+      }
+    }
+  ]
+}

@@ -22887,6 +22887,41 @@
       "bytes": 319713
     },
     {
+      "path": "evidence/artifacts/final-wave-preparation-20261016/us-equities-execution-broker/README.md",
+      "sha256": "624d6cfb2769f07ab18dcb654c06b2aec77338397df22662222eb6d9c35ff04c",
+      "bytes": 11789
+    },
+    {
+      "path": "evidence/artifacts/final-wave-preparation-20261016/us-equities-execution-broker/candidate-pins.json",
+      "sha256": "31ffccbff3c0b910220df698beca7b6c17a1a5b8cd749829dabe1ac306131fb1",
+      "bytes": 11880
+    },
+    {
+      "path": "evidence/artifacts/final-wave-preparation-20261016/us-equities-execution-broker/host-version-observation.txt",
+      "sha256": "c870d3d3fd9be87888967cfd06cbf67f60f204e1f7b2dfbaae2b37615e629ff4",
+      "bytes": 121
+    },
+    {
+      "path": "evidence/artifacts/final-wave-preparation-20261016/us-equities-execution-broker/observations.json",
+      "sha256": "d2aa0e7c2bc0e090def058ad19a95beea5e52762912d22f216d0d3477770c01e",
+      "bytes": 1626
+    },
+    {
+      "path": "evidence/artifacts/final-wave-preparation-20261016/us-equities-execution-broker/packet-receipt.json",
+      "sha256": "3fed485f2ca154486f160e993fde88458b21f07d3d607a7ec43f4ecde1bf93aa",
+      "bytes": 1089
+    },
+    {
+      "path": "evidence/artifacts/final-wave-preparation-20261016/us-equities-execution-broker/preparation.json",
+      "sha256": "cb507dfd50ef09ee5d62efc5fb53e4c69a13c8edd35c0586791e72e3b0dec99a",
+      "bytes": 3559
+    },
+    {
+      "path": "evidence/artifacts/final-wave-preparation-20261016/us-equities-execution-broker/six-angle-draft.json",
+      "sha256": "768f77b21395beb18acc6dce08bfebc12394b86ce6ded6fbe7eedde86fa2e3a5",
+      "bytes": 22268
+    },
+    {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
       "sha256": "ff34c3db7e67e4d96e9a1d0d154a0c7e8c01f42eade511302f963ad05a1d2c4c",
       "bytes": 6271

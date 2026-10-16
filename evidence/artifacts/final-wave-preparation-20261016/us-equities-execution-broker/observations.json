@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "read_only_package_metadata_inventory",
+  "observed_at_utc": "2026-10-16T05:09:09Z",
+  "interpreter_version": "Python 3.12.3",
+  "command": "\"$EXISTING_RUNTIME_PYTHON\" -I -B - <<'PY'\nfrom importlib.metadata import PackageNotFoundError, version\nfor name in ('nautilus_trader', 'alpaca-py', 'ibapi', 'ib_async'):\n    try:\n        print(name + '=' + version(name))\n    except PackageNotFoundError:\n        print(name + '=NOT_INSTALLED_IN_PROBED_RUNTIME')\nPY",
+  "command_normalization": "EXISTING_RUNTIME_PYTHON identifies one existing closed runtime; its private host path is deliberately not published.",
+  "exit_code": 0,
+  "distributions_queried": 4,
+  "distributions_found": 2,
+  "stdout_ref": "host-version-observation.txt",
+  "broker_modules_imported": false,
+  "is_layer_invoke_evidence": false,
+  "scope": "Package metadata only, in one existing runtime. No broker/transport import, connection, health probe, all-host absence claim or trading action.",
+  "initial_probe": {
+    "exit_code": 1,
+    "resolved_before_failure": [
+      "nautilus_trader=2.0.0rc5",
+      "alpaca-py=0.44.0"
+    ],
+    "error": "PackageNotFoundError for ibapi; the initial comprehension did not reach ib_async. This setup attempt is not a complete inventory.",
+    "corrected_by": "The recorded bounded PackageNotFoundError-handling probe above."
+  },
+  "interpreter_probe": {
+    "command": "\"$EXISTING_RUNTIME_PYTHON\" --version",
+    "exit_code": 0,
+    "stdout": "Python 3.12.3\n"
+  },
+  "upstream_source": "https://github.com/python/cpython/blob/v3.12.3/Lib/importlib/metadata/__init__.py"
+}

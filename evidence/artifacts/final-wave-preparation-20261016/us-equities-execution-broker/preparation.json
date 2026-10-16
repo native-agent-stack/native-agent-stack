@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "catalog": "us-equities",
+  "layer_id": "execution-broker",
+  "source_base": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "prepared_date": "2026-10-16",
+  "purpose": "FINAL-wave preparation only; recorded GAP disposition with an unresolved survivor delta.",
+  "terminal_admission": "NOT_REQUESTED",
+  "selected_winners": [],
+  "deliverables": {
+    "F1": {
+      "status": "GAP-F1-NO-WINNER",
+      "proposed_layer_run_pin": null,
+      "candidate_source_proposals_ref": "candidate-pins.json",
+      "reason": "The generated row and install plan have no execution-broker winner; do not infer one from component run records.",
+      "prerequisites": [
+        "Co-op engine comparison phase2 result",
+        "Two-family survivor adjudication and an explicitly recorded winner/run pin"
+      ]
+    },
+    "E2E": {
+      "status": "NOT_RUN",
+      "gap_ids": [
+        "GAP-E2E-NO-ADJUDICATED-PIN",
+        "GAP-E2E-PAPER-SESSION"
+      ],
+      "component_pin": null,
+      "install_command": null,
+      "test_command": null,
+      "exit_code": null,
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_skipped": 0,
+      "reason": "Co-op confirmed no broker-side installation in this preparation. No selected layer pin and no authorized session inputs. Zero counts mean not run, not a passing/skipped suite.",
+      "prerequisites": [
+        "Adjudicated layer run pin after co-op phase2",
+        "Vendor-supported isolated install and unchanged tests under a separately authorized scope",
+        "Owner-held paper credentials outside sessions and the approved comparison cap/window, controlled by the co-op and trading owner"
+      ]
+    },
+    "F2": {
+      "status": "GAP-F2-NO-SELECTED-INVOKE-ROLE",
+      "invocation_command": null,
+      "exit_code": null,
+      "output_hash": null,
+      "role_invocations": 0,
+      "reason": "No selected execution role invoked in this window. Metadata inventory and historical receipts are not new invoke evidence.",
+      "prerequisites": [
+        "Adjudicated winner and run pin",
+        "Separately authorized co-op/trading-owner paper invocation window"
+      ]
+    },
+    "multi_angle_draft": {
+      "status": "DRAFT",
+      "ref": "six-angle-draft.json",
+      "survivor_count": 9,
+      "disputed_dimensions": [
+        "capability_at_pin",
+        "upstream_engineering_quality",
+        "community_consensus",
+        "net_usage",
+        "published_evaluations",
+        "own_measured_runs"
+      ],
+      "adjudicator": "co-op two-family process; no model read self-dispatched"
+    }
+  },
+  "named_input_records": [
+    "final-wave-layer-prep.brief-20261016.md",
+    "FINAL-EXECUTION-BROKER INPUTS answer",
+    "engine comparison RESUME.md"
+  ],
+  "source_refs": [
+    "catalogs/landscape/final-stack.json:9221-9297",
+    "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md:155",
+    "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md:588",
+    "catalogs/landscape/us-equities.json:2674-2686",
+    "catalogs/sota-convergence/layer-verdict-waves.json:7-13",
+    "catalogs/saturation/ledger.json:6776",
+    "evidence/receipts/runtime-final-native-24-acceptance-20261008.json:14-24",
+    "evidence/artifacts/new-wsl-layer-reviews-20261001/execution-broker.json"
+  ],
+  "safety_scope": {
+    "broker_side_installations": 0,
+    "broker_or_account_calls": 0,
+    "orders": 0,
+    "credential_reads": 0,
+    "services_enabled": 0,
+    "model_routes_changed": 0,
+    "final_admission_or_default_changes": 0
+  },
+  "upstream_e2e_and_invoke_are_gaps": true
+}

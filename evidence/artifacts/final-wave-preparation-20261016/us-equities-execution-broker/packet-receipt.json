@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "kind": "packet_preparation",
+  "tool": "tools/sota-convergence/lane_packets.py",
+  "tool_source_base": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "command": "python3 tools/sota-convergence/lane_packets.py --root . --out \"$SCRATCH_PACKETS\" --catalog us-equities --manifest catalogs/sota-convergence/manifest-20260926.json --registered-receipts --gap-receipts --checked-at 2026-10-16",
+  "command_normalization": "Only the private scratch output path is replaced by SCRATCH_PACKETS. No command or model dispatch is implied beyond this recorded CLI.",
+  "exit_code": 0,
+  "packets_emitted": 12,
+  "packet_consumed": "packets/us-equities__execution-broker.json",
+  "candidate_cards_in_consumed_packet": 16,
+  "unmatched_sota_components_in_consumed_packet": 2,
+  "gap_receipts_in_consumed_packet": 0,
+  "carried_survivors_from_ledger": 9,
+  "other_layer_packets_consumed": 0,
+  "native_install_or_test": false,
+  "output_hash": null,
+  "output_hash_reason": "Generated scratch packets are not published here; no fingerprint of unpublished bytes is included."
+}
