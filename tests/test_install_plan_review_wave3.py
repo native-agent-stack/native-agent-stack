@@ -66,7 +66,7 @@ class ReviewWave3Tests(unittest.TestCase):
             self.assertEqual(upgrade.returncode, 0, upgrade.stderr)
             self.assertEqual((root / "config/grafana.ini").read_text(), original)
 
-    def test_unrelated_selected_row_keeps_unselected_gateway_allocation(self):
+    def test_unrelated_selected_row_refuses_a_conflicting_gateway_request(self):
         _, funcs = self.functions()
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -81,7 +81,8 @@ class ReviewWave3Tests(unittest.TestCase):
                 env={"PATH": "/usr/bin:/bin", "HOME": tmp, "plan_dir": str(PLAN),
                      "only": "structured-data", "host_file": str(root / "B.json"),
                      "config_root": str(root / "config")}, text=True, capture_output=True)
-            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("unselected", result.stderr)
             self.assertEqual(json.loads((root / "config/.service-ports.json").read_text()), previous)
 
     def test_selected_memory_config_keeps_references_to_the_installed_gateway(self):
@@ -90,7 +91,7 @@ class ReviewWave3Tests(unittest.TestCase):
             root = Path(tmp)
             (root / "config").mkdir()
             (root / "config/.service-ports.json").write_text(json.dumps(host_allocation({"NS_PORT_GATEWAY": "31128"})))
-            (root / "B.json").write_text(json.dumps(host_allocation({"NS_PORT_MEMORY": "39374", "NS_PORT_GATEWAY": "41128"})))
+            (root / "B.json").write_text(json.dumps(host_allocation({"NS_PORT_MEMORY": "39374", "NS_PORT_GATEWAY": "31128"})))
             names = ("stage_plan_sources", "commit_allocation", "run_command")
             body = '\n'.join(name + '() {\n' + funcs[name] + '\n}' for name in names)
             body += ('\nstage_plan_sources\n'
@@ -106,16 +107,17 @@ class ReviewWave3Tests(unittest.TestCase):
             self.assertEqual(active["NS_PORT_MEMORY"], "39374")
             self.assertEqual(active["NS_PORT_GATEWAY"], "31128")
 
-    def test_default_selection_preserves_measurement_only_ports_and_detects_merged_collisions(self):
+    def test_default_selection_refuses_changes_to_unselected_owners(self):
         renderer = module(PLAN / "config/observability_config.py", "wave3_selection")
         plan = json.loads((PLAN / "install-plan.json").read_text())
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / ".service-ports.json").write_text(json.dumps(host_allocation({"NS_PORT_GATEWAY": "31128"})))
             candidate = renderer.service_ports({"NS_PORT_GRAFANA_HTTP": "31301"})
-            self.assertEqual(renderer.installation_ports(candidate, root, plan)["GRAFANA_HTTP"], 21301)
+            with self.assertRaisesRegex(ValueError, "unselected"):
+                renderer.installation_ports(candidate, root, plan)
             candidate = renderer.service_ports({"NS_PORT_MEMORY": "31128", "NS_PORT_GATEWAY": "41128"})
-            with self.assertRaisesRegex(ValueError, "claimed"):
+            with self.assertRaisesRegex(ValueError, "unselected"):
                 renderer.installation_ports(candidate, root, plan, "memory-owner")
 
     def test_grafana_rerun_still_refuses_an_operator_modified_render(self):
@@ -250,7 +252,7 @@ class ReviewWave4RuntimeTests(unittest.TestCase):
             active = config / ".service-ports.json"
             active.write_text(json.dumps(host_allocation({"NS_PORT_GATEWAY": "31128"})))
             host = root / "B.json"
-            host.write_text(json.dumps(host_allocation({"NS_PORT_MEMORY": "39374"})))
+            host.write_text(json.dumps(host_allocation({"NS_PORT_MEMORY": "39374", "NS_PORT_GATEWAY": "31128"})))
             command = [sys.executable, str(PLAN / "config/observability_config.py")]
             env = {"PATH": "/usr/bin:/bin", "HOME": tmp}
             stage = subprocess.run(command + ["stage", "--config-root", str(config), "--output-root", str(staged),

@@ -1129,6 +1129,12 @@ operator activation and a fresh listener-ownership check. Existing enabled or
 running units retain their state. On a legacy install without an allocation
 snapshot, establish the installed allocation before attempting selective migration.
 
+For MinerU, before activation rerun
+`bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only mineru --host-file 'adoption/hosts/<host>.json'`
+without `--no-start`. This disables telemetry and sets the verified Standard
+models to managed mode; the temporary server is stopped if this step started it.
+Then perform the separate persistent activation and listener/health checks.
+
 The `--apply` line is the plain one: it writes none of the authorization settings, which grant a permission or suppress
 a confirmation (Claude Code's `permissions.defaultMode` and `skipDangerousModePermissionPrompt`, Codex's
 `approval_policy` and `sandbox_mode`, and the tool approval mode of a Codex MCP server, which no server wired here

@@ -43,8 +43,8 @@ if [[ ! -x "$python" || ! -f "$checkout/cli.py" ]]; then
   exit 1
 fi
 port_renderer="$here/observability_config.py"
-[[ -f "$port_renderer" ]] || port_renderer="$here/../../evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py"
-gateway="$("$python" "$port_renderer" gateway)"
+gateway_args=(); if [[ -f "$port_renderer" ]]; then gateway_args=(--config-root "$here" --consumer-config "$config_source"); else port_renderer="$here/../../evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py"; fi
+gateway="$("$python" "$port_renderer" gateway "${gateway_args[@]}")"
 # type -P searches PATH for an executable file only (no alias, function or builtin); a relative PATH entry is anchored here.
 timer="$(type -P timeout || type -P gtimeout || true)"
 if [[ -n "$timer" && "$timer" != /* ]]; then

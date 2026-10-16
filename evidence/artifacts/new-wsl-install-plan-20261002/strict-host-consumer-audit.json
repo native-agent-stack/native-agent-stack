@@ -246,5 +246,78 @@
     "docs/new-wsl-handbook.json",
     "docs/decisions/2026-10-16-new-wsl-host-allocation-addendum.md"
   ],
-  "fourth_wave_expansion": "GPT fix2 identified runtime_acceptance as a missed indirect caller. It is now explicitly inventoried and covered. CC identified live recipe/checklist/handbook consumers; they use the superseding addendum without rewriting historical decisions."
+  "fourth_wave_expansion": "GPT fix2 identified runtime_acceptance as a missed indirect caller. It is now explicitly inventoried and covered. CC identified live recipe/checklist/handbook consumers; they use the superseding addendum without rewriting historical decisions.",
+  "review_wave_7": {
+    "request": 196445,
+    "base": "c231aebcc29d70f88aeac0ae92385e25d1b6c241",
+    "policy": "Refuse any requested change to an unselected owner before installation; all runtime consumers must match committed allocation.",
+    "consumer_paths": [
+      {
+        "path": "config/observability_config.py",
+        "calls": [
+          "load_service_ports",
+          "committed_service_ports",
+          "client_service_ports",
+          "gateway_url"
+        ],
+        "disposition": "Shared committed-allocation check; installation/candidate-validation actions explicitly remain staged-request readers."
+      },
+      {
+        "path": "accept.sh",
+        "calls": [
+          "renderer stage without plan-file",
+          "listeners"
+        ],
+        "disposition": "Refuses an explicit host/snapshot conflict before dispatch; no full acceptance script was executed in tests."
+      },
+      {
+        "path": "tools/adoption/new_wsl_client_config.py",
+        "calls": [
+          "host_values",
+          "render"
+        ],
+        "disposition": "Both public paths use client_service_ports against the target home; direct Claude and Codex outputs covered."
+      },
+      {
+        "path": "tools/adoption/mcp_template_drift.py",
+        "calls": [
+          "render_files",
+          "render_templates"
+        ],
+        "disposition": "Delegates to the checked new-WSL host/render APIs; no new production edit needed."
+      },
+      {
+        "path": "tools/adoption/runtime_profiles.py",
+        "calls": [
+          "render_wsl_mcp",
+          "selected_service_ports",
+          "pi_models",
+          "opencode_provider",
+          "profile_environment"
+        ],
+        "disposition": "WSL MCP delegates through drift; provider and telemetry paths use the shared checked loader. Existing live locators preserved."
+      },
+      {
+        "path": "tools/adoption/runtime_acceptance.py",
+        "calls": [
+          "profile_environment"
+        ],
+        "disposition": "Existing direct/credential-wrapped acceptance paths inherit the checked profile environment; fixture tests intercept all native calls."
+      },
+      {
+        "path": "tools/research/gpt_researcher.sh",
+        "calls": [
+          "gateway --consumer-config"
+        ],
+        "disposition": "Installed wrapper uses its rendered native JSON endpoint; no listener ownership snapshot is created."
+      }
+    ],
+    "candidate_only_readers": [
+      "check_plan.py host_port_contract/ss candidate check",
+      "renderer installation stage with plan-file",
+      "renderer installation actions and command parameterization"
+    ],
+    "tests": "tests/test_install_plan_review_wave7.py covers negative conflicts and aligned-success entry points using temporary homes, fake research Config and offline renderer calls.",
+    "search_boundary": "Repository source/AST/grep fallback; graph transport unavailable. No whole-workspace graph completeness claim."
+  }
 }

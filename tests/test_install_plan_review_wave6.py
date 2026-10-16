@@ -29,6 +29,8 @@ def produced_config_files(name, functions, helpers, visited=None):
             continue
         if line.startswith("run_command "):
             command = shlex.split(line)[1]
+            if 'observability_config.py" research --config-root "$config_root"' in command:
+                files["gpt-researcher.config.json"] = "$repo_root/tools/research/gpt-researcher.config.json"
             for source, target in re.findall(
                 r'install -m [0-7]+ -- "(\$(?:plan_dir|repo_root)/[^"\n]+)" "\$config_root/([A-Za-z0-9_.@/-]+)"',
                 command,

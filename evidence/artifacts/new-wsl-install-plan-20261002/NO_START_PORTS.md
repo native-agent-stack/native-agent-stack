@@ -578,3 +578,47 @@ micro-to-micro byte-identity claim; the retained29 historical asset comparisons,
 six default dashboards and Promptfoo native-export equivalence have their
 separate recorded scopes. Native startup, disabled-unit/listener acceptance,
 Dagu bootstrap and recovery of partial writes remain unverified on the target.
+
+## Selective-install consumer correction
+
+At `c231aebc`, `review_output.json` reproduced a request that changed an
+unselected gateway from41128 to51128: provisioning retained41128 while a client
+render used51128. This revision supersedes silent retention of a conflicting
+request. Staging now refuses an unselected-owner change before row writes.
+Acceptance staging, direct Claude/Codex rendering, MCP/drift rendering, runtime
+providers and telemetry compare their complete requested allocation with the
+committed snapshot. A selected service can still move through staged
+installation and successful publication; consumers then use that committed
+allocation. The plan checker continues validating proposed allocations, because
+it does not render a runtime consumer.
+
+Fresh research-only installation also lost its temporary selector and reverted
+to21128. The row now renders the selected endpoint into its installed native
+`gpt-researcher.config.json`; later wrapper invocations consume it and refuse a
+conflicting explicit or committed selection. This is consumer state and creates
+no service snapshot. The independent DeerFlow configuration retains the same
+endpoint. The implementation follows
+[GPT Researcher0957c301 config/config.py:63–76,158–170](https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/config/config.py#L63),
+which merges the JSON and environment. The default JSON bytes remain unchanged.
+
+All four initial P2 controls failed on unchangedc231aebc and pass after the
+correction. Additional controls cover aligned success across every listed
+consumer, research-to-memory staging, and refusal without modifying the saved
+endpoint. Older fixtures that expected an ignored unselected-owner change now
+require refusal or supply an aligned request. Publication concurrency and
+operator-custody controls are retained.
+
+`MICRO-delta-c231aebc.md` additionally requires the normal MinerU configuration
+pass before activation. Both live instruction carriers now name it explicitly;
+their guard failed in both before the correction. Native handbook regeneration
+and an append-only receipt update preserve prior history.
+
+The target's ai-memory2.6.6 init behavior is covered by a source-backed test at
+[04a9e8f5, commands/init.rs:15,99–106](https://github.com/akitaonrails/ai-memory/blob/04a9e8f576de67e1d2282ee29415d1b0d5b979c8/crates/ai-memory-cli/src/commands/init.rs#L99).
+Init writes the [default template](https://github.com/akitaonrails/ai-memory/blob/04a9e8f576de67e1d2282ee29415d1b0d5b979c8/crates/ai-memory-cli/templates/config.default.toml#L10)
+and appends its auth block. The retained fixture contains all active template
+settings, with comments omitted after a parsed-TOML equality check; tests supply
+a synthetic pepper. The fresh configuration has no active provider key, so the
+migration inserts local exactly once and succeeds on repeated runs at29374 and
+49374. This is fixture/source evidence, not a native init or service run; no
+real credentials or credential store were used.

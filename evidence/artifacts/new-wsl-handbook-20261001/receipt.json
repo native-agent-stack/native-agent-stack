@@ -6,8 +6,8 @@
   "generator_sha256": "a57a56c5d9d935d0f5a73eec9fab9b716b37924a43f0022bd66ec542d9566048",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "2b98d8150307c97d203c2a647cedc7ed18e418f42bdd6d8c325c1ff9105e222a",
-    "docs/new-wsl-handbook.json": "11b58ef3e508abe6371c90676e43a5385d8f26c7bcee227ce92b6a061fb616bf"
+    "docs/new-wsl-handbook.md": "eecab4436abed523af18d7f35a12248835621dd74a13409959280d6eb416c5ba",
+    "docs/new-wsl-handbook.json": "ebc83bb69269c45b1f02edb4ad544fcb6621922f6aa85d1c23b19668001078b4"
   },
   "inventory": {
     "layers": 37,
@@ -1080,6 +1080,19 @@
       },
       "evidence_class": "local_integration",
       "scope": "Final native regeneration for activation order and publication privacy under grants186741/188939. Source evidence and public history remain unchanged per189041; no host acceptance."
+    },
+    {
+      "date": "2026-10-16",
+      "source_base": "c231aebcc29d70f88aeac0ae92385e25d1b6c241",
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "a57a56c5d9d935d0f5a73eec9fab9b716b37924a43f0022bd66ec542d9566048",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "eecab4436abed523af18d7f35a12248835621dd74a13409959280d6eb416c5ba",
+        "docs/new-wsl-handbook.json": "ebc83bb69269c45b1f02edb4ad544fcb6621922f6aa85d1c23b19668001078b4"
+      },
+      "evidence_class": "local_integration",
+      "scope": "CC196662 MinerU activation prerequisite; binding refresh under grant186741. No native service acceptance."
     }
   ],
   "previous_outputs": [
@@ -1322,6 +1335,23 @@
       "superseded_at_utc": "2026-10-16",
       "source_head": "3a74c27f0c22f96d448998a6279933b935d085bc",
       "reason": "Released fifth fold corrects activation ordering and publishes dated attributed decision paraphrases; prior published history is retained."
+    },
+    {
+      "generator_sha256": "a57a56c5d9d935d0f5a73eec9fab9b716b37924a43f0022bd66ec542d9566048",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "2b98d8150307c97d203c2a647cedc7ed18e418f42bdd6d8c325c1ff9105e222a",
+        "docs/new-wsl-handbook.json": "11b58ef3e508abe6371c90676e43a5385d8f26c7bcee227ce92b6a061fb616bf"
+      },
+      "inventory": {
+        "layers": 37,
+        "profile_entries": 78,
+        "projected_tools": 82,
+        "canonical_package_ids": 26
+      },
+      "superseded_at_utc": "2026-10-16",
+      "source_head": "c231aebcc29d70f88aeac0ae92385e25d1b6c241",
+      "reason": "CC196662 adds the normal MinerU configuration step before activation; native handbook regeneration refreshes its source bindings."
     }
   ]
 }

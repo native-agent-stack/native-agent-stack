@@ -1125,7 +1125,7 @@ def host_values(host: str, plan: dict, home: Path | None, wired_dirs: list) -> d
     # may name another.
     values.setdefault("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
     try:
-        ports = runpy.run_path(plan["port_renderer"])["service_ports"](values, require_complete=True)
+        ports = runpy.run_path(plan["port_renderer"])["client_service_ports"](values)
     except ValueError as error:
         raise ConfigError(str(error)) from error
     values["OTEL_ENDPOINT"] = f"127.0.0.1:{ports['OTEL_HTTP']}"
@@ -1147,7 +1147,7 @@ def render(root: Path, results: list, plan: dict, values: dict, manifest: dict |
         raise ConfigError("host value file must explicitly provide WSL_DISTRO_NAME; no distribution default is used")
     wired = {v.piece.key: v for v in results if v.wired}
     try:
-        host_ports = runpy.run_path(plan["port_renderer"])["service_ports"](values, require_complete=True)
+        host_ports = runpy.run_path(plan["port_renderer"])["client_service_ports"](values)
     except ValueError as error:
         raise ConfigError(str(error)) from error
     ports = {"collector_http_port": host_ports["OTEL_HTTP"], "collector_grpc_port": host_ports["OTEL_GRPC"],

@@ -68,11 +68,20 @@ all selected rows publishes `$config_root/.service-ports.json`; a failed run
 preserves the prior allocation. With an existing snapshot, only selected owners'
 ports change: unselected owners retain their recorded allocation before staging
 and at publication, so dependent URLs still target the configured services.
+If the host file requests different ports for an unselected owner, staging
+refuses with `needs_owner` before running rows. Acceptance and client renders
+also refuse host values that disagree with the committed allocation; a request
+is never silently partly applied. Use the complete current host file for
+selective C/D/S installation and every subsequent consumer.
 The merged allocation is collision-checked again. A row without allocated ports
 cannot publish an initial service snapshot. Later runs reuse the saved allocation
 unless another host file is supplied. Differing operator port configuration returns
 `needs_owner` and prevents publication. Staged files, commands, acceptance URLs,
 client configuration and the gateway wrapper's derived digest share this source.
+Research-only installation stores its chosen gateway in the installed GPT
+Researcher JSON, matching DeerFlow. Later invocations use that consumer setting
+after the staging selector disappears, without creating a service snapshot or
+claiming ownership of a listener.
 See [NO_START_PORTS.md](NO_START_PORTS.md) for sources, fail-first fixtures and the
 separate target-host acceptance boundary.
 

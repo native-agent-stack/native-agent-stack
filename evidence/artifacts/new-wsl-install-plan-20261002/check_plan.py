@@ -174,7 +174,7 @@ def no_start_contract(rows, funcs, text, bad):
 def host_port_contract(plan_dir, rows, host_file, bad):
     renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
     try:
-        ports = renderer["load_service_ports"](host_file)
+        ports = renderer["load_service_ports"](host_file, check_committed=False)
     except (OSError, ValueError) as error:
         bad("ports", str(error))
         return
@@ -460,7 +460,7 @@ def main():
     if args.ss_output is not None:
         renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
         try:
-            ports = renderer["load_service_ports"](args.host_file)
+            ports = renderer["load_service_ports"](args.host_file, check_committed=False)
             for error in renderer["listener_ownership"](plan, ports, args.ss_output.read_text()):
                 # A pre-install snapshot may have absent listeners. A foreign
                 # listener is an allocation conflict even before services start.

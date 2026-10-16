@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-16",
+  "before_head": "c231aebcc29d70f88aeac0ae92385e25d1b6c241",
+  "status": "implemented_for_authorized_single_fold",
+  "authorization_events": [196445, 196662, 197743],
+  "review_names": ["review_output.json", "MICRO-delta-c231aebc.md", "GPT-VERDICT-c231aebcc.md"],
+  "review_disposition": "The local review supplied two selective-install P2s. CC passed the preceding head and added the MinerU recipe prerequisite and ai-memory2.6.6 init verification. GPT q1067 acknowledged the preceding head with no new findings. One normal commit is authorized; no rebase.",
+  "execution_prefix": "systemd-run --user --scope -p CPUWeight=idle --quiet --",
+  "evidence_class": "synthetic",
+  "before": {
+    "initial_regressions": {
+      "source": "Unchanged c231aebcc29d70f88aeac0ae92385e25d1b6c241 production files",
+      "receipt_name": "install-nostart-wave7-before-velo.json",
+      "tests": 4,
+      "failures": 4,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 1,
+      "cases": [
+        "Selective installation silently retained snapshot gateway41128 despite host request51128",
+        "Acceptance staging accepted the conflicting explicit host",
+        "Client host loading accepted the conflicting explicit host",
+        "Later installed research invocation lost gateway41128 after the staging selector disappeared"
+      ]
+    },
+    "direct_api_replay": {
+      "source": "Exact c231aebc host_values and render function ASTs, with unchanged current dependencies and complete render arguments",
+      "receipt_name": "install-nostart-wave7-direct-before-corrected-velo.json",
+      "runner_name": "install-nostart-wave7-direct-before-velo.py",
+      "tests": 1,
+      "failures": 2,
+      "errors": 0,
+      "cases": ["host_values", "direct render"],
+      "qualification": "This replay isolates the prior public functions; it is not a full baseline checkout run."
+    },
+    "MinerU_prerequisite": {
+      "receipt_name": "install-nostart-wave7-mineru-doc-before-velo.json",
+      "tests": 1,
+      "failures": 2,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 1,
+      "cases": ["recipe", "first-boot checklist"]
+    },
+    "excluded_drafts": "An initial direct-render replay and an initial XDG test used incomplete render inputs and errored. Neither error is counted as fail-first evidence. The corrected direct replay above has two assertion failures and no errors. The XDG control is positive regression coverage only."
+  },
+  "changes": {
+    "selective_allocation": "Reject changes to unselected owners before row writes. Acceptance and every runtime client consumer validate against the committed allocation. Installation and candidate-plan checks intentionally read staged requests. Both public host_values and direct render APIs use the target HOME/config root; inherited XDG_CONFIG_HOME applies only to the current HOME.",
+    "consumer_audit": "strict-host-consumer-audit.json review_wave_7 records direct/indirect callers. Offline tests cover acceptance staging, direct Claude/Codex rendering, runtime telemetry, Pi/OpenCode providers, WSL MCP and template drift, with refusal and aligned-success controls. Runtime acceptance inherits the shared loader and retains its intercepted-call tests.",
+    "research_endpoint": "Render the selected gateway into GPT Researcher's existing native JSON LLM_KWARGS.base_url and read it on later installed invocations. Persist no listener allocation for research. Later memory-only staging retains the consumer endpoint; an explicitly conflicting allocation is refused. Default research JSON remains byte-identical.",
+    "MinerU_prerequisite": "Recipe and checklist require a normal --only mineru --host-file run without --no-start before activation, completing telemetry disable and managed-mode configuration.",
+    "ai_memory_2_6_6_init": "The public fixture contains only active upstream default-template TOML. Its parsed contents were compared with the pinned template. The test appends synthetic auth pepper, runs the extracted migration twice at29374 and49374, parses valid TOML, and verifies the local provider and auth preservation. No native init binary or real credential file was used."
+  },
+  "after": {
+    "new_regressions": {"tests": 9, "failures": 0, "errors": 0, "skips": 0, "exit_code": 0},
+    "final_combined": {
+      "command": "python3 -B /tmp/install-nostart-safe-tests-velo.py tests.test_install_plan_no_start_ports tests.test_install_plan_review_wave3 tests.test_install_plan_review_wave5 tests.test_install_plan_review_wave6 tests.test_install_plan_review_wave7 tests.test_runtime_profiles.StrictHostConsumerTests tests.test_harbor_currency_contracts tests.test_research_entry tests.test_wsl_new_distro_recipe tests.test_new_wsl_handbook tests.test_new_wsl_handbook_privacy",
+      "receipt_name": "install-nostart-wave7-final-combined-velo.json",
+      "tests": 328,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 0,
+      "output_policy": "Native unittest suites, count-only runner; assertion contents suppressed, no added skips"
+    },
+    "check_plan": {"rows": 84, "commands": 198, "acceptance_entries": 113, "exit_code": 0},
+    "validate": {
+      "command": "python3 scripts/validate.py",
+      "status": "passed",
+      "exit_code": 0,
+      "hashed_files": 12160,
+      "components": 71,
+      "profiles": 4,
+      "receipts": 240,
+      "qualification": "Repeated after recording these results and refreshing registrations, immediately before the authorized single commit."
+    },
+    "convergence": {
+      "command": "python3 -B scripts/validate_convergence.py --all-recorded --json",
+      "status": "passed",
+      "records": 33,
+      "exit_code": 0
+    },
+    "citation_audit": {
+      "pre_edit_inventory_name": "install-nostart-wave7-citations-before-velo.txt",
+      "pre_edit_matches": 78,
+      "pre_edit_files": 37,
+      "install_line_count_unchanged": true,
+      "accept_bytes_unchanged": true,
+      "current_anchors_verified": 8,
+      "receiver_selector": "config/observability_config.py:523-536",
+      "runtime_profiles_live_locators_unchanged": [43, "1027-1034"],
+      "research_wrapper_cited_line_unchanged": 27
+    },
+    "handbook": {
+      "grant": 186741,
+      "reason": "CC196662 normal MinerU prerequisite",
+      "native_regeneration": true,
+      "generator_unchanged": true,
+      "prior_history_preserved": true,
+      "one_binding_appended_against": "c231aebcc29d70f88aeac0ae92385e25d1b6c241",
+      "receipt": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json"
+    },
+    "transport": "The context-mode subprocess lacked a user-bus connection; no test executed in that attempt. The native-shell idle-scope transport passed its probe and was used for final checks without printing environment values."
+  },
+  "sources": [
+    {
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "pin": "c231aebcc29d70f88aeac0ae92385e25d1b6c241",
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py",
+      "lines": "274-277",
+      "mechanism": "Existing selective-install snapshot merge; the correction refuses unselected-owner disagreement and enforces the committed allocation in runtime consumers."
+    },
+    {
+      "repository": "https://github.com/assafelovic/gpt-researcher",
+      "pin": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "file": "gpt_researcher/config/config.py",
+      "lines": "63-76,158-170",
+      "mechanism": "Native JSON configuration and LLM_KWARGS consumption"
+    },
+    {
+      "repository": "https://github.com/opendatalab/MinerU",
+      "pin": "c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+      "file": "mineru/kit/commands/models.py",
+      "lines": "86-116,171-205",
+      "mechanism": "Standalone preparation and managed model configuration"
+    },
+    {
+      "repository": "https://github.com/opendatalab/MinerU",
+      "pin": "c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+      "file": "mineru/cli/commands/telemetry.py",
+      "lines": "39-57",
+      "mechanism": "Daemon-dependent telemetry disable requires the normal configuration rerun."
+    },
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "tag": "v2.6.6",
+      "file": "crates/ai-memory-cli/src/commands/init.rs",
+      "lines": "15,27-35,99-106",
+      "mechanism": "Fresh init writes the embedded default template and appends the default auth block."
+    },
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "file": "crates/ai-memory-cli/templates/config.default.toml",
+      "mechanism": "Active defaults bind49374 and contain no embedding_provider; the public active-TOML fixture matches parsed upstream settings."
+    }
+  ],
+  "registration": {
+    "status": "passed",
+    "method": "scripts.host_receipts.register_file, then scripts/evidence_manifest.py --write",
+    "base": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+    "changed_existing_entries": 59,
+    "added_entries": 21,
+    "removed_entries": 0,
+    "existing_metadata_changed_only_sha256_and_bytes": true,
+    "top_level_and_extra_fields_preserved": true,
+    "five_frozen_inputs_preserved": true,
+    "protected_prefix_scan": {
+      "reference": "Previously published58ee5cd49 receipt metadata, in memory only; private original never read or hashed",
+      "changed_new_files_and_PR_body": 93,
+      "prefix_match_counts": {"7": 0, "8": 0, "12": 0, "16": 0, "64": 0}
+    }
+  },
+  "local_execution_boundary": "Fixture homes, offline renderer calls, extracted memory migration commands and an installed research wrapper with stand-in Config/CLI only. No full install.sh or accept.sh, native installer, daemon, model download, credential store or target listener acceptance ran in this fold.",
+  "native_target_acceptance": "UNRUN here. native-agent-stack-51 owns install.sh --no-start --only memory-owner with the complete NativeHorizonNY host file, followed by disabled-unit and no-new-listener checks.",
+  "followups": [
+    "CC and GPT delta micros on the newly published head",
+    "Fresh CI and merged-tree verification remain landing checks.",
+    "Handbook overlap with #1161/#1179 requires the landing rebase and native regeneration, preserving append-only receipt history; never hand-merge receipt.json.",
+    "Original source evidence, historical records, frozen decisions/template/image experiment and the sealed critic remain unchanged."
+  ]
+}

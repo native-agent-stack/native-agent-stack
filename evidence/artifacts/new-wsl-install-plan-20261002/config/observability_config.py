@@ -114,6 +114,10 @@ def render_ports(text, ports):
 
 
 def render_asset(name, text, ports):
+    if name == "gpt-researcher.config.json":
+        settings = json.loads(text)
+        settings.setdefault("LLM_KWARGS", {})["base_url"] = f"http://127.0.0.1:{ports['GATEWAY']}/v1"
+        return json.dumps(settings, indent=1) + "\n"
     """Derive the wrapper only from the composition's pinned default bytes."""
     if name == "codebase-memory-ui.json":
         settings = json.loads(render_ports(text, ports))
@@ -154,26 +158,61 @@ def port_template(text):
                   lambda match: defaults[match[0]], text)
 
 
-def load_service_ports(host_file=None, config_root=None):
+def committed_service_ports(ports, root):
+    """A consumer cannot silently diverge from the completed installation."""
+    active = root / ".service-ports.json"
+    if active.is_symlink():
+        raise ValueError("needs_owner: allocation snapshot is a symlink; retained")
+    if not active.exists():
+        return ports
+    previous = service_ports(json.loads(active.read_text()), require_complete=True)
+    if ports != previous:
+        raise ValueError("needs_owner: requested consumer allocation differs from the committed installation; correct the host file or complete the selected service installation first")
+    return previous
+
+
+def client_service_ports(values):
+    """Resolve target-home client settings against that home's installation."""
+    home = Path(values.get("HOME", Path.home()))
+    inherited_config = os.environ.get("XDG_CONFIG_HOME") if home == Path.home() else None
+    root = Path(values.get("XDG_CONFIG_HOME") or inherited_config or str(home / ".config")) / "new-wsl-native-stack"
+    return committed_service_ports(service_ports(values, require_complete=True), root)
+
+
+def load_service_ports(host_file=None, config_root=None, *, check_committed=True):
     if host_file is None and os.environ.get("NS2604_HOST_FILE"):
         host_file = Path(os.environ["NS2604_HOST_FILE"])
-    path = host_file or (config_root / ".service-ports.json" if config_root else None)
+    root = config_root or default_config_root()
+    path = host_file or root / ".service-ports.json"
     values = json.loads(path.read_text()) if path and path.exists() else {}
     if host_file and not host_file.is_file():
         raise ValueError("host value file does not exist")
     if not isinstance(values, dict):
         raise ValueError("host value file must be a JSON object")
     isolated = bool(host_file or (path and path.exists()) or os.environ.get("NS2604_NO_START") == "1")
-    return service_ports(values, require_complete=isolated)
+    ports = service_ports(values, require_complete=isolated)
+    return committed_service_ports(ports, root) if check_committed else ports
 
 
 def default_config_root():
     return Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config"))) / "new-wsl-native-stack"
 
 
-def gateway_url(host_file=None, config_root=None):
-    ports = load_service_ports(host_file, config_root or default_config_root())
-    return f"http://127.0.0.1:{ports['GATEWAY']}/v1"
+def gateway_url(host_file=None, config_root=None, consumer_config=None):
+    root = config_root or default_config_root()
+    ports = load_service_ports(host_file, root)
+    selected = f"http://127.0.0.1:{ports['GATEWAY']}/v1"
+    if consumer_config is None:
+        return selected
+    # GPT Researcher0957c301 config.py:63-76,158-170 reads LLM_KWARGS
+    # from its JSON file. This endpoint is consumer state, never listener ownership.
+    endpoint = json.loads(consumer_config.read_text()).get("LLM_KWARGS", {}).get("base_url")
+    match = re.fullmatch(r"http://127\.0\.0\.1:([0-9]+)/v1", endpoint or "")
+    if not match or not 1 <= int(match[1]) <= 65535:
+        raise ValueError("needs_owner: installed research gateway must be an explicit loopback endpoint")
+    if (host_file or os.environ.get("NS2604_HOST_FILE") or (root / ".service-ports.json").exists()) and endpoint != selected:
+        raise ValueError("needs_owner: installed research gateway differs from the selected allocation; reinstall the research consumer with the same host file")
+    return endpoint
 
 
 def only_portless_configuration(root, plan, ports, source):
@@ -272,6 +311,11 @@ def installation_ports(ports, root, plan, slot=None, source=None):
             raise ValueError("needs_owner: existing configuration has no allocation snapshot; establish the installed owners' complete allocation before migration")
         return ports
     previous = service_ports(json.loads(active.read_text()), require_complete=True)
+    changed_unselected = [name for name, (owner, _) in SERVICE_PORTS.items()
+                          if owner not in selected and ports[name] != previous[name]]
+    if changed_unselected:
+        raise ValueError("needs_owner: requested ports for unselected owners differ from the committed allocation: "
+                         + ", ".join(changed_unselected))
     merged = {"NS_PORT_" + name: str(ports[name] if owner in selected else previous[name])
               for name, (owner, _) in SERVICE_PORTS.items()}
     return service_ports(merged, require_complete=True)
@@ -494,9 +538,10 @@ def destination():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("otel", "grafana", "alerting", "alerting-ready", "grafana-check", "prometheus", "stage", "command", "units", "gateway", "listeners", "begin-ports", "commit-ports", "code-graph"))
+    parser.add_argument("action", choices=("otel", "grafana", "alerting", "alerting-ready", "grafana-check", "prometheus", "stage", "command", "units", "gateway", "research", "listeners", "begin-ports", "commit-ports", "code-graph"))
     parser.add_argument("--config-root", type=Path)
     parser.add_argument("--source-root", type=Path)
+    parser.add_argument("--consumer-config", type=Path, help="gateway: installed research JSON with its selected endpoint")
     parser.add_argument("--tools-root", type=Path)
     parser.add_argument("--plan-file", type=Path)
     parser.add_argument("--host-file", type=Path, help="nonsecret host value JSON; NS_PORT_* values override defaults")
@@ -516,9 +561,16 @@ def main():
         parser.error("--config-root is required for this action")
     root = args.config_root or default_config_root()
     source = args.source_root or root
-    ports = load_service_ports(args.host_file, root)
+    # Installation actions consume a staged candidate; acceptance staging and
+    # runtime consumers must agree with the last completed installation.
+    check_committed = args.action in {"gateway", "listeners"} or (args.action == "stage" and args.plan_file is None)
+    ports = load_service_ports(args.host_file, root, check_committed=check_committed)
     if args.action == "gateway":
-        print(gateway_url(args.host_file, root))
+        print(gateway_url(args.host_file, root, args.consumer_config))
+        return 0
+    if args.action == "research":
+        name = "gpt-researcher.config.json"
+        atomic(root / name, render_asset(name, (source / name).read_text(), ports))
         return 0
     if args.action == "listeners":
         if args.plan_file is None:

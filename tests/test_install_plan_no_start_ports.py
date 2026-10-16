@@ -613,6 +613,7 @@ class ReviewWave2Tests(unittest.TestCase):
             self.allocation_fixture(root)
             result = self.allocation_setup(root,
                 'run_command \'printf "%s\\n" http://127.0.0.1:21128/v1\'\n'
+                'failed=0; needs_execution=true; commit_allocation\n'
                 'run_command \'python3 "$plan_dir/config/observability_config.py" gateway --config-root "$config_root"\'')
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(result.stdout.splitlines(), ["http://127.0.0.1:41128/v1"] * 2)

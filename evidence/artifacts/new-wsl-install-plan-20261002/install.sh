@@ -1076,7 +1076,7 @@ research-gpt-researcher() {
   # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files (this PR: tools/research/gpt_researcher.sh:27)
   run_command '(cd "$tool_root/gpt-researcher" && uv pip install --python .venv/bin/python -r requirements.txt)' || return "$?"
   # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files (this PR: tools/research/gpt_researcher.sh:27)
-  run_command 'install -d -m 0700 -- "$config_root" && install -m 0700 -- "$repo_root/tools/research/gpt_researcher.sh" "$config_root/gpt-researcher.sh" && install -m 0600 -- "$repo_root/tools/research/gpt-researcher.config.json" "$config_root/gpt-researcher.config.json"' || return "$?"
+  run_command 'install -d -m 0700 -- "$config_root" && install -m 0700 -- "$repo_root/tools/research/gpt_researcher.sh" "$config_root/gpt-researcher.sh" && python3 "$plan_dir/config/observability_config.py" research --config-root "$config_root" --source-root "$repo_root/tools/research"' || return "$?"
 }
 
 research-deer-flow() {
