@@ -779,7 +779,7 @@ BODY="${mb:+$mb$nl$nl}$TRAILERS"
 # A failed merge call is reconciled before anything is revoked (#1194's local review at 4fad2736, P2): GitHub can commit the merge and the
 # reply be lost (a reset connection, say), so gh exits non-zero for a pull request that is merged, and revoking would post failures for a
 # merged head and leave no landing receipt. gh returns the merge mutation's error as its own (cli v2.102.0
-# pkg/cmd/pr/merge/http.go:98-103, the MergePullRequest mutation returned from gql.Mutate; pkg/cmd/pr/merge/merge.go:347-349), so a lost
+# pkg/cmd/pr/merge/http.go:98-103, the MergePullRequest mutation returned from gql.Mutate; pkg/cmd/pr/merge/merge.go:348-350), so a lost
 # reply exits non-zero as a refusal does (#1194's GPT read at 967d068a, P3-5). The state is read three times, two seconds apart, since
 # GitHub's views can lag (the uet#58 measurement, above); the three reads two seconds apart are this lander's policy, not a consistency GitHub
 # documents. Each reads `state` and `headRefOid`, both gh pr view JSON fields (pkg/cmd/pr/view/view.go:84, api.PullRequestFields;

@@ -543,15 +543,17 @@ failing (also at the final gate), 6 timeout, 7 merge failed, or the squash body 
 holds a NUL byte, is not UTF-8, is longer than 64 KiB or holds no text, or changed after the body was built (nothing merged), 8
 blocked by policy, 9 as above (an adjudication that the gate does not accept is its 4), but a 5 proceeds (it is reachable only under a
 waiver), and a 3 before the validation stops too, 10 the merge onto current `origin/main` fails `scripts/validate.py` or does not merge cleanly, or GitHub reports `DIRTY` during the CI
-wait ("The merge commit cannot be cleanly created.", `schema.docs.graphql:26528-26530`): it stops at once instead of waiting for checks a
-DIRTY pull request never completes (the CC's follow-up of 2026-10-16: #1167 and #1180 each held the lock about 45-50 minutes, #1180
-ending with 6), 13 origin/main moved
+wait ("The merge commit cannot be cleanly created.", `schema.docs.graphql:26528-26530`): a merge conflict, which waiting does not resolve,
+and `pull_request` workflows do not run on it until it is resolved (only `pull_request_target` workflows do;
+`content/actions/reference/workflows-and-actions/events-that-trigger-workflows.md:466` at be38ec5d), so it stops at once instead of polling
+to the timeout (the CC's follow-up of 2026-10-16: #1167 and #1180 each held the lock about 45-50 minutes, #1180 ending with 6), 13
+origin/main moved
 after each of three validations, moved after the last validation (read at the final gate) or could not be read, so nothing is merged
 (#975, new in round 3). The three scripts also exit 11 when the no-reply author address cannot be formed (nothing is merged), 12 when the
 merge landed but its commit's author is not that address or the commit could not be read (CC correction #148), and 14 when another
 landing of the same repository holds the landing lock or the lock cannot be opened or taken (nothing has run; #975 round 4).
 `horizon_land.sh` (2026-10-15; nothing is merged on any code but 0, 12 and 16, and 129, 130 or 143 when the signal came during the author
-check after the merge): 2 an argument or an input, before any call (the usage, a pull
+check after the merge, while 17 leaves the outcome unknown: the statuses are kept and the pull request is checked by hand): 2 an argument or an input, before any call (the usage, a pull
 request that is not a number, a read head prefix that is not 7 to 40 lower-case hex digits, `HORIZON_CLAUDE_VERDICT`, `HORIZON_GPT_VERDICT`
 or `LOCAL_CI_RECEIPTS` unset or empty, `HORIZON_MUSE_VERDICT` set but empty, a file name of another form, a newline or an empty name in
 `LOCAL_CI_RECEIPTS`, a leading, trailing or doubled `:` in it, any input of `nas_land.sh` or `uet_land.sh` set, an empty value included),
@@ -577,7 +579,7 @@ line is printed either way; #1194's delta reads); 17 the merge call failed and t
 unmerged at the read head on three reads two seconds apart: the statuses are kept, nothing is revoked, and the pull request is checked by
 hand (a failed call whose pull request reads MERGED at the head continues as a landing; one that reads OPEN or CLOSED there on all three
 reads is 7; #1194's local review at 4fad2736, P2). gh returns the merge mutation's error as its own (cli v2.102.0
-`pkg/cmd/pr/merge/http.go:98-103`, `pkg/cmd/pr/merge/merge.go:347-349`), so a lost reply exits non-zero as a refusal does; the reads take
+`pkg/cmd/pr/merge/http.go:98-103`, `pkg/cmd/pr/merge/merge.go:348-350`), so a lost reply exits non-zero as a refusal does; the reads take
 `state` and `headRefOid`, both `gh pr view` JSON fields (`pkg/cmd/pr/view/view.go:84`; `api/query_builder.go:329, :365`), `state` being
 `CLOSED`, `MERGED` or `OPEN` (`PullRequestState`, github/docs@be38ec5d `src/graphql/data/fpt/schema.docs.graphql:47277-47292`); the three
 reads two seconds apart are this lander's policy, not a consistency GitHub documents (#1194's GPT read at 967d068a, P3-5); 129 a hangup, 130 an interrupt and 143 a termination signal (128 and the signal's number):
@@ -873,9 +875,9 @@ scripts that is neither a tracked file's, a named public artifact's nor a named 
 
 | File | As committed |
 | --- | --- |
-| `uet_land.sh` | `5f8d2eef6b3045d46c2c25f1e6b40b74b819536c304111ec3e7e834bf8d213b2` (449 lines) |
-| `nas_land.sh` | `5b680d7086e5c7d18c74c2b2b24817840c33ff39f553c37685089e6ee50447de` (698 lines) |
-| `horizon_land.sh` | `336209b11841dd403a4f770711ddfc55965956efa845b608975cf67cc89ab81b` (824 lines) |
+| `uet_land.sh` | `2401553e374ebde74024cebdff02f2c9e1128e8398415a85c8cf0261e70c7940` (451 lines) |
+| `nas_land.sh` | `b2d0cf7a4217edad688c0382c87d24d1c28c0c06a1eb1656aa5035240d9412af` (700 lines) |
+| `horizon_land.sh` | `abccef78b35583b81b34c3eb90eb40d208666a4e0aa14b42927d13edf971c7f8` (824 lines) |
 | `codex_gate.py` | `7afaa831c0763dd14c584d76b17465fa50993656cd63eec9fd0c4412fddb74b2` (559 lines) |
 | `review_normalize.py` | `b553d9cb67ca196bd587e980e01295e28e8ea0e2bcb3d0015fc5d040735a1594` (348 lines) |
 

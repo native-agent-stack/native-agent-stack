@@ -627,9 +627,11 @@ for i in $(seq 1 25); do
     echo "#$N head moved to ${1:0:8} and carries the read head's change: following it"
     cur=$1; follows=$((follows + 1)); sleep 20; continue
   fi
-  # The CC's follow-up of 2026-10-16 (#1167 and #1180 each held the landing lock about 45-50 minutes for a CI that a DIRTY pull request
-  # never completes; #1180 stopped with 6): DIRTY is "The merge commit cannot be cleanly created." (github/docs@be38ec5d
-  # schema.docs.graphql:26528-26530), so the wait stops at once with 10, merge_validate's exit for a merge that does not apply cleanly.
+  # The CC's follow-up of 2026-10-16 (#1167 and #1180 each held the landing lock about 45-50 minutes in this wait; #1180 stopped with 6):
+  # DIRTY is "The merge commit cannot be cleanly created." (github/docs@be38ec5d schema.docs.graphql:26528-26530), a merge conflict that
+  # waiting does not resolve, and "Workflows will not run on `pull_request` activity if the pull request has a merge conflict" (only
+  # pull_request_target workflows do; events-that-trigger-workflows.md:466). So the wait stops at once with 10, merge_validate's exit for
+  # a merge that does not apply cleanly.
   [ "${5:-}" = DIRTY ] && { echo "#$N GitHub reports DIRTY during the CI wait: the merge commit cannot be created cleanly; a native rebase is needed: stop, nothing merged"; exit 10; }
   if [ "${2:-1}" = 0 ] && [ "${4:-0}" -gt 0 ] && { [ "${vok:-0}" -gt 0 ] || [ "${3:-0}" -gt 0 ]; }; then
     [ "$3" = 0 ] || { echo "#$N CI failing=$3 of $4: stop"; exit 5; }

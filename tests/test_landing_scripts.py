@@ -635,6 +635,8 @@ PUBLIC_COMMITS = {
                                                 "https://github.com/native-agent-stack/native-agent-stack/commit/967d068a9aa0d4e3f025a12266055b63cb6d256e",
     "65d66a370d9a5f129662d14c84f2820e940b3a83": "native-agent-stack/native-agent-stack: #1194's merge commit, "
                                                 "https://github.com/native-agent-stack/native-agent-stack/commit/65d66a370d9a5f129662d14c84f2820e940b3a83",
+    "1b633d861518fa0d299279b1cfaec11d0fb47f82": "native-agent-stack/native-agent-stack: #1163's merge commit, #1229's base, "
+                                                "https://github.com/native-agent-stack/native-agent-stack/commit/1b633d861518fa0d299279b1cfaec11d0fb47f82",
 }
 HEX_FULL = re.compile(r"(?<![0-9A-Fa-f])[0-9A-Fa-f]{64}(?![0-9A-Fa-f])")
 HEX_MARKED = re.compile(r"(?<![0-9A-Fa-f])([0-9A-Fa-f]{6,})…")  # a prefix written `<hex>…`
@@ -1304,18 +1306,25 @@ class ScriptTextTests(LandingCase):
                        'all commands exit successfully" (the installed bash 5.3 bash(1), SHELL GRAMMAR, Pipelines)',
                        "17 the merge call failed and its outcome could not be read (the statuses kept, nothing revoked",
                        "unless the merge succeeded or its outcome is unknown (exit 17, HZ_KEEP)",
-                       "pkg/cmd/pr/merge/http.go:98-103", "pkg/cmd/pr/merge/merge.go:347-349", "pkg/cmd/pr/view/view.go:84",
+                       "pkg/cmd/pr/merge/http.go:98-103", "pkg/cmd/pr/merge/merge.go:348-350", "pkg/cmd/pr/view/view.go:84",
                        "api/query_builder.go:329, :365", "schema.docs.graphql:47277-47292",
                        "three reads two seconds apart are this lander's policy, not a consistency GitHub documents"):
             with self.subTest(script=phrase):
                 self.assertIn(phrase, own)
         self.assertEqual(own.count("unless the merge succeeded or its outcome is unknown (exit 17, HZ_KEEP)"), 2, "the header and hz_revoke")
         for phrase in ("unless the merge succeeded or its outcome is unknown (exit 17, which keeps them)",
+                       # the CC's micro at 54376798 (P3-3 and P3-4 partial): the README's summary of horizon's codes names 17, and the
+                       # recovery and residual disclosures stay
+                       "while 17 leaves the outcome unknown: the statuses are kept and the pull request is checked by hand",
+                       "a clone path with whitespace breaks both scripts",
+                       "The final gate narrows each local gate to the seconds between its read and the merge call, and does not close them",
+                       "A revocation POST that fails (the API refusing, the network lost) leaves that context's success standing",
                        "made in a temporary file in that directory and hard-linked to its name", "src/uu/ln/src/ln.rs:414-431, :475",
                        "library/std/src/fs.rs:2780, :2794", "pkg/cmd/pr/merge/http.go:98-103", "schema.docs.graphql:47277-47292"):
             with self.subTest(readme=phrase):
                 self.assertIn(phrase, readme)
-        for retired in ("written under bash's noclobber", "The EXIT trap is set right before the first POST: unless the merge succeeded, it"):
+        for retired in ("written under bash's noclobber", "The EXIT trap is set right before the first POST: unless the merge succeeded, it",
+                        "the sha256 the lander posts"):
             with self.subTest(retired=retired):
                 self.assertNotIn(retired, readme)
 
@@ -3941,6 +3950,13 @@ class EndToEndTests(LandingCase):
         running = [nas_run("validate", "2026-10-10T10:00:00Z", status="in_progress")]
         code, out, log = self.land(self.nas, merge_state="DIRTY", checkruns=running)
         self.assertEqual((code, self.merge_calls(log)), (10, []), out)
+        # The CC's micro at 54376798, P2: the reason is the documented one, a merge conflict (events-that-trigger-workflows.md:466), not
+        # that a DIRTY pull request "never completes" its checks (pull_request_target workflows and runs already started still do).
+        readme = " ".join((LANDING / "README.md").read_text(encoding="utf-8").split())
+        for name, text in (("nas_land.sh", " ".join(self.nas.text.split())), ("README.md", readme)):
+            with self.subTest(text=name):
+                self.assertIn("events-that-trigger-workflows.md:466", text)
+                self.assertNotIn("never completes", text)
         self.assertIn("GitHub reports DIRTY during the CI wait: the merge commit cannot be created cleanly; a native rebase is needed: stop", out)
         self.assertNotIn("sleep 120", log)
         self.assertNotIn("CI timeout", out)
@@ -3959,6 +3975,8 @@ class EndToEndTests(LandingCase):
         running = [check_run("ci-gate", status="IN_PROGRESS", conclusion=None)]
         code, out, log = self.land(self.uet, merge_state="DIRTY", rollup=running)
         self.assertEqual((code, self.merge_calls(log)), (10, []), out)
+        self.assertIn("events-that-trigger-workflows.md:466", " ".join(self.uet.text.split()))
+        self.assertNotIn("never completes", self.uet.text)
         self.assertIn("GitHub reports DIRTY during the CI wait: the merge commit cannot be created cleanly; a native rebase is needed: stop", out)
         self.assertNotIn("sleep 120", log)
         self.assertNotIn("CI timeout", out)

@@ -424,8 +424,10 @@ for i in $(seq 1 25); do
     H=$1; follows=$((follows + 1)); sleep 20; continue
   fi
   # The CC's ruling of 2026-10-16 on #1229, as nas_land.sh's CI wait: DIRTY is "The merge commit cannot be cleanly created."
-  # (github/docs@be38ec5d schema.docs.graphql:26528-26530), and such a pull request never completes its checks, so the wait stops at once
-  # with 10 (does not merge cleanly) instead of holding the landing lock until the timeout (6).
+  # (github/docs@be38ec5d schema.docs.graphql:26528-26530), a merge conflict that waiting does not resolve, and "Workflows will not run on
+  # `pull_request` activity if the pull request has a merge conflict" (only pull_request_target workflows do;
+  # events-that-trigger-workflows.md:466). So the wait stops at once with 10 (does not merge cleanly) instead of holding the landing lock
+  # until the timeout (6).
   [ "${6:-}" = DIRTY ] && { echo "#$N GitHub reports DIRTY during the CI wait: the merge commit cannot be created cleanly; a native rebase is needed: stop, nothing merged"; exit 10; }
   if [ "${2:-1}" = 0 ] && [ "${4:-0}" -gt 0 ] && { [ "${5:-0}" -gt 0 ] || [ "${3:-0}" -gt 0 ]; }; then
     [ "$3" = 0 ] || { echo "#$N CI failing=$3 of $4: stop"; exit 5; }
