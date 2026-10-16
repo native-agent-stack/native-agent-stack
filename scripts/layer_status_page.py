@@ -6,8 +6,8 @@ Each layer gets one state: FINAL (its terminal_state is FINAL), GAP (unswept, no
 docs/decisions/2026-10-11-layer-resolution-protocol.md, "Terminal states and evidence": a recorded verdict, a run pin
 per winner, an E2E receipt through the upstream's own path at that pin (the winner factors host_e2e and pin_current),
 and invoke evidence, which final-stack.json does not record, so every non-FINAL layer lists it. It also lists the
-missing multi-angle record and the carried survivors. Rows come in the wave order of the 2026-10-15 FINAL wave:
-trading-critical layers first, then the rest by name.
+missing multi-angle record and the carried survivors. Rows come in the FINAL wave's order, each with its tier:
+T1-trading (the layers that carry the owner's trading capabilities), then T1-harness, then the rest (T3) by name.
 
 --check (the default) rebuilds the page and exits 1 when the checked-in file differs; --write writes it.
 """
@@ -22,18 +22,41 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = "catalogs/landscape/final-stack.json"
 OUTPUT = "docs/layer-status.md"
-WAVE_ORDER = (
-    "us-equities/execution-broker",
-    "us-equities/backtesting-engine",
-    "us-equities/market-data-reference",
-    "foundation/durable-memory",
-    "foundation/model-routes",
-    "foundation/instructions-skills",
-    "foundation/native-clients",
-    "foundation/workers",
-    "foundation/agent-sdks",
-    "us-equities/agents-models-workers",
+# The FINAL wave's order: the command center's sequencing ruling of 2026-10-16 on the wave order of
+# docs/decisions/2026-10-15-new-wsl-clean-install-plan.md. T1-trading holds the layers that carry the owner's trading
+# capabilities, in this order; T1-harness holds the harness layers. Every other layer is T3. T2's one layer,
+# market-data-reference, moved into T1-trading.
+TIERS = (
+    ("T1-trading", (
+        "us-equities/execution-broker",
+        "us-equities/backtesting-engine",
+        "us-equities/portfolio-risk",
+        "us-equities/market-data-reference",
+        "us-equities/research-factors-ml",
+        "us-equities/catalysts-sentiment",
+    )),
+    ("T1-harness", (
+        "foundation/token-efficiency",
+        "foundation/durable-memory",
+        "foundation/code-navigation",
+        "foundation/semantic-rag",
+        "foundation/document-retrieval",
+        "foundation/instructions-skills",
+        "foundation/native-clients",
+        "foundation/workers",
+        "foundation/isolation",
+        "foundation/observation-inference",
+        "foundation/git-github-automation",
+        "foundation/ci-supply-chain",
+        "foundation/model-routes",
+        "foundation/agent-sdks",
+        "foundation/mcp-surfaces",
+        "foundation/quality-evaluation",
+        "foundation/scheduling-supervision",
+        "foundation/web-research",
+    )),
 )
+REST = "T3"
 
 
 def load(path: Path) -> dict:
@@ -94,8 +117,13 @@ def build_rows(stack: dict) -> list[dict]:
                            else "close the missing FINAL conditions")
         rows.append({"layer": key, "status": item.get("status"), "state": _state(item), "winners": winners,
                      "missing": _missing(item, runs), "next_action": next_action})
-    rank = {key: i for i, key in enumerate(WAVE_ORDER)}
-    rows.sort(key=lambda r: (rank.get(r["layer"], len(WAVE_ORDER)), r["layer"]))
+    rank, tier = {}, {}
+    for name, keys in TIERS:
+        for key in keys:
+            rank[key], tier[key] = len(rank), name
+    for r in rows:
+        r["tier"] = tier.get(r["layer"], REST)
+    rows.sort(key=lambda r: (rank.get(r["layer"], len(rank)), r["layer"]))
     return rows
 
 
@@ -113,16 +141,16 @@ def render(stack: dict) -> str:
         "by hand. FINAL needs the four conditions of the "
         "[layer-resolution protocol](decisions/2026-10-11-layer-resolution-protocol.md): a recorded verdict, a run pin, "
         "an upstream E2E at that pin and invoke evidence. TRIAL marks recorded winners whose FINAL conditions are "
-        "incomplete; GAP marks a layer with no winner or no completed sweep. Rows are in the wave order of the "
-        "2026-10-15 FINAL wave: trading-critical layers first.",
+        "incomplete; GAP marks a layer with no winner or no completed sweep. Rows are in the FINAL wave's order: "
+        "T1-trading (the layers that carry the owner's trading capabilities), then T1-harness, then the rest (T3).",
         "",
         f"**{len(rows)} layers:** {counts['FINAL']} FINAL, {counts['TRIAL']} TRIAL, {counts['GAP']} GAP.",
         "",
-        "| # | Layer | Status | State | Winner@run pin | Evidence still missing | Next action |",
-        "| ---: | --- | --- | --- | --- | --- | --- |",
+        "| # | Tier | Layer | Status | State | Winner@run pin | Evidence still missing | Next action |",
+        "| ---: | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for i, r in enumerate(rows, 1):
-        lines.append(f'| {i} | `{r["layer"]}` | {r["status"]} | {r["state"]} | '
+        lines.append(f'| {i} | {r["tier"]} | `{r["layer"]}` | {r["status"]} | {r["state"]} | '
                      f'{_cell("; ".join(r["winners"]) or "none")} | {_cell("; ".join(r["missing"]) or "none")} | '
                      f'{_cell(r["next_action"])} |')
     return "\n".join(lines) + "\n"

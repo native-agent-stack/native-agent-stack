@@ -68,12 +68,40 @@ class StateTests(unittest.TestCase):
         self.assertEqual(self.rows["foundation/model-routes"]["next_action"], "initial sweep scoped to the gap")
 
 
+WAVE_STACK = {
+    "checked_at": "2026-10-16",
+    "runs": [],
+    "layers": [
+        layer("foundation", "zeta", "reopened"),
+        layer("us-equities", "judgment-features", "unswept"),
+        layer("foundation", "web-research", "reopened"),
+        layer("foundation", "durable-memory", "reopened"),
+        layer("foundation", "token-efficiency", "reopened"),
+        layer("us-equities", "catalysts-sentiment", "unswept"),
+        layer("us-equities", "market-data-reference", "reopened"),
+        layer("us-equities", "portfolio-risk", "reopened"),
+        layer("us-equities", "backtesting-engine", "reopened"),
+        layer("us-equities", "execution-broker", "no-winner"),
+    ],
+}
+
+
 class OrderTests(unittest.TestCase):
-    def test_trading_critical_layers_come_first(self):
-        order = [r["layer"] for r in page.build_rows(STACK)]
-        self.assertEqual(order[:3], ["us-equities/execution-broker", "us-equities/backtesting-engine",
-                                     "foundation/model-routes"])
-        self.assertEqual(order[-1], "foundation/zeta")
+    def test_trading_capability_layers_come_first_then_harness_then_the_rest(self):
+        rows = page.build_rows(WAVE_STACK)
+        self.assertEqual([r["layer"] for r in rows], [
+            "us-equities/execution-broker", "us-equities/backtesting-engine", "us-equities/portfolio-risk",
+            "us-equities/market-data-reference", "us-equities/catalysts-sentiment",
+            "foundation/token-efficiency", "foundation/durable-memory", "foundation/web-research",
+            "foundation/zeta", "us-equities/judgment-features",
+        ])
+        self.assertEqual([r["tier"] for r in rows], ["T1-trading"] * 5 + ["T1-harness"] * 3 + ["T3"] * 2)
+
+    def test_every_tier_layer_is_named_once(self):
+        named = [key for _, keys in page.TIERS for key in keys]
+        self.assertEqual(len(named), len(set(named)))
+        self.assertEqual(len(dict(page.TIERS)["T1-trading"]), 6)
+        self.assertEqual(len(dict(page.TIERS)["T1-harness"]), 18)
 
 
 class FreshnessTests(unittest.TestCase):
