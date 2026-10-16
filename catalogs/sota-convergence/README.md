@@ -162,3 +162,22 @@ foundation and 12 trading layers, Claude lane only, Codex lane absent) are in
 the dated audit of the convergence run itself.
 
 Gate ladder (2026-09-22): the trading gates named by the critic are tracked in `catalogs/us-equities/gates-20260922.json` and checked by `scripts/trading_gates.py --check`; the reconciliations recorded there and in `tools/sota-convergence/reconciliations-20260922.json` supersede the engine-card note above.
+
+## 2026-10-13 wave 1: execution-broker and backtesting-engine
+
+This section is appended after the 2026-09-22 audit, so line citations of that
+audit keep their targets. [`manifest-20261013.json`](manifest-20261013.json)
+carries both completed sweep lanes. Execution-broker records 14 candidate-layer
+proposals, with 6 surviving and 8 refuted; backtesting-engine records 15, with
+4 surviving and 11 refuted. These are source-review/refutation results, not
+installations, default promotions or native engine/broker acceptance.
+
+Per-lane returns, ten pinned upstream source reviews, sanitized usage and
+RESULT records are retained under the matching
+`evidence/artifacts/landscape-sweep-20261013-*` directories. The saturation
+ledger appends both completed runs; original ledger history remains intact.
+This dated manifest is final with these two lanes: both ledger records bind its
+bytes, so a later publication wave does not edit it. Other layers carry catalog
+metadata and have no new sweep claim from this publication. The publication
+record is
+[2026-10-13-sweep-wave1-publication.md](../../docs/decisions/2026-10-13-sweep-wave1-publication.md).

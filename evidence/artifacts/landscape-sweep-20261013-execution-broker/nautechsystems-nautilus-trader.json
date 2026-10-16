@@ -1,0 +1,38 @@
+{
+ "schema_version": 1,
+ "id": "source-review-nautechsystems-nautilus-trader",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/nautechsystems/nautilus_trader",
+ "reviewed_commit": "afe8cb3fa3de06b5405491c1f25fec61a0903ea7",
+ "readme_path": "README.md",
+ "license": "LGPL-3.0",
+ "layers": [
+  "execution-broker"
+ ],
+ "claim": "Source and documentation review of nautechsystems/nautilus_trader at commit afe8cb3fa3de06b5405491c1f25fec61a0903ea7 (license LGPL-3.0), read from README.md at that commit. Repository description: \"Production-grade Rust-native trading engine with deterministic event-driven architecture\". Survived the landscape-sweep-20261013-execution-broker facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 29920,
+  "pushed_at": "2026-10-13T09:42:45Z",
+  "archived": false,
+  "default_branch": "develop"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@afe8cb3fa3de06b5405491c1f25fec61a0903ea7",
+   "text": "# <img src=\"https://github.com/nautechsystems/nautilus_trader/raw/develop/assets/nautilus-trader-logo.png\" alt=\"NautilusTrader\" width=\"500\">"
+  },
+  {
+   "source": "README.md@afe8cb3fa3de06b5405491c1f25fec61a0903ea7",
+   "text": "- **Docs**: <https://nautilustrader.io/docs/> - **Website**: <https://nautilustrader.io> - **Support**: [<public-contact-omitted>](mailto:<public-contact-omitted>)"
+  },
+  {
+   "source": "README.md@afe8cb3fa3de06b5405491c1f25fec61a0903ea7",
+   "text": "NautilusTrader is an open-source, production-grade, Rust-native engine for multi-asset, multi-venue trading systems."
+  }
+ ],
+ "publication_redaction": {
+  "public_contact_literals_omitted": 2,
+  "boundary": "Upstream public README contact strings omitted from excerpts under the publication literal rule. Reviewed commit/path and all non-contact observations are unchanged; no private input authentication is added."
+ }
+}

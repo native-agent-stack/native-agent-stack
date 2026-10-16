@@ -558,7 +558,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "ast-grep",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -614,7 +614,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "mcporter",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -701,8 +701,8 @@
             "unknown": 9
           },
           "pin_current": {
-            "false": 5,
-            "true": 4,
+            "false": 7,
+            "true": 2,
             "unknown": 1
           },
           "verdict_winner": {
@@ -1198,7 +1198,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -1255,8 +1255,8 @@
             "unknown": 4
           },
           "pin_current": {
-            "false": 3,
-            "true": 2,
+            "false": 4,
+            "true": 1,
             "unknown": 0
           },
           "verdict_winner": {
@@ -1809,7 +1809,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "mcporter",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -1884,8 +1884,8 @@
             "unknown": 5
           },
           "pin_current": {
-            "false": 4,
-            "true": 3,
+            "false": 5,
+            "true": 2,
             "unknown": 1
           },
           "verdict_winner": {
@@ -2231,7 +2231,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -2358,8 +2358,8 @@
             "unknown": 10
           },
           "pin_current": {
-            "false": 2,
-            "true": 4,
+            "false": 3,
+            "true": 3,
             "unknown": 5
           },
           "verdict_winner": {
@@ -2829,7 +2829,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "mcporter",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -2846,8 +2846,8 @@
             "unknown": 0
           },
           "pin_current": {
-            "false": 1,
-            "true": 1,
+            "false": 2,
+            "true": 0,
             "unknown": 0
           },
           "verdict_winner": {
@@ -3063,7 +3063,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "claude-code",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -3138,8 +3138,8 @@
             "unknown": 4
           },
           "pin_current": {
-            "false": 2,
-            "true": 4,
+            "false": 3,
+            "true": 3,
             "unknown": 0
           },
           "verdict_winner": {
@@ -3383,7 +3383,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "agentsview",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -3411,7 +3411,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "ccusage",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -3425,7 +3425,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -3439,7 +3439,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-hud",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -3600,8 +3600,8 @@
             "unknown": 12
           },
           "pin_current": {
-            "false": 4,
-            "true": 11,
+            "false": 8,
+            "true": 7,
             "unknown": 0
           },
           "verdict_winner": {
@@ -4260,7 +4260,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -4347,8 +4347,8 @@
             "unknown": 6
           },
           "pin_current": {
-            "false": 4,
-            "true": 2,
+            "false": 5,
+            "true": 1,
             "unknown": 1
           },
           "verdict_winner": {
@@ -4562,7 +4562,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -4623,8 +4623,8 @@
             "unknown": 3
           },
           "pin_current": {
-            "false": 3,
-            "true": 1,
+            "false": 4,
+            "true": 0,
             "unknown": 1
           },
           "verdict_winner": {
@@ -5437,7 +5437,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "ccusage",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -5556,8 +5556,8 @@
             "unknown": 5
           },
           "pin_current": {
-            "false": 2,
-            "true": 6,
+            "false": 3,
+            "true": 5,
             "unknown": 0
           },
           "verdict_winner": {
@@ -5827,7 +5827,7 @@
             "converged": false,
             "host_e2e": "false",
             "id": "agent-browser",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -5890,8 +5890,8 @@
             "unknown": 1
           },
           "pin_current": {
-            "false": 1,
-            "true": 2,
+            "false": 2,
+            "true": 1,
             "unknown": 1
           },
           "verdict_winner": {
@@ -6194,7 +6194,7 @@
             "converged": false,
             "host_e2e": "false",
             "id": "claude-code",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -6269,8 +6269,8 @@
             "unknown": 4
           },
           "pin_current": {
-            "false": 2,
-            "true": 3,
+            "false": 3,
+            "true": 2,
             "unknown": 1
           },
           "verdict_winner": {
@@ -6900,7 +6900,7 @@
       ],
       "catalog": "us-equities",
       "convergence": {
-        "all_rows": 3,
+        "all_rows": 4,
         "components": [
           {
             "adopted_as": null,
@@ -6967,6 +6967,10 @@
           {
             "date": "2026-10-09",
             "sweep_id": "landscape-sweep-20261009-pine"
+          },
+          {
+            "date": "2026-10-13",
+            "sweep_id": "landscape-sweep-20261013-backtesting-engine"
           }
         ],
         "unresolved": [],
@@ -7341,7 +7345,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "inspect-ai",
-            "pin_current": "unknown",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "true",
             "winner_ids": [
@@ -7358,9 +7362,9 @@
             "unknown": 0
           },
           "pin_current": {
-            "false": 0,
+            "false": 1,
             "true": 0,
-            "unknown": 1
+            "unknown": 0
           },
           "verdict_winner": {
             "false": 0,
@@ -7555,7 +7559,7 @@
       "alternatives": [],
       "catalog": "us-equities",
       "convergence": {
-        "all_rows": 5,
+        "all_rows": 6,
         "components": [
           {
             "adopted_as": null,
@@ -7598,18 +7602,6 @@
             "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
-            "id": "lean-alpaca",
-            "pin_current": "unknown",
-            "resolved_by": "decision",
-            "verdict_winner": "false",
-            "winner_ids": [],
-            "winner_match": null
-          },
-          {
-            "adopted_as": null,
-            "adopted_as_candidates": [],
-            "converged": false,
-            "host_e2e": "unknown",
             "id": "nautilus-ibkr-adapter",
             "pin_current": "false",
             "resolved_by": "decision",
@@ -7623,20 +7615,20 @@
           "host_e2e": {
             "false": 0,
             "true": 0,
-            "unknown": 5
+            "unknown": 4
           },
           "pin_current": {
             "false": 1,
             "true": 2,
-            "unknown": 2
+            "unknown": 1
           },
           "verdict_winner": {
-            "false": 5,
+            "false": 4,
             "true": 0,
             "unknown": 0
           }
         },
-        "in_use": 5,
+        "in_use": 4,
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "pending_lanes",
@@ -7718,20 +7710,6 @@
             "adopted_as": null,
             "adopted_as_candidates": [],
             "converged": false,
-            "host_e2e": "false",
-            "id": "data-dvc",
-            "pin_current": "true",
-            "resolved_by": "decision",
-            "verdict_winner": "true",
-            "winner_ids": [
-              "data-dvc"
-            ],
-            "winner_match": "id"
-          },
-          {
-            "adopted_as": null,
-            "adopted_as_candidates": [],
-            "converged": false,
             "host_e2e": "unknown",
             "id": "foundation-socraticode",
             "pin_current": "false",
@@ -7744,22 +7722,22 @@
         "converged": 0,
         "factors": {
           "host_e2e": {
-            "false": 1,
+            "false": 0,
             "true": 0,
             "unknown": 1
           },
           "pin_current": {
             "false": 1,
-            "true": 1,
+            "true": 0,
             "unknown": 0
           },
           "verdict_winner": {
             "false": 1,
-            "true": 1,
+            "true": 0,
             "unknown": 0
           }
         },
-        "in_use": 2,
+        "in_use": 1,
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
@@ -9286,7 +9264,7 @@
         },
         "us-equities": {
           "converged": 0,
-          "in_use": 40,
+          "in_use": 38,
           "layers": 12,
           "share": 0.0,
           "unresolved": 0
@@ -9355,9 +9333,9 @@
       },
       "manifest_layers_without_matrix_row": [],
       "newest_manifest": {
-        "checked_at": "2026-10-09",
-        "id": "sota-convergence-20261009",
-        "path": "catalogs/sota-convergence/manifest-20261009.json"
+        "checked_at": "2026-10-13",
+        "id": "sota-convergence-20261013",
+        "path": "catalogs/sota-convergence/manifest-20261013.json"
       },
       "newest_verdict_checked_at": {
         "foundation": "2026-09-22",
@@ -9365,7 +9343,7 @@
       },
       "overall": {
         "converged": 0,
-        "in_use": 170,
+        "in_use": 168,
         "layers": 32,
         "share": 0.0,
         "unresolved": 0
@@ -9396,6 +9374,18 @@
             "layers": 1,
             "manifest_ref": "catalogs/sota-convergence/manifest-20261009.json",
             "sweep_id": "landscape-sweep-20261009-pine"
+          },
+          {
+            "date": "2026-10-13",
+            "layers": 1,
+            "manifest_ref": "catalogs/sota-convergence/manifest-20261013.json",
+            "sweep_id": "landscape-sweep-20261013-backtesting-engine"
+          },
+          {
+            "date": "2026-10-13",
+            "layers": 1,
+            "manifest_ref": "catalogs/sota-convergence/manifest-20261013.json",
+            "sweep_id": "landscape-sweep-20261013-execution-broker"
           }
         ],
         "host_e2e_platform": "linux-wsl2-x86_64",

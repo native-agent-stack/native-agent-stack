@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-quantconnect-ibautomater",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/QuantConnect/IBAutomater",
+ "reviewed_commit": "0062526891c1e1bdf03ad91b49045ce0838c2ecd",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "execution-broker"
+ ],
+ "claim": "Source and documentation review of QuantConnect/IBAutomater at commit 0062526891c1e1bdf03ad91b49045ce0838c2ecd (license Apache-2.0), read from README.md at that commit. Repository description: \"Automates IB Gateway start, stopping and restarting.\". Survived the landscape-sweep-20261013-execution-broker facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 145,
+  "pushed_at": "2026-08-07T13:50:54Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@0062526891c1e1bdf03ad91b49045ce0838c2ecd",
+   "text": "IBAutomater is an automation tool for IB Gateway v978 and above. It supports starting, stopping and automated logins for IB Gateway. This package is best used in conjunction with LEAN. LEAN handles the automatic login and portfolio construction once you start the IB Gateway."
+  },
+  {
+   "source": "README.md@0062526891c1e1bdf03ad91b49045ce0838c2ecd",
+   "text": "IBAutomater is available on [NuGet](https://www.nuget.org/packages/QuantConnect.IBAutomater/):"
+  },
+  {
+   "source": "README.md@0062526891c1e1bdf03ad91b49045ce0838c2ecd",
+   "text": "To get started with IBAutomater, first you will need to get the library itself. The easiest way to do this is to install the package into your project using [NuGet](https://www.nuget.org/packages/QuantConnect.IBAutomater/). Using Visual Studio this can be done in two ways."
+  }
+ ]
+}
