@@ -1,0 +1,129 @@
+Scope: all 4 workspace projects
+Lockfile is up to date, resolution step is skipped
+Packages: +551
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 0, reused 0, downloaded 1, added 0
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: <SCRATCH_ARM>/tmp/pnpm-store/v10
+  Virtual store is at:             node_modules/.pnpm
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install$ npm install
+Progress: resolved 0, reused 0, downloaded 536, added 115
+
+   ╭──────────────────────────────────────────╮
+   │                                          │
+   │   Update available! 10.34.5 → 12.11.2.   │
+   │   Changelog: https://pnpm.io/v/12.11.2   │
+   │     To update, run: pnpm add -g pnpm     │
+   │                                          │
+   ╰──────────────────────────────────────────╯
+
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "block-exotic-subdeps". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "strict-dep-builds". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "prefer-workspace-packages". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "node-linker". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "store-dir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "trust-policy-ignore-after". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "minimum-release-age". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "trust-policy". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "npm-globalconfig". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "_jsr-registry". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+Progress: resolved 0, reused 0, downloaded 540, added 547
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: > @modelcontextprotocol/conformance@0.2.0-alpha.10 prepare
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: > npm run build
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "block-exotic-subdeps". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "strict-dep-builds". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "prefer-workspace-packages". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "node-linker". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "store-dir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "trust-policy-ignore-after". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "minimum-release-age". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "trust-policy". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "npm-globalconfig". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "_jsr-registry". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn Unknown env config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: > @modelcontextprotocol/conformance@0.2.0-alpha.10 build
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: > tsdown src/index.ts --minify --clean --target node20 --no-fixed-extension
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: ℹ tsdown v0.21.10 powered by rolldown v1.0.0-rc.17
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: ℹ config file: <SCRATCH_ARM>/tmp/pnpm-store/v10/tmp/_tmp_2194553_d7fa0477ca10f78d3f58ff4681c04e89/package.json 
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: ℹ entry: src/index.ts
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: ℹ target: node20
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: ℹ tsconfig: tsconfig.json
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: ℹ Build start
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: ℹ Granting execute permission to dist/index.js
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: ℹ dist/index.js  779.70 kB │ gzip: 154.94 kB
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: ℹ 1 files, total: 779.70 kB
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: ✔ Build complete in 246ms
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: added 300 packages, and audited 301 packages in 9s
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: 97 packages are looking for funding
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install:   run `npm fund` for details
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: 20 vulnerabilities (2 low, 6 moderate, 11 high, 1 critical)
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: To address all issues, run:
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install:   npm audit fix
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: Run `npm audit` for details.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn install-scripts 2 packages have install scripts not yet covered by allowScripts:
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn install-scripts   esbuild@0.27.4 (postinstall: node install.js)
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn install-scripts   lefthook@2.1.6 (postinstall: node postinstall.js)
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn install-scripts
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-install: Done
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack$ npm run prepack
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "block-exotic-subdeps". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "strict-dep-builds". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "prefer-workspace-packages". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "node-linker". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "store-dir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "trust-policy-ignore-after". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "minimum-release-age". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "trust-policy". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "npm-globalconfig". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "_jsr-registry". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: > @modelcontextprotocol/conformance@0.2.0-alpha.10 prepack
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: > npm run build
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "block-exotic-subdeps". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "strict-dep-builds". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "prefer-workspace-packages". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "node-linker". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "store-dir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "trust-policy-ignore-after". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "minimum-release-age". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "trust-policy". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "npm-globalconfig". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "_jsr-registry". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: npm warn Unknown env config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: > @modelcontextprotocol/conformance@0.2.0-alpha.10 build
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: > tsdown src/index.ts --minify --clean --target node20 --no-fixed-extension
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: ℹ tsdown v0.21.10 powered by rolldown v1.0.0-rc.17
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: ℹ config file: <SCRATCH_ARM>/tmp/pnpm-store/v10/tmp/_tmp_2194553_d7fa0477ca10f78d3f58ff4681c04e89/package.json 
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: ℹ entry: src/index.ts
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: ℹ target: node20
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: ℹ tsconfig: tsconfig.json
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: ℹ Build start
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: ℹ Cleaning 1 files
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: ℹ Granting execute permission to dist/index.js
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: ℹ dist/index.js  779.70 kB │ gzip: 154.94 kB
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: ℹ 1 files, total: 779.70 kB
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: ✔ Build complete in 237ms
+...4553_d7fa0477ca10f78d3f58ff4681c04e89 npm-run-prepack: Done
+Progress: resolved 0, reused 0, downloaded 541, added 547
+Progress: resolved 0, reused 0, downloaded 541, added 551, done
+
+sdk/typescript prepare$ pnpm run build
+sdk/typescript prepare: > @openai/codex-sdk@0.0.0-dev build <SCRATCH_ARM>/work/codex/sdk/typescript
+sdk/typescript prepare: > tsup
+sdk/typescript prepare: CLI Building entry: src/index.ts
+sdk/typescript prepare: CLI Using tsconfig: tsconfig.json
+sdk/typescript prepare: CLI tsup v8.5.0
+sdk/typescript prepare: CLI Using tsup config: <SCRATCH_ARM>/work/codex/sdk/typescript/tsup.config.ts
+sdk/typescript prepare: CLI Target: node18
+sdk/typescript prepare: CLI Cleaning output folder
+sdk/typescript prepare: ESM Build start
+sdk/typescript prepare: ESM dist/index.js     16.69 KB
+sdk/typescript prepare: ESM dist/index.js.map 33.13 KB
+sdk/typescript prepare: ESM ⚡️ Build success in 25ms
+sdk/typescript prepare: DTS Build start
+sdk/typescript prepare: DTS ⚡️ Build success in 1169ms
+sdk/typescript prepare: DTS dist/index.d.ts 10.12 KB
+sdk/typescript prepare: Done
+Done in 15.2s using pnpm v10.34.5

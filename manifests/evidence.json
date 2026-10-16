@@ -20347,6 +20347,226 @@
       "bytes": 5505
     },
     {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/README.md",
+      "sha256": "965cd5f5a5021df0d45edb6ed80e3cb368f166b6a3ed8728f46f9aba7d22d59f",
+      "bytes": 7822
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/bootstrap.sh",
+      "sha256": "faef9d0bfb5f4be5d88339c7e6e09e41c389774717466b28c552d1c4c23130f1",
+      "bytes": 1027
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/build_record.py",
+      "sha256": "a39612bb478eda57db9f80629370356a6a2b6cade0a65deee3da0c5150672691",
+      "bytes": 17535
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/check-receipts.json",
+      "sha256": "133d771d35cb70d900a61cdd4bed151f7ca65032301bde7f90618d0b2961ec60",
+      "bytes": 3585
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/claim-sources.json",
+      "sha256": "660c5cb3efaa7117a83be7a965c14be0e18f5947a19e58845972831066649f7e",
+      "bytes": 3010
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/complete_record.py",
+      "sha256": "dca4865b22943a505dfe182d8248e55851af85685ea01d5b0f3b23d076b242c0",
+      "bytes": 6613
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/evidence-integrity-tests.txt",
+      "sha256": "e92e760c9aa2974a6e6a3e49e5e9673807c1d65230b49e28a24d51b2543be390",
+      "bytes": 944
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/invoke.json",
+      "sha256": "01fc70f3461953f04cd75e613d7edf57238779c96b2ee0335ceada27461d7242",
+      "bytes": 1022
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/lane-packet-projection.json",
+      "sha256": "0162378bdcc03ba5f67a62a61de27f242fb9c42bf43b5cc6ef77d9056a3874e6",
+      "bytes": 1393
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/mask_capture.py",
+      "sha256": "99c49c00338c05df6d8bfabf931606364aaf30bfc7dbfb52cb0ae28fe2789c74",
+      "bytes": 6018
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/masking-tests.txt",
+      "sha256": "50c137cdca1570b2335bcec9854dc9fd8004e48d314ec57616f66ceb98d64264",
+      "bytes": 960
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/multi-angle-draft.json",
+      "sha256": "1d47d9335ffc41a55b181373a93cbf89b5d278a023b8a02df263f003aa8fe7cb",
+      "bytes": 16804
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/native_invoke.py",
+      "sha256": "6a245042b2c25f803e0222e07b4f84b2145f69252c0a9b05de56bdf99ed6ded6",
+      "bytes": 2079
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-01.txt",
+      "sha256": "22f8ea2f3e44c135dbfbc45083378828472e01767238317755705954c06d1e5d",
+      "bytes": 2140
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-02.txt",
+      "sha256": "0133952b696360a6d5f4a12d936bf0bb054cdcac7601650e0bfb04e264bcab77",
+      "bytes": 41
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-03.txt",
+      "sha256": "516ca69c8196af3d70f13eb01747ff797f490daa138c2a1928233743a32f8791",
+      "bytes": 296
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-04.txt",
+      "sha256": "601f3bd217d97b793d01ebf8b59d77d6a0b29612cbc9d7b917ae31a23afabdc4",
+      "bytes": 15932
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-05.txt",
+      "sha256": "f6464b8cc67af75deb2589fe1dbcde152fc15ffb76a91de1cf0686b4623afb1e",
+      "bytes": 18
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-06.txt",
+      "sha256": "ec88e9a6be0ae1488a9ef5172556f435a884b32a026d2e1471260e5a9b48dfc5",
+      "bytes": 4716
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-07.txt",
+      "sha256": "f2f8acb170334baaced260abb54f52dbad02e039aa97ca4ed11d8dac4c1c75bf",
+      "bytes": 171
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-08.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-09.txt",
+      "sha256": "87ee203a5609eb9d4bb0152f35c93ef5c54f6e5dcc38f2122ffbbe27c8fe4286",
+      "bytes": 384
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-10.txt",
+      "sha256": "0f0ea4fc6b37b5e10a444e81184c67cfa14781ca2629039ea026c6b17afb46dc",
+      "bytes": 227
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-11.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/packet-generation.txt",
+      "sha256": "f827c2f75ffe5b6e5f666aa2f1490f850c6a306af60e050e562b885b5bb0d5c6",
+      "bytes": 754
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/pin-reconciliation.json",
+      "sha256": "a4939580cfbe80f0f2d85e87e1dfc7ddac589b6912842b2e80c821a631c51444",
+      "bytes": 4796
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/primary-source-review.json",
+      "sha256": "b34bbc93475ace681f48f02ecb4990096b3ce2f94c0686ddd2dfd3d6adfd44a5",
+      "bytes": 5367
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/record_aux.py",
+      "sha256": "ba1b3bd3b699c064b284554e64466992ff0da4138d0f4c930f64c2f6b50f7500",
+      "bytes": 1268
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/recorder.py",
+      "sha256": "f3e3c8469730c8ec53f39cef7982680a6bb53bea1fc26a76e3cea6b095342bed",
+      "bytes": 3151
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/repository-validation.txt",
+      "sha256": "a08e96f9801cc95f17a5177c5ae3d78c010cdee99e17620a24deadd91483279f",
+      "bytes": 162
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/resolution.json",
+      "sha256": "a4d7688ec6174908cf6167e311fc84b61ec262bbe848e9cf37e23698b7133b6f",
+      "bytes": 9593
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/run_native.sh",
+      "sha256": "5f5c3343ab203a38ab0e9e4337a501d36a5341978712567b02c10af8f88e485d",
+      "bytes": 1317
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/runtime-receipt.json",
+      "sha256": "b9f2d0313539291e5dd4e636dd94db5da3eaa3f4691657e0e83bd69c521fd39d",
+      "bytes": 9682
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/source-seals.json",
+      "sha256": "d8e3079a763a22d361616b8d7556481d0a520c9d7dff2a12f5524b315cc78ed0",
+      "bytes": 4275
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
+      "sha256": "d68ea38f343fc1bd830dfb5a9ed74e01e7fe45812238702a93a5b673a24446b1",
+      "bytes": 1257
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-community.json",
+      "sha256": "9630e3f6ff9750fc012c4e31841f639bdb58acbdc2829cd8dbcbe468a3b99962",
+      "bytes": 86
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-ci.json",
+      "sha256": "a7345c95ba7c4ebec3ed991866fbecd0a06c78939f3c8f7c3a9a01c30dba4088",
+      "bytes": 254
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-community.json",
+      "sha256": "261437db8598e8b2babe5b7cb2e8fe851b768ab5bf3b5f485c1693f0116945df",
+      "bytes": 93
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-usage.json",
+      "sha256": "7a564976a34e4e2a32a21257db32d192d5b0a5b5ff7a1d2cb6f532fe012403eb",
+      "bytes": 289
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-ci.json",
+      "sha256": "d8afbc7213f8eeed5bf9c85e890b4f8ebb970189951784211ee6fa3114698ec0",
+      "bytes": 788
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-community.json",
+      "sha256": "d8b9a23a0457bab30eb65faa437184bc041d92123c27be2da892d53f696e2227",
+      "bytes": 97
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-usage.json",
+      "sha256": "83165510f5f4f8061006c11a369f4bbd57de73a73fb071da4beb412748df682d",
+      "bytes": 293
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/test_evidence_integrity.py",
+      "sha256": "f86ce71bb5af6df51f49039e32149a693898cd792de945496feb0dd2a5c602a2",
+      "bytes": 2999
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/test_mask_capture.py",
+      "sha256": "5ded731e67c62375af9edd7b616549b5d9653c6aa25142ced75d4e70cd3787e3",
+      "bytes": 1774
+    },
+    {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/README.md",
       "sha256": "5e22e9fe1b880e0770179a3b2d96766d7e44b7740b816fdbd2659899ac217d64",
       "bytes": 15075

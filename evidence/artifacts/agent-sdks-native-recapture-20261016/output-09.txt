@@ -1,0 +1,15 @@
+
+> @openai/codex-sdk@0.0.0-dev test <SCRATCH_ARM>/work/codex/sdk/typescript
+> jest
+
+PASS tests/exec.test.ts
+PASS tests/abort.test.ts
+PASS tests/runStreamed.test.ts (7.561 s)
+PASS tests/run.test.ts (30.579 s)
+PASS tests/mcpConformance.test.ts (176.596 s)
+
+Test Suites: 5 passed, 5 total
+Tests:       48 passed, 48 total
+Snapshots:   0 total
+Time:        177.664 s
+Ran all test suites.

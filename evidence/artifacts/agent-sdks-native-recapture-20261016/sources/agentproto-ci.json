@@ -1,0 +1,42 @@
+[
+  {
+    "conclusion": "skipped",
+    "head_sha": "08605fbe43a5c71e65f9561fd1d2b92abcbe9c4c",
+    "html_url": "https://github.com/agentproto/ts/actions/runs/36564530341",
+    "id": 36564530341,
+    "name": "Agent command",
+    "status": "completed"
+  },
+  {
+    "conclusion": "skipped",
+    "head_sha": "08605fbe43a5c71e65f9561fd1d2b92abcbe9c4c",
+    "html_url": "https://github.com/agentproto/ts/actions/runs/36564525283",
+    "id": 36564525283,
+    "name": "Agent command",
+    "status": "completed"
+  },
+  {
+    "conclusion": "skipped",
+    "head_sha": "08605fbe43a5c71e65f9561fd1d2b92abcbe9c4c",
+    "html_url": "https://github.com/agentproto/ts/actions/runs/36564047947",
+    "id": 36564047947,
+    "name": "Agent command",
+    "status": "completed"
+  },
+  {
+    "conclusion": "skipped",
+    "head_sha": "08605fbe43a5c71e65f9561fd1d2b92abcbe9c4c",
+    "html_url": "https://github.com/agentproto/ts/actions/runs/36518665094",
+    "id": 36518665094,
+    "name": "Agent command",
+    "status": "completed"
+  },
+  {
+    "conclusion": "success",
+    "head_sha": "08605fbe43a5c71e65f9561fd1d2b92abcbe9c4c",
+    "html_url": "https://github.com/agentproto/ts/actions/runs/36517458794",
+    "id": 36517458794,
+    "name": "CI",
+    "status": "completed"
+  }
+]

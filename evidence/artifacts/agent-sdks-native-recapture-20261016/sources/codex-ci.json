@@ -1,0 +1,10 @@
+[
+  {
+    "conclusion": "success",
+    "head_sha": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "html_url": "https://github.com/openai/codex/actions/runs/36897822835",
+    "id": 36897822835,
+    "name": "rust-release",
+    "status": "completed"
+  }
+]

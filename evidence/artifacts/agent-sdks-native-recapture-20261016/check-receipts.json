@@ -1,0 +1,102 @@
+[
+  {
+    "name": "packet-generation",
+    "exit_code": 0,
+    "started": "2026-10-16T06:21:46.382716+00:00",
+    "ended": "2026-10-16T06:21:46.731716+00:00",
+    "command_with_marked_placeholders": [
+      "python3",
+      "tools/sota-convergence/lane_packets.py",
+      "--root",
+      ".",
+      "--out",
+      "<PACKET_SCRATCH>",
+      "--catalog",
+      "foundation",
+      "--manifest",
+      "catalogs/sota-convergence/manifest-20260929.json",
+      "--checked-at",
+      "2026-10-16",
+      "--registered-receipts",
+      "--manifest-newcomers"
+    ],
+    "cwd_with_marked_placeholders": "<REVIEW_CHECKOUT>",
+    "capture_class": "deterministically_masked_native_capture",
+    "private_capture_name": "packet-generation.log",
+    "output": "packet-generation.txt",
+    "output_sha256": "f827c2f75ffe5b6e5f666aa2f1490f850c6a306af60e050e562b885b5bb0d5c6",
+    "masking_rule": "mask_capture.py: masked_aux(); literal root replacements only",
+    "masking_test": "test_mask_capture.py",
+    "co_op_private_reproduction": "pending"
+  },
+  {
+    "name": "masking-tests",
+    "exit_code": 0,
+    "started": "2026-10-16T06:21:47.012371+00:00",
+    "ended": "2026-10-16T06:21:47.079095+00:00",
+    "command_with_marked_placeholders": [
+      "python3",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "evidence/artifacts/agent-sdks-native-recapture-20261016",
+      "-p",
+      "test_mask_capture.py",
+      "-v"
+    ],
+    "cwd_with_marked_placeholders": "<REVIEW_CHECKOUT>",
+    "capture_class": "deterministically_masked_native_capture",
+    "private_capture_name": "masking-tests.log",
+    "output": "masking-tests.txt",
+    "output_sha256": "50c137cdca1570b2335bcec9854dc9fd8004e48d314ec57616f66ceb98d64264",
+    "masking_rule": "mask_capture.py: masked_aux(); literal root replacements only",
+    "masking_test": "test_mask_capture.py",
+    "co_op_private_reproduction": "pending"
+  },
+  {
+    "name": "evidence-integrity-tests",
+    "exit_code": 0,
+    "started": "2026-10-16T06:25:00.448131+00:00",
+    "ended": "2026-10-16T06:25:00.521910+00:00",
+    "command_with_marked_placeholders": [
+      "python3",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "evidence/artifacts/agent-sdks-native-recapture-20261016",
+      "-p",
+      "test_evidence_integrity.py",
+      "-v"
+    ],
+    "cwd_with_marked_placeholders": "<REVIEW_CHECKOUT>",
+    "capture_class": "deterministically_masked_native_capture",
+    "private_capture_name": "evidence-integrity-tests.log",
+    "output": "evidence-integrity-tests.txt",
+    "output_sha256": "e92e760c9aa2974a6e6a3e49e5e9673807c1d65230b49e28a24d51b2543be390",
+    "masking_rule": "mask_capture.py: masked_aux(); literal root replacements only",
+    "masking_test": "test_mask_capture.py",
+    "co_op_private_reproduction": "pending"
+  },
+  {
+    "name": "repository-validation",
+    "exit_code": 0,
+    "started": "2026-10-16T06:26:48.474691+00:00",
+    "ended": "2026-10-16T06:27:52.784222+00:00",
+    "command_with_marked_placeholders": [
+      "python3",
+      "scripts/validate.py"
+    ],
+    "cwd_with_marked_placeholders": "<REVIEW_CHECKOUT>",
+    "capture_class": "deterministically_masked_native_capture",
+    "private_capture_name": "repository-validation.log",
+    "output": "repository-validation.txt",
+    "output_sha256": "a08e96f9801cc95f17a5177c5ae3d78c010cdee99e17620a24deadd91483279f",
+    "masking_rule": "mask_capture.py: masked_aux(); literal root replacements only",
+    "masking_test": "test_mask_capture.py",
+    "co_op_private_reproduction": "pending"
+  }
+]

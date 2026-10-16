@@ -1,0 +1,125 @@
+{
+  "FINAL_admitted": false,
+  "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+  "catalog_mutated": false,
+  "component": "codex",
+  "drifts": [
+    "verdict0.155.1 versus run0.160.0",
+    "macOS0.155.1 versus linux0.160.0",
+    "plan-observed0.162.1 versus run0.160.0; current installed version not captured",
+    "historical packet0.157.1 versus run0.160.0",
+    "historical Python SDK0.154.0 and later Python0.160.0 candidate are distinct wrappers from the official TypeScript SDK source tested here"
+  ],
+  "historical_f1": "Exact release mapping is cited from the committed SDK source receipt; native source-pin capture independently records the checked-out release commit.",
+  "layer": "foundation/agent-sdks",
+  "proposed_run_pin": "0.160.0; source a956835d020762cb2b570053af06f643a11c0ecc",
+  "reason": "Preserve current linux F1 run version and exact upstream release commit; newly qualify this assigned run without silently adopting host0.162.1. A unified newer-version change requires its own explicit reconciliation and evidence.",
+  "sources": [
+    {
+      "citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 4666,
+        "path": "catalogs/landscape/foundation.json"
+      },
+      "json_pointer": "catalogs/landscape/foundation.json#/layers/16/winners/0",
+      "kind": "winner_verdict",
+      "value": "0.155.1"
+    },
+    {
+      "citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 5010,
+        "path": "catalogs/landscape/final-stack.json"
+      },
+      "json_pointer": "catalogs/landscape/final-stack.json#/layers/0/winners/0",
+      "kind": "final_stack_winner",
+      "value": "0.155.1"
+    },
+    {
+      "adoption_citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 54,
+        "path": "adoption/pins-linux-x86_64.json"
+      },
+      "citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 10541,
+        "path": "catalogs/landscape/final-stack.json"
+      },
+      "json_pointer": "catalogs/landscape/final-stack.json#/runs/14",
+      "kind": "run",
+      "value": "0.160.0"
+    },
+    {
+      "citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 60,
+        "path": "adoption/pins-macos-arm64.json"
+      },
+      "kind": "other_platform_conflict",
+      "value": [
+        {
+          "pin": "0.155.1",
+          "source": "adoption/pins-macos-arm64.json#/tools/3"
+        }
+      ]
+    },
+    {
+      "citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 129,
+        "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md"
+      },
+      "kind": "plan_layer_row",
+      "value": "reopened; codex; two carried survivors; F1 drift and E2E/invoke gaps"
+    },
+    {
+      "citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 964,
+        "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md"
+      },
+      "kind": "plan_observed_cli",
+      "value": "0.162.1, native installer row unpinned"
+    },
+    {
+      "citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 7,
+        "path": "blueprints/us-equities/workers/receipt.json"
+      },
+      "kind": "historical_original_native_worker",
+      "value": "Python openai-codex0.154.0 driving native0.155.1; historical task, not this pin"
+    },
+    {
+      "citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 146,
+        "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json"
+      },
+      "kind": "later_committed_sdk_review_candidate",
+      "limit": "The published Python candidate shares this native source pin; this fresh upstream TypeScript test package does not replace or qualify its separate Python worker integration",
+      "source_citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 46,
+        "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json"
+      },
+      "value": "Python SDK0.160.0 with bundled native CLI0.160.0; historical B3 candidate receipt, not a new runtime adoption"
+    },
+    {
+      "gap": "Earlier observation not captured; no installed-version receipt claimed here. Plan observation has its own source citation.",
+      "kind": "read_only_host_version",
+      "value": null
+    },
+    {
+      "citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 10275,
+        "path": "catalogs/sota-convergence/manifest-20260929.json"
+      },
+      "kind": "historical_manifest_packet",
+      "limit": "Historical packet pin differs from current F1 run; packet is a source index, not pin authority",
+      "value": "0.157.1"
+    }
+  ]
+}

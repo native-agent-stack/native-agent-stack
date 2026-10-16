@@ -1,0 +1,10 @@
+test_all_private_input_seals_stay_outside_public_receipt (test_evidence_integrity.EvidenceIntegrityTests.test_all_private_input_seals_stay_outside_public_receipt) ... ok
+test_every_native_capture_is_bound_without_generated_status (test_evidence_integrity.EvidenceIntegrityTests.test_every_native_capture_is_bound_without_generated_status) ... ok
+test_invoke_output_is_native_response_not_driver_summary (test_evidence_integrity.EvidenceIntegrityTests.test_invoke_output_is_native_response_not_driver_summary) ... ok
+test_pin_citation_supports_each_specific_pin (test_evidence_integrity.EvidenceIntegrityTests.test_pin_citation_supports_each_specific_pin) ... ok
+test_survivors_never_borrow_codex_runtime_and_no_numeric_scores (test_evidence_integrity.EvidenceIntegrityTests.test_survivors_never_borrow_codex_runtime_and_no_numeric_scores) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.009s
+
+OK
