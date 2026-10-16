@@ -19342,6 +19342,11 @@
       "bytes": 9884
     },
     {
+      "path": "docs/decisions/2026-10-16-research-campaign-practice.md",
+      "sha256": "edd36738a8cf89a925afd9548a534d4121cdd1551cad8be2ffc830a1c6619998",
+      "bytes": 8510
+    },
+    {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
       "sha256": "f646835af1648cfab7798f64626141c3964dfba4799d780dc728ea27f91f7f6c",
       "bytes": 15393
