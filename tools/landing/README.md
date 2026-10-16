@@ -308,10 +308,12 @@ with no hosted CI, no `scripts/validate.py`, no `manifests/evidence.json` and no
 request (squash merges only, no approval, review threads resolved), no deletion or force push, a linear history, and three required commit
 statuses, `lander/local-ci`, `lander/verdict-claude` and `lander/verdict-gpt`, strict ("The topic branch **must** be up to date with the base
 branch before merging", `available-rules-for-rulesets.md:188-193`, above) and with no app selected as their source (`:178`). The ruleset is the
-owner's; the lander does not read it, and these are its settings as the CC records them. **PROPOSAL** (the enforcement design, #1195's decision
-record `docs/decisions/2026-10-15-horizon-runtime-ecosystem-repository.md`): the lander is the merge path; it checks the local evidence,
-posts those statuses at the exact head and merges pinned to it. The residual, plainly: GitHub checks only the three contexts' states, and any
-account with write access can set one (`:178`), so a merge made in the web UI after the lander's posts is not refused (Known gaps). `R` is
+owner's; the lander does not read it, and these are its settings as the CC records them. The lander is **the required local workflow**, as
+#1195's decision record decides (`docs/decisions/2026-10-15-horizon-runtime-ecosystem-repository.md`, Decision 4): it checks the local
+evidence, posts those statuses at the exact head and merges pinned to it, while GitHub enforces the three status contexts and freshness, not
+the local gates. The residual, plainly: GitHub checks only the three contexts' states, and any account with write access can set one
+(`:178`), so a merge made in the web UI after the lander's posts is not refused (Known gaps); finding such a merge is the job of the
+PROPOSAL self-audit of that Decision 4. `R` is
 fixed (no `LANDING_REPO`), and the merging account is the other landers' (`LG_AUTHOR_LOGIN`). Its inputs are variables, each a file named by
 its path, as `nas_land.sh`'s verdict files are named (its arguments): `HORIZON_CLAUDE_VERDICT` and `HORIZON_GPT_VERDICT` (required),
 `HORIZON_MUSE_VERDICT` (optional, a TRIAL) and `LOCAL_CI_RECEIPTS` (required, colon-separated, so a path cannot hold `:` or a newline). Only the
@@ -362,10 +364,16 @@ success the lander posted outlives a landing that stopped, whatever stopped it. 
 executed before the shell terminates", the installed `bash(1)`, `exit`), keeping the exit status (measured), and HUP, INT and TERM are trapped
 to exit 129, 130 and 143, so a signal revokes too, once the command bash waits for completes ("it will not execute the trap until the
 command completes", `bash(1)`, SIGNALS; measured: a SIGTERM during the author lookup exits 143 and posts the three failures). A `$(...)`
-subshell does not run it (measured). The revocation's first statement is `trap '' HUP INT TERM` (#1194's CC read, P3): a second signal
-during it would otherwise run its `exit` trap after the POST it waits for and cut the POSTs still to come (measured: with it, a TERM sent
-during the first revocation POST leaves all three posted and the exit code the stop's). The merge's success is recorded on the line after the
-merge call, before the author check, so exit 12 and 16 leave a merged head's statuses alone. A revocation that fails says which context to
+subshell does not run it (measured). The revocation's first statement is `trap '' HUP INT TERM` (#1194's CC read, P3; "If *action* is the
+null string the signal specified by each *sigspec* is ignored by the shell and by the commands it invokes", the installed `bash(1)`, SHELL
+BUILTIN COMMANDS, `trap`): a second signal during it would otherwise run its `exit` trap after the POST it waits for and cut the POSTs still
+to come (measured: with it, a TERM sent during the first revocation POST leaves all three posted and the exit code the stop's; a copy of
+the script without the line failed that test). The merge is finalised whole (#1194's delta reads: the CC's P3-3 and the local review's P2): from right before
+the merge call, after the final gate, until the landing receipt is written and the merge reported, HUP, INT and TERM are ignored the same
+way, so a merge that completed always records its success (`HZ_MERGED`) and writes its receipt; before, a signal pending as the merge call
+finished exited before that record and revoked a merged head's statuses, and one during the sleep after the merge exited with no receipt
+(both measured at b4489b15, exit 143). The exit traps are then set again, for the author check. So exit 12 and 16, and 129, 130 or 143
+during the author check, leave a merged head's statuses alone. A revocation that fails says which context to
 revoke by hand. A landing posts one status for each context and a stopped one a second; GitHub allows 1000 for a head and a context
 (`api.github.com.json:79153`).
 
@@ -374,12 +382,14 @@ one LOCAL file, `$LANDING_COORD/horizon-landings/<pr>-<the head's first 12 digit
 printed (the messages name the file, never its path) and never published. It holds the repository, the pull request, the head, the base
 (`main`) and main's commit, the merge commit (`null` when it could not be read), the time, the three descriptions posted, each file's name
 and sha256 (the Claude, GPT and Muse verdicts, the Muse word, `GATES_DONE`, each CI receipt), the receipts' combined sha256 (that of the
-lines `<sha256>  <file name>` of the files in their order, sha256sum's form) and CODEOWNERS' path and sha256. The planned self-audit binds
-main's trailers, which hold the names and the head, to it. Its place is checked with the other local reads, before `ready` and the posts:
-the directory made (mode 0700) and writable, and no receipt there yet for this pull request and head, otherwise exit 7 and nothing posted.
-The file is created exclusively (bash's `set -C`, noclobber, which refuses a file or a symlink that is there; measured with bash 5.3.9: a
-second write and a dangling symlink were refused, and the mode was 0400 under `umask 0277`); a write that fails after the merge is exit 16
-(merged, the statuses kept). The landing that stops before its merge writes none.
+lines `<sha256>  <file name>` of the files in their order, sha256sum's form) and CODEOWNERS' path and sha256. The PROPOSAL self-audit
+(#1195's Decision 4) would bind main's trailers, which hold the names and the head, to it. Its place is checked with the other local reads,
+before `ready` and the posts: the directory made (mode 0700) and writable, and no receipt there yet for this pull request and head,
+otherwise exit 7 and nothing posted. The file is written under bash's noclobber (`set -C`): "the redirection fails if the file whose name
+results from the expansion of *word* exists and is a regular file" (the installed `bash(1)`, REDIRECTION, Redirecting Output), which is all
+the manual says of it. Measured with bash 5.3.9: a second write to that regular file was refused, and so was a write through a dangling
+symlink; the mode was 0400 under `umask 0277`. A write that fails after the merge is exit 16 (merged, the statuses kept). The landing that
+stops before its merge writes none.
 
 **The CI receipts (`LOCAL_CI_RECEIPTS`).** Each file is read once, as `nas_land.sh` reads a record (`nas_read`; a NUL byte refused, exit 2, as
 a missing or unreadable file), and only its lines `CI: exit <code> at <40 hex digits>: <command>` count, a trailing CR dropped; a line for
@@ -441,8 +451,9 @@ Lander-codeowners: <path> sha256 <sha256 of main's CODEOWNERS> satisfied
 ```
 
 Names only, and the head (#1194's GPT read, P1): no private file's digest. CODEOWNERS keeps its sha256, its preimage being main's own file,
-published where the trailer is. Each `Lander-<context>` line holds the description posted for `lander/<context>`, so a self-audit compares
-the trailers with the statuses at `Lander-head`, and binds the names to their digests in the landing receipt (above), which is local. At
+published where the trailer is. Each `Lander-<context>` line holds the description posted for `lander/<context>`, so the PROPOSAL
+self-audit (#1195's Decision 4) would compare the trailers with the statuses at `Lander-head`, and bind the names to their digests in the
+landing receipt (above), which is local. At
 34add438 these lines carried each file's sha256 and one `Lander-local-ci-receipt` line for each receipt. The merge takes the body as
 `--body`, as `nas_land.sh` does (`--body-file` would be read again when the merge call starts,
 `merge.go:146-153`). Read the trailers with `git log -1 --format='%(trailers)' <merge>` or `git interpret-trailers --parse --no-divider`: a
@@ -461,9 +472,10 @@ bytes of the schema cited above, sha256 `3ed09565…`): BEHIND "The head ref is 
 blocked." (`:26518-26520`), CLEAN "Mergeable and passing commit status." (`:26523-26525`), DIRTY "The merge commit cannot be cleanly
 created." (`:26528-26530`), UNKNOWN "The state cannot currently be determined." (`:26546-26548`) and UNSTABLE "Mergeable with non-passing
 commit status." (`:26551-26553`), which GitHub would merge and the lander refuses (6, fail closed). Before it, after the POSTs, the merge
-state is polled for up to two minutes (12 reads, 10 s apart) until CLEAN. That GitHub's recomputation after the statuses lags is measured on
-us-equities-trading #58, not documented by GitHub (there an update-branch's head reached the API views 6 s apart, `nas_land.sh:242-245`), so
-a BLOCKED or UNKNOWN right after the posts is read again, while BEHIND or DIRTY stops at once (13); a block that lasts is exit 8, with the
+state is polled for up to two minutes (12 reads, 10 s apart) until CLEAN. The two-minute poll rests on a lag measured on
+us-equities-trading #58, not documented by GitHub (there an update-branch's head reached the API views 6 s apart, `nas_land.sh:242-245`);
+how long GitHub takes to recompute the merge state after the statuses is neither measured here nor documented. So a BLOCKED or UNKNOWN right
+after the posts is read again, while BEHIND or DIRTY stops at once (13); a block that lasts is exit 8, with the
 count of unresolved review threads (the query as `nas_land.sh` builds it, owner and name from `R`), and any other state exit 6.
 
 ## Variables
@@ -528,10 +540,12 @@ after each of three validations, moved after the last validation (read at the fi
 (#975, new in round 3). The three scripts also exit 11 when the no-reply author address cannot be formed (nothing is merged), 12 when the
 merge landed but its commit's author is not that address or the commit could not be read (CC correction #148), and 14 when another
 landing of the same repository holds the landing lock or the lock cannot be opened or taken (nothing has run; #975 round 4).
-`horizon_land.sh` (2026-10-15; nothing is merged on any code but 0, 12 and 16): 2 an argument or an input, before any call (the usage, a pull
+`horizon_land.sh` (2026-10-15; nothing is merged on any code but 0, 12 and 16, and 129, 130 or 143 when the signal came during the author
+check after the merge): 2 an argument or an input, before any call (the usage, a pull
 request that is not a number, a read head prefix that is not 7 to 40 lower-case hex digits, `HORIZON_CLAUDE_VERDICT`, `HORIZON_GPT_VERDICT`
 or `LOCAL_CI_RECEIPTS` unset or empty, `HORIZON_MUSE_VERDICT` set but empty, a file name of another form, a newline or an empty name in
-`LOCAL_CI_RECEIPTS`, any input of `nas_land.sh` or `uet_land.sh` set, an empty value included), and after the lock a verdict or a receipt
+`LOCAL_CI_RECEIPTS`, a leading, trailing or doubled `:` in it, any input of `nas_land.sh` or `uet_land.sh` set, an empty value included),
+and after the lock a verdict or a receipt
 missing, unreadable or holding a NUL byte, the same bytes in both verdict slots, a verdict of another family, one that `nas_land.sh`'s
 acceptance refuses or whose last Gate line/Verdict line does not name the full head, as a whole word, with PASS or ACK, a verdict that states
 a landing gate without a `GATES_DONE` naming the full head as a whole word (a receipt missing, unreadable, holding a NUL byte or of another
@@ -543,12 +557,16 @@ merge state not settled, neither CLEAN, BLOCKED, BEHIND nor DIRTY after the two-
 or the merge failed, the landing receipt's place not writable or taken (before any post), or a verdict, a receipt or `GATES_DONE` changed
 after the statuses were posted (the Muse verdict after the body recorded it); 8 BLOCKED
 (after the poll or at the final gate) or main's CODEOWNERS (none in the three places, not a regular file, a NUL byte, 3 MB or more, no rule,
-a rule with another owner, a team, an address or none, GitHub's errors not 0 or unreadable, or read otherwise at the final gate); 12 merged,
-but the merge commit could not be read (the landing receipt then records none) or its author is not the no-reply address; 13 not up to date
+a rule with another owner, a team, an address or none, a lookup or a read of it that fails, GitHub's errors not 0 or unreadable, or read
+otherwise at the final gate); 12 merged, but the merge commit could not be read (the landing receipt then records none) or its author is not
+the no-reply address; 13 not up to date
 (origin/main not an ancestor of the head, or GitHub BEHIND or DIRTY), origin/main unreadable, or moved (final gate), or a base other than
 main (before any post and at the final gate; #1194's GPT read, P2); 15 a status POST failed; 16 merged, but the landing receipt could not be
-written (its place was free and writable before the posts; the statuses are kept); 129 a hangup, 130 an interrupt and 143 a termination
-signal (128 and the signal's number); 11 and 14 as above. Every code after the first POST, but 0, 12 and 16, revokes the three statuses (the
+written (its place was free and writable before the posts; the statuses are kept), and when 12 applies too, 12 is the exit (the receipt's
+line is printed either way; #1194's delta reads); 129 a hangup, 130 an interrupt and 143 a termination signal (128 and the signal's number):
+before the merge call nothing is merged and the statuses posted are revoked, from the merge call until the receipt is written and the merge
+reported the three are ignored, and during the author check after that the pull request is merged and its receipt and statuses are kept;
+11 and 14 as above. Every code after the first POST, but 0, 12, 16 and a signal during the author check, revokes the three statuses (the
 EXIT trap, "The statuses", above).
 `codex_gate.py`: 0, 3, 4 and 5 as above; a gate that fails itself exits 4, which both scripts stop on with 9. With a local review set
 ("Local reviews"): 0 (every file a review of the read head or of a head with its change, every `codex-review` completed with `patch is
@@ -840,7 +858,7 @@ scripts that is neither a tracked file's, a named public artifact's nor a named 
 | --- | --- |
 | `uet_land.sh` | `95a4e1634b6a53b14d7736d2d40a3f0058a15aec9c9178e528ca44cfb74324ce` (441 lines) |
 | `nas_land.sh` | `1ca0dabc6c535a08fb45f6956cf4549cc956ca6b25e798bb60c6a95cd398f511` (690 lines) |
-| `horizon_land.sh` | `133dab4cfd8da99a695753c9aea2e40f9f1c582bda6d2ee158cbb39c8d96a9a2` (749 lines) |
+| `horizon_land.sh` | `7ba9a06aacbff4e50111266891ac9d2f7ae8c305824a65f4181045fa04f22ee2` (772 lines) |
 | `codex_gate.py` | `7afaa831c0763dd14c584d76b17465fa50993656cd63eec9fd0c4412fddb74b2` (559 lines) |
 | `review_normalize.py` | `b553d9cb67ca196bd587e980e01295e28e8ea0e2bcb3d0015fc5d040735a1594` (348 lines) |
 
@@ -928,16 +946,19 @@ and 4). These stay until a change with its own tests fixes them:
   counts and words are such words, so a digest prefix written bare that happens to have no letter (or no digit) passes; written with `…`
   it is checked whatever its digits. A pull request's body is checked only when `LANDING_PR_BODY` names it (below).
 - `horizon_land.sh` (2026-10-15):
-  - The enforcement design, the lander as the merge path, is a PROPOSAL (#1195's decision record,
-    `docs/decisions/2026-10-15-horizon-runtime-ecosystem-repository.md`). A commit status carries no app identity: "Any person or integration
+  - The lander is the required local workflow (#1195's decision record, `docs/decisions/2026-10-15-horizon-runtime-ecosystem-repository.md`,
+    Decision 4), and GitHub enforces the three status contexts and freshness, not the local gates. A commit status carries no app identity: "Any person or integration
     with write permissions to a repository can set the state of any status check" (`available-rules-for-rulesets.md:178`; "Users with push
     access in a repository can create commit statuses", `api.github.com.json:79153`), and the ruleset then admits a merge whoever made it.
     GitHub checks only the three contexts' states, so a merge made in the web UI after the lander's posts, or after anyone posted the three,
     is not refused. The ruleset is the backstop and the lander's local checks are the gate; the final gate's exact-description read narrows
     a forged status to a landing by the lander. The closure path is the review App of `docs/decisions/2026-10-09-review-verdict-app-identity.md`,
     whose app can be selected as the statuses' expected source (`:178`), as for the other landers.
-  - The digests of the private files are local only (the landing receipt), so the self-audit that binds main's trailers to them needs the
-    host's `LANDING_COORD`: a host lost with its coordination tree loses them, and the trailers alone then bind names and the head, not bytes.
+  - The digests of the private files are local only (the landing receipt), so the PROPOSAL self-audit (#1195's Decision 4), which would
+    bind main's trailers to them, needs the host's `LANDING_COORD`: a host lost with its coordination tree loses them, and the trailers alone
+    then bind names and the head, not bytes. Finding a merge made in the web UI after the posts is that self-audit's job too.
+  - From the merge call until the receipt is written and the merge reported, HUP, INT and TERM are ignored, so an operator's interrupt then
+    waits for the landing to finish its merge; a SIGKILL there leaves a merged pull request whose receipt may be unwritten.
   - The receipts are claims the lander does not re-run: a `CI:` line says what ran and how it ended, and nothing binds it to a run.
   - A SIGKILL, or the host lost, between the first POST and the merge leaves the posted successes standing (no trap runs): post `failure`
     for each `lander/` context at that head by hand before anything else merges.
@@ -1205,7 +1226,17 @@ errors):
     failures; a main-based control lands); the full head followed by `A`, `G`, `0` or `_` refused in a verdict and `A` in `GATES_DONE`, and a
     full stop, a space, a CR or a comma after it landing; the view after the merge failing with a sentinel on stdout, or of another state (12,
     the sentinel not printed, the receipt written with no merge commit); a TERM during the first revocation POST (the three failures, the exit
-    the stop's 8); and the text: the trap's first line, the PROPOSAL label and the new citations.
+    the stop's 8); and the text: the trap's first line, the PROPOSAL label and the new citations;
+  - #1194's delta reads at b4489b15 (the CC's micro and the local review), each failing against `horizon_land.sh` at b4489b15 unless it says
+    otherwise (measured with the module of this change against that script; the counts are in the pull request): a TERM pending as the merge
+    call finishes and one during the sleep after it (exit 0, the receipt written, nothing revoked; at b4489b15 both exited 143, the first
+    revoking a merged head's statuses and the second leaving no receipt), with two controls that pass at b4489b15 too, a TERM before the merge
+    call (143, the three failures, no receipt) and one during the author check (143, merged, the receipt and the statuses kept); 12 and 16 at
+    once (12, the receipt's line printed; this pins b4489b15's behaviour, and passes there); a failed lookup of `.github/CODEOWNERS` beside the
+    account's own top-level file (8; it landed at b4489b15), with the control that `.github/`'s file decides, and a failed read of the blob (8,
+    its own reason); a leading, trailing or doubled `:` in `LOCAL_CI_RECEIPTS` (2 before any call; the trailing one landed at b4489b15); and
+    the text: "the required local workflow", "the PROPOSAL self-audit", the bash(1) texts for `trap ''` and noclobber, the lag's wording, the
+    signal hold right before the merge call and the exit traps set again after the report.
 
 ## Upstream sources for the #975 corrections
 

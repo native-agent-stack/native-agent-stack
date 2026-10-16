@@ -211,7 +211,10 @@ echo "${FAKE_GATE_LINE:-Codex review finished at 2026-10-10T00:00:00Z after the 
 exit "$rc"
 '''
 # #975 round 4: sleep is logged too, so the call-order test sees that nothing slow runs between the final gate and the merge.
-FAKE_SLEEP = "#!/bin/sh\n[ -z \"${FAKE_LOG:-}\" ] || printf 'sleep %s\\n' \"$*\" >> \"$FAKE_LOG\"\nexit 0\n"
+# #1194's delta reads: FAKE_SLEEP_HOOK runs (sh -c) when the arguments are exactly FAKE_SLEEP_HOOK_ON, so a test can signal a landing during
+# one sleep (horizon_land.sh's after its merge).
+FAKE_SLEEP = ("#!/bin/sh\n[ -z \"${FAKE_LOG:-}\" ] || printf 'sleep %s\\n' \"$*\" >> \"$FAKE_LOG\"\n"
+              "[ -z \"${FAKE_SLEEP_HOOK:-}\" ] || [ \"$*\" != \"${FAKE_SLEEP_HOOK_ON:-}\" ] || sh -c \"$FAKE_SLEEP_HOOK\"\nexit 0\n")
 # #975 round 4: git is the real git, and every call is appended to FAKE_LOG when it is set, so the call-order test sees the final gate's
 # git reads (the change identity, git ls-remote) beside the gh calls. FAKE_GIT_HOOK runs (sh -c) once, right after the first call that
 # matches the glob FAKE_GIT_HOOK_ON has returned, and that call's exit code is kept. {git} is the real git's path.
@@ -580,6 +583,8 @@ PUBLIC_DIGESTS = {
         "github/docs@be38ec5d:content/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.md",
     "3320c5ab0a312307fa47487a8d154f3fb138b32db41d1bcf1f54bf25f8582ce3": "native-agent-stack/native-agent-stack@34add438:tools/landing/horizon_land.sh, "
         "https://github.com/native-agent-stack/native-agent-stack/blob/34add43827b7516de8f8b19d8cb92f473e374849/tools/landing/horizon_land.sh",
+    "133dab4cfd8da99a695753c9aea2e40f9f1c582bda6d2ee158cbb39c8d96a9a2": "native-agent-stack/native-agent-stack@b4489b15:tools/landing/horizon_land.sh, "
+        "https://github.com/native-agent-stack/native-agent-stack/blob/b4489b15b307d81e4bb9f1a43c2348aed22b697b/tools/landing/horizon_land.sh",
 }
 
 
@@ -618,6 +623,9 @@ PUBLIC_COMMITS = {
                                                 "https://github.com/native-agent-stack/native-agent-stack/commit/a93ba0b8c289bbcc1ba43c8a044c0f50ffc32e52",
     "34add43827b7516de8f8b19d8cb92f473e374849": "native-agent-stack/native-agent-stack: #1194's first head, "
                                                 "https://github.com/native-agent-stack/native-agent-stack/commit/34add43827b7516de8f8b19d8cb92f473e374849",
+    # read on GitHub on 2026-10-16 the same way (#1194's delta reads cite the head they read)
+    "b4489b15b307d81e4bb9f1a43c2348aed22b697b": "native-agent-stack/native-agent-stack: #1194's second head (fold 1), "
+                                                "https://github.com/native-agent-stack/native-agent-stack/commit/b4489b15b307d81e4bb9f1a43c2348aed22b697b",
 }
 HEX_FULL = re.compile(r"(?<![0-9A-Fa-f])[0-9A-Fa-f]{64}(?![0-9A-Fa-f])")
 HEX_MARKED = re.compile(r"(?<![0-9A-Fa-f])([0-9A-Fa-f]{6,})…")  # a prefix written `<hex>…`
@@ -942,12 +950,14 @@ class ScriptTextTests(LandingCase):
         self.assertIn("Doc/library/os.rst:2754-2760", (LANDING / "review_normalize.py").read_text(encoding="utf-8"))
 
     def test_the_final_gate_runs_after_the_last_slow_step_and_right_before_the_merge(self):
-        # #975 round 4: the author lookup is the last slow step, final_gate the only thing between it and the pinned merge.
-        for script, pinned in ((self.uet, '"$H"'), (self.nas, '"$cur"'), (self.horizon, '"$EF"')):
+        # #975 round 4: the author lookup is the last slow step, final_gate the only thing between it and the pinned merge. #1194's delta
+        # reads: horizon_land.sh ignores HUP, INT and TERM from right before its merge call (one trap line, nothing slow), so a completed
+        # merge is always finalised.
+        for script, pinned, held in ((self.uet, '"$H"', []), (self.nas, '"$cur"', []), (self.horizon, '"$EF"', ["trap '' HUP INT TERM"])):
             with self.subTest(script=script.key):
                 merge = next(i for i, line in enumerate(script.lines) if line.startswith("out=$(gh pr merge "))
-                self.assertEqual(script.lines[merge - 1], f"final_gate {pinned}")
-                self.assertTrue(script.lines[merge - 2].startswith('ae=$(lg_author_email "$R")'))
+                self.assertEqual(script.lines[merge - 1 - len(held):merge], [f"final_gate {pinned}", *held])
+                self.assertTrue(script.lines[merge - 2 - len(held)].startswith('ae=$(lg_author_email "$R")'))
                 self.assertIn(f"--match-head-commit {pinned}", script.lines[merge])
                 self.assertEqual(script.text.count("\nfinal_gate "), 1)
 
@@ -1221,13 +1231,21 @@ class ScriptTextTests(LandingCase):
         self.assertEqual(lines[first - 5:first + 3], ["trap hz_revoke EXIT", "trap 'exit 129' HUP", "trap 'exit 130' INT", "trap 'exit 143' TERM",
                                                       "HZ_POSTED=1", 'hz_post "$CTX_CI" "$D_CI"', 'hz_post "$CTX_CLAUDE" "$D_CLAUDE"',
                                                       'hz_post "$CTX_GPT" "$D_GPT"'])
-        self.assertEqual(sum(1 for line in lines if line.startswith("trap ")), 4)
         # #1194's CC read, P3: the revocation ignores a second HUP, INT or TERM, its first statement
         revoke = lines.index("hz_revoke() {")
         self.assertEqual(lines[revoke + 1], "  trap '' HUP INT TERM")
         self.assertEqual(sum(1 for line in lines if "--method POST" in line and not line.lstrip().startswith("#")), 2, "hz_post and hz_revoke")
         merge = next(i for i, line in enumerate(lines) if line.startswith("out=$(gh pr merge "))
         self.assertEqual(lines[merge + 1], "HZ_MERGED=1")
+        # #1194's delta reads (the CC's P3-3, the local review's P2): the signals are ignored from right before the merge call until the
+        # receipt is written and the merge reported, and only then are the exit traps back, once
+        report = lines.index('echo "#$N merged at ${EF:0:8}: merge commit ${mc:0:12}"')
+        self.assertEqual(lines[merge - 1], "trap '' HUP INT TERM")
+        self.assertLess(lines.index('hz_receipt "$mc" || rr=16'), report)
+        self.assertEqual(lines[report + 1], "trap 'exit 129' HUP; trap 'exit 130' INT; trap 'exit 143' TERM")
+        self.assertEqual([line for line in lines if line.startswith("trap ")],
+                         ["trap hz_revoke EXIT", "trap 'exit 129' HUP", "trap 'exit 130' INT", "trap 'exit 143' TERM", "trap '' HUP INT TERM",
+                          "trap 'exit 129' HUP; trap 'exit 130' INT; trap 'exit 143' TERM"])
         self.assertIn('--squash --body "$BODY" --match-head-commit "$EF" -A "$ae"', lines[merge])
         self.assertLess(lines.index("verdict_gate"), first)
         self.assertLess(lines.index("receipts_gate"), first)
@@ -1243,13 +1261,22 @@ class ScriptTextTests(LandingCase):
                       "api.github.com.json:79150-79214", "pkg/cmd/api/api.go:104-110, :293, :295, :329-331", "about-code-owners.md:36, :44",
                       "api.github.com.json:53272-53329", ":147966-147968", '"Any trap on EXIT is executed before', "until the command completes",
                       "nas_land.sh:392-404", "nas_land.sh:365-372", "nas_land.sh:174-176", "nas_land.sh:673-674", "merge.go:146-153",
-                      # #1194's reads: the ruleset's mechanics, the base, the merge state's enum and the PROPOSAL label
+                      # #1194's reads: the ruleset's mechanics, the base, the merge state's enum and the labels, as #1195's record decides
+                      # them (its Decision 4: the lander is "the required local workflow", and the self-audit a PROPOSAL)
                       "available-rules-for-rulesets.md:188-193", "(:176)", "(:178)", "about-code-owners.md:44", "http.go:47-50, :77-80",
-                      "schema.docs.graphql:26511-26554", "(:26551-26553)", "measured on us-equities-trading #58, not documented by GitHub",
-                      "PROPOSAL (the enforcement design of #1195's decision record",
-                      "docs/decisions/2026-10-15-horizon-runtime-ecosystem-repository.md"):
+                      "schema.docs.graphql:26511-26554", "(:26551-26553)",
+                      "rests on a lag measured on us-equities-trading #58, not documented by GitHub: there an update-branch's head reached",
+                      "This script is the required local workflow (#1195's decision record", "Decision 4", "PROPOSAL self-audit",
+                      "docs/decisions/2026-10-15-horizon-runtime-ecosystem-repository.md",
+                      # the bash(1) texts for trap '' and for noclobber, and what was only measured
+                      "If action is the null string the signal specified by each sigspec is ignored by the shell and by the commands it invokes",
+                      "exists and is a regular file\" (bash(1), REDIRECTION, Redirecting Output", "and a write through a dangling symlink"):
             with self.subTest(cited=cited):
                 self.assertIn(cited, " ".join(line.lstrip("# ") for line in self.horizon.lines))
+        own = " ".join(line.lstrip("# ") for line in self.horizon.lines)
+        for retired in ("the merge path", "planned self-audit", "PROPOSAL (the enforcement design", "That it lags is measured on"):
+            with self.subTest(retired=retired):
+                self.assertNotIn(retired, own)
 
     def test_horizon_carries_correction_121_with_nas_phrases_and_the_full_head(self):
         # The CC's ruling of 2026-10-15: correction #121 as nas_land.sh carries it, its four phrases and its receipt rule (the shared block's
@@ -4643,6 +4670,10 @@ HZ_CONTEXTS = ("lander/local-ci", "lander/verdict-claude", "lander/verdict-gpt")
 HZ_REVOKED = [(context, "revoked: the landing stopped before its merge") for context in HZ_CONTEXTS]
 HZ_REFUSED = ("SQUASH_BODY_FILE", "LOCAL_REVIEW_ADJUDICATION", "LOCAL_REVIEW_WAIVER", "LOCAL_REVIEWS", "CODEX_LOCAL_REVIEW", "GPT_VERDICT",
               "VERDICT_FILES")  # the inputs of nas_land.sh and uet_land.sh, refused when set
+# A hook (sh -c) that sends TERM to the landing: the topmost of the hook's nearest ancestors whose command line names horizon_land.sh (the
+# landing itself, above any of its own subshells), its parent read from /proc/<pid>/stat after the command name's ")".
+HZ_TERM_LANDING = ('p=$PPID; top=; while [ "$p" -gt 1 ]; do if tr "\\000" " " < /proc/$p/cmdline | grep -q horizon_land.sh; then top=$p; '
+                   'elif [ -n "$top" ]; then break; fi; p=$(sed "s/^.*) //" /proc/$p/stat | cut -d" " -f2); done; [ -n "$top" ] && kill -TERM "$top"')
 
 
 def hz_sha(data):
@@ -4710,6 +4741,8 @@ class HorizonEndToEndTests(LandingCase):
             "a NUL byte": {".github/CODEOWNERS": f"* @{MERGING_ACCOUNT}\n\0\n"},
             "3 MB": {".github/CODEOWNERS": f"* @{MERGING_ACCOUNT}\n" + "#" * 3_000_000 + "\n"},
             "a symlink": {".github/CODEOWNERS": ("symlink", "../base.txt")},
+            # #1194's local review, P2: .github/'s file decides; a failed lookup of it must not hand the decision to the top level's
+            "github foreign, root ours": {".github/CODEOWNERS": "* @another-owner\n", "CODEOWNERS": f"* @{MERGING_ACCOUNT}\n"},
         }.items():
             main = branch("main-" + re.sub(r"[^a-z0-9]+", "-", name), cls.main, f"main: {name}", files, push=True)
             cls.worlds[name] = (main, commit("the change", {"change.txt": "change\n"}))
@@ -5417,6 +5450,64 @@ class HorizonEndToEndTests(LandingCase):
         code, out, log, run = self.land(merge_state="BLOCKED", FAKE_GH_HOOK_ON="*state=failure -f context=lander/local-ci*", FAKE_GH_HOOK=hook)
         self.assertEqual((code, self.merges(log)), (8, []), out)
         self.assertEqual(self.revoked(log), HZ_REVOKED)
+
+    def test_a_signal_while_the_merge_is_finalised_neither_revokes_nor_loses_the_receipt(self):
+        # #1194's delta reads (the CC's P3-3, the local review's P2): from right before the merge call until the receipt is written and the
+        # merge reported, HUP, INT and TERM are ignored. At b4489b15 a TERM pending as the merge call finished exited 143 and revoked the
+        # merged head's statuses, and one during the sleep after the merge exited 143 with no receipt.
+        for name, options in (("a TERM pending as the merge call finishes", {"FAKE_GH_HOOK_ON": "pr merge *", "FAKE_GH_HOOK": HZ_TERM_LANDING}),
+                              ("a TERM during the sleep after the merge", {"FAKE_SLEEP_HOOK_ON": "4", "FAKE_SLEEP_HOOK": HZ_TERM_LANDING})):
+            with self.subTest(case=name):
+                code, out, log, run = self.land(**options)
+                self.assertEqual((code, len(self.merges(log)), self.revoked(log)), (0, 1, []), out)
+                self.assertEqual(self.receipt(run)[1]["merge_commit"], "f" * 40)
+                self.assertIn(f"#{PR} merged at {self.head[:8]}: merge commit {'f' * 12}", out)
+        with self.subTest(control="a TERM before the merge call still stops the landing and revokes"):
+            code, out, log, run = self.land(FAKE_GH_HOOK_ON="api users/*", FAKE_GH_HOOK=HZ_TERM_LANDING)
+            self.assertEqual((code, self.merges(log), self.revoked(log)), (143, [], HZ_REVOKED), out)
+            self.assertIsNone(self.receipt(run))
+        with self.subTest(case="a TERM during the author check, after the report: merged, the receipt and the statuses kept"):
+            code, out, log, run = self.land(FAKE_GH_HOOK_ON=f"api repos/*/commits/{'f' * 40} *", FAKE_GH_HOOK=HZ_TERM_LANDING)
+            self.assertEqual((code, len(self.merges(log)), self.revoked(log)), (143, 1, []), out)
+            self.assertEqual(self.receipt(run)[1]["merge_commit"], "f" * 40)
+
+    def test_when_12_and_16_both_apply_12_is_the_exit(self):
+        # #1194's delta reads (the CC's P3-3): the receipt's failure (16) is the exit only when nothing else failed after the merge; with the
+        # merge commit unreadable or its author another address (12), 12 is the exit and both lines are printed.
+        taken = f'mkdir -p "$LANDING_COORD/horizon-landings" && : > "$LANDING_COORD/horizon-landings/{PR}-{self.head[:12]}.json"'
+        for name, options in (("the merge commit unreadable", {"FAKE_FAIL": "pr view * state,mergeCommit *"}),
+                              ("the merge's author another address", {"FAKE_COMMIT_EMAIL": "another@example.invalid"})):
+            with self.subTest(case=name):
+                code, out, log, run = self.land(FAKE_GH_HOOK_ON="pr merge *", FAKE_GH_HOOK=taken, **options)
+                self.assertEqual((code, len(self.merges(log)), self.revoked(log)), (12, 1, []), out)
+                self.assertIn(f"merged, but the landing receipt {PR}-{self.head[:12]}.json could not be written", out)
+
+    def test_a_codeowners_lookup_or_read_that_fails_stops_with_8(self):
+        # #1194's local review, P2: a git ls-tree that failed for .github/CODEOWNERS printed nothing and was taken for "no file there", so the
+        # top level's file (the account's) decided while .github/'s named another owner: it landed at b4489b15. Each lookup's exit code counts
+        # now, and so does each read of the blob.
+        main, head = self.worlds["github foreign, root ours"]
+        with self.subTest(case="the lookup of .github/CODEOWNERS fails"):
+            code, out, log, run = self.land(head=head, main=main, FAKE_GIT_FAIL="*ls-tree * -- .github/CODEOWNERS")
+            self.stopped(code, out, log, 8, f"main {main[:8]}'s tree could not be read for .github/CODEOWNERS")
+            self.assertEqual(self.posts(log), [])
+        with self.subTest(control="without the failure, .github/'s file decides: another owner"):
+            code, out, log, run = self.land(head=head, main=main)
+            self.stopped(code, out, log, 8, ".github/CODEOWNERS on main")
+        with self.subTest(case="a read of the blob fails"):
+            code, out, log, run = self.land(FAKE_GIT_FAIL="*cat-file blob *")
+            self.stopped(code, out, log, 8, ".github/CODEOWNERS on main")
+            self.assertIn("holds a NUL byte or is unreadable", out)
+
+    def test_an_empty_name_in_the_receipt_list_stops_with_2_before_any_call(self):
+        # #1194's local review, P2: read -a drops a trailing empty field, so "<receipt>:" (a second receipt variable that expanded to nothing)
+        # read as the first receipt alone and landed at b4489b15. A leading, trailing or doubled ':' is refused before the split.
+        good = self.write("ci.txt", f"CI: exit 0 at {self.head}: {HZ_REQUIRED}\n")
+        for name, value in (("a trailing ':'", f"{good}:"), ("a leading ':'", f":{good}"), ("a doubled ':'", f"{good}::{good}")):
+            with self.subTest(case=name):
+                code, out, log, run = self.land(LOCAL_CI_RECEIPTS=value)
+                self.assertEqual((code, log), (2, []), out)
+                self.assertIn("LOCAL_CI_RECEIPTS holds an empty name (a leading, trailing or doubled ':'): stop, nothing merged", out)
 
     def test_the_author_lookup_failing_stops_with_11_and_revokes(self):
         code, out, log, run = self.land(FAKE_USER_TYPE="Organization")
