@@ -63218,8 +63218,8 @@
     },
     {
       "path": "tests/fixtures/owner-quote-baseline.json",
-      "sha256": "7ac1bede364ac4d89cd29cf77b099fdd75de29296ebed2c1b5d7a76968677ec0",
-      "bytes": 17557
+      "sha256": "fbeb7110872bddd995cc41cc10aafea8fe5564e272f7571f661deab1be0bbbbe",
+      "bytes": 17632
     },
     {
       "path": "tests/fixtures/skill_usage/codex_lanes/rollout-2026-10-19T04-00-00-lanes-before.jsonl.fixture",
@@ -64563,8 +64563,8 @@
     },
     {
       "path": "tests/test_owner_quote_publication.py",
-      "sha256": "5c9d2eeea2f10750d6e915eb9d44a7cd0f93b62ef2641c844ffe7c6de69aa9f4",
-      "bytes": 20053
+      "sha256": "18c099b5e0be0fd293dcba7c6783a45788241c7413e5d942f0131ccdab02cac3",
+      "bytes": 23363
     },
     {
       "path": "tests/test_paired_runs_results.py",

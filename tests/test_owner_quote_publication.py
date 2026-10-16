@@ -17,10 +17,14 @@ Bounds (the command center's adjudication of #1161 at 9bcb8133, 2026-10-15); eac
   with a colon (the ruling of 2026-10-16 at 768d9cc0, which also closed C3, an introduction wrapped across lines); an
   introduction further away is not read (a CommonMark parser stays a PROPOSAL routed to the layer-resolution protocol).
 """
+import io
 import json
 import os
 import re
 import subprocess
+import sys
+import tarfile
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -207,6 +211,36 @@ def scan(root=ROOT):
     return found
 
 
+def measured_counts(root=ROOT):
+    """{path: hit count} of the tree at `root`, sorted by path: what the ratchet baseline records."""
+    return {name: len(lines) for name, lines in sorted(scan(root).items())}
+
+
+def write_baseline(root=ROOT):
+    """Rewrite the baseline's counts from the tree at `root` as measured, never set by hand; schema and rule stay.
+    Run on the tree that lands (after a rebase onto main, the branch's own tree is that merge):
+    `python3 tests/test_owner_quote_publication.py --write-baseline`."""
+    document = json.loads(BASELINE.read_text(encoding="utf-8"))
+    document["files"] = measured_counts(root)
+    BASELINE.write_text(json.dumps(document, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    return document["files"]
+
+
+def merge_with_main(root=ROOT):
+    """The tree of HEAD merged with the default branch (git merge-tree --write-tree), or None where no default branch is
+    fetched; a merge with conflicts raises."""
+    main = next((ref for ref in ("origin/main", "main") if subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "--verify", "--quiet", ref + "^{commit}"],
+        capture_output=True).returncode == 0), None)
+    if main is None:
+        return None
+    done = subprocess.run(["git", "-C", str(root), "merge-tree", "--write-tree", main, "HEAD"], capture_output=True,
+                          text=True, timeout=300)
+    if done.returncode != 0:
+        raise AssertionError(f"HEAD does not merge cleanly with {main} (git merge-tree rc {done.returncode})")
+    return done.stdout.split("\n", 1)[0].strip()
+
+
 class OwnerQuotePublication(unittest.TestCase):
     def test_every_tracked_file_matches_the_ratchet_baseline(self):
         baseline = json.loads(BASELINE.read_text(encoding="utf-8"))["files"]
@@ -218,6 +252,26 @@ class OwnerQuotePublication(unittest.TestCase):
                                   "never quoted; these files are not in tests/fixtures/owner-quote-baseline.json")
         self.assertEqual(changed, {}, "(baseline, now) per file: a fixed file lowers its baseline count in the same commit, "
                                       "and a count may never rise")
+
+    def test_the_ratchet_holds_on_the_merge_with_main(self):
+        # GPT's fix7 micro of #1161 at 1fb477b5 (P2, :217): the baseline matched the branch's own tree, while the tree
+        # that lands is its merge with main, which held a file main had added since. Here the ratchet runs on that merge
+        # result, extracted outside the checkout (git archive of the merge-tree). Skipped only where no default branch
+        # is fetched.
+        tree = merge_with_main()
+        if tree is None:
+            self.skipTest("no origin/main or main to merge with")
+        archive = subprocess.run(["git", "-C", str(ROOT), "archive", "--format=tar", tree], capture_output=True,
+                                 check=True, timeout=600).stdout
+        with tempfile.TemporaryDirectory() as scratch:
+            with tarfile.open(fileobj=io.BytesIO(archive)) as bundle:
+                bundle.extractall(scratch, filter="data")
+            found = measured_counts(Path(scratch))
+        baseline = json.loads(BASELINE.read_text(encoding="utf-8"))["files"]
+        self.assertEqual({name: count for name, count in found.items() if baseline.get(name) != count}, {},
+                         "(path: count on the merge with main) differs from tests/fixtures/owner-quote-baseline.json; "
+                         "rebase onto main and regenerate it with --write-baseline")
+        self.assertEqual(sorted(set(baseline) - set(found)), [], "baseline entries the merge no longer holds")
 
     def test_the_detector_finds_attributed_owner_text_and_passes_paraphrases(self):
         quoted = {"attributed": 'The owner asked: "light every fixture lane now".',
@@ -307,4 +361,8 @@ class OwnerQuotePublication(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    if sys.argv[1:] == ["--write-baseline"]:
+        counts = write_baseline()
+        print(f"owner-quote baseline: {len(counts)} files, {sum(counts.values())} hits (measured)")
+    else:
+        unittest.main()

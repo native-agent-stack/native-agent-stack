@@ -121,6 +121,7 @@
   "evidence/artifacts/mac-stage1-client-layer-20260927/README.md": 2,
   "evidence/artifacts/memory-stack-20260925/convergence.json": 1,
   "evidence/artifacts/memory-stack-20260925/experiment.json": 1,
+  "evidence/artifacts/model-routes-sweep-claude-20261015/returns.json": 3,
   "evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json": 1,
   "evidence/artifacts/nativestack-20260924/checks.py": 1,
   "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_foundation_definitive.py": 2,
