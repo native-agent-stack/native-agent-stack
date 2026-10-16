@@ -73,6 +73,8 @@
     }
   ],
   "currency_policy": "Identity recognition does not fail for an older generation, deprecated status, or age. Currency is maintenance rather than a merge gate. Historical exact snapshots remain accepted; availability and capability are separate claims.",
-  "source_membership_audit": {"supported_snapshot_ids": 84, "pinned_sdk_source_files": 5, "official_snapshot_table_supplements": 1, "unmapped_ids": 0},
+  "currency_policy_basis": "operator decision, recorded privately",
+  "currency_maintenance_decision": "docs/decisions/2026-09-27-model-currency.md",
+  "source_membership_audit": {"supported_snapshot_ids": 83, "pinned_sdk_source_files": 5, "official_snapshot_table_supplements": 1, "unmapped_ids": 0, "unverified_sdk_names_excluded": ["claude-mythos-preview"]},
   "limits": "No SDK installation, model invocation, capability comparison, current candidate screen, default selection or FINAL admission. Unknown provider identities remain unverified; this record makes no claim that a similarly shaped name is a snapshot."
 }

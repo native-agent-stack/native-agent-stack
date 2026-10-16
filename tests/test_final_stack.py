@@ -1048,15 +1048,26 @@ def _angle_fixture() -> dict:
 
 class AngleEnforcementTests(FixtureTestCase):
     def prepare(self, *, final=False, evidence_class="native_proven", run=True):
+        """Build synthetic FINAL fixtures, including a native-generated mocked tag proof.
+
+        The widget proof is synthetic test data produced by
+        tests/fixtures/generate_widget_source_proof.py through native resolve;
+        it is not a real external Git observation.
+        """
         root = self.root()
+        proof_path = "evidence/artifacts/fixture/widget-source-proof.json"
         initial_sweep = _sweep("fixture", "2026-09-22", [("foundation", "layer-a")])
         initial_sweep["layers"][0].update(requirement_sha256="a" * 64,
                                          platform_profiles_sha256="a" * 64, reopen=[])
         _fixture(root, foundation=[_layer("layer-a", winners=[_winner("widget", pin=COMMIT_A)],
                                          terminal_state="FINAL" if final else None)],
                  stack=[{"id": "widget", "repository": "https://github.com/example/widget",
-                         "version": "1.0.0", "source_pin": COMMIT_A}] if run else [],
+                         "version": "1.0.0", "source_pin": COMMIT_A,
+                         "source_proof": proof_path}] if run else [],
                  sweeps=[initial_sweep])
+        if run:
+            _write_json(root / proof_path, json.loads(
+                (REPO_ROOT / "tests/fixtures/widget-source-proof.json").read_text()))
         record = _angle_fixture()
         if final:
             c = record["candidates"][0]
@@ -1068,7 +1079,7 @@ class AngleEnforcementTests(FixtureTestCase):
                 native = f"evidence/artifacts/fixture/arm-{ident}.txt"
                 _write(root / native, "Synthetic native result stand-in.\n")
                 arms.append({"id": ident, "native_output": native})
-            _write_json(root / paired, {"kind": "comparative", "evidence_class": "native_proven",
+            _write_json(root / paired, {"kind": "comparative", "candidate_id": c["id"], "evidence_class": "native_proven",
                 "completed": True, "harness": "paired", "repository": c["repository"], "pin": c["pin"],
                 "confounds": ["Synthetic policy control, not a real measured comparison."], "arms": arms})
         wave_path = "catalogs/sota-convergence/layer-verdicts-20260922.json"
@@ -1211,7 +1222,7 @@ class AngleEnforcementTests(FixtureTestCase):
         for native in native_paths:
             _write(root / native, "Synthetic stand-in for an upstream result artifact.\n")
         _write_json(root / receipt_path, {
-            "kind": "comparative", "evidence_class": "native_proven", "completed": True,
+            "kind": "comparative", "candidate_id": c["id"], "evidence_class": "native_proven", "completed": True,
             "harness": "paired", "repository": c["repository"], "pin": c["pin"],
             "confounds": ["Synthetic policy control, not a measured comparison."],
             "arms": [{"id": ident, "native_output": native} for ident, native in zip(("a", "b"), native_paths)]})
@@ -1228,12 +1239,14 @@ class AngleEnforcementTests(FixtureTestCase):
             "kind": "receipt", "path": receipt,
             "repository": candidate["repository"], "pin": candidate["pin"],
         }]
-        _write_json(root / receipt, {"repository": candidate["repository"], "pin": candidate["pin"]})
+        _write_json(root / receipt, {"kind": "capability", "candidate_id": candidate["id"],
+                                   "repository": candidate["repository"], "pin": candidate["pin"]})
         _write_json(path, record)
         document = fs.build_document(root)
         self.assertEqual(self.layer(document, "layer-a")["angles"]["candidates"][0]["verdict"], "CONVERGED")
         self.assertIn(receipt, document["sources"])
-        _write_json(root / receipt, {"repository": candidate["repository"], "pin": COMMIT_B})
+        _write_json(root / receipt, {"kind": "capability", "candidate_id": candidate["id"],
+                                   "repository": candidate["repository"], "pin": COMMIT_B})
         with self.assertRaisesRegex(fs.FinalStackError, "A1 evidence.*current repository and pin"):
             fs.build_document(root)
 

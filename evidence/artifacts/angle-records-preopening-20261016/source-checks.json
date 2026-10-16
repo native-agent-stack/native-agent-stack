@@ -1,0 +1,21 @@
+{
+  "evidence_class": "source_review",
+  "observed_at": "2026-10-16T06:42:24Z",
+  "repository": "https://github.com/python-jsonschema/jsonschema",
+  "pin": "a7277432b0f7bcd0551f6e589d30457017125df4",
+  "path": "jsonschema/_keywords.py",
+  "line": 304,
+  "end_line": 309,
+  "source_url": "https://raw.githubusercontent.com/python-jsonschema/jsonschema/a7277432b0f7bcd0551f6e589d30457017125df4/jsonschema/_keywords.py",
+  "mechanism": "required object properties",
+  "excerpt": [
+    "def required(validator, required, instance, schema):",
+    "    if not validator.is_type(instance, \"object\"):",
+    "        return",
+    "    for property in required:",
+    "        if property not in instance:",
+    "            yield ValidationError(f\"{property!r} is a required property\")"
+  ],
+  "installed_package": {"name": "jsonschema", "version": "4.26.0", "exact_function_match": true},
+  "limits": "Primary pinned source and installed-function comparison only; no package installation, model invocation or candidate capability measurement."
+}

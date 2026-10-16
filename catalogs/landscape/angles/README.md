@@ -108,10 +108,18 @@ refused for age; currency is separate maintenance, with no age or generation
 cutoff here. A citation for a different recognized snapshot reports a
 current-identity mismatch.
 
-For a receipt, the native source loader must read the receipt's own repository
-and full pin, which must match the candidate. Relabelling a foreign receipt
-does not bind it, and derivation without a loader cannot count receipt-only
-A1 evidence. These checks do not contact a provider, authenticate a page,
+For A1 receipt evidence, the native source loader reads the receipt's own
+`kind: capability`, `candidate_id`, repository and complete pin. The id must
+equal this candidate's id, and the repository/pin must match its current
+identity. `$defs/capability_receipt` documents that content contract. Relabelling
+a foreign receipt or reusing one for a sibling route does not bind it, and
+derivation without a loader cannot count receipt-only A1 evidence. A6 retains
+its `kind: comparative`, native results, distinct arms and confounds, and also
+requires its own matching `candidate_id`; see `$defs/comparative_receipt`.
+Citation objects still use `kind: receipt` to name a file. The content's own
+kind and candidate identity are separate checks.
+
+These checks do not contact a provider, authenticate a page,
 prove capability, or complete a screen. Existing unscreened routes retain
 their evidence gaps.
 

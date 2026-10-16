@@ -724,7 +724,15 @@ def final_v2_refutes_on_merit(sources: Sources, entry: dict, layer: dict) -> boo
                    ("contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256"))
             or saturation_ledger.v2_field_sha256(source) != source.get("field_sha256")):
             return False
-        members = [member for member in _dicts(source.get("eligible_field"))
+        reference = layer.get("discovery_ref")
+        if not isinstance(reference, str):
+            return False
+        retained = sources.json(reference.partition("#")[0])
+        rounds = retained.get("raw") if isinstance(retained, dict) else None
+        raw = rounds.get(layer.get("layer_id")) if isinstance(rounds, dict) else None
+        if not isinstance(raw, list) or not all(isinstance(row, dict) for row in raw):
+            return False
+        members = [member for member in saturation_ledger.v2_expand_field(source, raw)
                    if member.get("candidate_key") == entry.get("candidate_key")]
         if (len(members) != 1 or members[0].get("repository") != entry.get("repository")
             or members[0].get("evidence_key") != entry.get("evidence_key")):

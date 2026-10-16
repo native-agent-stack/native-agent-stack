@@ -34,6 +34,13 @@ historical evidence. No age or generation cutoff is applied. Unverified
 provider identities remain unscreened until their provider source is admitted;
 a name's numeric shape grants no resolution.
 
+The currency separation is recorded by the
+[2026-10-16 clarification](2026-10-16-preopening-receipt-ownership-v2-replay.md#snapshot-recognition-and-currency),
+attributed to the privately recorded operator decision using the existing
+[basis convention at 1b633d86, schema.json:475-478](https://github.com/native-agent-stack/native-agent-stack/blob/1b633d861518fa0d299279b1cfaec11d0fb47f82/catalogs/landscape/angles/schema.json#L475-L478).
+The [2026-09-27 model-currency decision](2026-09-27-model-currency.md) supplies
+historical configuration and maintenance background.
+
 The OpenAI identities are present in
 [`openai/openai-python` v3.31.0 at 86cae50785fb7b7bf2a5d2383370b214b304acd2, chat_model.py:8-96](https://github.com/openai/openai-python/blob/86cae50785fb7b7bf2a5d2383370b214b304acd2/src/openai/types/shared/chat_model.py#L8-L96)
 and the official
@@ -57,6 +64,10 @@ Anthropic snapshots are retained from
 and
 [v0.55.0 at 472c51ebec9fca647df9f39e0da1ca77c221a62f, model.py:14-22](https://github.com/anthropics/anthropic-sdk-python/blob/472c51ebec9fca647df9f39e0da1ca77c221a62f/src/anthropic/types/model.py#L14-L22).
 Historical dated IDs remain recognizable when a later SDK omits them.
+The pre-opening correction excludes `claude-mythos-preview`: its SDK enum
+membership does not establish that it is a pinned snapshot under the cited
+versioning contract. The supported roster is 83; the source audit records the
+excluded unverified spelling without changing the historical source captures.
 `test_documented_historical_snapshots_are_not_refused_for_age` covers old
 OpenAI and Anthropic generations, both dated and documented dateless forms.
 
@@ -76,6 +87,10 @@ A stale, foreign, malformed or unread A1 receipt refuses. The native `derive`
 entry point accepts the same optional source loader; without it, receipt-only
 A1 evidence yields `INSUFFICIENT`. A correctly labelled repository citation
 cannot mask a receipt with another identity.
+
+The [pre-opening receipt/replay decision](2026-10-16-preopening-receipt-ownership-v2-replay.md)
+adds own kind/candidate fields to the receipt contract and records the native
+expanded-field replay correction. It keeps FINAL admission disabled.
 
 The same source loader is carried into the native generated angle summary,
 whose caller is

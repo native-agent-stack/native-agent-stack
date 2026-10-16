@@ -1,0 +1,30 @@
+{
+  "component": "widget",
+  "version": "1.0.0",
+  "repository": "github.com/example/widget",
+  "source": "manifests/stack.json#/components/0",
+  "original_pin": "1.0.0",
+  "command": [
+    "git",
+    "ls-remote",
+    "https://github.com/example/widget.git",
+    "refs/tags/v1.0.0",
+    "refs/tags/v1.0.0^{}",
+    "refs/tags/1.0.0",
+    "refs/tags/1.0.0^{}"
+  ],
+  "exit_code": 0,
+  "stdout": "1111111111111111111111111111111111111111\trefs/tags/v1.0.0\n",
+  "stderr": "",
+  "stderr_present": false,
+  "stderr_policy": "raw stderr withheld",
+  "status": "resolved",
+  "tag": "v1.0.0",
+  "tag_ref": "refs/tags/v1.0.0",
+  "tag_object": null,
+  "ref_object": "1111111111111111111111111111111111111111",
+  "tag_kind": "lightweight",
+  "peeled_commit": "1111111111111111111111111111111111111111",
+  "evidence_class": "synthetic",
+  "fixture_note": "Synthetic test fixture; exact tag output is mocked, no network observation."
+}

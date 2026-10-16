@@ -125,6 +125,42 @@
     }
   },
   "$defs": {
+    "capability_receipt": {
+      "type": "object",
+      "required": ["kind", "candidate_id", "repository", "pin"],
+      "properties": {
+        "kind": {"const": "capability"},
+        "candidate_id": {"$ref": "#/$defs/id"},
+        "repository": {"$ref": "#/$defs/url"},
+        "pin": {"$ref": "#/$defs/text"}
+      }
+    },
+    "comparative_receipt": {
+      "type": "object",
+      "required": ["kind", "candidate_id", "repository", "pin", "evidence_class", "completed", "harness", "confounds", "arms"],
+      "properties": {
+        "kind": {"const": "comparative"},
+        "candidate_id": {"$ref": "#/$defs/id"},
+        "repository": {"$ref": "#/$defs/url"},
+        "pin": {"$ref": "#/$defs/text"},
+        "evidence_class": {"const": "native_proven"},
+        "completed": {"const": true},
+        "harness": {"enum": ["Harbor", "promptfoo", "paired"]},
+        "confounds": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/text"}},
+        "arms": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["id", "native_output"],
+            "properties": {
+              "id": {"$ref": "#/$defs/text"},
+              "native_output": {"$ref": "#/$defs/path"}
+            }
+          }
+        }
+      }
+    },
     "id": {
       "type": "string",
       "pattern": "^[a-z0-9][a-z0-9-]*$"
