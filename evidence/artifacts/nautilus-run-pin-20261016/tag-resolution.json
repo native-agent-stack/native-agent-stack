@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "checked_on": "2026-10-16",
+  "component": "nautilus-trader",
+  "version": "2.0.0rc5",
+  "repository": "https://github.com/nautechsystems/nautilus_trader",
+  "command": [
+    "git",
+    "ls-remote",
+    "https://github.com/nautechsystems/nautilus_trader.git",
+    "refs/tags/v2.0.0rc5",
+    "refs/tags/v2.0.0rc5^{}"
+  ],
+  "exit_code": 0,
+  "stdout": "34de0d6f886a9fe8359f9d6590f43f53c86b1d32\trefs/tags/v2.0.0rc5\n1b0a49d2792a9432a3aca3fcb617ce7a630d905e\trefs/tags/v2.0.0rc5^{}\n",
+  "stderr": "",
+  "tag_object": "34de0d6f886a9fe8359f9d6590f43f53c86b1d32",
+  "peeled_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+  "boundary": "Exact tag identity only; no installation, E2E, invoke receipt, broker operation or FINAL admission."
+}

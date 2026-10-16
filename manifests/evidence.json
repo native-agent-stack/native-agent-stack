@@ -17608,8 +17608,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "e482c30346bbe97fc06a8909a43e86d8d69a93983a443747f92ad7d3d8b9d46d",
-      "bytes": 338896
+      "sha256": "d1bf813f10095b096b9f3eb90d7376286ef8d7679d03f8634d2f7b73286c54ba",
+      "bytes": 339603
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -17680,6 +17680,11 @@
       "path": "catalogs/landscape/independent-discovery.json",
       "sha256": "b3c294015ffeb4aa488353f9cd86e1e5181a2233bcac70fbc32231495b22bd31",
       "bytes": 90370
+    },
+    {
+      "path": "catalogs/landscape/lockfile-source-identities.json",
+      "sha256": "a25a267f8c87fd435297cdc5e9290e2fee5d2bcf4eb5980d52524bfa8fbc4da5",
+      "bytes": 876
     },
     {
       "path": "catalogs/landscape/manifest.json",
@@ -19340,6 +19345,11 @@
       "path": "docs/decisions/2026-10-15-unrun-registration-rules.md",
       "sha256": "10c05e99847859f1c66ba5746ad5872a79ea6f7c115bfb243911d69e86d8f1a6",
       "bytes": 9884
+    },
+    {
+      "path": "docs/decisions/2026-10-16-nautilus-rc5-run-source-pin.md",
+      "sha256": "a2ceae122b37a9df4c9fb53a53f3bf4a1eb188cc51a60a4c564cf857d4a25014",
+      "bytes": 6261
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -43302,6 +43312,21 @@
       "bytes": 817
     },
     {
+      "path": "evidence/artifacts/nautilus-run-pin-20261016/controls.json",
+      "sha256": "b848031405b6913a592751fbc0526604485bcd9ae876a7427f6167f054aa08aa",
+      "bytes": 3263
+    },
+    {
+      "path": "evidence/artifacts/nautilus-run-pin-20261016/tag-resolution.json",
+      "sha256": "9f685ec16531c682b296a51559441be110aedf12bed9e2a4f39ab1ed3f6ecb13",
+      "bytes": 805
+    },
+    {
+      "path": "evidence/artifacts/nautilus-run-pin-20261016/tags.md",
+      "sha256": "c6badb9cf3eeed7a5646670f0feea2cb012738f7db34bbd07da9d884d48c50da",
+      "bytes": 220
+    },
+    {
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/README.md",
       "sha256": "02b9dcd15080141851f8b18f0b6340279e2c43a032df8f3dd7b8f1560c3fcdb3",
       "bytes": 2323
@@ -62623,8 +62648,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "2319364f1f99b491f7d5fed2ec3a7851e1bce5117da5f0f6eebad1a0d05a66f1",
-      "bytes": 81671
+      "sha256": "4223d05642a5c6952dd6843010b474ad74ec4f7dd33b6e73321bd2d7982b3e12",
+      "bytes": 84061
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -64003,8 +64028,8 @@
     },
     {
       "path": "tests/test_local_pages_architecture_landscape_exclusions.py",
-      "sha256": "8e81ced59b9da8c72a9e3f62cba579713d940c0155a1f8772c74b4c7f6b91f21",
-      "bytes": 13218
+      "sha256": "471bba2c86e1e86f61e5fc81385de8e8d514f9180033b0d061a54d2ec7c1f202",
+      "bytes": 14126
     },
     {
       "path": "tests/test_local_pages_architecture_manifest.py",
@@ -64225,6 +64250,11 @@
       "path": "tests/test_nautilus_equity_replay.py",
       "sha256": "5e254b3f118ac09434dee27133c0665788e0b18190889334c39e4470a22fb056",
       "bytes": 5412
+    },
+    {
+      "path": "tests/test_nautilus_run_pin.py",
+      "sha256": "15c5da41f7be197dd826ea54281813742c3d446f9503bad3a5908f534ac8543a",
+      "bytes": 3670
     },
     {
       "path": "tests/test_new_host_grand_list.py",
@@ -65248,8 +65278,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "c14f88d5e3ffed65da4450b69c232651a24edc08b4bc262b3f40506ad4be5c73",
-      "bytes": 763877
+      "sha256": "173656f32c874d30c85f7240ce8f5be8a9151f67cc771678348b691dafa53ae7",
+      "bytes": 764798
     },
     {
       "path": "tools/muse_file_fence.py",

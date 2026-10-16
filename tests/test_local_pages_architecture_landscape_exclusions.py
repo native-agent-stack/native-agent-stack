@@ -36,6 +36,18 @@ POLICY, SOURCES, EVIDENCE, BUILDER = (load(name) for name in ("source_policy", "
 
 
 class CommittedLandscapeSetTests(unittest.TestCase):
+    def test_lock_source_identity_is_excluded_as_metadata_with_published_provenance(self):
+        relative = "catalogs/landscape/lockfile-source-identities.json"
+        policy = json.loads(POLICY_PATH.read_text())
+        excluded = {row["path"]: row for row in policy["architecture_supplement_exclusions"]}
+        self.assertIn(relative, excluded)
+        supplement = json.loads((ROOT / relative).read_text())
+        self.assertFalse({"layers", "rows", "candidates", "components"} & set(supplement))
+        self.assertIn("metadata", excluded[relative]["reason"])
+        provenance = {row["path"]: row for row in policy["architecture_derivation_sources"]}
+        self.assertRegex(provenance[relative]["pin"], r"\A[0-9a-f]{40}\Z")
+        self.assertRegex(provenance[relative]["sha256"], r"\A[0-9a-f]{64}\Z")
+
     def test_derived_final_stack_is_excluded_but_planned_layers_are_granted(self):
         policy = json.loads(POLICY_PATH.read_text())
         excluded = {row["path"]: row for row in policy["architecture_supplement_exclusions"]}
@@ -94,7 +106,8 @@ class CommittedLandscapeSetTests(unittest.TestCase):
         rows = {row["path"]: row for row in policy["architecture_supplement_exclusions"]}
         self.assertEqual(set(rows), {"catalogs/landscape/grand-catalog-counts.json",
                                      "catalogs/landscape/grand-catalog-20261008.json",
-                                     "catalogs/landscape/grand-catalog-index-20261008.json"})
+                                     "catalogs/landscape/grand-catalog-index-20261008.json",
+                                     "catalogs/landscape/lockfile-source-identities.json"})
         self.assertGreater((ROOT / "catalogs/landscape/grand-catalog-20261008.json").stat().st_size, SOURCES._DOC_LIMIT)
         index = json.loads((ROOT / "catalogs/landscape/grand-catalog-index-20261008.json").read_text())
         self.assertFalse({"layers", "rows", "candidates", "components"} & set(index))
