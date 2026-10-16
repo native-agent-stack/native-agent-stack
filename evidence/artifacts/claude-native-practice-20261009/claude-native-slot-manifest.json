@@ -9,7 +9,7 @@
   "describes": "The 33 role-slot rows of .claude/skills/claude-native-practice/reference/slots.json as merged in #923, built before the follow-up that adds this file extended that file: the defaults the 2026-10-09 reading compared every practice against, so each citation's relation (agrees, extends, contradicts, not-covered) is relative to these rows. For the current defaults read current_decision_source.",
   "current_decision_source": {
    "path": ".claude/skills/claude-native-practice/reference/slots.json",
-   "sha256_when_labeled": "826f052f4a7e5d4125c68433c1343a5ffccf95e43c90d5af31cdae78fabf102c",
+   "sha256_when_labeled": "4ac41ee491883e8ad161630ecaa21afe83f7b6d9d45ca8b10f0a64777e880a3b",
    "differs_from_this_snapshot_in": {
     "alternatives": [
      "model-effort-routing",
