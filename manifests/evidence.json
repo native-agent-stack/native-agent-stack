@@ -63212,6 +63212,61 @@
       "bytes": 974
     },
     {
+      "path": "tests/fixtures/model_routes_public_sources/README.md",
+      "sha256": "a8e23bbcd9b5ee762a0ef2ca80161674564c546c0bfaa39ec58e3e8d41816ad4",
+      "bytes": 2393
+    },
+    {
+      "path": "tests/fixtures/model_routes_public_sources/claude-api-LICENSE.txt",
+      "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362",
+      "bytes": 11345
+    },
+    {
+      "path": "tests/fixtures/model_routes_public_sources/claude-api-SKILL.md.txt",
+      "sha256": "40537cca17c4aa86e4ce83ced39efcbfb1204905e3cf4c4ff98f2eab011e4b7f",
+      "bytes": 105146
+    },
+    {
+      "path": "tests/fixtures/model_routes_public_sources/claude-api-models.md.txt",
+      "sha256": "c1af1f093d46fd58e50ef3e8e28d339650f333059bfc49a63d01d0175675161b",
+      "bytes": 17502
+    },
+    {
+      "path": "tests/fixtures/model_routes_public_sources/omniroute-LICENSE.txt",
+      "sha256": "5f3caa52b2c2ce5dfb40c85404a370d23b6dc3e26a1447d17dc7e56f773b91de",
+      "bytes": 1069
+    },
+    {
+      "path": "tests/fixtures/model_routes_public_sources/omniroute-codex.ts.txt",
+      "sha256": "79d856f4aaf4c3c62e40118813244976985edce9b33303ef396a74475e8d21af",
+      "bytes": 8413
+    },
+    {
+      "path": "tests/fixtures/model_routes_public_sources/omniroute-muse-code.ts.txt",
+      "sha256": "c10ada7126c3a339b6c87b1371bd4d5a7a8a26ad4b2664daac2208130c4fe1be",
+      "bytes": 4607
+    },
+    {
+      "path": "tests/fixtures/model_routes_public_sources/omniroute-museCode.ts.txt",
+      "sha256": "e7b7f3dc7b1187a275fac3446eec4d57ea64b482e525deaa7471a443dff11fc3",
+      "bytes": 1854
+    },
+    {
+      "path": "tests/fixtures/model_routes_public_sources/omniroute-package.json.txt",
+      "sha256": "b002c54561bd762f41c7f4cafe6809ac5d5e58bbe175ce0399eb7c1df5b0baf6",
+      "bytes": 35615
+    },
+    {
+      "path": "tests/fixtures/model_routes_public_sources/omniroute-requestDefaults.ts.txt",
+      "sha256": "f9ed676e244fc504deae354bb5dee46be5a242a24526d6e1017296ed34110043",
+      "bytes": 15459
+    },
+    {
+      "path": "tests/fixtures/model_routes_public_sources/omniroute-shared.ts.txt",
+      "sha256": "cb7c78ff2c0fcdebfdc815a174770f346af6d5eccda581a3ff3b2d9b8f588aaf",
+      "bytes": 29536
+    },
+    {
       "path": "tests/fixtures/opencode-permission-53d1eabb.ts",
       "sha256": "deddb980639a9d3220fd77fbe6868b5700beecaef1386a6212e34b9d6dae35fa",
       "bytes": 3014
@@ -64302,6 +64357,11 @@
       "bytes": 17767
     },
     {
+      "path": "tests/test_model_routes_digest_custody.py",
+      "sha256": "4ac44db7291999cedaa1cd3ef140b805e7765af86acb9f6639d9ed69ab03cf53",
+      "bytes": 10460
+    },
+    {
       "path": "tests/test_mover_coverage_asof.py",
       "sha256": "16e0096068470fe720b0f3cf714f614224daf1aa6d708871af928dacf99613d3",
       "bytes": 59843
@@ -64638,8 +64698,8 @@
     },
     {
       "path": "tests/test_provenance_digest_custody.py",
-      "sha256": "7229f97fb51bef1d384ea7db134556fbc1fa517a69c76fad2a26c8bd1e9b69c8",
-      "bytes": 25250
+      "sha256": "600f7e47ade2c6609fa7a461dbc36509ab31024228b2b5929899562eee3466c6",
+      "bytes": 25735
     },
     {
       "path": "tests/test_public_starred.py",
