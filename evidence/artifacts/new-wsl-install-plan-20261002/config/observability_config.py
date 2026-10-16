@@ -194,14 +194,26 @@ def only_portless_configuration(root, plan, ports, source):
         "gpt-researcher.sh": repo / "tools/research/gpt_researcher.sh",
         "gpt-researcher.config.json": repo / "tools/research/gpt-researcher.config.json",
     }
+    # Match check_plan.py's asset discovery: declarations, row copy_config
+    # calls, and explicit plan-config operands in the expanded commands.
+    installer = source.parent / "install.sh"
+    bodies = dict(re.findall(r"(?ms)^([A-Za-z0-9_.-]+) ?\(\) ?\{\n(.*?)^\}",
+                             installer.read_text())) if installer.is_file() else {}
     expected, state_directories = {}, set()
     for row in plan["owners"]:
         if row["slot"] in owners:
             continue
-        for name in row.get("config_paths", []):
-            if not name.startswith("$config_root/"):
+        paths = list(row.get("config_paths", []))
+        paths.extend("$plan_dir/config/" + name for name in
+                     re.findall(r"copy_config '([^']+)'", bodies.get(row["slot"], "")))
+        paths.extend("$plan_dir/config/" + name for name in
+                     re.findall(r'\$plan_dir/config/([A-Za-z0-9._@/-]+)', "\n".join(row.get("commands", []))))
+        for name in paths:
+            prefix = next((prefix for prefix in ("$config_root/", "$plan_dir/config/", "config/")
+                           if name.startswith(prefix)), None)
+            if prefix is None:
                 continue
-            relative = Path(name.removeprefix("$config_root/"))
+            relative = Path(name.removeprefix(prefix))
             # promptfoo's native CONFIG_DIR stores opaque runtime data, not a
             # listener configuration. The row declares this exact directory.
             if row["slot"] == "promptfoo" and relative == Path("promptfoo-state"):

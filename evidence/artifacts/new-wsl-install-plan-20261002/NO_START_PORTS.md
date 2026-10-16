@@ -520,3 +520,61 @@ packet's missing mirror captures, target-native lifecycle/disabled-unit/listener
 acceptance, and merged-tree verification are separate remaining boundaries.
 Earlier full-shard results remain historical validation; this wave does not
 claim a new full-shard run or target acceptance.
+
+## Final scoped install-path review
+
+The final scope-locked review at `2c764521` identified two install-path defects
+in `review_output.json`. Both were reproduced before editing production code.
+`review-wave-6-receipt.json` retains the before/after results and review gate.
+
+- The portless recognizer previously consumed only installed destinations from
+  `config_paths`. Four rows instead declared source paths or omitted a helper: Chrome
+  DevTools, research harnesses, trajectory analysis and MCP conformance. Their
+  entries now name the actual destination. The recognizer also follows the
+  checker's source-discovery rules: declared paths, row `copy_config` calls and
+  plan-config operands in expanded commands. Four separate subcases reproduce
+  the original declaration shapes and verify their installed assets resolve.
+  A separate test derives all31 copied
+  files across13 portless rows from the installer and its helper calls, performs
+  stage/copy/commit/rerun with disposable files, and verifies that altered files
+  still require custody. No port snapshot is published by those rows. This fixes
+  the inventory and discovery without accepting arbitrary configuration.
+- At the upstream memory port49374, the old bind replacement kept matching and
+  appended another provider key on each run. Bind replacement and provider
+  insertion are now separate: an existing provider field is retained, and a
+  missing local-provider field is inserted once. Repeated rendered commands
+  produce valid TOML at29374,39374 and49374; a different provider is preserved
+  and fails the existing local-provider requirement. The selected upstream
+  [default template at7580b74, config.default.toml:10,99–106](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/templates/config.default.toml#L10)
+  and [configuration fields, config.rs:257,454](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/config.rs#L454)
+  define independent bind and provider settings. No memory daemon or native
+  installer was invoked by these tests.
+- `MICRO-delta-2c764521.md` also requires normal MinerU setup to disable telemetry
+  before model downloads. The normal path restores that order; a failed download
+  still stops only the daemon it started and never sets managed configuration.
+  No-start retains standalone model preparation without any daemon operation.
+  At the selected pin, [telemetry.py:39–57](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/mineru/cli/commands/telemetry.py#L39)
+  sends disable through DoclibClient, while
+  [kit/main.py:42–54](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/mineru/kit/main.py#L42)
+  registers standalone model commands with an empty root callback. The
+  disable-first fixture failed before the change and passes afterward.
+
+Both command corrections stay on their original lines; all eight current citation
+anchors remain valid. The generator, public handbook, source evidence and
+historical privacy disposition from the preceding fold remain untouched.
+
+`GPT-VERDICT-2c7645218.md` found the existing F9 mutation test still captured
+the previous second sentence. Its capture now includes the activation and
+listener-ownership clause, with all14 mutation definitions and assertions
+unchanged. The full109-test recipe module plus the two W5 documentation guards
+failed once before the capture correction and pass afterward.
+
+The remaining source-pointer P3 is a verification follow-up: the reviewer lacked
+pinned Collector source mirrors and no dedicated failing-before locator test was
+supplied. The earlier Collector unit citation correction changes its first
+comment relative to the preceding micro head, while its executable settings are
+unchanged. That added-unit comment is an explicit exception to any blanket
+micro-to-micro byte-identity claim; the retained29 historical asset comparisons,
+six default dashboards and Promptfoo native-export equivalence have their
+separate recorded scopes. Native startup, disabled-unit/listener acceptance,
+Dagu bootstrap and recovery of partial writes remain unverified on the target.

@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-16",
+  "before_head": "2c76452186c23343ac0944d72a1bb9014386688c",
+  "status": "implemented_for_released_final_fold",
+  "scope_lock_event": 191487,
+  "review_names": [
+    "review_output.json",
+    "MICRO-delta-2c764521.md",
+    "GPT-VERDICT-2c7645218.md"
+  ],
+  "evidence_class": "synthetic",
+  "execution_prefix": "systemd-run --user --scope -p CPUWeight=idle --quiet --",
+  "before": {
+    "command": "python3 -B -m unittest tests.test_install_plan_review_wave6 -v",
+    "production_source": "Unchanged published2c764521 install.sh, install-plan.json and renderer",
+    "tests": 2,
+    "failures": 4,
+    "errors": 1,
+    "exit_code": 1,
+    "portless_failing_rows": [
+      "playwright-cli",
+      "research-harnesses",
+      "trajectory-analysis",
+      "mcp-protocol-conformance"
+    ],
+    "memory_observation": "Both extracted commands returned zero at allocated49374; parsing the result after the second invocation failed with duplicate-key TOML.",
+    "portless_observation": "Stage/copy/commit succeeded, no snapshot was published, then an unchanged rerun refused the installer's own files. The source-derived audit found31 actual file outputs across13 portless rows."
+  },
+  "after": {
+    "new_regressions": {
+      "command": "python3 -B -m unittest tests.test_install_plan_review_wave6 -v",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0,
+      "portless_rows": 13,
+      "actual_copied_files": 31,
+      "memory_allocations": [
+        29374,
+        39374,
+        49374
+      ],
+      "provider_controls": [
+        "absent inserted once",
+        "local preserved",
+        "openai preserved and existing requirement refuses"
+      ]
+    },
+    "focused": {
+      "command": "python3 -B /tmp/install-nostart-safe-tests-velo.py tests.test_install_plan_no_start_ports tests.test_install_plan_review_wave3 tests.test_install_plan_review_wave5 tests.test_install_plan_review_wave6 tests.test_runtime_profiles.StrictHostConsumerTests tests.test_harbor_currency_contracts",
+      "tests": 112,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 0
+    },
+    "check_plan": {
+      "rows": 84,
+      "commands": 198,
+      "acceptance_entries": 113,
+      "exit_code": 0
+    },
+    "citation_audit": {
+      "pre_edit_matches": 78,
+      "pre_edit_files": 37,
+      "install_line_count_unchanged": true,
+      "accept_bytes_unchanged": true,
+      "current_anchors_verified": 8
+    },
+    "validate": {
+      "command": "python3 scripts/validate.py",
+      "status": "passed",
+      "exit_code": 0,
+      "hashed_files": 12159,
+      "components": 71,
+      "profiles": 4,
+      "receipts": 240,
+      "qualification": "Released implementation; repeated after recording this result immediately before the single final commit."
+    },
+    "normal_MinerU_failure_control": {
+      "already_running_states": [
+        false,
+        true
+      ],
+      "result": "Telemetry disabled before download; failure preserves exit37, never verifies/models-configures afterward, stops only a daemon the command started."
+    },
+    "prior_fixture_adjustment": "The old failure fixture required no daemon call in both modes. CC disable-first makes that contract no-start-only; a separate normal-mode failure/cleanup fixture covers both existing and newly started daemons.",
+    "GPT_recipe_consumer": {
+      "command": "python3 -B /tmp/install-nostart-safe-tests-velo.py tests.test_wsl_new_distro_recipe tests.test_install_plan_review_wave5.DocumentationFlowTests",
+      "tests": 111,
+      "recipe_module_tests": 109,
+      "W5_documentation_guards": 2,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 0,
+      "mutation_definitions_and_assertions_unchanged": 14,
+      "proof": "AST comparison of the mutation dictionary and assertion loop before/after; corrected activation/listener clause remains in the recipe."
+    }
+  },
+  "sources": [
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+      "file": "crates/ai-memory-cli/templates/config.default.toml",
+      "lines": "10,99-106",
+      "mechanism": "Independent upstream bind and embedding-provider settings"
+    },
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+      "file": "crates/ai-memory-cli/src/config.rs",
+      "lines": "257,454",
+      "mechanism": "Separate typed fields for bind and optional provider"
+    },
+    {
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "pin": "2c76452186c23343ac0944d72a1bb9014386688c",
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "mechanism": "Actual copy_config calls, transitive helpers and direct file-install operands are the independent reference for produced destinations"
+    },
+    {
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "pin": "2c76452186c23343ac0944d72a1bb9014386688c",
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "lines": "890-894",
+      "mechanism": "Configuration-source discovery from declarations, row copy_config calls and expanded command operands"
+    },
+    {
+      "repository": "https://github.com/opendatalab/MinerU",
+      "pin": "c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+      "file": "mineru/cli/commands/telemetry.py",
+      "lines": "39-57",
+      "mechanism": "Telemetry disable requires DoclibClient"
+    },
+    {
+      "repository": "https://github.com/opendatalab/MinerU",
+      "pin": "c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+      "file": "mineru/kit/main.py",
+      "lines": "42-54",
+      "mechanism": "Standalone kit model commands; root callback does not start doclib"
+    },
+    {
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "pin": "2c76452186c23343ac0944d72a1bb9014386688c",
+      "file": "tests/test_wsl_new_distro_recipe.py",
+      "lines": "1591-1625",
+      "mechanism": "Retained F9 mutation-test contract; only paragraph capture follows the corrected activation-order instruction."
+    }
+  ],
+  "scope": "Touched install-path commands and asset discovery/config inventory, regression tests, owned evidence and the mechanical current-selector locator. No generator/handbook/source-evidence cleanup, service activation or full script execution.",
+  "preserved_boundaries": [
+    "Portless publication creates no listener allocation snapshot",
+    "Altered files still fail custody for every recognized portless row",
+    "Memory configuration remains valid TOML after repeated commands at the upstream default and moved ports",
+    "Existing provider settings are not duplicated or silently overwritten",
+    "All eight live citation anchors and the preceding fold's privacy disposition are retained"
+  ],
+  "local_execution_boundary": "Only source-derived copies, extracted migration commands, disposable HOME/config files and fake-free offline renderers. No installer, daemon, full install.sh/accept.sh or target listener acceptance runs.",
+  "native_target_acceptance": "Still owed by native-agent-stack-51 on NativeHorizonNY.",
+  "scope_proof": {
+    "changed_existing_manifest_entries_vs8053": 59,
+    "added_manifest_entries_vs8053": 20,
+    "removed_manifest_entries_vs8053": 0,
+    "existing_metadata_only_sha256_and_bytes_changed": true,
+    "five_frozen_inputs_preserved": true,
+    "generator_handbook_receipt_and_three_source_evidence_files_unchanged_from2c764521": true,
+    "plan_rows_changed": {
+      "memory-owner": [
+        "commands"
+      ],
+      "playwright-cli": [
+        "config_paths"
+      ],
+      "research-harnesses": [
+        "config_paths"
+      ],
+      "trajectory-analysis": [
+        "config_paths"
+      ],
+      "mcp-protocol-conformance": [
+        "config_paths"
+      ],
+      "mineru": [
+        "commands"
+      ]
+    },
+    "mechanical_receiver_locator": "SOURCES.md: config/observability_config.py:479-492"
+  },
+  "fold_gate": "Released by195682 after CC micro and GPT q1028 relay. One final normal commit/push, no rebase; all in-scope P1/P2 and expressly included CC F2 are handled. Other P3/out-of-scope items remain Follow-ups.",
+  "CC_micro_event": 192741,
+  "CC_before": {
+    "command": "python3 -B -m unittest tests.test_install_plan_review_wave6.PortlessOutputTests.test_source_declarations_and_commands_resolve_installed_portless_assets tests.test_install_plan_review_wave6.MineruTelemetryOrderTests -v",
+    "tests": 2,
+    "failures": 1,
+    "errors": 4,
+    "exit_code": 1,
+    "observations": [
+      "Four original declaration shapes failed when installed assets were resolved without destination-only metadata",
+      "Normal model download preceded telemetry disable"
+    ],
+    "source": "Unchanged2c764521 discovery and MinerU command; prior local P2 fixes already prepared"
+  },
+  "fold_release_event": 195682,
+  "GPT_before": {
+    "command": "python3 -B /tmp/install-nostart-safe-tests-velo.py tests.test_wsl_new_distro_recipe tests.test_install_plan_review_wave5.DocumentationFlowTests",
+    "tests": 111,
+    "failures": 1,
+    "errors": 0,
+    "skips": 0,
+    "exit_code": 1,
+    "failing_test": "tests.test_wsl_new_distro_recipe.StageTwoTests.test_the_check_rejects_the_old_commands_a_lost_step_a_wrong_order_and_a_second_block",
+    "source": "Unchanged2c764521 mutation-test capture against the corrected activation-order paragraph; other final-fold install-path fixes already prepared."
+  },
+  "GPT_followups": {
+    "source_pointer_evidence": "Pinned Collector mirrors were unavailable in the review packet; dedicated pointer fail-first evidence remains a follow-up. No new runtime failure is claimed for citation corrections.",
+    "byte_identity_qualification": "The added Collector unit first comment changed in the preceding micro fold while executable settings were unchanged. It is an explicit micro-to-micro byte-identity exception; historical29 assets,6 dashboards and Promptfoo export checks retain separate recorded scopes.",
+    "native_acceptance": "Actual package activation, disabled-unit/no-new-listener checks, Dagu bootstrap and recovery of partially written assets remain unverified on NativeHorizonNY."
+  }
+}

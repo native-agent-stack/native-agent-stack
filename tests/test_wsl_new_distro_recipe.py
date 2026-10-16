@@ -1597,7 +1597,8 @@ class StageTwoTests(unittest.TestCase):
         tool = "\n".join(F9_COMMANDS[3:])
         self.assertIn(block, recipe)
         sign_in_and_checks = re.search(r"(After the `--apply` line, run `codex login`.*?signed in\)\.)\s+"
-                                       r"(Then run the plan's\s+after-sign-in checks.*?has that stage\.)", recipe, re.S)
+                                       r"(Complete separate operator activation and a fresh listener-ownership check "
+                                       r"before running the plan's\s+after-sign-in checks.*?has that stage\.)", recipe, re.S)
         self.assertIsNotNone(sign_in_and_checks)
         mutants = {
             "the old bootstrap commands": recipe.replace(block, old),

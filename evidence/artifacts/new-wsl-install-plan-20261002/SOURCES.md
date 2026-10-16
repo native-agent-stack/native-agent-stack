@@ -541,7 +541,7 @@ webhook, Telegram or on-host delivery; the sink remains until safe files exist.
 Receiver support is restored from main `f946c6d4c` / `77d7516d8`:
 the historical `config/observability_config.py:65-78` selected the native webhook
 or Telegram pointer files. The current selector is `destination()` at
-`config/observability_config.py:467-480` in this PR; `accept.sh` selects the
+`config/observability_config.py:479-492` in this PR; `accept.sh` selects the
 matching native notification counters.
 The upstream Alertmanager v0.34.1 file fields are documented at
 `docs/configuration.md:1875-1882,1947-1950`. The round-2 handling of exit 78 as

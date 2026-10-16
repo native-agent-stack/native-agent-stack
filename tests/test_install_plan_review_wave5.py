@@ -283,14 +283,16 @@ mineru-kit() {
             self.assertIn("KIT models verify --tier standard", installed.stdout)
             self.assertNotIn("DAEMON", installed.stdout + accepted.stdout)
 
-    def test_failed_model_download_stops_before_verification_or_daemon_configuration(self):
+    def test_no_start_failed_model_download_stops_before_verification_or_daemon_configuration(self):
         checker = module(PLAN / "check_plan.py", "wave5_mineru_failure")
         funcs = checker.functions((PLAN / "install.sh").read_text())
         setup = next(c for c in checker.run_commands("mineru", funcs, set()) if "models download" in c)
         fakes = '''mineru() { printf 'DAEMON %s\\n' "$*"; return 99; }
 mineru-kit() { printf 'KIT %s\\n' "$*"; return 37; }
 '''
-        for mode in ("0", "1"):
+        # Normal mode disables doclib telemetry first (CC correction192741).
+        # This no-start contract still prohibits every daemon call.
+        for mode in ("1",):
             with self.subTest(mode=mode), tempfile.TemporaryDirectory() as tmp:
                 result = subprocess.run(["bash", "-euo", "pipefail", "-c", fakes + setup],
                     env={"PATH": "/usr/bin:/bin", "HOME": tmp, "NS2604_NO_START": mode},
