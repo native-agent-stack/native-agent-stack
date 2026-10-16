@@ -1,0 +1,538 @@
+{
+  "schema": "final-preparation-f1/1",
+  "catalog": "foundation",
+  "layer_id": "token-efficiency",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "read_date": "2026-10-16",
+  "status": "PROPOSAL_ONLY",
+  "final_admission": "CLOSED",
+  "reason": "Source-only pin proposal reconciles exact repository value lines with separately captured installed-host versions. No default or historical verdict is rewritten.",
+  "components": [
+    {
+      "component_id": "rtk",
+      "proposed_run_pin": {
+        "version": "0.51.0",
+        "tag": "v0.51.0",
+        "commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+        "repository": "https://github.com/rtk-ai/rtk",
+        "tag_resolution_source": "https://api.github.com/repos/rtk-ai/rtk/commits/v0.51.0",
+        "source_pin_citation": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "evidence/receipts/rtk-051-qualification-20261004.json",
+          "line": 27,
+          "detail": "Retained source commit for the exact version",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-051-qualification-20261004.json#L27"
+        }
+      },
+      "sources": [
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 8091,
+          "detail": "Historical winner verdict pin 0.49.0",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8091"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 147,
+          "detail": "Layer plan row names three drifted winners; does not independently specify versions",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-15-new-wsl-clean-install-plan.md#L147"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 11199,
+          "detail": "Current run pin 0.51.0",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L11199"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "manifests/stack.json",
+          "line": 835,
+          "detail": "Stack version 0.51.0",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/manifests/stack.json#L835"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "adoption/pins-linux-x86_64.json",
+          "line": 139,
+          "detail": "Linux installation pin 0.51.0",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/adoption/pins-linux-x86_64.json#L139"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "adoption/pins-macos-arm64.json",
+          "line": 223,
+          "detail": "macOS artifact manifest version 0.51.0; this line is not execution evidence",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/adoption/pins-macos-arm64.json#L223"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "evidence/receipts/rtk-051-qualification-20261004.json",
+          "line": 25,
+          "detail": "Prior receipt explicitly records version 0.51.0",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-051-qualification-20261004.json#L25"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+          "line": 52,
+          "detail": "Historical receipt's version field is 0.51.0; its other claims require their own separate locators.",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L52"
+        }
+      ],
+      "installed_read_only_probe": {
+        "status": "NATIVE_CAPTURE",
+        "command_display": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin <host-home>/.local/share/codex-ecosystem/bin/rtk --version",
+        "command_source": {
+          "path": "captures/installed-rtk-version.typescript",
+          "line": 1,
+          "evidence_class": "masked_native_capture"
+        },
+        "return_code": {
+          "value": 0,
+          "source": {
+            "path": "captures/installed-rtk-version.typescript",
+            "line": 4,
+            "evidence_class": "masked_native_capture"
+          }
+        },
+        "version_source": {
+          "path": "captures/installed-rtk-version.typescript",
+          "line": 2,
+          "evidence_class": "masked_native_capture"
+        },
+        "masked_capture": {
+          "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+          "command_display": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin <host-home>/.local/share/codex-ecosystem/bin/rtk --version",
+          "command_line": 1,
+          "command_rc_custody": "native util-linux script transcript header/footer",
+          "kind": "masked_native_output",
+          "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+          "published_bytes": 302,
+          "published_output": "captures/installed-rtk-version.typescript",
+          "published_sha256": "8b5a596a774c801964925770952cd504b518fbd60230e877cafca5ff0a2c22d5",
+          "raw_capture_name": "installed-rtk-version.typescript",
+          "return_code": 0,
+          "return_code_line": 4
+        },
+        "scope": "Already installed executable --version only; not a host install and not replaced by the scratch version."
+      },
+      "drifts": [
+        {
+          "kind": "verdict_vs_run",
+          "from": "0.49.0",
+          "to": "0.51.0",
+          "action": "Propose a single run pin; preserve historical verdict and receipts without rewriting them."
+        },
+        {
+          "kind": "generated_lane_packet",
+          "from": "0.50.0",
+          "to": "0.51.0",
+          "action": "Historical packet pin is retained verbatim as an input lead; proposed pin is bound by this record."
+        }
+      ],
+      "last_committed_evidence_boundary": "0.51.0 appears in the retained 72-trial Harbor study; limited grep tasks, one Codex client, cache and extraction confounds remain.",
+      "reason": "Current run/stack/platform value lines agree with the proposed pin and native installed-host version capture. This proposes a run pin only, not a default.",
+      "e2e_record": "execution-receipt.json",
+      "invoke_record": "invoke-evidence.json",
+      "last_committed_evidence_boundary_sources": [
+        {
+          "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+          "line": 9,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L9"
+        },
+        {
+          "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+          "line": 11,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L11"
+        },
+        {
+          "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+          "line": 12,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L12"
+        },
+        {
+          "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+          "line": 14,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L14"
+        },
+        {
+          "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+          "line": 16,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L16"
+        },
+        {
+          "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+          "line": 17,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L17"
+        },
+        {
+          "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+          "line": 18,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L18"
+        },
+        {
+          "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+          "line": 19,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L19"
+        }
+      ]
+    },
+    {
+      "component_id": "headroom",
+      "proposed_run_pin": {
+        "version": "0.40.0",
+        "tag": "v0.40.0",
+        "commit": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
+        "repository": "https://github.com/headroomlabs-ai/headroom",
+        "tag_resolution_source": "https://api.github.com/repos/headroomlabs-ai/headroom/commits/v0.40.0",
+        "source_pin_citation": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "evidence/receipts/2604-drift-version-readback-20261008.json",
+          "line": 32,
+          "detail": "Retained source commit for the exact version",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/2604-drift-version-readback-20261008.json#L32"
+        }
+      },
+      "sources": [
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 8113,
+          "detail": "Historical winner verdict pin 0.37.0",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8113"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 147,
+          "detail": "Layer plan row names three drifted winners; does not independently specify versions",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-15-new-wsl-clean-install-plan.md#L147"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 10751,
+          "detail": "Current run pin 0.40.0",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L10751"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "manifests/stack.json",
+          "line": 523,
+          "detail": "Stack version 0.40.0",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/manifests/stack.json#L523"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "adoption/pins-linux-x86_64.json",
+          "line": 320,
+          "detail": "Linux installation pin 0.40.0",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/adoption/pins-linux-x86_64.json#L320"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "adoption/pins-macos-arm64.json",
+          "line": 308,
+          "detail": "macOS artifact manifest version 0.40.0; this line is not execution evidence",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/adoption/pins-macos-arm64.json#L308"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "evidence/receipts/2604-drift-version-readback-20261008.json",
+          "line": 28,
+          "detail": "Prior receipt explicitly records version 0.40.0",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/2604-drift-version-readback-20261008.json#L28"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "evidence/receipts/2604-drift-version-readback-20261008.json",
+          "line": 9,
+          "detail": "Receipt expressly limits evidence to metadata and artifact identity, with no functional acceptance.",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/2604-drift-version-readback-20261008.json#L9"
+        }
+      ],
+      "installed_read_only_probe": {
+        "status": "NATIVE_CAPTURE",
+        "command_display": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin <host-home>/.local/share/codex-ecosystem/bin/headroom --version",
+        "command_source": {
+          "path": "captures/installed-headroom-version.typescript",
+          "line": 1,
+          "evidence_class": "masked_native_capture"
+        },
+        "return_code": {
+          "value": 0,
+          "source": {
+            "path": "captures/installed-headroom-version.typescript",
+            "line": 4,
+            "evidence_class": "masked_native_capture"
+          }
+        },
+        "version_source": {
+          "path": "captures/installed-headroom-version.typescript",
+          "line": 2,
+          "evidence_class": "masked_native_capture"
+        },
+        "masked_capture": {
+          "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+          "command_display": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin <host-home>/.local/share/codex-ecosystem/bin/headroom --version",
+          "command_line": 1,
+          "command_rc_custody": "native util-linux script transcript header/footer",
+          "kind": "masked_native_output",
+          "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+          "published_bytes": 321,
+          "published_output": "captures/installed-headroom-version.typescript",
+          "published_sha256": "2e364c9d75dca0e64f895158a75d72e22092240eda357a36d115557a6d18406b",
+          "raw_capture_name": "installed-headroom-version.typescript",
+          "return_code": 0,
+          "return_code_line": 4
+        },
+        "scope": "Already installed executable --version only; not a host install and not replaced by the scratch version."
+      },
+      "drifts": [
+        {
+          "kind": "verdict_vs_run",
+          "from": "0.37.0",
+          "to": "0.40.0",
+          "action": "Propose a single run pin; preserve historical verdict and receipts without rewriting them."
+        },
+        {
+          "kind": "generated_lane_packet",
+          "from": "0.37.0",
+          "to": "0.40.0",
+          "action": "Historical packet pin is retained verbatim as an input lead; proposed pin is bound by this record."
+        }
+      ],
+      "last_committed_evidence_boundary": "0.40.0 is explicitly a version/artifact readback without functional acceptance; prior functional receipts keep their historical scope.",
+      "reason": "Current run/stack/platform value lines agree with the proposed pin and native installed-host version capture. This proposes a run pin only, not a default.",
+      "e2e_record": "execution-receipt.json",
+      "invoke_record": "invoke-evidence.json",
+      "last_committed_evidence_boundary_sources": [
+        {
+          "path": "evidence/receipts/2604-drift-version-readback-20261008.json",
+          "line": 9,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/2604-drift-version-readback-20261008.json#L9"
+        },
+        {
+          "path": "evidence/receipts/2604-drift-version-readback-20261008.json",
+          "line": 10,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/2604-drift-version-readback-20261008.json#L10"
+        },
+        {
+          "path": "evidence/receipts/2604-drift-version-readback-20261008.json",
+          "line": 11,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/2604-drift-version-readback-20261008.json#L11"
+        },
+        {
+          "path": "evidence/receipts/2604-drift-version-readback-20261008.json",
+          "line": 28,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/2604-drift-version-readback-20261008.json#L28"
+        },
+        {
+          "path": "evidence/receipts/2604-drift-version-readback-20261008.json",
+          "line": 32,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/2604-drift-version-readback-20261008.json#L32"
+        }
+      ]
+    },
+    {
+      "component_id": "ccusage",
+      "proposed_run_pin": {
+        "version": "20.0.26",
+        "tag": "v20.0.26",
+        "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+        "repository": "https://github.com/ccusage/ccusage",
+        "tag_resolution_source": "https://api.github.com/repos/ccusage/ccusage/commits/v20.0.26",
+        "source_pin_citation": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "evidence/receipts/ccusage-20026-qualification-20260927.json",
+          "line": 35,
+          "detail": "Retained source commit for the exact version",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/ccusage-20026-qualification-20260927.json#L35"
+        }
+      },
+      "sources": [
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 8135,
+          "detail": "Historical winner verdict pin 20.0.24",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8135"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 147,
+          "detail": "Layer plan row names three drifted winners; does not independently specify versions",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-15-new-wsl-clean-install-plan.md#L147"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 10482,
+          "detail": "Current run pin 20.0.26",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L10482"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "manifests/stack.json",
+          "line": 166,
+          "detail": "Stack version 20.0.26",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/manifests/stack.json#L166"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "adoption/pins-linux-x86_64.json",
+          "line": 305,
+          "detail": "Linux installation pin 20.0.26",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/adoption/pins-linux-x86_64.json#L305"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "adoption/pins-macos-arm64.json",
+          "line": 291,
+          "detail": "macOS artifact manifest version 20.0.26; this line is not execution evidence",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/adoption/pins-macos-arm64.json#L291"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "evidence/receipts/ccusage-20026-qualification-20260927.json",
+          "line": 32,
+          "detail": "Prior receipt explicitly records version 20.0.26",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/ccusage-20026-qualification-20260927.json#L32"
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "evidence/receipts/claude-spend-window-20261004.json",
+          "line": 167,
+          "detail": "Historical receipt's version field is 20.0.26; its other claims require their own separate locators.",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/claude-spend-window-20261004.json#L167"
+        }
+      ],
+      "installed_read_only_probe": {
+        "status": "NATIVE_CAPTURE",
+        "command_display": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin <host-home>/.local/share/codex-ecosystem/bin/ccusage --version",
+        "command_source": {
+          "path": "captures/installed-ccusage-version.typescript",
+          "line": 1,
+          "evidence_class": "masked_native_capture"
+        },
+        "return_code": {
+          "value": 0,
+          "source": {
+            "path": "captures/installed-ccusage-version.typescript",
+            "line": 4,
+            "evidence_class": "masked_native_capture"
+          }
+        },
+        "version_source": {
+          "path": "captures/installed-ccusage-version.typescript",
+          "line": 2,
+          "evidence_class": "masked_native_capture"
+        },
+        "masked_capture": {
+          "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+          "command_display": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin <host-home>/.local/share/codex-ecosystem/bin/ccusage --version",
+          "command_line": 1,
+          "command_rc_custody": "native util-linux script transcript header/footer",
+          "kind": "masked_native_output",
+          "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+          "published_bytes": 311,
+          "published_output": "captures/installed-ccusage-version.typescript",
+          "published_sha256": "01009cdafd0e6c807a104a777e3a1d3ba0180c3c5ebb2901a4486eb845fa2de0",
+          "raw_capture_name": "installed-ccusage-version.typescript",
+          "return_code": 0,
+          "return_code_line": 4
+        },
+        "scope": "Already installed executable --version only; not a host install and not replaced by the scratch version."
+      },
+      "drifts": [
+        {
+          "kind": "verdict_vs_run",
+          "from": "20.0.24",
+          "to": "20.0.26",
+          "action": "Propose a single run pin; preserve historical verdict and receipts without rewriting them."
+        }
+      ],
+      "last_committed_evidence_boundary": "20.0.26 retained native output re-derivation, not a new upstream test or a quality/savings experiment; price/day/window/attempt-count caveats remain.",
+      "reason": "Current run/stack/platform value lines agree with the proposed pin and native installed-host version capture. This proposes a run pin only, not a default.",
+      "e2e_record": "execution-receipt.json",
+      "invoke_record": "invoke-evidence.json",
+      "last_committed_evidence_boundary_sources": [
+        {
+          "path": "evidence/receipts/claude-spend-window-20261004.json",
+          "line": 12,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/claude-spend-window-20261004.json#L12"
+        },
+        {
+          "path": "evidence/receipts/claude-spend-window-20261004.json",
+          "line": 13,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/claude-spend-window-20261004.json#L13"
+        },
+        {
+          "path": "evidence/receipts/claude-spend-window-20261004.json",
+          "line": 19,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/claude-spend-window-20261004.json#L19"
+        },
+        {
+          "path": "evidence/receipts/claude-spend-window-20261004.json",
+          "line": 167,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/claude-spend-window-20261004.json#L167"
+        }
+      ]
+    }
+  ],
+  "unresolved": [
+    "No current-pin macOS execution on this Linux host.",
+    "Source pin and artifact identity do not inherit earlier native-quality claims.",
+    "Headroom 0.39.0 historical concerns require adjudication against 0.40.0 behavior; CCR success alone is not answer-quality parity.",
+    "The FINAL gate chain remains closed; no catalog or default is changed."
+  ],
+  "capture_integrity_status": "NATIVE_HOST_VERSION_CAPTURES_RETAINED; co-op private check PASS 2026-10-16"
+}

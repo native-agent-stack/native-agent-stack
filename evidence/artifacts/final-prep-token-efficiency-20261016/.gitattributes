@@ -1,0 +1,4 @@
+# Preserve the reviewed native transcript bytes, including PTY CRLF output.
+captures/*.typescript -text whitespace=cr-at-eol
+# The vendor shell trace contains an exact '+ echo ' line; preserve its space.
+captures/rtk-install.typescript whitespace=cr-at-eol,-blank-at-eol

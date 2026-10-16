@@ -1,0 +1,37 @@
+Script started on 2026-10-16 02:22:23-04:00 [COMMAND="env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch> --setenv TZ UTC --setenv CLAUDE_CONFIG_DIR <scratch>/ccusage/fixture --setenv CCUSAGE_OFFLINE 1 <scratch>/recapture/ccusage/prefix/bin/ccusage claude daily --offline --json" <not executed on terminal>]
+{
+  "daily": [
+    {
+      "cacheCreationTokens": 30,
+      "cacheReadTokens": 40,
+      "date": "2026-10-15",
+      "inputTokens": 100,
+      "modelBreakdowns": [
+        {
+          "cacheCreationTokens": 30,
+          "cacheReadTokens": 40,
+          "cost": 0.01,
+          "inputTokens": 100,
+          "modelName": "claude-sonnet-4-20250514",
+          "outputTokens": 20
+        }
+      ],
+      "modelsUsed": [
+        "claude-sonnet-4-20250514"
+      ],
+      "outputTokens": 20,
+      "totalCost": 0.01,
+      "totalTokens": 190
+    }
+  ],
+  "totals": {
+    "cacheCreationTokens": 30,
+    "cacheReadTokens": 40,
+    "inputTokens": 100,
+    "outputTokens": 20,
+    "totalCost": 0.01,
+    "totalTokens": 190
+  }
+}
+
+Script done on 2026-10-16 02:22:23-04:00 [COMMAND_EXIT_CODE="0"]

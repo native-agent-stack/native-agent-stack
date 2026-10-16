@@ -1,0 +1,1498 @@
+{
+ "candidates": [
+  {
+   "adopted": true,
+   "component_id": "ccusage",
+   "decisions": [
+    {
+     "capability": "Read native provider usage without mixing counter scopes",
+     "evidence_scope": "Offline native usage parsing and scoped current-session observations have retained outputs.",
+     "id": "native-usage-reading",
+     "limitations": [
+      "Provider consumption, estimated savings, billing and cache subsets are distinct.",
+      "Repeated cumulative snapshots cannot be summed as additional usage."
+     ],
+     "next_gap": "Resolve missing attempt/child coverage before any whole-workflow efficiency claim.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/full-stack-convergence.md",
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c1",
+   "name": "ccusage",
+   "pin": "20.0.26",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/native-upgrades-20260921.md",
+   "registered_receipts": [
+    {
+     "id": "ccusage-20026-qualification-20260927",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/ccusage-20026-qualification-20260927.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-spend-attribution-20260929",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-spend-attribution-20260929.json"
+    },
+    {
+     "id": "claude-spend-window-20261004",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-spend-window-20261004.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "component-history",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/component-history.json"
+    },
+    {
+     "id": "current-session-observation-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/current-session-observation-20260920.json"
+    },
+    {
+     "id": "full-stack-convergence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/full-stack-convergence-20260921.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    },
+    {
+     "id": "token-practice-gap-followup-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-gap-followup-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/ccusage/ccusage",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v20.0.26",
+    "license": "NOASSERTION",
+    "prerelease": false,
+    "pushed_at": "2026-09-28",
+    "released_at": "2026-09-27",
+    "renamed_to": null,
+    "stars": 18778
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c2",
+   "name": "ojuschugh1/sqz",
+   "newcomer": true,
+   "note": "Created 2026-04-12 (170 days). RTK, the CLI-output winner, is supported only as an artifact reducer, and upstream issue #3157 ('rtk makes agentic coding 7.6% more expensive at low reasoning effort') was still OPEN on 2026-09-29. sqz fills the same command-rewriting slot (Claude Code PreToolUse hook, per-command formatters for 40+ commands) and adds the recoverability RTK lacks. Every compressed or deduplicated output is byte-exact recoverable: `sqz expand` resolves \u00a7ref:HASH\u00a7 tokens, and the MCP proxy injects an `sqz_expand` tool. Re-reads return an explicit line-range reference, not a lossy summary. It also ships regret signals as a quality-loss proxy (quick byte-identical re-runs within 2 minutes, and ref expands), a cache-priced cost estimate with printed assumptions, `sqz discover --replay` (a counterfactual over existing Claude Code transcripts, with no hook enabled), and `sqz-mcp proxy --lazy-tools` for MCP descriptions. Limits: BENCHMARKS.md is fixture-only (chars/4 with a cl100k cross-check; last updated May 2026 at v1.2.0) with no task-quality or billed-cost arm. The claim that it 'never invalidates provider prompt caches' is design-stated, not measured. Refs point at content that must still be in context (default ref TTL 1800 s; the README notes GLM 5.1 loops on refs). The surface is broad: browser, VS Code and JetBrains extensions, WASM and an API proxy.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/ojuschugh1/sqz",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "repomix",
+   "decisions": [
+    {
+     "capability": "Reproduce native context-tool commands in a clean CI environment",
+     "evidence_scope": "Local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks; retained artifact/source hashes matched.",
+     "id": "clean-token-tool-ci",
+     "limitations": [
+      "CI acceptance covers these four tool fixtures, not live providers, GPU execution or a full new-PC stack."
+     ],
+     "next_gap": "Extend a specific missing native-tool CI behavior only with its own useful fixture.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    },
+    {
+     "capability": "Pack selected files or encode structured data only when useful",
+     "evidence_scope": "Selected-file packing and TOON roundtrip passed; exact full-catalog tokens increased under TOON and compact JSON was retained.",
+     "id": "selected-file-representations",
+     "limitations": [
+      "Structural compression omits implementation details; originals remain required for edits and correctness.",
+      "A smaller heuristic estimate is not an exact token reduction."
+     ],
+     "next_gap": "Recount a changed artifact only when representation choice matters.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/full-stack-convergence.md",
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c3",
+   "name": "Repomix",
+   "pin": "1.18.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/native-upgrades-20260921.md",
+   "registered_receipts": [
+    {
+     "id": "claude-foundation-finalization-20260921",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-foundation-finalization-20260921.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "component-history",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/component-history.json"
+    },
+    {
+     "id": "foundation-native-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-native-20260920.json"
+    },
+    {
+     "id": "full-stack-convergence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/full-stack-convergence-20260921.json"
+    },
+    {
+     "id": "native-token-ci-github-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-ci-github-20260920.json"
+    },
+    {
+     "id": "native-token-ci-local-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-ci-local-20260920.json"
+    },
+    {
+     "id": "portable-cli-artifacts",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/portable-cli-artifacts.json"
+    },
+    {
+     "id": "portable-userspace-install-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/portable-userspace-install-20260921.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-practice-artifacts-20260920",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/yamadashy/repomix",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.18.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-28",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 28532
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c4",
+   "name": "paritok-official/paritok-4b-v1",
+   "newcomer": true,
+   "note": "TOO NEW TO ASSESS (<90 days): created 2026-07-15 (76 days). It has 152 default-branch commits since 2026-07-01 and no GitHub release. It is the only compression gateway found with both a paired end-to-end quality evaluation and a lever-decomposed multi-turn cost study priced at cache tier. Both are self-authored: arXiv 2608.24188 and 2609.22114 share authors Jiayu Shi and Luzhuo Chen, affiliation 'Paritok'. The gateway is non-destructive: segments carry [REF:id] and the agent pulls exact bytes back with `read_original`. That recovery property is shown for headroom only on synthetic fixtures. SWE-bench Lite: 122/300 resolved uncompressed vs 109/300 compressed (line-numbered input). The exact McNemar test on 47 discordant pairs gives p=0.0789, recomputed here. That is not significant at n=300, not equal quality, and it ran with recall off. The team's own cost study calls tool-schema filtering 'the only lever that is unambiguously and reproducibly positive' (about 21K\u201357K tokens per turn), finds content compression saves '~2% of the (cache-priced) prefix per turn', and says single-shot benchmarks are 'orthogonal to multi-turn cost'. In this session MCP schemas are deferred until ToolSearch, an in-session observation; built-in schemas are still sent, so the residual lever is unmeasured. Self-host is the default (Ollama about 2.5 GB, or vLLM serving the LoRA over Qwen3-4B-Instruct-2507 on a 24 GB GPU), so only the linux RTX 4090 host is clearly feasible. The README says to keep ANTHROPIC_API_KEY or OPENAI_API_KEY set, so native subscription sign-in through the proxy is unverified. The hosted backend becomes $0.30 per 1M tokens on 2026-10-01.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/paritok-official/paritok-4b-v1",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c5",
+   "name": "atlassian-labs/mcp-compressor",
+   "newcomer": true,
+   "note": "None of the winners (rtk, headroom, ccusage) reduces MCP tool-definition tokens. Native deferral already covers the default routes. (a) Claude Code on the first-party route defers every MCP tool. A historical receipt (v2.1.278, 2026-09-21) shows 'MCP tools: 609 tokens (0.1%)' with 92 tools from 6 servers deferred, and this lane's own subagent lists 111 MCP tools from 8 servers as names only. (b) By source, Codex rust-v0.158.0 defers MCP tools behind tool_search when the model's catalog entry has supports_search_tool (true for gpt-6-astra and gpt-6-sol in the bundled models.json) and the provider keeps namespace_tools (default true for configured providers). This is expected from source and was not observed on the OmniRoute lane. The gap is the eager route. On the repository's documented OmniRoute ANTHROPIC_BASE_URL route, Claude Code turns tool search off and loads every MCP tool schema upfront into the cached prefix. Subagents share that process environment. The native override ENABLE_TOOL_SEARCH=true makes requests fail on proxies that do not support tool_reference blocks. Whether OmniRoute forwards them is unknown: a code search found no tool_reference handling, but a pass-through proxy need not name the blocks, so this is no evidence either way. mcp-compressor replaces a server's tool list with get_tool_schema and invoke_tool (list_tools is added at max) plus a compressed listing. The default level, medium, lists name(args) and the description's first sentence. The full schema is returned on demand, which fits this layer's recoverable-originals requirement. Secondary hypothesis: Codex's native deferral has two upstream issues open (#21503, exact-name misses; #34719, loss after compaction), neither reproduced at 0.158.0 by this lane, and a direct compressed listing might avoid them. Codex's native tool_input_schema_max_bytes (default 5,000 bytes) compacts large schemas; whether the model can recover the uncompacted schema is unverified. The vendor's figures are unverified: a 70-97% reduction and 'almost no impact' on quality in an unpublished evaluation. How often the OmniRoute Claude route is used is unknown.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/atlassian-labs/mcp-compressor",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "headroom",
+   "decisions": [
+    {
+     "capability": "Compress selected artifacts with exact-source recovery",
+     "evidence_scope": "Owned synthetic MCP compression/retrieval and isolated install/restart/uninstall passed; retained guard comparisons preserve counterexamples.",
+     "id": "guarded-recoverable-compression",
+     "limitations": [
+      "Automatic interception of all agent traffic is not configured.",
+      "Capped native counters and exact artifact comparisons do not establish lifetime causal provider savings."
+     ],
+     "next_gap": "Reject a candidate representation that loses required facts or costs more than the adequate baseline.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    }
+   ],
+   "evidence_kind": "mixed",
+   "evidence_refs": [
+    "docs/token-native-saturation.md",
+    "docs/full-stack-convergence.md"
+   ],
+   "key": "c6",
+   "name": "Headroom",
+   "pin": "0.37.0",
+   "pin_behind_upstream": true,
+   "recipe_ref": "recipes/README.md",
+   "registered_receipts": [
+    {
+     "id": "2604-drift-version-readback-20261008",
+     "kind": "upstream_provenance",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/2604-drift-version-readback-20261008.json"
+    },
+    {
+     "id": "claude-host-practice-readback-20260928",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-host-practice-readback-20260928.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "codex-desktop-live-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/codex-desktop-live-20260920.json"
+    },
+    {
+     "id": "component-history",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/component-history.json"
+    },
+    {
+     "id": "current-session-observation-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/current-session-observation-20260920.json"
+    },
+    {
+     "id": "foundation-convergence-20260921",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-convergence-20260921.json"
+    },
+    {
+     "id": "foundation-native-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-native-20260920.json"
+    },
+    {
+     "id": "full-stack-convergence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/full-stack-convergence-20260921.json"
+    },
+    {
+     "id": "harbor-e2e-token-tools-20260930",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"
+    },
+    {
+     "id": "headroom-039-qualification-20260925",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/headroom-039-qualification-20260925.json"
+    },
+    {
+     "id": "native-dashboard-data-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-dashboard-data-20260921.json"
+    },
+    {
+     "id": "native-headroom-mcp-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-headroom-mcp-20260920.json"
+    },
+    {
+     "id": "native-returned-results-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-returned-results-20260921.json"
+    },
+    {
+     "id": "native-token-clean-prefix-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-clean-prefix-20260920.json"
+    },
+    {
+     "id": "native-token-stack-final-20260920",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-stack-final-20260920.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-native-retained-functional-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-native-retained-functional-20260920.json"
+    },
+    {
+     "id": "token-practice-confirmation-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-confirmation-20260920.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    },
+    {
+     "id": "token-practice-native-counters-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-native-counters-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/headroomlabs-ai/headroom",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.39.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-28",
+    "released_at": "2026-09-26",
+    "renamed_to": null,
+    "stars": 74033
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "rtk",
+   "decisions": [
+    {
+     "capability": "Reproduce native context-tool commands in a clean CI environment",
+     "evidence_scope": "Local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks; retained artifact/source hashes matched.",
+     "id": "clean-token-tool-ci",
+     "limitations": [
+      "CI acceptance covers these four tool fixtures, not live providers, GPU execution or a full new-PC stack."
+     ],
+     "next_gap": "Extend a specific missing native-tool CI behavior only with its own useful fixture.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    },
+    {
+     "capability": "Resolve persistent native command and MCP environments",
+     "evidence_scope": "Fresh native processes resolved selected commands/MCP servers and Claude startup hooks; restarted Desktop source retrieval has its own dated receipt.",
+     "id": "native-process-defaults",
+     "limitations": [
+      "Configuration presence does not prove an already-running task hot-reloaded it.",
+      "The Linux/WSL and Desktop process/configuration boundaries remain distinct."
+     ],
+     "next_gap": "Collect the specific new-host or changed-session activation evidence; do not copy account stores.",
+     "review_status": "accepted_within_scope",
+     "selection": "default"
+    },
+    {
+     "capability": "Process large tool output while preserving useful source facts",
+     "evidence_scope": "Selected explicit native calls and exact artifact checks passed; paired trials retain both a Codex reduction and a Claude increase. The later six-attempt selective-policy pilot passed its fixture checks but made zero Context Mode calls.",
+     "id": "selected-context-processing",
+     "limitations": [
+      "Cache conditions were uncontrolled and enclosing workflow usage was incomplete.",
+      "The foundation gateway RTK/lite previews failed required semantic checks; general CLI acceptance does not repair those failures.",
+      "The selective-policy pilot's +2.42% aggregate token difference is not a causal Context Mode measurement; its rejected first attempt remains retained."
+     ],
+     "next_gap": "Measure only a concrete changed workload, with correctness and complete attempt accounting.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    }
+   ],
+   "evidence_kind": "mixed",
+   "evidence_refs": [
+    "docs/full-stack-convergence.md",
+    "docs/token-native-saturation.md"
+   ],
+   "key": "c7",
+   "name": "RTK",
+   "pin": "0.50.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "registered_receipts": [
+    {
+     "id": "artifact-reductions",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/artifact-reductions.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "codex-desktop-live-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/codex-desktop-live-20260920.json"
+    },
+    {
+     "id": "component-history",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/component-history.json"
+    },
+    {
+     "id": "current-session-observation-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/current-session-observation-20260920.json"
+    },
+    {
+     "id": "foundation-convergence-20260921",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-convergence-20260921.json"
+    },
+    {
+     "id": "foundation-native-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-native-20260920.json"
+    },
+    {
+     "id": "full-stack-convergence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/full-stack-convergence-20260921.json"
+    },
+    {
+     "id": "harbor-e2e-token-tools-20260930",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"
+    },
+    {
+     "id": "native-claude-profile-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-claude-profile-20260920.json"
+    },
+    {
+     "id": "native-context-memory",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-context-memory.json"
+    },
+    {
+     "id": "native-dashboard-data-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-dashboard-data-20260921.json"
+    },
+    {
+     "id": "native-returned-results-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-returned-results-20260921.json"
+    },
+    {
+     "id": "native-session-defaults-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-session-defaults-20260920.json"
+    },
+    {
+     "id": "native-token-ci-github-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-ci-github-20260920.json"
+    },
+    {
+     "id": "native-token-ci-local-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-ci-local-20260920.json"
+    },
+    {
+     "id": "native-token-stack-final-20260920",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-stack-final-20260920.json"
+    },
+    {
+     "id": "portable-userspace-install-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/portable-userspace-install-20260921.json"
+    },
+    {
+     "id": "rtk-050-qualification-20260925",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/rtk-050-qualification-20260925.json"
+    },
+    {
+     "id": "rtk-051-qualification-20261004",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/rtk-051-qualification-20261004.json"
+    },
+    {
+     "id": "rtk-fold-harbor-20261004",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/rtk-fold-harbor-20261004.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-practice-artifacts-20260920",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+    },
+    {
+     "id": "token-practice-confirmation-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-confirmation-20260920.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    },
+    {
+     "id": "token-practice-native-counters-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-native-counters-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/rtk-ai/rtk",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.50.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-28",
+    "released_at": "2026-09-24",
+    "renamed_to": null,
+    "stars": 81928
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c8",
+   "name": "klavis-ai/klavis",
+   "newcomer": true,
+   "note": "A prominent progressive-discovery option: Strata, in this monorepo's open-strata directory, discovers in stages (intent, category, action, schema). Decisive reason: it is stale under the sweep rule. There is no commit on the default branch since 2026-07-01; the last, 45c9f7da83 on 2026-06-01, is an API-spec update. The organization has no maintained successor repository for Strata. Its mechanism also duplicates the host-native deferral that Claude Code and Codex already implement, which the 2026-07-28 MCP client guidance places at the host.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/klavis-ai/klavis",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "context-mode",
+   "decisions": [
+    {
+     "capability": "Resolve persistent native command and MCP environments",
+     "evidence_scope": "Fresh native processes resolved selected commands/MCP servers and Claude startup hooks; restarted Desktop source retrieval has its own dated receipt.",
+     "id": "native-process-defaults",
+     "limitations": [
+      "Configuration presence does not prove an already-running task hot-reloaded it.",
+      "The Linux/WSL and Desktop process/configuration boundaries remain distinct."
+     ],
+     "next_gap": "Collect the specific new-host or changed-session activation evidence; do not copy account stores.",
+     "review_status": "accepted_within_scope",
+     "selection": "default"
+    },
+    {
+     "capability": "Process large tool output while preserving useful source facts",
+     "evidence_scope": "Selected explicit native calls and exact artifact checks passed; paired trials retain both a Codex reduction and a Claude increase. The later six-attempt selective-policy pilot passed its fixture checks but made zero Context Mode calls.",
+     "id": "selected-context-processing",
+     "limitations": [
+      "Cache conditions were uncontrolled and enclosing workflow usage was incomplete.",
+      "The foundation gateway RTK/lite previews failed required semantic checks; general CLI acceptance does not repair those failures.",
+      "The selective-policy pilot's +2.42% aggregate token difference is not a causal Context Mode measurement; its rejected first attempt remains retained."
+     ],
+     "next_gap": "Measure only a concrete changed workload, with correctness and complete attempt accounting.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/token-native-saturation.md",
+    "docs/full-stack-convergence.md"
+   ],
+   "key": "c9",
+   "name": "Context Mode",
+   "pin": "1.0.169",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "registered_receipts": [
+    {
+     "id": "adoption-macos-hosted-smoke-20260922",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json"
+    },
+    {
+     "id": "adoption-macos-hosted-smoke-20260923",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/adoption-macos-hosted-smoke-20260923.json"
+    },
+    {
+     "id": "artifact-reductions",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/artifact-reductions.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-selective-context-pilot-20260921",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-selective-context-pilot-20260921.json"
+    },
+    {
+     "id": "claude-spend-window-20261004",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-spend-window-20261004.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "codex-desktop-live-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/codex-desktop-live-20260920.json"
+    },
+    {
+     "id": "codex-session-environment-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/codex-session-environment-20260920.json"
+    },
+    {
+     "id": "component-history",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/component-history.json"
+    },
+    {
+     "id": "current-session-observation-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/current-session-observation-20260920.json"
+    },
+    {
+     "id": "foundation-closure-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-closure-20260921.json"
+    },
+    {
+     "id": "foundation-convergence-20260921",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-convergence-20260921.json"
+    },
+    {
+     "id": "foundation-native-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-native-20260920.json"
+    },
+    {
+     "id": "full-stack-convergence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/full-stack-convergence-20260921.json"
+    },
+    {
+     "id": "harbor-e2e-token-tools-20260930",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"
+    },
+    {
+     "id": "native-claude-profile-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-claude-profile-20260920.json"
+    },
+    {
+     "id": "native-context-memory",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-context-memory.json"
+    },
+    {
+     "id": "native-dashboard-data-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-dashboard-data-20260921.json"
+    },
+    {
+     "id": "native-returned-results-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-returned-results-20260921.json"
+    },
+    {
+     "id": "native-session-defaults-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-session-defaults-20260920.json"
+    },
+    {
+     "id": "native-token-focus-clients-20260920",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-focus-clients-20260920.json"
+    },
+    {
+     "id": "native-token-stack-final-20260920",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-stack-final-20260920.json"
+    },
+    {
+     "id": "native-ultracode-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-ultracode-20260921.json"
+    },
+    {
+     "id": "omniroute-runtime-enhancements-20260930",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
+    },
+    {
+     "id": "omniroute-sdk-worker-0160-20261003",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-practice-confirmation-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-confirmation-20260920.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    },
+    {
+     "id": "token-practice-native-counters-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-native-counters-20260920.json"
+    },
+    {
+     "id": "token-practice-native-pairs-20260920",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-native-pairs-20260920.json"
+    },
+    {
+     "id": "native-observability-followup",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "observability/followup-receipt.json"
+    },
+    {
+     "id": "desktop-restart-acceptance",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "observability/restart-receipt.json"
+    }
+   ],
+   "repository": "https://github.com/mksglu/context-mode",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.0.169",
+    "license": "NOASSERTION",
+    "prerelease": false,
+    "pushed_at": "2026-09-28",
+    "released_at": "2026-06-29",
+    "renamed_to": null,
+    "stars": 24176
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": "toon",
+   "decisions": [
+    {
+     "capability": "Reproduce native context-tool commands in a clean CI environment",
+     "evidence_scope": "Local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks; retained artifact/source hashes matched.",
+     "id": "clean-token-tool-ci",
+     "limitations": [
+      "CI acceptance covers these four tool fixtures, not live providers, GPU execution or a full new-PC stack."
+     ],
+     "next_gap": "Extend a specific missing native-tool CI behavior only with its own useful fixture.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    },
+    {
+     "capability": "Pack selected files or encode structured data only when useful",
+     "evidence_scope": "Selected-file packing and TOON roundtrip passed; exact full-catalog tokens increased under TOON and compact JSON was retained.",
+     "id": "selected-file-representations",
+     "limitations": [
+      "Structural compression omits implementation details; originals remain required for edits and correctness.",
+      "A smaller heuristic estimate is not an exact token reduction."
+     ],
+     "next_gap": "Recount a changed artifact only when representation choice matters.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    }
+   ],
+   "evidence_kind": "measured_comparison",
+   "evidence_refs": [
+    "docs/full-stack-convergence.md",
+    "docs/token-practice.md"
+   ],
+   "key": "c10",
+   "name": "TOON",
+   "pin": "4.1.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "registered_receipts": [
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "component-history",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/component-history.json"
+    },
+    {
+     "id": "foundation-convergence-20260921",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-convergence-20260921.json"
+    },
+    {
+     "id": "foundation-native-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-native-20260920.json"
+    },
+    {
+     "id": "full-stack-convergence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/full-stack-convergence-20260921.json"
+    },
+    {
+     "id": "native-token-ci-github-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-ci-github-20260920.json"
+    },
+    {
+     "id": "native-token-ci-local-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-ci-local-20260920.json"
+    },
+    {
+     "id": "portable-cli-artifacts",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/portable-cli-artifacts.json"
+    },
+    {
+     "id": "portable-userspace-install-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/portable-userspace-install-20260921.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-practice-artifacts-20260920",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+    },
+    {
+     "id": "token-practice-catalog-toon-20260920",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-catalog-toon-20260920.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    },
+    {
+     "id": "token-practice-native-counters-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-native-counters-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/toon-format/toon",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v4.1.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-03",
+    "released_at": "2026-08-05",
+    "renamed_to": null,
+    "stars": 25436
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c11",
+   "name": "lockedinlabs-ai/agent-console",
+   "newcomer": true,
+   "note": "TOO NEW TO ASSESS (<90 days): created 2026-09-20 (9 days); 32 commits since 2026-07-01; v0.4.1 on 2026-09-27. ccusage lacks attempt and child coverage. Native Claude Code OTel already records per-request usage (api_request: input, output, cache_read and cache_creation tokens, and query_source including subagent names) and failed-request signals (api_retries_exhausted and a final api_error). agent-console is the only local consumer found that applies this stack's count-once rules. It splits tokens into cache read, cache write (by cache lifetime), output and uncached input. It shows each session's subagents. It ingests Claude Code OTel into a separate Telemetry panel 'so the same request is never added twice'. It counts uncountable transcript lines by reason instead of dropping them, and flags idle-gap cache breaks. Only counts, model ids and salted hashes leave a machine. It runs from a git checkout on Node 22 with no package, and its dollar figures are list-price estimates.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/lockedinlabs-ai/agent-console",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/star-audit.json"
+   ],
+   "key": "c12",
+   "name": "Claude Token Efficient",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/star-audit.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/drona23/claude-token-efficient",
+   "review_status": null,
+   "upstream": null
+  }
+ ],
+ "catalog": "foundation",
+ "checked_at": "2026-10-16",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "A frozen task/artifact and repeated controlled comparison improves answer correctness or retrieval completeness while reducing complete provider use or latency, with successful raw-input recovery.",
+ "group": null,
+ "layer_id": "token-efficiency",
+ "limitations": [
+  "The current native tasks have no matched baseline; counters, bytes avoided, artifact token counts and provider usage must not be summed.",
+  "TOON expands the full catalog relative to compact JSON; guarded compression must return originals on rejection. Exact whole-PC lifetime savings are unmeasured."
+ ],
+ "registered_receipts_note": "registered_receipts lists the receipts manifests/evidence.json registers for a candidate's component: matched_by component_id when the receipt names its id, alias when it names the same component under its manifests/stack.json spelling, repository when the receipt names the only registered component with its repository and no other manifest component shares that repository. A receipt may name several components, and its kind is the registrant's label, not a checked evidence class: open it and judge what it actually ran for this component, as for evidence_refs.",
+ "requirement": "Supply useful task context with recoverable originals and measure artifact reductions separately from provider usage.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories. Read only the packet and files under the repository root: no memory stores, code indexes, MCP tools, web search, git history, or other checkouts or work directories, which can carry the verdict you must reach.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. Adoption, incumbency, installation, retained-control status, receipt count, packet position, license, stars and popularity are not evidence of fit; choose among adopted candidates on what their evidence shows was run. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [
+  {
+   "id": "jcodemunch-mcp",
+   "pin": "1.108.319",
+   "pin_behind_upstream": false,
+   "registered_receipts": [
+    {
+     "id": "claude-host-practice-readback-20260928",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-host-practice-readback-20260928.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "codex-desktop-live-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/codex-desktop-live-20260920.json"
+    },
+    {
+     "id": "codex-session-environment-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/codex-session-environment-20260920.json"
+    },
+    {
+     "id": "current-session-observation-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/current-session-observation-20260920.json"
+    },
+    {
+     "id": "foundation-native-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-native-20260920.json"
+    },
+    {
+     "id": "full-stack-convergence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/full-stack-convergence-20260921.json"
+    },
+    {
+     "id": "harbor-e2e-token-tools-20260930",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"
+    },
+    {
+     "id": "jcodemunch-1108327-qualification-20261003",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
+    },
+    {
+     "id": "native-dashboard-data-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-dashboard-data-20260921.json"
+    },
+    {
+     "id": "native-jcodemunch-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-jcodemunch-20260920.json"
+    },
+    {
+     "id": "native-returned-results-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-returned-results-20260921.json"
+    },
+    {
+     "id": "native-token-clean-prefix-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-clean-prefix-20260920.json"
+    },
+    {
+     "id": "native-token-focus-clients-20260920",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-focus-clients-20260920.json"
+    },
+    {
+     "id": "native-token-stack-final-20260920",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-stack-final-20260920.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-practice-confirmation-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-confirmation-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.108.319",
+    "license": "NOASSERTION",
+    "prerelease": false,
+    "pushed_at": "2026-09-29",
+    "released_at": "2026-09-16",
+    "renamed_to": null,
+    "stars": 2719
+   }
+  },
+  {
+   "id": "qmd",
+   "pin": "2.8.3",
+   "pin_behind_upstream": false,
+   "registered_receipts": [
+    {
+     "id": "native-research-efficiency-20260920",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/us-equities/research-efficiency/native-receipt.json"
+    },
+    {
+     "id": "qmd-bm25-retrieval-20260919",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/us-equities/retrieval-evaluation/receipt.json"
+    },
+    {
+     "id": "claude-host-practice-readback-20260928",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-host-practice-readback-20260928.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "codex-desktop-live-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/codex-desktop-live-20260920.json"
+    },
+    {
+     "id": "component-history",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/component-history.json"
+    },
+    {
+     "id": "desktop-cli-workflows",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/desktop-cli-workflows.json"
+    },
+    {
+     "id": "foundation-native-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-native-20260920.json"
+    },
+    {
+     "id": "foundation-rd-20260921",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-rd-20260921.json"
+    },
+    {
+     "id": "full-stack-convergence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/full-stack-convergence-20260921.json"
+    },
+    {
+     "id": "memory-landscape-lifecycle-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/memory-landscape-lifecycle-20260921.json"
+    },
+    {
+     "id": "native-catalog-retrieval-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-catalog-retrieval-20260920.json"
+    },
+    {
+     "id": "native-cli-gaps",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-cli-gaps.json"
+    },
+    {
+     "id": "native-dashboard-data-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-dashboard-data-20260921.json"
+    },
+    {
+     "id": "native-memory-rag-alignment-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-memory-rag-alignment-20260921.json"
+    },
+    {
+     "id": "native-returned-results-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-returned-results-20260921.json"
+    },
+    {
+     "id": "native-session-defaults-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-session-defaults-20260920.json"
+    },
+    {
+     "id": "native-token-ci-github-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-ci-github-20260920.json"
+    },
+    {
+     "id": "native-token-ci-local-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-ci-local-20260920.json"
+    },
+    {
+     "id": "portable-userspace-install-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/portable-userspace-install-20260921.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-practice-artifacts-20260920",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    },
+    {
+     "id": "wsl-retrieval-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/wsl-retrieval-20260920.json"
+    },
+    {
+     "id": "wsl-retrieval-retirement-20261003",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/wsl-retrieval-retirement-20261003.json"
+    }
+   ],
+   "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.8.3",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-09",
+    "released_at": "2026-08-16",
+    "renamed_to": null,
+    "stars": 30094
+   }
+  }
+ ],
+ "title": "Context and usage efficiency",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale"
+ ]
+}

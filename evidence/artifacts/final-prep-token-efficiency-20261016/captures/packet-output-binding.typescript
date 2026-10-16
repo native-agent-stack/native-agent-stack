@@ -1,0 +1,5 @@
+Script started on 2026-10-16 06:13:36-04:00 [COMMAND="cmp '<scratch>/fold/packets/packets/foundation__token-efficiency.json' '<checkout>/evidence/artifacts/final-prep-token-efficiency-20261016/generator-token-efficiency.json' && sha256sum '<checkout>/evidence/artifacts/final-prep-token-efficiency-20261016/generator-token-efficiency.json' '<checkout>/evidence/artifacts/final-prep-token-efficiency-20261016/lane-packet.json'" <not executed on terminal>]
+0aa22901c2ae7001d07ec15e34e177353acaead825c54c61926d5ecedda81398  <checkout>/evidence/artifacts/final-prep-token-efficiency-20261016/generator-token-efficiency.json
+e6cb0f1160c3848b2196d4d6f1f6692e7a47c8d8f5f34d3a5f6b8e4e537a6687  <checkout>/evidence/artifacts/final-prep-token-efficiency-20261016/lane-packet.json
+
+Script done on 2026-10-16 06:13:36-04:00 [COMMAND_EXIT_CODE="0"]
