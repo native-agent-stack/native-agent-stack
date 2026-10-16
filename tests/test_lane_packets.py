@@ -90,14 +90,19 @@ class LanePacketsFixture(unittest.TestCase):
     SWEEP_LANE = "landscape-sweep-20260926"
     SWEEP_RETURNS = "evidence/artifacts/landscape-sweep-20260926/returns.json"
     SATURATION_LEDGER = "catalogs/saturation/ledger.json"
+    FINAL_STACK = "catalogs/landscape/final-stack.json"
 
-    def record_sweep(self, catalog, layer_id, votes):
+    def record_sweep(self, catalog, layer_id, votes, manifest=None, lane=None, date="2026-09-26", append=False):
         """A completed landscape sweep of one manifest layer, as landscape-sweep/convert.py and saturation_ledger.py
         --append record it. ``votes`` maps each proposed repository to its (facts, Claude fit, GPT-6 fit) votes: True
         refutes, False does not, None never returned (a missing vote counts as refuted). Each repository's manifest
         row gets the sweep's lane and the disposition its votes give; the returns and the ledger are written last,
-        because the sweep records the manifest's sha256."""
-        manifest = self.read(lane_packets.SOTA_MANIFEST_PATH)
+        because the sweep records the manifest's sha256. ``manifest`` and ``lane`` default to the 2026-09-22 manifest
+        and the 2026-09-26 sweep; ``append`` adds the sweep after the ledger's earlier sweeps instead of replacing
+        them."""
+        manifest_path, lane = manifest or lane_packets.SOTA_MANIFEST_PATH, lane or self.SWEEP_LANE
+        returns_path = f"evidence/artifacts/{lane}/returns.json"
+        manifest = self.read(manifest_path)
         row = next(item for item in manifest["foundation" if catalog == "foundation" else "trading"]
                    if item["layer"] == layer_id)
         rows = {item["repository"]: item for item in row.setdefault("candidates", [])}
@@ -108,24 +113,47 @@ class LanePacketsFixture(unittest.TestCase):
             if repository not in rows:
                 rows[repository] = {"repository": repository}
                 row["candidates"].append(rows[repository])
-            rows[repository].update({"lane": self.SWEEP_LANE, "disposition": "refuted_targeted_candidate"
+            rows[repository].update({"lane": lane, "disposition": "refuted_targeted_candidate"
                                      if facts_refuted or fit_refuted else "targeted_candidate"})
             returns.append({"facts": {"role": "facts", "repository": repository, "refuted": facts_refuted,
                                       **({"missing": True} if facts is None else {})},
                             "fit": {"role": "fit", "repository": repository, "refuted": fit_refuted,
                                     "claude": fit_member(claude), "gpt6": fit_member(gpt6)}})
-            ref = f"{self.SWEEP_RETURNS}#/votes/{layer_id}/{index}"
+            ref = f"{returns_path}#/votes/{layer_id}/{index}"
             layer["refuted" if facts_refuted or fit_refuted else "survived"].append({
                 "repo": repository,
                 "facts": {"vote": "refuted" if facts_refuted else "not_refuted", "ref": f"{ref}/facts"},
                 "fit": {"vote": "refuted" if fit_refuted else "not_refuted", "ref": f"{ref}/fit"}})
-        self.write(lane_packets.SOTA_MANIFEST_PATH, manifest)
-        self.write(self.SWEEP_RETURNS, {"votes": {layer_id: returns}})
-        manifest_sha256 = hashlib.sha256((self.root / lane_packets.SOTA_MANIFEST_PATH).read_bytes()).hexdigest()
-        self.write(self.SATURATION_LEDGER, {"schema_version": 1, "sweeps": [{
-            "sweep_id": self.SWEEP_LANE, "status": "completed", "lane": self.SWEEP_LANE,
-            "manifest_ref": lane_packets.SOTA_MANIFEST_PATH, "manifest_sha256": manifest_sha256,
-            "returns_ref": self.SWEEP_RETURNS, "layers": [layer]}]})
+        self.write(manifest_path, manifest)
+        self.write(returns_path, {"votes": {layer_id: returns}})
+        manifest_sha256 = hashlib.sha256((self.root / manifest_path).read_bytes()).hexdigest()
+        sweeps = self.read(self.SATURATION_LEDGER)["sweeps"] if append else []
+        self.write(self.SATURATION_LEDGER, {"schema_version": 1, "sweeps": sweeps + [{
+            "sweep_id": lane, "date": date, "status": "completed", "lane": lane,
+            "manifest_ref": manifest_path, "manifest_sha256": manifest_sha256,
+            "returns_ref": returns_path, "layers": [layer]}]})
+
+    def write_final_stack(self):
+        """catalogs/landscape/final-stack.json as scripts/final_stack.py derives it from this fixture's ledger:
+        survivors[] holds each repository whose latest outcome over the completed sweeps (final_stack.sweep_outcomes)
+        is a survival (no verdict date filters these sweeps), and sources[] binds the ledger bytes it read."""
+        from scripts import final_stack
+        raw = (self.root / self.SATURATION_LEDGER).read_bytes()
+        sweeps = [{"record": sweep, "sweep_id": sweep["sweep_id"], "date": sweep["date"]}
+                  for sweep in json.loads(raw)["sweeps"] if sweep["status"] == "completed"]
+        outcomes = final_stack.sweep_outcomes(sweeps, final_stack.Sources(self.root))
+        self.write(self.FINAL_STACK, {"schema_version": 1, "sources": {
+            self.SATURATION_LEDGER: hashlib.sha256(raw).hexdigest()}, "layers": [
+            {"catalog": catalog, "layer_id": layer_id, "survivors": sorted(
+                ({"repository": repository, "sweep_id": sweep_id, "date": day}
+                 for repository, (outcome, sweep_id, day) in entry["latest"].items() if outcome == "survived"),
+                key=lambda survivor: survivor["repository"])}
+            for (catalog, layer_id), entry in sorted(outcomes.items())]})
+
+    def survivors(self, catalog="foundation", layer_id="layer-a"):
+        layer = next(row for row in self.read(self.FINAL_STACK)["layers"]
+                     if (row["catalog"], row["layer_id"]) == (catalog, layer_id))
+        return {survivor["repository"] for survivor in layer["survivors"]}
 
 
 class BuildAllPacketsTests(LanePacketsFixture):
@@ -1285,6 +1313,177 @@ class ManifestNewcomersTradingTests(ManifestTradingCandidatesTests):
         self.assertIn("https://github.com/acme/newcomer", repositories)
         self.assertEqual(repositories.count("https://github.com/acme/newcomer"), 1, "first seen wins")
         self.assertNotIn("https://github.com/acme/refuted", repositories)
+
+
+class CarriedSurvivorsTests(LanePacketsFixture):
+    """--carried-survivors (2026-10-16; the memory/RAG adjudication plan, section 2.5): packets over the cumulative
+    survivor set catalogs/landscape/final-stack.json lists (layer resolution protocol, step 2), not one dated
+    manifest's newcomers. Shaped like the 2026-09-29 drop: survivors of the 2026-09-26 sweep are absent from the joined
+    2026-09-29 manifest, so no packet carried them, record_verdicts.py gave them no disposition and the FINAL check
+    refuses them."""
+
+    OLD_LANE, NEW_LANE = "landscape-sweep-20260926", "landscape-sweep-20260929"
+    OLD_MANIFEST = "catalogs/sota-convergence/manifest-20260926.json"
+    JOINED = "catalogs/sota-convergence/manifest-20260929.json"
+    EVIDENCE = "evidence/artifacts/landscape-sweep-20260926/old-survivor.json"
+    OLD_SURVIVOR = "https://github.com/old/survivor"  # survived 09-26; the 09-29 manifest does not list it
+    OLD_ABSENT = "https://github.com/old/absent-vote"  # a refuted_* 09-26 row that no returned vote refuted
+    MERIT = "https://github.com/old/merit-refuted"  # survived 09-26, refuted on merit by a returned 09-29 vote
+    NEW_SURVIVOR = "https://github.com/new/survivor"  # survived 09-29, a newcomer of the joined manifest
+
+    def setUp(self):
+        super().setUp()
+        self.write(self.EVIDENCE, {"evidence_class": "source_review"})
+        self.write("manifests/evidence.json", {"schema_version": 1, "convergence_records": [], "receipts": [],
+                                               "files": [{"path": self.EVIDENCE, "bytes": 1, "sha256": hashlib.sha256(
+                                                   (self.root / self.EVIDENCE).read_bytes()).hexdigest()}]})
+        manifest = self.read(lane_packets.SOTA_MANIFEST_PATH)
+        self.write(self.JOINED, manifest)
+        manifest["foundation"][0]["candidates"] = [
+            {"repository": self.OLD_SURVIVOR, "demonstrated_gap": "an older gap", "evidence": [self.EVIDENCE]}]
+        self.write(self.OLD_MANIFEST, manifest)
+        self.record_sweep("foundation", "layer-a", {self.OLD_SURVIVOR: (False, False, False),
+                                                    self.OLD_ABSENT: (False, False, None),
+                                                    self.MERIT: (False, False, False)},
+                          manifest=self.OLD_MANIFEST, lane=self.OLD_LANE, date="2026-09-26")
+        self.record_sweep("foundation", "layer-a", {self.NEW_SURVIVOR: (False, False, False),
+                                                    self.MERIT: (False, True, False)},
+                          manifest=self.JOINED, lane=self.NEW_LANE, date="2026-09-29", append=True)
+        self.write_final_stack()
+
+    def candidates(self, **kwargs):
+        packet = self.packet("foundation", "layer-a", self.build(manifest=self.JOINED, **kwargs))
+        return {candidate["repository"]: candidate for candidate in packet["candidates"]}
+
+    def run_main(self, *extra):
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
+            try:
+                code = lane_packets.main(["--root", str(self.root), "--out", str(self.out), "--manifest", self.JOINED,
+                                          *extra])
+            except SystemExit as exit:  # argparse refuses an unknown flag with exit status 2
+                code = exit.code
+        return code, err.getvalue()
+
+    def test_the_cli_carries_the_survivors_the_joined_manifest_dropped(self):
+        code, err = self.run_main("--manifest-newcomers", "--carried-survivors")
+        self.assertEqual(code, 0, err)
+        packet = json.loads((self.out / "packets" / "foundation__layer-a.json").read_text(encoding="utf-8"))
+        repositories = [candidate["repository"] for candidate in packet["candidates"]]
+        for repository in (self.OLD_SURVIVOR, self.OLD_ABSENT, self.NEW_SURVIVOR):
+            self.assertEqual(repositories.count(repository), 1, repository)
+
+    def test_a_survivor_is_built_from_its_own_sweeps_manifest_row(self):
+        self.assertNotIn(self.OLD_SURVIVOR, self.candidates(manifest_newcomers_on=True), "control: the drop")
+        self.assertEqual(self.candidates(manifest_newcomers_on=True),
+                         self.candidates(manifest_newcomers_on=True, carried_survivors_on=False))
+        survivor = self.candidates(manifest_newcomers_on=True, carried_survivors_on=True)[self.OLD_SURVIVOR]
+        self.assertTrue(survivor["newcomer"])
+        self.assertFalse(survivor["adopted"])
+        self.assertIsNone(survivor["component_id"])
+        self.assertEqual(survivor["evidence_refs"], [self.EVIDENCE])
+        self.assertEqual(survivor["note"], "an older gap")
+
+    def test_a_refuted_row_that_final_stack_carries_is_not_filtered_again(self):
+        # Four of the seven 2026-09-29 drops carry a refuted_* row in their 2026-09-26 manifest: the sweep counted a
+        # GPT-6 fit vote that never returned as a refutation, which final_stack reads as a survival.
+        row = next(item for item in self.read(self.OLD_MANIFEST)["foundation"][0]["candidates"]
+                   if item["repository"] == self.OLD_ABSENT)
+        self.assertEqual(row["disposition"], "refuted_targeted_candidate")
+        self.assertIn("github.com/old/absent-vote", self.survivors(), "control: final_stack reads it as surviving")
+        self.assertIn(self.OLD_ABSENT, self.candidates(manifest_newcomers_on=True, carried_survivors_on=True))
+
+    def test_a_survivor_a_later_sweep_refuted_on_merit_stays_out(self):
+        self.assertEqual(self.survivors(), {"github.com/new/survivor", "github.com/old/absent-vote",
+                                            "github.com/old/survivor"}, "control: final_stack drops the refuted row")
+        candidates = self.candidates(manifest_newcomers_on=True, carried_survivors_on=True)
+        self.assertIn(self.NEW_SURVIVOR, candidates, "control: the joined sweep is read")
+        self.assertIn(self.OLD_SURVIVOR, candidates, "control: the earlier sweep is read")
+        self.assertNotIn(self.MERIT, candidates, "its 2026-09-26 targeted_candidate row must not return")
+
+    def test_a_blind_build_carries_survivors_without_newcomer_markers(self):
+        packets = self.build(manifest=self.JOINED, manifest_newcomers_on=True, carried_survivors_on=True,
+                             withhold=True, sealed_keys={})
+        packet = self.packet("foundation", "layer-a", packets)
+        self.assertIn(self.OLD_SURVIVOR, [candidate["repository"] for candidate in packet["candidates"]])
+        for candidate in packet["candidates"]:
+            self.assertNotIn("newcomer", candidate)
+            self.assertNotIn("note", candidate)
+        self.assertEqual(withheld_packet_keys(packet), [])
+
+    def test_the_flag_needs_manifest_newcomers(self):
+        code, err = self.run_main("--carried-survivors")
+        self.assertEqual(code, 2)
+        self.assertIn("--carried-survivors needs --manifest-newcomers", err)
+        self.assertFalse((self.out / "packets").exists())
+        with self.assertRaisesRegex(ValueError, "--carried-survivors needs --manifest-newcomers"):
+            self.build(manifest=self.JOINED, carried_survivors_on=True)
+
+    def test_a_stale_or_missing_final_stack_is_refused(self):
+        # A sweep appended after final-stack.json was built, here one refuting old/survivor on merit, must not be
+        # read from the stale survivor list.
+        later = "catalogs/sota-convergence/manifest-20261009.json"
+        self.write(later, self.read(lane_packets.SOTA_MANIFEST_PATH))
+        self.record_sweep("foundation", "layer-a", {self.OLD_SURVIVOR: (False, True, False)}, manifest=later,
+                          lane="landscape-sweep-20261009", date="2026-10-09", append=True)
+        with self.assertRaisesRegex(ValueError, "final-stack.json was not built from this"):
+            self.candidates(manifest_newcomers_on=True, carried_survivors_on=True)
+        self.write_final_stack()
+        self.assertNotIn(self.OLD_SURVIVOR, self.candidates(manifest_newcomers_on=True, carried_survivors_on=True))
+        (self.root / self.FINAL_STACK).unlink()
+        with self.assertRaisesRegex(ValueError, "final-stack.json"):
+            self.candidates(manifest_newcomers_on=True, carried_survivors_on=True)
+
+    def test_a_survivor_whose_sweep_row_cannot_be_read_is_refused_not_dropped(self):
+        # The protocol records an unavailable sweep source as a gap (step 2); leaving the survivor out is the drop.
+        manifest = self.read(self.OLD_MANIFEST)
+        manifest["foundation"][0]["candidates"] = [item for item in manifest["foundation"][0]["candidates"]
+                                                   if item["repository"] != self.OLD_SURVIVOR]
+        self.write(self.OLD_MANIFEST, manifest)
+        with self.assertRaisesRegex(ValueError, "changed since that sweep"):
+            self.candidates(manifest_newcomers_on=True, carried_survivors_on=True)
+        ledger = self.read(self.SATURATION_LEDGER)
+        ledger["sweeps"][0]["manifest_sha256"] = hashlib.sha256((self.root / self.OLD_MANIFEST).read_bytes()).hexdigest()
+        self.write(self.SATURATION_LEDGER, ledger)
+        self.write_final_stack()
+        with self.assertRaisesRegex(ValueError, "github.com/old/survivor of foundation/layer-a has no row"):
+            self.candidates(manifest_newcomers_on=True, carried_survivors_on=True)
+
+    def test_without_the_flag_the_survivor_set_changes_no_packet_byte(self):
+        # The single-manifest path never reads final-stack.json: with or without it, every packet is byte-identical,
+        # and the survivors the joined manifest dropped stay missing.
+        variants = ({}, {"manifest_newcomers_on": True}, {"manifest_newcomers_on": True, "withhold": True})
+        before = [self.build(manifest=self.JOINED, **kwargs) for kwargs in variants]
+        (self.root / self.FINAL_STACK).unlink()
+        for kwargs, packets in zip(variants, before):
+            with self.subTest(**kwargs):
+                self.assertEqual(self.build(manifest=self.JOINED, **kwargs), packets)
+        self.assertNotIn(self.OLD_SURVIVOR, before[1]["foundation__layer-a.json"], "control: the joined manifest dropped it")
+        self.assertIn(self.NEW_SURVIVOR, before[1]["foundation__layer-a.json"], "control: newcomers are carried")
+
+
+class CarriedSurvivorsTradingTests(ManifestTradingCandidatesTests):
+    """--carried-survivors in manifest-mode trading packets: manifest_layer_candidates' list gains the survivors."""
+
+    OLDER = "catalogs/sota-convergence/manifest-20260926.json"
+    SURVIVOR = "https://github.com/acme/old-survivor"
+
+    def test_a_survivor_absent_from_the_joined_manifest_is_carried_in_manifest_mode(self):
+        self.write("manifests/evidence.json", {"schema_version": 1, "convergence_records": [], "receipts": [],
+                                               "files": []})
+        older = self.read(lane_packets.SOTA_MANIFEST_PATH)
+        older["trading"][0]["candidates"], older["trading"][0]["alternatives_keep_but_compare"] = [], []
+        self.write(self.OLDER, older)
+        self.record_sweep("us-equities", "layer-b", {self.SURVIVOR: (False, False, False)}, manifest=self.OLDER)
+        self.write_final_stack()
+        kwargs = {"trading_candidates": "manifest", "manifest_newcomers_on": True}
+        default = self.packet("us-equities", "layer-b", self.build(**kwargs))
+        self.assertNotIn(self.SURVIVOR, [candidate["repository"] for candidate in default["candidates"]])
+        packet = self.packet("us-equities", "layer-b", self.build(carried_survivors_on=True, **kwargs))
+        by_repository = {candidate["repository"]: candidate for candidate in packet["candidates"]}
+        self.assertEqual(len(packet["candidates"]), len(default["candidates"]) + 1)
+        self.assertTrue(by_repository[self.SURVIVOR]["newcomer"])
+        self.assertIsNone(by_repository[self.SURVIVOR]["role"])
+        self.assertEqual(by_repository[self.SURVIVOR]["card_limitations"], [])
 
 
 class GapReceiptsTests(LanePacketsFixture):

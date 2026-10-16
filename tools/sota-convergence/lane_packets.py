@@ -72,6 +72,9 @@ from scripts.landscape import (  # noqa: E402
     sealed_candidate_labels, withheld_candidate_label_labels, withheld_packet_keys, withhold_policy_labels,
 )
 from scripts.catalog_decisions import InvalidDecisionIndex, safe_file  # noqa: E402
+# normalize_repository is reused (not reimplemented) from scripts/host_receipts.py: scripts/final_stack.py writes
+# final-stack.json survivors[].repository in its form, so --carried-survivors compares repositories with it.
+from scripts.host_receipts import normalize_repository  # noqa: E402
 
 LEDGER_FILES = {
     "foundation": "catalogs/landscape/foundation.json",
@@ -91,6 +94,8 @@ SOTA_MANIFEST_PATH = default_sota_manifest_path(DEFAULT_MANIFEST_RUN_ID)
 ADOPTION_MANIFEST_PATH = "adoption/manifest.json"
 FOUNDATION_DECISIONS_PATH = "catalogs/foundation/decisions.json"
 EVIDENCE_MANIFEST_PATH = "manifests/evidence.json"
+FINAL_STACK_PATH = "catalogs/landscape/final-stack.json"
+SATURATION_LEDGER_PATH = "catalogs/saturation/ledger.json"
 PACKET_SCHEMA_VERSION = 1
 DEFAULT_SEED = "20260922"
 DEFAULT_CHECKED_AT = "2026-09-22"
@@ -452,6 +457,22 @@ def newcomer_evidence_refs(item: dict, evidence_files: dict, root: Path, withhol
     return refs
 
 
+def newcomer_record(item: dict, slug: str, evidence_files: dict = None, root: Path = None,
+                    withhold: bool = False) -> dict:
+    """The packet record of a manifest candidate or keep-but-compare alternative carried as a newcomer: never adopted
+    and without manifest component fields; evidence_refs only with ``evidence_files`` (--manifest-newcomers)."""
+    return {
+        "name": item.get("name") or item.get("id") or slug, "repository": item.get("repository"), "adopted": False,
+        "evidence_kind": None,
+        "evidence_refs": newcomer_evidence_refs(item, evidence_files, root, withhold)
+        if evidence_files is not None else [],
+        "component_id": None, "pin": None, "upstream": None,
+        "review_status": None, "pin_behind_upstream": None, "newcomer": True,
+        "recipe_ref": None, "decisions": [],
+        "note": item.get("demonstrated_gap") or item.get("comparison_that_would_overturn"),
+    }
+
+
 def manifest_newcomers(layer: dict, seen: set, evidence_files: dict = None, root: Path = None,
                        withhold: bool = False, absent: set = frozenset()) -> list:
     """Candidate records for a manifest layer's candidates and keep-but-compare alternatives whose repository
@@ -479,17 +500,88 @@ def manifest_newcomers(layer: dict, seen: set, evidence_files: dict = None, root
         if not slug or slug in seen or (evidence_files is not None and slug in refuted):
             continue
         seen.add(slug)
-        newcomers.append({
-            "name": item.get("name") or item.get("id") or slug, "repository": repository, "adopted": False,
-            "evidence_kind": None,
-            "evidence_refs": newcomer_evidence_refs(item, evidence_files, root, withhold)
-            if evidence_files is not None else [],
-            "component_id": None, "pin": None, "upstream": None,
-            "review_status": None, "pin_behind_upstream": None, "newcomer": True,
-            "recipe_ref": None, "decisions": [],
-            "note": item.get("demonstrated_gap") or item.get("comparison_that_would_overturn"),
-        })
+        newcomers.append(newcomer_record(item, slug, evidence_files, root, withhold))
     return newcomers
+
+
+# --carried-survivors (2026-10-16): the cumulative survivor set, not one dated manifest's newcomers. The layer
+# resolution protocol (docs/decisions/2026-10-11-layer-resolution-protocol.md:47-52, step 2) says to "Reconstruct
+# each candidate's latest adjudication from all prior sweeps covering the layer" and to "Carry forward every
+# unresolved survivor until a later retained substantive adjudication or catalog verdict explicitly settles it; later
+# omission and missing return do not clear it." scripts/final_stack.py owns that reconstruction (sweep_outcomes: the
+# latest outcome over the completed sweeps in date order, where a refutation no returned vote made reads as a
+# survival) and writes it as final-stack.json layers[].survivors[]; this build reads that list rather than deriving it
+# again. A later retained survival supersedes an earlier refutation, the joined manifest's included, so a survivor's
+# own refuted_* row is not filtered again; a repository its latest covering sweep refuted on merit is not listed and
+# stays out.
+MANIFEST_SECTIONS = {"foundation": "foundation", "us-equities": "trading"}
+
+
+def carried_survivor_index(root: Path) -> dict:
+    """(catalog, layer_id) -> final-stack.json's survivors[] entries, each with the manifest_ref and manifest_sha256
+    its completed sweep recorded. Refused when final-stack.json is missing or was built from other saturation-ledger
+    bytes (its sources[] sha256): a sweep appended since, such as a merit refutation of a listed survivor, would
+    otherwise be read from a stale list."""
+    final_stack, ledger = root / FINAL_STACK_PATH, root / SATURATION_LEDGER_PATH
+    if not (final_stack.is_file() and ledger.is_file()):
+        raise ValueError(f"--carried-survivors reads {FINAL_STACK_PATH} and {SATURATION_LEDGER_PATH}; one is missing")
+    document, raw = load_json(final_stack), ledger.read_bytes()
+    if (document.get("sources") or {}).get(SATURATION_LEDGER_PATH) != hashlib.sha256(raw).hexdigest():
+        raise ValueError(f"{FINAL_STACK_PATH} was not built from this {SATURATION_LEDGER_PATH}; run "
+                         "python3 scripts/final_stack.py --write first")
+    sweeps = {sweep.get("sweep_id"): sweep for sweep in json.loads(raw).get("sweeps") or []
+              if isinstance(sweep, dict) and sweep.get("status") == "completed"}
+    index: dict = {}
+    for layer in document.get("layers") or []:
+        for survivor in layer.get("survivors") or []:
+            sweep = sweeps.get(survivor.get("sweep_id"))
+            if sweep is None or not isinstance(sweep.get("manifest_ref"), str):
+                raise ValueError(f"{FINAL_STACK_PATH}: survivor {survivor.get('repository')} names "
+                                 f"{survivor.get('sweep_id')}, not a completed sweep of {SATURATION_LEDGER_PATH}")
+            index.setdefault((layer.get("catalog"), layer.get("layer_id")), []).append(
+                {**survivor, "manifest_ref": sweep["manifest_ref"], "manifest_sha256": sweep.get("manifest_sha256")})
+    return index
+
+
+def carried_survivors(survivors: list, present: list, catalog: str, layer_id: str, evidence_files: dict, root: Path,
+                      withhold: bool = False, manifests: dict = None) -> list:
+    """Newcomer records (newcomer_record) for the layer's carried survivors whose repository is not ``present`` (the
+    packet's repositories so far), both compared in normalize_repository form. Each is built from its own sweep's
+    manifest, read only while it has the sha256 that sweep recorded: the first of this layer's candidates and
+    keep-but-compare alternatives with the survivor's repository. A survivor without that row is refused rather
+    than dropped, as the protocol records an unavailable sweep source as a gap (step 2). ``manifests`` caches each
+    manifest across layers as (sha256, document)."""
+    manifests = {} if manifests is None else manifests
+    present = {normalize_repository(repository) for repository in present} - {None}
+    records = []
+    for survivor in survivors:
+        repository = normalize_repository(survivor.get("repository"))
+        if repository is None or repository in present:
+            continue
+        reference = survivor["manifest_ref"]
+        if reference not in manifests:
+            try:
+                path = safe_file(root, reference)
+            except (InvalidDecisionIndex, ValueError):
+                path = None
+            raw = path.read_bytes() if path is not None and path.is_file() else None
+            manifests[reference] = (hashlib.sha256(raw).hexdigest(), json.loads(raw)) if raw is not None else (None, {})
+        manifest_sha256, document = manifests[reference]
+        if manifest_sha256 is None or manifest_sha256 != survivor.get("manifest_sha256"):
+            raise ValueError(f"{reference}, the manifest of {survivor.get('sweep_id')}, is missing under --root or "
+                             "changed since that sweep")
+        row = next((row for row in document.get(MANIFEST_SECTIONS.get(catalog)) or []
+                    if isinstance(row, dict) and row.get("layer") == layer_id), {})
+        items = list(row.get("candidates") or []) + list(row.get("alternatives_keep_but_compare") or [])
+        item = next((item for item in items
+                     if isinstance(item, dict) and normalize_repository(item.get("repository")) == repository), None)
+        if item is None:
+            raise ValueError(f"carried survivor {survivor.get('repository')} of {catalog}/{layer_id} has no row in "
+                             f"{reference}, the manifest of {survivor.get('sweep_id')}")
+        present.add(repository)
+        records.append(newcomer_record(item, candidate_identity(item["repository"], True) or repository,
+                                       evidence_files, root, withhold))
+    return records
 
 
 # Marks a newcomer record inside build_packet's shuffled list (a ledger candidate never has this key).
@@ -1128,7 +1220,8 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                       trading_candidates: str = "ledger", withhold: bool = False,
                       manifest: str = None, registered_receipts: bool = False,
                       gap_receipts: bool = False, manifest_newcomers_on: bool = False,
-                      sealed_keys: dict = None, removed_refs: dict = None) -> dict:
+                      sealed_keys: dict = None, removed_refs: dict = None,
+                      carried_survivors_on: bool = False) -> dict:
     """Returns {filename: serialized packet text}, fully built and leak-
     checked in memory before any file is written. ``manifest`` overrides the
     dated sota manifest joined in (default reproduces the 2026-09-22
@@ -1136,7 +1229,9 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
     the packets and the verdict catalog agree on the pins. Under ``withhold``,
     each packet's sealed candidate fields (seal_candidate_fields) go to
     ``sealed_keys`` ({filename: {packet_sha256, candidates}}) when it is given, and the number of references to
-    files the blind export removes that each packet dropped (withhold_removed_refs) to ``removed_refs``."""
+    files the blind export removes that each packet dropped (withhold_removed_refs) to ``removed_refs``.
+    ``carried_survivors_on`` (with ``manifest_newcomers_on``) adds each layer's carried survivors after the joined
+    manifest's newcomers (carried_survivors)."""
     rules = load_rules()
     sota_doc = load_json(root / (manifest or SOTA_MANIFEST_PATH))
     sota_index = sota_layer_index(sota_doc)
@@ -1153,8 +1248,12 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
         raise ValueError("--gap-receipts cannot be combined with --withhold-labels: gap receipts name the "
                          "previous winner")
     gap_index = gap_receipts_index(root) if gap_receipts else None
+    if carried_survivors_on and not manifest_newcomers_on:
+        raise ValueError("--carried-survivors needs --manifest-newcomers: carried survivors are built as its newcomers")
     evidence_files = registered_evidence_files(root) if manifest_newcomers_on else None
     absent = absence_refuted(root, manifest or SOTA_MANIFEST_PATH) if manifest_newcomers_on else {}
+    survivors = carried_survivor_index(root) if carried_survivors_on else None
+    survivor_manifests: dict = {}
     manifest_rows = {"foundation": {layer["layer"]: layer for layer in sota_doc.get("foundation", [])},
                      "us-equities": trading_layers}
 
@@ -1179,6 +1278,11 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 layer_candidates = manifest_layer_candidates(
                     trading_layers.get(row["layer_id"], {}), cards, names, recipe_map, root, evidence_files,
                     withhold, absent.get((catalog, row["layer_id"]), frozenset()))
+                if survivors is not None:
+                    carried = carried_survivors(survivors.get((catalog, row["layer_id"]), []),
+                                                [c["repository"] for c in layer_candidates], catalog, row["layer_id"],
+                                                evidence_files, root, withhold, survivor_manifests)
+                    layer_candidates += [{**record, "role": None, "card_limitations": []} for record in carried]
             newcomers = None
             if evidence_files is not None and layer_candidates is None:
                 # --manifest-newcomers on a ledger-built packet: the manifest row's newcomers not refuted on merit.
@@ -1187,6 +1291,12 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 newcomers = manifest_newcomers(manifest_rows[catalog].get(row["layer_id"], {}), seen,
                                                evidence_files, root, withhold,
                                                absent.get((catalog, row["layer_id"]), frozenset()))
+                if survivors is not None:
+                    # --carried-survivors: then the layer's survivors from earlier covering sweeps.
+                    present = [c.get("repository") for c in row.get("candidates") or []]
+                    newcomers += carried_survivors(survivors.get((catalog, row["layer_id"]), []),
+                                                   present + [n["repository"] for n in newcomers], catalog,
+                                                   row["layer_id"], evidence_files, root, withhold, survivor_manifests)
             packet = build_packet(
                 row, catalog=catalog, sota_components=sota_index.get((catalog, row["layer_id"]), []),
                 catalog_components=catalog_components(sota_index, catalog),
@@ -1283,6 +1393,15 @@ def parse_args(argv=None):
                              "evidence_refs each evidence[] entry that is exactly an evidence/ path registered in "
                              "manifests/evidence.json files[] with its current sha256. Off by default so the "
                              "2026-09-22 packets reproduce.")
+    parser.add_argument("--carried-survivors", action="store_true",
+                        help="With --manifest-newcomers: also carry every unresolved survivor that "
+                             "catalogs/landscape/final-stack.json lists for the layer (layers[].survivors[], the "
+                             "cumulative set scripts/final_stack.py derives from every completed covering sweep of "
+                             "catalogs/saturation/ledger.json) and that is not already a candidate, as a newcomer "
+                             "built from its own sweep's manifest row. Refused when final-stack.json is missing or "
+                             "was built from other ledger bytes, or when a survivor's manifest changed since its "
+                             "sweep or has no row for it. Off by default: only the joined manifest's newcomers are "
+                             "carried.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",
                         help="Candidate source for us-equities packets: the ledger row's group-wide list "
                              "(default; reproduces the 2026-09-22 packets) or the sota manifest's own entries "
@@ -1298,6 +1417,10 @@ def main(argv=None) -> int:
     if args.gap_receipts and args.withhold_labels:
         print("lane_packets: --gap-receipts cannot be combined with --withhold-labels: gap receipts name the "
               "previous winner", file=sys.stderr)
+        return 2
+    if args.carried_survivors and not args.manifest_newcomers:
+        print("lane_packets: --carried-survivors needs --manifest-newcomers: carried survivors are built as its "
+              "newcomers", file=sys.stderr)
         return 2
     if args.withhold_labels != (args.keys_out is not None):
         print("lane_packets: --keys-out is required with --withhold-labels and only meaningful there: the sealed "
@@ -1344,7 +1467,7 @@ def main(argv=None) -> int:
                                 manifest=manifest_relative,
                                 registered_receipts=args.registered_receipts, gap_receipts=args.gap_receipts,
                                 manifest_newcomers_on=args.manifest_newcomers, sealed_keys=sealed_keys,
-                                removed_refs=removed_refs)
+                                removed_refs=removed_refs, carried_survivors_on=args.carried_survivors)
 
     out_dir = args.out / "packets"
     out_dir.mkdir(parents=True, exist_ok=True)
