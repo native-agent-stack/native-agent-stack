@@ -1,0 +1,24 @@
+{
+  "node_id": "TA_kwDOF9ti7NoAKDQ1OTM5ZTdkMTg3ODI3MmYxN2I1MmRkNDA3Mjg2NjNkZTdlZjdlYWU",
+  "sha": "45939e7d1878272f17b52dd40728663de7ef7eae",
+  "url": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/git/tags/45939e7d1878272f17b52dd40728663de7ef7eae",
+  "tagger": {
+    "name": "dmathieu",
+    "email": "42@dmathieu.com",
+    "date": "2026-09-29T12:30:34Z"
+  },
+  "object": {
+    "sha": "f6159a775dad1e21433c49bd8450673dd13ed4d3",
+    "type": "commit",
+    "url": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/git/commits/f6159a775dad1e21433c49bd8450673dd13ed4d3"
+  },
+  "tag": "v0.162.0",
+  "message": "Version v0.162.0\n-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgVf5sj4f1OGpAwEFwGmPRw0Omwy\nrOoF3j0XcVckMJGJcAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQBdFZ+SNNyCad+j6Fk85HkUrdBy0l/efTf0Wh4tUtvOo3na4lN79dFRJyVSBxB7epu\nLg6e5Bbi1G2G5sUdczHwQ=\n-----END SSH SIGNATURE-----\n",
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgVf5sj4f1OGpAwEFwGmPRw0Omwy\nrOoF3j0XcVckMJGJcAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQBdFZ+SNNyCad+j6Fk85HkUrdBy0l/efTf0Wh4tUtvOo3na4lN79dFRJyVSBxB7epu\nLg6e5Bbi1G2G5sUdczHwQ=\n-----END SSH SIGNATURE-----\n",
+    "payload": "object f6159a775dad1e21433c49bd8450673dd13ed4d3\ntype commit\ntag v0.162.0\ntagger dmathieu <42@dmathieu.com> 1790685034 +0200\n\nVersion v0.162.0\n",
+    "verified_at": "2026-09-29T12:32:31Z"
+  }
+}

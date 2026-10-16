@@ -1,0 +1,12 @@
+test_longest_match_prevents_parent_hiding_specific_root (test_capture_mask.CaptureMaskTests.test_longest_match_prevents_parent_hiding_specific_root) ... ok
+test_no_match_is_byte_identical (test_capture_mask.CaptureMaskTests.test_no_match_is_byte_identical) ... ok
+test_preserves_nonmatching_binary_bytes_and_line_endings (test_capture_mask.CaptureMaskTests.test_preserves_nonmatching_binary_bytes_and_line_endings) ... ok
+test_public_derivative_reproduces_and_omits_private_hashes (test_capture_mask.CaptureMaskTests.test_public_derivative_reproduces_and_omits_private_hashes) ... ok
+test_real_subprocess_nonzero_is_not_replaced_by_success (test_capture_mask.CaptureMaskTests.test_real_subprocess_nonzero_is_not_replaced_by_success) ... ok
+test_refuses_tampered_raw_stream (test_capture_mask.CaptureMaskTests.test_refuses_tampered_raw_stream) ... ok
+test_rejects_ambiguous_empty_and_recursive_mapping (test_capture_mask.CaptureMaskTests.test_rejects_ambiguous_empty_and_recursive_mapping) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.102s
+
+OK

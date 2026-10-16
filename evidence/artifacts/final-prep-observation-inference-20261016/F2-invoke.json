@@ -1,0 +1,157 @@
+{
+  "schema_version": 2,
+  "record_class": "native_invocation_claim_index_not_native_run_output",
+  "catalog": "foundation",
+  "layer_id": "observation-inference",
+  "capture_class": "deterministically_masked_native_capture",
+  "calls": [
+    {
+      "id": "26-collector-upstream-config",
+      "claim": "native offline smoke",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/26-collector-upstream-config.json",
+        "line": 14
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/26-collector-upstream-config.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/26-collector-upstream-config.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+    },
+    {
+      "id": "27-collector-repository-config",
+      "claim": "native offline smoke",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/27-collector-repository-config.json",
+        "line": 15
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/27-collector-repository-config.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/27-collector-repository-config.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+    },
+    {
+      "id": "28-prometheus-upstream-config",
+      "claim": "native offline smoke",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/28-prometheus-upstream-config.json",
+        "line": 15
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/28-prometheus-upstream-config.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/28-prometheus-upstream-config.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+    },
+    {
+      "id": "29-prometheus-upstream-rule-test",
+      "claim": "native upstream synthetic rule test",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/29-prometheus-upstream-rule-test.json",
+        "line": 15
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/29-prometheus-upstream-rule-test.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/29-prometheus-upstream-rule-test.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+    },
+    {
+      "id": "30-loki-upstream-config",
+      "claim": "native offline smoke",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/30-loki-upstream-config.json",
+        "line": 14
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/30-loki-upstream-config.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/30-loki-upstream-config.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+    },
+    {
+      "id": "31-collector-version",
+      "claim": "scratch binary native version",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/31-collector-version.json",
+        "line": 13
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/31-collector-version.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/31-collector-version.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+    },
+    {
+      "id": "32-prometheus-version",
+      "claim": "scratch binary native version",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/32-prometheus-version.json",
+        "line": 13
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/32-prometheus-version.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/32-prometheus-version.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+    },
+    {
+      "id": "33-loki-version",
+      "claim": "scratch binary native version",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/33-loki-version.json",
+        "line": 13
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/33-loki-version.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/33-loki-version.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+    }
+  ],
+  "counts": {
+    "classification": "DERIVED from listed command envelopes",
+    "calls": 8,
+    "zero_exit_codes": 8,
+    "method": "Count the eight listed captures and their exact exit_code fields; no synthesized component stdout."
+  },
+  "production_adoption": "GAP",
+  "real_native_workload_calls": null,
+  "not_invoked_reason": "No live service or native runtime task was authorized by the common brief. Native CLI smoke is not production usage/counter reconciliation.",
+  "final_evidence_eligible": false,
+  "masking": "Unfiltered native stdout/stderr are retained privately and deterministically masked; no sed/first-line projections. Public hashes appear only in the capture envelopes and bind published derivative bytes.",
+  "raw_custody": "Private capture names are listed in capture-index.json; raw digests never published."
+}

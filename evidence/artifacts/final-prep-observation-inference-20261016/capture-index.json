@@ -1,0 +1,630 @@
+{
+  "schema_version": 1,
+  "record_class": "capture_locator_index_not_run_output",
+  "capture_class": "deterministically_masked_native_capture",
+  "masker": "mask_capture.py",
+  "recorder": "capture_native.py",
+  "tests": "test_capture_mask.py",
+  "masking_rule": "Exact private literals replaced with <CHECKOUT>, <SCRATCH>, <USER_HOME>, <LOCAL_HOST>, longest first; no line filtering, projection or output synthesis. Replacement literals remain private; every nonmatching byte is preserved.",
+  "private_custody": "Each native raw capture is cited only by its name. Raw directory and mapping are supplied privately to the co-op; no raw digest or digest prefix is published.",
+  "captures": [
+    {
+      "id": "01-collector-release",
+      "role": "public release metadata",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/01-collector-release.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/01-collector-release.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/01-collector-release.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "01-collector-release"
+    },
+    {
+      "id": "02-prometheus-release",
+      "role": "public release metadata",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/02-prometheus-release.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/02-prometheus-release.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/02-prometheus-release.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "02-prometheus-release"
+    },
+    {
+      "id": "03-loki-release",
+      "role": "public release metadata",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/03-loki-release.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/03-loki-release.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/03-loki-release.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "03-loki-release"
+    },
+    {
+      "id": "04-download-collector",
+      "role": "native artifact download",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/04-download-collector.json",
+        "line": 22
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/04-download-collector.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/04-download-collector.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "04-download-collector"
+    },
+    {
+      "id": "05-download-prometheus",
+      "role": "native artifact download",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/05-download-prometheus.json",
+        "line": 22
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/05-download-prometheus.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/05-download-prometheus.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "05-download-prometheus"
+    },
+    {
+      "id": "06-download-loki",
+      "role": "native artifact download",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/06-download-loki.json",
+        "line": 22
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/06-download-loki.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/06-download-loki.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "06-download-loki"
+    },
+    {
+      "id": "07-collector-ci",
+      "role": "public upstream CI metadata",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "07-collector-ci"
+    },
+    {
+      "id": "08-prometheus-ci",
+      "role": "public upstream CI metadata",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "08-prometheus-ci"
+    },
+    {
+      "id": "09-loki-ci",
+      "role": "public upstream CI metadata",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "09-loki-ci"
+    },
+    {
+      "id": "10-archive-checksums",
+      "role": "native public-archive checksum command",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/10-archive-checksums.json",
+        "line": 15
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/10-archive-checksums.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/10-archive-checksums.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "10-archive-checksums"
+    },
+    {
+      "id": "11-extract-collector",
+      "role": "native isolated extraction",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/11-extract-collector.json",
+        "line": 16
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/11-extract-collector.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/11-extract-collector.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "11-extract-collector"
+    },
+    {
+      "id": "12-extract-prometheus",
+      "role": "native isolated extraction",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/12-extract-prometheus.json",
+        "line": 16
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/12-extract-prometheus.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/12-extract-prometheus.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "12-extract-prometheus"
+    },
+    {
+      "id": "13-extract-loki",
+      "role": "native isolated extraction",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/13-extract-loki.json",
+        "line": 16
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/13-extract-loki.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/13-extract-loki.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "13-extract-loki"
+    },
+    {
+      "id": "14-path-collector",
+      "role": "existing PATH binary version",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/14-path-collector.json",
+        "line": 13
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/14-path-collector.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/14-path-collector.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "14-path-collector"
+    },
+    {
+      "id": "15-path-prometheus",
+      "role": "existing PATH binary version",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/15-path-prometheus.json",
+        "line": 13
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/15-path-prometheus.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/15-path-prometheus.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "15-path-prometheus"
+    },
+    {
+      "id": "16-path-loki",
+      "role": "existing PATH binary version",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/16-path-loki.json",
+        "line": 13
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/16-path-loki.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/16-path-loki.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "16-path-loki"
+    },
+    {
+      "id": "17-custody-tests",
+      "role": "synthetic recorder/masking controls executed natively",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/17-custody-tests.json",
+        "line": 16
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/17-custody-tests.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/17-custody-tests.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "17-custody-tests"
+    },
+    {
+      "id": "18-collector-tag",
+      "role": "public tag reference",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/18-collector-tag.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/18-collector-tag.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/18-collector-tag.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "18-collector-tag"
+    },
+    {
+      "id": "19-distribution-tag",
+      "role": "public tag reference",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/19-distribution-tag.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/19-distribution-tag.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/19-distribution-tag.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "19-distribution-tag"
+    },
+    {
+      "id": "20-core-tag",
+      "role": "public tag reference",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/20-core-tag.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/20-core-tag.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/20-core-tag.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "20-core-tag"
+    },
+    {
+      "id": "21-fixture-collector",
+      "role": "upstream config source",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/21-fixture-collector.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/21-fixture-collector.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/21-fixture-collector.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "21-fixture-collector"
+    },
+    {
+      "id": "22-fixture-prometheus-tests",
+      "role": "upstream synthetic rule-test source",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "22-fixture-prometheus-tests"
+    },
+    {
+      "id": "23-fixture-prometheus-rules",
+      "role": "upstream rule source",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/23-fixture-prometheus-rules.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/23-fixture-prometheus-rules.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/23-fixture-prometheus-rules.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "23-fixture-prometheus-rules"
+    },
+    {
+      "id": "24-fixture-loki",
+      "role": "upstream config source",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/24-fixture-loki.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/24-fixture-loki.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/24-fixture-loki.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "24-fixture-loki"
+    },
+    {
+      "id": "25-fixture-repository-collector",
+      "role": "committed repository config source",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/25-fixture-repository-collector.json",
+        "line": 14
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/25-fixture-repository-collector.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/25-fixture-repository-collector.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "25-fixture-repository-collector"
+    },
+    {
+      "id": "26-collector-upstream-config",
+      "role": "native offline smoke",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/26-collector-upstream-config.json",
+        "line": 14
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/26-collector-upstream-config.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/26-collector-upstream-config.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "26-collector-upstream-config"
+    },
+    {
+      "id": "27-collector-repository-config",
+      "role": "native offline smoke",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/27-collector-repository-config.json",
+        "line": 15
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/27-collector-repository-config.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/27-collector-repository-config.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "27-collector-repository-config"
+    },
+    {
+      "id": "28-prometheus-upstream-config",
+      "role": "native offline smoke",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/28-prometheus-upstream-config.json",
+        "line": 15
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/28-prometheus-upstream-config.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/28-prometheus-upstream-config.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "28-prometheus-upstream-config"
+    },
+    {
+      "id": "29-prometheus-upstream-rule-test",
+      "role": "native upstream synthetic rule test",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/29-prometheus-upstream-rule-test.json",
+        "line": 15
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/29-prometheus-upstream-rule-test.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/29-prometheus-upstream-rule-test.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "29-prometheus-upstream-rule-test"
+    },
+    {
+      "id": "30-loki-upstream-config",
+      "role": "native offline smoke",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/30-loki-upstream-config.json",
+        "line": 14
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/30-loki-upstream-config.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/30-loki-upstream-config.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "30-loki-upstream-config"
+    },
+    {
+      "id": "31-collector-version",
+      "role": "scratch binary native version",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/31-collector-version.json",
+        "line": 13
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/31-collector-version.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/31-collector-version.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "31-collector-version"
+    },
+    {
+      "id": "32-prometheus-version",
+      "role": "scratch binary native version",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/32-prometheus-version.json",
+        "line": 13
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/32-prometheus-version.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/32-prometheus-version.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "32-prometheus-version"
+    },
+    {
+      "id": "33-loki-version",
+      "role": "scratch binary native version",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/33-loki-version.json",
+        "line": 13
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/33-loki-version.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/33-loki-version.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "33-loki-version"
+    },
+    {
+      "id": "34-collector-tag-object",
+      "role": "public annotated tag identity",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/34-collector-tag-object.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/34-collector-tag-object.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/34-collector-tag-object.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "34-collector-tag-object"
+    },
+    {
+      "id": "35-distribution-tag-object",
+      "role": "public annotated tag identity",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/35-distribution-tag-object.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/35-distribution-tag-object.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/35-distribution-tag-object.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "35-distribution-tag-object"
+    },
+    {
+      "id": "36-core-tag-object",
+      "role": "public annotated tag identity",
+      "envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/36-core-tag-object.json",
+        "line": 17
+      },
+      "stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/36-core-tag-object.stdout.txt",
+        "line": 1
+      },
+      "stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/36-core-tag-object.stderr.txt",
+        "line": 1
+      },
+      "raw_capture_name": "36-core-tag-object"
+    }
+  ],
+  "count_statement": {
+    "value": 36,
+    "classification": "DERIVED file count",
+    "method": "Count the capture locator entries; not an upstream-reported measurement."
+  },
+  "private_reproduction_status": "PASS: co-op MASKED-REPRO CHECK, received 2026-10-16. 108/108 derivative files byte-identical; 72 stream hashes/byte counts; 36 command/argv/cwd/rc/timeout records; 121 registry entries and 108 locators checked. Four masking-only tests independently rerun; the three recorder-invoking tests were not rerun, and their published native log reproduced. Private check cited by name only, without a digest. This authorizes opening the preparation PR, not layer convergence."
+}

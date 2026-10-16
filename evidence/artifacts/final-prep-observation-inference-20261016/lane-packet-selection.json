@@ -1,0 +1,142 @@
+{
+  "schema_version": 2,
+  "record_class": "derived_scope_index_not_generator_receipt",
+  "catalog": "foundation",
+  "layer_id": "observation-inference",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "generator": {
+    "command_used": "python3 tools/sota-convergence/lane_packets.py --root <CHECKOUT> --out <PACKET_SCRATCH> --catalog foundation --checked-at 2026-10-16 --registered-receipts --manifest-newcomers",
+    "native_capture_status": "GAP: the original successful preparation command was observed but its native recorder bytes were not retained; no return code or generated count is presented as a captured measurement.",
+    "source_contract": {
+      "path": "tools/sota-convergence/lane_packets.py",
+      "line": 1238,
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    "role": "Used to gather existing candidate/evidence references. Its older judgment instructions do not replace the current six-angle brief."
+  },
+  "selected_winners": [
+    {
+      "component_id": "opentelemetry-collector-contrib",
+      "repository": "open-telemetry/opentelemetry-collector-contrib",
+      "verdict_version": {
+        "value": "0.161.0",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7183,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        }
+      },
+      "role": "canonical incumbent, current source record; no default change",
+      "identity_source": {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 7169,
+        "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+      }
+    },
+    {
+      "component_id": "prometheus",
+      "repository": "prometheus/prometheus",
+      "verdict_version": {
+        "value": "3.14.0",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7205,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        }
+      },
+      "role": "canonical incumbent, current source record; no default change",
+      "identity_source": {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 7191,
+        "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+      }
+    },
+    {
+      "component_id": "loki",
+      "repository": "grafana/loki",
+      "verdict_version": {
+        "value": "3.7.8",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7227,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        }
+      },
+      "role": "canonical incumbent, current source record; no default change",
+      "identity_source": {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 7213,
+        "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+      }
+    }
+  ],
+  "carried_survivors": [
+    {
+      "repository": {
+        "value": "github.com/ml-explore/mlx-lm",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7109,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        }
+      },
+      "role": "carried candidate only; not re-surveyed, installed or admitted"
+    },
+    {
+      "repository": {
+        "value": "github.com/mostlygeek/llama-swap",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7114,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        }
+      },
+      "role": "carried candidate only; not re-surveyed, installed or admitted"
+    },
+    {
+      "repository": {
+        "value": "github.com/nvidia/dcgm-exporter",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7119,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        }
+      },
+      "role": "carried candidate only; not re-surveyed, installed or admitted"
+    },
+    {
+      "repository": {
+        "value": "github.com/ollama/ollama",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7124,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        }
+      },
+      "role": "carried candidate only; not re-surveyed, installed or admitted"
+    },
+    {
+      "repository": {
+        "value": "github.com/traceloop/openllmetry",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7129,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        }
+      },
+      "role": "carried candidate only; not re-surveyed, installed or admitted"
+    },
+    {
+      "repository": {
+        "value": "github.com/utkuozdemir/nvidia_gpu_exporter",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7134,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        }
+      },
+      "role": "carried candidate only; not re-surveyed, installed or admitted"
+    }
+  ],
+  "projection_boundary": "This scope index is reconstructed from cited canonical inputs, not from or as a native capture. No private packet hash, measured count or fabricated stdout is supplied."
+}

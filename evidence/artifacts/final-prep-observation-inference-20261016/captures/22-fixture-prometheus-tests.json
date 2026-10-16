@@ -1,0 +1,44 @@
+{
+  "argv": [
+    "curl",
+    "-q",
+    "--fail",
+    "--silent",
+    "--show-error",
+    "https://raw.githubusercontent.com/prometheus/prometheus/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/promtool/testdata/unittest.yml"
+  ],
+  "capture_class": "deterministically_masked_native_capture",
+  "capture_id": "22-fixture-prometheus-tests",
+  "cwd": "<SCRATCH>",
+  "environment": {
+    "LANG": "C.UTF-8",
+    "PATH": "<USER_HOME>/.local/share/codex-ecosystem/bin:<USER_HOME>/.local/bin:<USER_HOME>/.codex/packages/standalone/releases/0.162.1-x86_64-unknown-linux-musl/codex-path:<USER_HOME>/.local/share/mise/installs/ast-grep/0.45.3:<USER_HOME>/.local/share/mise/installs/betterleaks/1.9.0:<USER_HOME>/.local/share/mise/installs/bun/1.4.2/bin:<USER_HOME>/.local/share/mise/installs/difftastic/0.71.0/.mise-bins:<USER_HOME>/.local/share/mise/installs/github-cli/2.102.0/gh_2.102.0_linux_amd64/bin:<USER_HOME>/.local/share/mise/installs/github-kjanat-actionlint/1.17.0:<USER_HOME>/.local/share/mise/installs/gitleaks/8.30.1:<USER_HOME>/.local/share/mise/installs/node/24.21.0/bin:<USER_HOME>/.local/share/mise/installs/ollama/0.35.0/bin:<USER_HOME>/.local/share/mise/installs/python/3.13.16/bin:<USER_HOME>/.local/share/mise/installs/restic/0.19.1:<USER_HOME>/.local/share/mise/installs/syft/1.54.1:<USER_HOME>/.local/share/mise/installs/uv/0.12.22/.mise-bins:<USER_HOME>/.local/share/mise/installs/worktrunk/0.80.0/.mise-bins:<USER_HOME>/.local/share/mise/installs/zizmor/1.30.1:<USER_HOME>/.local/share/mise/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+  },
+  "exit_code": 0,
+  "finished_at": "2026-10-16T06:23:51.071241Z",
+  "mask_placeholders": [
+    "<CHECKOUT>",
+    "<LOCAL_HOST>",
+    "<SCRATCH>",
+    "<USER_HOME>"
+  ],
+  "masking_rule": "mask_capture.py: literal UTF-8 replacements, longest first; unchanged nonmatching bytes",
+  "raw_capture_name": "22-fixture-prometheus-tests",
+  "started_at": "2026-10-16T06:23:50.906141Z",
+  "streams": {
+    "stderr": {
+      "bytes": 0,
+      "hash_scope": "published masked bytes only",
+      "path": "22-fixture-prometheus-tests.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "bytes": 5626,
+      "hash_scope": "published masked bytes only",
+      "path": "22-fixture-prometheus-tests.stdout.txt",
+      "sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7"
+    }
+  },
+  "timed_out": false,
+  "timeout_seconds": 180
+}

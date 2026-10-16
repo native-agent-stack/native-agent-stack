@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "catalog": "foundation",
+  "layer_id": "observation-inference",
+  "recorded_at": "2026-10-16T06:27:50Z",
+  "status": "GAP_PROPOSAL_PENDING_TWO_FAMILY_REVIEW",
+  "admission": "Do not claim FINAL or clear release holds.",
+  "dimensions": [
+    {
+      "id": "pin-selection",
+      "dispute": "Reconcile selected run tuple against older verdicts; Collector source identity missing in canonical stack.",
+      "ready_input": "evidence/artifacts/final-prep-observation-inference-20261016/F1-run-pin.json",
+      "next_action": "Review exact tuple; registry changes belong to the owning gate after adjudication."
+    },
+    {
+      "id": "upstream-quality",
+      "dispute": "Collector build-and-test failed at selected tag; Loki has two release-workflow failures. Passing offline smoke does not refute those outcomes.",
+      "ready_input": "evidence/artifacts/final-prep-observation-inference-20261016/public-source-reads.json",
+      "next_action": "Read failed job causes and affected mechanisms; measure the disputed dimension only inside separately authorized scratch."
+    },
+    {
+      "id": "service-e2e",
+      "dispute": "Offline syntax/rule-test success versus unmeasured live ingestion/privacy/persistence.",
+      "ready_input": "evidence/artifacts/final-prep-observation-inference-20261016/upstream-install-smoke.json",
+      "next_action": "Named GAP: full isolated-service fixture with synthetic privacy canaries, native usage reconciliation and recovery is prohibited by this task's no-live-service constraint."
+    },
+    {
+      "id": "invoke",
+      "dispute": "Eight native CLI calls are observed; workload adoption/counter attribution is not.",
+      "ready_input": "evidence/artifacts/final-prep-observation-inference-20261016/F2-invoke.json",
+      "next_action": "Named GAP: real native runtime work receipt in a bounded approved measurement window."
+    },
+    {
+      "id": "survivor-carry",
+      "dispute": "Six derived survivors plus Tempo comparison role explicitly retained by both 09-29 fit reviewers.",
+      "ready_input": "evidence/artifacts/final-prep-observation-inference-20261016/angle-record-draft.json",
+      "next_action": "Co-op two-family adjudication of role/disposition; absence from later generated lists is not substantive retirement."
+    },
+    {
+      "id": "independent-angles",
+      "dispute": "A3/A4/A5 remain U and A6 has no compliant comparison; earlier popularity/maintenance/install evidence cannot fill them.",
+      "ready_input": "evidence/artifacts/final-prep-observation-inference-20261016/angle-record-draft.json",
+      "next_action": "Retain GAP until candidate-specific independent evidence and the required comparison exist; no new survey was dispatched."
+    },
+    {
+      "id": "capture-reproduction",
+      "dispute": "Earlier native commands were real but raw custody was not retained; all proposed measured support has now been re-captured and the old summaries excluded.",
+      "ready_input": "evidence/artifacts/final-prep-observation-inference-20261016/capture-index.json",
+      "next_action": "Custody prerequisite satisfied by the co-op's named MASKED-REPRO CHECK PASS received 2026-10-16: all 108 derivatives, 72 stream hashes/counts and 36 native metadata records reproduced. Preserve those checked bytes; the independent layer/claim reviews remain pending."
+    }
+  ],
+  "scratch_policy": "All new candidate artifacts/executions are inside <SCRATCH>, the owned throwaway prefix defined privately; no host install/service enable. Full raw recorder output stays private, each published derivative is masked with rule/tests.",
+  "private_coordination_references": [
+    "final-wave-layer-prep.brief-20261016.md",
+    "owner addendum-25 as relayed by the co-op",
+    "owner addendum-26 as relayed by the co-op",
+    "final-wave-layer-prep.brief-20261016.addendum-01.md",
+    "final-wave-layer-prep.brief-20261016.addendum-02.md"
+  ],
+  "review": "Co-op dispatches both families. No self-dispatched model review; no merge."
+}

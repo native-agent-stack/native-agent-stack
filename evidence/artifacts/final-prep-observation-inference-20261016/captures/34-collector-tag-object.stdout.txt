@@ -1,0 +1,24 @@
+{
+  "node_id": "TA_kwDOC7UN1doAKDBjZWEwZDRmMjQyMjBlMmU1NGJmODliNmFjZTA0MTZjZjZmZGQ1OTM",
+  "sha": "0cea0d4f24220e2e54bf89b6ace0416cf6fdd593",
+  "url": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-contrib/git/tags/0cea0d4f24220e2e54bf89b6ace0416cf6fdd593",
+  "tagger": {
+    "name": "Andrzej Stencel",
+    "email": "andrzej.stencel@elastic.co",
+    "date": "2026-09-29T09:36:45Z"
+  },
+  "object": {
+    "sha": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+    "type": "commit",
+    "url": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-contrib/git/commits/ae8c507510f48f433ab47dd1c6b01a59d6c388b5"
+  },
+  "tag": "v0.162.0",
+  "message": "Module set contrib-base, Version v0.162.0\n-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgdTD3k8voqf8BXYylf8n1EL1ekg\nbBJYSCxPBim+zRTrkAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQOKVyfWsQWP8ViC0UrgsTNWSc4VCUJxdD7JUhsvMffulyeKWyu6e8FPJnVGsyvh8Xx\nUtic9AS5nszKdAgpMvMAQ=\n-----END SSH SIGNATURE-----\n",
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgdTD3k8voqf8BXYylf8n1EL1ekg\nbBJYSCxPBim+zRTrkAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQOKVyfWsQWP8ViC0UrgsTNWSc4VCUJxdD7JUhsvMffulyeKWyu6e8FPJnVGsyvh8Xx\nUtic9AS5nszKdAgpMvMAQ=\n-----END SSH SIGNATURE-----\n",
+    "payload": "object ae8c507510f48f433ab47dd1c6b01a59d6c388b5\ntype commit\ntag v0.162.0\ntagger Andrzej Stencel <andrzej.stencel@elastic.co> 1790674605 +0200\n\nModule set contrib-base, Version v0.162.0\n",
+    "verified_at": "2026-09-29T09:38:35Z"
+  }
+}
