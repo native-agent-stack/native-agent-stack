@@ -47,6 +47,7 @@ import posixpath
 import random
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -514,49 +515,123 @@ def manifest_newcomers(layer: dict, seen: set, evidence_files: dict = None, root
 # again. A later retained survival supersedes an earlier refutation, the joined manifest's included, so a survivor's
 # own refuted_* row is not filtered again; a repository its latest covering sweep refuted on merit is not listed and
 # stays out.
+# survivors[] keeps a non-FINAL layer's survivals of completed sweeps dated after its verdict, but the protocol
+# (docs/decisions/2026-10-11-layer-resolution-protocol.md:73-76, Terminal states and evidence) needs "the disposition
+# of the cumulative unresolved survivor set" before any terminal state. So the flag also carries what final_stack's
+# FINAL replay (final_unresolved_survivors over every covering ledger row) holds unresolved beyond survivors[], each
+# labelled with its survivor_basis (SURVIVOR_BASES).
 MANIFEST_SECTIONS = {"foundation": "foundation", "us-equities": "trading"}
+# stopped_sweep_proposal: a stopped attempt proposed it and no refuter evaluated it (the 15 foundation repositories at
+# 65d66a37 are all of this kind); pre_verdict: a completed sweep dated on or before the layer's verdict holds it;
+# final_replay: any other repository the replay holds that survivors[] does not list.
+SURVIVOR_BASES = ("stopped_sweep_proposal", "pre_verdict", "final_replay")
 
 
-def carried_survivor_index(root: Path) -> dict:
-    """(catalog, layer_id) -> final-stack.json's survivors[] entries, each with the manifest_ref and manifest_sha256
-    its completed sweep recorded. Refused when final-stack.json is missing or was built from other saturation-ledger
-    bytes (its sources[] sha256): a sweep appended since, such as a merit refutation of a listed survivor, would
-    otherwise be read from a stale list."""
-    final_stack, ledger = root / FINAL_STACK_PATH, root / SATURATION_LEDGER_PATH
-    if not (final_stack.is_file() and ledger.is_file()):
+def survivor_basis(entry: dict, sweep: dict, verdict) -> str:
+    if sweep.get("status") != "completed":
+        return SURVIVOR_BASES[0]
+    try:
+        if date.fromisoformat(entry.get("date")) <= date.fromisoformat(verdict):
+            return SURVIVOR_BASES[1]
+    except (TypeError, ValueError):
+        pass
+    return SURVIVOR_BASES[2]
+
+
+def ledger_repository(sweep: dict, key: tuple, repository: str):
+    """The repository URL as ``sweep``'s layer record for ``key`` writes it (proposed, survived, refuted, pending)."""
+    for layer in sweep.get("layers") or []:
+        if not isinstance(layer, dict) or (layer.get("catalog"), layer.get("layer_id")) != key:
+            continue
+        values = list(layer.get("proposed") or []) + [item.get("repo", item.get("repository"))
+                                                       for field in ("survived", "refuted", "pending")
+                                                       for item in layer.get(field) or [] if isinstance(item, dict)]
+        for value in values:
+            if isinstance(value, str) and normalize_repository(value) == repository:
+                return value
+    return None
+
+
+def carried_survivor_index(root: Path, catalogs: list) -> dict:
+    """(catalog, layer_id) -> the carried survivors of every ledger layer of ``catalogs``: final-stack.json's
+    survivors[] entries, then the replay's other entries with their basis. Each carries its sweep's status,
+    manifest_ref and manifest_sha256; a stopped sweep's entry also carries the URL its ledger record writes. Refused
+    when final-stack.json is missing or was built from other saturation-ledger bytes (its sources[] sha256): a sweep
+    appended since, such as a merit refutation of a listed survivor, would otherwise be read from a stale list."""
+    final_stack_path, ledger_path = root / FINAL_STACK_PATH, root / SATURATION_LEDGER_PATH
+    if not (final_stack_path.is_file() and ledger_path.is_file()):
         raise ValueError(f"--carried-survivors reads {FINAL_STACK_PATH} and {SATURATION_LEDGER_PATH}; one is missing")
-    document, raw = load_json(final_stack), ledger.read_bytes()
+    document, raw = load_json(final_stack_path), ledger_path.read_bytes()
     if (document.get("sources") or {}).get(SATURATION_LEDGER_PATH) != hashlib.sha256(raw).hexdigest():
         raise ValueError(f"{FINAL_STACK_PATH} was not built from this {SATURATION_LEDGER_PATH}; run "
                          "python3 scripts/final_stack.py --write first")
-    sweeps = {sweep.get("sweep_id"): sweep for sweep in json.loads(raw).get("sweeps") or []
-              if isinstance(sweep, dict) and sweep.get("status") == "completed"}
-    index: dict = {}
+    ledger = json.loads(raw)
+    sweeps = {sweep.get("sweep_id"): sweep for sweep in ledger.get("sweeps") or [] if isinstance(sweep, dict)}
+    listed: dict = {}
     for layer in document.get("layers") or []:
-        for survivor in layer.get("survivors") or []:
-            sweep = sweeps.get(survivor.get("sweep_id"))
-            if sweep is None or not isinstance(sweep.get("manifest_ref"), str):
-                raise ValueError(f"{FINAL_STACK_PATH}: survivor {survivor.get('repository')} names "
-                                 f"{survivor.get('sweep_id')}, not a completed sweep of {SATURATION_LEDGER_PATH}")
-            index.setdefault((layer.get("catalog"), layer.get("layer_id")), []).append(
-                {**survivor, "manifest_ref": sweep["manifest_ref"], "manifest_sha256": sweep.get("manifest_sha256")})
+        listed.setdefault((layer.get("catalog"), layer.get("layer_id")), []).extend(layer.get("survivors") or [])
+    # The replay is reused (not reimplemented) from this checkout's scripts/final_stack.py and imported when the flag
+    # runs, as absence_refuted loads the ledger rules: an import statement would pull final_stack.py, and the
+    # saturation ledger it imports, into the verdict review gate's trust base (tests/test_saturation_ledger.py
+    # SeparationTests). The gate judges sealed packets by sha256 and never rebuilds them.
+    final_stack = importlib.import_module("scripts.final_stack")
+    sources = final_stack.Sources(root)
+    index: dict = {}
+    for catalog in catalogs:
+        for row in load_json(root / LEDGER_FILES[catalog]).get("layers") or []:
+            key = (catalog, row["layer_id"])
+            entries = [dict(survivor) for survivor in listed.get(key, [])]
+            known = {normalize_repository(entry.get("repository")) for entry in entries}
+            # The verdict's own dispositions are left to the FINAL check, which needs FINAL-grade retained evidence for
+            # them (final_disposition_index) and refuses six trading layers at 65d66a37. Without them the replay can
+            # only add a repository such a disposition settled, which a lane then adjudicates again.
+            replay = final_stack.final_unresolved_survivors(sources, {"catalog": catalog, "layer_id": row["layer_id"]},
+                                                             final_stack.final_covering_sweeps(ledger, key))
+            for entry in replay:
+                if normalize_repository(entry.get("repository")) not in known:
+                    entries.append({**entry, "basis": survivor_basis(entry, sweeps.get(entry.get("sweep_id")) or {},
+                                                                     row.get("checked_at"))})
+            for entry in entries:
+                sweep = sweeps.get(entry.get("sweep_id"))
+                if sweep is None or (sweep.get("status") == "completed"
+                                     and not isinstance(sweep.get("manifest_ref"), str)):
+                    raise ValueError(f"carried survivor {entry.get('repository')} names {entry.get('sweep_id')}, not "
+                                     f"a sweep of {SATURATION_LEDGER_PATH} (a completed one with a manifest_ref)")
+                entry.update(status=sweep.get("status"), manifest_ref=sweep.get("manifest_ref"),
+                             manifest_sha256=sweep.get("manifest_sha256"))
+                if entry["status"] != "completed":
+                    # A FINAL layer's survivors[] can name a stopped attempt too (final_unresolved_survivors).
+                    entry.setdefault("basis", survivor_basis(entry, sweep, row.get("checked_at")))
+                    entry["url"] = ledger_repository(sweep, key, normalize_repository(entry.get("repository")))
+                    if entry["url"] is None:
+                        raise ValueError(f"carried survivor {entry.get('repository')} of {catalog}/{row['layer_id']} "
+                                         f"has no repository in the ledger record of {entry.get('sweep_id')}")
+            index[key] = entries
     return index
 
 
 def carried_survivors(survivors: list, present: list, catalog: str, layer_id: str, evidence_files: dict, root: Path,
                       withhold: bool = False, manifests: dict = None) -> list:
     """Newcomer records (newcomer_record) for the layer's carried survivors whose repository is not ``present`` (the
-    packet's repositories so far), both compared in normalize_repository form. Each is built from its own sweep's
-    manifest, read only while it has the sha256 that sweep recorded: the first of this layer's candidates and
-    keep-but-compare alternatives with the survivor's repository. A survivor without that row is refused rather
-    than dropped, as the protocol records an unavailable sweep source as a gap (step 2). ``manifests`` caches each
-    manifest across layers as (sha256, document)."""
+    packet's repositories so far), both compared in normalize_repository form, each with its survivor_basis when it
+    has one. A completed sweep's survivor is built from that sweep's manifest, read only while it has the sha256 the
+    sweep recorded: the first of this layer's candidates and keep-but-compare alternatives with the survivor's
+    repository. A survivor without that row is refused rather than dropped, as the protocol records an unavailable
+    sweep source as a gap (step 2). A stopped sweep merged nothing into a manifest (its ledger notes; its manifest_ref
+    is only a baseline), so its proposal is built from the repository its ledger record names, with no evidence.
+    ``manifests`` caches each manifest across layers as (sha256, document)."""
     manifests = {} if manifests is None else manifests
     present = {normalize_repository(repository) for repository in present} - {None}
     records = []
     for survivor in survivors:
         repository = normalize_repository(survivor.get("repository"))
         if repository is None or repository in present:
+            continue
+        if survivor.get("status") != "completed":
+            present.add(repository)
+            records.append({**newcomer_record({"repository": survivor["url"]}, candidate_identity(survivor["url"], True)
+                                              or repository, evidence_files, root, withhold),
+                            "survivor_basis": survivor["basis"]})
             continue
         reference = survivor["manifest_ref"]
         if reference not in manifests:
@@ -579,8 +654,9 @@ def carried_survivors(survivors: list, present: list, catalog: str, layer_id: st
             raise ValueError(f"carried survivor {survivor.get('repository')} of {catalog}/{layer_id} has no row in "
                              f"{reference}, the manifest of {survivor.get('sweep_id')}")
         present.add(repository)
-        records.append(newcomer_record(item, candidate_identity(item["repository"], True) or repository,
-                                       evidence_files, root, withhold))
+        record = newcomer_record(item, candidate_identity(item["repository"], True) or repository, evidence_files, root,
+                                 withhold)
+        records.append({**record, "survivor_basis": survivor["basis"]} if survivor.get("basis") else record)
     return records
 
 
@@ -1252,7 +1328,7 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
         raise ValueError("--carried-survivors needs --manifest-newcomers: carried survivors are built as its newcomers")
     evidence_files = registered_evidence_files(root) if manifest_newcomers_on else None
     absent = absence_refuted(root, manifest or SOTA_MANIFEST_PATH) if manifest_newcomers_on else {}
-    survivors = carried_survivor_index(root) if carried_survivors_on else None
+    survivors = carried_survivor_index(root, catalogs) if carried_survivors_on else None
     survivor_manifests: dict = {}
     manifest_rows = {"foundation": {layer["layer"]: layer for layer in sota_doc.get("foundation", [])},
                      "us-equities": trading_layers}
@@ -1279,6 +1355,7 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                     trading_layers.get(row["layer_id"], {}), cards, names, recipe_map, root, evidence_files,
                     withhold, absent.get((catalog, row["layer_id"]), frozenset()))
                 if survivors is not None:
+                    # --carried-survivors: then the layer's survivors from earlier covering sweeps (carried_survivors).
                     carried = carried_survivors(survivors.get((catalog, row["layer_id"]), []),
                                                 [c["repository"] for c in layer_candidates], catalog, row["layer_id"],
                                                 evidence_files, root, withhold, survivor_manifests)
@@ -1398,10 +1475,12 @@ def parse_args(argv=None):
                              "catalogs/landscape/final-stack.json lists for the layer (layers[].survivors[], the "
                              "cumulative set scripts/final_stack.py derives from every completed covering sweep of "
                              "catalogs/saturation/ledger.json) and that is not already a candidate, as a newcomer "
-                             "built from its own sweep's manifest row. Refused when final-stack.json is missing or "
-                             "was built from other ledger bytes, or when a survivor's manifest changed since its "
-                             "sweep or has no row for it. Off by default: only the joined manifest's newcomers are "
-                             "carried.")
+                             "built from its own sweep's manifest row; then every other repository final_stack's "
+                             "FINAL replay holds unresolved, labelled survivor_basis stopped_sweep_proposal (built "
+                             "from the stopped attempt's ledger proposal), pre_verdict or final_replay. Refused when "
+                             "final-stack.json is missing or was built from other ledger bytes, or when a survivor's "
+                             "manifest changed since its sweep or has no row for it. Off by default: only the joined "
+                             "manifest's newcomers are carried.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",
                         help="Candidate source for us-equities packets: the ledger row's group-wide list "
                              "(default; reproduces the 2026-09-22 packets) or the sota manifest's own entries "

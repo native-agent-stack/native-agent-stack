@@ -885,6 +885,20 @@ survivor with no row there. Without the flag, packets are byte-identical. With `
 `65d66a37`, 49 of the 107 listed survivors reach no packet: 15 in seven foundation layers and 34 in trading (36 with
 `--trading-candidates manifest`). With the flag, all 107 do in either trading mode.
 
+`survivors[]` holds a non-FINAL layer's survivals of completed sweeps dated after its verdict. The protocol's
+terminal-state rule needs a disposition for the whole cumulative unresolved set first. So the flag also carries what
+`scripts/final_stack.py`'s FINAL replay (`final_unresolved_survivors`, over every covering ledger row) holds unresolved
+beyond `survivors[]`. Each such candidate is labelled with a `survivor_basis`:
+- `stopped_sweep_proposal`: a stopped attempt proposed it and no refuter evaluated it. Such an attempt merged nothing
+  into a manifest, so the candidate is built from the repository its ledger record names, with no evidence.
+- `pre_verdict`: a completed sweep dated on or before the layer's verdict holds it.
+- `final_replay`: any other repository the replay holds.
+
+The replay leaves the verdict's own dispositions to the FINAL check. That check needs FINAL-grade retained evidence for
+them and refuses six trading layers at `65d66a37`. At `65d66a37` the replay adds 15 foundation repositories in seven
+layers, all `stopped_sweep_proposal`, and none in trading. With the flag, the blind foundation build on
+`manifest-20260929.json` carries all 83 (68 listed plus 15).
+
 A newcomer's name must not redact the packet's shared prose (Codex review of #151 at `cf82e689`). A name part
 unique to one candidate is a redaction term, so granite-embedding's "embedding" had turned semantic-rag's
 requirement "a compatible embedding service" into "a compatible <candidate> service". Capability and format words
