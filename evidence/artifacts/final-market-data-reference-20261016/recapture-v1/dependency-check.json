@@ -1,0 +1,32 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Native observed command output only; no source acquisition, comparative A6 or FINAL admission.",
+  "command": [
+    "<uv-0-12-22>",
+    "pip",
+    "check",
+    "--python",
+    "<scratch>/venv/bin/python"
+  ],
+  "cwd": "<scratch>",
+  "declared_inputs": {
+    "winner_pins": [
+      "edgartools==5.61.1",
+      "alpaca-py==0.44.0",
+      "exchange-calendars==4.13.2"
+    ]
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T06:20:57.526979+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "output": "dependency-check.log",
+  "output_sha256": "fd59bf15ff34f8657883d30df510bb0ba3828ffe012fb3fa0ba0c6fbc37765ef",
+  "private_capture_name": "dependency-check",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T06:20:57.499827+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

@@ -1,0 +1,14 @@
+943bb25c120e0d4965e44f1baa5f3afb82423e5cf9b41155eae5901ca3877f57  <pinned-upstream>/README.md
+08908e1f93e1dc5cc2ecbc369cf323e84d9fc1508e10c6ca88a837898efa9d56  <pinned-upstream>/CONTRIBUTING.md
+3e38e21afd09b0c3e9952b88541a723aaa06a00477c8a93c82266749be82857a  <pinned-upstream>/pyproject.toml
+75c8168c47f828a9655c4a294ed7ed32f18732d6f1e57073042cbecc362af1ca  <pinned-upstream>/edgar/__about__.py
+b54fff3ab146a0fec7fc58ad8360ceccfe017983e97b91f68860bb88452343c0  <pinned-upstream>/edgar/sgml/sgml_header.py
+bc12963b0933cdb7d1510f5df2dc6540093089e82824b49a96b2d217d843b308  <pinned-upstream>/edgar/ownership/owners.py
+2493d71e5a9dbdcd3e9974692179d18f1fda99283a39dd94868334c6fadc70fd  <pinned-upstream>/tests/_offline_harness.py
+2bda87686624b5631e0ec13c247812132cc0943891a01021354b9c763e05d6d5  <pinned-upstream>/tests/sgml/test_filing_header.py
+05620ff88aa3eb7589a5f86490897e6b7a80c38f04b8afcec7be0b553ec162b4  <pinned-upstream>/tests/ownership/test_insider_parse_contract.py
+267230424ca6cef4c693cc5b607be641cf96ef9951df4e00e26af17877b040ba  <pinned-upstream>/tests/documents/test_html_style_parser.py
+420ae1977a1664fbf7d3c9d25cc577c7a7197048b21332b5292abb13a6a71396  <pinned-upstream>/data/secheader.424B5.abeona.txt
+75c8168c47f828a9655c4a294ed7ed32f18732d6f1e57073042cbecc362af1ca  <scratch>/venv/lib/python3.12/site-packages/edgar/__about__.py
+b54fff3ab146a0fec7fc58ad8360ceccfe017983e97b91f68860bb88452343c0  <scratch>/venv/lib/python3.12/site-packages/edgar/sgml/sgml_header.py
+bc12963b0933cdb7d1510f5df2dc6540093089e82824b49a96b2d217d843b308  <scratch>/venv/lib/python3.12/site-packages/edgar/ownership/owners.py

@@ -1,0 +1,31 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Native observed command output only; no source acquisition, comparative A6 or FINAL admission.",
+  "command": [
+    "<existing-isolated-python>",
+    "-I",
+    "-c",
+    "from importlib.metadata import version; print({n:version(n) for n in ['edgartools','alpaca-py','exchange-calendars']})"
+  ],
+  "cwd": "<scratch>",
+  "declared_inputs": {
+    "winner_pins": [
+      "edgartools==5.61.1",
+      "alpaca-py==0.44.0",
+      "exchange-calendars==4.13.2"
+    ]
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T06:20:57.645384+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "output": "existing-host-package-metadata.log",
+  "output_sha256": "6e6fbe3eba3fbb52ca067b8a189875a3031b46ffc4a630d1d866a882228f4ae1",
+  "private_capture_name": "existing-host-package-metadata",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T06:20:57.532488+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

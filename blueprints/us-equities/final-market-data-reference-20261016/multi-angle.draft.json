@@ -1,0 +1,468 @@
+{
+  "schema": "final-layer-multi-angle-draft/1",
+  "catalog": "us-equities",
+  "layer_id": "market-data-reference",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "status": "DRAFT_NOT_AN_ANGLE_CONVERGENCE_ADMISSION",
+  "gate": "FINAL admission remains closed; prepare evidence only",
+  "resolution_inputs": [
+    "catalogs/landscape/us-equities.json",
+    "catalogs/sota-convergence/layer-verdict-waves.json",
+    "catalogs/saturation/ledger.json",
+    "evidence/artifacts/landscape-sweep-20260926/returns.json",
+    "evidence/artifacts/final-market-data-reference-20261016/lane-packet.json"
+  ],
+  "method": "Six separate angles; no single angle/default, weighted score or model-produced numeric ranking. Unknown is distinct from negative, and noncomparative smokes remain A1/F2.",
+  "candidates": [
+    {
+      "id": "data-alpaca-py",
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "pin": {
+        "version": "0.44.0",
+        "commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+      },
+      "role": "carried_winner",
+      "disposition": "Retain role provisionally; no FINAL admission.",
+      "angles": {
+        "capability_at_pin": {
+          "state": "BOUNDED_NATIVE_SDK_DIAGNOSTIC",
+          "note": "Native StockBarsRequest object returned offline; no client, acquisition or broker call. This is SDK diagnostic evidence, not a full upstream E2E suite.",
+          "sources": [
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.json",
+              "line": 17
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
+              "line": 2
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
+              "line": 5
+            }
+          ]
+        },
+        "upstream_engineering_quality": {
+          "state": "UNASSESSED_NAMED_GAP",
+          "note": "No upstream engineering-quality conclusion is established by this draft. Exact source-specific evidence is pending; installation success would not suffice.",
+          "sources": []
+        },
+        "community_consensus": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "net_usage": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "published_evaluations": {
+          "state": "UNKNOWN_NOT_NONE",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "own_measured_runs": {
+          "state": "COMPARATIVE_NOT_RUN",
+          "note": "No matched A6 comparison. Capability and SDK diagnostics remain A1/F2; no superiority or default follows.",
+          "sources": []
+        }
+      },
+      "disputed_dimensions": [
+        "Historical verdict, accepted recipe and proposed run identities require the exact-value F1 ledger.",
+        "Native capture reproduction passed privately; live vendor acquisition and historical availability remain unqualified.",
+        "A3/A4/A5 evidence and matched comparative A6 remain unresolved."
+      ]
+    },
+    {
+      "id": "data-edgartools",
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": {
+        "version": "5.61.1",
+        "commit": "7338aa335f6442c52dfa0695422cf1cd27e946e0"
+      },
+      "role": "carried_winner",
+      "disposition": "Retain role provisionally; no FINAL admission.",
+      "angles": {
+        "capability_at_pin": {
+          "state": "BOUNDED_UPSTREAM_OFFLINE_PASS",
+          "note": "Fresh vendor-pip install and upstream offline tests exit0:29passed/10deselected/4warnings. Native fixture parse returns naive wall-clock acceptance. No SEC acquisition or historical-PIT qualification.",
+          "sources": [
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.json",
+              "line": 17
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
+              "line": 4
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.json",
+              "line": 30
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.log",
+              "line": 24
+            }
+          ]
+        },
+        "upstream_engineering_quality": {
+          "state": "UNASSESSED_NAMED_GAP",
+          "note": "No upstream engineering-quality conclusion is established by this draft. Exact source-specific evidence is pending; installation success would not suffice.",
+          "sources": []
+        },
+        "community_consensus": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "net_usage": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "published_evaluations": {
+          "state": "UNKNOWN_NOT_NONE",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "own_measured_runs": {
+          "state": "COMPARATIVE_NOT_RUN",
+          "note": "No matched A6 comparison. Capability and SDK diagnostics remain A1/F2; no superiority or default follows.",
+          "sources": []
+        }
+      },
+      "disputed_dimensions": [
+        "Historical verdict, accepted recipe and proposed run identities require the exact-value F1 ledger.",
+        "Native capture reproduction passed privately; live vendor acquisition and historical availability remain unqualified.",
+        "A3/A4/A5 evidence and matched comparative A6 remain unresolved."
+      ]
+    },
+    {
+      "id": "data-exchange-calendars",
+      "repository": "https://github.com/gerrymanoim/exchange_calendars",
+      "pin": {
+        "version": "4.13.2",
+        "commit": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a"
+      },
+      "role": "carried_winner",
+      "disposition": "Retain role provisionally; no FINAL admission.",
+      "angles": {
+        "capability_at_pin": {
+          "state": "BOUNDED_NATIVE_SDK_DIAGNOSTIC",
+          "note": "Native XNYS is_session/early-close returned values, with assertions. Bounded SDK diagnostic only, not a full upstream test suite.",
+          "sources": [
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.json",
+              "line": 17
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
+              "line": 3
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
+              "line": 6
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
+              "line": 7
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
+              "line": 8
+            }
+          ]
+        },
+        "upstream_engineering_quality": {
+          "state": "UNASSESSED_NAMED_GAP",
+          "note": "No upstream engineering-quality conclusion is established by this draft. Exact source-specific evidence is pending; installation success would not suffice.",
+          "sources": []
+        },
+        "community_consensus": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "net_usage": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "published_evaluations": {
+          "state": "UNKNOWN_NOT_NONE",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "own_measured_runs": {
+          "state": "COMPARATIVE_NOT_RUN",
+          "note": "No matched A6 comparison. Capability and SDK diagnostics remain A1/F2; no superiority or default follows.",
+          "sources": []
+        }
+      },
+      "disputed_dimensions": [
+        "Historical verdict, accepted recipe and proposed run identities require the exact-value F1 ledger.",
+        "Native capture reproduction passed privately; live vendor acquisition and historical availability remain unqualified.",
+        "A3/A4/A5 evidence and matched comparative A6 remain unresolved."
+      ]
+    },
+    {
+      "id": "databento/databento-python",
+      "repository": "https://github.com/databento/databento-python",
+      "pin": {
+        "commit": "25eef4ee8e66559e2370166a57c20925ce244d49"
+      },
+      "role": "carried_survivor",
+      "disposition": "Defer adjudication; carried unresolved with named gaps.",
+      "angles": {
+        "capability_at_pin": {
+          "state": "SOURCE_SCREEN_PARTIAL",
+          "note": "vendor_historical_live_reference; VENDOR_KEY_AND_MATCHED_PIT_RIGHTS_GAP",
+          "sources": [
+            {
+              "repository": "https://github.com/databento/databento-python",
+              "pin": "25eef4ee8e66559e2370166a57c20925ce244d49",
+              "path": "README.md",
+              "line": 49
+            }
+          ]
+        },
+        "upstream_engineering_quality": {
+          "state": "UNASSESSED_NAMED_GAP",
+          "note": "Pinned README establishes only the narrow source-screen statements in A1; no engineering-quality convergence is claimed.",
+          "sources": []
+        },
+        "community_consensus": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "net_usage": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "published_evaluations": {
+          "state": "UNKNOWN_NOT_NONE",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "own_measured_runs": {
+          "state": "NOT_RUN",
+          "note": "Live vendor acquisition needs an explicitly authorized credential/rights route; none read or invoked. No native comparative result.",
+          "sources": []
+        }
+      },
+      "disputed_dimensions": [
+        "Vendor-key-free client source coverage does not establish data entitlement/completeness.",
+        "No frozen identical universe/time/rights/reference-correction input exists for native comparison.",
+        "Survivor remains unresolved; no omission-as-adjudication."
+      ]
+    },
+    {
+      "id": "hydrosquall/tiingo-python",
+      "repository": "https://github.com/hydrosquall/tiingo-python",
+      "pin": {
+        "commit": "4d9a9776a811efb5b70b3238e31363f84fabab94"
+      },
+      "role": "carried_survivor",
+      "disposition": "Defer adjudication; carried unresolved with named gaps.",
+      "angles": {
+        "capability_at_pin": {
+          "state": "SOURCE_SCREEN_PARTIAL",
+          "note": "vendor_history_news_client; VENDOR_KEY_AND_MATCHED_PIT_RIGHTS_GAP",
+          "sources": [
+            {
+              "repository": "https://github.com/hydrosquall/tiingo-python",
+              "pin": "4d9a9776a811efb5b70b3238e31363f84fabab94",
+              "path": "README.rst",
+              "line": 77
+            }
+          ]
+        },
+        "upstream_engineering_quality": {
+          "state": "UNASSESSED_NAMED_GAP",
+          "note": "Pinned README establishes only the narrow source-screen statements in A1; no engineering-quality convergence is claimed.",
+          "sources": []
+        },
+        "community_consensus": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "net_usage": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "published_evaluations": {
+          "state": "UNKNOWN_NOT_NONE",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "own_measured_runs": {
+          "state": "NOT_RUN",
+          "note": "Live vendor acquisition needs an explicitly authorized credential/rights route; none read or invoked. No native comparative result.",
+          "sources": []
+        }
+      },
+      "disputed_dimensions": [
+        "Vendor-key-free client source coverage does not establish data entitlement/completeness.",
+        "No frozen identical universe/time/rights/reference-correction input exists for native comparison.",
+        "Survivor remains unresolved; no omission-as-adjudication."
+      ]
+    },
+    {
+      "id": "man-group/arcticdb",
+      "repository": "https://github.com/man-group/arcticdb",
+      "pin": {
+        "commit": "7d30a6eefe709e5379f1dd7f38b03074750cf1be"
+      },
+      "role": "carried_survivor",
+      "disposition": "Defer adjudication; carried unresolved with named gaps.",
+      "angles": {
+        "capability_at_pin": {
+          "state": "SOURCE_SCREEN_PLUS_SEPARATE_RELEASE_DIAGNOSTIC",
+          "note": "Carried README26 supports paid production/service license and103 local LMDB. Separate6.26.0release install and synthetic local-LMDB native diagnostic exit0; no matched comparison or deployment-rights conclusion.",
+          "sources": [
+            {
+              "repository": "https://github.com/man-group/arcticdb",
+              "pin": "7d30a6eefe709e5379f1dd7f38b03074750cf1be",
+              "path": "README.md",
+              "line": 26
+            },
+            {
+              "repository": "https://github.com/man-group/arcticdb",
+              "pin": "7d30a6eefe709e5379f1dd7f38b03074750cf1be",
+              "path": "README.md",
+              "line": 103
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.json",
+              "line": 14
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
+              "line": 16
+            },
+            {
+              "path": "catalogs/us-equities/data-research.json",
+              "line": 327,
+              "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+            }
+          ]
+        },
+        "upstream_engineering_quality": {
+          "state": "UNASSESSED_NAMED_GAP",
+          "note": "Pinned README establishes only the narrow source-screen statements in A1; no engineering-quality convergence is claimed.",
+          "sources": []
+        },
+        "community_consensus": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "net_usage": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "published_evaluations": {
+          "state": "UNKNOWN_NOT_NONE",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "own_measured_runs": {
+          "state": "COMPARATIVE_NOT_RUN",
+          "note": "No matched storage comparison; synthetic bounded native roundtrip is a capability diagnostic, not comparative A6.",
+          "sources": []
+        }
+      },
+      "disputed_dimensions": [
+        "Storage role complements rather than replaces an SEC/reference client.",
+        "Source documents paid production/service license; source screen says NOASSERTION and does not settle deployment rights.",
+        "Matched storage comparison and production/service license remain unresolved; bounded release diagnostic supplies no comparative verdict."
+      ],
+      "proposed_trial_pin": {
+        "version": "6.26.0",
+        "commit": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+        "status": "SEPARATE_BOUNDED_RELEASE_TRIAL_NOT_ADOPTION"
+      }
+    },
+    {
+      "id": "massive-com/client-python",
+      "repository": "https://github.com/massive-com/client-python",
+      "pin": {
+        "commit": "481e5c270ea85e8eae5e96f8b9fda34e5e2a674a"
+      },
+      "role": "carried_survivor",
+      "disposition": "Defer adjudication; carried unresolved with named gaps.",
+      "angles": {
+        "capability_at_pin": {
+          "state": "SOURCE_SCREEN_PARTIAL",
+          "note": "vendor_rest_websocket_reference; VENDOR_KEY_AND_MATCHED_PIT_RIGHTS_GAP",
+          "sources": [
+            {
+              "repository": "https://github.com/massive-com/client-python",
+              "pin": "481e5c270ea85e8eae5e96f8b9fda34e5e2a674a",
+              "path": "README.md",
+              "line": 31
+            },
+            {
+              "repository": "https://github.com/massive-com/client-python",
+              "pin": "481e5c270ea85e8eae5e96f8b9fda34e5e2a674a",
+              "path": "README.md",
+              "line": 167
+            }
+          ]
+        },
+        "upstream_engineering_quality": {
+          "state": "UNASSESSED_NAMED_GAP",
+          "note": "Pinned README establishes only the narrow source-screen statements in A1; no engineering-quality convergence is claimed.",
+          "sources": []
+        },
+        "community_consensus": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "net_usage": {
+          "state": "UNRESOLVED",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "published_evaluations": {
+          "state": "UNKNOWN_NOT_NONE",
+          "note": "Named evidence gap in this bounded preparation; no empirical value, negative finding or claim of absence is asserted.",
+          "sources": []
+        },
+        "own_measured_runs": {
+          "state": "NOT_RUN",
+          "note": "Live vendor acquisition needs an explicitly authorized credential/rights route; none read or invoked. No native comparative result.",
+          "sources": []
+        }
+      },
+      "disputed_dimensions": [
+        "Vendor-key-free client source coverage does not establish data entitlement/completeness.",
+        "No frozen identical universe/time/rights/reference-correction input exists for native comparison.",
+        "Survivor remains unresolved; no omission-as-adjudication."
+      ]
+    }
+  ],
+  "adjudication_request": "Co-op two-family maximum-setting reads of this bounded delta. No model read self-dispatched; require a recorded GAP disposition or converged evidence before any FINAL admission.",
+  "publication_status": "READY_FOR_ONE_PR_AND_COOP_FAMILY_READS",
+  "blinding_contract": {
+    "path": "tools/sota-convergence/blind_checkout.py",
+    "line": 56,
+    "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+    "rule": "Disposition text uses recognized Retain/Defer selection prefixes so blind exports remove it."
+  }
+}

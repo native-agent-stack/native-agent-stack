@@ -1,0 +1,32 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Native observed command output only; no source acquisition, comparative A6 or FINAL admission.",
+  "command": [
+    "/usr/bin/git",
+    "-C",
+    "<pinned-upstream>",
+    "rev-parse",
+    "HEAD"
+  ],
+  "cwd": "<scratch>",
+  "declared_inputs": {
+    "winner_pins": [
+      "edgartools==5.61.1",
+      "alpaca-py==0.44.0",
+      "exchange-calendars==4.13.2"
+    ]
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T06:23:48.114132+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "output": "edgar-source-commit.log",
+  "output_sha256": "40e8707e0fce0639f4b279933e67edd474b30c42fbe6a44c4a37ff686341efe7",
+  "private_capture_name": "edgar-source-commit",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T06:23:48.105990+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

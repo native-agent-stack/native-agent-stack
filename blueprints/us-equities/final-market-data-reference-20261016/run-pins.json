@@ -1,0 +1,371 @@
+{
+  "schema": "final-market-data-run-pin-reconciliation/1",
+  "catalog": "us-equities",
+  "layer_id": "market-data-reference",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "status": "PROPOSED_FOR_FINAL_PREPARATION",
+  "canonical_pins_changed": false,
+  "winners": [
+    {
+      "component_id": "data-alpaca-py",
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "proposed_run_pin": {
+        "version": "0.44.0",
+        "commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+      },
+      "reason": "Retain the current locked run identity; historical verdict pins are not relabelled. This is preparation only, not an upgrade/default/FINAL admission.",
+      "sources": [
+        {
+          "kind": "final_stack_winner",
+          "value": "v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+          "locator": {
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 9607,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "final_stack_run",
+          "value": "0.44.0",
+          "pointer": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/6",
+          "locator": {
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 10422,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "component_manifest",
+          "value": "0.44.0",
+          "commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+          "locator": {
+            "path": "manifests/stack.json",
+            "line": 1442,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          },
+          "commit_locator": {
+            "path": "manifests/stack.json",
+            "line": 1465,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "clean_install_plan",
+          "value": "0.44.0",
+          "locator": {
+            "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+            "line": 586,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "runtime_lock",
+          "value": "0.44.0",
+          "locator": {
+            "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+            "line": 105,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "existing_host_package_metadata",
+          "value": "0.44.0",
+          "method": "Read-only importlib.metadata.version via an existing private isolated interpreter; no service/credential access.",
+          "value_status": "OBSERVED_NATIVE_MASKED_CAPTURE_PRIVATE_REPRODUCTION_PASSED",
+          "locator": {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.log",
+            "line": 1
+          },
+          "exit_code_locator": {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.json",
+            "line": 18
+          }
+        },
+        {
+          "kind": "last_committed_evidence",
+          "value": "bounded_acquisition_accepted_reconciliation_partially_open",
+          "locator": {
+            "path": "blueprints/us-equities/authenticated-data/native-receipt.json",
+            "line": 10,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          },
+          "scope": "Historical source record only; neither fresh acquisition nor independently re-certified latest evidence.",
+          "command_locator": {
+            "path": "blueprints/us-equities/authenticated-data/native-receipt.json",
+            "line": 196,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          },
+          "exit_code_locator": {
+            "path": "blueprints/us-equities/authenticated-data/native-receipt.json",
+            "line": 197,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        }
+      ],
+      "drift": []
+    },
+    {
+      "component_id": "data-edgartools",
+      "repository": "https://github.com/dgunning/edgartools",
+      "proposed_run_pin": {
+        "version": "5.61.1",
+        "commit": "7338aa335f6442c52dfa0695422cf1cd27e946e0"
+      },
+      "reason": "Retain the current locked run identity; historical verdict pins are not relabelled. This is preparation only, not an upgrade/default/FINAL admission.",
+      "sources": [
+        {
+          "kind": "final_stack_winner",
+          "value": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+          "locator": {
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 9629,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "final_stack_run",
+          "value": "5.61.1",
+          "pointer": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/35",
+          "locator": {
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 10652,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "component_manifest",
+          "value": "5.60.0",
+          "commit": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
+          "locator": {
+            "path": "manifests/stack.json",
+            "line": 1539,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          },
+          "commit_locator": {
+            "path": "manifests/stack.json",
+            "line": 1542,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "clean_install_plan",
+          "value": "5.58.0 (historical; 5.62 screen pending)",
+          "locator": {
+            "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+            "line": 589,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "runtime_lock",
+          "value": "5.61.1",
+          "locator": {
+            "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+            "line": 546,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "existing_host_package_metadata",
+          "value": "5.61.1",
+          "method": "Read-only importlib.metadata.version via an existing private isolated interpreter; no service/credential access.",
+          "value_status": "OBSERVED_NATIVE_MASKED_CAPTURE_PRIVATE_REPRODUCTION_PASSED",
+          "locator": {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.log",
+            "line": 1
+          },
+          "exit_code_locator": {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.json",
+            "line": 18
+          }
+        },
+        {
+          "kind": "current_scope_record",
+          "value": "5.61.1 runtime,5.60.0 accepted SEC recipe,5.58.0 initial wave",
+          "locator": {
+            "path": "catalogs/us-equities/catalog-refresh-20261009.json",
+            "line": 18,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          },
+          "value_locators": [
+            {
+              "path": "catalogs/us-equities/catalog-refresh-20261009.json",
+              "line": 18,
+              "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+            },
+            {
+              "path": "catalogs/us-equities/catalog-refresh-20261009.json",
+              "line": 24,
+              "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+            },
+            {
+              "path": "catalogs/us-equities/catalog-refresh-20261009.json",
+              "line": 32,
+              "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+            }
+          ],
+          "scope_limit_locator": {
+            "path": "catalogs/us-equities/catalog-refresh-20261009.json",
+            "line": 43,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "last_committed_native_runtime_evidence",
+          "value": "Historical 24-case offline runtime acceptance claim; not fresh SEC acceptance.",
+          "locator": {
+            "path": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json",
+            "line": 6,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          },
+          "scope_limit_locator": {
+            "path": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json",
+            "line": 68,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          },
+          "exit_code_locator": {
+            "path": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json",
+            "line": 21,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          },
+          "count_locator": {
+            "path": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json",
+            "line": 22,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "accepted_sec_recipe",
+          "value": "5.60.0",
+          "locator": {
+            "path": "catalogs/us-equities/data-research.json",
+            "line": 160,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        }
+      ],
+      "drift": [
+        "Winner/install-plan historical5.58.0 differs from run5.61.1",
+        "Component manifest and accepted SEC recipe5.60.0 differ from run5.61.1; recipe is a distinct historical scope",
+        "5.62 screen is pending, not evidence of completed adoption"
+      ],
+      "proposed_run_pin_source": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-commit.log",
+        "line": 1
+      },
+      "wheel_module_binding_source": [
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+          "line": 4
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "component_id": "data-exchange-calendars",
+      "repository": "https://github.com/gerrymanoim/exchange_calendars",
+      "proposed_run_pin": {
+        "version": "4.13.2",
+        "commit": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a"
+      },
+      "reason": "Retain the current locked run identity; historical verdict pins are not relabelled. This is preparation only, not an upgrade/default/FINAL admission.",
+      "sources": [
+        {
+          "kind": "final_stack_winner",
+          "value": "4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+          "locator": {
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 9651,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "final_stack_run",
+          "value": "4.13.2",
+          "pointer": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/38",
+          "locator": {
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 10664,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "component_manifest",
+          "value": "4.13.2",
+          "commit": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+          "locator": {
+            "path": "manifests/stack.json",
+            "line": 1571,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          },
+          "commit_locator": {
+            "path": "manifests/stack.json",
+            "line": 1574,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "clean_install_plan",
+          "value": "4.13.2",
+          "locator": {
+            "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+            "line": 590,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "runtime_lock",
+          "value": "4.13.2",
+          "locator": {
+            "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+            "line": 603,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        {
+          "kind": "existing_host_package_metadata",
+          "value": "4.13.2",
+          "method": "Read-only importlib.metadata.version via an existing private isolated interpreter; no service/credential access.",
+          "value_status": "OBSERVED_NATIVE_MASKED_CAPTURE_PRIVATE_REPRODUCTION_PASSED",
+          "locator": {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.log",
+            "line": 1
+          },
+          "exit_code_locator": {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.json",
+            "line": 18
+          }
+        },
+        {
+          "kind": "last_committed_evidence",
+          "value": "Historical offline 2016-2027 comparison; one boundary-methodology disagreement.",
+          "locator": {
+            "path": "evidence/artifacts/gap-resolution-20260922/market-data-reference/xnys-multiyear-holiday-check.json",
+            "line": 24,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          },
+          "scope": "Historical source result only; not a fresh E2E or independently re-certified latest evidence.",
+          "version_locator": {
+            "path": "evidence/artifacts/gap-resolution-20260922/market-data-reference/xnys-multiyear-holiday-check.json",
+            "line": 20,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          },
+          "exit_code_locator": {
+            "path": "evidence/artifacts/gap-resolution-20260922/market-data-reference/xnys-multiyear-holiday-check.json",
+            "line": 12,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        }
+      ],
+      "drift": []
+    }
+  ],
+  "unresolved_pin_tasks": [
+    "Resolve wider generated projections through the shared pin/admission gate chain; this PR does not rewrite historical verdicts or another lane runtime."
+  ],
+  "scope": "Each winner gets one proposed run pin; survivor pins remain their carried source-review commits, not adopted runtime pins.",
+  "citation_status": "Exact-value references at stated base; host observations and source bindings refer to fresh retained native captures. Co-op private reproduction passed for 16 captures and 32 derivatives."
+}

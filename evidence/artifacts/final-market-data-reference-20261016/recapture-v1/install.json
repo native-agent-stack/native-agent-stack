@@ -1,0 +1,47 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Native observed command output only; no source acquisition, comparative A6 or FINAL admission.",
+  "command": [
+    "<uv-0-12-22>",
+    "pip",
+    "install",
+    "--python",
+    "<scratch>/venv/bin/python",
+    "edgartools==5.61.1",
+    "alpaca-py==0.44.0",
+    "exchange-calendars==4.13.2",
+    "pytest",
+    "pytest-cov",
+    "pytest-env",
+    "pytest-xdist",
+    "pytest-asyncio",
+    "pytest-retry",
+    "pytest-vcr",
+    "vcrpy>=8.3.0,<9",
+    "pytest-mock",
+    "freezegun==1.5.1",
+    "xlsxwriter",
+    "openpyxl"
+  ],
+  "cwd": "<scratch>",
+  "declared_inputs": {
+    "winner_pins": [
+      "edgartools==5.61.1",
+      "alpaca-py==0.44.0",
+      "exchange-calendars==4.13.2"
+    ]
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T06:20:27.789812+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "output": "install.log",
+  "output_sha256": "3bb77b1460ebef9a97e892e01c73625687f0aaf99679c8882241aba31fdab7b6",
+  "private_capture_name": "install",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T06:20:25.567514+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

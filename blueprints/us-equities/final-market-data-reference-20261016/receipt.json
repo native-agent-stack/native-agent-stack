@@ -1,0 +1,556 @@
+{
+  "schema": "final-market-data-reference-preparation-index/2",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "recorded_utc": "2026-10-16T06:18:03Z",
+  "evidence_class": "local_integration",
+  "native_commands": [
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-freeze.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-freeze.json",
+        "line": 16
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-install.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-install.json",
+        "line": 19
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.json",
+        "line": 14
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-arctic-venv.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-arctic-venv.json",
+        "line": 16
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-venv.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-venv.json",
+        "line": 19
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/dependency-check.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/dependency-check.json",
+        "line": 19
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-commit.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-commit.json",
+        "line": 19
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.json",
+        "line": 29
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.json",
+        "line": 18
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/install.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/install.json",
+        "line": 34
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/installed-freeze.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/installed-freeze.json",
+        "line": 19
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/masking-tests.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/masking-tests.json",
+        "line": 23
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.json",
+        "line": 17
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke.json",
+        "line": 17
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/recorder-tests.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/recorder-tests.json",
+        "line": 23
+      }
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.json",
+        "line": 30
+      }
+    }
+  ],
+  "upstream_inputs": [
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "README.md",
+      "bytes": 14765,
+      "sha256": "943bb25c120e0d4965e44f1baa5f3afb82423e5cf9b41155eae5901ca3877f57",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 1
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "CONTRIBUTING.md",
+      "bytes": 13578,
+      "sha256": "08908e1f93e1dc5cc2ecbc369cf323e84d9fc1508e10c6ca88a837898efa9d56",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 2
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "pyproject.toml",
+      "bytes": 17550,
+      "sha256": "3e38e21afd09b0c3e9952b88541a723aaa06a00477c8a93c82266749be82857a",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 3
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "edgar/__about__.py",
+      "bytes": 131,
+      "sha256": "75c8168c47f828a9655c4a294ed7ed32f18732d6f1e57073042cbecc362af1ca",
+      "installed_wheel_bytes_match": true,
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 4
+      },
+      "installed_wheel_capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 12
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "edgar/sgml/sgml_header.py",
+      "bytes": 48662,
+      "sha256": "b54fff3ab146a0fec7fc58ad8360ceccfe017983e97b91f68860bb88452343c0",
+      "installed_wheel_bytes_match": true,
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 5
+      },
+      "installed_wheel_capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 13
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "edgar/ownership/owners.py",
+      "bytes": 5707,
+      "sha256": "bc12963b0933cdb7d1510f5df2dc6540093089e82824b49a96b2d217d843b308",
+      "installed_wheel_bytes_match": true,
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 6
+      },
+      "installed_wheel_capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 14
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "tests/_offline_harness.py",
+      "bytes": 7054,
+      "sha256": "2493d71e5a9dbdcd3e9974692179d18f1fda99283a39dd94868334c6fadc70fd",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 7
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "tests/sgml/test_filing_header.py",
+      "bytes": 21715,
+      "sha256": "2bda87686624b5631e0ec13c247812132cc0943891a01021354b9c763e05d6d5",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 8
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "tests/ownership/test_insider_parse_contract.py",
+      "bytes": 6432,
+      "sha256": "05620ff88aa3eb7589a5f86490897e6b7a80c38f04b8afcec7be0b553ec162b4",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 9
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "tests/documents/test_html_style_parser.py",
+      "bytes": 6404,
+      "sha256": "267230424ca6cef4c693cc5b607be641cf96ef9951df4e00e26af17877b040ba",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 10
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "data/secheader.424B5.abeona.txt",
+      "bytes": 1135,
+      "sha256": "420ae1977a1664fbf7d3c9d25cc577c7a7197048b21332b5292abb13a6a71396",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 11
+      }
+    }
+  ],
+  "public_release_observation": {
+    "status": "UNQUALIFIED_SOURCE_OBSERVATION_NOT_A_NATIVE_CAPTURE",
+    "note": "Earlier release-API lookup lacked privately retained raw capture. The run-pin proposal does not rely on this as a native receipt."
+  },
+  "outputs": [
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/lane-packet.json",
+      "bytes": 27280,
+      "sha256": "59c1b6ddca1e53299006e93decfb6e755ce83bd33de2c8e557fdf677de082309"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-freeze.json",
+      "bytes": 1061,
+      "sha256": "28638088ae6bd4c1eb6ec10643afe12a046d50e472b5e4971d7393f87ff27fc9"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-freeze.log",
+      "bytes": 237,
+      "sha256": "3985cdee50a761bdff06d48c08fc2f49cbbe986b6cf8eb79edfa11c8f1e12981"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-install.json",
+      "bytes": 1122,
+      "sha256": "dd07a210895d6e5af7291759ee4b8dcbe163fd6b38445c1895de497809d5df3a"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-install.log",
+      "bytes": 463,
+      "sha256": "86b3f85915c2bfb47d49d4b50f58df2d9c0b4b793423777012aa44298b025fcd"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.json",
+      "bytes": 1203,
+      "sha256": "f762e8309338e5bb57ab34891abedbfde316f170ed6444badb51db97b91aefe5"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
+      "bytes": 1023,
+      "sha256": "895b566f5e6ad1ae3f156a6738f68851dea320bf466efeffe48cd02988007c3b"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-arctic-venv.json",
+      "bytes": 1061,
+      "sha256": "e975b7f54359bf36098abcd8a8bfc9c2171c9ff930fea536f9af362d38b5fb57"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-arctic-venv.log",
+      "bytes": 66,
+      "sha256": "131b932703542cd9ad1d7547b49d3fb3728f18bf6b9d35069e6785b3186d19c4"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-venv.json",
+      "bytes": 1074,
+      "sha256": "04e99068063e9d0b18b78843d25b28d08a6b943ac1d2d724030bd96500bc8049"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-venv.log",
+      "bytes": 179,
+      "sha256": "ea266639a24dc474e6483f152086236119223aa91cb4759637ecd2a600da3b2e"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/dependency-check.json",
+      "bytes": 1093,
+      "sha256": "702c4d558d8072898d353abfd76762e20657c0e2776549c34d172c733a02f396"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/dependency-check.log",
+      "bytes": 106,
+      "sha256": "fd59bf15ff34f8657883d30df510bb0ba3828ffe012fb3fa0ba0c6fbc37765ef"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-commit.json",
+      "bytes": 1090,
+      "sha256": "c43523992db146e1f23bcccffa71fd8387095abbe56392aa1ac20bd450913612"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-commit.log",
+      "bytes": 41,
+      "sha256": "40e8707e0fce0639f4b279933e67edd474b30c42fbe6a44c4a37ff686341efe7"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.json",
+      "bytes": 1835,
+      "sha256": "20bc73738c64393c344f1f8bbf0c252d774e7b3d5de70e040aff4cf3a8050739"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+      "bytes": 1617,
+      "sha256": "d6dc115080c26747158355827782c4080fec4413455b13e00cc43ec41849cff2"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.json",
+      "bytes": 1208,
+      "sha256": "99700de4fa14110bc387f40f66a67c795bb28120641ed2ec63102ce2bc280df8"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.log",
+      "bytes": 80,
+      "sha256": "6e6fbe3eba3fbb52ca067b8a189875a3031b46ffc4a630d1d866a882228f4ae1"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/install.json",
+      "bytes": 1392,
+      "sha256": "8c410514b28458c503e4a852818548c65a3a71d48de0c8eacbbc9891357e767a"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/install.log",
+      "bytes": 2103,
+      "sha256": "3bb77b1460ebef9a97e892e01c73625687f0aaf99679c8882241aba31fdab7b6"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/installed-freeze.json",
+      "bytes": 1094,
+      "sha256": "eae80c8d48b5ba1e116a207cde6f8122ec63cdab3d95053cab3b8fe26faceb48"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/installed-freeze.log",
+      "bytes": 1377,
+      "sha256": "4d421b500875687d472dcde44827a59beabc696c1708460feb41f0a7a25e98e1"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/masking-tests.json",
+      "bytes": 1198,
+      "sha256": "d9e27857d9cb1be3438f80c2652140fbf03bc7b0000fad52e08a02b45c61f3ff"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/masking-tests.log",
+      "bytes": 770,
+      "sha256": "ecc47d0e5a0c0b4151c85adcf12f35ce2b9674a0c8761d95ac600f65e12ae393"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.json",
+      "bytes": 1249,
+      "sha256": "040d1e68652bb83033d9286f4db35680e997a6345ba4e0801360c2992da68ad7"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
+      "bytes": 406,
+      "sha256": "a0ba7cfaeb46991b472c565db047685c81a54df9232c1c91bd995566e2cb5df7"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke.json",
+      "bytes": 1237,
+      "sha256": "0126bf261f6f5c5ab7e0c85150409cbf91d106baae5b618f7b44d0deff0acf41"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke.log",
+      "bytes": 406,
+      "sha256": "ad8be9f465aab31cc0840a07e0c589935d78b3d69aebe5fb515c0016a2e08355"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/recorder-tests.json",
+      "bytes": 1202,
+      "sha256": "8cb8a9ce7228e7b413a7bc68ad066eb174fb80f4eccfa7656ea511da67dacc3b"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/recorder-tests.log",
+      "bytes": 440,
+      "sha256": "01ac626eb1a45bb1a7974c739e7dd461905c23be2c3014f40dc97464dbb35e23"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.json",
+      "bytes": 1372,
+      "sha256": "3497c4d294472fb8ed6a8ef2bdf90f11bf7366009e94a428283f7671cdfb8d21"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.log",
+      "bytes": 1439,
+      "sha256": "4b72d3fa2c05fdc729e7f8dbdacebe2830a7129cd18527a45db8959b9ac0a7dc"
+    }
+  ],
+  "upstream_test_scope": {
+    "passed": 29,
+    "network_marked_deselected": 10,
+    "warnings": 4,
+    "full_upstream_suite": false,
+    "command_expands_upstream_hatch_script": "pyproject.toml:253",
+    "environment_override": "-o env= suppresses upstream contact identity injection; upstream socket/DNS blocking plugin remains active",
+    "no_credential_or_SEC_call": true,
+    "sources": [
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.log",
+        "line": 24
+      }
+    ]
+  },
+  "invoke_scope": {
+    "edgartools": "Native SDK returned acceptance datetime for pinned public fixture; not historical availability qualification.",
+    "alpaca-py": "Native StockBarsRequest object returned offline, no client.",
+    "exchange-calendars": "Native XNYS is_session and session_close return values printed.",
+    "arcticdb": "Separate 6.26.0 native local-LMDB dataframe return/roundtrip on explicitly synthetic input.",
+    "comparative": false,
+    "production_usage": false,
+    "source": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
+      "line": 4
+    },
+    "arctic_source": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
+      "line": 16
+    }
+  },
+  "named_gaps": [
+    "Vendor acquisition E2E requires authorized identity/key and licensed as-known data; none used",
+    "Alpaca and calendar bounded invokes are not full upstream E2E in this wave",
+    "Dependency versions were freshly resolved then frozen; install is not a hash-locked runtime migration",
+    "Existing acceptance timestamps are native wall clocks; no historical SEC availability conclusion follows",
+    "No matched survivor comparison; A6 NOT_RUN, no superiority or FINAL claim.",
+    "Upstream full suites remain outside bounded credential-free tests; SDK return-value invokes are diagnostics, not upstream CLI tests."
+  ],
+  "setup_failures": [
+    {
+      "stage": "upstream checkout before asynchronous clone completed",
+      "exit_code": 128,
+      "resolution": "waited for clone completion then checked out exact commit successfully"
+    },
+    {
+      "stage": "first install launcher used unavailable uv path",
+      "process_exit_code": 1,
+      "exception": "FileNotFoundError",
+      "resolution": "queried mise which uv, reran via installed uv0.12.22; final vendor package install exit0"
+    }
+  ],
+  "packet_generation": {
+    "command": [
+      "python3",
+      "tools/sota-convergence/lane_packets.py",
+      "--root",
+      ".",
+      "--out",
+      "<packet-scratch>",
+      "--catalog",
+      "us-equities",
+      "--manifest",
+      "catalogs/sota-convergence/manifest-20260926.json",
+      "--registered-receipts",
+      "--checked-at",
+      "2026-10-16"
+    ],
+    "exit_code": 0,
+    "generator_catalog_packets": 12,
+    "retained_layer_packets": 1,
+    "candidate_scope": "Historical packet includes16candidates; this draft adjudicates only3winners and4carried survivors; other entries are context, not new trials"
+  },
+  "hash_scope": "Only public upstream sources or published sanitized artifact bytes; no hash of raw unpublished host-bearing output, identity or private coordination record.",
+  "status": "PREPARATION_PRIVATE_REPRODUCTION_PASSED",
+  "publication_status": "READY_FOR_ONE_PR_AND_COOP_FAMILY_READS",
+  "recorded_utc_scope": "Tool-clock observation at recapture start; each command retains its own recorder timestamps.",
+  "masked_capture_contract": {
+    "classification": "All recapture-v1 JSON/log pairs are deterministic masked derivatives of privately retained recorder metadata/native merged output.",
+    "originals": "Private capture directories named in each command receipt; directory location shared with co-op outside the public repository.",
+    "command_placeholders": "Marked tokens refer to the private exact argv/cwd in receipt.raw.json.",
+    "masker": "blueprints/us-equities/final-market-data-reference-20261016/mask_capture.py",
+    "tests": [
+      "blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py",
+      "blueprints/us-equities/final-market-data-reference-20261016/test_native_capture.py"
+    ],
+    "reproduction_status": "COOP_PRIVATE_CHECK_PASS_2026-10-16_16_CAPTURES_32_DERIVATIVES",
+    "no_private_raw_digest_published": true
+  },
+  "retired_capture_disposition": {
+    "prior_commands": 10,
+    "status": "EXCLUDED_FROM_PUBLICATION",
+    "reason": "capture not retained; re-capture pending was resolved by fresh native runs, never by reconstruction or relabelling.",
+    "originals_retained": false,
+    "retired_derivatives": "Kept outside the repository as unqualified historical observations; none is included as a receipt."
+  },
+  "recorder_tests": {
+    "masking": 5,
+    "custody": 2,
+    "scope": "Synthetic regression fixtures for output retention and masking, not component E2E or market data.",
+    "sources": [
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/masking-tests.log",
+        "line": 8
+      },
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/recorder-tests.log",
+        "line": 5
+      }
+    ]
+  }
+}

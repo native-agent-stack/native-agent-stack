@@ -1,0 +1,29 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Native observed command output only; no source acquisition, comparative A6 or FINAL admission.",
+  "command": [
+    "<uv-0-12-22>",
+    "pip",
+    "freeze",
+    "--python",
+    "<scratch>/arctic-venv/bin/python"
+  ],
+  "cwd": "<scratch>",
+  "declared_inputs": {
+    "arcticdb": "6.26.0",
+    "commit": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T06:21:24.292270+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "output": "arctic-freeze.log",
+  "output_sha256": "3985cdee50a761bdff06d48c08fc2f49cbbe986b6cf8eb79edfa11c8f1e12981",
+  "private_capture_name": "arctic-freeze",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T06:21:24.277402+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

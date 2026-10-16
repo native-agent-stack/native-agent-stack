@@ -23082,6 +23082,171 @@
       "bytes": 167
     },
     {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/lane-packet.json",
+      "sha256": "59c1b6ddca1e53299006e93decfb6e755ce83bd33de2c8e557fdf677de082309",
+      "bytes": 27280
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-freeze.json",
+      "sha256": "28638088ae6bd4c1eb6ec10643afe12a046d50e472b5e4971d7393f87ff27fc9",
+      "bytes": 1061
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-freeze.log",
+      "sha256": "3985cdee50a761bdff06d48c08fc2f49cbbe986b6cf8eb79edfa11c8f1e12981",
+      "bytes": 237
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-install.json",
+      "sha256": "dd07a210895d6e5af7291759ee4b8dcbe163fd6b38445c1895de497809d5df3a",
+      "bytes": 1122
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-install.log",
+      "sha256": "86b3f85915c2bfb47d49d4b50f58df2d9c0b4b793423777012aa44298b025fcd",
+      "bytes": 463
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.json",
+      "sha256": "f762e8309338e5bb57ab34891abedbfde316f170ed6444badb51db97b91aefe5",
+      "bytes": 1203
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
+      "sha256": "895b566f5e6ad1ae3f156a6738f68851dea320bf466efeffe48cd02988007c3b",
+      "bytes": 1023
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-arctic-venv.json",
+      "sha256": "e975b7f54359bf36098abcd8a8bfc9c2171c9ff930fea536f9af362d38b5fb57",
+      "bytes": 1061
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-arctic-venv.log",
+      "sha256": "131b932703542cd9ad1d7547b49d3fb3728f18bf6b9d35069e6785b3186d19c4",
+      "bytes": 66
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-venv.json",
+      "sha256": "04e99068063e9d0b18b78843d25b28d08a6b943ac1d2d724030bd96500bc8049",
+      "bytes": 1074
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-venv.log",
+      "sha256": "ea266639a24dc474e6483f152086236119223aa91cb4759637ecd2a600da3b2e",
+      "bytes": 179
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/dependency-check.json",
+      "sha256": "702c4d558d8072898d353abfd76762e20657c0e2776549c34d172c733a02f396",
+      "bytes": 1093
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/dependency-check.log",
+      "sha256": "fd59bf15ff34f8657883d30df510bb0ba3828ffe012fb3fa0ba0c6fbc37765ef",
+      "bytes": 106
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-commit.json",
+      "sha256": "c43523992db146e1f23bcccffa71fd8387095abbe56392aa1ac20bd450913612",
+      "bytes": 1090
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-commit.log",
+      "sha256": "40e8707e0fce0639f4b279933e67edd474b30c42fbe6a44c4a37ff686341efe7",
+      "bytes": 41
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.json",
+      "sha256": "20bc73738c64393c344f1f8bbf0c252d774e7b3d5de70e040aff4cf3a8050739",
+      "bytes": 1835
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+      "sha256": "d6dc115080c26747158355827782c4080fec4413455b13e00cc43ec41849cff2",
+      "bytes": 1617
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.json",
+      "sha256": "99700de4fa14110bc387f40f66a67c795bb28120641ed2ec63102ce2bc280df8",
+      "bytes": 1208
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.log",
+      "sha256": "6e6fbe3eba3fbb52ca067b8a189875a3031b46ffc4a630d1d866a882228f4ae1",
+      "bytes": 80
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/install.json",
+      "sha256": "8c410514b28458c503e4a852818548c65a3a71d48de0c8eacbbc9891357e767a",
+      "bytes": 1392
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/install.log",
+      "sha256": "3bb77b1460ebef9a97e892e01c73625687f0aaf99679c8882241aba31fdab7b6",
+      "bytes": 2103
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/installed-freeze.json",
+      "sha256": "eae80c8d48b5ba1e116a207cde6f8122ec63cdab3d95053cab3b8fe26faceb48",
+      "bytes": 1094
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/installed-freeze.log",
+      "sha256": "4d421b500875687d472dcde44827a59beabc696c1708460feb41f0a7a25e98e1",
+      "bytes": 1377
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/masking-tests.json",
+      "sha256": "d9e27857d9cb1be3438f80c2652140fbf03bc7b0000fad52e08a02b45c61f3ff",
+      "bytes": 1198
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/masking-tests.log",
+      "sha256": "ecc47d0e5a0c0b4151c85adcf12f35ce2b9674a0c8761d95ac600f65e12ae393",
+      "bytes": 770
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.json",
+      "sha256": "040d1e68652bb83033d9286f4db35680e997a6345ba4e0801360c2992da68ad7",
+      "bytes": 1249
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
+      "sha256": "a0ba7cfaeb46991b472c565db047685c81a54df9232c1c91bd995566e2cb5df7",
+      "bytes": 406
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke.json",
+      "sha256": "0126bf261f6f5c5ab7e0c85150409cbf91d106baae5b618f7b44d0deff0acf41",
+      "bytes": 1237
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke.log",
+      "sha256": "ad8be9f465aab31cc0840a07e0c589935d78b3d69aebe5fb515c0016a2e08355",
+      "bytes": 406
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/recorder-tests.json",
+      "sha256": "8cb8a9ce7228e7b413a7bc68ad066eb174fb80f4eccfa7656ea511da67dacc3b",
+      "bytes": 1202
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/recorder-tests.log",
+      "sha256": "01ac626eb1a45bb1a7974c739e7dd461905c23be2c3014f40dc97464dbb35e23",
+      "bytes": 440
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.json",
+      "sha256": "3497c4d294472fb8ed6a8ef2bdf90f11bf7366009e94a428283f7671cdfb8d21",
+      "bytes": 1372
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.log",
+      "sha256": "4b72d3fa2c05fdc729e7f8dbdacebe2830a7129cd18527a45db8959b9ac0a7dc",
+      "bytes": 1439
+    },
+    {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
       "sha256": "ff34c3db7e67e4d96e9a1d0d154a0c7e8c01f42eade511302f963ad05a1d2c4c",
       "bytes": 6271

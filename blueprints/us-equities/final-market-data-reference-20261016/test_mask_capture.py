@@ -1,0 +1,56 @@
+"""Meaningful masking checks prepared locally; execution awaits pause release."""
+
+import unittest
+
+from mask_capture import mask_bytes
+
+
+class MaskCaptureTests(unittest.TestCase):
+    def test_preserves_all_unmapped_bytes_and_line_endings(self):
+        raw = b"\xff\x00 /private/scratch/file\r\npass  \n"
+        rules = [{"source": "/private/scratch", "placeholder": "<scratch>"}]
+        self.assertEqual(
+            mask_bytes(raw, rules), b"\xff\x00 <scratch>/file\r\npass  \n"
+        )
+
+    def test_longest_match_wins_independent_of_rule_order(self):
+        rules = [
+            {"source": "/private", "placeholder": "<private>"},
+            {"source": "/private/scratch", "placeholder": "<scratch>"},
+        ]
+        expected = b"<scratch>/f <private>/other"
+        raw = b"/private/scratch/f /private/other"
+        self.assertEqual(mask_bytes(raw, rules), expected)
+        self.assertEqual(mask_bytes(raw, list(reversed(rules))), expected)
+
+    def test_replacements_are_not_reprocessed(self):
+        rules = [
+            {"source": "original", "placeholder": "<scratch>"},
+            {"source": "scratch", "placeholder": "<other>"},
+        ]
+        self.assertEqual(mask_bytes(b"original scratch", rules), b"<scratch> <other>")
+
+    def test_no_rules_or_no_matches_leave_bytes_exact(self):
+        raw = b"unmatched\r\n\x80\t "
+        self.assertEqual(mask_bytes(raw, []), raw)
+        self.assertEqual(
+            mask_bytes(raw, [{"source": "elsewhere", "placeholder": "<private>"}]),
+            raw,
+        )
+
+    def test_rejects_ambiguous_or_unmarked_rules(self):
+        rule = {"source": "literal", "placeholder": "<private>"}
+        invalid = [
+            [rule, rule],
+            [{"source": "", "placeholder": "<private>"}],
+            [{"source": "literal", "placeholder": "unmarked"}],
+            [{"source": "literal", "placeholder": "<Private>"}],
+            [{"source": "literal", "placeholder": "<private>", "extra": "value"}],
+        ]
+        for rules in invalid:
+            with self.subTest(rules=rules), self.assertRaises(ValueError):
+                mask_bytes(b"literal", rules)
+
+
+if __name__ == "__main__":
+    unittest.main()
