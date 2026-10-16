@@ -43,5 +43,39 @@
       "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
     ]
   },
+  "review_micro_fold": {
+    "reviews": ["GPT-VERDICT-1a7917ff9.md", "MICRO-full-1a7917ff.md"],
+    "reviewed_commit": "1a7917ff95d9f1d2908c0bd0c3cbf213320fc6d1",
+    "before_existing_architecture_module": {
+      "tests": 8,
+      "failures": 2,
+      "errors": 0,
+      "cause": "Unclassified lock-source metadata refuses the real Architecture join and exact landscape coverage."
+    },
+    "before_added_controls": {
+      "tests": 13,
+      "failures": 6,
+      "errors": 0,
+      "skipped": 0,
+      "scope": "Architecture metadata/provenance classification and two run-source attribution controls fail before the corrections."
+    },
+    "after_before_regeneration": {
+      "tests": 31,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "scope": "Complete Architecture exclusion module, three fixture binding tests and 19 existing parser/precedence controls."
+    },
+    "after_regeneration": {
+      "command": "python3 -m unittest tests.test_local_pages_architecture_landscape_exclusions tests.test_nautilus_run_pin tests.test_final_stack.PinTests tests.test_final_stack.RunTests",
+      "tests": 32,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "scope": "Complete Architecture exclusion module, all four binding tests including the real generated run, and 19 existing parser/precedence controls."
+    },
+    "deferred": "Authentication of an otherwise well-formed wrong source commit belongs to the separate PIN-RULES work."
+  },
   "boundary": "No E2E, invoke receipt, broker operation, installation or FINAL admission; all fixture mutations stay in temporary roots."
 }

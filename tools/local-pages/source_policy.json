@@ -21559,6 +21559,11 @@
       "root": "repo",
       "path": "catalogs/landscape/final-stack.json",
       "reason": "A derived manifest that would duplicate the source layer records as a supplement. Both supplement globs skip it; the Foundation and North-star layer pages read it only through the dedicated architecture_final_stack role."
+    },
+    {
+      "root": "repo",
+      "path": "catalogs/landscape/lockfile-source-identities.json",
+      "reason": "Exact lock-entry source identity metadata with no layers, rows, candidates or components collection; final_stack.py consumes its bindings, while the Architecture supplement projection has no layer record to attach."
     }
   ],
   "architecture_derivation_sources": [
@@ -21623,6 +21628,13 @@
       "sha256": "bec35c4130522b9ac8169cc4b040ce87bc9ea3645f602aad9c07607745cfbadb",
       "pin": "4d6cee1582f024d27319ee005117da5f15ebe269",
       "scope": "Excluded from architecture_supplement: this derived manifest duplicates the canonical landscape layer records and is presented by landscape.html. Its classification was reviewed at this pin; regenerated output bytes remain bound separately by manifests/evidence.json. planned-layers.json remains a granted supplement."
+    },
+    {
+      "root": "repo",
+      "path": "catalogs/landscape/lockfile-source-identities.json",
+      "sha256": "61204af26d0da94eb3cc3292caca0fd39e7c4625395ce6cf2d1ebc7e5223de80",
+      "pin": "1a7917ff95d9f1d2908c0bd0c3cbf213320fc6d1",
+      "scope": "Excluded from architecture_supplement: the published metadata at this pin has schema_version, lockfile and bindings, with no projected layer or candidate collection. Its binding supplies the final-stack run source identity only; current bytes remain registered separately in manifests/evidence.json. No read grant is added."
     }
   ],
   "overview": {

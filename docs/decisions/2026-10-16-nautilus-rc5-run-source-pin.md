@@ -45,7 +45,7 @@ display becomes `2.0.0rc5; source 1b0a49d2792a9432a3aca3fcb617ce7a630d905e`.
 No installer version, source precedence or FINAL admission rule changes.
 
 The reused parser and receipt-binding mechanisms are
-`scripts/final_stack.py:127-129,325-346` and `complete_final_pin` at the base;
+`scripts/final_stack.py:127-129,324-344` and `complete_final_pin` at the base;
 the original #1058 contract is pinned at
 `252babe4040e39173cc178317c67699371806df6`, lines 127-129 and 706-721.
 Adding an exact source supplement fills metadata absent from the registry lock
@@ -77,3 +77,32 @@ The base-trusted verdict gate must pass without a bypass before this narrowed
 PR opens. Publication validation establishes repository integrity; it does not
 establish native acceptance at this source or settle any comparison dimension.
 Reopen this binding only on retained evidence of a changed tag or lock identity.
+
+## Review micro-fold
+
+The full reads `GPT-VERDICT-1a7917ff9.md` and `MICRO-full-1a7917ff.md` identify
+one missed publication consumer and inexpensive provenance corrections. At
+reviewed pin `1a7917ff95d9f1d2908c0bd0c3cbf213320fc6d1`,
+`tools/local-pages/source_policy.py:284-309` already supports exact, reasoned
+landscape supplement exclusions before byte access. The new lock identity file
+contains metadata rather than a projected layer collection, so the policy now
+excludes that exact path and records its published classification provenance.
+No new Architecture read grant or consumer rule is added.
+
+The original Architecture exclusion module reproduced two failures in eight
+tests. Adding the new metadata/provenance and run-source assertions before
+correction produced six failures in 13 tests. The existing real catalog join
+and fail-closed controls remain active. Retained controls distinguish this
+micro-fold from the original four-test binding correction.
+
+An accepted run's source now points to its supplement binding; that binding's
+source points to the unchanged lock entry. The run definitions name both inputs.
+The unread `tag_ref` and `resolution_ref` fields are removed; the independently
+recorded tag command/output remains source evidence. An unused repository
+fallback is removed because the stack already supplies Nautilus's repository.
+The base parser citation is corrected to lines 324-344.
+
+A well-formed but incorrect commit in a supplement is not authenticated against
+the upstream tag by this reader. The review's wrong-commit guard is deferred to
+the separate PIN-RULES work, alongside the remaining source-identity batch; this
+micro-fold does not claim that guard. No FINAL admission rule changes.

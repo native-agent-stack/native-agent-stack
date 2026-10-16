@@ -45,6 +45,7 @@ class NautilusRunPinTests(fixtures.FixtureTestCase):
         after = final_stack.build_runs([self.record(root)])[0]
         self.assertTrue(final_stack.complete_final_pin(receipt_pin, after))
         self.assertEqual(after["pin"], receipt_pin)
+        self.assertEqual(after["source"], SUPPLEMENT + "#/bindings/0")
 
     def test_version_artifact_repository_package_or_commit_mismatch_is_unparsed(self):
         for field, wrong in [("version", "2.0.0rc6"), ("artifact_sha256", ["sha256:" + "b" * 64]),
@@ -66,6 +67,7 @@ class NautilusRunPinTests(fixtures.FixtureTestCase):
         document = json.loads((ROOT / final_stack.OUTPUT).read_text())
         run = next(row for row in document["runs"] if row["id"] == "nautilus-trader")
         self.assertEqual(run["pin"], "2.0.0rc5; source " + COMMIT)
+        self.assertEqual(run["source"], SUPPLEMENT + "#/bindings/0")
         self.assertTrue(final_stack.complete_final_pin(COMMIT, run))
         self.assertFalse(final_stack.complete_final_pin("f" * 40, run))
 

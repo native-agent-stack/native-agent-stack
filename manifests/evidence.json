@@ -17608,8 +17608,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "c0192f2e9f8c51d1a890be1d5bf7e264833b287c31dcfb7bfa54937ad272a572",
-      "bytes": 339109
+      "sha256": "d1bf813f10095b096b9f3eb90d7376286ef8d7679d03f8634d2f7b73286c54ba",
+      "bytes": 339603
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -17683,8 +17683,8 @@
     },
     {
       "path": "catalogs/landscape/lockfile-source-identities.json",
-      "sha256": "61204af26d0da94eb3cc3292caca0fd39e7c4625395ce6cf2d1ebc7e5223de80",
-      "bytes": 1008
+      "sha256": "a25a267f8c87fd435297cdc5e9290e2fee5d2bcf4eb5980d52524bfa8fbc4da5",
+      "bytes": 876
     },
     {
       "path": "catalogs/landscape/manifest.json",
@@ -19343,8 +19343,8 @@
     },
     {
       "path": "docs/decisions/2026-10-16-nautilus-rc5-run-source-pin.md",
-      "sha256": "796d0194b72cf824b26dbbbf4ddceefb2f51c0f575764078c60e15dbe1b40a27",
-      "bytes": 4531
+      "sha256": "a2ceae122b37a9df4c9fb53a53f3bf4a1eb188cc51a60a4c564cf857d4a25014",
+      "bytes": 6261
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -43223,8 +43223,8 @@
     },
     {
       "path": "evidence/artifacts/nautilus-run-pin-20261016/controls.json",
-      "sha256": "377cfe2369d5277c98b42c96a09f56ffbba0a178b5c20875e46dd68f46b1587c",
-      "bytes": 1764
+      "sha256": "b848031405b6913a592751fbc0526604485bcd9ae876a7427f6167f054aa08aa",
+      "bytes": 3263
     },
     {
       "path": "evidence/artifacts/nautilus-run-pin-20261016/tag-resolution.json",
@@ -62508,8 +62508,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "df1fe84127b3bf3871f578eb73f56890d4d97379286081a8e1c12f82404f5736",
-      "bytes": 83545
+      "sha256": "4223d05642a5c6952dd6843010b474ad74ec4f7dd33b6e73321bd2d7982b3e12",
+      "bytes": 84061
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -63888,8 +63888,8 @@
     },
     {
       "path": "tests/test_local_pages_architecture_landscape_exclusions.py",
-      "sha256": "8e81ced59b9da8c72a9e3f62cba579713d940c0155a1f8772c74b4c7f6b91f21",
-      "bytes": 13218
+      "sha256": "471bba2c86e1e86f61e5fc81385de8e8d514f9180033b0d061a54d2ec7c1f202",
+      "bytes": 14126
     },
     {
       "path": "tests/test_local_pages_architecture_manifest.py",
@@ -64103,8 +64103,8 @@
     },
     {
       "path": "tests/test_nautilus_run_pin.py",
-      "sha256": "e192ef634053f77916a1f3f4c938bc3f8f1372576a8b0519b6eb07396d59657a",
-      "bytes": 3530
+      "sha256": "15c5da41f7be197dd826ea54281813742c3d446f9503bad3a5908f534ac8543a",
+      "bytes": 3670
     },
     {
       "path": "tests/test_new_host_grand_list.py",
@@ -65128,8 +65128,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "c14f88d5e3ffed65da4450b69c232651a24edc08b4bc262b3f40506ad4be5c73",
-      "bytes": 763877
+      "sha256": "173656f32c874d30c85f7240ce8f5be8a9151f67cc771678348b691dafa53ae7",
+      "bytes": 764798
     },
     {
       "path": "tools/muse_file_fence.py",
