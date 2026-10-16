@@ -1,0 +1,95 @@
+{
+  "schema": 2,
+  "repo": {
+    "default_branch": "main"
+  },
+  "collected": {
+    "ci": false,
+    "summary": false
+  },
+  "items": [
+    {
+      "branch": "main",
+      "head": {
+        "sha": "eb5e13812c41a56113bd4164ee855d026aacb498",
+        "short_sha": "eb5e138",
+        "subject": "synthetic worker ownership fixture",
+        "committed_at": "2026-10-16T05:09:41Z"
+      },
+      "worktree": {
+        "path": "$SCRATCH/worktrunk/work/fixture",
+        "main": true,
+        "current": true,
+        "previous": true,
+        "detached": false,
+        "branch_mismatch": false,
+        "duplicate_branch": false,
+        "changes": {
+          "staged": false,
+          "modified": false,
+          "untracked": false,
+          "renamed": false,
+          "deleted": false,
+          "conflicted": false,
+          "diff": {
+            "added": 0,
+            "deleted": 0
+          }
+        }
+      },
+      "display": {
+        "state": "is_main",
+        "symbols": "^",
+        "statusline": "main  \u001b[2m^\u001b[22m"
+      }
+    },
+    {
+      "branch": "owned-worker",
+      "head": {
+        "sha": "eb5e13812c41a56113bd4164ee855d026aacb498",
+        "short_sha": "eb5e138",
+        "subject": "synthetic worker ownership fixture",
+        "committed_at": "2026-10-16T05:09:41Z"
+      },
+      "worktree": {
+        "path": "$SCRATCH/worktrunk/work/fixture.owned-worker",
+        "main": false,
+        "current": false,
+        "previous": false,
+        "detached": false,
+        "branch_mismatch": false,
+        "duplicate_branch": false,
+        "changes": {
+          "staged": false,
+          "modified": false,
+          "untracked": false,
+          "renamed": false,
+          "deleted": false,
+          "conflicted": false,
+          "diff": {
+            "added": 0,
+            "deleted": 0
+          }
+        }
+      },
+      "default_branch": {
+        "ahead": 0,
+        "behind": 0,
+        "diff": {
+          "added": 0,
+          "deleted": 0
+        },
+        "orphan": false,
+        "integration": {
+          "reason": "same_commit"
+        },
+        "merge_conflicts": false
+      },
+      "display": {
+        "state": "empty",
+        "symbols": "_",
+        "statusline": "owned-worker  \u001b[2m_\u001b[22m"
+      }
+    }
+  ]
+}

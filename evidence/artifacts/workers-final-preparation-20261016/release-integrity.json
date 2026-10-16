@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "kind": "public-release-integrity",
+  "evidence_class": "local_integration",
+  "claude_code": {
+    "version": "2.1.301",
+    "public_documentation_commit": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+    "internal_build_commit": "12a1baed117fbcc7e0695ab8aa6d2a4c6bd00cbb",
+    "manifest_url": "https://downloads.claude.ai/claude-code-releases/2.1.301/manifest.json",
+    "signature_url": "https://downloads.claude.ai/claude-code-releases/2.1.301/manifest.json.sig",
+    "signing_public_key_url": "https://downloads.claude.ai/keys/claude-code.asc",
+    "verified_public_key_fingerprint": "31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE",
+    "signature_command_exit_code": 0,
+    "platform": "linux-x64",
+    "published_binary": {
+      "binary": "claude",
+      "checksum": "bc1aad9982c7b59c7d889ff92595d61cf46e0a6eae074cb551d932a989bcd222",
+      "size": 267955384
+    },
+    "binary_match_output": "outputs/claude/010-verify.txt",
+    "boundary": "Public issue/documentation repository commit is distinct from the proprietary CLI build commit. No CLI source equivalence or vendor unit tests inferred."
+  },
+  "worktrunk": {
+    "version": "0.80.0",
+    "source_commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+    "archive_url": "https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-x86_64-unknown-linux-musl.tar.xz",
+    "checksum_url": "https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/sha256.sum",
+    "archive_sha256": "532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199",
+    "checksum_match_output": "outputs/worktrunk/008-verify.txt"
+  }
+}

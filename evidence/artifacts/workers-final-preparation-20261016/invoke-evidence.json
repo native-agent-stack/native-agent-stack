@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "kind": "bounded-native-invoke-evidence",
+  "records": [
+    {
+      "component_id": "claude-code",
+      "command": "env -i HOME=$SCRATCH/claude/work/isolated-state PATH=/usr/bin:/bin TMPDIR=$SCRATCH/claude/tmp $SCRATCH/claude/work/isolated-state/.local/bin/claude agents --json",
+      "exit_code": 0,
+      "started": "2026-10-16T05:10:13Z",
+      "ended": "2026-10-16T05:10:14Z",
+      "output": "outputs/claude/014-invoke.txt",
+      "output_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "output_transform": "ANSI escapes removed; isolated scratch root replaced with $SCRATCH and its synthetic work/home segment aliased as work/isolated-state before hashing. Digest binds the published derived output only; command paths use the same aliases.",
+      "scope": "Administrative agent-definition inventory, empty list; no delegated task and no model call.",
+      "evidence_class": "local_integration",
+      "adoption_now_task_window_complete": false
+    },
+    {
+      "component_id": "worktrunk",
+      "command": "env -i HOME=$SCRATCH/worktrunk/work/isolated-state PATH=/usr/bin:/bin XDG_CONFIG_HOME=$SCRATCH/worktrunk/work/config XDG_CACHE_HOME=$SCRATCH/worktrunk/work/cache GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 $SCRATCH/worktrunk/bin/wt list --format=json",
+      "exit_code": 0,
+      "started": "2026-10-16T05:09:41Z",
+      "ended": "2026-10-16T05:09:41Z",
+      "output": "outputs/worktrunk/017-invoke.txt",
+      "output_sha256": "7a453763f262d7f866344d481de5ffd348b5580442910b4ad0098d0e80399270",
+      "output_transform": "ANSI escapes removed; isolated scratch root replaced with $SCRATCH and its synthetic work/home segment aliased as work/isolated-state before hashing. Digest binds the published derived output only; command paths use the same aliases.",
+      "scope": "Native listing of the synthetic main and worker worktrees created by the preceding vendor quickstart command.",
+      "evidence_class": "local_integration",
+      "adoption_now_task_window_complete": false
+    }
+  ],
+  "gap": "No credentialed Claude worker invocation at 2.1.301 in an adoption-now task window; historical 2.1.278/2.1.296 evidence is not upgraded. Worktrunk current invocation is synthetic lifecycle evidence, not a measured normal-task adoption window."
+}
