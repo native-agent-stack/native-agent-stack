@@ -1,0 +1,30 @@
+           _                 _    
+  __ _  __| |_ __ __ _ _ __ | |_  
+ / _` |/ _` | '__/ _` | '_ \| __| 
+| (_| | (_| | | | (_| | | | | |_  
+ \__, |\__,_|_|  \__,_|_| |_|\__| 
+    |_|                           
+
+Version: 1.19.1, build: 6ab21cac
+Access web UI at http://localhost:6333/dashboard
+Agentic Skills: https://skills.qdrant.tech/
+
+2026-10-16T05:39:03.636246Z  WARN qdrant::settings: Config file not found: config/config
+2026-10-16T05:39:03.636271Z  WARN qdrant::settings: Config file not found: config/development
+2026-10-16T05:39:03.638624Z  INFO storage::content_manager::consensus::persistent: Initializing new raft state at /work/qdrant-offline/storage/raft_state.json
+2026-10-16T05:39:03.714241Z  INFO qdrant: Distributed mode disabled
+2026-10-16T05:39:03.714282Z  INFO qdrant: Telemetry reporting disabled
+2026-10-16T05:39:03.737778Z ERROR qdrant::startup: Panic backtrace: 
+   0: qdrant::startup::setup_panic_hook::{closure#0}
+   1: std::panicking::panic_with_hook
+   2: std::panicking::panic_handler::{closure#0}
+   3: std::sys::backtrace::__rust_end_short_backtrace::<std::panicking::panic_handler::{closure#0}, !>
+   4: __rustc::rust_begin_unwind
+   5: core::panicking::panic_fmt
+   6: core::result::unwrap_failed
+   7: <qdrant::common::inference::service::InferenceService>::init_global
+   8: qdrant::main
+   9: std::sys::backtrace::__rust_begin_short_backtrace::<fn() -> core::result::Result<(), anyhow::Error>, core::result::Result<(), anyhow::Error>>
+  10: main
+
+2026-10-16T05:39:03.737807Z ERROR qdrant::startup: Panic occurred in file src/common/inference/service.rs at line 104: Invalid timeout value for HTTP client: reqwest::Error { kind: Builder, source: General("No CA certificates were loaded from the system") }

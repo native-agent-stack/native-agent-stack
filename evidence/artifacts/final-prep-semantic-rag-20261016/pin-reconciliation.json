@@ -1,0 +1,593 @@
+{
+  "schema_version": 1,
+  "kind": "final_preparation_pin_reconciliation",
+  "catalog": "foundation",
+  "layer_id": "semantic-rag",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "recorded_at": "2026-10-16T05:49:00Z",
+  "status": "PROPOSAL; no operational run-pin/default change and no FINAL admission",
+  "plan_source": {
+    "kind": "repo",
+    "repository": "https://github.com/native-agent-stack/native-agent-stack",
+    "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+    "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+    "line": 146
+  },
+  "winners": [
+    {
+      "id": "socraticode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "proposed_run_pin": {
+        "version": "1.16.0",
+        "commit": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+        "tag": "v1.16.0"
+      },
+      "reason": "Version-specific qualification receipt already exists at this release; this preparation reproduces its upstream model-free unit path. No deployed cutover or full layer acceptance is inferred.",
+      "pin_sources": [
+        {
+          "role": "catalog verdict / final-stack winner",
+          "version": "1.14.0",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 7909
+          }
+        },
+        {
+          "role": "run pin",
+          "version": "1.15.0",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 11299
+          }
+        },
+        {
+          "role": "Linux adoption pin",
+          "version": "1.15.0",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "adoption/pins-linux-x86_64.json",
+            "line": 353
+          }
+        },
+        {
+          "role": "macOS adoption pin",
+          "version": "1.14.0",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "adoption/pins-macos-arm64.json",
+            "line": 208
+          }
+        },
+        {
+          "role": "stack manifest",
+          "version": "1.15.0",
+          "commit": "f6191f076a42405f0d5508139f3a8b505cfef93a",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "manifests/stack.json",
+            "line": 976
+          },
+          "commit_source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "manifests/stack.json",
+            "line": 1007
+          }
+        },
+        {
+          "role": "recipe",
+          "version": "1.15.0",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "recipes/README.md",
+            "line": 113
+          }
+        },
+        {
+          "role": "latest named version-specific qualification receipt",
+          "version": "1.16.0",
+          "commit": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/receipts/socraticode-1160-qualification-20260929.json",
+            "line": 31
+          },
+          "commit_source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/receipts/socraticode-1160-qualification-20260929.json",
+            "line": 33
+          }
+        },
+        {
+          "role": "frozen W6 comparison arm",
+          "commit": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
+            "line": 21
+          },
+          "commit_source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
+            "line": 21
+          }
+        }
+      ],
+      "installed_observation": {
+        "status": "NOT_ESTABLISHED",
+        "reason": "No accepted current-host metadata capture for the deployed SocratiCode prefix. The public adoption pin warns that --version starts MCP; the new evidence concerns isolated source tests only.",
+        "source": {
+          "kind": "repo",
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "adoption/pins-linux-x86_64.json",
+          "line": 361
+        },
+        "scratch_version": "1.16.0"
+      },
+      "reproducibility": {
+        "kind": "upstream_lock",
+        "source": {
+          "kind": "repo",
+          "repository": "https://github.com/giancarloerra/SocratiCode",
+          "pin": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+          "path": "package-lock.json",
+          "line": 1
+        },
+        "sha256": "b84a66a59bdb16876f5c628188e4c78e9baa78bc8f906f666d342b5a97e3520c",
+        "install_command": "npm ci --no-audit --no-fund",
+        "lock_unchanged": true,
+        "dependency_count": 425,
+        "node": "24.21.0",
+        "npm": "11.19.0",
+        "boundary": "npm ci locks the source test environment. The registry tarball/runtime/plugin dependency resolution is a different identity.",
+        "native_sources": [
+          "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-install.stdout:2",
+          "evidence/artifacts/final-prep-semantic-rag-20261016/captures/node-version.stdout:1",
+          "evidence/artifacts/final-prep-semantic-rag-20261016/captures/npm-version.stdout:1",
+          "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stdout:155"
+        ],
+        "source_pin_capture": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-pin.stdout:1",
+        "hash_capture": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/public-artifact-hashes.stdout:2"
+      },
+      "drift": [
+        "1.14.0 verdict/macOS versus 1.15.0 Linux run/recipe versus proposed/tested 1.16.0.",
+        "Frozen W6 comparison uses 2218f251; do not relabel the 3d3a4a4d unit result as that comparison's receipt."
+      ],
+      "promotion_prerequisites": [
+        "Reviewed run-pin/recipe amendment after native MCP retrieval, full-service recovery and both platform/profile contracts are qualified.",
+        "Keep the existing W6 comparison immutable; adjudicate or amend any target-pin mismatch through its protocol before scoring."
+      ]
+    },
+    {
+      "id": "qdrant",
+      "repository": "https://github.com/qdrant/qdrant",
+      "proposed_run_pin": {
+        "version": "1.19.1",
+        "commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+        "tag": "v1.19.1"
+      },
+      "reason": "Retain the existing operational and frozen-comparison version, while adding the full source identity omitted by runs[]. Newer release availability does not qualify migration.",
+      "pin_sources": [
+        {
+          "role": "catalog verdict / final-stack winner",
+          "version": "1.19.1",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 7931
+          }
+        },
+        {
+          "role": "run pin; only macOS adoption source in generated row",
+          "version": "1.19.1",
+          "commit": null,
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 11129
+          }
+        },
+        {
+          "role": "stack source pin",
+          "version": "1.19.1",
+          "commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "manifests/stack.json",
+            "line": 740
+          },
+          "commit_source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "manifests/stack.json",
+            "line": 765
+          }
+        },
+        {
+          "role": "macOS adoption pin",
+          "version": "1.19.1",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "adoption/pins-macos-arm64.json",
+            "line": 191
+          }
+        },
+        {
+          "role": "recipe and official asset digest",
+          "version": "1.19.1",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "recipes/README.md",
+            "line": 70
+          }
+        },
+        {
+          "role": "named version-bearing native receipt",
+          "version": "1.19.1",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
+            "line": 27
+          }
+        },
+        {
+          "role": "frozen W6 comparison arm",
+          "commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
+            "line": 34
+          },
+          "commit_source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
+            "line": 34
+          }
+        }
+      ],
+      "installed_observation": {
+        "status": "NOT_ESTABLISHED",
+        "reason": "No current-host deployment capture; the observation is the fresh scratch binary only.",
+        "scratch_version": "1.19.1",
+        "receipt": "native-checks.json"
+      },
+      "reproducibility": {
+        "kind": "official_binary_digest",
+        "asset": "qdrant-x86_64-unknown-linux-musl.tar.gz",
+        "bytes": 32315868,
+        "sha256": "70a40529e2ebe0a2787d574d3a2e28437cfe94f26f24fa419f6ac57b4ae817c9",
+        "source": {
+          "kind": "url",
+          "url": "https://api.github.com/repos/qdrant/qdrant/releases/tags/v1.19.1",
+          "read_at": "2026-10-16T05:24:37.223259+00:00"
+        },
+        "verification": "Official release digest matched the downloaded public asset; scratch native --version/help and two upstream offline integration files ran. The latter use synthetic/precomputed vectors, not model-backed retrieval.",
+        "hash_capture": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/public-artifact-hashes.stdout:1"
+      },
+      "drift": [
+        "Generated run pin has no commit; manifest supplies the full 1.19.1 source identity.",
+        "Generated run row lists only macOS platform provenance; scratch Linux CLI/integration results do not establish full Qdrant recovery/cluster E2E.",
+        "The earlier A1 packet screened newer 1.19.2 separately; that pin is not silently substituted here."
+      ],
+      "promotion_prerequisites": [
+        "Service-backed upstream tests and snapshot/query recovery in a disposable environment with a concrete data/port boundary."
+      ]
+    },
+    {
+      "id": "vllm",
+      "repository": "https://github.com/vllm-project/vllm",
+      "proposed_run_pin": {
+        "version": "0.31.0",
+        "commit": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+        "tag": "v0.31.0"
+      },
+      "reason": "The recorded replacement target and read-only installed distribution metadata agree on 0.31.0. The target is reproducible through a retained hash-bearing lock; installation/version does not qualify serving.",
+      "pin_sources": [
+        {
+          "role": "catalog verdict / final-stack winner",
+          "version": "0.25.0",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 7953
+          }
+        },
+        {
+          "role": "run pin",
+          "version": "0.30.0",
+          "commit": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 11381
+          },
+          "commit_source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 11383
+          }
+        },
+        {
+          "role": "stack manifest",
+          "version": "0.30.0",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "manifests/stack.json",
+            "line": 1043
+          }
+        },
+        {
+          "role": "current-base recipe (line 116, not the older relay's line 118)",
+          "version": "0.30.0",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "recipes/README.md",
+            "line": 116
+          }
+        },
+        {
+          "role": "version-specific switch receipt",
+          "version": "0.30.0",
+          "commit": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/receipts/vllm-030-switch-20260925.json",
+            "line": 21
+          },
+          "commit_source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/receipts/vllm-030-switch-20260925.json",
+            "line": 22
+          }
+        },
+        {
+          "role": "replacement target; explicitly not serving acceptance",
+          "version": "0.31.0",
+          "commit": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "docs/decisions/2026-10-06-one-host-tool-default.md",
+            "line": 19
+          },
+          "commit_source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "docs/decisions/2026-10-06-one-host-tool-default.md",
+            "line": 19
+          }
+        },
+        {
+          "role": "frozen W6 comparison arm",
+          "commit": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+          "source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
+            "line": 60
+          },
+          "commit_source": {
+            "kind": "repo",
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
+            "line": 60
+          }
+        }
+      ],
+      "installed_observation": {
+        "status": "METADATA_CONFIRMED",
+        "version": "0.31.0",
+        "command": "python -c 'import importlib.metadata; print(importlib.metadata.version(\"vllm\"))'",
+        "exit_code": 0,
+        "receipt": "native-checks.json",
+        "cli_probe": {
+          "command": "vllm --version",
+          "exit_code": 1,
+          "limitation": "No GPU devices are exposed in the sandbox; CLI constructs device configuration before printing version. Failed to infer device type is a sandbox-bound result, not a live-serving regression."
+        },
+        "receipt_sources": [
+          "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-metadata.stdout:1",
+          "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-version.stderr:31"
+        ]
+      },
+      "reproducibility": {
+        "kind": "hash-bearing dependency lock",
+        "lock": "vllm-0.31.0.requirements.lock",
+        "sha256": "cc7d568fd9368d0ba1090c4ff729daa7d3c96d23970c0d5b7c3a74faf074c05f",
+        "packages": 199,
+        "resolver": "uv 0.12.22",
+        "resolver_source": {
+          "kind": "repo",
+          "repository": "https://github.com/astral-sh/uv",
+          "pin": "70fe1196a546e49148a73b1c592b2f74c33af80e",
+          "path": "docs/pip/compile.md",
+          "line": 113
+        },
+        "python": "3.13",
+        "platform": "current Linux x86_64 wheel compatibility; not a universal or macOS lock",
+        "exclude_newer": "2026-10-16T05:15:55Z",
+        "index": "https://pypi.org/simple",
+        "installation_performed": false,
+        "qualified": false,
+        "qualification_date": null,
+        "qualification_rule": "Qualify this exact retained lock and publish the resulting qualification timestamp. The resolver cutoff is not a backdated qualification time.",
+        "proposed_recipe": [
+          "uv venv --python 3.13 <isolated-scratch>/vllm-0.31.0",
+          "uv pip sync --python <isolated-scratch>/vllm-0.31.0/bin/python --require-hashes vllm-0.31.0.requirements.lock"
+        ],
+        "boundary": "Recipe reconciliation is a proposal at one pin; the old executable recipe stays historical until promotion is supported. Hashes pin artifacts but do not prove hardware fit, serving correctness or equivalence to an earlier installation.",
+        "core_versions": {
+          "source": "evidence/artifacts/final-prep-semantic-rag-20261016/vllm-0.31.0.requirements.lock",
+          "vllm": "0.31.0",
+          "torch": "2.13.0",
+          "transformers": "5.17.0",
+          "flashinfer_python": "0.7.0.post1"
+        },
+        "hash_capture": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/public-artifact-hashes.stdout:3",
+        "resolver_version_capture": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/uv-version.stdout:1"
+      },
+      "drift": [
+        "0.25.0 verdict versus 0.30.0 run/manifest/recipe versus installed and proposed 0.31.0.",
+        "MEMRAG-INSTALL-STATUS-20261016.md reports 36 transitive versions differ across two 199-package installations with matching core versions. This lane did not reproduce that comparison and publishes no private freeze hash.",
+        "An earlier generic-platform compile failed before the byte-preserving recorder was introduced. No compliant raw capture is retained for that attempt; it is a named capture gap, not candidate evidence. The native-platform compile was recaptured and passed."
+      ],
+      "promotion_prerequisites": [
+        "C2 model arms not yet measured.",
+        "Exact lock + model revision + GPU allocation + isolated serving E2E and client-native invoke receipts.",
+        "Measured cross-install transitive equivalence or explicit acceptance of the new locked environment."
+      ]
+    }
+  ],
+  "embedder": {
+    "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+    "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+    "source": {
+      "kind": "repo",
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+      "path": "catalogs/landscape/foundation.json",
+      "line": 1750
+    },
+    "primary_card": {
+      "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16/raw/c0c9fea93ea424587517f2c59e20db9f1d6bf615/README.md",
+      "read_at": "2026-10-16T05:22:15.658899+00:00",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "line_count": 736,
+      "selected": [
+        {
+          "line": 2,
+          "text": "license: other"
+        },
+        {
+          "line": 10,
+          "text": "  - text-embeddings"
+        },
+        {
+          "line": 57,
+          "text": "**NVIDIA Nemotron 3 Embed**"
+        },
+        {
+          "line": 59,
+          "text": "<a href=\"https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16\">"
+        },
+        {
+          "line": 60,
+          "text": "  <img alt=\"Nemotron 3 Embed 1B BF16\" src=\"https://img.shields.io/badge/1B-BF16-76B900?style=for-the-badge&logo=nvidia&logoColor=white\">"
+        },
+        {
+          "line": 63,
+          "text": "<a href=\"https://huggingface.co/nvidia/Nemotron-3-Embed-1B-NVFP4\">"
+        },
+        {
+          "line": 64,
+          "text": "  <img alt=\"Nemotron 3 Embed 1B NVFP4\" src=\"https://img.shields.io/badge/1B-NVFP4-76B900?style=for-the-badge&logo=nvidia&logoColor=white\">"
+        },
+        {
+          "line": 67,
+          "text": "<a href=\"https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16\">"
+        },
+        {
+          "line": 68,
+          "text": "  <img alt=\"Nemotron 3 Embed 8B BF16\" src=\"https://img.shields.io/badge/8B-BF16-76B900?style=for-the-badge&logo=nvidia&logoColor=white\">"
+        },
+        {
+          "line": 78,
+          "text": "The model generates dense vector embeddings from multilingual text inputs, enabling retrieval, semantic search, and (agentic) RAG workflows. As a core component of text retrieval systems, an embedding model transforms text, such as questions or passages, into dense vector representations. These models are typically transformer encoders that process"
+        },
+        {
+          "line": 80,
+          "text": "Among models of comparable size, **Nemotron-3-Embed-1B-BF16** achieves state-of-the-art performance across multiple multilingual retrieval benchmarks. Read more details in our [Blog Post](https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb)."
+        },
+        {
+          "line": 101,
+          "text": "07/16/2026 via https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16"
+        },
+        {
+          "line": 110,
+          "text": "**Hidden Size:** 2048 <br>"
+        },
+        {
+          "line": 112,
+          "text": "The **Nemotron-3-Embed-1B-BF16** model is a transformer-based text embedding model trained with bidirectional attention masking, where the final embedding vector is obtained by applying average pooling to the transformer’s token-level representations. It encodes each input text into a dense embedding vector of dimension 2048. "
+        },
+        {
+          "line": 116,
+          "text": "The resulting 2B model was then distilled from the fine-tuned [Nemotron-3-Embed-8B-BF16](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16) embedding teacher model to recover accuracy. Distillation used combined cosine distance loss (COS) and mean squared error (MSE) loss on a multilingual, in-domain retrieval data blend. The same pruning-and-"
+        }
+      ]
+    },
+    "state": "Carried incumbent identity, not a new C2 model winner.",
+    "parameters_boundary": "Earlier 2048-dimensional/4096-token receipts do not qualify every new runtime, profile, model or corpus."
+  },
+  "gaps": [
+    "C2 model arms not yet measured",
+    "Full service E2E prohibited in this preparation; no live service connection",
+    "No new macOS arm64 native run",
+    "F1 proposals do not supersede operational or comparison pins without review",
+    "Ollama's survival/refutation split requires two-family adjudication"
+  ],
+  "private_coordination_records_named_only": [
+    "final-wave-layer-prep.brief-20261016.md",
+    "C2/PLAN.md",
+    "MEMRAG-INSTALL-STATUS-20261016.md"
+  ]
+}

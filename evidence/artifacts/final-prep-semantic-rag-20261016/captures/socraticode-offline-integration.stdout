@@ -1,0 +1,17 @@
+
+ RUN  v4.1.11 /work/socraticode
+
+ ✓ tests/integration/interrupted-resume-recovery.test.ts (4 tests) 24999ms
+     ✓ restores a file whose chunks were removed, via updateProjectIndex(), in the same collection  7347ms
+     ✓ restores a file whose chunks were removed, via indexProject(), in the same collection  7161ms
+     ✓ recovers from the original checkout when two worktrees share a project id  5598ms
+     ✓ leaves a healthy completed index alone  4853ms
+ ✓ tests/integration/partial-upsert-skip.test.ts (2 tests) 4378ms
+     ✓ stores the valid point, then throws naming the invalid one  1646ms
+     ✓ leaves the stored hash unadvanced so a later healthy run retries the file  1708ms
+
+ Test Files  2 passed (2)
+      Tests  6 passed (6)
+   Start at  05:40:49
+   Duration  31.20s (transform 752ms, setup 0ms, import 1.42s, tests 29.38s, environment 0ms)
+

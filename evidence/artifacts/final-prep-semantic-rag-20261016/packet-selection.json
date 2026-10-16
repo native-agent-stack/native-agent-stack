@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "kind": "lane_packet_delta_projection",
+  "catalog": "foundation",
+  "layer_id": "semantic-rag",
+  "read_at": "2026-10-16T05:27:02.884221+00:00",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "generator_command": "python3 tools/sota-convergence/lane_packets.py --root <current-main-worktree> --out <isolated-scratch>/lane-packets --catalog foundation --checked-at 2026-10-16 --manifest catalogs/sota-convergence/manifest-20261009.json --manifest-newcomers --registered-receipts",
+  "generator_exit_code": 0,
+  "generator_packet_count": 20,
+  "generator_limitation": "The CLI has a catalog filter, not a single-layer option. Only this layer was read and projected. Its older candidate join omits four carried survivors; final-stack plus the existing W6 arm list supply those exact carried identities. No candidates discovered.",
+  "generated_candidates": [
+    {
+      "key": "c1",
+      "component_id": "qdrant",
+      "name": "Qdrant",
+      "repository": "https://github.com/qdrant/qdrant",
+      "pin": "1.19.1",
+      "evidence_kind": "native_execution",
+      "recipe_ref": "recipes/README.md"
+    },
+    {
+      "key": "c7",
+      "component_id": "socraticode",
+      "name": "SocratiCode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "pin": "1.15.0",
+      "evidence_kind": "native_execution",
+      "recipe_ref": "recipes/README.md"
+    },
+    {
+      "key": "c8",
+      "component_id": "vllm",
+      "name": "vLLM",
+      "repository": "https://github.com/vllm-project/vllm",
+      "pin": "0.30.0",
+      "evidence_kind": "mixed",
+      "recipe_ref": "recipes/README.md"
+    }
+  ],
+  "excluded_non_delta_candidates": [
+    "https://github.com/deepset-ai/haystack",
+    "https://github.com/huggingface/huggingface_hub",
+    "https://github.com/pgvector/pgvector",
+    "https://github.com/kapillamba4/code-memory",
+    "https://github.com/lancedb/lancedb"
+  ],
+  "unmatched_not_added": [
+    "https://github.com/akitaonrails/ai-memory",
+    "https://github.com/restic/restic"
+  ],
+  "carried_survivors": [
+    {
+      "date": "2026-09-26",
+      "repository": "github.com/giancarloerra/socraticode",
+      "sweep_id": "landscape-sweep-20260926"
+    },
+    {
+      "date": "2026-09-29",
+      "repository": "github.com/lightonai/next-plaid",
+      "sweep_id": "landscape-sweep-20260929"
+    },
+    {
+      "date": "2026-09-29",
+      "repository": "github.com/minishlab/semble",
+      "sweep_id": "landscape-sweep-20260929"
+    },
+    {
+      "date": "2026-09-29",
+      "repository": "github.com/ollama/ollama",
+      "sweep_id": "landscape-sweep-20260929"
+    },
+    {
+      "date": "2026-09-26",
+      "repository": "github.com/osu-nlp-group/hipporag",
+      "sweep_id": "landscape-sweep-20260926"
+    }
+  ],
+  "frozen_comparison_arms": [
+    {
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+      "role_ids": [
+        "project_semantic_index",
+        "semantic_code_retrieval"
+      ],
+      "dependency": false
+    },
+    {
+      "repository": "https://github.com/qdrant/qdrant",
+      "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "role_ids": [
+        "vector_storage",
+        "multivector_semantic_index"
+      ],
+      "dependency": true
+    },
+    {
+      "repository": "https://github.com/vllm-project/vllm",
+      "pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+      "role_ids": [
+        "model_serving"
+      ],
+      "dependency": true
+    },
+    {
+      "repository": "https://github.com/ollama/ollama",
+      "pin": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
+      "role_ids": [
+        "model_serving"
+      ],
+      "dependency": true
+    },
+    {
+      "repository": "https://github.com/OSU-NLP-Group/HippoRAG",
+      "pin": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
+      "role_ids": [
+        "project_semantic_index",
+        "semantic_code_retrieval"
+      ],
+      "dependency": false
+    },
+    {
+      "repository": "https://github.com/lightonai/next-plaid",
+      "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+      "role_ids": [
+        "multivector_semantic_index",
+        "semantic_code_retrieval",
+        "project_semantic_index"
+      ],
+      "dependency": false
+    },
+    {
+      "repository": "https://github.com/minishlab/semble",
+      "pin": "0e5e02832ae0340c0feb637d2b7213fe065571fd",
+      "role_ids": [
+        "project_semantic_index",
+        "semantic_code_retrieval"
+      ],
+      "dependency": false
+    }
+  ],
+  "authority": "Known labels retained; not a blind packet. No old candidate is retired by omission from this bounded preparation."
+}

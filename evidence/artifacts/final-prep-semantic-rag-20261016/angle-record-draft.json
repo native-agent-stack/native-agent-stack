@@ -1,0 +1,680 @@
+{
+  "schema_version": 1,
+  "rule_version": "angle-convergence/2",
+  "catalog": "foundation",
+  "layer_id": "semantic-rag",
+  "weights": {
+    "A1": 0.2,
+    "A2": 0.2,
+    "A3": 0.15,
+    "A4": 0.15,
+    "A5": 0.2,
+    "A6": 0.1
+  },
+  "weights_stated_at": "2026-10-16T05:09:57Z",
+  "weight_reason": "Retain the protocol's default six-angle weights. Existing source screens and historical results were visible before this statement; no new comparison metric or post-hoc preregistration is asserted.",
+  "published_evaluations_available": true,
+  "disclosure": "Preparation draft only, outside catalogs/landscape/angles. Prior A1/history were visible. New source reads follow the weight statement. No model-backed comparative run or FINAL admission; model-free unit/CLI observations remain A1. C2/PLAN.md and MEMRAG-INSTALL-STATUS-20261016.md are named private coordination inputs without digests.",
+  "resolution_inputs": [
+    "catalogs/landscape/foundation.json",
+    "catalogs/landscape/final-stack.json",
+    "catalogs/sota-convergence/manifest-20261009.json",
+    "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
+    "evidence/artifacts/final-prep-semantic-rag-20261016/packet-selection.json",
+    "evidence/artifacts/final-prep-semantic-rag-20261016/pin-reconciliation.json"
+  ],
+  "gaps": [
+    "C2 model arms not yet measured",
+    "New-run-pin full E2E and native semantic retrieval invoke evidence missing",
+    "A3 community consensus and A4 net usage not re-surveyed in this delta",
+    "Ollama retained survival/refutation split requires two-family adjudication",
+    "SocratiCode proposed release and frozen comparison pins differ",
+    "Reported 36/199 transitive-package drift; generated lock has not been runtime-qualified",
+    "FINAL admission stays closed; this draft is not a freeze"
+  ],
+  "candidates": [
+    {
+      "id": "socraticode",
+      "name": "socraticode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "pin": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+      "role": "index/retrieval",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "Role-specific dependency qualification must not be ranked as a standalone end-to-end layer winner.",
+        "No new same-pin, same-corpus model-backed comparison occurred.",
+        "Earlier literal-search baseline used traversal-order ranking and many identifier-naming questions."
+      ],
+      "angles": {
+        "A1": {
+          "score": "0",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/giancarloerra/SocratiCode",
+              "pin": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+              "path": "README.md",
+              "line": 44
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json"
+            }
+          ],
+          "note": "Pinned upstream unit suite passes 2517 tests; two upstream integration files pass six tests against isolated Qdrant with synthetic/stub vectors. Real model-backed retrieval, client invocation and full recovery at this proposed run pin remain unqualified; no complete A1 admission."
+        },
+        "A2": {
+          "score": "+",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/giancarloerra/SocratiCode",
+              "pin": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+              "path": ".github/workflows/ci.yml",
+              "line": 39
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json"
+            }
+          ],
+          "note": "Pinned upstream lock and unit/release plus two offline integration checks reproduced; native masked stdout/stderr captures retain every byte except private-path tokens. Synthetic vector fixtures are not comparative model evidence."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No independent consensus evidence for the scoped requirement was verified in this delta. Stars and popularity are not used as evidence of fit."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No matched package/client net-usage measurement is retained here; install presence and existing receipts are not usage statistics."
+        },
+        "A5": {
+          "score": "0",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/giancarloerra/SocratiCode",
+              "pin": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+              "path": "README.md",
+              "line": 54
+            }
+          ],
+          "note": "Vendor README reports a VS Code/Claude Opus benchmark. Its task/model/baseline differs from the carried project retrieval comparison; no general superiority or token-saving claim is accepted."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-vs-baselines.json"
+            }
+          ],
+          "note": "No comparative measurement at this complete run identity. Historical/synthetic/model-card or smoke evidence is retained with its limits and is not promoted to A6."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Adjudicate proposed 1.16.0 release versus frozen 2218f251 arm; qualify index freshness, isolation, restart/recovery and native client retrieval with C2's sealed model inputs."
+    },
+    {
+      "id": "qdrant",
+      "name": "qdrant",
+      "repository": "https://github.com/qdrant/qdrant",
+      "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "role": "vector storage dependency",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "Role-specific dependency qualification must not be ranked as a standalone end-to-end layer winner.",
+        "No new same-pin, same-corpus model-backed comparison occurred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "0",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/qdrant/qdrant",
+              "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+              "path": "README.md",
+              "line": 24
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json"
+            }
+          ],
+          "note": "Official 1.19.1 version/help and real isolated Qdrant calls in two upstream SocratiCode integration files pass; vectors are synthetic/precomputed. Qdrant's own full snapshot/recovery/cluster E2E is absent."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/qdrant/qdrant",
+              "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+              "path": "README.md",
+              "line": 24
+            }
+          ],
+          "note": "No current-pin engineering-quality verdict is inferred from recency or a README; no separate quality sweep is commissioned."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No independent consensus evidence for the scoped requirement was verified in this delta. Stars and popularity are not used as evidence of fit."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No matched package/client net-usage measurement is retained here; install presence and existing receipts are not usage statistics."
+        },
+        "A5": {
+          "score": "0",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/qdrant/qdrant",
+              "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+              "path": "README.md",
+              "line": 26
+            }
+          ],
+          "note": "README points to vendor vector-database benchmarks; they are not comparative end-to-end conceptual-code evidence at this run identity."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json"
+            }
+          ],
+          "note": "No comparative measurement at this complete run identity. Historical/synthetic/model-card or smoke evidence is retained with its limits and is not promoted to A6."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Run upstream service-backed storage/query/snapshot tests in isolated scratch after the service boundary and C2 inputs are ready."
+    },
+    {
+      "id": "vllm",
+      "name": "vllm",
+      "repository": "https://github.com/vllm-project/vllm",
+      "pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+      "role": "model-serving dependency",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "Role-specific dependency qualification must not be ranked as a standalone end-to-end layer winner.",
+        "No new same-pin, same-corpus model-backed comparison occurred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "0",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vllm-project/vllm",
+              "pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+              "path": "README.md",
+              "line": 59
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json"
+            }
+          ],
+          "note": "Existing metadata reports 0.31.0. No-GPU sandbox CLI cannot infer a device. New hash-bearing dependency lock resolves 199 packages but is not installed or qualified."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vllm-project/vllm",
+              "pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+              "path": "README.md",
+              "line": 59
+            }
+          ],
+          "note": "No current-pin engineering-quality verdict is inferred from recency or a README; no separate quality sweep is commissioned."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No independent consensus evidence for the scoped requirement was verified in this delta. Stars and popularity are not used as evidence of fit."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No matched package/client net-usage measurement is retained here; install presence and existing receipts are not usage statistics."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vllm-project/vllm",
+              "pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+              "path": "README.md",
+              "line": 24
+            }
+          ],
+          "note": "Generic serving capability and papers do not establish the selected embedding model/runtime's source-grounded retrieval or memory fit."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-vs-baselines.json"
+            }
+          ],
+          "note": "No comparative measurement at this complete run identity. Historical/synthetic/model-card or smoke evidence is retained with its limits and is not promoted to A6."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "C2 model arms not yet measured. Qualify the exact retained lock, model revision, dtype/context/batch and GPU allocation; compare serving-interface behavior with the retained Ollama arm."
+    },
+    {
+      "id": "next-plaid",
+      "name": "next-plaid",
+      "repository": "https://github.com/lightonai/next-plaid",
+      "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+      "role": "multivector index / code retrieval",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "Role-specific dependency qualification must not be ranked as a standalone end-to-end layer winner.",
+        "No new same-pin, same-corpus model-backed comparison occurred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/lightonai/next-plaid",
+              "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+              "path": "README.md",
+              "line": 22
+            }
+          ],
+          "note": "Pinned README names ColGREP semantic code retrieval and NextPlaid multivector indexing. Native model artifact, memory, isolation/recovery and same-oracle results are absent here."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/lightonai/next-plaid",
+              "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+              "path": "README.md",
+              "line": 22
+            }
+          ],
+          "note": "No current-pin engineering-quality verdict is inferred from recency or a README; no separate quality sweep is commissioned."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No independent consensus evidence for the scoped requirement was verified in this delta. Stars and popularity are not used as evidence of fit."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No matched package/client net-usage measurement is retained here; install presence and existing receipts are not usage statistics."
+        },
+        "A5": {
+          "score": "0",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/lightonai/next-plaid",
+              "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+              "path": "README.md",
+              "line": 196
+            }
+          ],
+          "note": "README provides vendor Semble-bench and performance comparisons. These are leads at the source pin, not this layer's executed held-out/restore comparison."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json"
+            }
+          ],
+          "note": "No comparative measurement at this complete run identity. Historical/synthetic/model-card or smoke evidence is retained with its limits and is not promoted to A6."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Keep shared code-retrieval role versus SocratiCode/Semble and multivector-storage role separate; retain judged-set/NDCG@10 and recovery prerequisites."
+    },
+    {
+      "id": "semble",
+      "name": "semble",
+      "repository": "https://github.com/minishlab/semble",
+      "pin": "0e5e02832ae0340c0feb637d2b7213fe065571fd",
+      "role": "code retrieval",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "Role-specific dependency qualification must not be ranked as a standalone end-to-end layer winner.",
+        "No new same-pin, same-corpus model-backed comparison occurred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/minishlab/semble",
+              "pin": "0e5e02832ae0340c0feb637d2b7213fe065571fd",
+              "path": "README.md",
+              "line": 27
+            }
+          ],
+          "note": "Pinned source describes CPU code retrieval. Rebuilding/index freshness, exact model artifact and target host memory remain to be executed."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/minishlab/semble",
+              "pin": "0e5e02832ae0340c0feb637d2b7213fe065571fd",
+              "path": "README.md",
+              "line": 27
+            }
+          ],
+          "note": "No current-pin engineering-quality verdict is inferred from recency or a README; no separate quality sweep is commissioned."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No independent consensus evidence for the scoped requirement was verified in this delta. Stars and popularity are not used as evidence of fit."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No matched package/client net-usage measurement is retained here; install presence and existing receipts are not usage statistics."
+        },
+        "A5": {
+          "score": "0",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/minishlab/semble",
+              "pin": "0e5e02832ae0340c0feb637d2b7213fe065571fd",
+              "path": "README.md",
+              "line": 81
+            }
+          ],
+          "note": "Vendor NDCG@10/token claims use its benchmark population. No first-hand matched retrieval/cost comparison at this pin was run."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json"
+            }
+          ],
+          "note": "No comparative measurement at this complete run identity. Historical/synthetic/model-card or smoke evidence is retained with its limits and is not promoted to A6."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Adjudicate the same source-span/membership oracle and retained judged-set benchmark; do not reuse release v0.6.2 evidence as this newer commit."
+    },
+    {
+      "id": "ollama",
+      "name": "ollama",
+      "repository": "https://github.com/ollama/ollama",
+      "pin": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
+      "role": "model-serving dependency",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "Role-specific dependency qualification must not be ranked as a standalone end-to-end layer winner.",
+        "No new same-pin, same-corpus model-backed comparison occurred.",
+        "Retained decisions disagree; neither is silently discarded."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/ollama/ollama",
+              "pin": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
+              "path": "README.md",
+              "line": 92
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/README.md",
+              "line": 91
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 7855
+            }
+          ],
+          "note": "Pinned source supplies a model server, not an end-to-end code index. The two retained landscape decisions split; source code existence does not settle deployment merit."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/ollama/ollama",
+              "pin": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
+              "path": "README.md",
+              "line": 92
+            }
+          ],
+          "note": "No current-pin engineering-quality verdict is inferred from recency or a README; no separate quality sweep is commissioned."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No independent consensus evidence for the scoped requirement was verified in this delta. Stars and popularity are not used as evidence of fit."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No matched package/client net-usage measurement is retained here; install presence and existing receipts are not usage statistics."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/ollama/ollama",
+              "pin": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
+              "path": "README.md",
+              "line": 24
+            }
+          ],
+          "note": "No matched published evaluation of this serving role at the selected model/profile was verified in this delta."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json"
+            }
+          ],
+          "note": "No comparative measurement at this complete run identity. Historical/synthetic/model-card or smoke evidence is retained with its limits and is not promoted to A6."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "DISPUTED: 2026-09-29 survivor versus 2026-10-03 fit re-vote refuted 0.90. Two-family adjudication must inspect the retained refutation and run a same-model serving-interface comparison only if unresolved."
+    },
+    {
+      "id": "hipporag",
+      "name": "hipporag",
+      "repository": "https://github.com/OSU-NLP-Group/HippoRAG",
+      "pin": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
+      "role": "project semantic index / associative retrieval",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "Role-specific dependency qualification must not be ranked as a standalone end-to-end layer winner.",
+        "No new same-pin, same-corpus model-backed comparison occurred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/OSU-NLP-Group/HippoRAG",
+              "pin": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
+              "path": "README.md",
+              "line": 13
+            }
+          ],
+          "note": "Pinned source names associative/document retrieval. Its assigned code/project role remains a comparison obligation; no code-span membership, recovery or model/quality result was produced."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/OSU-NLP-Group/HippoRAG",
+              "pin": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
+              "path": "README.md",
+              "line": 13
+            }
+          ],
+          "note": "No current-pin engineering-quality verdict is inferred from recency or a README; no separate quality sweep is commissioned."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No independent consensus evidence for the scoped requirement was verified in this delta. Stars and popularity are not used as evidence of fit."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [],
+          "note": "No matched package/client net-usage measurement is retained here; install presence and existing receipts are not usage statistics."
+        },
+        "A5": {
+          "score": "0",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/OSU-NLP-Group/HippoRAG",
+              "pin": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
+              "path": "README.md",
+              "line": 23
+            }
+          ],
+          "note": "Upstream links NeurIPS 2024/ICML 2025 research and document/multi-hop benchmarks; this does not establish project-code retrieval at the selected pin."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:49:00Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json"
+            }
+          ],
+          "note": "No comparative measurement at this complete run identity. Historical/synthetic/model-card or smoke evidence is retained with its limits and is not promoted to A6."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Retain sealed judged multi-hop cross-file set and shared source-span/isolation/recovery checks; no singleton-role acceptance."
+    }
+  ],
+  "final_evidence": [
+    {
+      "candidate_id": "socraticode",
+      "run_pin": "1.16.0@3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+      "e2e_receipt": null,
+      "invoke_receipt": null,
+      "not_invoked_reason": "Full native semantic retrieval/model serving was not invoked: C2 model arms not yet measured; live services excluded."
+    },
+    {
+      "candidate_id": "qdrant",
+      "run_pin": "1.19.1@6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "e2e_receipt": null,
+      "invoke_receipt": "evidence/artifacts/final-prep-semantic-rag-20261016/invoke-evidence.json",
+      "not_invoked_reason": "Native CLI and isolated synthetic-vector integration invocation observed; complete semantic/model-backed role invocation remains a gap."
+    },
+    {
+      "candidate_id": "vllm",
+      "run_pin": "0.31.0@db9527a46873454610df6dbedf79a36d6bf1a7f6",
+      "e2e_receipt": null,
+      "invoke_receipt": null,
+      "not_invoked_reason": "Full native semantic retrieval/model serving was not invoked: C2 model arms not yet measured; live services excluded."
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+
+> socraticode@1.16.0 check:release-versions
+> node scripts/check-release-versions.mjs
+
+release manifests match 1.16.0

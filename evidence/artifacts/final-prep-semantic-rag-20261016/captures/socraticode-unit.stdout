@@ -1,0 +1,158 @@
+
+> socraticode@1.16.0 test:unit
+> vitest run tests/unit/
+
+
+ RUN  v4.1.11 /work/socraticode
+
+ ✓ tests/unit/graph-resolution.test.ts (273 tests) 297ms
+ ✓ tests/unit/graph-symbols-gdscript.test.ts (84 tests) 110ms
+ ✓ tests/unit/graph-gdscript.test.ts (123 tests) 322ms
+ ✓ tests/unit/graph-discovery.test.ts (68 tests) 517ms
+ ✓ tests/unit/graph-imports.test.ts (110 tests) 124ms
+ ✓ tests/unit/watcher.test.ts (76 tests) 4723ms
+       ✓ triggers update for a detected extensionless file event (async filter)  2005ms
+       ✓ schedules a reconcile for an extensionless update event even when it no longer detects as code  2011ms
+ ✓ tests/unit/graph-symbol-resolution.test.ts (46 tests) 25ms
+ ✓ tests/unit/graph-symbols.test.ts (64 tests) 134ms
+ ✓ tests/unit/remove-tools.test.ts (42 tests) 728ms
+     ✓ cancels in-progress indexing and waits for drain  402ms
+ ✓ tests/unit/index-profile-indexer.test.ts (27 tests) 415ms
+ ✓ tests/unit/graph-input-invalidation.test.ts (47 tests) 363ms
+ ✓ tests/unit/symbol-graph-contract.test.ts (20 tests) 505ms
+ ✓ tests/unit/graph-symbols-php-references.test.ts (69 tests) 232ms
+ ✓ tests/unit/context-artifacts.test.ts (50 tests) 196ms
+ ✓ tests/unit/startup.test.ts (42 tests) 1650ms
+     ✓ waits until indexing completes  501ms
+     ✓ times out and logs a warning when indexing persists  1003ms
+ ✓ tests/unit/max-chunk-chars.test.ts (34 tests) 526ms
+ ✓ tests/unit/config.test.ts (66 tests) 199ms
+ ✓ tests/unit/indexer.test.ts (51 tests) 152ms
+ ✓ tests/unit/list-collections-metadata-scroll.test.ts (23 tests) 2214ms
+     ✓ retries a transient page failure instead of truncating the list  514ms
+     ✓ returns what it has when a page fails for good, without throwing  1514ms
+ ✓ tests/unit/constants.test.ts (122 tests) 50ms
+ ✓ tests/unit/ignore.test.ts (45 tests) 107ms
+ ✓ tests/unit/index-profile-context.test.ts (17 tests) 322ms
+ ✓ tests/unit/code-graph-rust-crate-scope.test.ts (26 tests) 1384ms
+ ✓ tests/unit/graph-impact.test.ts (13 tests) 14ms
+ ✓ tests/unit/graph-analysis.test.ts (55 tests) 17ms
+ ✓ tests/unit/code-graph-rust-inline-mod.test.ts (20 tests) 129ms
+ ✓ tests/unit/embedding-config.test.ts (72 tests) 34ms
+ ✓ tests/unit/code-graph-php-scoped-qualifiers.test.ts (23 tests) 158ms
+ ✓ tests/unit/lock-compromise-cancels.test.ts (11 tests) 277ms
+ ✓ tests/unit/docker.test.ts (33 tests) 10070ms
+     ✓ throws 'Cannot reach external Qdrant' when health check fails  5010ms
+     ✓ throws 'Cannot reach external Qdrant' when health endpoint returns non-ok  5010ms
+ ✓ tests/unit/query-tools.test.ts (17 tests) 19ms
+ ✓ tests/unit/dense-score-extraction.test.ts (13 tests) 22ms
+ ✓ tests/unit/graph-symbols-php-qualifiers.test.ts (40 tests) 91ms
+ ✓ tests/unit/graph-symbol-resolution-php-qualified.test.ts (25 tests) 16ms
+ ✓ tests/unit/symbol-graph-multipart-shards.test.ts (12 tests) 6890ms
+     ✓ splits an oversized name shard and round-trips it exactly  985ms
+     ✓ deletes stale continuation parts when a shard shrinks back  746ms
+     ✓ splits and round-trips an oversized reverse shard the same way  827ms
+     ✓ returns null and warns when a declared continuation part is missing  894ms
+     ✓ refuses to serve a mixture when a rewrite died between parts  1625ms
+     ✓ refuses a multipart shard whose write identities were stripped  730ms
+     ✓ refuses a continuation part whose part header was altered  624ms
+     ✓ throws a named error when one ENTRY alone exceeds a part budget  443ms
+ ✓ tests/unit/extensionless.test.ts (22 tests) 50ms
+ ✓ tests/unit/git-refresh.test.ts (19 tests) 2286ms
+     ✓ coalesces repeated checks, exposes pending reads, and retries the newest state after an in-flight checkout  303ms
+ ✓ tests/unit/lmstudio-missing-model-listing.test.ts (31 tests) 39ms
+ ✓ tests/unit/embeddings.test.ts (13 tests) 30ms
+ ✓ tests/unit/embedding-provider.test.ts (18 tests) 5565ms
+     ✓ ensureReady throws an actionable error when LM Studio is unreachable  1282ms
+     ✓ healthCheck reports unreachable LM Studio without throwing  1274ms
+     ✓ ensureReady throws an actionable error when the proxy is unreachable  1299ms
+     ✓ healthCheck reports unreachable proxy without throwing  1258ms
+ ✓ tests/unit/branch-aware-explicit-id-warning.test.ts (12 tests) 213ms
+ ✓ tests/unit/qdrant-project-collection-race.test.ts (12 tests) 143ms
+ ✓ tests/unit/qdrant-metadata-collection-race.test.ts (10 tests) 116ms
+ ✓ tests/unit/graph-resolution-php-fqcn.test.ts (13 tests) 30ms
+ ✓ tests/unit/index-profile.test.ts (13 tests) 28ms
+ ✓ tests/unit/qdrant-error-wrapping.test.ts (13 tests) 152ms
+ ✓ tests/unit/code-graph-php-symbol-edges.test.ts (9 tests) 137ms
+ ✓ tests/unit/reclamation-lock-orderings.test.ts (7 tests) 123ms
+ ✓ tests/unit/lock.test.ts (22 tests) 25ms
+ ✓ tests/unit/graph-aliases.test.ts (21 tests) 45ms
+ ✓ tests/unit/context-artifacts-preread.test.ts (6 tests) 111ms
+ ✓ tests/unit/multi-collection-search.test.ts (11 tests) 11ms
+ ✓ tests/unit/reclamation-barrier.test.ts (15 tests) 23ms
+ ✓ tests/unit/reconcile-status-read.test.ts (7 tests) 125ms
+ ✓ tests/unit/status-during-collection-create.test.ts (1 test) 115ms
+ ✓ tests/unit/graph-visualize-html.test.ts (8 tests) 160ms
+ ✓ tests/unit/code-graph-php-non-ascii-identifiers.test.ts (13 tests) 139ms
+ ✓ tests/unit/qdrant-read-only-metadata.test.ts (6 tests) 20ms
+ ✓ tests/unit/indexer-partial-upsert.test.ts (2 tests) 1638ms
+     ✓ propagates the failure, saves no completion, and re-indexes the file on the next healthy run  1527ms
+ ✓ tests/unit/mcp-logging-protocol.test.ts (2 tests) 2259ms
+     ✓ advertises logging, accepts logging/setLevel, and delivers one notification per log line  1615ms
+     ✓ still shuts down gracefully when the host has already closed its end of stdout  642ms
+ ✓ tests/unit/distribution-launchers.test.ts (8 tests) 24ms
+ ✓ tests/unit/embedding-prefix.test.ts (13 tests) 25ms
+ ✓ tests/unit/qdrant-collection-prefix.test.ts (20 tests) 56ms
+ ✓ tests/unit/cross-project-cosine-ranking.test.ts (9 tests) 10ms
+ ✓ tests/unit/embedding-document-path.test.ts (26 tests) 15ms
+ ✓ tests/unit/code-graph-skips.test.ts (7 tests) 464ms
+ ✓ tests/unit/graph-symbols-php-calls.test.ts (21 tests) 96ms
+ ✓ tests/unit/symbol-graph-upsert-budget.test.ts (7 tests) 2615ms
+     ✓ splits by BYTES when large files would otherwise exceed the request ceiling  322ms
+     ✓ gives an oversized-but-writable point a request of its own  422ms
+     ✓ throws a named error instead of a bare 400 when one point cannot ever fit  544ms
+     ✓ names the offending shard when a name-index shard cannot fit  693ms
+     ✓ names the offending shard when a reverse-call shard cannot fit  619ms
+ ✓ tests/unit/logger.test.ts (22 tests) 26ms
+ ✓ tests/unit/graph-symbol-error-record.test.ts (5 tests) 180ms
+ ✓ tests/unit/code-graph-node-language.test.ts (8 tests) 342ms
+ ✓ tests/unit/provider-ollama-connection-pool.test.ts (5 tests) 1253ms
+     ✓ caps concurrent connections at the default bound  560ms
+ ✓ tests/unit/context-artifacts-checkpoint.test.ts (3 tests) 50ms
+ ✓ tests/unit/graph-symbols-js-classes.test.ts (9 tests) 73ms
+ ✓ tests/unit/reclamation-writers.test.ts (10 tests) 83ms
+ ✓ tests/unit/code-graph-php.test.ts (8 tests) 148ms
+ ✓ tests/unit/graph-resolution-php-psr4.test.ts (9 tests) 37ms
+ ✓ tests/unit/qdrant-client-compat.test.ts (11 tests) 16ms
+ ✓ tests/unit/graph-build-consistency.test.ts (4 tests) 485ms
+ ✓ tests/unit/code-graph-progress.test.ts (12 tests) 201ms
+ ✓ tests/unit/context-tools.test.ts (3 tests) 8ms
+ ✓ tests/unit/viewer-app.test.ts (1 test) 10ms
+ ✓ tests/unit/git-state.test.ts (4 tests) 5444ms
+     ✓ terminates a hung executable and reports the real timeout boundary  5038ms
+ ✓ tests/unit/symbol-graph-scale.test.ts (5 tests) 258ms
+ ✓ tests/unit/elixir-templates.test.ts (4 tests) 126ms
+ ✓ tests/unit/code-graph-python-roots.test.ts (4 tests) 160ms
+ ✓ tests/unit/graph-symbols-ruby-calls.test.ts (9 tests) 75ms
+ ✓ tests/unit/symbol-graph-collection-race.test.ts (4 tests) 12ms
+ ✓ tests/unit/dynamic-language-loader.test.ts (9 tests) 69ms
+ ✓ tests/unit/partial-upsert-skip.test.ts (4 tests) 4556ms
+     ✓ throws when a point still fails after the per-point fallback  1533ms
+     ✓ names the affected file and the collection in the error  1507ms
+     ✓ still stores the healthy points of a mixed batch before failing  1506ms
+ ✓ tests/unit/release-manifests.test.ts (3 tests) 236ms
+ ✓ tests/unit/graph-rebuild-load-outcomes.test.ts (4 tests) 151ms
+ ✓ tests/unit/graph-cache-identity.test.ts (3 tests) 11ms
+ ✓ tests/unit/elixir.test.ts (4 tests) 107ms
+ ✓ tests/unit/graph-entrypoints.test.ts (4 tests) 7ms
+ ✓ tests/unit/symbol-graph-store.test.ts (14 tests) 20ms
+ ✓ tests/unit/plugin-version-sync.test.ts (3 tests) 86ms
+ ✓ tests/unit/git-lock.test.ts (2 tests) 1228ms
+     ✓ retains and releases the acquired identity across a checkout (explicit shared identity: false)  598ms
+     ✓ retains and releases the acquired identity across a checkout (explicit shared identity: true)  628ms
+ ✓ tests/unit/provider-google-dimensions.test.ts (1 test) 13ms
+ ✓ tests/unit/graph-visualize-browser.test.ts (4 tests) 24ms
+ ✓ tests/unit/graph-language-display.test.ts (5 tests) 5ms
+ ✓ tests/unit/embedding-batch-size.test.ts (9 tests) 7ms
+ ✓ tests/unit/symbol-graph-cache.test.ts (7 tests) 7ms
+ ✓ tests/unit/qdrant-delete-completion.test.ts (3 tests) 1510ms
+     ✓ propagates a failed completion request instead of reporting deletion success  1504ms
+ ✓ tests/unit/index-status.test.ts (5 tests) 6ms
+ ✓ tests/unit/max-file-size.test.ts (14 tests) 36ms
+ ✓ tests/unit/graph-node-language.test.ts (3 tests) 4ms
+
+ Test Files  107 passed (107)
+      Tests  2517 passed (2517)
+   Start at  05:36:36
+   Duration  96.77s (transform 3.06s, setup 0ms, import 12.44s, tests 66.99s, environment 15ms)
+

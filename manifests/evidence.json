@@ -5092,8 +5092,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "cba06a43e1b0c1fadaea82c75e412b4344fcf03f17bea3d0830bd765414ec6fb",
-      "bytes": 16138
+      "sha256": "0427178c54ea86d87b7dc747a2433dfcc080696799f4be135701fa625dece673",
+      "bytes": 16285
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -22885,6 +22885,266 @@
       "path": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
       "sha256": "45cd2b5c580d6f65aaf8eafd80d9412295e40de275dc8a5356d08f8deadb05a7",
       "bytes": 319713
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/README.md",
+      "sha256": "4d9a5763fd0ddc6e8d51d393790516da25359c2fa6fd391fb77dfd73289dba4b",
+      "bytes": 15607
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/angle-record-draft.json",
+      "sha256": "034120df0da52413c5d03030dfe539232d114621cff3669fddc73b8d1f7dae8f",
+      "bytes": 28958
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/lane-packets.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/lane-packets.stdout",
+      "sha256": "e1a75dc4646465a7f13af30e1c38b23f553ff2c72932c484f54db82c1e9616c6",
+      "bytes": 783
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/node-version.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/node-version.stdout",
+      "sha256": "f2ec568164f99546161909b0189b57bb5be3e80f8e2ccd8a51a4aed8c4055a04",
+      "bytes": 9
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/npm-version.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/npm-version.stdout",
+      "sha256": "005206ab803f8881d8227540b7980b37e723b69a8849edb31734a90b7e7964e2",
+      "bytes": 8
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/public-artifact-hashes.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/public-artifact-hashes.stdout",
+      "sha256": "6e7e6c881ab529474b1aaaf7b737434a91ca4e5bf3ff93ee9c8809486031a987",
+      "bytes": 297
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-help.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-help.stdout",
+      "sha256": "352e3f395f741298fd090cc76cc9fc66a4a423e2ff43fe65cff783effbb45b66",
+      "bytes": 2825
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline-first.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline-first.stdout",
+      "sha256": "b3ca0bd7a2ca536313c2ee789eb5af98112fbf94f7be5a43455a7eb20e9ca3c1",
+      "bytes": 1742
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline.stdout",
+      "sha256": "135f1af041e5defd2bdc0d81b474423b0319bfe4586b344774e9c0418a1017ba",
+      "bytes": 60723
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-version.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-version.stdout",
+      "sha256": "214295b22d2d525fae20e55f19eb6c016fe20ec4863a531f204e6e849124071e",
+      "bytes": 14
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-build.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-build.stdout",
+      "sha256": "3f43d84f379bb4173f796dafdddfd33d66721bc068b4754615b9d028f89a7429",
+      "bytes": 269
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-install.stderr",
+      "sha256": "071e031d7fef181af9e270f8e696166ee0bd6f622c808f3393aa86627d5b3f68",
+      "bytes": 2164
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-install.stdout",
+      "sha256": "5ce742b53d25d17f9f702e14252ebb84cc883a59afffaffe466d6a224ae7c778",
+      "bytes": 27
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-lock-unchanged.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-lock-unchanged.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration-first.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration-first.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stderr",
+      "sha256": "5aa937dc43d1e4a68b5795ef3b9170532ee0fe3a4c7d829f1d1b6cfc1c8bc114",
+      "bytes": 21136
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stdout",
+      "sha256": "54f1939e8b091761ae14fcc8669f1fe0225c29fe10f33ebac743ace88450b3dc",
+      "bytes": 875
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-release-versions.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-release-versions.stdout",
+      "sha256": "f4bd6abd0f700e18f30bc3b4a9314b557c5ed243711807ed2f30a1b514adcca8",
+      "bytes": 119
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-clean.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-clean.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-pin.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-pin.stdout",
+      "sha256": "7180be4b6eb2526f6f43cc9747c54f704949b1b4ecbcfaf272773b324e27b93a",
+      "bytes": 41
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stderr",
+      "sha256": "4a4fc8c25f5fd4b625335d52e15eff9cb84e7e905073db448bdbf37aafa51252",
+      "bytes": 134956
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stdout",
+      "sha256": "8aa11223bf7c426be7c5f0303b71bf69a3af117bd88c8ee75c754fa31d58075b",
+      "bytes": 9994
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/uv-version.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/uv-version.stdout",
+      "sha256": "dcccc14d410dab345544375b730933845d90c3222a4a8a0c08ed6c412ca336a4",
+      "bytes": 38
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-metadata.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-metadata.stdout",
+      "sha256": "8c4f709e958791f38fd4d06c953c9182f61a05abbc45508e281b907f08b52210",
+      "bytes": 7
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-resolution.stderr",
+      "sha256": "10b6fa5a239d5b1900bd6eea22652e7214780abff69055a9fa7c94a72a1b351e",
+      "bytes": 143
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-resolution.stdout",
+      "sha256": "cc7d568fd9368d0ba1090c4ff729daa7d3c96d23970c0d5b7c3a74faf074c05f",
+      "bytes": 396581
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-version.stderr",
+      "sha256": "a6cc14befe72f26f1e9206a81a8e8a4ecd36ef6378dbeb4c68a7752efe4e12a7",
+      "bytes": 2166
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-version.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/integrity-audit.json",
+      "sha256": "3488826797d9cec4a0af4fe0ce5080559e54027c66828079cdda5f26ead961df",
+      "bytes": 11517
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/invoke-evidence.json",
+      "sha256": "121f423873e94d8df6ea97bcbd44eed846b1e1968f06096721e96bcce9151cb6",
+      "bytes": 3552
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py",
+      "sha256": "88d41f7a0c27ed872414a7a85b16eb248c2c6885c87b6e949bcae4a7d1bac64f",
+      "bytes": 1568
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json",
+      "sha256": "73c0fb2dd61b2576e08ebcfc1b27e04d872a356d4b165367800c8d726e90209c",
+      "bytes": 54531
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/offline-integration.sh",
+      "sha256": "f4dc1351908c8f0b55a90547dcbee2741ebb5c3b0689af4727c3b0488f255620",
+      "bytes": 1027
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/packet-selection.json",
+      "sha256": "f89f4912ec4ef0fc02c8283fe3f0214621f6d9e2cf6649fe220b5d6d7ade7faa",
+      "bytes": 4679
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/pin-reconciliation.json",
+      "sha256": "5a3d146062e9c2b5745548bd4ef9c654dbfcc3b1853df166b303acaa774fe8a3",
+      "bytes": 26645
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/vllm-0.31.0.requirements.lock",
+      "sha256": "cc7d568fd9368d0ba1090c4ff729daa7d3c96d23970c0d5b7c3a74faf074c05f",
+      "bytes": 396581
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
