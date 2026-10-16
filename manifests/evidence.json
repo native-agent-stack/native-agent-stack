@@ -22882,6 +22882,176 @@
       "bytes": 26706
     },
     {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/CAPTURES.md",
+      "sha256": "8c6517816426875b9b09cd9f3b68f502cf8a4f6292746410c70fadae4529b8a8",
+      "bytes": 3982
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/GAPS.md",
+      "sha256": "da99b934ca8f85f4af02858935574c5f4a90d6b9fad23212c2ac5868884eb175",
+      "bytes": 4371
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/PUBLIC-SHA256SUMS",
+      "sha256": "39fdd97aa3fc62195754a0d8a9a91241b3bfd7bbe42e690bd29b91730a0d1a0f",
+      "bytes": 2796
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/README.md",
+      "sha256": "9436d586b601be55cf329022ab680a51a0b4c4e9d544212a496376cc1bdce1e2",
+      "bytes": 7247
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/angles.md",
+      "sha256": "26496e60295f3820a71a3e53e3a0bdb642c68bf6b2f8158ba1d62e41c5d3cdaf",
+      "bytes": 6135
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/masker-tests/argv.json",
+      "sha256": "33e0558e4459e75b831b071e78702d0f0526472d5c1a8de890aae160fe2d017a",
+      "bytes": 100
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/masker-tests/cwd.txt",
+      "sha256": "5b89ccee01d41ea0baa4daade344b11ad8ae41e1f85521acde59f302b27d3d37",
+      "bytes": 11
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/masker-tests/ended.txt",
+      "sha256": "6931e9237750449808343910f4ee66d4051b746253ab56ff6886c1476f315cbe",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/masker-tests/rc.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/masker-tests/started.txt",
+      "sha256": "29a947390201065e5e6c17c3ff3b7c89a88728be099cb85475a5fe444e5e0ea6",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/masker-tests/stderr.txt",
+      "sha256": "e341979bfd2eb837d77f55eba3c77e3a6c9fa63b3a901701ff54260f9b471bf0",
+      "bytes": 626
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/masker-tests/stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/packets/argv.json",
+      "sha256": "74c385a5da9fe057acad25cff8c90bad96a1c26b745f0d57c0a70abb91540946",
+      "bytes": 295
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/packets/cwd.txt",
+      "sha256": "5b89ccee01d41ea0baa4daade344b11ad8ae41e1f85521acde59f302b27d3d37",
+      "bytes": 11
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/packets/ended.txt",
+      "sha256": "5378be10afa83d408545c21c9698d9009788c781a678fe5863baa9bc092cce37",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/packets/rc.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/packets/started.txt",
+      "sha256": "a2946c575b639c914735f335d978bead464c568879cd6053814d33f726cfee3e",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/packets/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/packets/stdout.txt",
+      "sha256": "d302829dae99324938974fff10e39b71f75bd46f274eb7d6b17ce74d0527e462",
+      "bytes": 680
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/recorder-python-version/argv.json",
+      "sha256": "63b2aa4fbe2f47bbb16cbde1b02d18fdfa3d8ab2e07a6c6fd04c14133f6b2624",
+      "bytes": 31
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/recorder-python-version/cwd.txt",
+      "sha256": "5b89ccee01d41ea0baa4daade344b11ad8ae41e1f85521acde59f302b27d3d37",
+      "bytes": 11
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/recorder-python-version/ended.txt",
+      "sha256": "0097f958b509926a1ddc202f407110b47164a6eb22a3484640f90b7a4df5d6df",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/recorder-python-version/rc.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/recorder-python-version/started.txt",
+      "sha256": "63e772e44b5cfd5fd7cc8fb463a1ef0330b43b31f159744f0f787e93c9723ee9",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/recorder-python-version/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/recorder-python-version/stdout.txt",
+      "sha256": "8a078b480fefb612930032cc46f81bc6d76b152bac4903485d0c5771f32219ad",
+      "bytes": 15
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/runtime-python-version/argv.json",
+      "sha256": "39f524e0768b8589ec76084ba95ec65ef4251152f20907c26074fccacf118835",
+      "bytes": 41
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/runtime-python-version/cwd.txt",
+      "sha256": "5b89ccee01d41ea0baa4daade344b11ad8ae41e1f85521acde59f302b27d3d37",
+      "bytes": 11
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/runtime-python-version/ended.txt",
+      "sha256": "cd6f8cea3a6ff05223d837374cd2f07bef04812f2473881a9b49030d729464f0",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/runtime-python-version/rc.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/runtime-python-version/started.txt",
+      "sha256": "b23c003f7433cb6559a548003d8190e180cf781705606b385166c940512b1a00",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/runtime-python-version/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/runtime-python-version/stdout.txt",
+      "sha256": "5b3e43dc38ca01e3f5a7854ba50d4330864b0c1e0f646650b2c78cf072acc366",
+      "bytes": 14
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/pins.md",
+      "sha256": "391dea2ef91d3fe2309a7b89cbdc345def8798c0951f984cc854316ce594c1ba",
+      "bytes": 3660
+    },
+    {
       "path": "evidence/artifacts/final-architecture-round2-20261004/integration-resolutions.json",
       "sha256": "8dd4d08202e4f334fa0c47ebe4d210c4e4a4d96eba990b76cb09cc17203a99e9",
       "bytes": 101093

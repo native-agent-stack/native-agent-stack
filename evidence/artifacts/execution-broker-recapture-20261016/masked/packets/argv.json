@@ -1,0 +1,16 @@
+[
+  "python3",
+  "tools/sota-convergence/lane_packets.py",
+  "--root",
+  ".",
+  "--out",
+  "<PACKET_SCRATCH>",
+  "--catalog",
+  "us-equities",
+  "--manifest",
+  "catalogs/sota-convergence/manifest-20260926.json",
+  "--registered-receipts",
+  "--gap-receipts",
+  "--checked-at",
+  "2026-10-16"
+]

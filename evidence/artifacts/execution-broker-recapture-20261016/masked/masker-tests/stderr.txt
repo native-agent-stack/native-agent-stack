@@ -1,0 +1,8 @@
+test_cli_preserves_bytes_except_exact_private_path_substitutions (tests.test_execution_broker_capture_mask.CaptureMask.test_cli_preserves_bytes_except_exact_private_path_substitutions) ... ok
+test_invalid_map_refuses_without_emitting_derivative (tests.test_execution_broker_capture_mask.CaptureMask.test_invalid_map_refuses_without_emitting_derivative) ... ok
+test_replacement_is_one_pass_and_no_input_is_deleted (tests.test_execution_broker_capture_mask.CaptureMask.test_replacement_is_one_pass_and_no_input_is_deleted) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.090s
+
+OK
