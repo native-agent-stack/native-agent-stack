@@ -11,6 +11,7 @@ import importlib.util
 import io
 import json
 import os
+import re
 import stat
 import subprocess
 import sys
@@ -518,7 +519,7 @@ class Relaunch(Fixture):
         self.assertEqual(len(self.ps_calls()), 2)
 
     def test_a_reopen_refused_by_a_complete_or_capped_relaunch_is_recorded(self):
-        # The GPT read of 7aad5a02 (GPT-VERDICT-7aad5a02f.md, P2; its reviewer regressions in test_review_paths.py:62): a
+        # The GPT read of #1116's follow-up at 7aad5a02 (its P2; the reviewer's two regression cases, reproduced here as the subtests case=complete and case=capped): a
         # --reopen refused because the relaunch is complete, or because the relaunch cap is reached, returned before the
         # only writer of the refusal record. It now records the refusal in the existing state, under the run lock, with no
         # run added and no tab call.
@@ -543,7 +544,8 @@ class Relaunch(Fixture):
                 self.assertEqual(len(state["runs"]), runs)
 
     def test_a_dry_run_records_no_refusal(self):
-        # The same read's P3: the refusal write ran before the dry-run return. A dry run writes nothing.
+        # The same read's P3: the refusal write ran before the dry-run return. A dry run records no refusal and leaves
+        # the state file as it was (it may create the run lock: test_a_dry_run_creates_the_run_lock_and_nothing_else).
         self.crash_roster([row("trading-cc", "s"), row("ns2604-coop", "t")])
         with mock.patch.dict(os.environ, {"FAKE_PS_LAUNCH": "0", "FAKE_PS_RC": "0"}):
             self.run_relaunch()
@@ -604,6 +606,114 @@ class Relaunch(Fixture):
         self.assertEqual({a["result"] for s in sessions for a in s["attempts"]}, {"failed"})
         self.assertEqual(len(self.ps_calls()), 6)
 
+    def test_a_dry_run_creates_the_run_lock_and_nothing_else(self):
+        # #1116 follow-up (d), item 1: the README said a dry run records nothing, but every run, dry or not, takes the run
+        # lock, and run_lock() opens relaunch.lock with O_CREAT. Measured on a state directory that does not exist yet, and
+        # on one that holds only the earlier boot's roster, where the dry run goes through the whole plan and the handoff.
+        readme = " ".join((ROOT / "tools" / "session-relaunch" / "README.md").read_text().split())
+        self.assertNotIn("A dry run records nothing", readme)
+        self.assertIn("A dry run writes no relaunch state, roster, refusal or handoff, but like every run it takes the run "
+                      "lock: it creates `relaunch.lock` in the state directory, creating the directory too when it is "
+                      "missing, and sets the directory to mode 0700.", readme)
+
+        def tree():
+            return {p.relative_to(self.tmp).as_posix(): p.read_bytes() if p.is_file() else None for p in self.tmp.rglob("*")}
+
+        before = tree()
+        self.assertEqual(self.run_relaunch(dry_run=True)["reason"], "no roster from an earlier boot")
+        after = tree()
+        self.assertEqual(sorted(set(after) - set(before)), ["state", "state/relaunch.lock"])
+        self.assertEqual({p: v for p, v in after.items() if p in before}, before)
+        self.assertEqual(stat.S_IMODE(Path(self.config["state_dir"]).stat().st_mode), 0o700)
+        self.setUp()
+        self.crash_roster()
+        state_dir = Path(self.config["state_dir"])
+        state_dir.chmod(0o755)  # as `install -D` leaves it
+        before = tree()
+        self.assertIn("handoff_text", self.run_relaunch(dry_run=True))
+        after = tree()
+        self.assertEqual(sorted(set(after) - set(before)), ["state/relaunch.lock"])
+        self.assertEqual({p: v for p, v in after.items() if p in before}, before)
+        self.assertEqual(stat.S_IMODE(state_dir.stat().st_mode), 0o700)
+
+    def test_only_the_refusals_the_readme_names_are_recorded(self):
+        # #1116 follow-up (d), item 2 (the CC micro's P3-1): the README read as if every refused --reopen with a readable
+        # state were recorded. plan()'s own refusals (no journal entry, an unreadable state), a missing or changed sealed
+        # handoff, a held run lock and a client that gives no list record nothing, and a --reopen refused before any
+        # relaunch state exists has nothing to record into; only the two kinds the README names are recorded.
+        readme = " ".join((ROOT / "tools" / "session-relaunch" / "README.md").read_text().split())
+        for sentence in (
+                "Two kinds of refusal are also recorded, as a `refusals` entry in the ended boot's relaunch state file, "
+                "under the run lock, with no run added: a name that is not an unresolved session this relaunch still has "
+                "to bring back, and any `--reopen` while the relaunch has nothing to relaunch",
+                "Either is recorded only when that state file already exists and can be read, and never in a dry run.",
+                "No other refusal is recorded: another run holds the run lock, the client gives no session list, the "
+                "journal has no entry for the ended boot, the relaunch state cannot be read, or the sealed handoff of an "
+                "unfinished relaunch is missing or changed."):
+            self.assertIn(sentence, readme)
+
+        said = []
+
+        def reopen(name, *extra, boots=BOOTS):
+            err = io.StringIO()
+            with mock.patch.object(R, "read_boots", return_value=boots), \
+                    mock.patch.object(R, "current_boot_id", return_value=THIS), \
+                    contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+                code = R.main(["relaunch", *extra, "--reopen", name, "--config", str(self.tmp / "config.json")])
+            said.append(err.getvalue())
+            return code
+
+        def refused_for(text):
+            # The CC's FULL read of bae41b92 (P3, :601): each case must show which refusal fired, not only exit 1.
+            self.assertIn(text, said[-1])
+
+        self.crash_roster([row("trading-cc", "s")])
+        self.assertEqual(reopen("trading-cc"), 1)  # no relaunch state yet: nothing to record into
+        refused_for("not an unresolved session")
+        self.assertIsNone(self.state())
+        with mock.patch.dict(os.environ, {"FAKE_PS_LAUNCH": "0", "FAKE_PS_RC": "0"}):
+            self.run_relaunch()
+        self.assertEqual((self.outcomes(), self.state()["status"]), ({"trading-cc": "unconfirmed"}, "partial"))
+        path = R.marker(self.config, "relaunch", PREV)
+        kept = path.read_bytes()
+        self.assertEqual(reopen("trading-cc", boots=[BOOTS[1]]), 1)  # no journal entry for the ended boot
+        refused_for("no journal entry for boot")
+        self.assertEqual(reopen("no-such-lane", "--dry-run"), 1)  # a dry run
+        refused_for("not an unresolved session")
+        handoff = Path(self.state()["handoff"])
+        sealed = handoff.read_bytes()
+        handoff.chmod(0o600)
+        handoff.write_bytes(sealed + b"changed\n")
+        self.assertEqual(reopen("trading-cc"), 1)  # the sealed handoff changed
+        refused_for("is missing or changed")
+        handoff.write_bytes(sealed)
+        import fcntl
+        with open(R.state_dir(self.config) / "relaunch.lock", "a") as held:
+            fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            self.assertEqual(reopen("trading-cc"), 1)  # another run holds the run lock
+            refused_for("another relaunch run holds")
+        self.agents.write_text("not json")
+        self.assertEqual(reopen("trading-cc"), 1)  # the client gives no session list
+        refused_for("gave no session list")
+        self.agents.write_text("[]")
+        self.assertEqual(path.read_bytes(), kept)
+        self.assertNotIn("refusals", self.state())
+        self.assertEqual(reopen("no-such-lane"), 1)  # recorded: not an unresolved session to bring back
+        refused_for("not an unresolved session")
+        state = self.state()
+        state["status"] = "complete"
+        path.write_text(json.dumps(state))
+        self.assertEqual(reopen("trading-cc", "--dry-run"), 1)  # a dry run records neither kind
+        refused_for("nothing to relaunch")
+        self.assertEqual(reopen("trading-cc"), 1)  # recorded: nothing to relaunch, the relaunch is complete
+        refused_for("nothing to relaunch")
+        self.assertEqual([entry["reopen"] for entry in self.state()["refusals"]], [["no-such-lane"], ["trading-cc"]])
+        path.write_text("{not json")
+        self.assertEqual(reopen("trading-cc"), 1)  # the relaunch state cannot be read
+        refused_for("is unreadable")
+        self.assertEqual(path.read_text(), "{not json")
+        self.assertEqual(len(self.ps_calls()), 1)
+
 
 class Modes(Fixture):
     def mode(self, path):
@@ -631,6 +741,33 @@ class Modes(Fixture):
         self.crash_roster()
         R.cmd_relaunch(self.config, boot_id=THIS, at=NOW, boots=BOOTS, dry_run=False)
         self.assertEqual(self.mode(handoff_dir), 0o755)
+
+
+    def test_the_tool_and_its_tests_publish_no_full_digest(self):
+        # The CC's FULL read of bae41b92 (P1): a test comment carried the full sha256 of a review file outside the
+        # repository, which commits to unpublished bytes. Reads are cited by PR, commit and finding only.
+        paths = [Path(__file__), *sorted((ROOT / "tools" / "session-relaunch").rglob("*")),
+                 ROOT / "evidence" / "artifacts" / "session-relaunch-20261014" / "README.md"]
+        for path in paths:
+            if path.is_file():
+                with self.subTest(path=str(path.relative_to(ROOT))):
+                    self.assertIsNone(re.search(r"(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])", path.read_text(errors="replace")))
+
+    def test_missing_parents_of_the_state_directory_are_created_private(self):
+        # The CC's FULL read of bae41b92 (P3, R:69): Path.mkdir(parents=True) creates missing parents with the default
+        # permissions, without taking mode into account (python/cpython v3.13.16, cbc944f4, Doc/library/pathlib.rst:1476-1478).
+        # Each directory the tool creates is 0700, as the XDG Base Directory specification asks of a
+        # directory it creates (version 0.8, "Referencing this specification").
+        old = os.umask(0o022)
+        try:
+            leaf = self.tmp / "new-parent" / "nested" / "state"
+            R.private_dir(leaf)
+        finally:
+            os.umask(old)
+        for path in (self.tmp / "new-parent", self.tmp / "new-parent" / "nested", leaf):
+            with self.subTest(path=path.name):
+                self.assertEqual(self.mode(path), 0o700)
+        self.assertEqual(self.mode(self.tmp), stat.S_IMODE(self.tmp.stat().st_mode))  # an existing parent is untouched
 
 
 class CommandLine(Fixture):
@@ -698,6 +835,21 @@ class PublicationSurfaces(unittest.TestCase):
                         self.assertFalse(any(q in flat for q in self.QUOTES), f"{path.relative_to(ROOT)}: a quoted phrase in a sentence that names the owner")
         self.assertGreater(checked, 0)
 
+    def test_the_readme_states_the_files_this_check_scans(self):
+        # #1116 follow-up (d), item 6 (the GPT fix3 read's P3-5): a description of this check must keep its boundary, so the
+        # README's Tests section states it, and the count it gives is the length of the list scanned here.
+        import re
+        readme = " ".join((ROOT / "tools" / "session-relaunch" / "README.md").read_text().split())
+        stated = re.search(r"The publication check \(`PublicationSurfaces`\) scans (\d+) files: the decision record and "
+                           r"every file under `tools/session-relaunch/` and `evidence/artifacts/session-relaunch-20261014/`; "
+                           r"it does not scan the test module, `manifests/evidence\.json`, PR bodies or commit messages\.",
+                           readme)
+        self.assertIsNotNone(stated, "the README's Tests section states what PublicationSurfaces scans")
+        scanned = self.surfaces()
+        self.assertEqual(int(stated.group(1)), len(scanned))
+        self.assertNotIn(ROOT / "tests" / "test_session_relaunch.py", scanned)
+        self.assertNotIn(ROOT / "manifests" / "evidence.json", scanned)
+
 
 class Units(unittest.TestCase):
     def test_the_units_run_the_installed_tool(self):
@@ -733,6 +885,32 @@ class Units(unittest.TestCase):
         count = loader.loadTestsFromModule(sys.modules[__name__]).countTestCases()
         evidence = (ROOT / "evidence" / "artifacts" / "session-relaunch-20261014" / "README.md").read_text()
         self.assertIn(f"`python3 -m unittest tests.test_session_relaunch` ({count} tests;", evidence)
+
+    def test_the_decision_records_a_reopen_refusal_only_where_a_state_exists(self):
+        # #1116 follow-up (d), item 3 (the CC micro's P3-2): the decision said the 307f686c fix refuses with a record, with
+        # no condition, while the README records such a refusal only where the ended boot's relaunch state exists.
+        decision = " ".join((ROOT / "docs" / "decisions" / "2026-10-14-session-relaunch-after-wsl-restart.md").read_text()
+                            .split())
+        self.assertNotIn("refuses with a record", decision)
+        self.assertIn("refuses a --reopen name that is not unresolved or not still to be relaunched, recording the refusal "
+                      "only where the ended boot's relaunch state already exists;", decision)
+        self.assertIn("records no refusal in a dry run;", decision)
+
+    def test_the_readme_and_the_decision_cite_the_vendor_sources_of_the_three_mechanisms(self):
+        # #1116 follow-up (d), item 5 (the GPT fix3 read's P3-2): the run lock, the call timeouts and the atomic replacement
+        # had no pinned source. Each now cites flock(2) or the 3.14 docs of the unit's interpreter, /usr/bin/python3.
+        sources = ("https://docs.python.org/3.14/library/fcntl.html#fcntl.flock",
+                   "https://man7.org/linux/man-pages/man2/flock.2.html",
+                   "https://docs.python.org/3.14/library/subprocess.html#subprocess.run",
+                   "https://docs.python.org/3.14/library/os.html#os.replace")
+        readme = " ".join((ROOT / "tools" / "session-relaunch" / "README.md").read_text().split())
+        decision = " ".join((ROOT / "docs" / "decisions" / "2026-10-14-session-relaunch-after-wsl-restart.md").read_text()
+                            .split())
+        for name, text in (("README", readme), ("decision", decision)):
+            for source in sources:
+                self.assertIn(source, text, name)
+        self.assertIn("If the timeout expires, the child process will be killed and waited for.", readme)
+        self.assertIn("If successful, the renaming will be an atomic operation (this is a POSIX requirement).", readme)
 
 
 if __name__ == "__main__":

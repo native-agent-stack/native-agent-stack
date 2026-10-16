@@ -65,8 +65,17 @@ def write_atomic(path: Path, text: str, mode: int = 0o600) -> None:
 
 
 def private_dir(path: Path) -> Path:
-    """A directory this tool owns (the state directory and its rosters): created when missing and kept 0700."""
-    path.mkdir(parents=True, exist_ok=True)
+    """A directory this tool owns (the state directory and its rosters): created when missing and kept 0700. Missing
+    parents are created 0700 one by one: Path.mkdir(parents=True) gives them the default permissions without taking mode
+    into account (python/cpython v3.13.16, cbc944f4, Doc/library/pathlib.rst:1476-1478), and the XDG Base Directory
+    specification (0.8) asks for 0700 on a directory it creates. An existing parent keeps its mode."""
+    missing, probe = [], path
+    while not probe.exists():
+        missing.append(probe)
+        probe = probe.parent
+    for directory in reversed(missing):
+        directory.mkdir(mode=0o700, exist_ok=True)
+        os.chmod(directory, 0o700)
     os.chmod(path, 0o700)
     return path
 
