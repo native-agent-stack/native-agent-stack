@@ -359,8 +359,9 @@ before any POST (exit 2): a verdict's name has 60 characters at most, and two re
 measured (no POST was made here), and a server that cut a description short would fail the final gate's exact read (exit 5). A context is
 case-insensitive ("This field is case-insensitive", `:79208`), so the lander compares contexts in lower case.
 
-The EXIT trap is set right before the first POST: unless the merge succeeded, it posts `state=failure` for each of the three contexts, so no
-success the lander posted outlives a landing that stopped, whatever stopped it. bash runs the trap on every exit ("Any trap on EXIT is
+The EXIT trap is set right before the first POST: unless the merge succeeded or its outcome is unknown (exit 17, which keeps them), it posts
+`state=failure` for each of the three contexts, so no success the lander posted outlives a landing that stopped before its merge, whatever
+stopped it. bash runs the trap on every exit ("Any trap on EXIT is
 executed before the shell terminates", the installed `bash(1)`, `exit`), keeping the exit status (measured), and HUP, INT and TERM are trapped
 to exit 129, 130 and 143, so a signal revokes too, once the command bash waits for completes ("it will not execute the trap until the
 command completes", `bash(1)`, SIGNALS; measured: a SIGTERM during the author lookup exits 143 and posts the three failures). A `$(...)`
@@ -385,10 +386,16 @@ and sha256 (the Claude, GPT and Muse verdicts, the Muse word, `GATES_DONE`, each
 lines `<sha256>  <file name>` of the files in their order, sha256sum's form) and CODEOWNERS' path and sha256. The PROPOSAL self-audit
 (#1195's Decision 4) would bind main's trailers, which hold the names and the head, to it. Its place is checked with the other local reads,
 before `ready` and the posts: the directory made (mode 0700) and writable, and no receipt there yet for this pull request and head,
-otherwise exit 7 and nothing posted. The file is written under bash's noclobber (`set -C`): "the redirection fails if the file whose name
-results from the expansion of *word* exists and is a regular file" (the installed `bash(1)`, REDIRECTION, Redirecting Output), which is all
-the manual says of it. Measured with bash 5.3.9: a second write to that regular file was refused, and so was a write through a dangling
-symlink; the mode was 0400 under `umask 0277`. A write that fails after the merge is exit 16 (merged, the statuses kept). The landing that
+otherwise exit 7 and nothing posted. The file is made in a temporary file in that directory and hard-linked to its name (`mktemp` under
+`umask 077`, written, `chmod 0400`, then `ln -T`, and the temporary name removed), since a hard link never follows or replaces an entry
+already at its name (#1194's GPT reads, P3-2: written under noclobber before, which refuses only an existing regular file, a symlink to
+`/dev/null` put there after the place's check took the write and the landing exited 0 with no receipt). The installed `ln`, uutils
+coreutils 0.10.0 (`uutils/coreutils@28b6856d7b215bf844b4223589cb54ade84f5223`, tag 0.10.0), removes nothing at the name without `-f` or `-i`
+and then calls `std::fs::hard_link` (`src/uu/ln/src/ln.rs:414-431, :475`), which "corresponds to the `linkat` function with no flags" and
+fails when "The 'link' path already exists." (rust-lang/rust 1.92.0 `library/std/src/fs.rs:2780, :2794`); `-T` keeps a directory at the
+name from taking the link inside it (`ln.rs:279-289`). Measured with that `ln`: a regular file, a symlink to `/dev/null`, a dangling
+symlink, a directory, a symlink to a directory and a FIFO at the name were each refused (rc 1) and left as they were. A write that fails
+after the merge is exit 16 (merged, the statuses kept). The landing that
 stops before its merge writes none.
 
 **The CI receipts (`LOCAL_CI_RECEIPTS`).** Each file is read once, as `nas_land.sh` reads a record (`nas_read`; a NUL byte refused, exit 2, as
@@ -566,7 +573,11 @@ written (its place was free and writable before the posts; the statuses are kept
 line is printed either way; #1194's delta reads); 17 the merge call failed and the pull request's state could not be read as merged or
 unmerged at the read head on three reads two seconds apart: the statuses are kept, nothing is revoked, and the pull request is checked by
 hand (a failed call whose pull request reads MERGED at the head continues as a landing; one that reads OPEN or CLOSED there on all three
-reads is 7; #1194's local review at 4fad2736, P2); 129 a hangup, 130 an interrupt and 143 a termination signal (128 and the signal's number):
+reads is 7; #1194's local review at 4fad2736, P2). gh returns the merge mutation's error as its own (cli v2.102.0
+`pkg/cmd/pr/merge/http.go:98-103`, `pkg/cmd/pr/merge/merge.go:347-349`), so a lost reply exits non-zero as a refusal does; the reads take
+`state` and `headRefOid`, both `gh pr view` JSON fields (`pkg/cmd/pr/view/view.go:84`; `api/query_builder.go:329, :365`), `state` being
+`CLOSED`, `MERGED` or `OPEN` (`PullRequestState`, github/docs@be38ec5d `src/graphql/data/fpt/schema.docs.graphql:47277-47292`); the three
+reads two seconds apart are this lander's policy, not a consistency GitHub documents (#1194's GPT read at 967d068a, P3-5); 129 a hangup, 130 an interrupt and 143 a termination signal (128 and the signal's number):
 before the merge call nothing is merged and the statuses posted are revoked, from the merge call until the receipt is written and the merge
 reported the three are ignored, and during the author check after that the pull request is merged and its receipt and statuses are kept;
 11 and 14 as above. Every code after the first POST, but 0, 12, 16, 17 and a signal during the author check, revokes the three statuses (the
@@ -859,9 +870,9 @@ scripts that is neither a tracked file's, a named public artifact's nor a named 
 
 | File | As committed |
 | --- | --- |
-| `uet_land.sh` | `95a4e1634b6a53b14d7736d2d40a3f0058a15aec9c9178e528ca44cfb74324ce` (441 lines) |
-| `nas_land.sh` | `1ca0dabc6c535a08fb45f6956cf4549cc956ca6b25e798bb60c6a95cd398f511` (690 lines) |
-| `horizon_land.sh` | `21c635cea5bc06d4dfa0b0e4a069a21af9d56b357246fc273915e67f8b67591c` (798 lines) |
+| `uet_land.sh` | `00a22674e6b0067d0fee1efe9ff412059db5b817fc8323c89bff4c12a74f0c0b` (444 lines) |
+| `nas_land.sh` | `c8c1489aff66c2238d6b4a332919b47df4969b3a1588e321898ef781743ca32f` (693 lines) |
+| `horizon_land.sh` | `336209b11841dd403a4f770711ddfc55965956efa845b608975cf67cc89ab81b` (824 lines) |
 | `codex_gate.py` | `7afaa831c0763dd14c584d76b17465fa50993656cd63eec9fd0c4412fddb74b2` (559 lines) |
 | `review_normalize.py` | `b553d9cb67ca196bd587e980e01295e28e8ea0e2bcb3d0015fc5d040735a1594` (348 lines) |
 
@@ -1240,6 +1251,16 @@ errors):
     its own reason); a leading, trailing or doubled `:` in `LOCAL_CI_RECEIPTS` (2 before any call; the trailing one landed at b4489b15); and
     the text: "the required local workflow", "the PROPOSAL self-audit", the bash(1) texts for `trap ''` and noclobber, the lag's wording, the
     signal hold right before the merge call and the exit traps set again after the report.
+  - #1194's five GPT follow-ups (its reads at b4489b15, 4fad2736 and 967d068a), each failing against the scripts at 65d66a37 (20 failures
+    in these 5 tests, measured with the module of this change; the identity test of the shared block passes before and after): the shared
+    block's merge-commit read after the merge failing with a sentinel on stdout, in each lander (12, the sentinel not printed; at 65d66a37
+    each exited 0 and printed it), and in `uet_land.sh` and `nas_land.sh` a read that succeeds with a reply of another form (12); a symlink
+    to `/dev/null` put at the landing receipt's place after the merge (16, the statuses kept, the symlink left and no temporary file; at
+    65d66a37 it exited 0 with no receipt), with a dangling symlink, a directory and a symlink to a directory (16 before and after) and a
+    landing that writes one regular file, 0400, with one link (the controls); and the text: the hard link's sources in place of the
+    noclobber texts, exit 17 in the header and the unknown outcome in both revocation summaries, the merge outcome's sources and the
+    three reads named a local policy, and the corrected Word Splitting and pipefail texts (these three fail against `horizon_land.sh` at
+    4fad2736, where the text test fails 12 times).
 
 ## Upstream sources for the #975 corrections
 

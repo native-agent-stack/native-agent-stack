@@ -15,10 +15,11 @@
 # -> the read head, which must be the pull request's head (no head-following), and the base, which must be main -> origin/main an ancestor of
 # the head and GitHub reporting neither BEHIND nor DIRTY (strict; the branch is never updated here) -> the verdicts (and GATES_DONE when one
 # states a landing gate), the CI receipts, main's CODEOWNERS (with GitHub's CODEOWNERS errors) and the local landing receipt's place -> a
-# draft marked ready -> the three statuses posted at the head (from here an EXIT trap revokes them unless the merge succeeded) -> the merge
-# state polled until CLEAN -> the squash body with the lander's trailers, the author address -> final_gate, fast reads only (the head and the
-# base, the verdicts, GATES_DONE and the receipts and their digests, the combined status, CODEOWNERS, origin/main, the merge state) -> the
-# squash merge pinned to the head -> the merge commit, the local landing receipt (0400) and the merge's author.
+# draft marked ready -> the three statuses posted at the head (from here an EXIT trap revokes them unless the merge succeeded or its outcome
+# is unknown (exit 17, HZ_KEEP)) -> the merge state polled until CLEAN -> the squash body with the lander's trailers, the author address ->
+# final_gate, fast reads only (the head and the base, the verdicts, GATES_DONE and the receipts and their digests, the combined status,
+# CODEOWNERS, origin/main, the merge state) -> the squash merge pinned to the head -> the merge commit, the local landing receipt (0400) and
+# the merge's author.
 # The statuses and the trailers publish file NAMES only: the verdicts, GATES_DONE and the receipts are private files, and a digest of private
 # bytes is an offline oracle for them (correction #161), so their sha256 stay local, compared at the final gate and kept in the landing receipt
 # under LANDING_COORD (README, "The landing receipt").
@@ -34,7 +35,8 @@
 # merge commit could not be read or its author is not that address (correction #148), 13 not up to date with origin/main, origin/main
 # unreadable, or moved (final gate), or a base other than main (also at the final gate), 14 another landing of this repository holds the
 # landing lock, or the lock cannot be taken (nothing merged), 15 a status POST failed (nothing merged; the statuses posted are revoked), 16
-# merged, but the local landing receipt could not be written (when 12 applies too, 12 is the exit), 129, 130 and 143 a hangup, an interrupt
+# merged, but the local landing receipt could not be written (when 12 applies too, 12 is the exit), 17 the merge call failed and its outcome
+# could not be read (the statuses kept, nothing revoked; the pull request is checked by hand), 129, 130 and 143 a hangup, an interrupt
 # or a termination signal: before the merge call, nothing merged and the statuses posted revoked; from the merge call until the receipt is
 # written and the merge reported, HUP, INT and TERM are ignored; during the author check after that, merged, the receipt and the statuses
 # kept.
@@ -236,11 +238,14 @@ lg_author_email() {  # <owner/repo> : the account's no-reply address; rc 1 and n
   case "$id" in ''|*[!0-9]*) return 1 ;; esac
   printf '%s+%s@users.noreply.github.com\n' "$id" "$login"
 }
+# #1194's GPT reads (P3-1 at b4489b15, 4fad2736 and 967d068a): the merge commit is taken only from a read whose call exited 0, and only as
+# 40 hex digits (lg_hex40, below); a failed call's stdout, or another reply, is no merge commit, so five such reads are exit 12 with nothing
+# of them printed.
 lg_author_check() {  # <owner/repo> <pr> <no-reply address> : after the merge, the merge commit's author is that address; prints text only, never the stored address
   local mc="" ok="" i
   for i in 1 2 3 4 5; do
-    mc=$(gh pr view "$2" -R "$1" --json mergeCommit --jq '.mergeCommit.oid // empty' 2>/dev/null)
-    [ -n "$mc" ] && break
+    mc=$(gh pr view "$2" -R "$1" --json mergeCommit --jq '.mergeCommit.oid // empty' 2>/dev/null) && lg_hex40 "$mc" && break
+    mc=""
     sleep 3
   done
   [ -n "$mc" ] || { echo "#$2 author address NOT CHECKED: the merge commit is unreadable (correction #148)"; return 1; }
@@ -527,9 +532,10 @@ hz_post() {  # <context> <description>
   gh api "repos/$R/statuses/$EF" --method POST -f state=success -f context="$1" -f description="$2" >/dev/null 2>&1 \
     || { echo "#$N the $1 status could not be posted at ${EF:0:8} (output withheld): stop, nothing merged"; exit 15; }
 }
-# The EXIT trap, set right before the first POST: unless the merge succeeded, each of the three contexts is posted as failure at the head, so
-# no success the lander posted outlives a landing that stopped. bash runs the EXIT trap on every exit ("Any trap on EXIT is executed before
-# the shell terminates", bash(1), exit, bash 5.3; an exit status kept, measured), and HUP, INT and TERM are trapped to exit (129, 130, 143),
+# The EXIT trap, set right before the first POST: unless the merge succeeded or its outcome is unknown (exit 17, HZ_KEEP), each of the three
+# contexts is posted as failure at the head, so no success the lander posted outlives a landing that stopped before its merge. bash runs
+# the EXIT trap on every exit ("Any trap on EXIT is executed before the shell terminates", bash(1), exit, bash 5.3; an exit status kept,
+# measured), and HUP, INT and TERM are trapped to exit (129, 130, 143),
 # so a signal revokes too, once the command bash waits for completes ("it will not execute the trap until the command completes", bash(1),
 # SIGNALS). A $(...) subshell does not run it (measured). SIGKILL cannot be trapped (README, Known gaps). Its first statement ignores HUP,
 # INT and TERM ("If action is the null string the signal specified by each sigspec is ignored by the shell and by the commands it invokes",
@@ -645,10 +651,24 @@ final_gate() {  # <pinned head>
 # and never printed: the repository, the pull request, the head, the base (main) and main's commit, the merge commit (null when it could not be
 # read), the time, the three posted descriptions, each file's name and sha256 (the Claude, GPT and Muse verdicts, GATES_DONE, each CI
 # receipt), the receipts' combined sha256 and CODEOWNERS. The PROPOSAL self-audit (#1195's Decision 4) would bind main's trailers (names and
-# the head) to it. The file is created with mode 0400 (umask 0277) under bash's noclobber, set -C: "the redirection fails if the file whose
-# name results from the expansion of word exists and is a regular file" (bash(1), REDIRECTION, Redirecting Output, bash 5.3); measured with
-# bash 5.3.9, a second write to the regular file and a write through a dangling symlink were both refused. Prints one line; rc 1 when it
-# cannot be written.
+# the head) to it. The file is made whole in a temporary file in that directory (mktemp, umask 077; written, then chmod 0400) and
+# hard-linked to its name with ln -T, and the temporary name is removed. A hard link never follows or replaces an entry already at its name
+# (#1194's GPT reads, P3-2: under bash's noclobber, which refuses only an existing regular file, a symlink to /dev/null put there after the
+# place's check took the write, and the landing reported a receipt it did not keep). The installed ln, uutils coreutils 0.10.0
+# (uutils/coreutils@28b6856d7b215bf844b4223589cb54ade84f5223, tag 0.10.0; src/uu/ln/src/ln.rs:414-431, :475), removes nothing at the name
+# without -f or -i and then links with std::fs::hard_link, which "corresponds to the `linkat` function with no flags"
+# and fails when "The 'link' path already exists." (rust-lang/rust 1.92.0 library/std/src/fs.rs:2780, :2794); -T keeps a directory at the
+# name from taking the link inside it (ln.rs:279-289). Measured with that ln: a regular file, a symlink to /dev/null, a dangling symlink, a
+# directory, a symlink to a directory and a FIFO at the name were each refused (rc 1) and left as they were. Prints one line; rc 1 when the
+# receipt cannot be written.
+hz_link_receipt() {  # <text> : rc 1 when any step fails; the temporary file is removed either way
+  local t rc
+  t=$(umask 077; mktemp "$HZ_RECEIPT_DIR/.$N-${EF:0:12}.XXXXXXXXXX" 2>/dev/null) || return 1
+  { printf '%s\n' "$1" > "$t" && chmod 0400 "$t" && ln -T "$t" "$HZ_RECEIPT"; } 2>/dev/null
+  rc=$?
+  rm -f -- "$t" 2>/dev/null
+  return "$rc"
+}
 hz_receipt() {  # <merge commit, or nothing>
   local j
   j=$(jq -n --arg repo "$R" --argjson pr "$N" --arg head "$EF" --arg main "$MAIN" --arg merge "$1" --arg at "$(date -u +%FT%TZ)" \
@@ -662,7 +682,7 @@ hz_receipt() {  # <merge commit, or nothing>
       gates_done: (if $dn == "" then null else {name: $dn, sha256: $ds} end),
       local_ci_receipts: [$rcs | split("\n")[] | select(length > 0) | capture("^(?<sha256>[0-9a-f]{64})  (?<name>.+)$")],
       local_ci_sha256: $rc, codeowners: {path: $cop, sha256: $cos}}' 2>/dev/null) \
-    && { ( set -C; umask 0277; printf '%s\n' "$j" > "$HZ_RECEIPT" ); } 2>/dev/null \
+    && hz_link_receipt "$j" \
     || { echo "#$N merged, but the landing receipt $N-${EF:0:12}.json could not be written under LANDING_COORD/horizon-landings (path withheld)"; return 1; }
   echo "#$N landing receipt $N-${EF:0:12}.json written under LANDING_COORD/horizon-landings (0400; the digests stay local)"
 }
@@ -758,10 +778,16 @@ BODY="${mb:+$mb$nl$nl}$TRAILERS"
 # traps are back.
 # A failed merge call is reconciled before anything is revoked (#1194's local review at 4fad2736, P2): GitHub can commit the merge and the
 # reply be lost (a reset connection, say), so gh exits non-zero for a pull request that is merged, and revoking would post failures for a
-# merged head and leave no landing receipt. The state is read three times, two seconds apart, since GitHub's views can lag (the uet#58
-# measurement, above): MERGED at the read head on any read continues as a landing (HZ_MERGED, the receipt and the report); OPEN or CLOSED
-# at the read head on all three is exit 7, and the EXIT trap revokes; anything else (a read that fails, another head, a mix) is exit 17:
-# the outcome is unknown, so the statuses are kept (HZ_KEEP), nothing is revoked and the pull request is checked by hand.
+# merged head and leave no landing receipt. gh returns the merge mutation's error as its own (cli v2.102.0
+# pkg/cmd/pr/merge/http.go:98-103, the MergePullRequest mutation returned from gql.Mutate; pkg/cmd/pr/merge/merge.go:347-349), so a lost
+# reply exits non-zero as a refusal does (#1194's GPT read at 967d068a, P3-5). The state is read three times, two seconds apart, since
+# GitHub's views can lag (the uet#58 measurement, above); the three reads two seconds apart are this lander's policy, not a consistency GitHub
+# documents. Each reads `state` and `headRefOid`, both gh pr view JSON fields (pkg/cmd/pr/view/view.go:84, api.PullRequestFields;
+# api/query_builder.go:329, :365), `state` being CLOSED, MERGED or OPEN (PullRequestState, github/docs@be38ec5d
+# src/graphql/data/fpt/schema.docs.graphql:47277-47292): MERGED at the read head on any read continues as a landing (HZ_MERGED, the receipt
+# and the report); OPEN or CLOSED at the read head on all three is exit 7, and the EXIT trap revokes; anything else (a read that fails,
+# another head, a mix) is exit 17: the outcome is unknown, so the statuses are kept (HZ_KEEP), nothing is revoked and the pull request is
+# checked by hand.
 hz_merge_outcome() {
   local i o unmerged=0
   for i in 1 2 3; do

@@ -268,11 +268,14 @@ lg_author_email() {  # <owner/repo> : the account's no-reply address; rc 1 and n
   case "$id" in ''|*[!0-9]*) return 1 ;; esac
   printf '%s+%s@users.noreply.github.com\n' "$id" "$login"
 }
+# #1194's GPT reads (P3-1 at b4489b15, 4fad2736 and 967d068a): the merge commit is taken only from a read whose call exited 0, and only as
+# 40 hex digits (lg_hex40, below); a failed call's stdout, or another reply, is no merge commit, so five such reads are exit 12 with nothing
+# of them printed.
 lg_author_check() {  # <owner/repo> <pr> <no-reply address> : after the merge, the merge commit's author is that address; prints text only, never the stored address
   local mc="" ok="" i
   for i in 1 2 3 4 5; do
-    mc=$(gh pr view "$2" -R "$1" --json mergeCommit --jq '.mergeCommit.oid // empty' 2>/dev/null)
-    [ -n "$mc" ] && break
+    mc=$(gh pr view "$2" -R "$1" --json mergeCommit --jq '.mergeCommit.oid // empty' 2>/dev/null) && lg_hex40 "$mc" && break
+    mc=""
     sleep 3
   done
   [ -n "$mc" ] || { echo "#$2 author address NOT CHECKED: the merge commit is unreadable (correction #148)"; return 1; }
