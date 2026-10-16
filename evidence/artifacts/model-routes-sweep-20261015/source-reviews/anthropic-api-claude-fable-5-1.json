@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "id": "source-review-anthropic-api-claude-fable-5-1",
+  "kind": "upstream_provenance",
+  "evidence_class": "source_review",
+  "catalog": "foundation",
+  "layer_id": "model-routes",
+  "read_at": "2026-10-15",
+  "candidate_id": "anthropic-api-claude-fable-5-1",
+  "repository": "https://platform.claude.com/docs/en/models/fable-5-1/overview",
+  "role_identity": "https://platform.claude.com/docs/en/models/fable-5-1/overview#route=anthropic-api-claude-fable-5-1",
+  "carried": false,
+  "carried_verdict": null,
+  "proposal_label": "keep_but_compare",
+  "model": {
+    "value": "claude-fable-5-1",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/fable-5-1/overview"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "route": {
+    "value": {
+      "client": "Approved Anthropic harness not yet selected",
+      "provider": "Anthropic API",
+      "endpoint": "https://api.anthropic.com/v1/messages",
+      "endpoint_class": "Anthropic Messages"
+    },
+    "verification": "VERIFIED",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/fable-5-1/overview",
+      "https://platform.claude.com/docs/en/api/messages"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "pin": {
+    "value": null,
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-CLIENT",
+    "cheapest_check": "Select an already converged harness and record its installed version.",
+    "sources": [],
+    "read_at": "2026-10-15"
+  },
+  "effort": {
+    "value": "low, medium, high, xhigh, max; default high; always-on adaptive thinking.",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://platform.claude.com/docs/en/build-with-claude/effort",
+      "https://platform.claude.com/docs/en/models/fable-5-1/overview"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "tier": {
+    "value": "Service-tier behavior not established in this sweep.",
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-ANTHROPIC-TIER",
+    "cheapest_check": "Read the Messages tier parameter; measure only after approval.",
+    "sources": [],
+    "read_at": "2026-10-15"
+  },
+  "limits": {
+    "value": {
+      "context": "1M",
+      "max_output": "128K"
+    },
+    "verification": "VERIFIED",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/fable-5-1/overview"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "pricing": {
+    "value": "API $10 input / $50 output per MTok; cache read $0.25.",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://platform.claude.com/docs/en/about-claude/pricing",
+      "https://platform.claude.com/docs/en/models/fable-5-1/overview"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "adoption_status": {
+    "value": "NOT_ADOPTED",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/fable-5-1/overview"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "New source-based proposal only."
+  },
+  "facts_adjudication": {
+    "author_family": "openai",
+    "canonical_facts_vote": false,
+    "summary": "Current primary documentation names Fable 5.1 for demanding reasoning and long-horizon work. This model is absent from the 14 carried rows. Vendor positioning is not a measured local advantage."
+  },
+  "fit_adjudication": {
+    "role": "gpt6-refute-fit:model-routes",
+    "refuted": false,
+    "confidence": 0.85,
+    "reasoning": "Keep a conditional higher-capability comparison arm, not a default: vendor guidance supplies a concrete capability hypothesis beyond Opus; the premium cost must be justified by same-harness task results."
+  },
+  "formal_sweep_survivor": false,
+  "angle_status": {
+    "A1": "Partial documented capability; route/host qualification incomplete.",
+    "A2": "Route-specific engineering quality not independently established.",
+    "A3": "Route-specific community consensus not established.",
+    "A4": "Net usage not measured.",
+    "A5": "Published vendor capability/positioning only; no independent cross-route evaluation retained.",
+    "A6": "No executed comparative run."
+  },
+  "comparison_that_would_overturn": "Compare Fable 5.1 against Opus 5.5 at explicit max in an approved, identical harness. Predeclare tasks where Opus fails and evaluate success gain against 2.5x input/output list rates; require retained independent-family review.",
+  "sources": [
+    "https://platform.claude.com/docs/en/models/fable-5-1/overview",
+    "https://platform.claude.com/docs/en/about-claude/models/overview",
+    "https://platform.claude.com/docs/en/about-claude/pricing",
+    "https://platform.claude.com/docs/en/build-with-claude/effort"
+  ],
+  "limitations": [
+    "SINGLE-FAMILY (GPT), source-review initial sweep; the same Codex session authored discovery and fit, so these are not independent judgments.",
+    "Claude discovery, Claude facts refutation, Claude fit refutation and completeness critic were not run. No formal survivors, clean sweep, saturation, FINAL verdict or default change is claimed.",
+    "Only unkeyed loopback model listings and client version/help were probed. No inference, keyed API request, Muse process, credential file, environment file, OmniRoute data directory or account record was inspected.",
+    "Model/API documentation establishes advertised capabilities and prices, not current account entitlement, effective gateway effort/tier, billing or comparative quality.",
+    "Repository, wave and ledger files remain unchanged. Proposed ledger record is not append-ready: the model-routes research-state row and normal harness usage/workflow receipts do not exist.",
+    "The exact user-dispatched model/effort/tier are requested metadata; no private rollout or usage files were read to verify actual execution."
+  ]
+}

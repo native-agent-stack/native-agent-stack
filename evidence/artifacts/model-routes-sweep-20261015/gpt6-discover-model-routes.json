@@ -1,0 +1,384 @@
+{
+  "layer_id": "model-routes",
+  "proposed": [
+    {
+      "repository": "https://dev.meta.ai/docs/muse-code#route=muse-code-wonder-full",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "Wonder Full is a separate subscription-only product, not the max setting on Wonder API. The source-reviewed native fence is held and is a filesystem boundary, with shared networking. No gateway Full availability or native invocation was established today. Keep only the conditional native Muse Code reader trial. Preserve all fence gates and the lack of builder/reviewer qualification; do not promote the gateway alias or infer Full availability from passthroughModels.",
+      "comparison_that_would_overturn": "After named fence reviews and explicit CC authorization, run the existing fenced reader smoke, then preregister a comparable full-harness task comparison. No trial runs in this sweep.",
+      "evidence": [
+        "https://dev.meta.ai/docs/models",
+        "https://dev.meta.ai/docs/muse-code",
+        "https://dev.meta.ai/docs/muse-code/subscriptions",
+        "https://dev.meta.ai/docs/reasoning",
+        "https://dev.meta.ai/docs/muse-code/configuration",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:docs/decisions/2026-10-14-muse-file-fence.md:7",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:docs/decisions/2026-10-15-muse-toolchain-directory-grants.md:13",
+        "OmniRoute@sha256:c10ada7126c3a339b6c87b1371bd4d5a7a8a26ad4b2664daac2208130c4fe1be:open-sse/config/providers/registry/muse-code/index.ts:41",
+        "evidence/artifacts/model-routes-sweep-20261015/listing.json",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+      ],
+      "upstream_now": {
+        "latest_release": "muse-wonder-full-1.0",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://dev.meta.ai/docs/models#route=muse-code-wonder-api",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "muse-wonder-1.0 is the API model, distinct from subscription Wonder Full. Meta documents the selected coding-agent protocol; actual installed client configuration, tool fidelity and entitlement are unverified. Keep as a conditional comparison candidate: this distinct client/protocol can test harness parity or cost/capability against existing routes. No source-only result justifies adoption or starting a keyed trial.",
+      "comparison_that_would_overturn": "After the harness screen and CC approval, run identical frozen tasks in the named client through Meta's documented endpoint, preserving reasoning replay and tool schemas; compare success, latency, tokens and actual cost.",
+      "evidence": [
+        "https://dev.meta.ai/docs/models",
+        "https://dev.meta.ai/docs/coding-agents",
+        "https://dev.meta.ai/docs/pricing-rate-limits",
+        "https://dev.meta.ai/docs/reasoning",
+        "https://dev.meta.ai/docs/muse-code/configuration",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+      ],
+      "upstream_now": {
+        "latest_release": "muse-wonder-1.0",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://dev.meta.ai/docs/models#route=codex-wonder-api",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "muse-wonder-1.0 is the API model, distinct from subscription Wonder Full. Meta documents the selected coding-agent protocol; actual installed client configuration, tool fidelity and entitlement are unverified. Keep as a conditional comparison candidate: this distinct client/protocol can test harness parity or cost/capability against existing routes. No source-only result justifies adoption or starting a keyed trial.",
+      "comparison_that_would_overturn": "After the harness screen and CC approval, run identical frozen tasks in the named client through Meta's documented endpoint, preserving reasoning replay and tool schemas; compare success, latency, tokens and actual cost.",
+      "evidence": [
+        "https://dev.meta.ai/docs/models",
+        "https://dev.meta.ai/docs/coding-agents",
+        "https://dev.meta.ai/docs/pricing-rate-limits",
+        "https://dev.meta.ai/docs/reasoning",
+        "https://dev.meta.ai/docs/muse-code/configuration",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+      ],
+      "upstream_now": {
+        "latest_release": "muse-wonder-1.0",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://dev.meta.ai/docs/models#route=opencode-wonder-api",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "muse-wonder-1.0 is the API model, distinct from subscription Wonder Full. Meta documents the selected coding-agent protocol; actual installed client configuration, tool fidelity and entitlement are unverified. Keep as a conditional comparison candidate: this distinct client/protocol can test harness parity or cost/capability against existing routes. No source-only result justifies adoption or starting a keyed trial.",
+      "comparison_that_would_overturn": "After the harness screen and CC approval, run identical frozen tasks in the named client through Meta's documented endpoint, preserving reasoning replay and tool schemas; compare success, latency, tokens and actual cost.",
+      "evidence": [
+        "https://dev.meta.ai/docs/models",
+        "https://dev.meta.ai/docs/coding-agents",
+        "https://dev.meta.ai/docs/pricing-rate-limits",
+        "https://dev.meta.ai/docs/reasoning",
+        "https://dev.meta.ai/docs/muse-code/configuration",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+      ],
+      "upstream_now": {
+        "latest_release": "muse-wonder-1.0",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://dev.meta.ai/docs/models#route=claude-code-wonder-api",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "muse-wonder-1.0 is the API model, distinct from subscription Wonder Full. Meta documents the selected coding-agent protocol; actual installed client configuration, tool fidelity and entitlement are unverified. Keep as a conditional comparison candidate: this distinct client/protocol can test harness parity or cost/capability against existing routes. No source-only result justifies adoption or starting a keyed trial.",
+      "comparison_that_would_overturn": "After the harness screen and CC approval, run identical frozen tasks in the named client through Meta's documented endpoint, preserving reasoning replay and tool schemas; compare success, latency, tokens and actual cost.",
+      "evidence": [
+        "https://dev.meta.ai/docs/models",
+        "https://dev.meta.ai/docs/coding-agents",
+        "https://dev.meta.ai/docs/pricing-rate-limits",
+        "https://dev.meta.ai/docs/reasoning",
+        "https://dev.meta.ai/docs/muse-code/configuration",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+      ],
+      "upstream_now": {
+        "latest_release": "muse-wonder-1.0",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://dev.meta.ai/docs/models#route=harness-spark-api",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "Muse Spark 1.3 is the current documented Spark; the gateway lists it under mc/muse-code. A listed endpoint is not proof of model execution, entitlement or a qualified harness. Keep as a conditional comparison candidate: this distinct client/protocol can test harness parity or cost/capability against existing routes. No source-only result justifies adoption or starting a keyed trial.",
+      "comparison_that_would_overturn": "After the harness screen and CC approval, run identical frozen tasks in the named client through Meta's documented endpoint, preserving reasoning replay and tool schemas; compare success, latency, tokens and actual cost.",
+      "evidence": [
+        "https://dev.meta.ai/docs/models",
+        "https://dev.meta.ai/docs/coding-agents",
+        "https://dev.meta.ai/docs/pricing-rate-limits",
+        "https://dev.meta.ai/docs/reasoning",
+        "https://dev.meta.ai/docs/muse-code/configuration",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json",
+        "OmniRoute@sha256:c10ada7126c3a339b6c87b1371bd4d5a7a8a26ad4b2664daac2208130c4fe1be:open-sse/config/providers/registry/muse-code/index.ts:41",
+        "evidence/artifacts/model-routes-sweep-20261015/listing.json"
+      ],
+      "upstream_now": {
+        "latest_release": "muse-spark-1.3",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://dev.meta.ai/docs/models#route=muse-subscription-foreign-harness",
+      "proposed_label": "not_adopted",
+      "demonstrated_gap": "Retain the carried REJECTED disposition. Public sources keep Wonder Full out of Model API and restrict coding-harness subscription credentials to their harness. This is a route/capability boundary, not a license-quality score. The not_adopted label survives refutation: the intended subscription route is not a documented general API alternative. A separate Model API route is already represented by the Wonder/Spark candidates.",
+      "comparison_that_would_overturn": "Reopen only on new primary evidence of a supported route, or an independently entitled API route. No keyed measurement is proposed for unsupported subscription reuse.",
+      "evidence": [
+        "https://dev.meta.ai/docs/models",
+        "https://dev.meta.ai/docs/muse-code/subscriptions",
+        "https://dev.meta.ai/legal/terms-of-service",
+        "https://dev.meta.ai/docs/coding-agents",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json",
+        "OmniRoute@sha256:c10ada7126c3a339b6c87b1371bd4d5a7a8a26ad4b2664daac2208130c4fe1be:open-sse/config/providers/registry/muse-code/index.ts:41"
+      ],
+      "upstream_now": {
+        "latest_release": "muse-code-subscription",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://developers.openai.com/codex/models#route=codex-gpt-6-1-sol",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "Exact vendor model and cx route are present. API documentation and the gateway agree on identity but advertise different context limits. No model call or account inspection proves entitlement, outbound max/default, quality or billing. Keep for comparison: a documented distinct quality/cost role in the existing Codex harness. CURRENT/TRIAL labels alone do not establish convergence; retain same-harness measurements and missing-family gates.",
+      "comparison_that_would_overturn": "Approved paired Codex runs at max/default with identical frozen tasks, tool layers and context budgets; compare task success, tokens, latency and billed plan class. No winner until all retained angles agree.",
+      "evidence": [
+        "https://developers.openai.com/codex/models",
+        "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+        "https://developers.openai.com/codex/config-reference",
+        "https://developers.openai.com/codex/enterprise/sign-in-with-chatgpt-through-a-gateway",
+        "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+        "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/v3.8.51/CHANGELOG.md",
+        "OmniRoute@sha256:cb2a82f1fe8661468b51df578ede6409cb57a359591f8e25541969cf9f71f469:open-sse/config/providers/registry/codex/index.ts:10",
+        "OmniRoute@sha256:cb7c78ff2c0fcdebfdc815a174770f346af6d5eccda581a3ff3b2d9b8f588aaf:open-sse/config/providers/shared.ts:339",
+        "OmniRoute@sha256:f9ed676e244fc504deae354bb5dee46be5a242a24526d6e1017296ed34110043:src/lib/providers/requestDefaults.ts:59",
+        "evidence/artifacts/model-routes-sweep-20261015/listing.json",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+      ],
+      "upstream_now": {
+        "latest_release": "gpt-6.1-sol",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://developers.openai.com/codex/models#route=codex-gpt-6-astra",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "Exact vendor model and cx route are present. API documentation and the gateway agree on identity but advertise different context limits. No model call or account inspection proves entitlement, outbound max/default, quality or billing. Keep for comparison: a documented distinct quality/cost role in the existing Codex harness. CURRENT/TRIAL labels alone do not establish convergence; retain same-harness measurements and missing-family gates.",
+      "comparison_that_would_overturn": "Approved paired Codex runs at max/default with identical frozen tasks, tool layers and context budgets; compare task success, tokens, latency and billed plan class. No winner until all retained angles agree.",
+      "evidence": [
+        "https://developers.openai.com/codex/models",
+        "https://developers.openai.com/api/docs/models/gpt-6-astra",
+        "https://developers.openai.com/codex/config-reference",
+        "https://developers.openai.com/codex/enterprise/sign-in-with-chatgpt-through-a-gateway",
+        "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+        "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/v3.8.51/CHANGELOG.md",
+        "OmniRoute@sha256:cb2a82f1fe8661468b51df578ede6409cb57a359591f8e25541969cf9f71f469:open-sse/config/providers/registry/codex/index.ts:10",
+        "OmniRoute@sha256:cb7c78ff2c0fcdebfdc815a174770f346af6d5eccda581a3ff3b2d9b8f588aaf:open-sse/config/providers/shared.ts:339",
+        "OmniRoute@sha256:f9ed676e244fc504deae354bb5dee46be5a242a24526d6e1017296ed34110043:src/lib/providers/requestDefaults.ts:59",
+        "evidence/artifacts/model-routes-sweep-20261015/listing.json",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+      ],
+      "upstream_now": {
+        "latest_release": "gpt-6-astra",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://developers.openai.com/codex/models#route=codex-gpt-6-luna",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "Exact vendor model and cx route are present. API documentation and the gateway agree on identity but advertise different context limits. No model call or account inspection proves entitlement, outbound max/default, quality or billing. Keep for comparison: a documented distinct quality/cost role in the existing Codex harness. CURRENT/TRIAL labels alone do not establish convergence; retain same-harness measurements and missing-family gates.",
+      "comparison_that_would_overturn": "Approved paired Codex runs at max/default with identical frozen tasks, tool layers and context budgets; compare task success, tokens, latency and billed plan class. No winner until all retained angles agree.",
+      "evidence": [
+        "https://developers.openai.com/codex/models",
+        "https://developers.openai.com/api/docs/models/gpt-6-luna",
+        "https://developers.openai.com/codex/config-reference",
+        "https://developers.openai.com/codex/enterprise/sign-in-with-chatgpt-through-a-gateway",
+        "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+        "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/v3.8.51/CHANGELOG.md",
+        "OmniRoute@sha256:cb2a82f1fe8661468b51df578ede6409cb57a359591f8e25541969cf9f71f469:open-sse/config/providers/registry/codex/index.ts:10",
+        "OmniRoute@sha256:cb7c78ff2c0fcdebfdc815a174770f346af6d5eccda581a3ff3b2d9b8f588aaf:open-sse/config/providers/shared.ts:339",
+        "OmniRoute@sha256:f9ed676e244fc504deae354bb5dee46be5a242a24526d6e1017296ed34110043:src/lib/providers/requestDefaults.ts:59",
+        "evidence/artifacts/model-routes-sweep-20261015/listing.json",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+      ],
+      "upstream_now": {
+        "latest_release": "gpt-6-luna",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://code.claude.com/docs/en/model-config#route=claude-code-claude-opus-5-5",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "Vendor model page, release notes and installed skill identify this model and its limits/prices. The model's API behavior is distinct from a Claude Code subscription. No direct API request was made. Keep the native-harness model comparison open. Vendor capability/latency claims support a plausible role; account access, native tool parity and an independent comparative run remain unverified.",
+      "comparison_that_would_overturn": "After approval, compare the carried Claude models in the same approved Claude harness, explicit max effort and fixed tier/task set; record task success, latency and usage before deciding a default.",
+      "evidence": [
+        "https://platform.claude.com/docs/en/models/opus-5-5/overview",
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/about-claude/pricing",
+        "https://platform.claude.com/docs/en/release-notes/overview",
+        "https://platform.claude.com/docs/en/build-with-claude/effort",
+        "https://platform.claude.com/docs/en/api/messages",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json",
+        "anthropics/skills@dbd4588f9e1033efb41dad4bef2f7947c8993d44:skills/claude-api/shared/models.md:64"
+      ],
+      "upstream_now": {
+        "latest_release": "claude-opus-5-5",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://code.claude.com/docs/en/model-config#route=claude-code-claude-sonnet-5-5",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "Vendor model page, release notes and installed skill identify this model and its limits/prices. The model's API behavior is distinct from a Claude Code subscription. No direct API request was made. Keep the native-harness model comparison open. Vendor capability/latency claims support a plausible role; account access, native tool parity and an independent comparative run remain unverified.",
+      "comparison_that_would_overturn": "After approval, compare the carried Claude models in the same approved Claude harness, explicit max effort and fixed tier/task set; record task success, latency and usage before deciding a default.",
+      "evidence": [
+        "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/about-claude/pricing",
+        "https://platform.claude.com/docs/en/release-notes/overview",
+        "https://platform.claude.com/docs/en/build-with-claude/effort",
+        "https://platform.claude.com/docs/en/api/messages",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json",
+        "anthropics/skills@dbd4588f9e1033efb41dad4bef2f7947c8993d44:skills/claude-api/shared/models.md:64"
+      ],
+      "upstream_now": {
+        "latest_release": "claude-sonnet-5-5",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://code.claude.com/docs/en/model-config#route=claude-code-claude-haiku-5-5",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "Vendor model page, release notes and installed skill identify this model and its limits/prices. The model's API behavior is distinct from a Claude Code subscription. No direct API request was made. Keep the native-harness model comparison open. Vendor capability/latency claims support a plausible role; account access, native tool parity and an independent comparative run remain unverified.",
+      "comparison_that_would_overturn": "After approval, compare the carried Claude models in the same approved Claude harness, explicit max effort and fixed tier/task set; record task success, latency and usage before deciding a default.",
+      "evidence": [
+        "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/about-claude/pricing",
+        "https://platform.claude.com/docs/en/release-notes/overview",
+        "https://platform.claude.com/docs/en/build-with-claude/effort",
+        "https://platform.claude.com/docs/en/api/messages",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json",
+        "anthropics/skills@dbd4588f9e1033efb41dad4bef2f7947c8993d44:skills/claude-api/shared/models.md:64"
+      ],
+      "upstream_now": {
+        "latest_release": "claude-haiku-5-5",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://developers.openai.com/codex/models#route=openai-pool-foreign-harness",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "OpenAI documents a per-user Codex sign-in through a gateway. That source does not establish this unspecified non-Codex pooled deployment. Carried COMPARISON_ARM metadata is not adoption. Refuted under the template's default-on-uncertainty rule: no named client or supported deployment is established. Keep the gap unresolved; this does not prove every possible non-Codex route impossible.",
+      "comparison_that_would_overturn": "First name and source the client/entitlement design; only then authorize a same-task full-harness parity comparison. No blind credential or inference probe closes this design gap.",
+      "evidence": [
+        "https://developers.openai.com/codex/models",
+        "https://developers.openai.com/codex/enterprise/sign-in-with-chatgpt-through-a-gateway",
+        "OmniRoute@sha256:cb2a82f1fe8661468b51df578ede6409cb57a359591f8e25541969cf9f71f469:open-sse/config/providers/registry/codex/index.ts:10",
+        "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+      ],
+      "upstream_now": {
+        "latest_release": "gpt-6.1-sol",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "Required carried candidate from foundation-model-routes angle record; primary-source recheck."
+    },
+    {
+      "repository": "https://platform.claude.com/docs/en/models/fable-5-1/overview#route=anthropic-api-claude-fable-5-1",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "Current primary documentation names Fable 5.1 for demanding reasoning and long-horizon work. This model is absent from the 14 carried rows. Vendor positioning is not a measured local advantage. Keep a conditional higher-capability comparison arm, not a default: vendor guidance supplies a concrete capability hypothesis beyond Opus; the premium cost must be justified by same-harness task results.",
+      "comparison_that_would_overturn": "Compare Fable 5.1 against Opus 5.5 at explicit max in an approved, identical harness. Predeclare tasks where Opus fails and evaluate success gain against 2.5x input/output list rates; require retained independent-family review.",
+      "evidence": [
+        "https://platform.claude.com/docs/en/models/fable-5-1/overview",
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/about-claude/pricing",
+        "https://platform.claude.com/docs/en/build-with-claude/effort"
+      ],
+      "upstream_now": {
+        "latest_release": "claude-fable-5-1",
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": null
+      },
+      "source": "New candidate from current first-party Anthropic model overview."
+    }
+  ],
+  "calls": {
+    "web_search": 1,
+    "web_fetch": 34,
+    "gh_api": 5
+  },
+  "notes": "SINGLE-FAMILY GPT source-only initial sweep authored in one existing Codex session, not a new harness child run. The explicit 14-candidate task expands the ordinary six-proposal discovery template; one new primary-sourced candidate is added. Calls are lower-bound source-review counts, exceed the stock discovery budget, and are not child usage. Role JSON conforms to schemas/discover.json, but scope/budget/identity deviations and missing families prevent a completed or clean sweep. Upstream git popularity/maintenance fields are null for closed vendor model services; unknown maintenance is not a refutation. Read date 2026-10-15. The same session performed fit; no independence is claimed.",
+  "skills_used": [
+    "context-mode:context-mode",
+    "openai-docs",
+    "claude-api (source reference)"
+  ]
+}

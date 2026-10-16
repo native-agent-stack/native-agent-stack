@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalog": "foundation",
+  "layer_id": "model-routes",
+  "base_commit": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+  "scope_bound_to": "Immutable base and F5 dispatch; hashes retained during this source review.",
+  "hashes_recorded_at": "2026-10-15T19:36:11.714443+00:00",
+  "requirement_row_present": false,
+  "proposed_requirement": {
+    "next_action": "Initial source-only sweep of the 14 carried foundation/model-routes candidates and the current Anthropic API, OpenAI through OmniRoute, and Meta muse-code routes. Retain single-family GPT judgments and missing-family failures; no keyed probes.",
+    "decision_ref": "docs/decisions/2026-10-11-layer-resolution-protocol.md"
+  },
+  "requirement_sha256": {
+    "foundation/model-routes": "c3ffea932766854386890f23c1c1c982071264ef05a4b04398d1ea2e2c728766"
+  },
+  "requirement_hash_boundary": "Hash of the explicit proposed requirement using saturation_ledger.requirement_sha256's canonical algorithm; NOT a claim that research-state contains this row.",
+  "platform_profiles_sha256": "cc6f4bef036223ea12a4fb637945a43c9de3a7dec1a55c0b4acf2be8303b76ba",
+  "carried_ids": [
+    "muse-code-wonder-full",
+    "muse-code-wonder-api",
+    "codex-wonder-api",
+    "opencode-wonder-api",
+    "claude-code-wonder-api",
+    "harness-spark-api",
+    "muse-subscription-foreign-harness",
+    "codex-gpt-6-1-sol",
+    "codex-gpt-6-astra",
+    "codex-gpt-6-luna",
+    "claude-code-claude-opus-5-5",
+    "claude-code-claude-sonnet-5-5",
+    "claude-code-claude-haiku-5-5",
+    "openai-pool-foreign-harness"
+  ],
+  "direction": {
+    "ref": "command-center/research-cc-role-20261008/direction-cc-20261015T1912Z-new-wsl-harness-first.md",
+    "custody": "Name-only private direction reference; neither content nor a digest is published."
+  },
+  "limits": [
+    "SINGLE-FAMILY (GPT), source-review initial sweep; the same Codex session authored discovery and fit, so these are not independent judgments.",
+    "Claude discovery, Claude facts refutation, Claude fit refutation and completeness critic were not run. No formal survivors, clean sweep, saturation, FINAL verdict or default change is claimed.",
+    "Only unkeyed loopback model listings and client version/help were probed. No inference, keyed API request, Muse process, credential file, environment file, OmniRoute data directory or account record was inspected.",
+    "Model/API documentation establishes advertised capabilities and prices, not current account entitlement, effective gateway effort/tier, billing or comparative quality.",
+    "Repository, wave and ledger files remain unchanged. Proposed ledger record is not append-ready: the model-routes research-state row and normal harness usage/workflow receipts do not exist.",
+    "The exact user-dispatched model/effort/tier are requested metadata; no private rollout or usage files were read to verify actual execution."
+  ]
+}

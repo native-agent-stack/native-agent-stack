@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-16T03:28:17.672921+00:00",
+  "pr": 1177,
+  "surface": "Current PR body and all API-visible userContentEdits diffs",
+  "pages_scanned": 1,
+  "history_nodes_scanned": 0,
+  "history_nodes_with_unavailable_diff": 0,
+  "history_deleted_nodes": 0,
+  "counts": {
+    "private_direction": {
+      "current_body_full_occurrences": 0,
+      "current_body_8char_prefix_occurrences": 0,
+      "edit_history_full_occurrences": 0,
+      "edit_history_8char_prefix_occurrences": 0
+    },
+    "withheld_raw_response": {
+      "current_body_full_occurrences": 0,
+      "current_body_8char_prefix_occurrences": 0,
+      "edit_history_full_occurrences": 0,
+      "edit_history_8char_prefix_occurrences": 0
+    }
+  },
+  "privacy": "Values were compared only in process; no values or prefixes are emitted or retained.",
+  "limitation": "API-visible edit history only; not GitHub caches, forks, notifications or copies held elsewhere.",
+  "residual": {
+    "superseded_publication_values": 2,
+    "classes": {
+      "private_direction": 1,
+      "withheld_raw_response": 1
+    },
+    "branch_history_plan": "Rebuild one sanitized commit on current main with an explicit lease; do not include the superseded commit in the rebuilt branch ancestry.",
+    "external_copies": "Prior public commit objects, caches and external copies may persist. A force-with-lease update cannot certify their deletion."
+  }
+}

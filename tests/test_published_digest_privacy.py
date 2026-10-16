@@ -448,6 +448,30 @@ class PublishedDigestPrivacyTests(unittest.TestCase):
                 self.assertEqual(entry[key], published)
 
 
+class ModelRoutesCustodyTests(unittest.TestCase):
+    """Name-only private provenance needs no original bytes or host-name guesses."""
+
+    ARTIFACT = ROOT / "evidence/artifacts/model-routes-sweep-20261015"
+
+    def test_direction_provenance_is_name_only(self):
+        direction = json.loads((self.ARTIFACT / "scope.json").read_text(encoding="utf-8"))["direction"]
+        expected_ref = (
+            "command-center/research-cc-role-20261008/"
+            "direction-cc-20261015T1912Z-new-wsl-harness-first.md"
+        )
+        self.assertTrue(direction.get("ref") == expected_ref, "Retain the direction's name-only reference.")
+        self.assertFalse(bool(set(direction) - {"ref", "custody"}),
+                         "Private direction provenance must not publish a digest or verification of private bytes.")
+        self.assertFalse(bool(DIGEST.search(json.dumps(direction))),
+                         "Private direction provenance must contain no digest.")
+
+    def test_listing_does_not_bind_an_unpublished_response(self):
+        listing = json.loads((self.ARTIFACT / "listing.json").read_text(encoding="utf-8"))
+        self.assertIs(listing.get("raw_response_retained"), False)
+        self.assertFalse("response_sha256" in listing,
+                         "An unretained response must not have a published digest; register the sanitized file instead.")
+
+
 class ReadinessPinTests(unittest.TestCase):
     """A receipt that changes must not leave its old sha256 in readiness.json: rebuilt from a guess, the old receipt would
     confirm the guess against that pin (#1010 B1). Needs no names; skips without origin/main."""

@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "id": "source-review-openai-pool-foreign-harness",
+  "kind": "upstream_provenance",
+  "evidence_class": "source_review",
+  "catalog": "foundation",
+  "layer_id": "model-routes",
+  "read_at": "2026-10-15",
+  "candidate_id": "openai-pool-foreign-harness",
+  "repository": "https://developers.openai.com/codex/models",
+  "role_identity": "https://developers.openai.com/codex/models#route=openai-pool-foreign-harness",
+  "carried": true,
+  "carried_verdict": "INSUFFICIENT",
+  "proposal_label": "keep_but_compare",
+  "model": {
+    "value": "gpt-6.1-sol",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://developers.openai.com/api/docs/models/gpt-6.1-sol"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "route": {
+    "value": {
+      "client": "Non-Codex harness (not specified)",
+      "provider": "OpenAI subscription pool through OmniRoute",
+      "endpoint_class": "Gateway Responses"
+    },
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-OPENAI-FOREIGN",
+    "cheapest_check": "Name the client, supported sign-in design and deployment entitlement; compare with the vendor's per-user Codex gateway mechanism.",
+    "sources": [
+      "https://developers.openai.com/codex/enterprise/sign-in-with-chatgpt-through-a-gateway"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "pin": {
+    "value": null,
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-CLIENT",
+    "cheapest_check": "Read the named client's --version output; no invocation.",
+    "sources": [],
+    "read_at": "2026-10-15"
+  },
+  "effort": {
+    "value": "No approved client-to-gateway effort mapping.",
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-OPENAI-FOREIGN",
+    "cheapest_check": "Name/pin the client and read its supported controls.",
+    "sources": [],
+    "read_at": "2026-10-15"
+  },
+  "tier": {
+    "value": "Not qualified.",
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-OPENAI-FOREIGN",
+    "cheapest_check": "Resolve the client and route first.",
+    "sources": [],
+    "read_at": "2026-10-15"
+  },
+  "limits": {
+    "value": "The cx listing cannot qualify another client's tool/context behavior.",
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-OPENAI-FOREIGN",
+    "cheapest_check": "Resolve the client and route first.",
+    "sources": [],
+    "read_at": "2026-10-15"
+  },
+  "pricing": {
+    "value": "Specific pooled entitlement and plan class unverified.",
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-OPENAI-FOREIGN",
+    "cheapest_check": "Review supported per-user gateway deployment without exposing account identifiers.",
+    "sources": [
+      "https://developers.openai.com/codex/enterprise/sign-in-with-chatgpt-through-a-gateway"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "adoption_status": {
+    "value": "NOT_ADOPTED",
+    "verification": "VERIFIED",
+    "sources": [
+      "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Display normalization only: carried COMPARISON_ARM is not adoption; its comparison/trial metadata stays in the angle file."
+  },
+  "facts_adjudication": {
+    "author_family": "openai",
+    "canonical_facts_vote": false,
+    "summary": "OpenAI documents a per-user Codex sign-in through a gateway. That source does not establish this unspecified non-Codex pooled deployment. Carried COMPARISON_ARM metadata is not adoption."
+  },
+  "fit_adjudication": {
+    "role": "gpt6-refute-fit:model-routes",
+    "refuted": true,
+    "confidence": 0.92,
+    "reasoning": "Refuted under the template's default-on-uncertainty rule: no named client or supported deployment is established. Keep the gap unresolved; this does not prove every possible non-Codex route impossible."
+  },
+  "formal_sweep_survivor": false,
+  "angle_status": {
+    "A1": "Partial documented capability; route/host qualification incomplete.",
+    "A2": "Route-specific engineering quality not independently established.",
+    "A3": "Route-specific community consensus not established.",
+    "A4": "Net usage not measured.",
+    "A5": "Published vendor capability/positioning only; no independent cross-route evaluation retained.",
+    "A6": "No executed comparative run."
+  },
+  "comparison_that_would_overturn": "First name and source the client/entitlement design; only then authorize a same-task full-harness parity comparison. No blind credential or inference probe closes this design gap.",
+  "sources": [
+    "https://developers.openai.com/codex/models",
+    "https://developers.openai.com/codex/enterprise/sign-in-with-chatgpt-through-a-gateway",
+    "OmniRoute@sha256:cb2a82f1fe8661468b51df578ede6409cb57a359591f8e25541969cf9f71f469:open-sse/config/providers/registry/codex/index.ts:10",
+    "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+  ],
+  "limitations": [
+    "SINGLE-FAMILY (GPT), source-review initial sweep; the same Codex session authored discovery and fit, so these are not independent judgments.",
+    "Claude discovery, Claude facts refutation, Claude fit refutation and completeness critic were not run. No formal survivors, clean sweep, saturation, FINAL verdict or default change is claimed.",
+    "Only unkeyed loopback model listings and client version/help were probed. No inference, keyed API request, Muse process, credential file, environment file, OmniRoute data directory or account record was inspected.",
+    "Model/API documentation establishes advertised capabilities and prices, not current account entitlement, effective gateway effort/tier, billing or comparative quality.",
+    "Repository, wave and ledger files remain unchanged. Proposed ledger record is not append-ready: the model-routes research-state row and normal harness usage/workflow receipts do not exist.",
+    "The exact user-dispatched model/effort/tier are requested metadata; no private rollout or usage files were read to verify actual execution."
+  ]
+}

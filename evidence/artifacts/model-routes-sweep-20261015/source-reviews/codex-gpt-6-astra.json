@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "id": "source-review-codex-gpt-6-astra",
+  "kind": "upstream_provenance",
+  "evidence_class": "source_review",
+  "catalog": "foundation",
+  "layer_id": "model-routes",
+  "read_at": "2026-10-15",
+  "candidate_id": "codex-gpt-6-astra",
+  "repository": "https://developers.openai.com/codex/models",
+  "role_identity": "https://developers.openai.com/codex/models#route=codex-gpt-6-astra",
+  "carried": true,
+  "carried_verdict": "INSUFFICIENT",
+  "proposal_label": "keep_but_compare",
+  "model": {
+    "value": "gpt-6-astra",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://developers.openai.com/codex/models"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Current public identifier; account availability is not established."
+  },
+  "route": {
+    "value": {
+      "client": "Codex CLI",
+      "provider": "OmniRoute codex (cx)",
+      "client_model": "cx/gpt-6-astra",
+      "ingress": "http://127.0.0.1:21128/v1/responses",
+      "upstream": "https://chatgpt.com/backend-api/codex/responses",
+      "endpoint_class": "Responses; ChatGPT/Codex subscription transport"
+    },
+    "verification": "VERIFIED",
+    "sources": [
+      "OmniRoute@sha256:cb2a82f1fe8661468b51df578ede6409cb57a359591f8e25541969cf9f71f469:open-sse/config/providers/registry/codex/index.ts:10",
+      "evidence/artifacts/model-routes-sweep-20261015/listing.json"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Listing and installed source establish the advertised route, not a successful inference or specific account entitlement."
+  },
+  "pin": {
+    "value": "Codex CLI 0.162.1; deployed OmniRoute 3.8.51, file hashes in deployed-source-review.json",
+    "verification": "VERIFIED",
+    "sources": [
+      "codex --version",
+      "evidence/artifacts/model-routes-sweep-20261015/deployed-source-review.json"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Running build label differs from public release lineage; Codex registry is modified."
+  },
+  "effort": {
+    "value": "API: low, medium, high, xhigh, max; Codex uses model_reasoning_effort.",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://developers.openai.com/api/docs/models/gpt-6-astra",
+      "https://developers.openai.com/codex/config-reference"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "This session was dispatched at max. Outbound effective effort was not traced. OmniRoute ultra aliases are not evidence of an API ultra effort or Codex Ultra orchestration."
+  },
+  "tier": {
+    "value": "Gateway accepts default, priority and flex; fast normalizes to priority.",
+    "verification": "VERIFIED",
+    "sources": [
+      "OmniRoute@sha256:f9ed676e244fc504deae354bb5dee46be5a242a24526d6e1017296ed34110043:src/lib/providers/requestDefaults.ts:59"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Requested default in this lane; actual service tier is UNVERIFIED (F5-G-OMNI-WIRE). No account defaults were read."
+  },
+  "limits": {
+    "value": {
+      "vendor_api_context": 1050000,
+      "vendor_api_output": 128000,
+      "gateway_advertised_context": 872000,
+      "gateway_advertised_max_input": 872000,
+      "gateway_advertised_output": 128000
+    },
+    "verification": "VERIFIED",
+    "sources": [
+      "https://developers.openai.com/api/docs/models/gpt-6-astra",
+      "OmniRoute@sha256:cb7c78ff2c0fcdebfdc815a174770f346af6d5eccda581a3ff3b2d9b8f588aaf:open-sse/config/providers/shared.ts:339",
+      "evidence/artifacts/model-routes-sweep-20261015/listing.json"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "The 1,050,000 API and 872,000 gateway limits are different surfaces. Effective accepted context is UNVERIFIED (F5-G-LIMITS); do not merge them."
+  },
+  "pricing": {
+    "value": {
+      "vendor_api_usd_per_million": {
+        "input": 10,
+        "cached_input": 1,
+        "cache_write": 12.5,
+        "output": 50
+      },
+      "route_plan_class": "ChatGPT/Codex subscription pool; exact plan and quota unverified"
+    },
+    "verification": "VERIFIED",
+    "sources": [
+      "https://developers.openai.com/api/docs/models/gpt-6-astra",
+      "https://developers.openai.com/codex/enterprise/sign-in-with-chatgpt-through-a-gateway",
+      "OmniRoute@sha256:cb2a82f1fe8661468b51df578ede6409cb57a359591f8e25541969cf9f71f469:open-sse/config/providers/registry/codex/index.ts:10"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "API rates are reference prices, not the charge for a subscription request. Over 272K input, docs price input/cache at 2x and output at 1.5x."
+  },
+  "adoption_status": {
+    "value": "CURRENT",
+    "verification": "VERIFIED",
+    "sources": [
+      "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Verified carried classification at the base; this does not prove today's configured account, transport or usage."
+  },
+  "facts_adjudication": {
+    "author_family": "openai",
+    "canonical_facts_vote": false,
+    "summary": "Exact vendor model and cx route are present. API documentation and the gateway agree on identity but advertise different context limits. No model call or account inspection proves entitlement, outbound max/default, quality or billing."
+  },
+  "fit_adjudication": {
+    "role": "gpt6-refute-fit:model-routes",
+    "refuted": false,
+    "confidence": 0.86,
+    "reasoning": "Keep for comparison: a documented distinct quality/cost role in the existing Codex harness. CURRENT/TRIAL labels alone do not establish convergence; retain same-harness measurements and missing-family gates."
+  },
+  "formal_sweep_survivor": false,
+  "angle_status": {
+    "A1": "Partial documented capability; route/host qualification incomplete.",
+    "A2": "Route-specific engineering quality not independently established.",
+    "A3": "Route-specific community consensus not established.",
+    "A4": "Net usage not measured.",
+    "A5": "Published vendor capability/positioning only; no independent cross-route evaluation retained.",
+    "A6": "No executed comparative run."
+  },
+  "comparison_that_would_overturn": "Approved paired Codex runs at max/default with identical frozen tasks, tool layers and context budgets; compare task success, tokens, latency and billed plan class. No winner until all retained angles agree.",
+  "sources": [
+    "https://developers.openai.com/codex/models",
+    "https://developers.openai.com/api/docs/models/gpt-6-astra",
+    "https://developers.openai.com/codex/config-reference",
+    "https://developers.openai.com/codex/enterprise/sign-in-with-chatgpt-through-a-gateway",
+    "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+    "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/v3.8.51/CHANGELOG.md",
+    "OmniRoute@sha256:cb2a82f1fe8661468b51df578ede6409cb57a359591f8e25541969cf9f71f469:open-sse/config/providers/registry/codex/index.ts:10",
+    "OmniRoute@sha256:cb7c78ff2c0fcdebfdc815a174770f346af6d5eccda581a3ff3b2d9b8f588aaf:open-sse/config/providers/shared.ts:339",
+    "OmniRoute@sha256:f9ed676e244fc504deae354bb5dee46be5a242a24526d6e1017296ed34110043:src/lib/providers/requestDefaults.ts:59",
+    "evidence/artifacts/model-routes-sweep-20261015/listing.json",
+    "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+  ],
+  "limitations": [
+    "SINGLE-FAMILY (GPT), source-review initial sweep; the same Codex session authored discovery and fit, so these are not independent judgments.",
+    "Claude discovery, Claude facts refutation, Claude fit refutation and completeness critic were not run. No formal survivors, clean sweep, saturation, FINAL verdict or default change is claimed.",
+    "Only unkeyed loopback model listings and client version/help were probed. No inference, keyed API request, Muse process, credential file, environment file, OmniRoute data directory or account record was inspected.",
+    "Model/API documentation establishes advertised capabilities and prices, not current account entitlement, effective gateway effort/tier, billing or comparative quality.",
+    "Repository, wave and ledger files remain unchanged. Proposed ledger record is not append-ready: the model-routes research-state row and normal harness usage/workflow receipts do not exist.",
+    "The exact user-dispatched model/effort/tier are requested metadata; no private rollout or usage files were read to verify actual execution."
+  ]
+}

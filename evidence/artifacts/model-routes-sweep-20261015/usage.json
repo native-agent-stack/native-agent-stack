@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "available": false,
+  "source": "No child-usage.mjs run or private transcript inspection was performed.",
+  "requested_model": "cx/gpt-6-astra",
+  "requested_effort": "max",
+  "requested_service_tier": "default",
+  "actual_model": null,
+  "actual_effort": null,
+  "actual_service_tier": null,
+  "token_usage": null,
+  "lower_bound_usage": true,
+  "role_sessions": "One existing Codex lane; two authored role-shaped outputs, no independent refuter.",
+  "gap": "F5-G-USAGE",
+  "boundary": "Unknown is not zero. This file is not child-usage.mjs output and cannot substitute for it at append."
+}

@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "id": "source-review-claude-code-claude-haiku-5-5",
+  "kind": "upstream_provenance",
+  "evidence_class": "source_review",
+  "catalog": "foundation",
+  "layer_id": "model-routes",
+  "read_at": "2026-10-15",
+  "candidate_id": "claude-code-claude-haiku-5-5",
+  "repository": "https://code.claude.com/docs/en/model-config",
+  "role_identity": "https://code.claude.com/docs/en/model-config#route=claude-code-claude-haiku-5-5",
+  "carried": true,
+  "carried_verdict": "INSUFFICIENT",
+  "proposal_label": "keep_but_compare",
+  "model": {
+    "value": "claude-haiku-5-5",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://code.claude.com/docs/en/model-config"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Current public identifier; account availability is not established."
+  },
+  "route": {
+    "value": {
+      "client": "Claude Code or Anthropic SDK",
+      "provider": "Anthropic API",
+      "model": "claude-haiku-5-5",
+      "endpoint": "https://api.anthropic.com/v1/messages",
+      "endpoint_class": "Anthropic Messages"
+    },
+    "verification": "VERIFIED",
+    "sources": [
+      "https://platform.claude.com/docs/en/api/messages",
+      "https://platform.claude.com/docs/en/models/haiku-5-5/overview"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Public API route. Carried native Claude Code subscription adoption does not verify a direct-key API deployment."
+  },
+  "pin": {
+    "value": "Claude Code 2.1.301; public model docs read 2026-10-15; claude-api skill dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+    "verification": "VERIFIED",
+    "sources": [
+      "claude --version",
+      "https://platform.claude.com/docs/en/models/haiku-5-5/overview"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "effort": {
+    "value": {
+      "parameter": "output_config.effort",
+      "levels": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "vendor_default": "medium"
+    },
+    "verification": "VERIFIED",
+    "sources": [
+      "https://platform.claude.com/docs/en/build-with-claude/effort",
+      "https://platform.claude.com/docs/en/models/haiku-5-5/overview"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Opus 5.5 thinking is always on; Sonnet 5.5 between_tools works only through high; Haiku disabled thinking only through high. Installed CLI exposes --effort; transport was not tested."
+  },
+  "tier": {
+    "value": "Direct API service-tier acceptance and configured tier not established here.",
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-ANTHROPIC-TIER",
+    "cheapest_check": "Read the current Messages service_tier parameter section and then obtain approved, filtered Models API metadata or a Messages smoke if required.",
+    "sources": [
+      "https://platform.claude.com/docs/en/api/messages"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "limits": {
+    "value": {
+      "context": "1M",
+      "max_output": "128K"
+    },
+    "verification": "VERIFIED",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
+      "https://platform.claude.com/docs/en/about-claude/models/overview"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Documentation limits; account rate limits and live capability response are UNVERIFIED (F5-G-ANTHROPIC-MODELS)."
+  },
+  "pricing": {
+    "value": "API <=100K prompt: $0.10 input / $0.50 output per MTok; >100K: $0.50 / $2.50.",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://platform.claude.com/docs/en/about-claude/pricing",
+      "https://platform.claude.com/docs/en/models/haiku-5-5/overview"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "These are first-party API rates, not Claude Code subscription prices or evidence of current account billing."
+  },
+  "adoption_status": {
+    "value": "TRIAL",
+    "verification": "VERIFIED",
+    "sources": [
+      "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Verified carried classification at the base; this does not prove today's configured account, transport or usage."
+  },
+  "facts_adjudication": {
+    "author_family": "openai",
+    "canonical_facts_vote": false,
+    "summary": "Vendor model page, release notes and installed skill identify this model and its limits/prices. The model's API behavior is distinct from a Claude Code subscription. No direct API request was made."
+  },
+  "fit_adjudication": {
+    "role": "gpt6-refute-fit:model-routes",
+    "refuted": false,
+    "confidence": 0.86,
+    "reasoning": "Keep the native-harness model comparison open. Vendor capability/latency claims support a plausible role; account access, native tool parity and an independent comparative run remain unverified."
+  },
+  "formal_sweep_survivor": false,
+  "angle_status": {
+    "A1": "Partial documented capability; route/host qualification incomplete.",
+    "A2": "Route-specific engineering quality not independently established.",
+    "A3": "Route-specific community consensus not established.",
+    "A4": "Net usage not measured.",
+    "A5": "Published vendor capability/positioning only; no independent cross-route evaluation retained.",
+    "A6": "No executed comparative run."
+  },
+  "comparison_that_would_overturn": "After approval, compare the carried Claude models in the same approved Claude harness, explicit max effort and fixed tier/task set; record task success, latency and usage before deciding a default.",
+  "sources": [
+    "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
+    "https://platform.claude.com/docs/en/about-claude/models/overview",
+    "https://platform.claude.com/docs/en/about-claude/pricing",
+    "https://platform.claude.com/docs/en/release-notes/overview",
+    "https://platform.claude.com/docs/en/build-with-claude/effort",
+    "https://platform.claude.com/docs/en/api/messages",
+    "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json",
+    "anthropics/skills@dbd4588f9e1033efb41dad4bef2f7947c8993d44:skills/claude-api/shared/models.md:64"
+  ],
+  "limitations": [
+    "SINGLE-FAMILY (GPT), source-review initial sweep; the same Codex session authored discovery and fit, so these are not independent judgments.",
+    "Claude discovery, Claude facts refutation, Claude fit refutation and completeness critic were not run. No formal survivors, clean sweep, saturation, FINAL verdict or default change is claimed.",
+    "Only unkeyed loopback model listings and client version/help were probed. No inference, keyed API request, Muse process, credential file, environment file, OmniRoute data directory or account record was inspected.",
+    "Model/API documentation establishes advertised capabilities and prices, not current account entitlement, effective gateway effort/tier, billing or comparative quality.",
+    "Repository, wave and ledger files remain unchanged. Proposed ledger record is not append-ready: the model-routes research-state row and normal harness usage/workflow receipts do not exist.",
+    "The exact user-dispatched model/effort/tier are requested metadata; no private rollout or usage files were read to verify actual execution."
+  ]
+}
