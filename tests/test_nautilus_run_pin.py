@@ -24,7 +24,17 @@ class NautilusRunPinTests(fixtures.FixtureTestCase):
                         + "a" * 64 + '"}]\n')
         binding = {"source": final_stack.LOCKFILE + "#/package/1", "package": "nautilus-trader",
                    "version": "2.0.0rc5", "repository": REPOSITORY, "commit": COMMIT,
-                   "artifact_sha256": ["sha256:" + "a" * 64]}
+                   "artifact_sha256": ["sha256:" + "a" * 64],
+                   "source_proof": "evidence/artifacts/pin-fixture/tag-resolution.json"}
+        proof = root / binding["source_proof"]
+        proof.parent.mkdir(parents=True, exist_ok=True)
+        proof.write_text(json.dumps({
+            "component": "nautilus-trader", "version": "2.0.0rc5", "repository": REPOSITORY,
+            "command": ["git", "ls-remote", "https://" + REPOSITORY + ".git",
+                        "refs/tags/v2.0.0rc5", "refs/tags/v2.0.0rc5^{}"],
+            "exit_code": 0, "stderr": "",
+            "stdout": "b" * 40 + "\trefs/tags/v2.0.0rc5\n" + COMMIT + "\trefs/tags/v2.0.0rc5^{}\n",
+            "tag_object": "b" * 40, "peeled_commit": COMMIT}))
         return root, binding
 
     def write_binding(self, root, bindings):
@@ -63,6 +73,54 @@ class NautilusRunPinTests(fixtures.FixtureTestCase):
         with self.assertRaisesRegex(final_stack.FinalStackError, "duplicate source identity"):
             self.record(root)
 
+    def test_missing_stack_repository_cannot_be_invented_by_a_fallback(self):
+        root, binding = self.prepare()
+        path = root / final_stack.STACK
+        document = json.loads(path.read_text())
+        document["components"] = []
+        path.write_text(json.dumps(document))
+        self.write_binding(root, [binding])
+        record = self.record(root)
+        self.assertIsNone(record["repository"])
+        self.assertEqual(record["parsed"], {"pin_parse": "unparsed"})
+
+    def test_published_bindings_carry_only_fields_the_reader_consumes(self):
+        document = json.loads((ROOT / SUPPLEMENT).read_text())
+        allowed = {"source", "package", "version", "artifact_sha256", "repository", "commit", "source_proof"}
+        for binding in document["bindings"]:
+            self.assertFalse(set(binding) - allowed)
+
+    def test_well_formed_wrong_commit_cannot_bind_against_the_retained_tag(self):
+        root, binding = self.prepare()
+        binding["commit"] = "f" * 40
+        self.write_binding(root, [binding])
+        run = final_stack.build_runs([self.record(root)])[0]
+        self.assertEqual(run.get("pin_parse"), "unparsed")
+        self.assertFalse(final_stack.complete_final_pin("f" * 40, run))
+
+    def test_missing_contradictory_or_foreign_source_proof_is_unparsed(self):
+        for case in ("missing", "repository", "version", "stdout", "advertised_commit", "tag_object"):
+            with self.subTest(case=case):
+                root, binding = self.prepare()
+                path = root / binding["source_proof"]
+                proof = json.loads(path.read_text())
+                if case == "missing":
+                    path.unlink()
+                elif case == "repository":
+                    proof["command"][2] = "https://github.com/example/foreign.git"
+                elif case == "version":
+                    proof["version"] = "2.0.0rc6"
+                elif case == "stdout":
+                    proof["stdout"] = ""
+                elif case == "advertised_commit":
+                    proof["peeled_commit"] = "f" * 40
+                else:
+                    binding["commit"] = proof["tag_object"]
+                if case != "missing":
+                    path.write_text(json.dumps(proof))
+                self.write_binding(root, [binding])
+                self.assertEqual(self.record(root)["parsed"], {"pin_parse": "unparsed"})
+
     def test_published_rc5_run_binds_its_peeled_commit(self):
         document = json.loads((ROOT / final_stack.OUTPUT).read_text())
         run = next(row for row in document["runs"] if row["id"] == "nautilus-trader")
@@ -70,6 +128,12 @@ class NautilusRunPinTests(fixtures.FixtureTestCase):
         self.assertEqual(run["source"], SUPPLEMENT + "#/bindings/0")
         self.assertTrue(final_stack.complete_final_pin(COMMIT, run))
         self.assertFalse(final_stack.complete_final_pin("f" * 40, run))
+
+    def test_real_lock_binding_replays_and_hashes_the_published_source_observation(self):
+        sources = final_stack.Sources(ROOT)
+        record = next(row for row in final_stack.run_records(sources) if row["id"] == "nautilus-trader")
+        self.assertEqual(record["parsed"]["pin_parsed"]["commit"], COMMIT)
+        self.assertIn("evidence/artifacts/nautilus-run-pin-20261016/tag-resolution.json", sources.hashes)
 
 
 if __name__ == "__main__":

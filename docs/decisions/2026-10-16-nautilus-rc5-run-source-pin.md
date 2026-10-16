@@ -73,6 +73,13 @@ frozen scheduling-supervision row and its wave byte-for-byte. Other version-only
 winner pins remain for that separately reviewed batch. No receipt transfers,
 installs, source-version upgrades, account operations or broker calls occur.
 
+Ownership update, 2026-10-16: the layer-verdict lane owns the tracked PIN-RULES
+then PIN-DATA work, including the systemd source-identity gap, under
+`ROW-cc-20261016T0108Z-new-wsl-gap-routing.md` and the subsequent 02:59Z split.
+PIN-RULES lands before the separate FINAL-opening work; that opening's owner
+keeps qualified admission and refusal paths. This source-pin decision does not
+transfer either implementation or broker-operation authority between lanes.
+
 The base-trusted verdict gate must pass without a bypass before this narrowed
 PR opens. Publication validation establishes repository integrity; it does not
 establish native acceptance at this source or settle any comparison dimension.

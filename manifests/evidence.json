@@ -17608,8 +17608,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "d1bf813f10095b096b9f3eb90d7376286ef8d7679d03f8634d2f7b73286c54ba",
-      "bytes": 339603
+      "sha256": "f8835da6a47925e7758d24fea6bfe0feec3dc34e3f1205b4daf08e267f9c7ba6",
+      "bytes": 339743
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -19348,8 +19348,13 @@
     },
     {
       "path": "docs/decisions/2026-10-16-nautilus-rc5-run-source-pin.md",
-      "sha256": "a2ceae122b37a9df4c9fb53a53f3bf4a1eb188cc51a60a4c564cf857d4a25014",
-      "bytes": 6261
+      "sha256": "c5b86d5e8d3975029bad40531ec5a9fe670e9ea510be2f718b49066ae908388c",
+      "bytes": 6723
+    },
+    {
+      "path": "docs/decisions/2026-10-16-pin-source-rules.md",
+      "sha256": "75aee25f7bd1b2098a70b6b80cfd3828e98bdfe7d4165d464058217e69919897",
+      "bytes": 7064
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -49182,6 +49187,11 @@
       "bytes": 2
     },
     {
+      "path": "evidence/artifacts/pin-source-rules-20261016/controls.json",
+      "sha256": "bcbfa6429be82ab21b7a8412268fb647f810e537e58654b3d1b7c497fff3f246",
+      "bytes": 2714
+    },
+    {
       "path": "evidence/artifacts/plugin-skill-identity-20261013/README.md",
       "sha256": "b6afce8e7008ad7470041bcd52d3d1829a8e4e2f110e20e53ba4c5f66496910f",
       "bytes": 6792
@@ -62797,6 +62807,11 @@
       "bytes": 16819
     },
     {
+      "path": "scripts/complete_run_pins.py",
+      "sha256": "f108f05ba107dcdc343a2ada99bc62b9bdf28fe63f7d7caf7d787609ffe3665b",
+      "bytes": 13491
+    },
+    {
       "path": "scripts/component_matrix.py",
       "sha256": "d20bf375c5638a4ef46e7b8d188f5773ae877398f192c8d6a79abc225371fa3e",
       "bytes": 81209
@@ -62823,8 +62838,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "4223d05642a5c6952dd6843010b474ad74ec4f7dd33b6e73321bd2d7982b3e12",
-      "bytes": 84061
+      "sha256": "b0369fb068741a6d7b2deda67d10577e72211924bfb274e11760968e5b8d6f0e",
+      "bytes": 85580
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -62873,8 +62888,8 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "df16a4ee5f3cf6953e2f4145737802b82cb35970a18d56721075dc1ef4160620",
-      "bytes": 111070
+      "sha256": "ef987c1786a12aaac07130ddb091391d97d3b8416127eb4fd20f786ad2c4c4d5",
+      "bytes": 112422
     },
     {
       "path": "scripts/native_token_ci.py",
@@ -63857,6 +63872,11 @@
       "bytes": 24344
     },
     {
+      "path": "tests/test_distribution_source_identity.py",
+      "sha256": "774ff7d065af788824cf510c8e55913c44fc2c62360e6758ada7c213a2764fbb",
+      "bytes": 1769
+    },
+    {
       "path": "tests/test_document_ingestion.py",
       "sha256": "27cf6c52900ec88722fefc08f8724808ff79adb6c2ee18fb7b4d5df149cf46ed",
       "bytes": 6566
@@ -64428,8 +64448,8 @@
     },
     {
       "path": "tests/test_nautilus_run_pin.py",
-      "sha256": "15c5da41f7be197dd826ea54281813742c3d446f9503bad3a5908f534ac8543a",
-      "bytes": 3670
+      "sha256": "d4736989ded2696323bc0b1c93f15dacd973ac11c632d78f19d4f3ff4b3fe25d",
+      "bytes": 7166
     },
     {
       "path": "tests/test_new_host_grand_list.py",
@@ -64710,6 +64730,11 @@
       "path": "tests/test_rtk_receipt_locators.py",
       "sha256": "4590794a9cf7ed00ac928190e22e42374c21b3730eccf9113e127a3ad40cc4b9",
       "bytes": 12192
+    },
+    {
+      "path": "tests/test_run_pin_sources.py",
+      "sha256": "2b481220349369a3f158ab2eb7e8b930bfab3c36590f97ae449af2f1776e4780",
+      "bytes": 10316
     },
     {
       "path": "tests/test_runtime_boot.py",

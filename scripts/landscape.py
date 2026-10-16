@@ -94,6 +94,24 @@ def is_unrun_registration(row, *, root=None):
     published = registration_history(root).get(key)
     require(published is None, f"registration_only {key} already belongs to {published}")
     return True
+def catalog_identity(repository, record=None):
+    """Use an explicitly marked package's upstream only for the legacy index.
+
+    The actual candidate/winner/run repository remains the distribution source.
+    Receipt identity and FINAL admission are not changed by this coverage bridge.
+    """
+    if (isinstance(repository, str) and re.fullmatch(
+            r"https://git\.launchpad\.net/ubuntu/\+source/[a-z0-9][a-z0-9+.-]*", repository)):
+        require(isinstance(record, dict) and record.get("source_identity_kind") == "os_distribution_package",
+                "distribution source URL requires an explicit OS-distribution package marker")
+        upstream = record.get("upstream_repository")
+        require(isinstance(upstream, str) and re.fullmatch(
+            r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", upstream),
+            "distribution source package needs a canonical upstream-project repository")
+        return identity(upstream)
+    return identity(repository)
+
+
 DISPOSITIONS = {
     "selected", "observed_failure", "measured_tradeoff", "overlap",
     "out_of_scope", "unqualified", "conditional",
@@ -1115,7 +1133,7 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         repository = winner.get("repository")
         if repository is not None:
             require(https_url(repository), str(key) + ".winner.repository must be an https URL or null")
-            repo_id = canonical(identity(repository), aliases)
+            repo_id = canonical(catalog_identity(repository, winner), aliases)
             require(repo_id in identities, str(key) + ".winner.repository absent from canonical index")
         require(isinstance(winner.get("pin"), str), str(key) + ".winner.pin must be text")
         if component_id in sota_pins:
@@ -1173,7 +1191,7 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
                     str(key) + ".winner.why_selected must differ from every alternative's why_not_default")
         # The v1 ``overturn_when`` belongs to the dated review that the quality
         # comparison mirrors; a recorded verdict carries its own condition.
-        winner_ids = {canonical(identity(w["repository"]), aliases) for w in winners if w.get("repository")}
+        winner_ids = {canonical(catalog_identity(w["repository"], w), aliases) for w in winners if w.get("repository")}
         require(not any(canonical(identity(a["repository"]), aliases) in winner_ids for a in alternatives),
                 str(key) + " lists a winner repository among its alternatives")
         require(any(marker in verdict_overturn_when for marker in OVERTURN_MARKERS),
@@ -1380,10 +1398,13 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 for field in ("name", "rationale"):
                     nonempty(candidate.get(field), "candidate." + field)
                 repository = candidate.get("repository")
+                distribution = candidate.get("source_identity_kind") == "os_distribution_package"
                 require(https_url(repository) and bool(re.fullmatch(
-                    r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository)),
+                    r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository)
+                    or distribution and re.fullmatch(
+                        r"https://git\.launchpad\.net/ubuntu/\+source/[a-z0-9][a-z0-9+.-]*", repository)),
                     "candidate needs a canonical public repository URL")
-                repo_id = canonical(identity(repository), aliases)
+                repo_id = canonical(catalog_identity(repository, candidate), aliases)
                 require(repo_id in identities, "comparison repository absent from canonical index: " + repo_id)
                 require(repo_id not in candidate_ids, "duplicate candidate repository in layer: " + repo_id)
                 candidate_ids.add(repo_id)
@@ -1407,7 +1428,7 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
 
     component_coverage = []
     for component in stack["components"]:
-        repo_id = canonical(identity(component["repository"]), aliases)
+        repo_id = canonical(catalog_identity(component["repository"], component), aliases)
         matched = [layer["id"] for layer in layers
                    if any(candidate["repository_id"] == repo_id for candidate in layer["candidates"])]
         require(bool(matched), "selected component lacks a current role explanation: " + component["id"])
@@ -1499,8 +1520,8 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 "freshness selected version differs from current manifest")
         require(row.get("selected_source_pin") == selected.get("source_pin"),
                 "freshness selected source pin differs from current manifest")
-        require(canonical(identity(row.get("selected_repository_url")), aliases)
-                == canonical(identity(selected.get("repository")), aliases),
+        require(canonical(catalog_identity(row.get("selected_repository_url"), row), aliases)
+                == canonical(catalog_identity(selected.get("repository"), selected), aliases),
                 "freshness selected repository differs from current manifest")
     stars = freshness.get("stars", {})
     require(stars.get("status") == "checked", "current public-star snapshot is not checked")

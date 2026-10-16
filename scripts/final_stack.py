@@ -35,17 +35,18 @@ import tempfile
 import tomllib
 
 try:
-    from . import angle_records, component_matrix, host_receipts, host_name_scan, saturation_ledger
-    from .catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
+    from . import angle_records, component_matrix, complete_run_pins, host_receipts, host_name_scan, saturation_ledger
+    from .catalog_decisions import InvalidDecisionIndex, pointer, safe_file, unique_json
     from .landscape import FINAL_ADMISSION_REFUSAL, refuse_final
     from .sweep_policy import DEFAULT_SWEEP_CADENCE_DAYS
 except ImportError:  # running as a plain script, not a package
     import angle_records
     import component_matrix
+    import complete_run_pins
     import host_receipts
     import host_name_scan
     import saturation_ledger
-    from catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
+    from catalog_decisions import InvalidDecisionIndex, pointer, safe_file, unique_json
     from landscape import FINAL_ADMISSION_REFUSAL, refuse_final
     from sweep_policy import DEFAULT_SWEEP_CADENCE_DAYS
 
@@ -103,6 +104,11 @@ MEASURED_EVIDENCE = (("evidence_class", "measured_comparison"), ("evidence_kind"
 # Run-pin sources, highest precedence first. A component is the normalized repository (or, without one, its id).
 LOCKFILE = "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
 LOCKFILE_SOURCES = "catalogs/landscape/lockfile-source-identities.json"
+# Compatibility for the source observation already published by #1197. New
+# PIN-DATA entries carry source_proof explicitly; no commit is hardcoded here.
+LOCKFILE_SOURCE_PROOFS = {
+    ("nautilus-trader", "2.0.0rc5"): "evidence/artifacts/nautilus-run-pin-20261016/tag-resolution.json",
+}
 PIN_FILES = (("linux-x86_64", "adoption/pins-linux-x86_64.json"), ("macos-arm64", "adoption/pins-macos-arm64.json"))
 STACK = component_matrix.STACK_FILE
 RUNTIME_TARGET = "catalogs/us-equities/runtime-target.json"
@@ -114,6 +120,8 @@ RUN_PIN_SOURCES_TEXT = (f"the allowlisted lockfile {LOCKFILE} (its root package'
 # The lockfile records no repository. A requirement whose name is a manifests/stack.json id takes that component's
 # repository; these are the repositories of the other requirements that a landscape winner records for the same
 # package (catalogs/landscape/us-equities.json data-mlflow and data-pandera).
+# Keep this fallback limited to missing stack identities; the other F1 packages
+# already have canonical repositories in the stack and need no redundant map.
 LOCKFILE_REPOSITORIES = {
     "mlflow": "https://github.com/mlflow/mlflow",
     "pandera": "https://github.com/unionai-oss/pandera",
@@ -372,6 +380,27 @@ def github_repository(url) -> str | None:
             if isinstance(url, str) and host_receipts.GITHUB_REPOSITORY_PATTERN.match(url.strip().lower()) else None)
 
 
+def lock_source_proof(sources: Sources, binding: dict) -> str | None:
+    """Match a source claim to its retained exact-version Git observation offline."""
+    reference = binding.get("source_proof")
+    if reference is None:
+        reference = LOCKFILE_SOURCE_PROOFS.get((binding.get("package"), binding.get("version")))
+    if not isinstance(reference, str):
+        return None
+    path, separator, selector = reference.partition("#")
+    if not path.startswith("evidence/artifacts/") or not path.endswith(".json"):
+        return None
+    try:
+        proof = sources.json(path)
+        if separator:
+            proof = pointer(proof, selector)
+    except (FinalStackError, InvalidDecisionIndex, OSError, ValueError):
+        return None
+    return complete_run_pins.verified_commit(
+        proof, binding.get("package"), binding.get("version"),
+        host_receipts.normalize_repository(binding.get("repository")))
+
+
 def run_records(sources: Sources) -> list[dict]:
     """Every run-pin record, in precedence order: rank, then platform order, then position in its source."""
     stack = sources.json(STACK)
@@ -422,7 +451,8 @@ def run_records(sources: Sources) -> list[dict]:
                     and artifacts and binding.get("artifact_sha256") == artifacts
                     and repository is not None
                     and host_receipts.normalize_repository(binding.get("repository")) == repository
-                    and isinstance(binding.get("commit"), str) and COMMIT_PATTERN.fullmatch(binding["commit"])):
+                    and isinstance(binding.get("commit"), str) and COMMIT_PATTERN.fullmatch(binding["commit"])
+                    and lock_source_proof(sources, binding) == binding["commit"]):
                 parsed = record_pin(pin, binding["commit"])
                 pin = f"{pin}; source {binding['commit']}"
                 source = f"{LOCKFILE_SOURCES}#/bindings/{binding_index}"
