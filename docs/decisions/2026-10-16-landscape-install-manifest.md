@@ -33,13 +33,26 @@ The 10-02 install plan cannot hold stage H as it stands:
 - Its commands are shell strings, and it has no inverse field and no label.
 
 The co-op's screen tables (private, cited by name: `ns2604-coop/screens-20261015/tables`) hold 1,019 rows: 131 PASS,
-837 INCOMPLETE and 51 FAIL. The 131 PASS rows cover 26 distinct candidates, and they record install paths as prose.
-Classifying them (2026-10-16) shows:
+837 INCOMPLETE and 51 FAIL. The 131 PASS rows record install paths as prose. Classifying them (2026-10-16) shows:
 
 - mostly versioned release-binary downloads;
 - 14 npm global installs, 8 Python packages and 4 vendor install scripts;
 - 2 Homebrew lines and 1 `uv add`;
 - 11 rows that document no inverse.
+
+**Counting the PASS candidates.** The tables carry a candidate's identity in one of two shapes: `id` with
+`repository_url`, or `repository` with `ids`. The 131 PASS rows give:
+
+| Key | Distinct |
+| --- | ---: |
+| normalized repository URL | 52 |
+| `id`, else the repository | 53 |
+| (candidate, layer) pair | 60 |
+| whole candidate record | 61 |
+
+- The campaign plan's survey counted 62 distinct, and none of these keys reproduces that.
+- An earlier draft of this record keyed on `id` alone and undercounted 26.
+- A row is one installable artifact, so the manifest's row count follows the converted rows, not these counts.
 
 ## The row
 
@@ -50,38 +63,40 @@ defines one row per candidate. A candidate installs once, however many layers an
 | --- | --- | --- |
 | `id` | stable row id | the `component_id` of the row's host receipts |
 | `candidate` | repository, name, package ids | an https URL with no user information |
-| `pin` | exact `version`, plus `commit` (40 hex) or `artifact` (url, sha256) | no `latest`, `stable`, `main`, `HEAD`, range or wildcard; a `vendor-installer` row needs `artifact` |
+| `pin` | an exact `version` (three numeric components, then optional pre-release or build parts), plus `commit` (40 hex) or `artifact` (url, sha256) | no wildcard segment, comparator, range or channel name; commit routes need `commit`, artifact routes `artifact` |
 | `screens` | each PASS screen: layer, family, table name, candidate | at least one; verdict `PASS` only |
-| `route` | the vendor-path family (below) | fixes the stage the row follows |
+| `route` | the vendor-path family (below) | fixes the stage the row follows and what its install must bind |
 | `install`, `inverse` | lists of argv | no element is a shell, so no command is a shell string |
-| `check` | argv, `expect_exit`, `stdout_contains`, and how cleanup proves absence: `absent_by` (`exit` with `absent_exit`, `text`, or the labelled fallback `negation`) | at least one; `text` needs `stdout_contains` |
-| `sources` | where install, check and inverse are documented, at a pin | the candidate's docs, or the route tool's where the candidate documents none |
+| `check` | argv, `expect_exit`, `stdout_contains`, and how cleanup proves absence: `absent_by` is `exit` (with `absent_exit`) or `text` | at least one; `text` needs `stdout_contains`; no bare-negation fallback |
+| `sources` | where install, check and inverse are documented: a commit, or a client version with the time its help was read | the candidate's docs, or the route tool's where the candidate documents none |
 | `dials` | the install plan's service slots the candidate dials (for example `gpt-gateway`) | none of its runs starts before stage S proves that slot's listener |
-| `models` | each model the row selects, by its `catalogs/foundation/model-currency.json` id, and where it is selected | required, empty when none; the active-selector check refuses one that is not current |
-| `invoke` | kind (`skill`, `plugin`, `mcp-server`, `cli`, `sdk`, `service`) and names | what invoke tracking counts, so zero calls is a wiring finding |
+| `models` | the record of each selection: the inventory slug, the selected model id it maps to, and where it is selected (argv flag, config key or SDK option) | required, empty when none; a record, never a gate |
+| `invoke` | kind (`skill`, `plugin`, `mcp-server`, `cli`, `sdk`, `service`) and names | names are tokens; zero calls is a wiring finding |
 | `roles` | rows of the role-assignment matrix | never a fenced session |
 | `startup_context_cost` | tokens or null, basis, method, receipt name | FINAL needs `measured`, integer tokens and a receipt |
-| `label` | TRIAL or FINAL | FINAL only when every layer in `screens` is FINAL with this candidate as winner at this pin |
+| `label` | TRIAL or FINAL | FINAL only when every layer in `screens` is FINAL with a winner from this repository at this pin |
 
 The row has no port or service fields. A service's port and isolation stay under the install plan's Decision 3.
 
 ## Routes
 
 Help texts were captured on NativeStack2604 at 2026-10-16T02:39Z (private, by name: `route-help-20261016-v2.txt`).
+Each route binds what it fetches. A version route names the exact version; a commit route names the commit; an
+artifact route runs or links the verified download.
 
-| Route | Install, check, inverse | Stage | Source |
-| --- | --- | --- | --- |
-| `mise` | `mise use --global <backend:tool@version>`; `mise where <tool@version>`; `mise unuse --global ...` | C | mise 2026.10.3 help; `mise where` exits 1 for a tool that is not installed (measured). Its registry maps grype, syft, trivy, gitleaks, shellcheck, difftastic, actionlint, ast-grep and worktrunk to `aqua:` backends; prometheus and poutine have no registry entry and take the `github:` backend. `mise lock` records versions, checksums and download URLs. The Homebrew lines fold in here. |
-| `uv-tool` | `uv tool install <pkg>==<version>`; `uv tool list`; `uv tool uninstall <pkg>` | C | uv 0.12.22 (`70fe1196`), `crates/uv-cli/src/lib.rs:5513`, `:5538` |
-| `uv-add` | `uv add --project <env> <pkg>==<version>`; `uv tree --project <env> --package <pkg> --depth 0`; `uv remove --project <env> <pkg>` | C | the same, `:1142`, `:1165`, `:1250`; `docs/concepts/projects/dependencies.md:22`, `:92` |
-| `npm-global` | `npm install --global <pkg>@<version>`; `npm ls --global <pkg>`; `npm uninstall --global <pkg>` | C | npm 11.19.0 help; `npm ls --global` exits 1 for a missing package (measured) |
-| `claude-plugin` | `claude plugin install --scope local <plugin>@<marketplace>`; `claude plugin list`; `claude plugin uninstall --scope local ...` | D | Claude Code 2.1.301 help; per role project (Decision 9, `:789`) |
-| `claude-mcp` | `claude mcp add --scope local <name> -- <command>`; `claude mcp list`; `claude mcp remove --scope local <name>` | D | Claude Code 2.1.301 help: `mcp list` and `mcp get` health-check approved servers, so this check runs the server |
-| `codex-plugin` | `codex plugin add <plugin>@<marketplace>`; `codex plugin list`; `codex plugin remove ...` | D | codex-cli 0.162.1 help; inside each lane's `CODEX_HOME` (Decision 9, `:789`) |
-| `codex-mcp` | `codex mcp add <name> -- <command>`; `codex mcp list`; `codex mcp remove <name>` | D | codex-cli 0.162.1 help |
-| `skills-cli` | `npx --yes skills@1.7.0 add <immutable tree URL> -a <agent> -y`; `list`; `remove <skill> -y` | D | the adopted Skills CLI (`adoption/skills/lifecycle.md:13-14`), vercel-labs/skills `7407f389` `README.md:87-92`, `:132` (project scope by default) |
-| `systemd-user` | `systemctl --user enable --now <unit>`; `systemctl --user show --property=ActiveState <unit>` for `ActiveState=active`; `disable --now` | S | systemd 259. Its man page calls the LSB exit codes an imperfect map and points to unit states instead; `show` exits 0 with `ActiveState=inactive` for a missing unit (measured). After Decision 3's port and isolation proofs |
-| `vendor-installer` | the verified download of `pin.artifact`, made executable and run directly with the exact version as an argument | C | the candidate's own installer at its sha256 |
+| Route | Install, check, inverse | Binds | Stage | Source |
+| --- | --- | --- | --- | --- |
+| `mise` | `mise use --global <backend:tool@version>`; `mise where <tool@version>`; `mise unuse --global ...` | version | C | mise 2026.10.3 help. A two-part version is a fuzzy prefix in mise, so the pin has three parts. `mise where` exits 1 for an unknown tool name (measured). The registry maps grype, syft, trivy, gitleaks, shellcheck, difftastic, actionlint, ast-grep and worktrunk to `aqua:` backends; prometheus and poutine have no entry and take `github:`. `mise lock` records versions, checksums and URLs. The Homebrew lines fold in here. |
+| `uv-tool` | `uv tool install <pkg>==<version>`; `uv tool list`; `uv tool uninstall <pkg>` | version | C | uv 0.12.22 (`70fe1196`), `crates/uv-cli/src/lib.rs:5513`, `:5538` |
+| `uv-add` | `uv add --project <env> <pkg>==<version>`; `uv tree --project <env> --package <pkg> --depth 0`; `uv remove --project <env> <pkg>` | version | C | the same, `:1142`, `:1165`, `:1250`; `docs/concepts/projects/dependencies.md:22`, `:92` |
+| `npm-global` | `npm install --global <pkg>@<version>`; `npm ls --global <pkg>`; `npm uninstall --global <pkg>` | version | C | npm 11.19.0 help; `npm ls --global` exits 1 for a missing package (measured) |
+| `claude-mcp` | `claude mcp add --scope local <name> -- npx -y <pkg>@<version>`; `claude mcp list`; `claude mcp remove --scope local <name>` | version | D | Claude Code 2.1.301 help: `mcp list` and `mcp get` health-check approved servers, so this check runs the server |
+| `codex-mcp` | `codex mcp add <name> -- npx -y <pkg>@<version>`; `codex mcp list`; `codex mcp remove <name>` | version | D | codex-cli 0.162.1 help |
+| `claude-plugin` | `git clone --no-checkout <marketplace repository> <dir>`; `git -C <dir> checkout --detach <commit>`; `claude plugin marketplace add --scope local <dir>`; `claude plugin install --scope local <plugin>@<marketplace>`; check `claude plugin list`; inverse `claude plugin uninstall --scope local ...` and `claude plugin marketplace remove <marketplace>` | commit | D | Claude Code 2.1.301 help: `marketplace add` takes "a URL, path, or GitHub repo" and documents no ref, so the pin is a local checkout at the commit. Per role project (Decision 9, `:789`) |
+| `codex-plugin` | `codex plugin marketplace add <owner/repo> --ref <commit>`; `codex plugin add <plugin>@<marketplace>`; check `codex plugin list`; inverse `codex plugin remove ...` and `codex plugin marketplace remove <marketplace>` | commit | D | codex-cli 0.162.1 help: `--ref <REF>`, "Git ref to fetch for Git marketplace sources". `marketplace upgrade` refreshes snapshots, so a pinned source is never upgraded. Inside each lane's `CODEX_HOME` (Decision 9, `:789`) |
+| `skills-cli` | `npx --yes skills@1.7.0 add <tree URL at the commit> -a <agent> -y`; `list`; `remove <skill> -y` | commit | D | the adopted Skills CLI (`adoption/skills/lifecycle.md:13-14`), vercel-labs/skills `7407f389` `README.md:87-92`, `:132` (project scope by default) |
+| `systemd-user` | `systemctl --user link {artifact}` (the verified unit file, keeping its unit name), then `enable --now <unit>`; `systemctl --user show --property=ActiveState <unit>` for `ActiveState=active`; `disable --now <unit>` | artifact | S | systemd 259, `systemctl(1)`: `link` takes an absolute unit-file path, "the effect of this may be undone with disable", and `disable` "undoes any changes made by enable or link". The man page calls the LSB exit codes an imperfect map and points to unit states; `show` exits 0 with `ActiveState=inactive` for a missing unit (measured). After Decision 3's port and isolation proofs |
+| `vendor-installer` | the verified download of `pin.artifact`, made executable and run directly, with the exact version (or `v` and the version) as an argument | version and artifact | C | the candidate's own installer at its sha256 |
 
 Notes on the routes:
 
@@ -99,6 +114,7 @@ Notes on the routes:
     PASS in `orchestration-frameworks`), installs nothing; enabling it is role configuration;
   - a candidate already installed as a stage C slot stays with stage C. For example the plan's `claude-agent-sdk`
     slot is at 0.2.163 and its screen is at 0.2.167; its re-pin goes through the plan.
+  - a remote MCP server reached by URL has no version to pin, so it is not a row.
 
 ## Receipts: host receipts, no new format
 
@@ -122,10 +138,12 @@ carries the inverse argv and the checks, which must no longer pass.
       Commands; measured); 1 for `npm ls --global` and for `mise where` (measured).
     - `text`: `out=$(<check>); test $? -eq N && ! printf '%s\n' "$out" | grep -q -F -e <quoted text>`. The check ran
       normally and its text is gone.
-    - `negation`: `! <check>`, the labelled fallback for a check with no documented absence. Any failing exit, a crash
-      included, reads as absent there.
+  - There is no bare-negation fallback: under `! <check>` a crash would read as a removal. A check with neither a
+    documented absent exit nor a text cannot be a row's check. api-actions' review allowed a labelled fallback; the
+    CC's read at `0d78f600` found it weak, and dropping it fails closed.
   - `compose` in [`tests/test_landscape_install_row_schema.py`](../../tests/test_landscape_install_row_schema.py) states
-    this composition. Its tests run it under `/bin/sh`, with controls for the plain pipeline and for an unbraced `cd`.
+    this composition. Its tests run it under `/bin/sh`, with controls for the plain pipeline, a bare negation and an
+    unbraced `cd`.
 - **Role locations.** `record` runs every command in the repository root (`run_command(cmd, cwd=root, ...)`, `:1023`).
   A client-level row runs in each role's location (Decision 9, `:789`): the role's project for Claude Code
   (`--scope local`), or the lane's own `CODEX_HOME` for Codex.
@@ -151,17 +169,24 @@ carries the inverse argv and the checks, which must no longer pass.
 
 ## Model selection
 
-The owner's addendum-18 to the CC's direction (2026-10-16, cited by name) makes the latest models and practice hard
-rules on NativeHorizonNY and every later distribution.
+The owner's addendum-19 (2026-10-16, cited by name; it replaces addendum-18's routing) makes model currency
+maintenance, not a gate.
 
-- Each row names the models it selects (`models`), by their `catalogs/foundation/model-currency.json` ids. The
-  active-selector check of the [2026-10-09 decision](2026-10-09-active-model-currency.md)
-  (`scripts/active_model_currency.py`) can then refuse a row whose model is not current.
-- PROPOSAL: build the row check from `model_currency_problems` (`scripts/validate.py:68-162` at `5bab63233`). That code
-  holds the 42-day release-age and 7-day landscape-age limits and the `in_use`, `held` and `package_bound` statuses.
-  The check runs as one of horizon's required checks, which api-actions owns.
-- Running the same check from the installer and the session-start hook, with its inverse, is a separate pull request
-  after #1180.
+- New installs select the inventory's current generation at install time.
+- `models` records each selection:
+  - the inventory slug (`id`, for example `gpt-6-1-sol`);
+  - the selected model id that slug maps to (`model_id`, `gpt-6.1-sol`; `catalogs/foundation/model-currency.json:148`,
+    `:151`);
+  - where it is selected: an argv flag, a config key or an SDK option.
+  - It is a record, never a gate.
+- The active-selector check of the [2026-10-09 decision](2026-10-09-active-model-currency.md) reads selector keys and
+  model-flag argv (`scripts/active_model_currency.py:33`, `:228-232`, `:489-503` at `5bab63233`), not `models`.
+- A stale selection shows in the session-start currency notice (`adoption/hooks/claude/currency-due-notice.py`, which
+  exits 0, wired at `adoption/new-wsl/client-config-map.json:170-177`). The notice prints the due file that the daily
+  stack-currency timer writes.
+- `model_record_problems` in the test checks only the record's join: the slug exists and maps to the recorded model
+  id. Age and status stay with the notice.
+- Installing that timer on the new WSL is a separate pull request after #1180.
 
 ## Generation and checks, in horizon
 
@@ -175,10 +200,15 @@ Horizon pins this repository by commit (`pins.json`, per horizon's README), so i
 at one commit. Its checker refuses a row that:
 
 - fails the schema;
-- on a versioned route, has no install argv naming `pin.version`. `unbound_version` in
-  [`tests/test_landscape_install_row_schema.py`](../../tests/test_landscape_install_row_schema.py) states this rule.
+- binds nothing its route fetches: a version route without an exact `pin.version`, a commit route without
+  `pin.commit`, or an artifact route without the verified `{artifact}`. `unbound_pin` in
+  [`tests/test_landscape_install_row_schema.py`](../../tests/test_landscape_install_row_schema.py) states this rule;
+  a comparator, range or channel never binds.
 - installs a repository that an installed stage C slot already installs. `stage_c_slots` in the same test states this
   rule, and it finds the plan's `claude-agent-sdk` slot.
+- carries FINAL without its layers being FINAL with this winner at this pin (`final_label_problems`, below);
+- records a model whose slug is not in the inventory or maps to another model id (`model_record_problems`; a record
+  check, never a currency gate);
 - is a `systemd-user` row whose unit has no port and isolation entry under Decision 3;
 - starts a run before stage S has proved, for each slot in `dials`, the listener-ownership check (Decision 9,
   `:750-761`).
@@ -197,8 +227,11 @@ The roles are the rows of the role-assignment matrix (Decision 9, `:787-795`): `
 
 ## Labels and start-up cost
 
-- **Label.** A row is TRIAL unless every layer it screens in is FINAL with this candidate as the winner at this pin
-  (`scripts/final_stack.py`, `enforce_final`).
+- **Label.** A row is TRIAL unless every layer it screens in is FINAL in `catalogs/landscape/final-stack.json`, with a
+  winner from this repository whose run pin is this pin. `final_label_problems` states the rule.
+  - Plan 6b makes FINAL rows defaults, so the rule fails closed.
+  - Today it refuses every FINAL label: no layer is FINAL, and `enforce_final` refuses FINAL while admission is
+    redesigned (`scripts/final_stack.py:835`, `:843` at `5bab63233`).
 - **Start-up cost.** The matrix measures each role's start-up cost at session start, against its plain control profile
   (Decision 9, `:779-780`). Most screens give only an ESTIMATE, often with no total; the schema keeps such a cost
   TRIAL.
@@ -215,21 +248,22 @@ The roles are the rows of the role-assignment matrix (Decision 9, `:787-795`): `
 | `acceptance` | `check` |
 | `service` | none: Decision 3 |
 | `needs` (host prerequisites) | none: stage C provides them |
-| none | `inverse`, `screens`, `sources`, `dials`, `invoke`, `roles`, `startup_context_cost`, `label` |
+| none | `inverse`, `screens`, `sources`, `dials`, `models`, `invoke`, `roles`, `startup_context_cost`, `label` |
 
 ## Boundaries
 
 - **Measured** on NativeStack2604, 2026-10-16:
   - the route help texts;
   - the `uv-add` check behaviour;
-  - the shell facts behind the composition (dash 0.5.12), and the absent exits of `npm ls`, `mise where`,
-    `systemctl show` and a missing command;
-  - the classification of the 131 PASS rows;
+  - the shell facts behind the composition (dash 0.5.12), and the absent exits of `npm ls`, `mise where` (for an
+    unknown tool name), `systemctl show` and a missing command;
+  - the classification and candidate counts of the 131 PASS rows;
   - the schema tests (`python3 -m unittest tests.test_landscape_install_row_schema`, jsonschema 4.26.0 as in
     `.github/requirements-ci.txt:17`).
 - **Not run:** no route ran on NativeHorizonNY for this record, and no row exists yet.
 - **Pins drift.** The campaign plan's survey found superpowers at v7.0.0 against v6.4.1, and claude-code, codex,
-  trailofbits and git unpinned in places. Every row here is pinned; a new pin is a new row version through review.
+  trailofbits and git unpinned in places. Every row here binds its exact version, commit or artifact; a new pin is a
+  new row version through review.
 - **Not covered:** a source build (for example `make build` in a source workspace) has no route. The OpenHands SDK's
   screen points to its modular packages once their exact versions are bound; those take `uv-add`.
 - **Overturn.** No PASS screen row is an installer that covers these routes. The screens were classified by install

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "adoption/landscape-install-row.schema.json",
   "title": "Landscape install manifest row",
-  "description": "One screened candidate that NativeHorizonNY installs once in stage H: its exact pin, the screens it passed, the vendor-path install, check and inverse commands as argv (never prose or a shell string), the plan services it dials, the models it selects, its invoke identity, its suited roles, its start-up context cost and its TRIAL or FINAL label. A PROPOSAL routed to the layer-resolution protocol; see docs/decisions/2026-10-16-landscape-install-manifest.md. The manifest of these rows lives in horizon, which pins this schema by commit. Install, check and inverse runs are recorded as host receipts (adoption/host-receipt.schema.json).",
+  "description": "One screened candidate that NativeHorizonNY installs once in stage H: its exact pin, the screens it passed, the vendor-path install, check and inverse commands as argv (never prose or a shell string), the plan services it dials, the record of the models it selects, its invoke identity, its suited roles, its start-up context cost and its TRIAL or FINAL label. A PROPOSAL routed to the layer-resolution protocol; see docs/decisions/2026-10-16-landscape-install-manifest.md. The manifest of these rows lives in horizon, which pins this schema by commit. Install, check and inverse runs are recorded as host receipts (adoption/host-receipt.schema.json).",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -65,17 +65,10 @@
       "properties": {
         "version": {
           "type": "string",
-          "pattern": "^[0-9A-Za-z][0-9A-Za-z.+_-]*$",
+          "description": "An exact version: three numeric components, then optional pre-release or build parts. A wildcard segment, a comparator, a range or a channel name (latest, canary, nightly) is refused",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+[0-9A-Za-z]*(?:[.+_-][0-9A-Za-z]+)*$",
           "not": {
-            "enum": [
-              "latest",
-              "stable",
-              "next",
-              "main",
-              "master",
-              "HEAD",
-              "default"
-            ]
+            "pattern": "(^|[.+_-])[xX](?=$|[.+_-])"
           }
         },
         "tag": {
@@ -158,7 +151,7 @@
       }
     },
     "route": {
-      "description": "The vendor-path family the commands use. It also fixes the install plan stage the row follows: C for a host tool, D for a client-level install (a Claude Code or Codex plugin or MCP server, a skill pack), S for a user service",
+      "description": "The vendor-path family the commands use. It fixes the install plan stage the row follows (C for a host tool, D for a client-level install, S for a user service) and what the install argv must bind: the exact version (mise, uv-tool, uv-add, npm-global, claude-mcp, codex-mcp, vendor-installer), the commit (skills-cli, claude-plugin, codex-plugin) or the verified artifact (vendor-installer, systemd-user)",
       "enum": [
         "mise",
         "uv-tool",
@@ -219,12 +212,13 @@
     "models": {
       "type": "array",
       "uniqueItems": true,
-      "description": "Each model the row selects, by its catalogs/foundation/model-currency.json models[].id, and where it is selected; empty when the row selects none. The active-selector check reads it and refuses a model that is not current",
+      "description": "The record of each model the row selects: its catalogs/foundation/model-currency.json slug, the selected model id that slug maps to, and where it is selected. Empty when the row selects none. A record, never a gate: a stale selection shows in the session-start currency notice",
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "id",
+          "model_id",
           "selector"
         ],
         "properties": {
@@ -232,8 +226,28 @@
             "type": "string",
             "pattern": "^[a-z0-9][a-z0-9.-]*$"
           },
+          "model_id": {
+            "$ref": "#/$defs/token"
+          },
           "selector": {
-            "$ref": "#/$defs/text"
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "where",
+              "key"
+            ],
+            "properties": {
+              "where": {
+                "enum": [
+                  "argv",
+                  "config",
+                  "sdk-option"
+                ]
+              },
+              "key": {
+                "$ref": "#/$defs/token"
+              }
+            }
           }
         }
       }
@@ -262,7 +276,7 @@
           "minItems": 1,
           "uniqueItems": true,
           "items": {
-            "$ref": "#/$defs/text"
+            "$ref": "#/$defs/token"
           }
         }
       }
@@ -361,7 +375,10 @@
         ],
         "properties": {
           "route": {
-            "const": "vendor-installer"
+            "enum": [
+              "vendor-installer",
+              "systemd-user"
+            ]
           }
         }
       },
@@ -370,6 +387,31 @@
           "pin": {
             "required": [
               "artifact"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "route"
+        ],
+        "properties": {
+          "route": {
+            "enum": [
+              "skills-cli",
+              "claude-plugin",
+              "codex-plugin"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "pin": {
+            "required": [
+              "commit"
             ]
           }
         }
@@ -402,7 +444,7 @@
     "argv": {
       "type": "array",
       "minItems": 1,
-      "description": "One command as argv. No element is a shell, so no command is a shell string; the generator quotes each element when it records the command. The program {artifact} is the verified download of pin.artifact, run directly",
+      "description": "One command as argv. No element is a shell, so no command is a shell string; the generator quotes each element when it records the command. The token {artifact} is the verified download of pin.artifact, as the program or as an argument",
       "prefixItems": [
         {
           "type": "string",
@@ -447,11 +489,10 @@
           "$ref": "#/$defs/text"
         },
         "absent_by": {
-          "description": "How the cleanup stage proves the candidate is gone: exit (the check returns absent_exit), text (the check returns expect_exit without stdout_contains), or negation (any failing exit; the labelled fallback when neither is documented)",
+          "description": "How the cleanup stage proves the candidate is gone: exit (the check returns absent_exit) or text (the check returns expect_exit without stdout_contains). A check with neither documented cannot be a row's check",
           "enum": [
             "exit",
-            "text",
-            "negation"
+            "text"
           ]
         },
         "absent_exit": {
@@ -501,15 +542,20 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "url",
-        "pin"
+        "url"
       ],
+      "description": "A source at a pin: the commit it was read at, or, for a client's help text, the client version and the time it was read",
       "properties": {
         "url": {
           "$ref": "#/$defs/https_url"
         },
-        "pin": {
-          "$ref": "#/$defs/text"
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9A-Za-z][0-9A-Za-z.+_-]*$"
         },
         "path": {
           "$ref": "#/$defs/text"
@@ -522,7 +568,25 @@
           "type": "string",
           "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
         }
-      }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "commit"
+          ]
+        },
+        {
+          "required": [
+            "version",
+            "read_at_utc"
+          ]
+        }
+      ]
+    },
+    "token": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9@-][A-Za-z0-9@._/:+=-]*$",
+      "maxLength": 200
     }
   }
 }

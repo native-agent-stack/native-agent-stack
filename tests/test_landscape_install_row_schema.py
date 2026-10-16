@@ -6,13 +6,16 @@ The real row is the co-op's PASS screen of openai/openai-agents-python, converte
 documents. A second real conversion, anthropics/claude-agent-sdk-python, shows the stage C overlap rule: the 10-02
 install plan already installs it. The other route rows are synthetic (example names, zero digests); their argv follows
 the route tools' own help at the versions the record cites. Each refusal is shown against the shipped schema, and the
-control removes two rules to show the refusals come from them.
+control removes the version and shell rules to show the refusals come from them. The functions below the fixtures
+(unbound_pin, stage_c_slots, final_label_problems, model_record_problems, compose) state the generator's rules that
+JSON Schema cannot express; horizon's checker carries the same rules.
 """
 from __future__ import annotations
 
 from copy import deepcopy
 import json
 from pathlib import Path
+import re
 import shlex
 import subprocess
 import sys
@@ -28,22 +31,28 @@ except ImportError as error:
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = "adoption/landscape-install-row.schema.json"
 INSTALL_PLAN = "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json"
+FINAL_STACK = "catalogs/landscape/final-stack.json"
+MODEL_CURRENCY = "catalogs/foundation/model-currency.json"
 AGENTS_COMMIT = "17d994bd3045dae71acda676a4ef4762ed8ecd94"  # openai/openai-agents-python v0.24.0
 SDK_COMMIT = "c10b52c674e5c709c7263544b38e8a5dad10e01d"  # anthropics/claude-agent-sdk-python v0.2.167
 UV_COMMIT = "70fe1196a546e49148a73b1c592b2f74c33af80e"  # astral-sh/uv tag 0.12.22
 ZERO_COMMIT = "0" * 40
 ZERO_SHA256 = "0" * 64
-# Routes whose install argv must name pin.version. JSON Schema cannot compare one field's value with another's, so the
-# horizon generator carries this rule; unbound_version() is its executable statement.
-VERSIONED_ROUTES = frozenset({"mise", "uv-tool", "uv-add", "npm-global", "vendor-installer"})
+# What each route's install argv must bind: the exact version, the commit, or the verified artifact.
+VERSION_ROUTES = frozenset({"mise", "uv-tool", "uv-add", "npm-global", "claude-mcp", "codex-mcp", "vendor-installer"})
+COMMIT_ROUTES = frozenset({"skills-cli", "claude-plugin", "codex-plugin"})
+ARTIFACT_ROUTES = frozenset({"vendor-installer", "systemd-user"})
 # The role-assignment matrix's sessions that take no framework (the install plan, Decision 9), and names that are not
 # matrix rows.
 REFUSED_ROLES = ("trader", "blind-judge", "blind-reviewer", "control-arm", "jev", "lane", "evidence-reviewer")
+FLOATING_VERSIONS = ("latest", "stable", "main", "HEAD", "canary", "nightly", "", ">=0.24", "^0.24.0", "~0.24",
+                     "0.24.*", "0.24.x", "0.24.X", "1.x", "0.24.0.x", "0.24", "v0.24.0", "==0.24.0", "~=0.24.0",
+                     "!=0.24.0", "0.24.0 || 0.25.0")
 
 
 def uv_source(line):
     return {"url": f"https://github.com/astral-sh/uv/blob/{UV_COMMIT}/crates/uv-cli/src/lib.rs#L{line}",
-            "pin": "0.12.22 " + UV_COMMIT, "path": "crates/uv-cli/src/lib.rs", "line": line}
+            "version": "0.12.22", "commit": UV_COMMIT, "path": "crates/uv-cli/src/lib.rs", "line": line}
 
 
 def agents_row():
@@ -69,12 +78,13 @@ def agents_row():
         "inverse": [["uv", "remove", "--project", project, "openai-agents"]],
         "sources": {
             "install": {"url": f"https://github.com/openai/openai-agents-python/blob/{AGENTS_COMMIT}/README.md#L39-L45",
-                        "pin": "v0.24.0 " + AGENTS_COMMIT, "path": "README.md", "line": 45},
+                        "version": "0.24.0", "commit": AGENTS_COMMIT, "path": "README.md", "line": 45},
             "check": uv_source(1250),
             "inverse": uv_source(1165),
         },
         "dials": ["gpt-gateway"],
-        "models": [{"id": "gpt-6-1-sol", "selector": "the worker application's model argument"}],
+        "models": [{"id": "gpt-6-1-sol", "model_id": "gpt-6.1-sol",
+                    "selector": {"where": "sdk-option", "key": "model"}}],
         "invoke": {"kind": "sdk", "names": ["openai-agents"]},
         "roles": ["builder", "command-center", "co-op"],
         "startup_context_cost": {"tokens": 0, "basis": "estimate",
@@ -104,12 +114,14 @@ def claude_sdk_row():
             "inverse": [["uv", "remove", "--project", project, "claude-agent-sdk"]],
             "sources": {
                 "install": {"url": f"https://github.com/anthropics/claude-agent-sdk-python/blob/{SDK_COMMIT}/README.md"
-                                   "#L5-L11", "pin": "v0.2.167 " + SDK_COMMIT, "path": "README.md", "line": 8},
+                                   "#L5-L11", "version": "0.2.167", "commit": SDK_COMMIT, "path": "README.md",
+                            "line": 8},
                 "check": uv_source(1250),
                 "inverse": uv_source(1165),
             },
             "dials": [],
-            "models": [{"id": "claude-opus-5-5", "selector": "the worker's model option"}],
+            "models": [{"id": "claude-opus-5-5", "model_id": "claude-opus-5-5",
+                        "selector": {"where": "sdk-option", "key": "model"}}],
             "invoke": {"kind": "sdk", "names": ["claude-agent-sdk"]},
             "roles": ["builder", "reviewer"],
             "startup_context_cost": {"tokens": None, "basis": "estimate",
@@ -129,7 +141,7 @@ def synthetic(route, install, check, inverse, invoke, models=(), **pin):
         "install": install,
         "check": check,
         "inverse": inverse,
-        "sources": {key: {"url": "https://github.com/example/" + route, "pin": "1.2.3 " + ZERO_COMMIT}
+        "sources": {key: {"url": "https://github.com/example/" + route, "version": "1.2.3", "commit": ZERO_COMMIT}
                     for key in ("install", "check", "inverse")},
         "models": list(models),
         "invoke": invoke,
@@ -140,6 +152,7 @@ def synthetic(route, install, check, inverse, invoke, models=(), **pin):
 
 
 def route_rows():
+    market = "markets/example-market"
     return [
         agents_row(),
         synthetic("mise", [["mise", "use", "--global", "aqua:example/tool@1.2.3"]],
@@ -155,20 +168,29 @@ def route_rows():
                     "absent_by": "exit", "absent_exit": 1}],
                   [["npm", "uninstall", "--global", "@example/cli"]],
                   {"kind": "cli", "names": ["example"]}),
-        synthetic("claude-plugin", [["claude", "plugin", "install", "--scope", "local", "example@example-market"]],
+        synthetic("claude-plugin",
+                  [["git", "clone", "--no-checkout", "https://github.com/example/claude-plugin", market],
+                   ["git", "-C", market, "checkout", "--detach", ZERO_COMMIT],
+                   ["claude", "plugin", "marketplace", "add", "--scope", "local", market],
+                   ["claude", "plugin", "install", "--scope", "local", "example@example-market"]],
                   [{"argv": ["claude", "plugin", "list"], "stdout_contains": "example@example-market",
                     "absent_by": "text"}],
-                  [["claude", "plugin", "uninstall", "--scope", "local", "example@example-market"]],
+                  [["claude", "plugin", "uninstall", "--scope", "local", "example@example-market"],
+                   ["claude", "plugin", "marketplace", "remove", "example-market"]],
                   {"kind": "plugin", "names": ["example@example-market"]}),
         synthetic("claude-mcp", [["claude", "mcp", "add", "--scope", "local", "example", "--", "npx", "-y",
                                   "@example/mcp@1.2.3", "--model", "claude-sonnet-5-5"]],
                   [{"argv": ["claude", "mcp", "list"], "stdout_contains": "example", "absent_by": "text"}],
                   [["claude", "mcp", "remove", "--scope", "local", "example"]],
                   {"kind": "mcp-server", "names": ["example"]},
-                  models=[{"id": "claude-sonnet-5-5", "selector": "the server's --model argument"}]),
-        synthetic("codex-plugin", [["codex", "plugin", "add", "example@example-market"]],
+                  models=[{"id": "claude-sonnet-5-5", "model_id": "claude-sonnet-5-5",
+                           "selector": {"where": "argv", "key": "--model"}}]),
+        synthetic("codex-plugin", [["codex", "plugin", "marketplace", "add", "example/codex-plugin", "--ref",
+                                    ZERO_COMMIT],
+                                   ["codex", "plugin", "add", "example@example-market"]],
                   [{"argv": ["codex", "plugin", "list"], "stdout_contains": "example", "absent_by": "text"}],
-                  [["codex", "plugin", "remove", "example@example-market"]],
+                  [["codex", "plugin", "remove", "example@example-market"],
+                   ["codex", "plugin", "marketplace", "remove", "example-market"]],
                   {"kind": "plugin", "names": ["example@example-market"]}),
         synthetic("codex-mcp", [["codex", "mcp", "add", "example", "--", "npx", "-y", "@example/mcp@1.2.3"]],
                   [{"argv": ["codex", "mcp", "list"], "stdout_contains": "example", "absent_by": "text"}],
@@ -181,11 +203,14 @@ def route_rows():
                     "absent_by": "text"}],
                   [["npx", "--yes", "skills@1.7.0", "remove", "example", "-y"]],
                   {"kind": "skill", "names": ["example"]}),
-        synthetic("systemd-user", [["systemctl", "--user", "enable", "--now", "example.service"]],
+        synthetic("systemd-user", [["systemctl", "--user", "link", "{artifact}"],
+                                   ["systemctl", "--user", "enable", "--now", "example.service"]],
                   [{"argv": ["systemctl", "--user", "show", "--property=ActiveState", "example.service"],
                     "stdout_contains": "ActiveState=active", "absent_by": "text"}],
                   [["systemctl", "--user", "disable", "--now", "example.service"]],
-                  {"kind": "service", "names": ["example.service"]}),
+                  {"kind": "service", "names": ["example.service"]},
+                  artifact={"url": f"https://github.com/example/systemd-user/raw/{ZERO_COMMIT}/example.service",
+                            "sha256": ZERO_SHA256}),
         synthetic("vendor-installer", [["{artifact}", "1.2.3"]],
                   [{"argv": ["example", "--version"], "stdout_contains": "1.2.3", "absent_by": "exit",
                     "absent_exit": 127}],
@@ -195,23 +220,71 @@ def route_rows():
     ]
 
 
-def unbound_version(row):
-    """True when a versioned route's install argv never names pin.version as an exact argument or an exact suffix
-    after '@', '=' or 'v' (openai-agents==0.24.0, @example/cli@1.2.3, aqua:example/tool@1.2.3)."""
-    if row["route"] not in VERSIONED_ROUTES:
-        return False
-    version = row["pin"]["version"]
-    return not any(arg == version or (arg.endswith(version) and arg[-len(version) - 1] in "@=v")
-                   for argv in row["install"] for arg in argv)
+def exact_spec(arg, version):
+    """True when arg pins exactly this version: the version alone, PEP 440 `name==version` (extras allowed), or an npm
+    or mise `[@scope/]name@version` / `backend:tool@version`. A comparator, a range or a channel never matches."""
+    exact = re.escape(version)
+    return bool(arg == version or re.fullmatch(rf"[A-Za-z0-9._\[\],-]+=={exact}", arg)
+                or re.fullmatch(rf"(?:@[A-Za-z0-9._-]+/)?[A-Za-z0-9._:/-]+@{exact}", arg))
+
+
+def unbound_pin(row):
+    """True when the install argv binds nothing the route fetches: a version route names no exact pin.version, a
+    commit route never names pin.commit (an immutable tree URL, a --ref, a detached checkout or an @commit source), or
+    an artifact route never uses the verified {artifact}."""
+    route, pin = row["route"], row["pin"]
+    args = [arg for argv in row["install"] for arg in argv]
+    if route in VERSION_ROUTES and not any(
+            exact_spec(arg, pin["version"]) or (route == "vendor-installer" and arg == "v" + pin["version"])
+            for arg in args):
+        return True
+    commit = pin.get("commit")
+    if route in COMMIT_ROUTES and not (commit and any(
+            arg == commit or arg.endswith("@" + commit) or f"/tree/{commit}/" in arg or arg.endswith(f"/tree/{commit}")
+            for arg in args)):
+        return True
+    return route in ARTIFACT_ROUTES and not ("artifact" in pin and "{artifact}" in args)
+
+
+def norm(url):
+    return re.sub(r"^https?://", "", (url or "").lower()).rstrip("/").removesuffix(".git")
 
 
 def stage_c_slots(row, plan):
     """The install plan's stage C slots that already install this row's repository; the generator refuses such a row
     until the plan's own row is retired through the plan."""
-    def norm(url):
-        return (url or "").lower().rstrip("/").removesuffix(".git")
     return sorted(owner["slot"] for owner in plan["owners"]
                   if owner.get("installed") and norm(owner.get("repository")) == norm(row["candidate"]["repository"]))
+
+
+def final_label_problems(row, stack):
+    """A FINAL row needs every layer it screens in to be FINAL in final-stack.json with a winner from this repository
+    whose run pin is this pin; anything else is TRIAL. Plan 6b makes FINAL rows defaults, so this fails closed."""
+    if row["label"] != "FINAL":
+        return []
+    layers = {f'{item["catalog"]}/{item["layer_id"]}': item for item in stack.get("layers") or []}
+    runs = {run["id"]: run for run in stack.get("runs") or []}
+    pins = {row["pin"]["version"], row["pin"].get("commit")} - {None}
+    problems = []
+    for screen in row["screens"]:
+        item = layers.get(screen["layer"])
+        if item is None or item.get("terminal_state") != "FINAL":
+            problems.append(f"{screen['layer']}: the layer is not FINAL")
+        elif not any(norm(winner.get("repository")) == norm(row["candidate"]["repository"])
+                     and str((runs.get(winner.get("run")) or {}).get("pin", "")).removeprefix("v") in pins
+                     for winner in item.get("winners") or []):
+            problems.append(f"{screen['layer']}: no winner from this repository at this pin")
+    return problems
+
+
+def model_record_problems(row, currency):
+    """Each recorded selection joins the inventory: its slug exists and maps to the selected model id. A record, never
+    a gate (the owner's addendum-19): age and status are the currency notice's business, not a refusal."""
+    inventory = {model["id"]: model["model_id"] for model in currency.get("models") or []}
+    return [f"{model['id']}: not in the inventory" if model["id"] not in inventory else
+            f"{model['id']}: selects {inventory[model['id']]}, not {model['model_id']}"
+            for model in row["models"]
+            if model["id"] not in inventory or inventory[model["id"]] != model["model_id"]]
 
 
 def compose(check, stage, project=None, codex_home=None):
@@ -231,10 +304,8 @@ def compose(check, stage, project=None, codex_home=None):
                 f"out=$({cmd}); test $? -eq {want} && printf '%s\\n' \"$out\" | grep -F -e {text}")
     elif check["absent_by"] == "exit":
         body = f"{cmd}; test $? -eq {check['absent_exit']}"
-    elif check["absent_by"] == "text":
-        body = f"out=$({cmd}); test $? -eq {want} && ! printf '%s\\n' \"$out\" | grep -q -F -e {text}"
     else:
-        body = f"! {cmd}"
+        body = f"out=$({cmd}); test $? -eq {want} && ! printf '%s\\n' \"$out\" | grep -q -F -e {text}"
     return body if project is None else f"cd {shlex.quote(project)} && {{ {body}; }}"
 
 
@@ -247,10 +318,14 @@ def prints(text, code=0):
     return [sys.executable, "-c", f"print({text!r}); raise SystemExit({code})"]
 
 
+def load(path):
+    return json.loads((ROOT / path).read_text(encoding="utf-8"))
+
+
 class LandscapeInstallRowSchemaTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.schema = json.loads((ROOT / SCHEMA).read_text(encoding="utf-8"))
+        cls.schema = load(SCHEMA)
         Draft202012Validator.check_schema(cls.schema)
         cls.validator = Draft202012Validator(cls.schema)
 
@@ -260,13 +335,15 @@ class LandscapeInstallRowSchemaTests(unittest.TestCase):
     def refused(self, row):
         self.assertNotEqual(self.errors(row), [], json.dumps(row)[:300])
 
-    def test_every_route_has_a_valid_row(self):
+    def test_every_route_has_a_valid_bound_row(self):
         rows = route_rows() + [claude_sdk_row()]
-        self.assertEqual({row["route"] for row in rows}, set(self.schema["properties"]["route"]["enum"]))
+        routes = set(self.schema["properties"]["route"]["enum"])
+        self.assertEqual({row["route"] for row in rows}, routes)
+        self.assertEqual(VERSION_ROUTES | COMMIT_ROUTES | ARTIFACT_ROUTES, routes)
         for row in rows:
             with self.subTest(row=row["id"]):
                 self.assertEqual(self.errors(row), [])
-                self.assertFalse(unbound_version(row))
+                self.assertFalse(unbound_pin(row))
 
     def test_prose_and_shell_strings_are_refused(self):
         for install in ([["pip install openai-agents"]], [["bash", "-c", "pip install openai-agents"]],
@@ -282,35 +359,106 @@ class LandscapeInstallRowSchemaTests(unittest.TestCase):
         self.refused(row)
 
     def test_floating_or_unidentified_pins_are_refused(self):
-        for version in ("latest", "stable", "main", "HEAD", ">=0.24", "^0.24.0", "~0.24", "0.24.*", ""):
+        for version in FLOATING_VERSIONS:
             with self.subTest(version=version):
                 row = agents_row()
                 row["pin"]["version"] = version
                 self.refused(row)
+        for version in ("0.24.0", "2.0.0rc5", "2.0.0.dev0", "16.0.0-canary.5", "2026.10.3", "1.2.3+build.7"):
+            with self.subTest(exact=version):
+                row = agents_row()
+                row["pin"]["version"] = version
+                row["install"] = [["uv", "add", "--project", "envs/sdk-workers", f"openai-agents=={version}"]]
+                self.assertEqual(self.errors(row), [])
+                self.assertFalse(unbound_pin(row))
         row = agents_row()
         del row["pin"]["commit"]
         self.refused(row)
         row["pin"]["commit"] = AGENTS_COMMIT[:12]
         self.refused(row)
-        vendor = route_rows()[-1]
-        del vendor["pin"]["artifact"]
-        self.refused(vendor)
+        rows = {row["route"]: row for row in route_rows()}
+        for route, field in (("vendor-installer", "artifact"), ("systemd-user", "artifact"), ("skills-cli", "commit"),
+                             ("claude-plugin", "commit"), ("codex-plugin", "commit")):
+            with self.subTest(route=route, missing=field):
+                row = deepcopy(rows[route])
+                del row["pin"][field]
+                if field == "commit":
+                    row["pin"]["artifact"] = {"url": "https://example.com/a.tgz", "sha256": ZERO_SHA256}
+                self.refused(row)
 
-    def test_the_version_rule_finds_a_floating_install(self):
-        row = agents_row()
-        row["install"] = [["uv", "add", "--project", "envs/sdk-workers", "openai-agents"]]
-        self.assertEqual(self.errors(row), [])
-        self.assertTrue(unbound_version(row))
-        row["install"] = [["uv", "add", "--project", "envs/sdk-workers", "openai-agents==0.24.01"]]
-        self.assertTrue(unbound_version(row))
+    def test_comparators_ranges_and_unpinned_routes_never_bind(self):
+        for spec in ("openai-agents", "openai-agents>=0.24.0", "openai-agents~=0.24.0", "openai-agents!=0.24.0",
+                     "openai-agents<=0.24.0", "openai-agents===0.24.0", "openai-agents>0.24.0",
+                     "openai-agents==0.24.01", "openai-agents==0.24.0.post1"):
+            with self.subTest(spec=spec):
+                row = agents_row()
+                row["install"] = [["uv", "add", "--project", "envs/sdk-workers", spec]]
+                self.assertTrue(unbound_pin(row))
+        rows = {row["route"]: row for row in route_rows()}
+        for spec in ("@example/cli", "@example/cli@^1.2.3", "@example/cli@~1.2.3", "@example/cli@1.2",
+                     "@example/cli@1.2.x", "@example/cli@latest", "@example/cli@>=1.2.3"):
+            with self.subTest(npm=spec):
+                row = deepcopy(rows["npm-global"])
+                row["install"] = [["npm", "install", "--global", spec]]
+                self.assertTrue(unbound_pin(row))
+        unbound = {
+            "claude-mcp": [["claude", "mcp", "add", "--scope", "local", "example", "--", "npx", "-y", "@example/mcp"]],
+            "codex-mcp": [["codex", "mcp", "add", "example", "--", "npx", "-y", "@example/mcp@latest"]],
+            "claude-plugin": [["claude", "plugin", "install", "--scope", "local", "example@example-market"]],
+            "codex-plugin": [["codex", "plugin", "marketplace", "add", "example/codex-plugin"],
+                             ["codex", "plugin", "add", "example@example-market"]],
+            "skills-cli": [["npx", "--yes", "skills@1.7.0", "add",
+                            "https://github.com/example/skills/tree/main/skills/x"]],
+            "systemd-user": [["systemctl", "--user", "enable", "--now", "example.service"]],
+            "vendor-installer": [["{artifact}"]],
+            "mise": [["mise", "use", "--global", "aqua:example/tool@1.2"]],
+        }
+        for route, install in unbound.items():
+            with self.subTest(route=route):
+                row = deepcopy(rows[route])
+                row["install"] = install
+                self.assertTrue(unbound_pin(row))
+        vendor = deepcopy(rows["vendor-installer"])
+        vendor["install"] = [["{artifact}", "--version", "v1.2.3"]]
+        self.assertFalse(unbound_pin(vendor))
 
     def test_the_overlap_rule_finds_a_stage_c_row(self):
-        plan = json.loads((ROOT / INSTALL_PLAN).read_text(encoding="utf-8"))
+        plan = load(INSTALL_PLAN)
         self.assertEqual(stage_c_slots(claude_sdk_row(), plan), ["claude-agent-sdk"])
         self.assertEqual(stage_c_slots(agents_row(), plan), [])
 
+    def test_a_final_label_needs_final_layers_with_this_winner_at_this_pin(self):
+        row = claude_sdk_row()
+        row["label"] = "FINAL"
+        row["startup_context_cost"] = {"tokens": 1834, "basis": "measured", "method": "count_tokens",
+                                       "receipt": "claude-agent-sdk-python.startup.json"}
+        self.assertEqual(self.errors(row), [])
+        self.assertEqual(len(final_label_problems(row, load(FINAL_STACK))), 2)
+        stack = {"runs": [{"id": "r", "pin": "v0.2.167"}, {"id": "old", "pin": "0.2.163"}],
+                 "layers": [{"catalog": "foundation", "layer_id": layer, "terminal_state": "FINAL",
+                             "winners": [{"repository": "https://github.com/anthropics/claude-agent-sdk-python.git",
+                                          "run": "r"}]}
+                            for layer in ("agent-sdks", "native-clients")]}
+        self.assertEqual(final_label_problems(row, stack), [])
+        stack["layers"][1]["winners"][0]["run"] = "old"
+        self.assertEqual(final_label_problems(row, stack), ["foundation/native-clients: no winner from this "
+                                                             "repository at this pin"])
+        self.assertEqual(final_label_problems(claude_sdk_row(), stack), [])
+
+    def test_models_are_a_record_joined_to_the_inventory(self):
+        currency = load(MODEL_CURRENCY)
+        for row in route_rows() + [claude_sdk_row()]:
+            with self.subTest(row=row["id"]):
+                self.assertEqual(model_record_problems(row, currency), [])
+        row = agents_row()
+        row["models"][0]["model_id"] = "gpt-6-1-sol"
+        self.assertEqual(model_record_problems(row, currency), ["gpt-6-1-sol: selects gpt-6.1-sol, not gpt-6-1-sol"])
+        row["models"][0]["id"] = "gpt-0-unknown"
+        self.assertEqual(model_record_problems(row, currency), ["gpt-0-unknown: not in the inventory"])
+
     def test_a_missing_inverse_check_invoke_or_source_is_refused(self):
-        for field in ("inverse", "check", "sources", "screens", "invoke", "roles", "startup_context_cost", "label"):
+        for field in ("inverse", "check", "sources", "screens", "models", "invoke", "roles", "startup_context_cost",
+                      "label"):
             with self.subTest(field=field):
                 row = agents_row()
                 del row[field]
@@ -320,7 +468,8 @@ class LandscapeInstallRowSchemaTests(unittest.TestCase):
                 row = agents_row()
                 del row["sources"][field]
                 self.refused(row)
-        for invoke in ({"kind": "sdk", "names": []}, {"kind": "library", "names": ["x"]}, {"kind": "sdk"}):
+        for invoke in ({"kind": "sdk", "names": []}, {"kind": "library", "names": ["x"]}, {"kind": "sdk"},
+                       {"kind": "sdk", "names": ["openai agents"]}):
             with self.subTest(invoke=invoke):
                 row = agents_row()
                 row["invoke"] = invoke
@@ -328,6 +477,13 @@ class LandscapeInstallRowSchemaTests(unittest.TestCase):
         row = agents_row()
         row["dials"] = ["GPT Gateway"]
         self.refused(row)
+        unpinned = agents_row()
+        unpinned["sources"]["install"] = {"url": "https://www.npmjs.com/package/@openai/agents"}
+        self.refused(unpinned)
+        unpinned["sources"]["install"]["version"] = "0.24.0"
+        self.refused(unpinned)
+        unpinned["sources"]["install"]["read_at_utc"] = "2026-10-16T02:39:34Z"
+        self.assertEqual(self.errors(unpinned), [])
 
     def test_fenced_or_unknown_roles_and_unscreened_rows_are_refused(self):
         for role in REFUSED_ROLES:
@@ -375,36 +531,21 @@ class LandscapeInstallRowSchemaTests(unittest.TestCase):
         row = agents_row()
         row["route"] = "pip"
         self.refused(row)
-        row = agents_row()
-        row["sources"]["install"]["url"] = "https://www.npmjs.com/package/@openai/agents"
-        self.assertEqual(self.errors(row), [])
-
-    def test_the_control_shows_the_refusals_come_from_the_rules(self):
-        loose = deepcopy(self.schema)
-        del loose["properties"]["pin"]["properties"]["version"]["not"]
-        argv = loose["$defs"]["argv"]
-        del argv["prefixItems"][0]["not"]
-        del argv["items"]["not"]
-        validator = Draft202012Validator(loose)
-        floating = agents_row()
-        floating["pin"]["version"] = "latest"
-        shell = agents_row()
-        shell["install"] = [["bash", "-c", "pip install openai-agents"]]
-        for row in (floating, shell):
-            self.assertNotEqual(self.errors(row), [])
-            self.assertEqual(self.errors(row, validator), [])
 
     def test_model_selection_and_absence_rules_are_enforced(self):
-        for models in ([{"id": "Claude Opus 5.5", "selector": "x"}], [{"id": "claude-opus-5-5", "selector": ""}],
-                       [{"id": "claude-opus-5-5"}]):
+        for models in ([{"id": "Claude Opus 5.5", "model_id": "x", "selector": {"where": "argv", "key": "--model"}}],
+                       [{"id": "claude-opus-5-5", "selector": {"where": "argv", "key": "--model"}}],
+                       [{"id": "claude-opus-5-5", "model_id": "claude-opus-5-5", "selector": "the worker's option"}],
+                       [{"id": "claude-opus-5-5", "model_id": "claude-opus-5-5",
+                         "selector": {"where": "env", "key": "MODEL"}}],
+                       [{"id": "claude-opus-5-5", "model_id": "claude opus",
+                         "selector": {"where": "argv", "key": "--model"}}]):
             with self.subTest(models=models):
                 row = agents_row()
                 row["models"] = models
                 self.refused(row)
-        row = agents_row()
-        del row["models"]
-        self.refused(row)
-        for change in ({"absent_by": "exit"}, {"absent_by": "gone"}, {"absent_by": "exit", "absent_exit": 256}):
+        for change in ({"absent_by": "exit"}, {"absent_by": "negation"}, {"absent_by": "gone"},
+                       {"absent_by": "exit", "absent_exit": 256}):
             with self.subTest(change=change):
                 row = agents_row()
                 row["check"][0].update(change)
@@ -415,6 +556,24 @@ class LandscapeInstallRowSchemaTests(unittest.TestCase):
                 del row["check"][0][field]
                 self.refused(row)
 
+    def test_the_control_shows_the_refusals_come_from_the_rules(self):
+        loose = deepcopy(self.schema)
+        loose["properties"]["pin"]["properties"]["version"] = {"type": "string"}
+        argv = loose["$defs"]["argv"]
+        del argv["prefixItems"][0]["not"]
+        del argv["items"]["not"]
+        validator = Draft202012Validator(loose)
+        rows = []
+        for version in ("latest", "0.24.x", "canary"):
+            row = agents_row()
+            row["pin"]["version"] = version
+            rows.append(row)
+        shell = agents_row()
+        shell["install"] = [["bash", "-c", "pip install openai-agents"]]
+        for row in rows + [shell]:
+            self.assertNotEqual(self.errors(row), [])
+            self.assertEqual(self.errors(row, validator), [])
+
 
 class CompositionTests(unittest.TestCase):
     """api-actions' review of 2bb57790: the check's own exit gates its text, and absence is proved, not assumed."""
@@ -424,7 +583,7 @@ class CompositionTests(unittest.TestCase):
         self.assertNotEqual(sh(compose(check, "install")), 0)
         self.assertEqual(sh(compose({**check, "argv": prints("example v1.2.3", 0)}, "install")), 0)
         self.assertNotEqual(sh(compose({**check, "argv": prints("other", 0)}, "install")), 0)
-        plain = {"argv": prints("x", 2), "expect_exit": 2, "absent_by": "negation"}
+        plain = {"argv": prints("x", 2), "expect_exit": 2, "absent_by": "exit", "absent_exit": 127}
         self.assertEqual(sh(compose(plain, "install")), 0)
         self.assertNotEqual(sh(compose({**plain, "argv": prints("x", 0)}, "install")), 0)
         # Control: the plain pipeline the review refused takes grep's status and passes the failed check.
@@ -438,8 +597,8 @@ class CompositionTests(unittest.TestCase):
         self.assertEqual(sh(compose(text, "cleanup")), 0)
         self.assertNotEqual(sh(compose({**text, "argv": prints("example v1.2.3", 0)}, "cleanup")), 0)
         self.assertNotEqual(sh(compose({**text, "argv": prints("", 1)}, "cleanup")), 0)
-        # The labelled fallback reads any failing exit, a crash included, as absent; that is why the row labels it.
-        self.assertEqual(sh(compose({"argv": prints("crashed", 2), "absent_by": "negation"}, "cleanup")), 0)
+        # Control: a bare negation would read the crash as a removal; the schema has no such fallback.
+        self.assertEqual(sh(f"! {shlex.join(prints('crashed', 2))}"), 0)
 
     def test_a_failed_cd_into_a_role_location_never_reads_as_a_pass(self):
         with tempfile.TemporaryDirectory() as scratch:
