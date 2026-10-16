@@ -70,6 +70,21 @@ every frozen/discovered identity is retained, votes remain credible/not_credible
 independent replicated family majorities. It retains declared judgment metadata and raw returns; it does not prove
 native execution, provider sampling controls, or V2 runner copy/usage acceptance. Newly discovered identities need
 a screen bound to a later frozen field before resolution. V1 dispatch and artifacts remain unchanged.
+
+Repository transfer: published GitHub URLs for this repository's former owner are normalized to
+native-agent-stack/native-agent-stack, including api.github.com/repos URLs and preserving their
+revision/path/query/fragment. This applies to
+all emitted documents and the stdout summary, including dictionary keys; collisions refuse publication.
+Pinned owner/repo@sha:path citation locators for this same repository are normalized as well, with
+the revision and path unchanged; other owners, repository names and enclosing slugs are not aliases.
+The exact plain owner/repo spelling in prose is also a reference to this transferred repository.
+Raw workflow inputs and the GPT-6 byte-copy check remain unchanged.
+The native hostname (CPython os.uname().nodename) and optional WSL_DISTRO_NAME installation label
+become <host-installation> through the same recursive rewrite path, including keys and the summary.
+This includes a WSL label the native scanner treats as public; source collection failures refuse publication.
+Per-call prompt_sha256 fields and copies of their digests (including prefixes of seven or more hex
+characters) are omitted from publication. The original run/cache inputs remain private and unchanged.
+The public frozen-template prompts_sha256 and public schema hashes remain distinct and are retained.
 """
 
 from __future__ import annotations
@@ -752,6 +767,92 @@ def redact_project_dirs(value, work: Path | None = None, repo_root: Path | None 
     return rewrite_strings(value, fix)
 
 
+def normalize_repository_urls(value):
+    """Apply this repository's verified GitHub transfer, refusing key collisions.
+
+    #1073 correction: GitHub's GET repos/<former-owner>/native-agent-stack
+    resolved to full_name native-agent-stack/native-agent-stack on 2026-10-13.
+    Use the native sweep_common.rewrite_strings mechanism at 7dcbe9a58:177-191;
+    do not treat other owners or similarly named repositories as redirects.
+    """
+    former_owner = "seathatflowsinourveins"
+    pattern = re.compile(r"(https?://(?:github\.com/|api\.github\.com/repos/))" + re.escape(former_owner)
+                         + r"/native-agent-stack(\.git)?(?=$|[^A-Za-z0-9_.-])", re.I)
+    locator = re.compile(r"(?<![\w/.-])" + re.escape(former_owner)
+                         + r"/native-agent-stack(?=@|$|[)\],;:!?\s])", re.I)
+
+    def fix(text):
+        text = pattern.sub(lambda match: match[1] + "native-agent-stack/native-agent-stack"
+                           + (match[2] or ""), text)
+        return locator.sub("native-agent-stack/native-agent-stack", text)
+
+    return rewrite_strings(value, fix)
+
+
+def host_installation_names():
+    """Collect the installation labels without publishing or logging their values.
+
+    CPython 3.13 os.uname().nodename reads the same native source as
+    scripts/host_name_scan.py at 7dcbe9a58:60-66 (uname -n). That scanner excludes
+    a hostname equal to WSL_DISTRO_NAME; #1073 P2-2 still requires its redaction.
+    Keep the scanner's refusal behavior and validate these sources locally.
+    """
+    names = [os.uname().nodename.strip()]
+    if os.environ.get("WSL_DISTRO_NAME"):
+        names.append(os.environ["WSL_DISTRO_NAME"])
+    if any(not name or len(name) > 512 or any(ord(char) < 32 or ord(char) == 127
+                                           or 0xD800 <= ord(char) <= 0xDFFF for char in name) for name in names):
+        raise host_name_scan.HostNameScanError("invalid host installation source")
+    return tuple(dict.fromkeys(names))
+
+
+def redact_host_installation(value, names):
+    """Replace literal installation labels case-insensitively; collisions refuse."""
+    pattern = re.compile("|".join(re.escape(name) for name in sorted(names, key=len, reverse=True)), re.I)
+    return rewrite_strings(value, lambda text: pattern.sub("<host-installation>", text))
+
+
+def omit_private_prompt_commitments(value):
+    """Omit private input seals before any public document or summary is emitted.
+
+    #1073 / #161: codex_job.py at 7dcbe9a58:651 hashes original prompt bytes;
+    make_prompt.py:63 embeds the private layer/proposal input. Retain that local
+    producer/cache identity, but never publish it as authentication of private
+    bytes. Collect first, then prune fields and rewrite copies in keys/values
+    through native rewrite_strings, with its collision refusal. No word boundary
+    excludes glued prefixes. The plural prompts_sha256 authenticates the frozen
+    public template and is not this per-call seal.
+    """
+    prefixes = set()
+
+    def collect(item):
+        if isinstance(item, dict):
+            for key, child in item.items():
+                if key == "prompt_sha256" and isinstance(child, str) and re.fullmatch(r"[0-9a-f]{7,64}", child, re.I):
+                    prefixes.add(child[:7].lower())
+                collect(child)
+        elif isinstance(item, list):
+            for child in item:
+                collect(child)
+
+    def prune(item):
+        if isinstance(item, dict):
+            return {key: prune(child) for key, child in item.items() if key != "prompt_sha256"}
+        if isinstance(item, list):
+            return [prune(child) for child in item]
+        return item
+
+    collect(value)
+    pruned = prune(value)
+    if not prefixes:
+        return pruned
+    # Cover a complete digest or any shortened prefix without keeping an alias
+    # of the private input seal. Match pasted/glued spellings as well as tokens.
+    pattern = re.compile("(?:" + "|".join(re.escape(prefix) for prefix in sorted(prefixes))
+                         + r")[0-9a-f]{0,57}", re.I)
+    return rewrite_strings(pruned, lambda text: pattern.sub("<private-prompt-commitment-omitted>", text))
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--workflow-output", type=Path, required=True)
@@ -780,14 +881,26 @@ def main(argv=None) -> int:
         return 2
     repo_root = args.repo_root.resolve()
     replacements = host_replacements(work, repo_root)
+    try:
+        installation_names = host_installation_names()
+    except (OSError, AttributeError, host_name_scan.HostNameScanError):
+        print("refusing to publish: host installation source unavailable (no artifacts written)", file=sys.stderr)
+        return EXIT_PRIVATE
     summary = {**out["summary"], "run": meta}
     if meta.get("status") not in (None, "completed"):
         summary["warning"] = f"the run record's status is {meta.get('status')!r}, not completed"
     documents = {}
+    name = "publication"
     try:
+        # Process the whole publication together: a copied seal in a different
+        # document or the stdout summary must not escape its original field.
+        publication = omit_private_prompt_commitments(
+            {name: summary if name == "summary" else out[name]
+             for name in ("returns", "lanes", "layers", "survivors", "summary")})
         for name in ("returns", "lanes", "layers", "survivors", "summary"):
-            value = summary if name == "summary" else out[name]
-            documents[name] = redact_project_dirs(sanitize(value, replacements), work, repo_root)
+            value = publication[name]
+            documents[name] = normalize_repository_urls(redact_host_installation(
+                redact_project_dirs(sanitize(value, replacements), work, repo_root), installation_names))
         # Percent-encoding is representation, not anonymity. Check values AND keys after all URL decoding
         # layers, without publishing that view or changing source citations. Collisions also refuse.
         def url_decoded(text):

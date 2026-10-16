@@ -1,0 +1,214 @@
+{
+ "sweep_id": "landscape-sweep-20261013-execution-broker",
+ "date": "2026-10-13",
+ "workflow_run": "wf_ba4e1e02-e9e",
+ "status": "completed",
+ "manifest_ref": "catalogs/sota-convergence/manifest-20261013.json",
+ "lane": "landscape-sweep-20261013-execution-broker",
+ "prompts_sha256": "68f11a62e24adaa3e40b5a6dec9bcd5be532bf66ef6c5bd1e2686f105c98a254",
+ "usage_ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker-attempts/child-usage-wf_ba4e1e02-e9e.json",
+ "lower_bound_usage": false,
+ "returns_ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json",
+ "layers": [
+  {
+   "catalog": "us-equities",
+   "layer_id": "execution-broker",
+   "votes": "retained",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/discovery/execution-broker",
+   "calls": {
+    "web_search": 9,
+    "web_fetch": 16,
+    "gh_api": 75,
+    "gpt6_web_search": 3,
+    "gpt6_web_fetch": 16,
+    "gpt6_gh_api": 80
+   },
+   "proposed": [
+    "https://github.com/nautechsystems/nautilus_trader",
+    "https://github.com/gnzsnz/ib-gateway-docker",
+    "https://github.com/ib-api-reloaded/ib_async",
+    "https://github.com/lumiwealth/lumibot",
+    "https://github.com/quantconnect/ibautomater",
+    "https://github.com/alpacahq/alpaca-py",
+    "https://github.com/quantconnect/lean",
+    "https://github.com/ibcalpha/ibc",
+    "https://github.com/wboayue/rust-ibapi",
+    "https://github.com/csingley/ibflex",
+    "https://github.com/shopify/toxiproxy",
+    "https://github.com/gmatrunich/nautilus-alpaca",
+    "https://github.com/quantconnect/lean.brokerages.interactivebrokers",
+    "https://github.com/voyz/ibind"
+   ],
+   "survived": [
+    {
+     "repo": "https://github.com/nautechsystems/nautilus_trader",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/0/facts"
+     },
+     "fit": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/0/fit"
+     },
+     "source_review": "evidence/artifacts/landscape-sweep-20261013-execution-broker/nautechsystems-nautilus-trader.json"
+    },
+    {
+     "repo": "https://github.com/gnzsnz/ib-gateway-docker",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/1/facts"
+     },
+     "fit": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/1/fit"
+     },
+     "source_review": "evidence/artifacts/landscape-sweep-20261013-execution-broker/gnzsnz-ib-gateway-docker.json"
+    },
+    {
+     "repo": "https://github.com/ib-api-reloaded/ib_async",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/2/facts"
+     },
+     "fit": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/2/fit"
+     },
+     "source_review": "evidence/artifacts/landscape-sweep-20261013-execution-broker/ib-api-reloaded-ib-async.json"
+    },
+    {
+     "repo": "https://github.com/quantconnect/ibautomater",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/4/facts"
+     },
+     "fit": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/4/fit"
+     },
+     "source_review": "evidence/artifacts/landscape-sweep-20261013-execution-broker/quantconnect-ibautomater.json"
+    },
+    {
+     "repo": "https://github.com/ibcalpha/ibc",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/7/facts"
+     },
+     "fit": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/7/fit"
+     },
+     "source_review": "evidence/artifacts/landscape-sweep-20261013-execution-broker/ibcalpha-ibc.json"
+    },
+    {
+     "repo": "https://github.com/shopify/toxiproxy",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/10/facts"
+     },
+     "fit": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/10/fit"
+     },
+     "source_review": "evidence/artifacts/landscape-sweep-20261013-execution-broker/shopify-toxiproxy.json"
+    }
+   ],
+   "refuted": [
+    {
+     "repo": "https://github.com/lumiwealth/lumibot",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/3/facts"
+     },
+     "fit": {
+      "vote": "refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/3/fit"
+     }
+    },
+    {
+     "repo": "https://github.com/alpacahq/alpaca-py",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/5/facts"
+     },
+     "fit": {
+      "vote": "refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/5/fit"
+     }
+    },
+    {
+     "repo": "https://github.com/quantconnect/lean",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/6/facts"
+     },
+     "fit": {
+      "vote": "refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/6/fit"
+     }
+    },
+    {
+     "repo": "https://github.com/wboayue/rust-ibapi",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/8/facts"
+     },
+     "fit": {
+      "vote": "refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/8/fit"
+     }
+    },
+    {
+     "repo": "https://github.com/csingley/ibflex",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/9/facts"
+     },
+     "fit": {
+      "vote": "refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/9/fit"
+     }
+    },
+    {
+     "repo": "https://github.com/gmatrunich/nautilus-alpaca",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/11/facts"
+     },
+     "fit": {
+      "vote": "refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/11/fit"
+     }
+    },
+    {
+     "repo": "https://github.com/quantconnect/lean.brokerages.interactivebrokers",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/12/facts"
+     },
+     "fit": {
+      "vote": "refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/12/fit"
+     }
+    },
+    {
+     "repo": "https://github.com/voyz/ibind",
+     "facts": {
+      "vote": "not_refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/13/facts"
+     },
+     "fit": {
+      "vote": "refuted",
+      "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/13/fit"
+     }
+    }
+   ],
+   "reopen": [
+    {
+     "trigger": "platform_profile_changed",
+     "ref": "adoption/manifest.json#/platform_profiles"
+    }
+   ]
+  }
+ ]
+}

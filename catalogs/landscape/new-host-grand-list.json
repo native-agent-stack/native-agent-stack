@@ -7,7 +7,7 @@
       "foundation": "catalogs/landscape/foundation.json",
       "us-equities": "catalogs/landscape/us-equities.json"
     },
-    "manifest": "catalogs/sota-convergence/manifest-20261009.json",
+    "manifest": "catalogs/sota-convergence/manifest-20261013.json",
     "profiles": "adoption/manifest.json",
     "bootstrap_pins": {
       "linux-wsl2-x86_64": "adoption/pins-linux-x86_64.json",
@@ -400,7 +400,7 @@
           "repository": "https://github.com/openai/codex",
           "pin": "0.155.1",
           "evidence_class": "native_proven",
-          "upstream_latest": "rust-v0.162.0",
+          "upstream_latest": "rust-v0.162.1",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -721,7 +721,7 @@
           "repository": "https://github.com/akitaonrails/ai-memory",
           "pin": "2.3.2",
           "evidence_class": "native_proven",
-          "upstream_latest": "v2.6.2",
+          "upstream_latest": "v2.6.5",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -1169,7 +1169,7 @@
           "repository": "https://github.com/openclaw/mcporter",
           "pin": "0.13.13",
           "evidence_class": "native_proven",
-          "upstream_latest": "v0.14.2",
+          "upstream_latest": "v0.14.3",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -1249,7 +1249,7 @@
           "repository": "https://github.com/anthropics/claude-code",
           "pin": "2.1.278",
           "evidence_class": "native_proven",
-          "upstream_latest": "v2.1.295",
+          "upstream_latest": "v2.1.296",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -1289,7 +1289,7 @@
           "repository": "https://github.com/openai/codex",
           "pin": "0.155.1",
           "evidence_class": "native_proven",
-          "upstream_latest": "rust-v0.162.0",
+          "upstream_latest": "rust-v0.162.1",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -1616,7 +1616,7 @@
           "repository": "https://github.com/dagucloud/dagu",
           "pin": "2.16.6",
           "evidence_class": "local_integration",
-          "upstream_latest": "v2.18.2",
+          "upstream_latest": "v2.19.2",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -1926,7 +1926,7 @@
           "repository": "https://github.com/ccusage/ccusage",
           "pin": "20.0.24",
           "evidence_class": "synthetic",
-          "upstream_latest": "v20.0.26",
+          "upstream_latest": "v20.0.30",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -2007,7 +2007,7 @@
           "repository": "https://github.com/vercel-labs/agent-browser",
           "pin": "0.38.1",
           "evidence_class": "local_integration",
-          "upstream_latest": "v0.38.2",
+          "upstream_latest": "v0.39.0",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [],
@@ -2044,7 +2044,7 @@
           "repository": "https://github.com/alphaXiv/OpenResearch",
           "pin": "0.2.7",
           "evidence_class": "local_integration",
-          "upstream_latest": "v0.2.17",
+          "upstream_latest": "v0.2.18",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [],
@@ -2093,7 +2093,7 @@
           "repository": "https://github.com/anthropics/claude-code",
           "pin": "2.1.278",
           "evidence_class": "local_integration",
-          "upstream_latest": "v2.1.295",
+          "upstream_latest": "v2.1.296",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -2177,7 +2177,7 @@
           "repository": "https://github.com/openai/codex",
           "pin": "CLI rust-v0.155.1; Python openai-codex 0.154.0",
           "evidence_class": "native_proven",
-          "upstream_latest": "rust-v0.162.0",
+          "upstream_latest": "rust-v0.162.1",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [],
@@ -2210,7 +2210,7 @@
           "repository": "https://github.com/akitaonrails/ai-memory",
           "pin": "v2.3.1",
           "evidence_class": "native_proven",
-          "upstream_latest": "v2.6.2",
+          "upstream_latest": "v2.6.5",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -2383,7 +2383,7 @@
           "repository": "https://github.com/dagucloud/dagu",
           "pin": "v2.16.6",
           "evidence_class": "synthetic",
-          "upstream_latest": "v2.18.2",
+          "upstream_latest": "v2.19.2",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -2494,8 +2494,8 @@
           "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
           "pin": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26",
           "evidence_class": "source_review",
-          "upstream_latest": null,
-          "pin_behind_upstream": null,
+          "upstream_latest": "0.3.279",
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [],
           "recipe": null,
@@ -2657,7 +2657,7 @@
           "repository": "https://github.com/dgunning/edgartools",
           "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
           "evidence_class": "native_proven",
-          "upstream_latest": "v5.61.1",
+          "upstream_latest": "v5.62.0",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -2754,7 +2754,7 @@
           "repository": "https://github.com/skfolio/skfolio",
           "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
           "evidence_class": "native_proven",
-          "upstream_latest": "v1.7.1",
+          "upstream_latest": "v1.8.5",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -2797,7 +2797,7 @@
           "repository": "https://github.com/skfolio/skfolio",
           "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
           "evidence_class": "native_proven",
-          "upstream_latest": "v1.7.1",
+          "upstream_latest": "v1.8.5",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -2828,7 +2828,7 @@
           "repository": "https://github.com/dgunning/edgartools",
           "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
           "evidence_class": "native_proven",
-          "upstream_latest": "v5.61.1",
+          "upstream_latest": "v5.62.0",
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
@@ -3102,6 +3102,7 @@
       "fastapi",
       "grype",
       "headroom",
+      "inspect-ai",
       "markitdown",
       "mcp-inspector",
       "mcporter",

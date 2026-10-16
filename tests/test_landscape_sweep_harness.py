@@ -3951,6 +3951,229 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(done.stdout, "")
         self.assertEqual({path.name: path.read_bytes() for path in (work / "out").iterdir()}, previous)
 
+    def test_cli_normalizes_the_transferred_repository_url_in_values_keys_and_summary(self):
+        work = temp_dir(self)
+        prefix = "https://github.com/"
+        former = prefix + "seathatflowsinourveins" + "/native-agent-stack"
+        current = prefix + "native-agent-stack/native-agent-stack"
+        # Preserve the pinned path, query and fragment; similarly named repos and
+        # other owners are independent sources, not aliases of this transfer.
+        suffix = "/blob/" + "a" * 40 + "/README.md?plain=1#run-it"
+        unrelated = [former + "-tools", prefix + "fixture-owner/native-agent-stack"]
+        notes = {former + suffix: [former + ".git", current, *unrelated]}
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = notes
+        done = self.cli(work, res, "--limit", "source " + former + suffix, run_id=former + suffix)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {current + suffix: [current + ".git", current, *unrelated]})
+        lanes = json.loads((work / "out/lanes.json").read_text())
+        self.assertEqual(lanes["lanes"][0]["result"]["limits"][-1], "source " + current + suffix)
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], current + suffix)
+
+    def test_cli_repository_redirect_collision_refuses_before_writing(self):
+        work = temp_dir(self)
+        prefix = "https://github.com/"
+        former = prefix + "seathatflowsinourveins" + "/native-agent-stack"
+        current = prefix + "native-agent-stack/native-agent-stack"
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {former: "first note", current: "second note"}
+        self.assert_cli_key_collision(work, res, r"(?:/<key-\d+>){5}", [former, current])
+
+    def test_cli_normalizes_only_this_repositorys_pinned_locators(self):
+        work = temp_dir(self)
+        former = "seathatflowsinourveins" + "/native-agent-stack"
+        current = "native-agent-stack/native-agent-stack"
+        suffix = "@" + "a" * 40 + ":tools/sota-convergence/README.md:12"
+        unrelated = ["fixture-owner/native-agent-stack" + suffix,
+                     former + "-tools" + suffix, "prefix-" + former + suffix,
+                     "other/" + former + suffix]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {
+            former + suffix: ["source " + former + suffix, *unrelated]}
+        done = self.cli(work, res, "--limit", "source " + former + suffix, run_id=former + suffix)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {current + suffix: ["source " + current + suffix, *unrelated]})
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], current + suffix)
+        lanes = json.loads((work / "out/lanes.json").read_text())
+        self.assertEqual(lanes["lanes"][0]["result"]["limits"][-1], "source " + current + suffix)
+
+    def test_cli_normalizes_only_this_repositorys_github_api_urls(self):
+        work = temp_dir(self)
+        prefix = "https://api.github.com/repos/"
+        former = prefix + "seathatflowsinourveins" + "/native-agent-stack"
+        current = prefix + "native-agent-stack/native-agent-stack"
+        suffix = "/contents/tools/sota-convergence/README.md?ref=" + "a" * 40 + "#L12"
+        unrelated = [prefix + "fixture-owner/native-agent-stack" + suffix,
+                     former + "-tools" + suffix,
+                     "https://example.test/repos/seathatflowsinourveins/native-agent-stack" + suffix]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {former + suffix: [former, *unrelated]}
+        done = self.cli(work, res, "--limit", "source " + former + suffix, run_id=former + suffix)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {current + suffix: [current, *unrelated]})
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], current + suffix)
+        lanes = json.loads((work / "out/lanes.json").read_text())
+        self.assertEqual(lanes["lanes"][0]["result"]["limits"][-1], "source " + current + suffix)
+
+    def test_cli_github_api_redirect_collision_refuses_before_writing(self):
+        work = temp_dir(self)
+        prefix = "https://api.github.com/repos/"
+        former = prefix + "seathatflowsinourveins" + "/native-agent-stack/contents/README.md"
+        current = prefix + "native-agent-stack/native-agent-stack/contents/README.md"
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {former: "first", current: "second"}
+        self.assert_cli_key_collision(work, res, r"(?:/<key-\d+>){5}", [former, current])
+
+    def test_cli_normalizes_only_this_repositorys_plain_slug_in_prose(self):
+        work = temp_dir(self)
+        former = "seathatflowsinourveins" + "/native-agent-stack"
+        current = "native-agent-stack/native-agent-stack"
+        unrelated = [former + "-tools", "prefix-" + former, "other/" + former,
+                     "fixture-owner/native-agent-stack"]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {former: ["source (" + former + ")", *unrelated]}
+        done = self.cli(work, res, "--limit", "source " + former, run_id=former)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {current: ["source (" + current + ")", *unrelated]})
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], current)
+        lanes = json.loads((work / "out/lanes.json").read_text())
+        self.assertEqual(lanes["lanes"][0]["result"]["limits"][-1], "source " + current)
+
+    def test_cli_repository_locator_collision_refuses_before_writing(self):
+        work = temp_dir(self)
+        suffix = "@" + "a" * 40 + ":README.md"
+        former = "seathatflowsinourveins" + "/native-agent-stack" + suffix
+        current = "native-agent-stack/native-agent-stack" + suffix
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {former: "first", current: "second"}
+        self.assert_cli_key_collision(work, res, r"(?:/<key-\d+>){5}", [former, current])
+
+    def test_cli_redacts_host_installation_in_values_keys_and_summary(self):
+        work = temp_dir(self)
+        hostname, distro = "fixture-installation", "fixture-distro-label"
+        res = healthy_result()
+        note = f"the paper Gateway on {hostname} at 127.0.0.1:4002"
+        res["first"][0]["claude_discover"]["notes"] = {hostname: [note, distro]}
+        run_file = write_json(work / "run.json", {"runId": hostname, "status": "completed", "result": res})
+        write_json(work / "scope.json", scope_for())
+        write_codex_files(work, res)
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.object(os, "uname", return_value=mock.Mock(nodename=hostname)), \
+                mock.patch.dict(os.environ, {"WSL_DISTRO_NAME": distro,
+                                            convert.host_name_scan.OVERRIDE: json.dumps(["fixture-scanner-control"])}), \
+                contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = convert.main(["--workflow-output", str(run_file), "--work-dir", str(work),
+                                 "--out", str(work / "out"), "--limit", note])
+        self.assertEqual(code, 0, stderr.getvalue())
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"<host-installation>": ["the paper Gateway on <host-installation> at 127.0.0.1:4002",
+                                                  "<host-installation>"]})
+        self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], "<host-installation>")
+        self.assertEqual(json.loads(stdout.getvalue())["gpt6_copy_check"], {"match": 2})
+        for text in [stdout.getvalue(), stderr.getvalue(),
+                     *((work / "out" / f"{name}.json").read_text()
+                       for name in ("returns", "lanes", "layers", "survivors"))]:
+            self.assertNotIn(hostname, text)
+            self.assertNotIn(distro, text)
+
+    def test_cli_host_installation_key_collision_refuses_before_writing(self):
+        work = temp_dir(self)
+        hostname = "fixture-installation"
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {hostname: "first", "<host-installation>": "second"}
+        run_file = write_json(work / "run.json", {"status": "completed", "result": res})
+        scope = write_json(work / "scope.json", scope_for())
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.object(os, "uname", return_value=mock.Mock(nodename=hostname)), \
+                contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                 "--out", str(work / "out")])
+        self.assertEqual(code, 3, stderr.getvalue())
+        self.assertIn("redaction key collision", stderr.getvalue())
+        self.assertNotIn(hostname, stderr.getvalue())
+        self.assertEqual(stdout.getvalue(), "")
+        self.assertFalse((work / "out").exists())
+
+    def test_cli_host_installation_source_failure_refuses_before_writing(self):
+        work = temp_dir(self)
+        run_file = write_json(work / "run.json", {"status": "completed", "result": healthy_result()})
+        scope = write_json(work / "scope.json", scope_for())
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.object(os, "uname", side_effect=OSError("fixture-private-source-detail")), \
+                contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                 "--out", str(work / "out")])
+        self.assertEqual(code, 3)
+        self.assertEqual(stderr.getvalue(),
+                         "refusing to publish: host installation source unavailable (no artifacts written)\n")
+        self.assertEqual(stdout.getvalue(), "")
+        self.assertFalse((work / "out").exists())
+
+    def test_cli_omits_private_prompt_commitments_and_glued_prefixes(self):
+        work = temp_dir(self)
+        res = synthetic_result()
+        private_digests = []
+        schema_digest = hashlib.sha256((HARNESS / "schemas/discover.json").read_bytes()).hexdigest()
+        template_digest = hashlib.sha256((HARNESS / "templates.json").read_bytes()).hexdigest()
+        for round_row in [*res["first"], *res["followups"]]:
+            for role in ("gpt6_discover", "fit_gpt6"):
+                if role not in round_row:
+                    continue
+                digest = hashlib.sha256(f"synthetic withheld prompt {len(private_digests)}".encode()).hexdigest()
+                private_digests.append(digest)
+                round_row[role]["inputs"] = {"prompt_sha256": digest, "schema_sha256": schema_digest,
+                                            "model": "gpt-6-astra", "effort": "max"}
+                round_row[role]["attempts"] = [{"inputs": {"prompt_sha256": digest},
+                                               "seal_note": "SHA" + digest[:8] + "tail"}]
+        res["first"][0]["claude_discover"]["notes"] = {
+            "prompts_sha256": template_digest,
+            "copies": ["SHA" + digest + "tail" for digest in private_digests],
+            "prefixes": [digest[:length] for digest in private_digests for length in (7, 8, 32, 63)]}
+        before = copy.deepcopy(res)
+        done = self.cli(work, res, run_id="SHA" + private_digests[0][:12] + "tail")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        texts = [done.stdout, done.stderr,
+                 *((work / "out" / f"{name}.json").read_text()
+                   for name in ("returns", "lanes", "layers", "survivors"))]
+        for digest in private_digests:
+            for text in texts:
+                self.assertNotIn(digest[:7], text)
+        for text in texts:
+            self.assertNotIn('"prompt_sha256"', text)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"]["prompts_sha256"],
+                         template_digest)
+        self.assertEqual(returns["raw"]["alpha"]["first"]["gpt6_discover"]["inputs"],
+                         {"schema_sha256": schema_digest, "model": "gpt-6-astra", "effort": "max"})
+        # The private producer/cache and GPT-6 output copies are evidence inputs, never rewritten.
+        self.assertEqual(json.loads((work / "run.json").read_text())["result"], before)
+        self.assertEqual(res, before)
+        self.assertNotIn("mismatch", json.loads(done.stdout)["gpt6_copy_check"])
+
+    def test_cli_prompt_commitment_key_collision_refuses_before_writing(self):
+        work = temp_dir(self)
+        res = healthy_result()
+        digest = hashlib.sha256(b"synthetic withheld prompt collision").hexdigest()
+        res["first"][0]["gpt6_discover"]["inputs"] = {"prompt_sha256": digest}
+        res["first"][0]["claude_discover"]["notes"] = {
+            digest[:8]: "first", "<private-prompt-commitment-omitted>": "second"}
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 3, done.stderr)
+        self.assertIn("publication.json#", done.stderr)
+        self.assertIn("redaction key collision", done.stderr)
+        self.assertNotIn(digest[:7], done.stderr + done.stdout)
+        self.assertEqual(done.stdout, "")
+        self.assertFalse((work / "out").exists())
+
     def test_cli_redacts_session_segments_only_in_native_scratchpad_paths(self):
         identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])
         encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
