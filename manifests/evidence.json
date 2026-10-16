@@ -17513,13 +17513,18 @@
     },
     {
       "path": "catalogs/foundation/model-currency.json",
-      "sha256": "3c5a2d3665aefab02aef36770de4dd0f7f191e534b2c83535405894a62d2932a",
-      "bytes": 41958
+      "sha256": "d232b69436f2cdbb2ddff8cd0d8e011c91fdc9788ff15a27e78a1d8a854fcfbe",
+      "bytes": 44753
     },
     {
       "path": "catalogs/foundation/model-currency.schema.json",
       "sha256": "d7d830f80078db3ba33409a5fde55fe8fc2af45bb7ae5418ca19ea1cc4a231e1",
       "bytes": 9709
+    },
+    {
+      "path": "catalogs/foundation/model-route-bindings.json",
+      "sha256": "00cd71396b5162a54c2ac1f7e192ddc3d997d3f4dfdd1c97f610e10a52b2e2c8",
+      "bytes": 2593
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
@@ -18958,8 +18963,8 @@
     },
     {
       "path": "docs/decisions/2026-10-07-model-currency-enforcement.md",
-      "sha256": "b1454ff36b35030f12ad7d853386bf8b0e92b52f7e509251870ab10c75e05335",
-      "bytes": 18041
+      "sha256": "5d0d067ab2bb614fccfb00bce91e6f6f06164a3308d601073e7b775160209910",
+      "bytes": 18401
     },
     {
       "path": "docs/decisions/2026-10-07-qmd-instruction-landing-composition.md",
@@ -19335,6 +19340,11 @@
       "path": "docs/decisions/2026-10-15-unrun-registration-rules.md",
       "sha256": "10c05e99847859f1c66ba5746ad5872a79ea6f7c115bfb243911d69e86d8f1a6",
       "bytes": 9884
+    },
+    {
+      "path": "docs/decisions/2026-10-16-model-route-currency-consistency.md",
+      "sha256": "afced0cb51c44c9271359be1f91568768e8f32ba3af44a11170536f59c7fd81f",
+      "bytes": 8075
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -41482,6 +41492,16 @@
       "bytes": 3552
     },
     {
+      "path": "evidence/artifacts/model-route-currency-consistency-20261016/checks.json",
+      "sha256": "e8b506a9f06d70a50e983a52de529c428f91c4ce5d5c8f74a6f169012f4049db",
+      "bytes": 3085
+    },
+    {
+      "path": "evidence/artifacts/model-route-currency-consistency-20261016/sources.json",
+      "sha256": "635a33dd3058be1b67b1c237595204ddbc80f5e2e18b6fc6178b29ccb3892594",
+      "bytes": 4983
+    },
+    {
       "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/build_input.py",
       "sha256": "0b2c37319278823dd0968b33aea87ea31118c000115023a8a017d16518f1b0db",
       "bytes": 7716
@@ -62713,8 +62733,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "a68c189c56bef41b0d3d8a5069920e15db45249818054c444988abad1e8f8477",
-      "bytes": 49157
+      "sha256": "cd7426378544ff5136870c860c6287acfbdf3f4d41b5b005e08a91d05382a24c",
+      "bytes": 59528
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -64018,8 +64038,8 @@
     },
     {
       "path": "tests/test_model_currency.py",
-      "sha256": "0d5b98a3894c1d5f39484e0f6be87f8cc48452be3b831501e6b42e4d43651b54",
-      "bytes": 18945
+      "sha256": "2adface0415204baf1326a3e9ec79de1db2ac4d44f7259d1c2fe4d7bd2a423ac",
+      "bytes": 28886
     },
     {
       "path": "tests/test_model_currency_propose.py",

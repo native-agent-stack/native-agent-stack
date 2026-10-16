@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "date": "2026-10-16",
+  "tests_command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 -B -m unittest tests.test_model_currency tests.test_validate -q",
+  "observed_test_count": 120,
+  "result": "passed",
+  "related_consumer_checks": {
+    "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 -B -m unittest tests.test_model_currency tests.test_validate tests.test_currency_due tests.test_model_currency_propose -q",
+    "tests": 237,
+    "result": "passed",
+    "model_currency_module_tests_at_that_run": 33,
+    "final_scope_check": "After the 237-test consumer run, the final 120-test publication/currency run also covers the new component-identity guard; the currency module then has 34 tests."
+  },
+  "fail_first": [
+    {
+      "case": "C2 component identity",
+      "before": "A model route could be mislabeled as an unrelated package while preserving proposal coverage.",
+      "after": "Component declarations must match the referenced package's canonical source identity."
+    },
+    {
+      "case": "Publication age report and step-summary visibility",
+      "before": "The stale inventory CLI case returned 1; the first report-only implementation then failed the step-summary visibility assertion.",
+      "after": "The CLI returns 0, retains the due row in model_currency_notices and appends it to the step summary. Malformed JSON, structural, date-format, source and future-date failures still return 1."
+    },
+    {
+      "case": "Missing inventory row",
+      "before": "CLI returned 0 with a nonexistent row reference.",
+      "after": "CLI returns 1 and names the broken join."
+    },
+    {
+      "case": "Older model generation",
+      "before": "CLI returned no route observation or notice.",
+      "after": "CLI returns 0 and a nonblocking selected-model/inventory-model notice."
+    },
+    {
+      "case": "GPT half consumption",
+      "before": "The retained manifest was ignored.",
+      "after": "The explicit candidate model is checked through the stable-ID binding."
+    },
+    {
+      "case": "C2 table presence and proposal coverage",
+      "before": "Missing or empty join table passed beside retained proposals.",
+      "after": "CLI rejects incomplete consistency input; model age is not a rejection."
+    },
+    {
+      "case": "Binding removal",
+      "before": "Removing the binding declaration disabled the checker.",
+      "after": "A present route source requires its binding declaration."
+    },
+    {
+      "case": "Background-Haiku refresh proposal",
+      "before": "The real inventory row retained the older model.",
+      "after": "The row names the current Haiku generation as held for normal refresh."
+    }
+  ],
+  "not_measured": [
+    "No model inference, credential lookup, Muse command or runtime application.",
+    "No quality comparison or entitlement qualification.",
+    "The 42-day and seven-day maintenance windows remain. Publication reports their age findings; it does not perform refreshes or model changes."
+  ]
+}

@@ -1,5 +1,7 @@
 # Model currency enforcement — 2026-10-07
 
+Publication age failures are superseded by the [2026-10-16 reporting decision](2026-10-16-model-route-currency-consistency.md#supersession-of-publication-age-enforcement). The 42-day and seven-day windows remain maintenance windows; structural, date-format and source validation continue. The record below preserves the original enforcement and its evidence.
+
 ## Decision
 
 Keep the current-model record in `catalogs/foundation/model-currency.json` and

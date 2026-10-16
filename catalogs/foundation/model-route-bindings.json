@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "inventory": "catalogs/foundation/model-currency.json",
+  "scope": "Stable route identities from the carried angle record and the GPT/Claude retained proposals. Bindings record identity; eligibility, entitlement, adoption and runtime application remain separate.",
+  "policy": "Missing or malformed row references fail consistency validation. A selected model differing from its inventory row produces a nonblocking notice. The withdrawn Muse subscription route names the Full family for traceability; its non-model placeholder remains a notice and its rejection remains unchanged.",
+  "routes": [
+    {
+      "route_id": "muse-code-wonder-full",
+      "model_currency_id": "muse-wonder-full-1.0"
+    },
+    {
+      "route_id": "muse-code-wonder-api",
+      "model_currency_id": "muse-wonder-1.0"
+    },
+    {
+      "route_id": "codex-wonder-api",
+      "model_currency_id": "muse-wonder-1.0"
+    },
+    {
+      "route_id": "opencode-wonder-api",
+      "model_currency_id": "muse-wonder-1.0"
+    },
+    {
+      "route_id": "claude-code-wonder-api",
+      "model_currency_id": "muse-wonder-1.0"
+    },
+    {
+      "route_id": "harness-spark-api",
+      "model_currency_id": "muse-spark-1.3"
+    },
+    {
+      "route_id": "muse-subscription-foreign-harness",
+      "model_currency_id": "muse-wonder-full-1.0"
+    },
+    {
+      "route_id": "codex-gpt-6-1-sol",
+      "model_currency_id": "gpt-6-1-sol"
+    },
+    {
+      "route_id": "codex-gpt-6-astra",
+      "model_currency_id": "gpt-6-astra"
+    },
+    {
+      "route_id": "codex-gpt-6-luna",
+      "model_currency_id": "gpt-6-luna"
+    },
+    {
+      "route_id": "claude-code-claude-opus-5-5",
+      "model_currency_id": "claude-opus-5-5"
+    },
+    {
+      "route_id": "claude-code-claude-sonnet-5-5",
+      "model_currency_id": "claude-sonnet-5-5"
+    },
+    {
+      "route_id": "claude-code-claude-haiku-5-5",
+      "model_currency_id": "claude-haiku-5-5"
+    },
+    {
+      "route_id": "openai-pool-foreign-harness",
+      "model_currency_id": "gpt-6-1-sol"
+    },
+    {
+      "route_id": "anthropic-api-claude-fable-5-1",
+      "model_currency_id": "claude-fable-5-1"
+    },
+    {
+      "route_id": "claude-code-claude-fable-5-1",
+      "model_currency_id": "claude-fable-5-1"
+    },
+    {
+      "route_id": "anthropic-api-claude-opus-5-5",
+      "model_currency_id": "claude-opus-5-5"
+    },
+    {
+      "route_id": "muse-code-spark-subscription",
+      "model_currency_id": "muse-spark-1.3"
+    },
+    {
+      "route_id": "codex-omniroute-gpt-6-1-sol",
+      "model_currency_id": "gpt-6-1-sol"
+    }
+  ]
+}

@@ -625,41 +625,117 @@
     },
     {
       "id": "background-haiku",
-      "role": "Simple Claude Code background tasks: titles, safety checks and quick summaries",
-      "consumer": "Claude Code 2.1.292 background slot",
-      "model_id": "claude-haiku-4-5-20251001",
-      "revision": "claude-haiku-4-5-20251001",
-      "release_date": "2025-10-15",
-      "release_source": "https://www.anthropic.com/news/claude-haiku-4-5",
-      "checked_at": "2026-10-15",
-      "status": "in_use",
+      "role": "Proposed current generation for simple Claude Code background tasks",
+      "consumer": "Claude Code background slot: Haiku 5.5 proposal for normal refresh. No runtime configuration is changed by this inventory update; deployment and invocation receipts remain separate.",
+      "model_id": "claude-haiku-5-5",
+      "revision": "claude-haiku-5-5",
+      "release_date": "2026-10-07",
+      "release_source": "https://platform.claude.com/docs/en/release-notes/overview#october-7-2026",
+      "checked_at": "2026-10-16",
+      "status": "held",
       "release_line": {
         "kind": "vendor_page",
-        "url": "https://platform.claude.com/docs/en/models/haiku-4-5/overview"
+        "url": "https://platform.claude.com/docs/en/models/haiku-5-5/overview"
       },
       "landscape_check": {
-        "date": "2026-10-15",
+        "date": "2026-10-16",
         "sources": [
-          "https://platform.claude.com/docs/en/about-claude/models/overview",
-          "https://platform.claude.com/docs/en/models/haiku-4-5/overview",
-          "https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions",
-          "https://www.anthropic.com/news/claude-haiku-4-5",
           "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
-          "https://platform.claude.com/docs/en/release-notes/overview",
-          "https://platform.claude.com/docs/en/about-claude/model-deprecations",
-          "https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide"
+          "https://platform.claude.com/docs/en/release-notes/overview#october-7-2026"
         ],
-        "newer_candidates": [
-          {
-            "model_id": "claude-haiku-5-5",
-            "revision": "claude-haiku-5-5",
-            "source": "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
-            "reason": "Official specification lists this successor as Active (latest), released 2026-10-07. The availability overturn condition is met; queue background-slot migration/quality-cost review and authorized application rather than silently changing the pin."
-          }
-        ],
-        "reason": "Read 2026-10-15: Anthropic now lists Claude Haiku 5.5 as Active (latest), released 2026-10-07, with API ID claude-haiku-5-5 for latency-sensitive classification/extraction/routing. This supersedes the October 7 no-newer-Haiku claim and triggers the recorded Haiku-line overturn condition. Record the successor for normal background-slot migration/quality-cost review and authorized application. Haiku 4.5 remains pinned pending that review; it is not represented as the leading Haiku. No model call or silent configuration switch occurs. The cited Haiku 4.5 page NOW labels it Active (legacy), gives retirement as not sooner than 2026-10-15, and directs migration to Haiku 5.5. Anthropic promises at least 60 days' notice before retirement of publicly released models; the floor is not a dated retirement announcement. Keeping the current pin is temporary migration staging, not an untriggered exception."
+        "newer_candidates": [],
+        "reason": "Supersedes the prior Haiku 4.5 temporary staging row with a held Haiku 5.5 refresh proposal. The prior successor-review record identified missing comparisons, not a measured reason to retain the older generation. No retention exception or expiry is needed. The current proposal follows the published October 7 launch; runtime application remains part of normal refresh."
       },
-      "overturn": "Triggered by the 2026-10-15 source review: Haiku 5.5 is available. Migration-review owner: command center (CC), which reviews and applies. Paired Haiku 4.5/5.5 check: api-actions runs Claude API slots through Claude Code headless using the routing-run paired-run practice and full harness on same-task background-role workloads; never a bare API call from a Codex lane. Tracking record: docs/decisions/2026-10-15-model-currency-landscape-check.md#haiku-background-migration-review. Readiness trigger: paired quality parity measured on the same tasks, plus cost and latency, plus CC review, before any authorized application. The October 7 newest-Haiku rule requires this review now; no silent pin switch."
+      "overturn": "Normal refresh applies the current-generation proposal and retains its native invocation evidence. Future model or measured compatibility changes are reported for refresh; staleness is not a new publication gate."
+    },
+    {
+      "id": "gpt-6-luna",
+      "role": "Efficient Codex route comparison",
+      "consumer": "Codex Luna route inventory; source-reviewed candidate, not a new deployment.",
+      "model_id": "gpt-6-luna",
+      "revision": "gpt-6-luna",
+      "release_date": "2026-09-22",
+      "release_source": "https://developers.openai.com/api/docs/changelog#september-2026",
+      "checked_at": "2026-10-16",
+      "status": "held",
+      "release_line": {
+        "kind": "vendor_page",
+        "url": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+      },
+      "overturn": "A newer model is documented for this route: report the change and handle it through normal refresh; this inventory entry alone authorizes no runtime change."
+    },
+    {
+      "id": "claude-haiku-5-5",
+      "role": "Latency-sensitive Claude route comparison",
+      "consumer": "Claude Haiku 5.5 route inventory; separate from the background-slot refresh proposal.",
+      "model_id": "claude-haiku-5-5",
+      "revision": "claude-haiku-5-5",
+      "release_date": "2026-10-07",
+      "release_source": "https://platform.claude.com/docs/en/release-notes/overview#october-7-2026",
+      "checked_at": "2026-10-16",
+      "status": "held",
+      "release_line": {
+        "kind": "vendor_page",
+        "url": "https://platform.claude.com/docs/en/models/haiku-5-5/overview"
+      },
+      "overturn": "A newer model is documented for this route: report the change and handle it through normal refresh; this inventory entry alone authorizes no runtime change."
+    },
+    {
+      "id": "muse-wonder-1.0",
+      "role": "Meta Model API Wonder route comparison",
+      "consumer": "Muse Code and third-party Model API comparison routes. Independent API entitlement and harness qualification remain unverified.",
+      "model_id": "muse-wonder-1.0",
+      "revision": "muse-wonder-1.0",
+      "release_date": "2026-10-12",
+      "release_source": "https://dev.meta.ai/resources/blog/build-with-muse-wonder",
+      "checked_at": "2026-10-16",
+      "status": "held",
+      "release_line": {
+        "kind": "vendor_page",
+        "url": "https://dev.meta.ai/docs/models#muse-wonder"
+      },
+      "overturn": "A newer model is documented for this route: report the change and handle it through normal refresh; this inventory entry alone authorizes no runtime change."
+    },
+    {
+      "id": "muse-wonder-full-1.0",
+      "role": "Native Muse Code subscription Wonder Full candidate",
+      "consumer": "Native Muse Code only; the exact ID is bound by the published 1.4.7 fence receipt, while the vendor page names the Full product. Gateway availability is not established. Muse fence HOLD remains.",
+      "model_id": "muse-wonder-full-1.0",
+      "revision": "muse-wonder-full-1.0",
+      "release_date": "2026-10-12",
+      "release_source": "https://dev.meta.ai/resources/blog/build-with-muse-wonder",
+      "checked_at": "2026-10-16",
+      "status": "held",
+      "release_line": {
+        "kind": "vendor_page",
+        "url": "https://dev.meta.ai/docs/models#muse-wonder-availability"
+      },
+      "overturn": "A newer model is documented for this route: report the change and handle it through normal refresh; this inventory entry alone authorizes no runtime change."
+    },
+    {
+      "id": "muse-spark-1.3",
+      "role": "Hosted Meta Spark route comparison",
+      "consumer": "Hosted Spark Standard candidate. Contributor and open-weight routes are separate. No Muse invocation or trial promotion.",
+      "model_id": "muse-spark-1.3",
+      "revision": "muse-spark-1.3",
+      "release_date": "2026-09-02",
+      "release_source": "https://research.meta.ai/blog/introducing-muse-spark-1-3",
+      "checked_at": "2026-10-16",
+      "status": "held",
+      "release_line": {
+        "kind": "vendor_page",
+        "url": "https://dev.meta.ai/docs/models#muse-spark"
+      },
+      "overturn": "A newer model is documented for this route: report the change and handle it through normal refresh; this inventory entry alone authorizes no runtime change.",
+      "landscape_check": {
+        "date": "2026-10-16",
+        "sources": [
+          "https://dev.meta.ai/docs/models#muse-spark",
+          "https://research.meta.ai/blog/introducing-muse-spark-1-3"
+        ],
+        "newer_candidates": [],
+        "reason": "The current vendor models page still names muse-spark-1.3 as the latest hosted Spark version and recommends it for new work. Muse Spark Open is a separate open-weight route, not a newer hosted Spark identifier. This is a dated maintenance review, not runtime or quality acceptance."
+      }
     }
   ]
 }

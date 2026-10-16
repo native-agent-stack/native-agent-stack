@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "read_at": "2026-10-16",
+  "custody": "Only the published excerpts/paraphrases below are retained and registered. No digest of an unretained webpage, private direction or review is published.",
+  "sources": [
+    {
+      "id": "openai-luna-release",
+      "url": "https://developers.openai.com/api/docs/changelog#september-2026",
+      "pin": "gpt-6-luna; release entry 2026-09-22",
+      "published_date": "2026-09-22",
+      "excerpt": "Released GPT-6 Sol (gpt-6-sol) and GPT-6 Luna (gpt-6-luna).",
+      "finding": "The September 22 entry supplies the release date; the current model page confirms the exact identifier.",
+      "current_model_page": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    {
+      "id": "anthropic-haiku-release",
+      "url": "https://platform.claude.com/docs/en/release-notes/overview#october-7-2026",
+      "pin": "claude-haiku-5-5; release entry 2026-10-07",
+      "published_date": "2026-10-07",
+      "excerpt": "We've launched Claude Haiku 5.5 (claude-haiku-5-5)",
+      "finding": "The October 7 launch and current model page support the new held route row and the background refresh proposal.",
+      "current_model_page": "https://platform.claude.com/docs/en/models/haiku-5-5/overview"
+    },
+    {
+      "id": "meta-wonder-release",
+      "url": "https://dev.meta.ai/resources/blog/build-with-muse-wonder",
+      "pin": "muse-wonder-1.0 / Muse Wonder Full; release announcement 2026-10-12",
+      "published_date": "2026-10-12",
+      "excerpt": "Muse Wonder Full, available exclusively by subscription in Muse Code",
+      "finding": "The dated announcement launches Wonder and Full. The current model page identifies muse-wonder-1.0 and keeps Full exclusive to native subscription Muse Code.",
+      "current_model_page": "https://dev.meta.ai/docs/models#muse-wonder-availability"
+    },
+    {
+      "id": "meta-full-native-identifier",
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/5bab63233ef90260bec4a8ee0cec4f5e4431776c/docs/decisions/2026-10-14-muse-file-fence.md#L123",
+      "pin": "Native Muse Code 1.4.7 / muse-bin-1.4.7-R6101.1; muse-wonder-full-1.0",
+      "finding": "The exact Full identifier comes from the published native reader receipt in the pinned fence decision. The vendor announcement names the Full product but does not establish its availability in a gateway. This row remains held with the fence restrictions."
+    },
+    {
+      "id": "meta-spark-release",
+      "url": "https://research.meta.ai/blog/introducing-muse-spark-1-3",
+      "pin": "muse-spark-1.3; release announcement 2026-09-02",
+      "published_date": "2026-09-02",
+      "excerpt": "We're excited to release Muse Spark 1.3",
+      "finding": "The release page is dated September 2, 2026. The current hosted-model page still calls 1.3 the latest Spark version; Spark Open is a separate open-weight route.",
+      "current_model_page": "https://dev.meta.ai/docs/models#muse-spark"
+    },
+    {
+      "id": "validation-mechanism",
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/5bab63233ef90260bec4a8ee0cec4f5e4431776c/scripts/validate.py",
+      "pin": "5bab63233ef90260bec4a8ee0cec4f5e4431776c",
+      "finding": "Extends the existing offline inventory validator and publication CLI. Its unittest fixture framework is reused; no new runtime or dependency is installed."
+    },
+    {
+      "id": "python-unittest",
+      "url": "https://github.com/python/cpython/blob/v3.13.16/Lib/unittest/case.py",
+      "pin": "v3.13.16",
+      "finding": "Installed Python 3.13.16 unittest assertions and subprocess CLI tests establish the red/green checks."
+    }
+  ],
+  "policy_supersession": {
+    "owner_direction_local_time": "2026-10-15 23:39 ET",
+    "authority_record": "direction-cc-20261015T1946Z-north-star-new-wsl-takeover.addendum-19.md",
+    "item": 4,
+    "paraphrase": "Keep north-star work primary and treat model currency as visible maintenance rather than an age-based publication stop.",
+    "superseded_record": "docs/decisions/2026-10-07-model-currency-enforcement.md",
+    "incident_record": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
+    "custody": "Private authority is cited by name only; no private text or digest is published."
+  },
+  "reporting_source": {
+    "url": "https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#adding-a-job-summary",
+    "read_at": "2026-10-16",
+    "mechanism": "Append Markdown to the runner-provided GITHUB_STEP_SUMMARY file; preserve existing summary text."
+  },
+  "limits": [
+    "Public source review, not account entitlement, effective route invocation or model comparison.",
+    "Exact Full ID remains based on the published pinned native receipt; no native process ran in this change.",
+    "Background-Haiku proposal changes inventory metadata only; no runtime setting or deployment was switched."
+  ]
+}
