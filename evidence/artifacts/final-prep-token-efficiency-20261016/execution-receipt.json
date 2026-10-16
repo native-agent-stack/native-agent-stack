@@ -1,0 +1,578 @@
+{
+  "schema": "final-preparation-native-execution/3",
+  "catalog": "foundation",
+  "layer_id": "token-efficiency",
+  "status": "BOUNDED_NATIVE_CAPTURES_RETAINED; co-op private check PASS 2026-10-16",
+  "final_admission": "CLOSED",
+  "masking": {
+    "manifest": "masked-captures.json",
+    "script": "mask_capture.py",
+    "test": "test_mask_capture.py",
+    "class": "deterministic masked derivatives of native util-linux script transcripts",
+    "raw": "private captures named only; no unpublished raw digest is published",
+    "commands": "Exact captured COMMAND headers, with only marked path placeholders substituted; COMMAND_EXIT_CODE comes from the recorder footer."
+  },
+  "scope": {
+    "candidate_installs": "Isolated throwaway prefixes only. The capture headers contain full env/bwrap/install commands.",
+    "network": "Tests/invokes have --unshare-net in each captured command; installers only download public artifacts.",
+    "credentials": "The recorded env -i and bwrap bindings expose no host home or credential directory to candidate test/install execution. Installed-host version probes are separate read-only calls.",
+    "host_promotion": false,
+    "models_invoked": false,
+    "services_enabled": false,
+    "production_usage_measured": false
+  },
+  "pins": [
+    {
+      "id": "rtk",
+      "version": "0.51.0",
+      "source_commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "version_capture": {
+        "path": "captures/rtk-version.typescript",
+        "line": 2,
+        "evidence_class": "masked_native_capture"
+      },
+      "installed_host_version_capture": {
+        "path": "captures/installed-rtk-version.typescript",
+        "line": 2,
+        "evidence_class": "masked_native_capture"
+      }
+    },
+    {
+      "id": "headroom",
+      "version": "0.40.0",
+      "source_commit": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
+      "version_capture": {
+        "path": "captures/headroom-version.typescript",
+        "line": 2,
+        "evidence_class": "masked_native_capture"
+      },
+      "installed_host_version_capture": {
+        "path": "captures/installed-headroom-version.typescript",
+        "line": 2,
+        "evidence_class": "masked_native_capture"
+      }
+    },
+    {
+      "id": "ccusage",
+      "version": "20.0.26",
+      "source_commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+      "version_capture": {
+        "path": "captures/ccusage-version.typescript",
+        "line": 2,
+        "evidence_class": "masked_native_capture"
+      },
+      "installed_host_version_capture": {
+        "path": "captures/installed-ccusage-version.typescript",
+        "line": 2,
+        "evidence_class": "masked_native_capture"
+      }
+    }
+  ],
+  "captures": [
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch> --setenv TZ UTC --setenv CLAUDE_CONFIG_DIR <scratch>/ccusage/fixture --setenv CCUSAGE_OFFLINE 1 <scratch>/recapture/ccusage/prefix/bin/ccusage claude daily --offline --json",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 1753,
+      "published_output": "captures/ccusage-fixture-report.typescript",
+      "published_sha256": "bb5e851d68f617689d28a8b92d2fef211bcc564f343aa20a2d19b7588189fbf3",
+      "raw_capture_name": "ccusage-fixture-report.typescript",
+      "return_code": 0,
+      "return_code_line": 37,
+      "evidence_scope": "SIMULATION: synthetic fixture or upstream test/seeded corpus; not production use, model-quality or provider savings"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --chdir <scratch> --setenv npm_config_cache <scratch>/ccusage/cache /bootstrap/node/bin/node /bootstrap/node/lib/node_modules/npm/bin/npm-cli.js --userconfig=<scratch>/ccusage/user.npmrc --globalconfig=<scratch>/ccusage/global.npmrc install --global --prefix <scratch>/recapture/ccusage/prefix --no-audit --no-fund ccusage@20.0.26",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 1221,
+      "published_output": "captures/ccusage-install.typescript",
+      "published_sha256": "b227c376ca7b827692fe225f535385572a457740cea9fa0abdc7552ab2fca4e8",
+      "raw_capture_name": "ccusage-install.typescript",
+      "return_code": 0,
+      "return_code_line": 5,
+      "evidence_scope": "native install/version record; not production use"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch>/ccusage/source --setenv TZ UTC /bootstrap/node/bin/node --test apps/ccusage/src/cli.test.ts nix/tools/models-dev-gen/compact.test.ts",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 4311,
+      "published_output": "captures/ccusage-node-tests.typescript",
+      "published_sha256": "e87062d7c5aea9888ef748ddb8c2d3abd9286512b6d9bc2c636b43b49afb18c2",
+      "raw_capture_name": "ccusage-node-tests.typescript",
+      "return_code": 0,
+      "return_code_line": 53,
+      "evidence_scope": "SIMULATION: synthetic fixture or upstream test/seeded corpus; not production use, model-quality or provider savings"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch>  <scratch>/recapture/ccusage/prefix/bin/ccusage --version",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 899,
+      "published_output": "captures/ccusage-version.typescript",
+      "published_sha256": "cf0dc237ee870a98c31e8695e0e62ff4054057c3e499f49ef8697000e17f3c79",
+      "raw_capture_name": "ccusage-version.typescript",
+      "return_code": 0,
+      "return_code_line": 4,
+      "evidence_scope": "native install/version record; not production use"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch>/headroom/test-root --setenv HEADROOM_OFFLINE 1 --setenv HEADROOM_BEACON off --setenv LITELLM_LOCAL_MODEL_COST_MAP True --setenv TIKTOKEN_CACHE_DIR <scratch>/headroom/tokenizer-cache --setenv XDG_CACHE_HOME <scratch>/headroom/cache --setenv PYTHONDONTWRITEBYTECODE 1 <scratch>/recapture/headroom/tools/headroom-ai/bin/python <scratch>/headroom/source/benchmarks/index_proof_table.py --seed 20260902",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 2870,
+      "published_output": "captures/headroom-benchmark.typescript",
+      "published_sha256": "cb45396b14b7a2b90619287dcffcfce1b875b68ae91eaed25a4bbfeec2101c54",
+      "raw_capture_name": "headroom-benchmark.typescript",
+      "return_code": 0,
+      "return_code_line": 35,
+      "evidence_scope": "SIMULATION: synthetic fixture or upstream test/seeded corpus; not production use, model-quality or provider savings"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch>/headroom/test-root --setenv HEADROOM_OFFLINE 1 --setenv HEADROOM_BEACON off --setenv LITELLM_LOCAL_MODEL_COST_MAP True --setenv TIKTOKEN_CACHE_DIR <scratch>/headroom/tokenizer-cache --setenv XDG_CACHE_HOME <scratch>/headroom/cache --setenv PYTHONDONTWRITEBYTECODE 1 --setenv PYTHONPATH <scratch>/headroom/test-root <scratch>/recapture/headroom/tools/headroom-ai/bin/python -m pytest -q tests/test_ccr.py",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 1329,
+      "published_output": "captures/headroom-ccr-tests.typescript",
+      "published_sha256": "dc4cafeec14975de95b0c47d24cec6413094e7a28b9eeb0e42b2a7ba60c7a6c6",
+      "raw_capture_name": "headroom-ccr-tests.typescript",
+      "return_code": 0,
+      "return_code_line": 5,
+      "evidence_scope": "SIMULATION: synthetic fixture or upstream test/seeded corpus; not production use, model-quality or provider savings"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --chdir <scratch> --setenv UV_TOOL_DIR <scratch>/recapture/headroom/tools --setenv UV_TOOL_BIN_DIR <scratch>/recapture/headroom/tool-bin --setenv UV_CACHE_DIR <scratch>/headroom/cache --setenv XDG_CONFIG_HOME <scratch>/recapture/headroom/config --setenv XDG_DATA_HOME <scratch>/recapture/headroom/data --setenv XDG_CACHE_HOME <scratch>/headroom/cache --setenv UV_KEYRING_PROVIDER disabled /bootstrap/uv --no-config tool install --python /usr/bin/python3 --with pytest --with pytest-asyncio 'headroom-ai[mcp]==0.40.0'",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 3311,
+      "published_output": "captures/headroom-install.typescript",
+      "published_sha256": "062ce1872c02409eefee57d1026462f66c7acd0b9409f10795f7f5d01451d037",
+      "raw_capture_name": "headroom-install.typescript",
+      "return_code": 0,
+      "return_code_line": 88,
+      "evidence_scope": "native install/version record; not production use"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch> --setenv HEADROOM_OFFLINE 1 --setenv HEADROOM_BEACON off --setenv LITELLM_LOCAL_MODEL_COST_MAP True --setenv TIKTOKEN_CACHE_DIR <scratch>/headroom/tokenizer-cache --setenv XDG_CACHE_HOME <scratch>/headroom/cache --setenv PYTHONDONTWRITEBYTECODE 1 <scratch>/recapture/headroom/tools/headroom-ai/bin/headroom --version",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 1167,
+      "published_output": "captures/headroom-version.typescript",
+      "published_sha256": "8311e4c308d28a6b1b0627700825be24873ccfabf631c9643586275cbba840ec",
+      "raw_capture_name": "headroom-version.typescript",
+      "return_code": 0,
+      "return_code_line": 4,
+      "evidence_scope": "native install/version record; not production use"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin <host-home>/.local/share/codex-ecosystem/bin/ccusage --version",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 311,
+      "published_output": "captures/installed-ccusage-version.typescript",
+      "published_sha256": "01009cdafd0e6c807a104a777e3a1d3ba0180c3c5ebb2901a4486eb845fa2de0",
+      "raw_capture_name": "installed-ccusage-version.typescript",
+      "return_code": 0,
+      "return_code_line": 4,
+      "evidence_scope": "native install/version record; not production use"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin <host-home>/.local/share/codex-ecosystem/bin/headroom --version",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 321,
+      "published_output": "captures/installed-headroom-version.typescript",
+      "published_sha256": "2e364c9d75dca0e64f895158a75d72e22092240eda357a36d115557a6d18406b",
+      "raw_capture_name": "installed-headroom-version.typescript",
+      "return_code": 0,
+      "return_code_line": 4,
+      "evidence_scope": "native install/version record; not production use"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin <host-home>/.local/share/codex-ecosystem/bin/rtk --version",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 302,
+      "published_output": "captures/installed-rtk-version.typescript",
+      "published_sha256": "8b5a596a774c801964925770952cd504b518fbd60230e877cafca5ff0a2c22d5",
+      "raw_capture_name": "installed-rtk-version.typescript",
+      "return_code": 0,
+      "return_code_line": 4,
+      "evidence_scope": "native install/version record; not production use"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/usr/bin:/bin /usr/bin/script --version",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 232,
+      "published_output": "captures/recorder-version.typescript",
+      "published_sha256": "656d4fa3fc30119f9e1c06788e1cb8377741b2d1fdab24d472678cf4f0250061",
+      "raw_capture_name": "recorder-version.typescript",
+      "return_code": 0,
+      "return_code_line": 4,
+      "evidence_scope": "native install/version record; not production use"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch>/rtk/work --setenv XDG_CONFIG_HOME <scratch>/recapture/rtk/config --setenv XDG_DATA_HOME <scratch>/recapture/rtk/data --setenv RTK_TELEMETRY_DISABLED 1 --setenv RTK_SUPPRESS_HOOK_WARNING 1 <scratch>/recapture/rtk/bin/rtk proxy sh -c 'exit 7'",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 1065,
+      "published_output": "captures/rtk-exit-control.typescript",
+      "published_sha256": "f27ece9f5364736895575d7361c2ce2b048d8881013389384e7919c5eeeb1615",
+      "raw_capture_name": "rtk-exit-control.typescript",
+      "return_code": 7,
+      "return_code_line": 3,
+      "evidence_scope": "SIMULATION: synthetic fixture or upstream test/seeded corpus; not production use, model-quality or provider savings"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch>/rtk/work --setenv XDG_CONFIG_HOME <scratch>/recapture/rtk/config --setenv XDG_DATA_HOME <scratch>/recapture/rtk/data --setenv RTK_TELEMETRY_DISABLED 1 --setenv RTK_SUPPRESS_HOOK_WARNING 1 <scratch>/recapture/rtk/bin/rtk gain --all --format json",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 2094,
+      "published_output": "captures/rtk-gain.typescript",
+      "published_sha256": "5c6e77ac0ff38b95202f1bd326d6bcb5a9c2b1a8f1464233021f0ad7212863df",
+      "raw_capture_name": "rtk-gain.typescript",
+      "return_code": 0,
+      "return_code_line": 51,
+      "evidence_scope": "SIMULATION: synthetic fixture or upstream test/seeded corpus; not production use, model-quality or provider savings"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --chdir <scratch> --setenv RTK_INSTALL_DIR <scratch>/recapture/rtk/bin --setenv RTK_VERSION v0.51.0 --setenv RTK_TELEMETRY_DISABLED 1 sh <scratch>/rtk/source/install.sh",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 1702,
+      "published_output": "captures/rtk-install.typescript",
+      "published_sha256": "8426ddf7e3e839997b0c6cdcb0395ae9ea4ec111a05c891cd38252f5fb0dc06f",
+      "raw_capture_name": "rtk-install.typescript",
+      "return_code": 0,
+      "return_code_line": 20,
+      "evidence_scope": "native install/version record; not production use"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch>/rtk/work --setenv XDG_CONFIG_HOME <scratch>/recapture/rtk/config --setenv XDG_DATA_HOME <scratch>/recapture/rtk/data --setenv RTK_TELEMETRY_DISABLED 1 --setenv RTK_SUPPRESS_HOOK_WARNING 1 <scratch>/recapture/rtk/bin/rtk read fixture.txt --head-lines 10",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 1427,
+      "published_output": "captures/rtk-preview.typescript",
+      "published_sha256": "a5db5859106a223195e783675988336f4d938fdc037a23eed7ca90255f523e8e",
+      "raw_capture_name": "rtk-preview.typescript",
+      "return_code": 0,
+      "return_code_line": 13,
+      "evidence_scope": "SIMULATION: synthetic fixture or upstream test/seeded corpus; not production use, model-quality or provider savings"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch>/rtk/work --setenv XDG_CONFIG_HOME <scratch>/recapture/rtk/config --setenv XDG_DATA_HOME <scratch>/recapture/rtk/data --setenv RTK_TELEMETRY_DISABLED 1 --setenv RTK_SUPPRESS_HOOK_WARNING 1 /bin/sh -c '<scratch>/recapture/rtk/bin/rtk proxy cat fixture.txt > <scratch>/recapture/rtk/recovered.txt && cmp fixture.txt <scratch>/recapture/rtk/recovered.txt && wc -c fixture.txt <scratch>/recapture/rtk/recovered.txt && sha256sum fixture.txt <scratch>/recapture/rtk/recovered.txt'",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 1556,
+      "published_output": "captures/rtk-recovery.typescript",
+      "published_sha256": "cee5dd1ad9d3ef3beacc1319d0dd8bc69520c891295cb3ba964b052a7115a6cb",
+      "raw_capture_name": "rtk-recovery.typescript",
+      "return_code": 0,
+      "return_code_line": 8,
+      "evidence_scope": "SIMULATION: synthetic fixture or upstream test/seeded corpus; not production use, model-quality or provider savings"
+    },
+    {
+      "co_op_private_reproduction": "co-op private check PASS 2026-10-16",
+      "command_display": "env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch> --setenv XDG_CONFIG_HOME <scratch>/recapture/rtk/config --setenv XDG_DATA_HOME <scratch>/recapture/rtk/data --setenv RTK_TELEMETRY_DISABLED 1 --setenv RTK_SUPPRESS_HOOK_WARNING 1 <scratch>/recapture/rtk/bin/rtk --version",
+      "command_line": 1,
+      "command_rc_custody": "native util-linux script transcript header/footer",
+      "kind": "masked_native_output",
+      "masking_rule": "mask_capture.py:ANSI_SGR removal and explicit path-prefix replacements only",
+      "published_bytes": 1057,
+      "published_output": "captures/rtk-version.typescript",
+      "published_sha256": "e1a9a7bdaa7d927131a942dfabb09c754651a2e80d60ff92668a837bdf934713",
+      "raw_capture_name": "rtk-version.typescript",
+      "return_code": 0,
+      "return_code_line": 4,
+      "evidence_scope": "native install/version record; not production use"
+    }
+  ],
+  "findings": [
+    {
+      "id": "vendor_installs",
+      "class": "native installation output",
+      "details": "RTK pinned vendor installer verifies release checksum; Headroom 0.40.0 MCP extra installs in uv tool prefix; ccusage npm prefix installs its runtime package. Pin/versions are separately captured.",
+      "sources": [
+        {
+          "path": "captures/rtk-install.typescript",
+          "line": 10,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/rtk-install.typescript",
+          "line": 14,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/headroom-install.typescript",
+          "line": 25,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/ccusage-version.typescript",
+          "line": 2,
+          "evidence_class": "masked_native_capture"
+        }
+      ],
+      "return_codes": [
+        {
+          "value": 0,
+          "source": {
+            "path": "captures/rtk-install.typescript",
+            "line": 20,
+            "evidence_class": "masked_native_capture"
+          }
+        },
+        {
+          "value": 0,
+          "source": {
+            "path": "captures/headroom-install.typescript",
+            "line": 88,
+            "evidence_class": "masked_native_capture"
+          }
+        },
+        {
+          "value": 0,
+          "source": {
+            "path": "captures/ccusage-install.typescript",
+            "line": 5,
+            "evidence_class": "masked_native_capture"
+          }
+        }
+      ]
+    },
+    {
+      "id": "rtk_fixture",
+      "class": "SIMULATION",
+      "details": "Explicit ten-line preview and direct proxy recovery on a published synthetic text file. The recovery command runs cmp before byte counts/checksums. This is not automatic recall, hook wiring or semantic-completeness proof.",
+      "sources": [
+        {
+          "path": "captures/rtk-preview.typescript",
+          "line": 1,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/rtk-recovery.typescript",
+          "line": 1,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/rtk-recovery.typescript",
+          "line": 2,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "fixtures/rtk.txt",
+          "line": 1
+        }
+      ],
+      "expected_failure_control": {
+        "expected_return_code": 7,
+        "observed_return_code": 7,
+        "source": {
+          "path": "captures/rtk-exit-control.typescript",
+          "line": 3,
+          "evidence_class": "masked_native_capture"
+        }
+      }
+    },
+    {
+      "id": "headroom_upstream_ccr",
+      "class": "SIMULATION / upstream unit tests",
+      "passed": 15,
+      "source": {
+        "path": "captures/headroom-ccr-tests.typescript",
+        "line": 3,
+        "evidence_class": "masked_native_capture"
+      },
+      "return_code": {
+        "value": 0,
+        "source": {
+          "path": "captures/headroom-ccr-tests.typescript",
+          "line": 5,
+          "evidence_class": "masked_native_capture"
+        }
+      },
+      "limit": "Proves only the upstream CCR unit fixture checks at this install; not proxy/MCP wiring, live usage or quality."
+    },
+    {
+      "id": "headroom_seeded_corpus",
+      "class": "SIMULATION / upstream generated corpus",
+      "before_tokens": 178024,
+      "after_tokens": 104261,
+      "sources": [
+        {
+          "path": "captures/headroom-benchmark.typescript",
+          "line": 13,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/headroom-benchmark.typescript",
+          "line": 23,
+          "evidence_class": "masked_native_capture"
+        }
+      ],
+      "tokenizer": {
+        "name": "TiktokenCounter",
+        "source": {
+          "path": "captures/headroom-benchmark.typescript",
+          "line": 2,
+          "evidence_class": "masked_native_capture"
+        }
+      },
+      "detector": {
+        "mode": "pure-Python fallback",
+        "source": {
+          "path": "captures/headroom-benchmark.typescript",
+          "line": 3,
+          "evidence_class": "masked_native_capture"
+        }
+      },
+      "limit": "Lexical artifact counts only; both displayed configurations produce the same totals. No provider/model call or task-quality evaluation ran."
+    },
+    {
+      "id": "ccusage_upstream_node_tests",
+      "class": "SIMULATION / upstream unit tests",
+      "values": {
+        "tests": 34,
+        "pass": 34,
+        "fail": 0,
+        "skipped": 0
+      },
+      "sources": [
+        {
+          "path": "captures/ccusage-node-tests.typescript",
+          "line": 44,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/ccusage-node-tests.typescript",
+          "line": 46,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/ccusage-node-tests.typescript",
+          "line": 47,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/ccusage-node-tests.typescript",
+          "line": 49,
+          "evidence_class": "masked_native_capture"
+        }
+      ],
+      "limit": "Exact upstream justfile Node target only; full Rust suite not executed."
+    },
+    {
+      "id": "ccusage_fixture_accounting",
+      "class": "SIMULATION / published fixture replay",
+      "values": {
+        "input": 100,
+        "output": 20,
+        "cache_creation": 30,
+        "cache_read": 40,
+        "total": 190,
+        "declared_cost": 0.01
+      },
+      "sources": [
+        {
+          "path": "fixtures/claude-session.jsonl",
+          "line": 1
+        },
+        {
+          "path": "captures/ccusage-fixture-report.typescript",
+          "line": 28,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/ccusage-fixture-report.typescript",
+          "line": 29,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/ccusage-fixture-report.typescript",
+          "line": 30,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/ccusage-fixture-report.typescript",
+          "line": 31,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/ccusage-fixture-report.typescript",
+          "line": 32,
+          "evidence_class": "masked_native_capture"
+        },
+        {
+          "path": "captures/ccusage-fixture-report.typescript",
+          "line": 33,
+          "evidence_class": "masked_native_capture"
+        }
+      ],
+      "limit": "The cost is input fixture costUSD, not an observed bill. No private session log was read."
+    }
+  ],
+  "supersession": "Rebuilt from fresh native script captures after integrity addenda. Earlier hand-assembled command/rc summaries and selected/modified output views are withdrawn from this publication; original private files are retained for audit, not used as replacement receipts.",
+  "unexecuted": [
+    "Current-pin macOS arm64 E2E",
+    "Complete RTK/ccusage Rust suites",
+    "Headroom ONNX detector and proxy/MCP interception",
+    "Live Anthropic/OpenAI sessions and complete attempt/child/provider accounting",
+    "Fresh randomized quality/cost comparison",
+    "Survivor trials or new model adjudication; co-op owns two-family reads"
+  ]
+}

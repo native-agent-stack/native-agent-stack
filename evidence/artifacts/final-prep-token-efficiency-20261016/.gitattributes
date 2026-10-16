@@ -1,0 +1,2 @@
+# Preserve the reviewed native transcript bytes, including PTY CRLF output.
+captures/*.typescript -text whitespace=cr-at-eol

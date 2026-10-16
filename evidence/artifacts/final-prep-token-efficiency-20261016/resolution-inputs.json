@@ -1,0 +1,129 @@
+{
+  "schema": "final-preparation-resolution/1",
+  "catalog": "foundation",
+  "layer_id": "token-efficiency",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "scope": "Three current catalog winners plus five cumulative carried survivors; no landscape sweep or new candidate discovery.",
+  "references": [
+    {
+      "path": "AGENTS.md",
+      "line": 7,
+      "role": "Primary-source and evidence-class rule",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
+      "line": 29,
+      "role": "Resolution before dispatch",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
+      "line": 53,
+      "role": "Missing return is not adjudication",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "line": 2544,
+      "role": "Exact layer requirement",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "line": 2757,
+      "role": "Complete native provider usage at equal correctness",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 7990,
+      "role": "Missing angle record",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 8009,
+      "role": "Latest covering sweep identity",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 8013,
+      "role": "Layer reopened",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 8041,
+      "role": "No terminal state",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdict-waves.json",
+      "json_pointer": "/waves/0",
+      "role": "Recorded 20260922 verdict wave",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "catalogs/saturation/ledger.json",
+      "role": "Cumulative sweep/return chain, not only latest listed survivors",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260929.json",
+      "role": "Dated manifest used by supported lane-packet generator",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+      "line": 7432,
+      "role": "MCP Compressor missing GPT return",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+      "line": 7497,
+      "role": "Klavis missing GPT return",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    },
+    {
+      "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+      "line": 147,
+      "role": "Token-efficiency preparation row",
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+    }
+  ],
+  "existing_state": {
+    "verdict_wave": "20260922",
+    "latest_covering_retained_sweep": "landscape-sweep-20260929",
+    "layer_state": "reopened",
+    "final_admission": "closed",
+    "winners": [
+      "rtk",
+      "headroom",
+      "ccusage"
+    ],
+    "survivors": [
+      "atlassian-labs/mcp-compressor",
+      "klavis-ai/klavis",
+      "lockedinlabs-ai/agent-console",
+      "ojuschugh1/sqz",
+      "paritok-official/paritok-4b-v1"
+    ]
+  },
+  "packet": {
+    "builder": "tools/sota-convergence/lane_packets.py",
+    "command_display": "python3 tools/sota-convergence/lane_packets.py --root <checkout> --out <scratch>/packets --catalog foundation --checked-at 2026-10-16 --manifest catalogs/sota-convergence/manifest-20260929.json --registered-receipts --manifest-newcomers",
+    "retained": "lane-packet.json",
+    "projection": "Builder generated the catalog's packets; only this layer's three winners and five survivors are retained in the delta projection. Projection is generated input data, not an E2E receipt. No model dispatch occurred."
+  },
+  "frozen_inputs_notice": "Base remains the current-main commit fetched at task start; other lanes' subsequent main changes do not silently change this evidence snapshot.",
+  "gate_sequence": "As stated by final-wave-layer-prep.brief-20261016.md: FINAL admission remains closed pending the named gate chain. This preparation admits nothing.",
+  "private_direction_records": [
+    "final-wave-layer-prep.brief-20261016.md",
+    "final-wave-layer-prep.brief-20261016.addendum-01.md",
+    "final-wave-layer-prep.brief-20261016.addendum-02.md"
+  ],
+  "next": "Co-op private masking reproduction, then co-op two-family review of the disputed dimensions in multi-angle-draft.json. No merge or default update is performed here."
+}

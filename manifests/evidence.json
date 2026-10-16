@@ -22887,6 +22887,166 @@
       "bytes": 319713
     },
     {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/.gitattributes",
+      "sha256": "54daf2b7881cb5d207ed2b13633b1f75ffeefda8843850d5e31f99916575eb04",
+      "bytes": 125
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/CAPTURE-INTEGRITY.md",
+      "sha256": "d642cec3d4526ab63bca429f127a162d12a0bfe246391b19b93e853ac714acbe",
+      "bytes": 3860
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/README.md",
+      "sha256": "b172b35398ab89652194524b61addd31d418208620d9009459bd9cd67e705752",
+      "bytes": 10355
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/ccusage-fixture-report.typescript",
+      "sha256": "bb5e851d68f617689d28a8b92d2fef211bcc564f343aa20a2d19b7588189fbf3",
+      "bytes": 1753
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/ccusage-install.typescript",
+      "sha256": "b227c376ca7b827692fe225f535385572a457740cea9fa0abdc7552ab2fca4e8",
+      "bytes": 1221
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/ccusage-node-tests.typescript",
+      "sha256": "e87062d7c5aea9888ef748ddb8c2d3abd9286512b6d9bc2c636b43b49afb18c2",
+      "bytes": 4311
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/ccusage-version.typescript",
+      "sha256": "cf0dc237ee870a98c31e8695e0e62ff4054057c3e499f49ef8697000e17f3c79",
+      "bytes": 899
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/headroom-benchmark.typescript",
+      "sha256": "cb45396b14b7a2b90619287dcffcfce1b875b68ae91eaed25a4bbfeec2101c54",
+      "bytes": 2870
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/headroom-ccr-tests.typescript",
+      "sha256": "dc4cafeec14975de95b0c47d24cec6413094e7a28b9eeb0e42b2a7ba60c7a6c6",
+      "bytes": 1329
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/headroom-install.typescript",
+      "sha256": "062ce1872c02409eefee57d1026462f66c7acd0b9409f10795f7f5d01451d037",
+      "bytes": 3311
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/headroom-version.typescript",
+      "sha256": "8311e4c308d28a6b1b0627700825be24873ccfabf631c9643586275cbba840ec",
+      "bytes": 1167
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/installed-ccusage-version.typescript",
+      "sha256": "01009cdafd0e6c807a104a777e3a1d3ba0180c3c5ebb2901a4486eb845fa2de0",
+      "bytes": 311
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/installed-headroom-version.typescript",
+      "sha256": "2e364c9d75dca0e64f895158a75d72e22092240eda357a36d115557a6d18406b",
+      "bytes": 321
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/installed-rtk-version.typescript",
+      "sha256": "8b5a596a774c801964925770952cd504b518fbd60230e877cafca5ff0a2c22d5",
+      "bytes": 302
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/recorder-version.typescript",
+      "sha256": "656d4fa3fc30119f9e1c06788e1cb8377741b2d1fdab24d472678cf4f0250061",
+      "bytes": 232
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/rtk-exit-control.typescript",
+      "sha256": "f27ece9f5364736895575d7361c2ce2b048d8881013389384e7919c5eeeb1615",
+      "bytes": 1065
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/rtk-gain.typescript",
+      "sha256": "5c6e77ac0ff38b95202f1bd326d6bcb5a9c2b1a8f1464233021f0ad7212863df",
+      "bytes": 2094
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/rtk-install.typescript",
+      "sha256": "8426ddf7e3e839997b0c6cdcb0395ae9ea4ec111a05c891cd38252f5fb0dc06f",
+      "bytes": 1702
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/rtk-preview.typescript",
+      "sha256": "a5db5859106a223195e783675988336f4d938fdc037a23eed7ca90255f523e8e",
+      "bytes": 1427
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/rtk-recovery.typescript",
+      "sha256": "cee5dd1ad9d3ef3beacc1319d0dd8bc69520c891295cb3ba964b052a7115a6cb",
+      "bytes": 1556
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/captures/rtk-version.typescript",
+      "sha256": "e1a9a7bdaa7d927131a942dfabb09c754651a2e80d60ff92668a837bdf934713",
+      "bytes": 1057
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/execution-receipt.json",
+      "sha256": "9c5bdf8ad124b0a90bae145d2dd1c1e1f382b450890c305592bc0461f9ba7fc2",
+      "bytes": 37890
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/fixtures/claude-session.jsonl",
+      "sha256": "f854b6e67a7e470ea2d80b925789dab7e10d30f55770fd35533153d3866e6867",
+      "bytes": 321
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/fixtures/rtk.txt",
+      "sha256": "69ef85832278b55baa1a742a4ddf7ce1eb84f3645f6b2251befec15048ea5147",
+      "bytes": 2047
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/invoke-evidence.json",
+      "sha256": "2681239fa5d77f833baa2536942b5be6ad9103355ed0834454d61a59d39a5524",
+      "bytes": 13346
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/lane-packet.json",
+      "sha256": "0e8a82d84a105a1f2f02657b9ac82c060dbd2b177b01f53bb1e44b24ebe7dad5",
+      "bytes": 5059
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/mask_capture.py",
+      "sha256": "bddd35ebb717b3d997c27ad4de0b21b3dc2d023d87fb61b29c70869fb8b5f2b9",
+      "bytes": 4382
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/masked-captures.json",
+      "sha256": "3c0103697100093d6fd28e11e0d3b1c15f2b8dca341502dea89bff7a55ddce10",
+      "bytes": 26897
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/multi-angle-draft.json",
+      "sha256": "449b93ec1e8280faa629354ecdb2aa55fa6804eac050ba6af4a94630d3ee8faa",
+      "bytes": 65715
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/pin-reconciliation.json",
+      "sha256": "4abad4ab62f25529ae350e6ebd179b15dc6384a21d983c0f458bab2240ed26e7",
+      "bytes": 30114
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/resolution-inputs.json",
+      "sha256": "61d0977d372285173731e0fe00a01230ba10133520ea9f941765094abcb05356",
+      "bytes": 5105
+    },
+    {
+      "path": "evidence/artifacts/final-prep-token-efficiency-20261016/test_mask_capture.py",
+      "sha256": "9224bfaf38b03845b5f62c999fb968b1cf96c62a8306cd38fead4cd9e966a173",
+      "bytes": 3184
+    },
+    {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
       "sha256": "ff34c3db7e67e4d96e9a1d0d154a0c7e8c01f42eade511302f963ad05a1d2c4c",
       "bytes": 6271

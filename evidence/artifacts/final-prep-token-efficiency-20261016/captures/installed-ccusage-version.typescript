@@ -1,0 +1,4 @@
+Script started on 2026-10-16 02:22:24-04:00 [COMMAND="env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin <host-home>/.local/share/codex-ecosystem/bin/ccusage --version" <not executed on terminal>]
+ccusage 20.0.26
+
+Script done on 2026-10-16 02:22:24-04:00 [COMMAND_EXIT_CODE="0"]

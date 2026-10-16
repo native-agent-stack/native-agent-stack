@@ -1,0 +1,8 @@
+Script started on 2026-10-16 02:22:08-04:00 [COMMAND="env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch>/rtk/work --setenv XDG_CONFIG_HOME <scratch>/recapture/rtk/config --setenv XDG_DATA_HOME <scratch>/recapture/rtk/data --setenv RTK_TELEMETRY_DISABLED 1 --setenv RTK_SUPPRESS_HOOK_WARNING 1 /bin/sh -c '<scratch>/recapture/rtk/bin/rtk proxy cat fixture.txt > <scratch>/recapture/rtk/recovered.txt && cmp fixture.txt <scratch>/recapture/rtk/recovered.txt && wc -c fixture.txt <scratch>/recapture/rtk/recovered.txt && sha256sum fixture.txt <scratch>/recapture/rtk/recovered.txt'" <not executed on terminal>]
+2047 fixture.txt
+2047 <scratch>/recapture/rtk/recovered.txt
+4094 total
+69ef85832278b55baa1a742a4ddf7ce1eb84f3645f6b2251befec15048ea5147  fixture.txt
+69ef85832278b55baa1a742a4ddf7ce1eb84f3645f6b2251befec15048ea5147  <scratch>/recapture/rtk/recovered.txt
+
+Script done on 2026-10-16 02:22:08-04:00 [COMMAND_EXIT_CODE="0"]

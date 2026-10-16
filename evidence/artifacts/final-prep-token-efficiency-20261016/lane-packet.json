@@ -1,0 +1,156 @@
+{
+  "schema": "final-wave-delta-packet/1",
+  "catalog": "foundation",
+  "layer_id": "token-efficiency",
+  "requirement": "Supply useful task context with recoverable originals and measure artifact reductions separately from provider usage.",
+  "generated_by": "tools/sota-convergence/lane_packets.py",
+  "manifest": "catalogs/sota-convergence/manifest-20260929.json",
+  "generated_checked_at": "2026-10-16",
+  "selection": "Current catalog winners and all five cumulative survivors only. Packet pins are historical leads; reconciled proposed pins are separate. Existing alternatives were not re-surveyed.",
+  "candidates": [
+    {
+      "key": "c1",
+      "name": "ccusage",
+      "repository": "https://github.com/ccusage/ccusage",
+      "packet_pin": "20.0.26",
+      "component_id": "ccusage",
+      "evidence_refs": [
+        "docs/full-stack-convergence.md",
+        "catalogs/foundation/decisions.json"
+      ],
+      "registered_receipts": [
+        {
+          "path": "evidence/receipts/full-stack-convergence-20260921.json",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id"
+        },
+        {
+          "path": "evidence/receipts/sota-convergence-20260922.json",
+          "kind": "historical_inventory",
+          "matched_by": "component_id"
+        },
+        {
+          "path": "evidence/receipts/token-practice-coverage-20260920.json",
+          "kind": "historical_inventory",
+          "matched_by": "component_id"
+        },
+        {
+          "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id"
+        }
+      ]
+    },
+    {
+      "key": "c2",
+      "name": "ojuschugh1/sqz",
+      "repository": "https://github.com/ojuschugh1/sqz",
+      "packet_pin": null,
+      "component_id": null,
+      "evidence_refs": [],
+      "registered_receipts": []
+    },
+    {
+      "key": "c4",
+      "name": "paritok-official/paritok-4b-v1",
+      "repository": "https://github.com/paritok-official/paritok-4b-v1",
+      "packet_pin": null,
+      "component_id": null,
+      "evidence_refs": [],
+      "registered_receipts": []
+    },
+    {
+      "key": "c5",
+      "name": "atlassian-labs/mcp-compressor",
+      "repository": "https://github.com/atlassian-labs/mcp-compressor",
+      "packet_pin": null,
+      "component_id": null,
+      "evidence_refs": [],
+      "registered_receipts": []
+    },
+    {
+      "key": "c6",
+      "name": "Headroom",
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "packet_pin": "0.37.0",
+      "component_id": "headroom",
+      "evidence_refs": [
+        "docs/token-native-saturation.md",
+        "docs/full-stack-convergence.md"
+      ],
+      "registered_receipts": [
+        {
+          "path": "evidence/receipts/token-native-retained-functional-20260920.json",
+          "kind": "native_cli_e2e",
+          "matched_by": "component_id"
+        },
+        {
+          "path": "evidence/receipts/token-practice-confirmation-20260920.json",
+          "kind": "historical_inventory",
+          "matched_by": "component_id"
+        },
+        {
+          "path": "evidence/receipts/token-practice-coverage-20260920.json",
+          "kind": "historical_inventory",
+          "matched_by": "component_id"
+        },
+        {
+          "path": "evidence/receipts/token-practice-native-counters-20260920.json",
+          "kind": "historical_inventory",
+          "matched_by": "component_id"
+        }
+      ]
+    },
+    {
+      "key": "c7",
+      "name": "RTK",
+      "repository": "https://github.com/rtk-ai/rtk",
+      "packet_pin": "0.50.0",
+      "component_id": "rtk",
+      "evidence_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/token-native-saturation.md"
+      ],
+      "registered_receipts": [
+        {
+          "path": "evidence/receipts/token-practice-artifacts-20260920.json",
+          "kind": "artifact_measurement",
+          "matched_by": "component_id"
+        },
+        {
+          "path": "evidence/receipts/token-practice-confirmation-20260920.json",
+          "kind": "historical_inventory",
+          "matched_by": "component_id"
+        },
+        {
+          "path": "evidence/receipts/token-practice-coverage-20260920.json",
+          "kind": "historical_inventory",
+          "matched_by": "component_id"
+        },
+        {
+          "path": "evidence/receipts/token-practice-native-counters-20260920.json",
+          "kind": "historical_inventory",
+          "matched_by": "component_id"
+        }
+      ]
+    },
+    {
+      "key": "c8",
+      "name": "klavis-ai/klavis",
+      "repository": "https://github.com/klavis-ai/klavis",
+      "packet_pin": null,
+      "component_id": null,
+      "evidence_refs": [],
+      "registered_receipts": []
+    },
+    {
+      "key": "c11",
+      "name": "lockedinlabs-ai/agent-console",
+      "repository": "https://github.com/lockedinlabs-ai/agent-console",
+      "packet_pin": null,
+      "component_id": null,
+      "evidence_refs": [],
+      "registered_receipts": []
+    }
+  ]
+}

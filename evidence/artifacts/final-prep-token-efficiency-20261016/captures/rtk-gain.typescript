@@ -1,0 +1,51 @@
+Script started on 2026-10-16 02:22:08-04:00 [COMMAND="env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --unshare-net --chdir <scratch>/rtk/work --setenv XDG_CONFIG_HOME <scratch>/recapture/rtk/config --setenv XDG_DATA_HOME <scratch>/recapture/rtk/data --setenv RTK_TELEMETRY_DISABLED 1 --setenv RTK_SUPPRESS_HOOK_WARNING 1 <scratch>/recapture/rtk/bin/rtk gain --all --format json" <not executed on terminal>]
+{
+  "summary": {
+    "total_commands": 3,
+    "total_input": 1024,
+    "total_output": 597,
+    "total_saved": 427,
+    "avg_savings_pct": 41.69921875,
+    "total_time_ms": 4,
+    "avg_time_ms": 1
+  },
+  "daily": [
+    {
+      "date": "2026-10-16",
+      "commands": 3,
+      "input_tokens": 1024,
+      "output_tokens": 597,
+      "saved_tokens": 427,
+      "savings_pct": 41.69921875,
+      "total_time_ms": 4,
+      "avg_time_ms": 1
+    }
+  ],
+  "weekly": [
+    {
+      "week_start": "2026-10-12",
+      "week_end": "2026-10-18",
+      "commands": 3,
+      "input_tokens": 1024,
+      "output_tokens": 597,
+      "saved_tokens": 427,
+      "savings_pct": 41.69921875,
+      "total_time_ms": 4,
+      "avg_time_ms": 1
+    }
+  ],
+  "monthly": [
+    {
+      "month": "2026-10",
+      "commands": 3,
+      "input_tokens": 1024,
+      "output_tokens": 597,
+      "saved_tokens": 427,
+      "savings_pct": 41.69921875,
+      "total_time_ms": 4,
+      "avg_time_ms": 1
+    }
+  ]
+}
+
+Script done on 2026-10-16 02:22:08-04:00 [COMMAND_EXIT_CODE="0"]

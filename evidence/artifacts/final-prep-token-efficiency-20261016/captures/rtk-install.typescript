@@ -1,0 +1,20 @@
+Script started on 2026-10-16 02:20:39-04:00 [COMMAND="env -i PATH=/bootstrap/node/bin:/usr/bin:/bin DO_NOT_TRACK=1 NO_COLOR=1 bwrap --die-with-parent --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --ro-bind /bin /bin --proc /proc --dev /dev --tmpfs /tmp --dir /etc --ro-bind /etc/alternatives /etc/alternatives --ro-bind <scratch>/synthetic-etc/passwd /etc/passwd --ro-bind <scratch>/synthetic-etc/group /etc/group --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind <host-home>/.local/share/mise/installs/node/24.21.0 /bootstrap/node --ro-bind <host-home>/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv /bootstrap/uv --bind <scratch> <scratch> --chdir <scratch> --setenv RTK_INSTALL_DIR <scratch>/recapture/rtk/bin --setenv RTK_VERSION v0.51.0 --setenv RTK_TELEMETRY_DISABLED 1 sh <scratch>/rtk/source/install.sh" <not executed on terminal>]
+[INFO] Installing rtk...
+[INFO] Using pinned version from RTK_VERSION: v0.51.0
+[INFO] Detected: linux x86_64
+[INFO] Target: x86_64-unknown-linux-musl
+[INFO] Version: v0.51.0
+[INFO] Downloading from: https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz
+[INFO] Downloading checksums...
+[INFO] Verifying SHA-256 checksum...
+[INFO] Checksum verified.
+[INFO] Verifying archive contents...
+[INFO] Extracting...
+[INFO] Successfully installed rtk to <scratch>/recapture/rtk/bin/rtk
+[INFO] Verification: rtk 0.51.0
+[WARN] Binary installed but not in PATH. Add to your shell profile:
+[WARN]   export PATH="$HOME/.local/bin:$PATH"
+
+[INFO] Installation complete! Run 'rtk --help' to get started.
+
+Script done on 2026-10-16 02:20:40-04:00 [COMMAND_EXIT_CODE="0"]

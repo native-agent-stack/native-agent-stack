@@ -1,0 +1,1246 @@
+{
+  "schema": "final-preparation-six-angle-draft/1",
+  "catalog": "foundation",
+  "layer_id": "token-efficiency",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "status": "DRAFT_FOR_CO_OP_TWO_FAMILY_READS; NOT_CONVERGENCE_ADMISSION",
+  "default_or_catalog_change": false,
+  "new_candidates": [],
+  "source_rule": "Repository/current primary sources and scoped native captures; retained model-review assertions are labelled leads, not silently promoted to primary evidence.",
+  "requirement": {
+    "value": "Supply useful task context with recoverable originals and measure artifact reductions separately from provider usage.",
+    "source": {
+      "path": "catalogs/landscape/foundation.json",
+      "line": 2544,
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+      "detail": "Exact layer requirement",
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/foundation.json#L2544"
+    }
+  },
+  "weights": {
+    "A1": "0.20",
+    "A2": "0.20",
+    "A3": "0.15",
+    "A4": "0.15",
+    "A5": "0.20",
+    "A6": "0.10",
+    "status": "existing angle-convergence/2 defaults for the future review, not calculated scores",
+    "source": {
+      "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
+      "line": 236,
+      "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+      "detail": "Policy weight defaults",
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-12-angle-records-final-check.md#L236"
+    }
+  },
+  "scores": "NULL throughout: missing/disputed evidence is not manufactured into numerical angle values. The co-op's two-family gate owns scoring and adjudication.",
+  "resolution_inputs": [
+    "resolution-inputs.json",
+    "lane-packet.json",
+    "pin-reconciliation.json",
+    "execution-receipt.json",
+    "invoke-evidence.json"
+  ],
+  "candidates": [
+    {
+      "id": "rtk",
+      "role": "recorded winner; run-pin proposal",
+      "pin": {
+        "version": "0.51.0",
+        "commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026"
+      },
+      "selection_source": {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 8072,
+        "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+        "detail": "Winner identity",
+        "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8072"
+      },
+      "disposition": "PREPARED_WITH_GAPS; no promotion",
+      "angles": {
+        "A3": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No fresh independent community-consensus evidence is supplied by this delta. Prior fit votes and project popularity are not substituted for that angle.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 7990,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Current layer has no angle record; convergence is unverified.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L7990"
+            }
+          ],
+          "disputed_dimension": "Independent community evidence needed; co-op must not count reader agreement as market consensus."
+        },
+        "A4": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No population-level net usage or complete current production adoption window was collected. Fixture invocation counts are not net usage.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/foundation.json",
+              "line": 2757,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Complete provider use per accepted task, including retries and child attempts; artifact and recovery metrics stay separate.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/foundation.json#L2757"
+            }
+          ],
+          "disputed_dimension": "Separate actual production use from installation, tests, artifact counts and estimated prices."
+        },
+        "A1": {
+          "state": "SUPPORTED_WITHIN_SCOPE",
+          "score": null,
+          "finding": "Pinned upstream output-filter/recovery mechanisms are documented; native fixture preview, direct-original cmp and exit-code preservation are captured. Automatic recall and live hook/agent integration were not requalified.",
+          "sources": [
+            {
+              "repository": "https://github.com/rtk-ai/rtk",
+              "commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+              "path": "README.md",
+              "line": 491,
+              "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/README.md#L491"
+            },
+            {
+              "path": "captures/rtk-preview.typescript",
+              "line": 1,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/rtk-recovery.typescript",
+              "line": 1,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/rtk-exit-control.typescript",
+              "line": 3,
+              "evidence_class": "masked_native_capture"
+            }
+          ],
+          "disputed_dimension": "Read/preview success is not semantic completeness or automatic recall proof."
+        },
+        "A2": {
+          "state": "PARTIAL",
+          "score": null,
+          "finding": "Vendor installer verifies the publisher checksum and exact binary version. Full upstream Rust tests were not run in this preparation.",
+          "sources": [
+            {
+              "path": "captures/rtk-install.typescript",
+              "line": 10,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/rtk-install.typescript",
+              "line": 14,
+              "evidence_class": "masked_native_capture"
+            }
+          ],
+          "disputed_dimension": "Release smoke and checksum agreement do not establish full upstream engineering quality."
+        },
+        "A5": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No new independent published evaluation is added. The retained Harbor report is this repository's scoped historical native study and belongs in A6, not independent literature.",
+          "sources": [
+            {
+              "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+              "line": 19,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Historical local-fixture study classification",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L19"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A6": {
+          "state": "PARTIAL_HISTORICAL; NEW_SIMULATION_ONLY",
+          "score": null,
+          "finding": "Retained Harbor study reports 72 trials on narrow synthetic grep tasks, but one Codex route and uncontrolled cache limit claims. New fixture output/recovery controls are simulations, not task-quality/provider-savings comparisons.",
+          "sources": [
+            {
+              "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+              "line": 9,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Study claim",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L9"
+            },
+            {
+              "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+              "line": 12,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Single client/family limitation",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L12"
+            },
+            {
+              "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+              "line": 18,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "No saving claim",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/rtk-fold-harbor-20261004.json#L18"
+            },
+            {
+              "path": "captures/rtk-recovery.typescript",
+              "line": 2,
+              "evidence_class": "masked_native_capture"
+            }
+          ],
+          "disputed_dimension": "Do historical bounded outcomes plus current smoke justify this role at 0.51.0 without broader semantic/provider claims?"
+        }
+      }
+    },
+    {
+      "id": "headroom",
+      "role": "recorded winner; run-pin proposal",
+      "pin": {
+        "version": "0.40.0",
+        "commit": "855390d6110e0bbb199d9b97025baac16c2f5cf3"
+      },
+      "selection_source": {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 8094,
+        "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+        "detail": "Winner identity",
+        "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8094"
+      },
+      "disposition": "PREPARED_WITH_GAPS; no promotion",
+      "angles": {
+        "A3": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No fresh independent community-consensus evidence is supplied by this delta. Prior fit votes and project popularity are not substituted for that angle.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 7990,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Current layer has no angle record; convergence is unverified.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L7990"
+            }
+          ],
+          "disputed_dimension": "Independent community evidence needed; co-op must not count reader agreement as market consensus."
+        },
+        "A4": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No population-level net usage or complete current production adoption window was collected. Fixture invocation counts are not net usage.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/foundation.json",
+              "line": 2757,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Complete provider use per accepted task, including retries and child attempts; artifact and recovery metrics stay separate.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/foundation.json#L2757"
+            }
+          ],
+          "disputed_dimension": "Separate actual production use from installation, tests, artifact counts and estimated prices."
+        },
+        "A1": {
+          "state": "SUPPORTED_WITHIN_SCOPE",
+          "score": null,
+          "finding": "Upstream documents inline compression and CCR originals. Current-pin installed package passes 15 upstream CCR tests; live MCP/proxy interception and production-session benefit remain untested.",
+          "sources": [
+            {
+              "repository": "https://github.com/headroomlabs-ai/headroom",
+              "commit": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
+              "path": "README.md",
+              "line": 54,
+              "url": "https://github.com/headroomlabs-ai/headroom/blob/855390d6110e0bbb199d9b97025baac16c2f5cf3/README.md#L54"
+            },
+            {
+              "path": "captures/headroom-ccr-tests.typescript",
+              "line": 3,
+              "evidence_class": "masked_native_capture"
+            }
+          ],
+          "disputed_dimension": "Recoverability fixture success does not prove the visible compressed context preserves every required fact."
+        },
+        "A2": {
+          "state": "PARTIAL",
+          "score": null,
+          "finding": "Supported uv tool installation, version readback and upstream CCR test execution are retained; optional native detector and broader suites were not exercised.",
+          "sources": [
+            {
+              "path": "captures/headroom-install.typescript",
+              "line": 25,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/headroom-version.typescript",
+              "line": 2,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/headroom-ccr-tests.typescript",
+              "line": 3,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/headroom-benchmark.typescript",
+              "line": 3,
+              "evidence_class": "masked_native_capture"
+            }
+          ],
+          "disputed_dimension": "Is pure-Python detector qualification sufficient for the proposed role, or must the native path be qualified first?"
+        },
+        "A5": {
+          "state": "PUBLISHED_VENDOR_CLAIMS_ONLY",
+          "score": null,
+          "finding": "Pinned README publishes seeded artifact counts and separate small quality-benchmark claims. The artifact table is reproduced; the quality claims were not rerun or independently validated.",
+          "sources": [
+            {
+              "repository": "https://github.com/headroomlabs-ai/headroom",
+              "commit": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
+              "path": "README.md",
+              "line": 145,
+              "url": "https://github.com/headroomlabs-ai/headroom/blob/855390d6110e0bbb199d9b97025baac16c2f5cf3/README.md#L145"
+            },
+            {
+              "repository": "https://github.com/headroomlabs-ai/headroom",
+              "commit": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
+              "path": "README.md",
+              "line": 158,
+              "url": "https://github.com/headroomlabs-ai/headroom/blob/855390d6110e0bbb199d9b97025baac16c2f5cf3/README.md#L158"
+            },
+            {
+              "repository": "https://github.com/headroomlabs-ai/headroom",
+              "commit": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
+              "path": "README.md",
+              "line": 167,
+              "url": "https://github.com/headroomlabs-ai/headroom/blob/855390d6110e0bbb199d9b97025baac16c2f5cf3/README.md#L167"
+            }
+          ],
+          "disputed_dimension": "Self-published benchmark claims and a lexical-count replay are not independent outcome convergence."
+        },
+        "A6": {
+          "state": "NEW_SIMULATION_ONLY; SEMANTIC_DISPUTE_OPEN",
+          "score": null,
+          "finding": "Native recorder output contains the upstream seeded 178024-to-104261 lexical-token table. This is a simulation. Earlier 0.39.0 receipts retain concerns about omission notices and detector paths; these have not been resolved by a new quality comparison at 0.40.0.",
+          "sources": [
+            {
+              "path": "captures/headroom-benchmark.typescript",
+              "line": 13,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/headroom-benchmark.typescript",
+              "line": 23,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "evidence/receipts/headroom-039-qualification-20260925.json",
+              "line": 11,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Prior rejection boundary",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/headroom-039-qualification-20260925.json#L11"
+            },
+            {
+              "path": "evidence/receipts/headroom-039-qualification-20260925.json",
+              "line": 13,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Detector limitation",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/headroom-039-qualification-20260925.json#L13"
+            }
+          ],
+          "disputed_dimension": "Measure required-fact/answer quality and full attempt-inclusive provider usage before any efficiency/default claim."
+        }
+      }
+    },
+    {
+      "id": "ccusage",
+      "role": "recorded winner; usage-observer role",
+      "pin": {
+        "version": "20.0.26",
+        "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b"
+      },
+      "selection_source": {
+        "path": "catalogs/landscape/final-stack.json",
+        "line": 8116,
+        "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+        "detail": "Winner identity",
+        "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8116"
+      },
+      "disposition": "PREPARED_WITH_GAPS; no promotion",
+      "angles": {
+        "A3": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No fresh independent community-consensus evidence is supplied by this delta. Prior fit votes and project popularity are not substituted for that angle.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 7990,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Current layer has no angle record; convergence is unverified.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L7990"
+            }
+          ],
+          "disputed_dimension": "Independent community evidence needed; co-op must not count reader agreement as market consensus."
+        },
+        "A4": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No population-level net usage or complete current production adoption window was collected. Fixture invocation counts are not net usage.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/foundation.json",
+              "line": 2757,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Complete provider use per accepted task, including retries and child attempts; artifact and recovery metrics stay separate.",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/foundation.json#L2757"
+            }
+          ],
+          "disputed_dimension": "Separate actual production use from installation, tests, artifact counts and estimated prices."
+        },
+        "A1": {
+          "state": "SUPPORTED_WITHIN_SCOPE",
+          "score": null,
+          "finding": "Native CLI reports local usage and has an explicit offline path. The published synthetic fixture is reproduced exactly; current-host private usage files were not read.",
+          "sources": [
+            {
+              "repository": "https://github.com/ccusage/ccusage",
+              "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+              "path": "apps/ccusage/README.md",
+              "line": 62,
+              "url": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/apps/ccusage/README.md#L62"
+            },
+            {
+              "repository": "https://github.com/ccusage/ccusage",
+              "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+              "path": "docs/guide/environment-variables.md",
+              "line": 124,
+              "url": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/docs/guide/environment-variables.md#L124"
+            },
+            {
+              "path": "captures/ccusage-fixture-report.typescript",
+              "line": 33,
+              "evidence_class": "masked_native_capture"
+            }
+          ],
+          "disputed_dimension": "Accounting capability is not output compression, causal saving or a subscription bill."
+        },
+        "A2": {
+          "state": "PARTIAL",
+          "score": null,
+          "finding": "Vendor npm-prefix install and exact upstream Node test command are captured, with 34 passing tests. Full Rust adapter suites and macOS execution remain outside this run.",
+          "sources": [
+            {
+              "repository": "https://github.com/ccusage/ccusage",
+              "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+              "path": "justfile",
+              "line": 52,
+              "url": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/justfile#L52"
+            },
+            {
+              "path": "captures/ccusage-node-tests.typescript",
+              "line": 44,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/ccusage-node-tests.typescript",
+              "line": 46,
+              "evidence_class": "masked_native_capture"
+            }
+          ],
+          "disputed_dimension": "Launcher/catalog tests do not cover all native source parsers."
+        },
+        "A5": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No independent published accuracy/coverage evaluation is added. Vendor reporting documentation is capability evidence, not a benchmark.",
+          "sources": [
+            {
+              "repository": "https://github.com/ccusage/ccusage",
+              "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+              "path": "apps/ccusage/README.md",
+              "line": 62,
+              "url": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/apps/ccusage/README.md#L62"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A6": {
+          "state": "PARTIAL_HISTORICAL; NEW_SIMULATION_ONLY",
+          "score": null,
+          "finding": "Historical usage-window evidence explicitly distinguishes native outputs, derived counts and pricing caveats. Current 190-token/$0.01 result is simulation input accounting only, not current spending or full attempt/child coverage.",
+          "sources": [
+            {
+              "path": "evidence/receipts/claude-spend-window-20261004.json",
+              "line": 19,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Historical re-derivation boundary",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/claude-spend-window-20261004.json#L19"
+            },
+            {
+              "path": "evidence/receipts/claude-spend-window-20261004.json",
+              "line": 12,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Pricing/scope caveat",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/receipts/claude-spend-window-20261004.json#L12"
+            },
+            {
+              "path": "captures/ccusage-fixture-report.typescript",
+              "line": 32,
+              "evidence_class": "masked_native_capture"
+            },
+            {
+              "path": "captures/ccusage-fixture-report.typescript",
+              "line": 33,
+              "evidence_class": "masked_native_capture"
+            }
+          ],
+          "disputed_dimension": "Qualify complete attempt/child/source reconciliation before accepting a whole-workflow usage claim."
+        }
+      }
+    },
+    {
+      "id": "atlassian-labs/mcp-compressor",
+      "role": "carried survivor; not installed or trialled here",
+      "pin": {
+        "commit": null,
+        "status": "GAP_EXACT_PIN",
+        "source": null
+      },
+      "disposition": "UNRESOLVED_CARRIED_SURVIVOR",
+      "angles": {
+        "A1": {
+          "state": "GAP_REVALIDATION",
+          "score": null,
+          "finding": "Tool-schema compression may add value on an eager route but overlap native host deferral. No exact run pin or installation is selected here.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8017,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8017"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7402,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7402"
+            }
+          ],
+          "disputed_dimension": "Primary capability at a proposed run pin and both platform/account boundaries must be checked before any trial."
+        },
+        "A2": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No new engineering-quality evidence or upstream test was collected for this survivor in the bounded winner-preparation run.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8017,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8017"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7402,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7402"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A3": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No independent community-consensus evidence is introduced; prior model fit votes are not this angle.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8017,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8017"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7402,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7402"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A4": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No net-usage evidence is introduced; popularity and a listed survivor identity are not usage qualification.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8017,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8017"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7402,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7402"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A5": {
+          "state": "GAP_OR_DISPUTED_RETAINED_CLAIM",
+          "score": null,
+          "finding": "No independent publication is newly retained or validated for this survivor.",
+          "sources": [
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7402,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7402"
+            }
+          ],
+          "disputed_dimension": "Tool-schema compression may add value on an eager route but overlap native host deferral. No exact run pin or installation is selected here."
+        },
+        "A6": {
+          "state": "NOT_RUN",
+          "score": null,
+          "finding": "No local install, model call, comparison or simulation was executed for this survivor; do not fill the missing angle with incumbent outcomes.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8017,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8017"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7402,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7402"
+            }
+          ],
+          "disputed_dimension": null
+        }
+      },
+      "missing_vote": {
+        "status": "MISSING_IS_NOT_REFUTATION",
+        "source": {
+          "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+          "line": 7432,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "detail": "gpt6.missing is true",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7432"
+        },
+        "protocol": {
+          "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
+          "line": 53,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "detail": "A missing return is not an adjudication",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-11-layer-resolution-protocol.md#L53"
+        }
+      }
+    },
+    {
+      "id": "klavis-ai/klavis",
+      "role": "carried survivor; not installed or trialled here",
+      "pin": {
+        "commit": null,
+        "status": "GAP_EXACT_PIN",
+        "source": null
+      },
+      "disposition": "UNRESOLVED_CARRIED_SURVIVOR",
+      "angles": {
+        "A1": {
+          "state": "GAP_REVALIDATION",
+          "score": null,
+          "finding": "Retained review notes inactivity and managed-account constraints; age alone is not abandonment under current policy. A source pin and route-fit adjudication remain missing.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8022,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8022"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7481,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7481"
+            }
+          ],
+          "disputed_dimension": "Primary capability at a proposed run pin and both platform/account boundaries must be checked before any trial."
+        },
+        "A2": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No new engineering-quality evidence or upstream test was collected for this survivor in the bounded winner-preparation run.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8022,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8022"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7481,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7481"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A3": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No independent community-consensus evidence is introduced; prior model fit votes are not this angle.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8022,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8022"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7481,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7481"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A4": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No net-usage evidence is introduced; popularity and a listed survivor identity are not usage qualification.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8022,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8022"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7481,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7481"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A5": {
+          "state": "GAP_OR_DISPUTED_RETAINED_CLAIM",
+          "score": null,
+          "finding": "No independent publication is newly retained or validated for this survivor.",
+          "sources": [
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7481,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7481"
+            }
+          ],
+          "disputed_dimension": "Retained review notes inactivity and managed-account constraints; age alone is not abandonment under current policy. A source pin and route-fit adjudication remain missing."
+        },
+        "A6": {
+          "state": "NOT_RUN",
+          "score": null,
+          "finding": "No local install, model call, comparison or simulation was executed for this survivor; do not fill the missing angle with incumbent outcomes.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8022,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8022"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7481,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7481"
+            }
+          ],
+          "disputed_dimension": null
+        }
+      },
+      "missing_vote": {
+        "status": "MISSING_IS_NOT_REFUTATION",
+        "source": {
+          "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+          "line": 7497,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "detail": "gpt6.missing is true",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7497"
+        },
+        "protocol": {
+          "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
+          "line": 53,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "detail": "A missing return is not an adjudication",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-11-layer-resolution-protocol.md#L53"
+        }
+      }
+    },
+    {
+      "id": "lockedinlabs-ai/agent-console",
+      "role": "carried survivor; not installed or trialled here",
+      "pin": {
+        "commit": "d14755421d4a8b183d43ca227bcf8e2e871b3b27",
+        "status": "HISTORICAL_REVIEW_PIN_ONLY",
+        "source": {
+          "path": "evidence/artifacts/landscape-sweep-20260929/lockedinlabs-ai-agent-console.json",
+          "line": 7,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "detail": "Historical reviewed commit",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/lockedinlabs-ai-agent-console.json#L7"
+        }
+      },
+      "disposition": "UNRESOLVED_CARRIED_SURVIVOR",
+      "angles": {
+        "A1": {
+          "state": "GAP_REVALIDATION",
+          "score": null,
+          "finding": "Retained two-family review disputes the claim that interop provides per-request attempts/query_source coverage. Its metrics panel is not substituted for a native-event ledger.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8027,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8027"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7191,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7191"
+            }
+          ],
+          "disputed_dimension": "Primary capability at a proposed run pin and both platform/account boundaries must be checked before any trial."
+        },
+        "A2": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No new engineering-quality evidence or upstream test was collected for this survivor in the bounded winner-preparation run.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8027,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8027"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7191,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7191"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A3": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No independent community-consensus evidence is introduced; prior model fit votes are not this angle.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8027,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8027"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7191,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7191"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A4": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No net-usage evidence is introduced; popularity and a listed survivor identity are not usage qualification.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8027,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8027"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7191,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7191"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A5": {
+          "state": "GAP_OR_DISPUTED_RETAINED_CLAIM",
+          "score": null,
+          "finding": "No independent publication is newly retained or validated for this survivor.",
+          "sources": [
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7191,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7191"
+            }
+          ],
+          "disputed_dimension": "Retained two-family review disputes the claim that interop provides per-request attempts/query_source coverage. Its metrics panel is not substituted for a native-event ledger."
+        },
+        "A6": {
+          "state": "NOT_RUN",
+          "score": null,
+          "finding": "No local install, model call, comparison or simulation was executed for this survivor; do not fill the missing angle with incumbent outcomes.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8027,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8027"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7191,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7191"
+            }
+          ],
+          "disputed_dimension": null
+        }
+      },
+      "missing_vote": null
+    },
+    {
+      "id": "ojuschugh1/sqz",
+      "role": "carried survivor; not installed or trialled here",
+      "pin": {
+        "commit": "e66e717dc08d74977d6b991b071aac220046ed0d",
+        "status": "HISTORICAL_REVIEW_PIN_ONLY",
+        "source": {
+          "path": "evidence/artifacts/landscape-sweep-20260929/ojuschugh1-sqz.json",
+          "line": 7,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "detail": "Historical reviewed commit",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/ojuschugh1-sqz.json#L7"
+        }
+      },
+      "disposition": "UNRESOLVED_CARRIED_SURVIVOR",
+      "angles": {
+        "A1": {
+          "state": "GAP_REVALIDATION",
+          "score": null,
+          "finding": "Retained review corrects the claim that RTK lacks original recovery; comparison must configure recovery fairly and distinguish regret/cost proxies from actual quality/provider usage.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8032,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8032"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 6914,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L6914"
+            }
+          ],
+          "disputed_dimension": "Primary capability at a proposed run pin and both platform/account boundaries must be checked before any trial."
+        },
+        "A2": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No new engineering-quality evidence or upstream test was collected for this survivor in the bounded winner-preparation run.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8032,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8032"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 6914,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L6914"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A3": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No independent community-consensus evidence is introduced; prior model fit votes are not this angle.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8032,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8032"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 6914,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L6914"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A4": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No net-usage evidence is introduced; popularity and a listed survivor identity are not usage qualification.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8032,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8032"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 6914,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L6914"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A5": {
+          "state": "GAP_OR_DISPUTED_RETAINED_CLAIM",
+          "score": null,
+          "finding": "No independent publication is newly retained or validated for this survivor.",
+          "sources": [
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 6914,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L6914"
+            }
+          ],
+          "disputed_dimension": "Retained review corrects the claim that RTK lacks original recovery; comparison must configure recovery fairly and distinguish regret/cost proxies from actual quality/provider usage."
+        },
+        "A6": {
+          "state": "NOT_RUN",
+          "score": null,
+          "finding": "No local install, model call, comparison or simulation was executed for this survivor; do not fill the missing angle with incumbent outcomes.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8032,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8032"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 6914,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L6914"
+            }
+          ],
+          "disputed_dimension": null
+        }
+      },
+      "missing_vote": null
+    },
+    {
+      "id": "paritok-official/paritok-4b-v1",
+      "role": "carried survivor; not installed or trialled here",
+      "pin": {
+        "commit": "2c913302073367f2402d8bc4bb1a929a3f70a030",
+        "status": "HISTORICAL_REVIEW_PIN_ONLY",
+        "source": {
+          "path": "evidence/artifacts/landscape-sweep-20260929/paritok-official-paritok-4b-v1.json",
+          "line": 7,
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "detail": "Historical reviewed commit",
+          "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/paritok-official-paritok-4b-v1.json#L7"
+        }
+      },
+      "disposition": "UNRESOLVED_CARRIED_SURVIVOR",
+      "angles": {
+        "A1": {
+          "state": "GAP_REVALIDATION",
+          "score": null,
+          "finding": "Retained review flags self-authored quality results with recall disabled and a lower resolution point estimate; nonsignificance is not non-inferiority. Live route/account fit remains unqualified.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8037,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8037"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7121,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7121"
+            }
+          ],
+          "disputed_dimension": "Primary capability at a proposed run pin and both platform/account boundaries must be checked before any trial."
+        },
+        "A2": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No new engineering-quality evidence or upstream test was collected for this survivor in the bounded winner-preparation run.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8037,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8037"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7121,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7121"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A3": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No independent community-consensus evidence is introduced; prior model fit votes are not this angle.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8037,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8037"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7121,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7121"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A4": {
+          "state": "GAP",
+          "score": null,
+          "finding": "No net-usage evidence is introduced; popularity and a listed survivor identity are not usage qualification.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8037,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8037"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7121,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7121"
+            }
+          ],
+          "disputed_dimension": null
+        },
+        "A5": {
+          "state": "GAP_OR_DISPUTED_RETAINED_CLAIM",
+          "score": null,
+          "finding": "Historical review discusses a vendor-authored evaluation; the paper/results were not revalidated in this preparation.",
+          "sources": [
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7121,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7121"
+            }
+          ],
+          "disputed_dimension": "Retained review flags self-authored quality results with recall disabled and a lower resolution point estimate; nonsignificance is not non-inferiority. Live route/account fit remains unqualified."
+        },
+        "A6": {
+          "state": "NOT_RUN",
+          "score": null,
+          "finding": "No local install, model call, comparison or simulation was executed for this survivor; do not fill the missing angle with incumbent outcomes.",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 8037,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Cumulative survivor identity",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L8037"
+            },
+            {
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 7121,
+              "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "detail": "Retained review lead; not independently revalidated in this delta",
+              "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/landscape-sweep-20260929/returns.json#L7121"
+            }
+          ],
+          "disputed_dimension": null
+        }
+      },
+      "missing_vote": null
+    }
+  ],
+  "overall_gap_disposition": {
+    "status": "GAP_PENDING_REVIEW",
+    "reasons": [
+      "FINAL admission gate remains closed.",
+      "Community and net-usage angles are not established by this run.",
+      "New local counts/tests are simulations, not task-quality/provider-use evidence.",
+      "Five cumulative survivors remain unresolved; missing GPT returns do not clear two of them.",
+      "macOS execution and a current production adoption window remain missing."
+    ],
+    "next": "Co-op private capture reproduction passed on 2026-10-16. Co-op runs both family reads on the explicit disputed dimensions and re-verifies the committed capture bytes after PR opening. No self-dispatched model read or merge."
+  }
+}
