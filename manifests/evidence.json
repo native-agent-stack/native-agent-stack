@@ -56697,6 +56697,46 @@
       "bytes": 6424
     },
     {
+      "path": "evidence/artifacts/startup-context-20261016/README.md",
+      "sha256": "ee311f2b3aaa71c8fd0cbc52d1e1402e08a6a5d6291398585c46f4221c0711e1",
+      "bytes": 2032
+    },
+    {
+      "path": "evidence/artifacts/startup-context-20261016/receipts/CC.+ai-memory.json",
+      "sha256": "555ab6efc52f7c5165d5df77bcce1cd269f1a5915d120515994607426b04d523",
+      "bytes": 12146
+    },
+    {
+      "path": "evidence/artifacts/startup-context-20261016/receipts/CC.+context-mode.json",
+      "sha256": "269d384a4ac5a13887a09f731160d2f2bca8d6e2b2de90ba6eb8d7631d8bcd83",
+      "bytes": 12956
+    },
+    {
+      "path": "evidence/artifacts/startup-context-20261016/receipts/CC.+headroom.json",
+      "sha256": "feeddeeb1539b8b3508765d5cbd24dfb854e93a3f58bcb0f683bf35e432c4552",
+      "bytes": 12470
+    },
+    {
+      "path": "evidence/artifacts/startup-context-20261016/receipts/CC.+qmd.json",
+      "sha256": "cd1e7ebc268c437573ed2cade888c61decf8f28e87bc6983f3f0abf9adf331b1",
+      "bytes": 12470
+    },
+    {
+      "path": "evidence/artifacts/startup-context-20261016/receipts/CC.+socraticode.json",
+      "sha256": "9ea7051d67633c3e501a3f41133f09bfd4b2c088c2b7e41d2d60a3b6fa0be09c",
+      "bytes": 12154
+    },
+    {
+      "path": "evidence/artifacts/startup-context-20261016/receipts/CC.control.json",
+      "sha256": "d573bc9b4e9948da28817b745eb4388431e4f914ac34592537c956a8ef2a01e7",
+      "bytes": 12071
+    },
+    {
+      "path": "evidence/artifacts/startup-context-20261016/receipts/CC.summary.json",
+      "sha256": "843201730461dacbbce9efc88f6f9b46cb19ffa8e77eee108f3ca74c96800d9b",
+      "bytes": 2036
+    },
+    {
       "path": "evidence/artifacts/suite-parallelism-trial-20261003/README.md",
       "sha256": "0a9faceaf4268eb54b76c174609ea8e597d50a9ea39170317944f62caea474e4",
       "bytes": 9207
@@ -64657,6 +64697,11 @@
       "bytes": 57351
     },
     {
+      "path": "tests/test_startup_context.py",
+      "sha256": "dbd24a67818b8f6d6fb08c298985fa7255ec8851d2c6bee033f2b47870674949",
+      "bytes": 8292
+    },
+    {
       "path": "tests/test_supply_chain_scan.py",
       "sha256": "a4e3e5a6f40a7f3b4e679b21dc56f443a27ccdd9f097423bdf64d9e41eef19f8",
       "bytes": 6838
@@ -65560,6 +65605,21 @@
       "path": "tools/starred-maintenance/systemd/native-agent-newstars.timer.in",
       "sha256": "cbefc2da967aca3c1789ad96052cdd678231f42f0ff83ceced71290731fe205d",
       "bytes": 229
+    },
+    {
+      "path": "tools/startup-context/README.md",
+      "sha256": "eef785b06bacc7f7dfc76174755f57913d9a3d48de96bd18ed1442f057b01e99",
+      "bytes": 2652
+    },
+    {
+      "path": "tools/startup-context/launches/CC.json",
+      "sha256": "4f598db8fe531c3627bf459ef042e38ff3cf9ccdeea0d9724d76dfa6d09b2626",
+      "bytes": 2003
+    },
+    {
+      "path": "tools/startup-context/startup_context.py",
+      "sha256": "93bfb2e108e86462457cf168641864e795fa507eb501bc951dde5e9d996781c4",
+      "bytes": 14296
     },
     {
       "path": "tools/token-e2e/README.md",

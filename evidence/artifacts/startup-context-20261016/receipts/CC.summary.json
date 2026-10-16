@@ -1,0 +1,87 @@
+{
+ "schema": "startup-context-summary/1",
+ "role_id": "CC",
+ "family": "claude-code",
+ "client_version": "2.1.301",
+ "rows": [
+  {
+   "variant": "control",
+   "component": null,
+   "total_tokens": 24800,
+   "servers_not_connected": [],
+   "component_loaded": null,
+   "over_control": null,
+   "mcp_tokens_by_server": {
+    "serena": 8743
+   },
+   "mcp_tools_deferred": true
+  },
+  {
+   "variant": "+ai-memory",
+   "component": "ai-memory",
+   "total_tokens": 24800,
+   "servers_not_connected": [
+    "ai-memory"
+   ],
+   "component_loaded": false,
+   "over_control": null,
+   "mcp_tokens_by_server": {
+    "serena": 8743
+   },
+   "mcp_tools_deferred": true
+  },
+  {
+   "variant": "+qmd",
+   "component": "qmd",
+   "total_tokens": 25400,
+   "servers_not_connected": [],
+   "component_loaded": true,
+   "over_control": 600,
+   "mcp_tokens_by_server": {
+    "qmd": 2308,
+    "serena": 8872
+   },
+   "mcp_tools_deferred": true
+  },
+  {
+   "variant": "+socraticode",
+   "component": "socraticode",
+   "total_tokens": 24800,
+   "servers_not_connected": [
+    "socraticode"
+   ],
+   "component_loaded": false,
+   "over_control": null,
+   "mcp_tokens_by_server": {
+    "serena": 8743
+   },
+   "mcp_tools_deferred": true
+  },
+  {
+   "variant": "+headroom",
+   "component": "headroom",
+   "total_tokens": 24800,
+   "servers_not_connected": [],
+   "component_loaded": true,
+   "over_control": 0,
+   "mcp_tokens_by_server": {
+    "headroom": 480,
+    "serena": 8633
+   },
+   "mcp_tools_deferred": true
+  },
+  {
+   "variant": "+context-mode",
+   "component": "context-mode",
+   "total_tokens": 26600,
+   "servers_not_connected": [],
+   "component_loaded": true,
+   "over_control": 1800,
+   "mcp_tokens_by_server": {
+    "serena": 8743
+   },
+   "mcp_tools_deferred": true
+  }
+ ],
+ "note": "total_tokens is the client's own start-up total; over_control is a component's start-up cost. mcp_tokens_by_server counts each server's tool definitions, which are outside the start-up total when mcp_tools_deferred is true (loaded on demand by tool search)"
+}

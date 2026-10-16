@@ -1,0 +1,109 @@
+{
+ "schema": "startup-context-launch/1",
+ "role_id": "CC",
+ "family": "claude-code",
+ "role_source": "docs/role-tool-sets.json roles[CC].expected_tool_ids",
+ "note": "control: the role's MCP set from adoption/mcp/claude-user.json without the token-efficiency and memory components (serena only) and the context-mode plugin off; each other variant adds one component. User and project settings, hooks and other plugins are the same in every variant.",
+ "cwd": ".",
+ "variants": [
+  {
+   "id": "control",
+   "mcp_servers": [
+    "serena"
+   ],
+   "settings": {
+    "enabledPlugins": {
+     "context-mode@context-mode": false
+    }
+   },
+   "flags": [
+    "--model",
+    "claude-opus-5-5"
+   ]
+  },
+  {
+   "id": "+ai-memory",
+   "component": "ai-memory",
+   "mcp_servers": [
+    "serena",
+    "ai-memory"
+   ],
+   "settings": {
+    "enabledPlugins": {
+     "context-mode@context-mode": false
+    }
+   },
+   "flags": [
+    "--model",
+    "claude-opus-5-5"
+   ]
+  },
+  {
+   "id": "+qmd",
+   "component": "qmd",
+   "mcp_servers": [
+    "serena",
+    "qmd"
+   ],
+   "settings": {
+    "enabledPlugins": {
+     "context-mode@context-mode": false
+    }
+   },
+   "flags": [
+    "--model",
+    "claude-opus-5-5"
+   ]
+  },
+  {
+   "id": "+socraticode",
+   "component": "socraticode",
+   "mcp_servers": [
+    "serena",
+    "socraticode"
+   ],
+   "settings": {
+    "enabledPlugins": {
+     "context-mode@context-mode": false
+    }
+   },
+   "flags": [
+    "--model",
+    "claude-opus-5-5"
+   ]
+  },
+  {
+   "id": "+headroom",
+   "component": "headroom",
+   "mcp_servers": [
+    "serena",
+    "headroom"
+   ],
+   "settings": {
+    "enabledPlugins": {
+     "context-mode@context-mode": false
+    }
+   },
+   "flags": [
+    "--model",
+    "claude-opus-5-5"
+   ]
+  },
+  {
+   "id": "+context-mode",
+   "component": "context-mode",
+   "mcp_servers": [
+    "serena"
+   ],
+   "settings": {
+    "enabledPlugins": {
+     "context-mode@context-mode": true
+    }
+   },
+   "flags": [
+    "--model",
+    "claude-opus-5-5"
+   ]
+  }
+ ]
+}
