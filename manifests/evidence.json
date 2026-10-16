@@ -64193,8 +64193,8 @@
     },
     {
       "path": "tests/test_muse_cli_harness.py",
-      "sha256": "a3beb727792baef1ae6dcda274668833ccb4b44bfa39472de37ba172db1c46ba",
-      "bytes": 16916
+      "sha256": "f7e543dd2cb91a0d824ff738dc0d984bfac26a1cbc7d0bdc0416fb6a7273f74a",
+      "bytes": 27885
     },
     {
       "path": "tests/test_muse_file_fence.py",
@@ -65073,8 +65073,8 @@
     },
     {
       "path": "tools/adoption/muse_cli_harness.py",
-      "sha256": "70195636e7d0e8c35aa626cd94f68efc1d605c5f5509381e29ce5c13bbc51dbe",
-      "bytes": 28735
+      "sha256": "1d69b918eb6f73411feced783ac2a23d3737b0a1f429e102c7eefef9b915adda",
+      "bytes": 30599
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",

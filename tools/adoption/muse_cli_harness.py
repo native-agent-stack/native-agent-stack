@@ -18,9 +18,11 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import signal
 import subprocess
 import sys
+import time
 import tomllib
 import uuid
 
@@ -379,6 +381,15 @@ def prepare(args, profile: str) -> dict:
         data = codex_settings(tomllib.loads(bundle["codex.config.toml"]))
         for name in ("headroom", "hindsight", "grafana"):
             data.get("mcp_servers", {}).pop(name, None)
+        # Codex092d3acd (0.162.1) rmcp-client/src/utils.rs:16-58 and
+        # stdio_server_launcher.rs:276-284 build MCP's explicit env; hooks
+        # replay their session env in hooks/src/engine/command_runner.rs:424-433.
+        # MCP builds its own transport environment, independently of the
+        # shell_environment_policy used by hooks. Keep both stores identical.
+        context_server = data['mcp_servers']['context-mode']
+        context_server['env'] = {**context_server.get('env', {}),
+                                 **{key: token_env[key] for key in
+                                    ('CONTEXT_MODE_DIR', 'CONTEXT_MODE_DATA_DIR')}}
         native_mcp = data.get("mcp_servers", {})
         data["shell_environment_policy"] = {"inherit": "none", "set": token_env}
         wiring = adoption_module("new_wsl_client_config")
@@ -440,7 +451,9 @@ def event_facts(path: Path, runtime: str) -> dict:
                 elif isinstance(block, dict) and block.get("type") == "tool_result" and block.get("tool_use_id"):
                     outcomes[block["tool_use_id"]] = not bool(block.get("is_error"))
             item = event.get("item", {})
-            if isinstance(item, dict) and item.get("type") in ("command_execution", "mcp_tool_call", "web_search"):
+            # Codex092d3acd exec/src/exec_events.rs:116-118,175-188 emits
+            # apply_patch as completed file_change items, including failures.
+            if isinstance(item, dict) and item.get("type") in ("command_execution", "mcp_tool_call", "web_search", "file_change"):
                 call = item.get("id") or "unkeyed-" + str(count)
                 attempts.setdefault(call, item.get("tool") or item["type"])
                 if event.get("type") == "item.completed":
@@ -465,6 +478,18 @@ def event_facts(path: Path, runtime: str) -> dict:
             "runtime-or-gateway-reported; upstream-unverified" if models else "not-reported"}
 
 
+def codex_identity_command(argv: list[str]) -> list[str]:
+    """Run the existing identity launcher around the verified native ELF.
+
+    observability/collector/README.md:296-348, Writer identity and counter
+    integrity. Use the committed launcher unchanged except its supported
+    executable substitution; no second identity parser or generator.
+    """
+    template = (ROOT / 'observability/collector/codex-identity-launcher.sh.example').read_text()
+    launcher = template.replace("'@CODEX_BIN@'", shlex.quote(argv[0]))
+    return ['/bin/sh', '-c', launcher, 'ns-codex-muse', *argv[1:]]
+
+
 def launch(args) -> int:
     if args.profile not in PROFILES or not args.print or not args.prompt:
         raise HarnessError("native Muse TRIAL requires a named headless task")
@@ -486,6 +511,8 @@ def launch(args) -> int:
     run = root / "runs" / uuid.uuid4().hex
     run.mkdir(mode=0o700, parents=True)
     argv = command(meta, root, workspace, args)
+    if meta['runtime'] == 'codex':
+        argv = codex_identity_command(argv)
     environment = child_environment(root, args.profile, workspace)
     started = datetime.now(timezone.utc).isoformat()
     events = run / "events.jsonl"
@@ -503,12 +530,16 @@ def launch(args) -> int:
             exit_code = 127
         except subprocess.TimeoutExpired:
             timed_out = True
-            os.killpg(process.pid, signal.SIGTERM)
-            try:
-                process.wait(timeout=5)
-            except subprocess.TimeoutExpired:
+            with contextlib.suppress(ProcessLookupError):
+                os.killpg(process.pid, signal.SIGTERM)
+            # Hold the unreaped leader PID for the full grace period, even
+            # after it exits. Descendants may ignore TERM; leader exit alone
+            # does not establish group exit. Kill the group before reaping so
+            # a reused leader PID cannot name an unrelated process group.
+            time.sleep(5)
+            with contextlib.suppress(ProcessLookupError):
                 os.killpg(process.pid, signal.SIGKILL)
-                process.wait()
+            process.wait()
             exit_code = 124
     receipt = {"schema": "native-stack/muse-cli-harness-trial/v1", "profile": args.profile,
                "status": "trial", "role": args.role or "isolated-builder", "workspace": str(workspace),
