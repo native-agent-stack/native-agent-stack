@@ -1,0 +1,21 @@
+Script started on 2026-10-16 01:44:18-04:00 [COMMAND="<SCRATCH>/prefixes/markitdown/bin/python -m pytest --override-ini addopts= --disable-warnings -ra tests/test_html_converter.py tests/test_csv_blank_runs.py tests/test_csv_line_endings.py tests/test_docx_math.py tests/test_pdf_memory.py" <not executed on terminal>]
+============================= test session starts ==============================
+platform linux -- Python 3.13.16, pytest-9.1.1, pluggy-1.7.0
+rootdir: <SCRATCH>/sources/markitdown/packages/markitdown
+configfile: pyproject.toml
+collecting ... 
+collecting 26 items                                                            
+collected 57 items                                                             
+
+tests/test_html_converter.py ..........................                  [ 45%]
+tests/test_csv_blank_runs.py ....                                        [ 52%]
+tests/test_csv_line_endings.py ...............                           [ 78%]
+tests/test_docx_math.py ....                                             [ 85%]
+tests/test_pdf_memory.py ......ss                                        [100%]
+
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_pdf_memory.py:303: fpdf2 not installed
+SKIPPED [1] tests/test_pdf_memory.py:333: fpdf2 not installed
+======================== 55 passed, 2 skipped in 6.31s =========================
+
+Script done on 2026-10-16 01:44:25-04:00 [COMMAND_EXIT_CODE="0"]

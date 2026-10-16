@@ -1,0 +1,9 @@
+Script started on 2026-10-16 01:46:16-04:00 [COMMAND="env XDG_CACHE_HOME=<SCRATCH>/qmd-cache XDG_CONFIG_HOME=<SCRATCH>/qmd-config BUN_INSTALL_CACHE_DIR=<SCRATCH>/bun-cache bun install --frozen-lockfile" <not executed on terminal>]
+mise ERROR No version is set for shim: bun
+Set a global default version with one of the following:
+mise use -g bun@1.4.2
+mise use -g bun@1.4.3
+mise ERROR Version: 2026.10.3 linux-x64 (2026-10-05)
+mise ERROR Run with --verbose or MISE_VERBOSE=1 for more information
+
+Script done on 2026-10-16 01:46:16-04:00 [COMMAND_EXIT_CODE="1"]

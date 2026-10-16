@@ -1,0 +1,6 @@
+Script started on 2026-10-16 01:44:57-04:00 [COMMAND="npm --userconfig=<SCRATCH>/npm-user.rc --globalconfig=<SCRATCH>/npm-global.rc --cache <SCRATCH>/npm-cache install --registry https://registry.npmjs.org --no-audit --no-fund --allow-scripts=node-llama-cpp,tree-sitter-go,tree-sitter-python,tree-sitter-rust,tree-sitter-typescript,tree-sitter-javascript" <not executed on terminal>]
+npm error code EALLOWSCRIPTS
+npm error --allow-scripts is not allowed in project-scoped installs. Add the entries to the "allowScripts" field in package.json, or to .npmrc, instead.
+npm error A complete log of this run can be found in: <SCRATCH>/npm-cache/_logs/2026-10-16T05_44_57_384Z-debug-0.log
+
+Script done on 2026-10-16 01:44:57-04:00 [COMMAND_EXIT_CODE="1"]

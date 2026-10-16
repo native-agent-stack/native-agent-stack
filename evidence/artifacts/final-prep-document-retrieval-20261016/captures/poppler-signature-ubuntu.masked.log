@@ -1,0 +1,11 @@
+Script started on 2026-10-16 01:45:43-04:00 [COMMAND="gpgv --status-fd 1 --keyring <SCRATCH>/downloads/poppler-ubuntu-key.gpg <SCRATCH>/downloads/poppler-26.10.0.tar.xz.sig <SCRATCH>/downloads/poppler-26.10.0.tar.xz" <not executed on terminal>]
+[GNUPG:] NEWSIG
+gpgv: Signature made Sat Oct  3 20:25:19 2026 EDT
+gpgv:                using RSA key CA262C6C83DE4D2FB28A332A3A6A4DB839EAA6D7
+[GNUPG:] KEY_CONSIDERED CA262C6C83DE4D2FB28A332A3A6A4DB839EAA6D7 0
+[GNUPG:] SIG_ID wz88XBSHIOJTEX3PBWBa1+gwXh8 2026-10-04 1791073519
+[GNUPG:] GOODSIG 3A6A4DB839EAA6D7 Albert Astals Cid <aacid@kde.org>
+gpgv: Good signature from "Albert Astals Cid <aacid@kde.org>"
+[GNUPG:] VALIDSIG CA262C6C83DE4D2FB28A332A3A6A4DB839EAA6D7 2026-10-04 1791073519 0 4 0 1 10 00 CA262C6C83DE4D2FB28A332A3A6A4DB839EAA6D7
+
+Script done on 2026-10-16 01:45:43-04:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,16 @@
+
+added 159 packages in 14s
+npm warn install-scripts 6 packages have install scripts not yet covered by allowScripts:
+npm warn install-scripts   node-llama-cpp@3.20.0 (postinstall: node ./dist/cli/cli.js postinstall)
+npm warn install-scripts   tree-sitter-go@0.25.0 (install: node-gyp-build)
+npm warn install-scripts   tree-sitter-python@0.25.0 (install: node-gyp-build)
+npm warn install-scripts   tree-sitter-rust@0.24.0 (install: node-gyp-build)
+npm warn install-scripts   tree-sitter-typescript@0.23.2 (install: node-gyp-build)
+npm warn install-scripts   tree-sitter-javascript@0.23.1 (install: node-gyp-build)
+npm warn install-scripts
+npm warn install-scripts Run `npm install -g --allow-scripts=node-llama-cpp,tree-sitter-go,tree-sitter-python,tree-sitter-rust,tree-sitter-typescript,tree-sitter-javascript` to allow these scripts once, or `npm config set allow-scripts=node-llama-cpp,tree-sitter-go,tree-sitter-python,tree-sitter-rust,tree-sitter-typescript,tree-sitter-javascript --location=user` to allow them for all global installs.
+npm notice
+npm notice New major version of npm available! 11.19.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice

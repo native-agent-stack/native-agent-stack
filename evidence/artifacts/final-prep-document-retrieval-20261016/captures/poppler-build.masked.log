@@ -1,0 +1,724 @@
+Script started on 2026-10-16 01:51:18-04:00 [COMMAND="docker --config <SCRATCH>/docker-config exec final-prep-poppler-2610 cmake --build /work/poppler-build --parallel 2" <not executed on terminal>]
+[1/679] Building CXX object CMakeFiles/poppler.dir/goo/GooString.cc.o
+[2/679] Building CXX object CMakeFiles/poppler.dir/goo/ImgWriter.cc.o
+[3/679] Building CXX object CMakeFiles/poppler.dir/goo/GooTimer.cc.o
+[4/679] Building CXX object CMakeFiles/poppler.dir/goo/NetPBMWriter.cc.o
+[5/679] Building CXX object CMakeFiles/poppler.dir/goo/JpegWriter.cc.o
+[6/679] Building CXX object CMakeFiles/poppler.dir/goo/TiffWriter.cc.o
+[7/679] Building CXX object CMakeFiles/poppler.dir/goo/PNGWriter.cc.o
+[8/679] Building CXX object CMakeFiles/poppler.dir/goo/ft_utils.cc.o
+[9/679] Building CXX object CMakeFiles/poppler.dir/goo/gbase64.cc.o
+[10/679] Building CXX object CMakeFiles/poppler.dir/goo/gbasename.cc.o
+[11/679] Building CXX object CMakeFiles/poppler.dir/goo/glibc.cc.o
+[12/679] Building CXX object CMakeFiles/poppler.dir/goo/glibc_strtok_r.cc.o
+[13/679] Building CXX object CMakeFiles/poppler.dir/goo/gfile.cc.o
+[14/679] Building CXX object CMakeFiles/poppler.dir/goo/gstrtod.cc.o
+[15/679] Building CXX object CMakeFiles/poppler.dir/goo/grandom.cc.o
+[16/679] Building CXX object CMakeFiles/poppler.dir/fofi/FoFiEncodings.cc.o
+[17/679] Building CXX object CMakeFiles/poppler.dir/fofi/FoFiBase.cc.o
+[18/679] Building CXX object CMakeFiles/poppler.dir/fofi/FoFiType1.cc.o
+[19/679] Building CXX object CMakeFiles/poppler.dir/fofi/FoFiTrueType.cc.o
+[20/679] Building CXX object CMakeFiles/poppler.dir/fofi/FoFiIdentifier.cc.o
+[21/679] Building CXX object CMakeFiles/poppler.dir/fofi/FoFiType1C.cc.o
+[22/679] Building CXX object CMakeFiles/poppler.dir/poppler/AnnotStampImageHelper.cc.o
+[23/679] Building CXX object CMakeFiles/poppler.dir/poppler/Array.cc.o
+[24/679] Building CXX object CMakeFiles/poppler.dir/poppler/CachedFile.cc.o
+[25/679] Building CXX object CMakeFiles/poppler.dir/poppler/Catalog.cc.o
+[26/679] Building CXX object CMakeFiles/poppler.dir/poppler/Annot.cc.o
+[27/679] Building CXX object CMakeFiles/poppler.dir/poppler/CMap.cc.o
+[28/679] Building CXX object CMakeFiles/poppler.dir/poppler/CharCodeToUnicode.cc.o
+[29/679] Building CXX object CMakeFiles/poppler.dir/poppler/DateInfo.cc.o
+[30/679] Building CXX object CMakeFiles/poppler.dir/poppler/CryptoSignBackend.cc.o
+[31/679] Building CXX object CMakeFiles/poppler.dir/poppler/Decrypt.cc.o
+[32/679] Building CXX object CMakeFiles/poppler.dir/poppler/Error.cc.o
+[33/679] Building CXX object CMakeFiles/poppler.dir/poppler/Dict.cc.o
+[34/679] Building CXX object CMakeFiles/poppler.dir/poppler/FILECacheLoader.cc.o
+[35/679] Building CXX object CMakeFiles/poppler.dir/poppler/FDPDFDocBuilder.cc.o
+[36/679] Building CXX object CMakeFiles/poppler.dir/poppler/FlateEncoder.cc.o
+[37/679] Building CXX object CMakeFiles/poppler.dir/poppler/FontEncodingTables.cc.o
+[38/679] Building CXX object CMakeFiles/poppler.dir/poppler/FileSpec.cc.o
+[39/679] Building CXX object CMakeFiles/poppler.dir/poppler/FontInfo.cc.o
+[40/679] Building CXX object CMakeFiles/poppler.dir/poppler/Function.cc.o
+[41/679] Building CXX object CMakeFiles/poppler.dir/poppler/Form.cc.o
+[42/679] Building CXX object CMakeFiles/poppler.dir/poppler/GfxFont.cc.o
+[43/679] Building CXX object CMakeFiles/poppler.dir/poppler/Gfx.cc.o
+[44/679] Building CXX object CMakeFiles/poppler.dir/poppler/GlobalParams.cc.o
+[45/679] Building CXX object CMakeFiles/poppler.dir/poppler/Hints.cc.o
+[46/679] Building CXX object CMakeFiles/poppler.dir/poppler/GfxState.cc.o
+[47/679] Building CXX object CMakeFiles/poppler.dir/poppler/JArithmeticDecoder.cc.o
+[48/679] Building CXX object CMakeFiles/poppler.dir/poppler/ImageEmbeddingUtils.cc.o
+[49/679] Building CXX object CMakeFiles/poppler.dir/poppler/JSInfo.cc.o
+[50/679] Building CXX object CMakeFiles/poppler.dir/poppler/JBIG2Stream.cc.o
+[51/679] Building CXX object CMakeFiles/poppler.dir/poppler/Lexer.cc.o
+[52/679] Building CXX object CMakeFiles/poppler.dir/poppler/Linearization.cc.o
+[53/679] Building CXX object CMakeFiles/poppler.dir/poppler/Link.cc.o
+[54/679] Building CXX object CMakeFiles/poppler.dir/poppler/LocalPDFDocBuilder.cc.o
+[55/679] Building CXX object CMakeFiles/poppler.dir/poppler/NameToCharCode.cc.o
+[56/679] Building CXX object CMakeFiles/poppler.dir/poppler/MarkedContentOutputDev.cc.o
+[57/679] Building CXX object CMakeFiles/poppler.dir/poppler/Object.cc.o
+[58/679] Building CXX object CMakeFiles/poppler.dir/poppler/OptionalContent.cc.o
+[59/679] Building CXX object CMakeFiles/poppler.dir/poppler/OutputDev.cc.o
+[60/679] Building CXX object CMakeFiles/poppler.dir/poppler/Outline.cc.o
+[61/679] Building CXX object CMakeFiles/poppler.dir/poppler/PageTransition.cc.o
+[62/679] Building CXX object CMakeFiles/poppler.dir/poppler/Parser.cc.o
+[63/679] Building CXX object CMakeFiles/poppler.dir/poppler/Page.cc.o
+[64/679] Building CXX object CMakeFiles/poppler.dir/poppler/PDFDocBuilder.cc.o
+[65/679] Building CXX object CMakeFiles/poppler.dir/poppler/PDFDocEncoding.cc.o
+[66/679] Building CXX object CMakeFiles/poppler.dir/poppler/PDFDocFactory.cc.o
+[67/679] Building CXX object CMakeFiles/poppler.dir/poppler/ProfileData.cc.o
+[68/679] Building CXX object CMakeFiles/poppler.dir/poppler/PreScanOutputDev.cc.o
+[69/679] Building CXX object CMakeFiles/poppler.dir/poppler/PSTokenizer.cc.o
+[70/679] Building CXX object CMakeFiles/poppler.dir/poppler/SignatureInfo.cc.o
+[71/679] Building CXX object CMakeFiles/poppler.dir/poppler/PDFDoc.cc.o
+[72/679] Building CXX object CMakeFiles/poppler.dir/poppler/Stream.cc.o
+[73/679] Building CXX object CMakeFiles/poppler.dir/poppler/StructTreeRoot.cc.o
+[74/679] Building CXX object CMakeFiles/poppler.dir/poppler/UnicodeMap.cc.o
+[75/679] Building CXX object CMakeFiles/poppler.dir/poppler/UnicodeMapFuncs.cc.o
+[76/679] Building CXX object CMakeFiles/poppler.dir/poppler/UnicodeTypeTable.cc.o
+[77/679] Building CXX object CMakeFiles/poppler.dir/poppler/UTF.cc.o
+[78/679] Building CXX object CMakeFiles/poppler.dir/poppler/StructElement.cc.o
+[79/679] Building CXX object CMakeFiles/poppler.dir/poppler/XRef.cc.o
+[80/679] Building CXX object CMakeFiles/poppler.dir/poppler/PSOutputDev.cc.o
+[81/679] Building CXX object CMakeFiles/poppler.dir/poppler/TextOutputDev.cc.o
+[82/679] Building CXX object CMakeFiles/poppler.dir/poppler/PageLabelInfo.cc.o
+[83/679] Building CXX object CMakeFiles/poppler.dir/poppler/Sound.cc.o
+[84/679] Building CXX object CMakeFiles/poppler.dir/poppler/SecurityHandler.cc.o
+[85/679] Building CXX object CMakeFiles/poppler.dir/poppler/ViewerPreferences.cc.o
+[86/679] Building CXX object CMakeFiles/poppler.dir/poppler/Movie.cc.o
+[87/679] Building CXX object CMakeFiles/poppler.dir/poppler/Rendition.cc.o
+[88/679] Building CXX object CMakeFiles/poppler.dir/poppler/CertificateInfo.cc.o
+[89/679] Building CXX object CMakeFiles/poppler.dir/poppler/BBoxOutputDev.cc.o
+[90/679] Building CXX object CMakeFiles/poppler.dir/poppler/SplashOutputDev.cc.o
+[91/679] Building CXX object CMakeFiles/poppler.dir/splash/Splash.cc.o
+[92/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashBitmap.cc.o
+[93/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashFTFont.cc.o
+[94/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashClip.cc.o
+[95/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashFTFontEngine.cc.o
+[96/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashFont.cc.o
+[97/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashFTFontFile.cc.o
+[98/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashFontFile.cc.o
+[99/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashFontFileID.cc.o
+[100/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashFontEngine.cc.o
+[101/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashPattern.cc.o
+[102/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashPath.cc.o
+[103/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashScreen.cc.o
+[104/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashState.cc.o
+[105/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashXPath.cc.o
+[106/679] Building CXX object CMakeFiles/poppler.dir/splash/SplashXPathScanner.cc.o
+[107/679] Building CXX object CMakeFiles/poppler.dir/poppler/BrotliStream.cc.o
+[108/679] Building CXX object CMakeFiles/poppler.dir/poppler/DCTStream.cc.o
+[109/679] Building CXX object CMakeFiles/poppler.dir/poppler/CurlCachedFile.cc.o
+[110/679] Building CXX object CMakeFiles/poppler.dir/poppler/CurlPDFDocBuilder.cc.o
+[111/679] Building CXX object CMakeFiles/poppler.dir/poppler/JPEG2000Stream.cc.o
+[112/679] Building CXX object CMakeFiles/poppler.dir/poppler/NSSCryptoSignBackend.cc.o
+[113/679] Building C object CMakeFiles/poppler.dir/poppler/CourierWidths.pregenerated.c.o
+[114/679] Building C object CMakeFiles/poppler.dir/poppler/CourierBoldWidths.pregenerated.c.o
+[115/679] Building C object CMakeFiles/poppler.dir/poppler/CourierBoldObliqueWidths.pregenerated.c.o
+[116/679] Building C object CMakeFiles/poppler.dir/poppler/CourierObliqueWidths.pregenerated.c.o
+[117/679] Building C object CMakeFiles/poppler.dir/poppler/HelveticaWidths.pregenerated.c.o
+[118/679] Building C object CMakeFiles/poppler.dir/poppler/HelveticaBoldWidths.pregenerated.c.o
+[119/679] Building C object CMakeFiles/poppler.dir/poppler/HelveticaBoldObliqueWidths.pregenerated.c.o
+[120/679] Building C object CMakeFiles/poppler.dir/poppler/HelveticaObliqueWidths.pregenerated.c.o
+[121/679] Building C object CMakeFiles/poppler.dir/poppler/SymbolWidths.pregenerated.c.o
+[122/679] Building C object CMakeFiles/poppler.dir/poppler/TimesBoldWidths.pregenerated.c.o
+[123/679] Building C object CMakeFiles/poppler.dir/poppler/TimesBoldItalicWidths.pregenerated.c.o
+[124/679] Building C object CMakeFiles/poppler.dir/poppler/TimesItalicWidths.pregenerated.c.o
+[125/679] Building C object CMakeFiles/poppler.dir/poppler/TimesRomanWidths.pregenerated.c.o
+[126/679] Building C object CMakeFiles/poppler.dir/poppler/ZapfDingbatsWidths.pregenerated.c.o
+[127/679] Building CXX object utils/CMakeFiles/utils_common_lib.dir/parseargs.cc.o
+[128/679] Building CXX object utils/CMakeFiles/utils_common_lib.dir/Win32Console.cc.o
+[129/679] Building CXX object utils/CMakeFiles/pdftoppm.dir/pdftoppm.cc.o
+[130/679] Building CXX object utils/CMakeFiles/pdftoppm.dir/sanitychecks.cc.o
+[131/679] Building CXX object CMakeFiles/poppler.dir/poppler/FontSubsetter.cc.o
+[132/679] Linking CXX shared library libpoppler.so.165.0.0
+[133/679] Creating library symlink libpoppler.so.165 libpoppler.so
+[134/679] Linking CXX static library utils/libutils_common_lib.a
+[135/679] Linking CXX executable utils/pdftoppm
+[136/679] Building CXX object utils/CMakeFiles/pdftocairo.dir/pdftocairo-win32.cc.o
+[137/679] Building CXX object utils/CMakeFiles/pdftocairo.dir/pdftocairo.cc.o
+[138/679] Building CXX object utils/CMakeFiles/pdftocairo.dir/__/poppler/CairoFontEngine.cc.o
+[139/679] Building CXX object utils/CMakeFiles/pdftocairo.dir/__/poppler/CairoRescaleBox.cc.o
+[140/679] Building CXX object utils/CMakeFiles/pdfdetach.dir/pdfdetach.cc.o
+[141/679] Linking CXX executable utils/pdfdetach
+[142/679] Building CXX object utils/CMakeFiles/pdftocairo.dir/__/poppler/CairoOutputDev.cc.o
+[143/679] Linking CXX executable utils/pdftocairo
+[144/679] Building CXX object utils/CMakeFiles/pdfattach.dir/pdfattach.cc.o
+[145/679] Linking CXX executable utils/pdfattach
+[146/679] Building CXX object utils/CMakeFiles/pdffonts.dir/pdffonts.cc.o
+[147/679] Linking CXX executable utils/pdffonts
+[148/679] Building CXX object utils/CMakeFiles/pdfimages.dir/pdfimages.cc.o
+[149/679] Building CXX object utils/CMakeFiles/pdfimages.dir/ImageOutputDev.cc.o
+[150/679] Linking CXX executable utils/pdfimages
+[151/679] Building CXX object utils/CMakeFiles/pdfinfo.dir/printencodings.cc.o
+[152/679] Building CXX object utils/CMakeFiles/pdfinfo.dir/pdfinfo.cc.o
+[153/679] Linking CXX executable utils/pdfinfo
+[154/679] Building CXX object utils/CMakeFiles/pdfsig.dir/pdfsig.cc.o
+[155/679] Linking CXX executable utils/pdfsig
+[156/679] Building CXX object utils/CMakeFiles/pdftops.dir/sanitychecks.cc.o
+[157/679] Building CXX object utils/CMakeFiles/pdftops.dir/pdftops.cc.o
+[158/679] Linking CXX executable utils/pdftops
+[159/679] Building CXX object utils/CMakeFiles/pdftotext.dir/printencodings.cc.o
+[160/679] Building CXX object utils/CMakeFiles/pdftohtml.dir/InMemoryFile.cc.o
+[161/679] Building CXX object utils/CMakeFiles/pdftotext.dir/pdftotext.cc.o
+[162/679] Linking CXX executable utils/pdftotext
+[163/679] Building CXX object utils/CMakeFiles/pdftohtml.dir/pdftohtml.cc.o
+[164/679] Building CXX object utils/CMakeFiles/pdftohtml.dir/HtmlFonts.cc.o
+[165/679] Building CXX object utils/CMakeFiles/pdftohtml.dir/HtmlLinks.cc.o
+[166/679] Building CXX object utils/CMakeFiles/pdfseparate.dir/pdfseparate.cc.o
+[167/679] Linking CXX executable utils/pdfseparate
+[168/679] Building CXX object utils/CMakeFiles/pdftohtml.dir/HtmlOutputDev.cc.o
+[169/679] Linking CXX executable utils/pdftohtml
+[170/679] Generating poppler-enums.h
+[171/679] Generating poppler-enums.c
+[172/679] Building CXX object utils/CMakeFiles/pdfunite.dir/pdfunite.cc.o
+[173/679] Linking CXX executable utils/pdfunite
+[174/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler-date.cc.o
+[175/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler-action.cc.o
+[176/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler-document.cc.o
+[177/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler-page.cc.o
+[178/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler-attachment.cc.o
+[179/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler-form-field.cc.o
+[180/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler-layer.cc.o
+[181/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler-annot.cc.o
+/work/sources/poppler-26.10.0/glib/poppler-annot.cc:185: warning: ignoring '#pragma clang diagnostic' [-Wunknown-pragmas]
+  185 | #pragma clang diagnostic push
+      | 
+/work/sources/poppler-26.10.0/glib/poppler-annot.cc:206: warning: ignoring '#pragma clang diagnostic' [-Wunknown-pragmas]
+  206 | #pragma clang diagnostic pop
+      | 
+[182/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler-movie.cc.o
+[183/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler-media.cc.o
+[184/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler-cached-file-loader.cc.o
+[185/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler.cc.o
+[186/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler-input-stream.cc.o
+[187/679] Building C object glib/CMakeFiles/poppler-glib.dir/poppler-enums.c.o
+[188/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/poppler-structure-element.cc.o
+[189/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/__/poppler/CairoFontEngine.cc.o
+[190/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/__/poppler/CairoRescaleBox.cc.o
+[191/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/main.c.o
+[192/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/find.c.o
+[193/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/fonts.c.o
+[194/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/forms.c.o
+[195/679] Building CXX object glib/demo/CMakeFiles/poppler-glib-demo.dir/info.cc.o
+[196/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/images.c.o
+[197/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/links.c.o
+[198/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/outline.c.o
+[199/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/page.c.o
+[200/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/print.c.o
+[201/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/render.c.o
+[202/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/text.c.o
+[203/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/transitions.c.o
+[204/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/utils.c.o
+[205/679] Building CXX object glib/CMakeFiles/poppler-glib.dir/__/poppler/CairoOutputDev.cc.o
+[206/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/annots.c.o
+[207/679] Linking CXX shared library glib/libpoppler-glib.so.8.31.0
+[208/679] Creating library symlink glib/libpoppler-glib.so.8 glib/libpoppler-glib.so
+[209/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/attachments.c.o
+[210/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/layers.c.o
+[211/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/selections.c.o
+[212/679] Generating Poppler-0.18.gir
+g-ir-scanner: link: x86_64-linux-gnu-gcc -o /work/poppler-build/glib/tmp-introspectrh5gd3b0/Poppler-0.18 /work/poppler-build/glib/tmp-introspectrh5gd3b0/Poppler-0.18.o -L. -Wl,-rpath,. -Wl,--no-as-needed -L/work/poppler-build -Wl,-rpath,/work/poppler-build -L/work/poppler-build/glib -Wl,-rpath,/work/poppler-build/glib -lpoppler-glib -lpoppler -lgio-2.0 -lgobject-2.0 -Wl,--export-dynamic -lgmodule-2.0 -pthread -lglib-2.0 -lglib-2.0
+[213/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/taggedstruct.c.o
+[214/679] Generating Poppler-0.18.typelib
+[215/679] Building C object glib/tests/CMakeFiles/poppler-check-text.dir/check_text.c.o
+[216/679] Building C object glib/demo/CMakeFiles/poppler-glib-demo.dir/signature.c.o
+[217/679] Linking C executable glib/tests/poppler-check-text
+[218/679] Linking CXX executable glib/demo/poppler-glib-demo
+[219/679] Building C object glib/tests/CMakeFiles/poppler-check-bb.dir/check_bb.c.o
+[220/679] Building C object glib/tests/CMakeFiles/pdfdrawbb.dir/pdfdrawbb.c.o
+[221/679] Linking C executable glib/tests/poppler-check-bb
+[222/679] Linking C executable glib/tests/pdfdrawbb
+[223/679] Building CXX object test/CMakeFiles/perf-test.dir/perf-test.cc.o
+[224/679] Linking CXX executable test/perf-test
+[225/679] Building CXX object test/CMakeFiles/gtk-test.dir/gtk-test.cc.o
+[226/679] Linking CXX executable test/gtk-test
+[227/679] Building CXX object test/CMakeFiles/pdf-inspector.dir/pdf-inspector.cc.o
+[228/679] Building CXX object test/CMakeFiles/pdf-inspector.dir/__/poppler/CairoFontEngine.cc.o
+[229/679] Building CXX object test/CMakeFiles/pdf-inspector.dir/__/poppler/CairoRescaleBox.cc.o
+[230/679] Building CXX object test/CMakeFiles/pdf-inspector.dir/__/poppler/CairoOutputDev.cc.o
+[231/679] Linking CXX executable test/pdf-inspector
+[232/679] Building CXX object test/CMakeFiles/cairo-thread-test.dir/cairo-thread-test.cc.o
+[233/679] Building CXX object test/CMakeFiles/cairo-thread-test.dir/__/poppler/CairoFontEngine.cc.o
+[234/679] Building CXX object test/CMakeFiles/cairo-thread-test.dir/__/poppler/CairoRescaleBox.cc.o
+[235/679] Building CXX object test/CMakeFiles/pdf-fullrewrite.dir/pdf-fullrewrite.cc.o
+[236/679] Building CXX object test/CMakeFiles/cairo-thread-test.dir/__/poppler/CairoOutputDev.cc.o
+[237/679] Linking CXX executable test/cairo-thread-test
+[238/679] Building CXX object test/CMakeFiles/pdf-fullrewrite.dir/__/utils/parseargs.cc.o
+[239/679] Linking CXX executable test/pdf-fullrewrite
+[240/679] Building CXX object test/CMakeFiles/image-embedding.dir/__/utils/parseargs.cc.o
+[241/679] Building CXX object test/CMakeFiles/image-embedding.dir/image-embedding.cc.o
+[242/679] Linking CXX executable test/image-embedding
+[243/679] Building CXX object test/CMakeFiles/pdf-validate-signature.dir/pdf-validate-signature.cc.o
+[244/679] Linking CXX executable test/pdf-validate-signature
+[245/679] Building CXX object test/CMakeFiles/pdf-signing-nss.dir/pdf-signing-nss.cc.o
+[246/679] Linking CXX executable test/pdf-signing-nss
+[247/679] Automatic MOC for target poppler-qt5
+[248/679] Building CXX object test/CMakeFiles/fontsubsetting-basic-test.dir/font-subsetting/fontsubsetting-basic-test.cc.o
+[249/679] Linking CXX executable test/fontsubsetting-basic-test
+[250/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-qt5_autogen/mocs_compilation.cpp.o
+[251/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-document.cc.o
+[252/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-annotation.cc.o
+/work/sources/poppler-26.10.0/qt5/src/poppler-annotation.cc: In constructor 'Poppler::Annotation::Annotation(Poppler::AnnotationPrivate&, const QDomNode&)':
+/work/sources/poppler-26.10.0/qt5/src/poppler-annotation.cc:1120:54: warning: 'static QDomElement Poppler::AnnotationUtils::findChildElement(const QDomNode&, const QString&)' is deprecated [-Wdeprecated-declarations]
+ 1120 |     QDomElement e = AnnotationUtils::findChildElement(annNode, QStringLiteral("base"));
+      |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/work/sources/poppler-26.10.0/qt5/src/poppler-annotation.cc:127:13: note: declared here
+  127 | QDomElement AnnotationUtils::findChildElement(const QDomNode &parentNode, const QString &name)
+      |             ^~~~~~~~~~~~~~~
+/work/sources/poppler-26.10.0/qt5/src/poppler-annotation.cc:1260:62: warning: 'static Poppler::Annotation* Poppler::AnnotationUtils::createAnnotation(const QDomElement&)' is deprecated [-Wdeprecated-declarations]
+ 1260 |         Annotation *reply = AnnotationUtils::createAnnotation(revElement);
+      |                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~
+/work/sources/poppler-26.10.0/qt5/src/poppler-annotation.cc:80:13: note: declared here
+   80 | Annotation *AnnotationUtils::createAnnotation(const QDomElement &annElement)
+      |             ^~~~~~~~~~~~~~~
+/work/sources/poppler-26.10.0/qt5/src/poppler-annotation.cc: In member function 'void Poppler::Annotation::storeBaseAnnotationProperties(QDomNode&, QDomDocument&) const':
+/work/sources/poppler-26.10.0/qt5/src/poppler-annotation.cc:1392:41: warning: 'static void Poppler::AnnotationUtils::storeAnnotation(const Poppler::Annotation*, QDomElement&, QDomDocument&)' is deprecated [-Wdeprecated-declarations]
+ 1392 |         AnnotationUtils::storeAnnotation(rev, r, document);
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~
+/work/sources/poppler-26.10.0/qt5/src/poppler-annotation.cc:118:6: note: declared here
+  118 | void AnnotationUtils::storeAnnotation(const Annotation *ann, QDomElement &annElement, QDomDocument &document)
+      |      ^~~~~~~~~~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/qt5/QtCore/QLinkedList:1,
+                 from /work/sources/poppler-26.10.0/qt5/src/poppler-annotation.h:38,
+                 from /work/sources/poppler-26.10.0/qt5/src/poppler-annotation.cc:47:
+In member function 'void QLinkedList<T>::freeData(QLinkedListData*) [with T = QPointF]',
+    inlined from 'QLinkedList<T>::~QLinkedList() [with T = QPointF]' at /usr/include/x86_64-linux-gnu/qt5/QtCore/qlinkedlist.h:301:17,
+    inlined from 'QLinkedList<T>::~QLinkedList() [with T = QPointF]' at /usr/include/x86_64-linux-gnu/qt5/QtCore/qlinkedlist.h:298:8,
+    inlined from 'void QLinkedList<T>::clear() [with T = QPointF]' at /usr/include/x86_64-linux-gnu/qt5/QtCore/qlinkedlist.h:378:13,
+    inlined from 'virtual std::shared_ptr<Annot> Poppler::LineAnnotationPrivate::createNativeAnnot(Page*, Poppler::DocumentData*)' at /work/sources/poppler-26.10.0/qt5/src/poppler-annotation.cc:2436:21:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qlinkedlist.h:372:5: warning: 'void operator delete(void*, std::size_t)' called on unallocated object 'QLinkedListData::shared_null' [-Wfree-nonheap-object]
+  372 |     delete x;
+      |     ^~~~~~~~
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qlinkedlist.h: In member function 'virtual std::shared_ptr<Annot> Poppler::LineAnnotationPrivate::createNativeAnnot(Page*, Poppler::DocumentData*)':
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qlinkedlist.h:80:48: note: declared here
+   80 |     Q_CORE_EXPORT static const QLinkedListData shared_null;
+      |                                                ^~~~~~~~~~~
+[253/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-embeddedfile.cc.o
+[254/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-fontinfo.cc.o
+[255/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-form.cc.o
+[256/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-link.cc.o
+[257/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-link-extractor.cc.o
+[258/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-movie.cc.o
+[259/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-optcontent.cc.o
+[260/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-page.cc.o
+[261/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-base-converter.cc.o
+[262/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-pdf-converter.cc.o
+[263/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-private.cc.o
+[264/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-qiodeviceinstream.cc.o
+[265/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-ps-converter.cc.o
+[266/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-qiodeviceoutstream.cc.o
+[267/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-sound.cc.o
+[268/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-page-transition.cc.o
+[269/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-textbox.cc.o
+[270/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-media.cc.o
+[271/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-outline.cc.o
+[272/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/poppler-version.cpp.o
+[273/679] Automatic MOC for target poppler-qt6
+[274/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-qt6_autogen/mocs_compilation.cpp.o
+[275/679] Building CXX object qt5/src/CMakeFiles/poppler-qt5.dir/QPainterOutputDev.cc.o
+[276/679] Linking CXX shared library qt5/src/libpoppler-qt5.so.1.41.0
+[277/679] Creating library symlink qt5/src/libpoppler-qt5.so.1 qt5/src/libpoppler-qt5.so
+[278/679] Automatic MOC for target test-poppler-qt5
+[279/679] Building CXX object qt5/tests/CMakeFiles/test-poppler-qt5.dir/test-poppler-qt5_autogen/mocs_compilation.cpp.o
+[280/679] Building CXX object qt5/tests/CMakeFiles/test-poppler-qt5.dir/test-poppler-qt5.cpp.o
+[281/679] Linking CXX executable qt5/tests/test-poppler-qt5
+[282/679] Automatic MOC for target test-password-qt5
+[283/679] Building CXX object qt5/tests/CMakeFiles/test-password-qt5.dir/test-password-qt5_autogen/mocs_compilation.cpp.o
+[284/679] Building CXX object qt5/tests/CMakeFiles/test-password-qt5.dir/test-password-qt5.cpp.o
+[285/679] Linking CXX executable qt5/tests/test-password-qt5
+[286/679] Automatic MOC for target test-render-to-file-qt5
+[287/679] Building CXX object qt5/tests/CMakeFiles/test-render-to-file-qt5.dir/test-render-to-file-qt5_autogen/mocs_compilation.cpp.o
+[288/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-annotation.cc.o
+[289/679] Automatic MOC for target poppler-qt5-forms
+[290/679] Building CXX object qt5/tests/CMakeFiles/poppler-qt5-forms.dir/poppler-qt5-forms_autogen/mocs_compilation.cpp.o
+[291/679] Building CXX object qt5/tests/CMakeFiles/test-render-to-file-qt5.dir/test-render-to-file.cpp.o
+[292/679] Building CXX object qt5/tests/CMakeFiles/poppler-qt5-forms.dir/poppler-forms.cpp.o
+[293/679] Linking CXX executable qt5/tests/test-render-to-file-qt5
+[294/679] Automatic MOC for target poppler-qt5-fonts
+[295/679] Building CXX object qt5/tests/CMakeFiles/poppler-qt5-fonts.dir/poppler-qt5-fonts_autogen/mocs_compilation.cpp.o
+[296/679] Linking CXX executable qt5/tests/poppler-qt5-forms
+[297/679] Automatic MOC for target poppler-qt5-attachments
+[298/679] Building CXX object qt5/tests/CMakeFiles/poppler-qt5-attachments.dir/poppler-qt5-attachments_autogen/mocs_compilation.cpp.o
+[299/679] Building CXX object qt5/tests/CMakeFiles/poppler-qt5-fonts.dir/poppler-fonts.cpp.o
+[300/679] Building CXX object qt5/tests/CMakeFiles/poppler-qt5-attachments.dir/poppler-attachments.cpp.o
+[301/679] Linking CXX executable qt5/tests/poppler-qt5-fonts
+[302/679] Automatic MOC for target stress-poppler-qt5
+[303/679] Building CXX object qt5/tests/CMakeFiles/stress-poppler-qt5.dir/stress-poppler-qt5_autogen/mocs_compilation.cpp.o
+[304/679] Linking CXX executable qt5/tests/poppler-qt5-attachments
+[305/679] Automatic MOC for target stress-poppler-dir-qt5
+[306/679] Building CXX object qt5/tests/CMakeFiles/stress-poppler-dir-qt5.dir/stress-poppler-dir-qt5_autogen/mocs_compilation.cpp.o
+[307/679] Building CXX object qt5/tests/CMakeFiles/stress-poppler-qt5.dir/stress-poppler-qt5.cpp.o
+[308/679] Building CXX object qt5/tests/CMakeFiles/stress-poppler-dir-qt5.dir/stress-poppler-dir.cpp.o
+[309/679] Linking CXX executable qt5/tests/stress-poppler-qt5
+[310/679] Automatic MOC for target stress-threads-qt5
+[311/679] Building CXX object qt5/tests/CMakeFiles/stress-threads-qt5.dir/stress-threads-qt5_autogen/mocs_compilation.cpp.o
+[312/679] Linking CXX executable qt5/tests/stress-poppler-dir-qt5
+[313/679] Automatic MOC for target poppler-qt5-texts
+[314/679] Building CXX object qt5/tests/CMakeFiles/poppler-qt5-texts.dir/poppler-qt5-texts_autogen/mocs_compilation.cpp.o
+[315/679] Building CXX object qt5/tests/CMakeFiles/poppler-qt5-texts.dir/poppler-texts.cpp.o
+[316/679] Linking CXX executable qt5/tests/poppler-qt5-texts
+[317/679] Automatic MOC for target poppler-qt5-page-labels
+[318/679] Building CXX object qt5/tests/CMakeFiles/poppler-qt5-page-labels.dir/poppler-qt5-page-labels_autogen/mocs_compilation.cpp.o
+[319/679] Building CXX object qt5/tests/CMakeFiles/stress-threads-qt5.dir/stress-threads-qt5.cpp.o
+[320/679] Linking CXX executable qt5/tests/stress-threads-qt5
+[321/679] Automatic MOC for target check_qt5_attachments
+[322/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_attachments.dir/check_qt5_attachments_autogen/mocs_compilation.cpp.o
+[323/679] Building CXX object qt5/tests/CMakeFiles/poppler-qt5-page-labels.dir/poppler-page-labels.cpp.o
+[324/679] Linking CXX executable qt5/tests/poppler-qt5-page-labels
+[325/679] Automatic MOC for target check_qt5_dateConversion
+[326/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_dateConversion.dir/check_qt5_dateConversion_autogen/mocs_compilation.cpp.o
+[327/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_attachments.dir/check_attachments.cpp.o
+[328/679] Linking CXX executable qt5/tests/check_qt5_attachments
+[329/679] Automatic MOC for target check_qt5_fonts
+[330/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_fonts.dir/check_qt5_fonts_autogen/mocs_compilation.cpp.o
+[331/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_dateConversion.dir/check_dateConversion.cpp.o
+[332/679] Linking CXX executable qt5/tests/check_qt5_dateConversion
+[333/679] Automatic MOC for target check_qt5_links
+[334/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_links.dir/check_qt5_links_autogen/mocs_compilation.cpp.o
+[335/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_fonts.dir/check_fonts.cpp.o
+[336/679] Linking CXX executable qt5/tests/check_qt5_fonts
+[337/679] Automatic MOC for target check_qt5_annotations
+[338/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_annotations.dir/check_qt5_annotations_autogen/mocs_compilation.cpp.o
+[339/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_links.dir/check_links.cpp.o
+[340/679] Linking CXX executable qt5/tests/check_qt5_links
+[341/679] Automatic MOC for target check_qt5_metadata
+[342/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_metadata.dir/check_qt5_metadata_autogen/mocs_compilation.cpp.o
+[343/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_annotations.dir/check_annotations.cpp.o
+[344/679] Linking CXX executable qt5/tests/check_qt5_annotations
+[345/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_metadata.dir/check_metadata.cpp.o
+[346/679] Automatic MOC for target check_qt5_optcontent
+[347/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_optcontent.dir/check_qt5_optcontent_autogen/mocs_compilation.cpp.o
+[348/679] Linking CXX executable qt5/tests/check_qt5_metadata
+[349/679] Automatic MOC for target check_qt5_forms
+[350/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_forms.dir/check_qt5_forms_autogen/mocs_compilation.cpp.o
+[351/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_optcontent.dir/check_optcontent.cpp.o
+[352/679] Linking CXX executable qt5/tests/check_qt5_optcontent
+[353/679] Automatic MOC for target check_qt5_pagelayout
+[354/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_pagelayout.dir/check_qt5_pagelayout_autogen/mocs_compilation.cpp.o
+[355/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_forms.dir/check_forms.cpp.o
+[356/679] Linking CXX executable qt5/tests/check_qt5_forms
+[357/679] Automatic MOC for target check_qt5_pagemode
+[358/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_pagemode.dir/check_qt5_pagemode_autogen/mocs_compilation.cpp.o
+[359/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_pagelayout.dir/check_pagelayout.cpp.o
+[360/679] Linking CXX executable qt5/tests/check_qt5_pagelayout
+[361/679] Automatic MOC for target check_qt5_password
+[362/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_password.dir/check_qt5_password_autogen/mocs_compilation.cpp.o
+[363/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_pagemode.dir/check_pagemode.cpp.o
+[364/679] Linking CXX executable qt5/tests/check_qt5_pagemode
+[365/679] Automatic MOC for target check_qt5_permissions
+[366/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_permissions.dir/check_qt5_permissions_autogen/mocs_compilation.cpp.o
+[367/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_password.dir/check_password.cpp.o
+[368/679] Linking CXX executable qt5/tests/check_qt5_password
+[369/679] Automatic MOC for target check_qt5_search
+[370/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_search.dir/check_qt5_search_autogen/mocs_compilation.cpp.o
+[371/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_permissions.dir/check_permissions.cpp.o
+[372/679] Linking CXX executable qt5/tests/check_qt5_permissions
+[373/679] Automatic MOC for target check_qt5_actualtext
+[374/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_actualtext.dir/check_qt5_actualtext_autogen/mocs_compilation.cpp.o
+[375/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_search.dir/check_search.cpp.o
+[376/679] Linking CXX executable qt5/tests/check_qt5_search
+[377/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_actualtext.dir/check_actualtext.cpp.o
+[378/679] Automatic MOC for target check_qt5_lexer
+[379/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_lexer.dir/check_qt5_lexer_autogen/mocs_compilation.cpp.o
+[380/679] Linking CXX executable qt5/tests/check_qt5_actualtext
+[381/679] Automatic MOC for target check_qt5_internal_outline
+[382/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_internal_outline.dir/check_qt5_internal_outline_autogen/mocs_compilation.cpp.o
+[383/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_lexer.dir/check_lexer.cpp.o
+[384/679] Linking CXX executable qt5/tests/check_qt5_lexer
+[385/679] Automatic MOC for target check_qt5_goostring
+[386/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_goostring.dir/check_qt5_goostring_autogen/mocs_compilation.cpp.o
+[387/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_internal_outline.dir/check_internal_outline.cpp.o
+[388/679] Linking CXX executable qt5/tests/check_qt5_internal_outline
+[389/679] Automatic MOC for target check_qt5_object
+[390/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_object.dir/check_qt5_object_autogen/mocs_compilation.cpp.o
+[391/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_goostring.dir/check_goostring.cpp.o
+[392/679] Linking CXX executable qt5/tests/check_qt5_goostring
+[393/679] Automatic MOC for target check_qt5_stroke_opacity
+[394/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_stroke_opacity.dir/check_qt5_stroke_opacity_autogen/mocs_compilation.cpp.o
+[395/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_object.dir/check_object.cpp.o
+[396/679] Linking CXX executable qt5/tests/check_qt5_object
+[397/679] Automatic MOC for target check_qt5_utf_conversion
+[398/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_utf_conversion.dir/check_qt5_utf_conversion_autogen/mocs_compilation.cpp.o
+[399/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_stroke_opacity.dir/check_stroke_opacity.cpp.o
+[400/679] Linking CXX executable qt5/tests/check_qt5_stroke_opacity
+[401/679] Automatic MOC for target check_qt5_outline
+[402/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_outline.dir/check_qt5_outline_autogen/mocs_compilation.cpp.o
+[403/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_outline.dir/check_outline.cpp.o
+[404/679] Linking CXX executable qt5/tests/check_qt5_outline
+[405/679] Automatic MOC for target check_qt5_signature_basics
+[406/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_signature_basics.dir/check_qt5_signature_basics_autogen/mocs_compilation.cpp.o
+[407/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_utf_conversion.dir/check_utf_conversion.cpp.o
+[408/679] Linking CXX executable qt5/tests/check_qt5_utf_conversion
+[409/679] Automatic MOC for target check_qt5_utf8document
+[410/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_utf8document.dir/check_qt5_utf8document_autogen/mocs_compilation.cpp.o
+[411/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_signature_basics.dir/check_signature_basics.cpp.o
+[412/679] Linking CXX executable qt5/tests/check_qt5_signature_basics
+[413/679] Automatic MOC for target check_qt5_distinguished_name_parser
+[414/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_distinguished_name_parser.dir/check_qt5_distinguished_name_parser_autogen/mocs_compilation.cpp.o
+[415/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_utf8document.dir/check_utf8document.cpp.o
+[416/679] Linking CXX executable qt5/tests/check_qt5_utf8document
+[417/679] Automatic MOC for target check_qt5_cidfontswidthsbuilder
+[418/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_cidfontswidthsbuilder.dir/check_qt5_cidfontswidthsbuilder_autogen/mocs_compilation.cpp.o
+[419/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_cidfontswidthsbuilder.dir/check_cidfontswidthsbuilder.cpp.o
+[420/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_distinguished_name_parser.dir/check_distinguished_name_parser.cpp.o
+[421/679] Linking CXX executable qt5/tests/check_qt5_cidfontswidthsbuilder
+[422/679] Linking CXX executable qt5/tests/check_qt5_distinguished_name_parser
+[423/679] Automatic MOC for target check_qt5_overprint
+[424/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_overprint.dir/check_qt5_overprint_autogen/mocs_compilation.cpp.o
+[425/679] Automatic MOC for target check_qt5_pagelabelinfo
+[426/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_pagelabelinfo.dir/check_qt5_pagelabelinfo_autogen/mocs_compilation.cpp.o
+[427/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_overprint.dir/check_overprint.cpp.o
+[428/679] Linking CXX executable qt5/tests/check_qt5_overprint
+[429/679] Automatic MOC for target check_qt5_strings
+[430/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_strings.dir/check_qt5_strings_autogen/mocs_compilation.cpp.o
+[431/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_pagelabelinfo.dir/check_pagelabelinfo.cpp.o
+[432/679] Linking CXX executable qt5/tests/check_qt5_pagelabelinfo
+[433/679] Automatic MOC for target poppler_qt5viewer
+[434/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/poppler_qt5viewer_autogen/mocs_compilation.cpp.o
+[435/679] Building CXX object qt5/tests/CMakeFiles/check_qt5_strings.dir/check_strings.cpp.o
+[436/679] Linking CXX executable qt5/tests/check_qt5_strings
+[437/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/abstractinfodock.cpp.o
+[438/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/documentobserver.cpp.o
+[439/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/embeddedfiles.cpp.o
+[440/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/fonts.cpp.o
+[441/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/info.cpp.o
+[442/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/main_viewer.cpp.o
+[443/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/metadata.cpp.o
+[444/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/navigationtoolbar.cpp.o
+[445/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/optcontent.cpp.o
+[446/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/pageview.cpp.o
+[447/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/permissions.cpp.o
+[448/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/thumbnails.cpp.o
+[449/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/toc.cpp.o
+[450/679] Building CXX object qt5/demos/CMakeFiles/poppler_qt5viewer.dir/viewer.cpp.o
+[451/679] Linking CXX executable qt5/demos/poppler_qt5viewer
+[452/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-embeddedfile.cc.o
+[453/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-document.cc.o
+[454/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-fontinfo.cc.o
+[455/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-form.cc.o
+[456/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-link.cc.o
+[457/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-link-extractor.cc.o
+[458/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-movie.cc.o
+[459/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-optcontent.cc.o
+[460/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-base-converter.cc.o
+[461/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-page.cc.o
+[462/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-pdf-converter.cc.o
+[463/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-private.cc.o
+[464/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-qiodeviceinstream.cc.o
+[465/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-ps-converter.cc.o
+[466/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-qiodeviceoutstream.cc.o
+[467/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-sound.cc.o
+[468/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-page-transition.cc.o
+[469/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-textbox.cc.o
+[470/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-media.cc.o
+[471/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-outline.cc.o
+[472/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/poppler-version.cpp.o
+[473/679] Building CXX object qt6/src/CMakeFiles/poppler-qt6.dir/QPainterOutputDev.cc.o
+[474/679] Building CXX object cpp/CMakeFiles/poppler-cpp.dir/poppler-destination.cpp.o
+[475/679] Linking CXX shared library qt6/src/libpoppler-qt6.so.3.13.0
+[476/679] Creating library symlink qt6/src/libpoppler-qt6.so.3 qt6/src/libpoppler-qt6.so
+[477/679] Automatic MOC for target test-poppler-qt6
+[478/679] Building CXX object qt6/tests/CMakeFiles/test-poppler-qt6.dir/test-poppler-qt6_autogen/mocs_compilation.cpp.o
+[479/679] Building CXX object cpp/CMakeFiles/poppler-cpp.dir/poppler-document.cpp.o
+[480/679] Building CXX object qt6/tests/CMakeFiles/test-poppler-qt6.dir/test-poppler-qt6.cpp.o
+[481/679] Automatic MOC for target test-password-qt6
+[482/679] Building CXX object qt6/tests/CMakeFiles/test-password-qt6.dir/test-password-qt6_autogen/mocs_compilation.cpp.o
+[483/679] Linking CXX executable qt6/tests/test-poppler-qt6
+[484/679] Automatic MOC for target test-render-to-file-qt6
+[485/679] Building CXX object qt6/tests/CMakeFiles/test-render-to-file-qt6.dir/test-render-to-file-qt6_autogen/mocs_compilation.cpp.o
+[486/679] Building CXX object qt6/tests/CMakeFiles/test-password-qt6.dir/test-password-qt6.cpp.o
+[487/679] Building CXX object qt6/tests/CMakeFiles/test-render-to-file-qt6.dir/test-render-to-file.cpp.o
+[488/679] Linking CXX executable qt6/tests/test-password-qt6
+[489/679] Automatic MOC for target poppler-qt6-forms
+[490/679] Building CXX object qt6/tests/CMakeFiles/poppler-qt6-forms.dir/poppler-qt6-forms_autogen/mocs_compilation.cpp.o
+[491/679] Linking CXX executable qt6/tests/test-render-to-file-qt6
+[492/679] Automatic MOC for target poppler-qt6-fonts
+[493/679] Building CXX object qt6/tests/CMakeFiles/poppler-qt6-fonts.dir/poppler-qt6-fonts_autogen/mocs_compilation.cpp.o
+[494/679] Building CXX object qt6/tests/CMakeFiles/poppler-qt6-fonts.dir/poppler-fonts.cpp.o
+[495/679] Building CXX object qt6/tests/CMakeFiles/poppler-qt6-forms.dir/poppler-forms.cpp.o
+[496/679] Linking CXX executable qt6/tests/poppler-qt6-fonts
+[497/679] Automatic MOC for target poppler-qt6-attachments
+[498/679] Building CXX object qt6/tests/CMakeFiles/poppler-qt6-attachments.dir/poppler-qt6-attachments_autogen/mocs_compilation.cpp.o
+[499/679] Linking CXX executable qt6/tests/poppler-qt6-forms
+[500/679] Automatic MOC for target stress-poppler-qt6
+[501/679] Building CXX object qt6/tests/CMakeFiles/stress-poppler-qt6.dir/stress-poppler-qt6_autogen/mocs_compilation.cpp.o
+[502/679] Building CXX object qt6/tests/CMakeFiles/poppler-qt6-attachments.dir/poppler-attachments.cpp.o
+[503/679] Linking CXX executable qt6/tests/poppler-qt6-attachments
+[504/679] Automatic MOC for target stress-poppler-dir-qt6
+[505/679] Building CXX object qt6/tests/CMakeFiles/stress-poppler-dir-qt6.dir/stress-poppler-dir-qt6_autogen/mocs_compilation.cpp.o
+[506/679] Building CXX object qt6/tests/CMakeFiles/stress-poppler-qt6.dir/stress-poppler-qt6.cpp.o
+[507/679] Linking CXX executable qt6/tests/stress-poppler-qt6
+[508/679] Automatic MOC for target stress-threads-qt6
+[509/679] Building CXX object qt6/tests/CMakeFiles/stress-threads-qt6.dir/stress-threads-qt6_autogen/mocs_compilation.cpp.o
+[510/679] Building CXX object qt6/tests/CMakeFiles/stress-poppler-dir-qt6.dir/stress-poppler-dir.cpp.o
+[511/679] Linking CXX executable qt6/tests/stress-poppler-dir-qt6
+[512/679] Automatic MOC for target poppler-qt6-texts
+[513/679] Building CXX object qt6/tests/CMakeFiles/poppler-qt6-texts.dir/poppler-qt6-texts_autogen/mocs_compilation.cpp.o
+[514/679] Building CXX object qt6/tests/CMakeFiles/stress-threads-qt6.dir/stress-threads-qt6.cpp.o
+[515/679] Linking CXX executable qt6/tests/stress-threads-qt6
+[516/679] Automatic MOC for target poppler-qt6-page-labels
+[517/679] Building CXX object qt6/tests/CMakeFiles/poppler-qt6-page-labels.dir/poppler-qt6-page-labels_autogen/mocs_compilation.cpp.o
+[518/679] Building CXX object qt6/tests/CMakeFiles/poppler-qt6-texts.dir/poppler-texts.cpp.o
+[519/679] Linking CXX executable qt6/tests/poppler-qt6-texts
+[520/679] Automatic MOC for target check_qt6_attachments
+[521/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_attachments.dir/check_qt6_attachments_autogen/mocs_compilation.cpp.o
+[522/679] Building CXX object qt6/tests/CMakeFiles/poppler-qt6-page-labels.dir/poppler-page-labels.cpp.o
+[523/679] Linking CXX executable qt6/tests/poppler-qt6-page-labels
+[524/679] Automatic MOC for target check_qt6_dateConversion
+[525/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_dateConversion.dir/check_qt6_dateConversion_autogen/mocs_compilation.cpp.o
+[526/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_attachments.dir/check_attachments.cpp.o
+[527/679] Linking CXX executable qt6/tests/check_qt6_attachments
+[528/679] Automatic MOC for target check_qt6_fonts
+[529/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_fonts.dir/check_qt6_fonts_autogen/mocs_compilation.cpp.o
+[530/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_dateConversion.dir/check_dateConversion.cpp.o
+[531/679] Linking CXX executable qt6/tests/check_qt6_dateConversion
+[532/679] Automatic MOC for target check_qt6_links
+[533/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_links.dir/check_qt6_links_autogen/mocs_compilation.cpp.o
+[534/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_fonts.dir/check_fonts.cpp.o
+[535/679] Linking CXX executable qt6/tests/check_qt6_fonts
+[536/679] Automatic MOC for target check_qt6_annotations
+[537/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_annotations.dir/check_qt6_annotations_autogen/mocs_compilation.cpp.o
+[538/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_links.dir/check_links.cpp.o
+[539/679] Linking CXX executable qt6/tests/check_qt6_links
+[540/679] Automatic MOC for target check_qt6_metadata
+[541/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_metadata.dir/check_qt6_metadata_autogen/mocs_compilation.cpp.o
+[542/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_metadata.dir/check_metadata.cpp.o
+[543/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_annotations.dir/check_annotations.cpp.o
+[544/679] Linking CXX executable qt6/tests/check_qt6_metadata
+[545/679] Linking CXX executable qt6/tests/check_qt6_annotations
+[546/679] Automatic MOC for target check_qt6_optcontent
+[547/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_optcontent.dir/check_qt6_optcontent_autogen/mocs_compilation.cpp.o
+[548/679] Automatic MOC for target check_qt6_forms
+[549/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_forms.dir/check_qt6_forms_autogen/mocs_compilation.cpp.o
+[550/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_optcontent.dir/check_optcontent.cpp.o
+[551/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_forms.dir/check_forms.cpp.o
+[552/679] Linking CXX executable qt6/tests/check_qt6_optcontent
+[553/679] Automatic MOC for target check_qt6_pagelayout
+[554/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_pagelayout.dir/check_qt6_pagelayout_autogen/mocs_compilation.cpp.o
+[555/679] Linking CXX executable qt6/tests/check_qt6_forms
+[556/679] Automatic MOC for target check_qt6_pagemode
+[557/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_pagemode.dir/check_qt6_pagemode_autogen/mocs_compilation.cpp.o
+[558/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_pagelayout.dir/check_pagelayout.cpp.o
+[559/679] Linking CXX executable qt6/tests/check_qt6_pagelayout
+[560/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_pagemode.dir/check_pagemode.cpp.o
+[561/679] Automatic MOC for target check_qt6_password
+[562/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_password.dir/check_qt6_password_autogen/mocs_compilation.cpp.o
+[563/679] Linking CXX executable qt6/tests/check_qt6_pagemode
+[564/679] Automatic MOC for target check_qt6_permissions
+[565/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_permissions.dir/check_qt6_permissions_autogen/mocs_compilation.cpp.o
+[566/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_password.dir/check_password.cpp.o
+[567/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_permissions.dir/check_permissions.cpp.o
+[568/679] Linking CXX executable qt6/tests/check_qt6_password
+[569/679] Linking CXX executable qt6/tests/check_qt6_permissions
+[570/679] Automatic MOC for target check_qt6_search
+[571/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_search.dir/check_qt6_search_autogen/mocs_compilation.cpp.o
+[572/679] Automatic MOC for target check_qt6_actualtext
+[573/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_actualtext.dir/check_qt6_actualtext_autogen/mocs_compilation.cpp.o
+[574/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_actualtext.dir/check_actualtext.cpp.o
+[575/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_search.dir/check_search.cpp.o
+[576/679] Linking CXX executable qt6/tests/check_qt6_actualtext
+[577/679] Automatic MOC for target check_qt6_lexer
+[578/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_lexer.dir/check_qt6_lexer_autogen/mocs_compilation.cpp.o
+[579/679] Linking CXX executable qt6/tests/check_qt6_search
+[580/679] Automatic MOC for target check_qt6_internal_outline
+[581/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_internal_outline.dir/check_qt6_internal_outline_autogen/mocs_compilation.cpp.o
+[582/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_lexer.dir/check_lexer.cpp.o
+[583/679] Linking CXX executable qt6/tests/check_qt6_lexer
+[584/679] Automatic MOC for target check_qt6_goostring
+[585/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_goostring.dir/check_qt6_goostring_autogen/mocs_compilation.cpp.o
+[586/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_internal_outline.dir/check_internal_outline.cpp.o
+[587/679] Linking CXX executable qt6/tests/check_qt6_internal_outline
+[588/679] Automatic MOC for target check_qt6_object
+[589/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_object.dir/check_qt6_object_autogen/mocs_compilation.cpp.o
+[590/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_goostring.dir/check_goostring.cpp.o
+[591/679] Linking CXX executable qt6/tests/check_qt6_goostring
+[592/679] Automatic MOC for target check_qt6_stroke_opacity
+[593/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_stroke_opacity.dir/check_qt6_stroke_opacity_autogen/mocs_compilation.cpp.o
+[594/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_object.dir/check_object.cpp.o
+[595/679] Linking CXX executable qt6/tests/check_qt6_object
+[596/679] Automatic MOC for target check_qt6_utf_conversion
+[597/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_utf_conversion.dir/check_qt6_utf_conversion_autogen/mocs_compilation.cpp.o
+[598/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_stroke_opacity.dir/check_stroke_opacity.cpp.o
+[599/679] Linking CXX executable qt6/tests/check_qt6_stroke_opacity
+[600/679] Automatic MOC for target check_qt6_outline
+[601/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_outline.dir/check_qt6_outline_autogen/mocs_compilation.cpp.o
+[602/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_utf_conversion.dir/check_utf_conversion.cpp.o
+[603/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_outline.dir/check_outline.cpp.o
+[604/679] Linking CXX executable qt6/tests/check_qt6_utf_conversion
+[605/679] Linking CXX executable qt6/tests/check_qt6_outline
+[606/679] Automatic MOC for target check_qt6_signature_basics
+[607/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_signature_basics.dir/check_qt6_signature_basics_autogen/mocs_compilation.cpp.o
+[608/679] Automatic MOC for target check_qt6_signature_basics_pgp
+[609/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_signature_basics_pgp.dir/check_qt6_signature_basics_pgp_autogen/mocs_compilation.cpp.o
+[610/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_signature_basics_pgp.dir/check_signature_basics_pgp.cpp.o
+[611/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_signature_basics.dir/check_signature_basics.cpp.o
+[612/679] Linking CXX executable qt6/tests/check_qt6_signature_basics_pgp
+[613/679] Linking CXX executable qt6/tests/check_qt6_signature_basics
+[614/679] Automatic MOC for target check_qt6_utf8document
+[615/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_utf8document.dir/check_qt6_utf8document_autogen/mocs_compilation.cpp.o
+[616/679] Automatic MOC for target check_qt6_distinguished_name_parser
+[617/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_distinguished_name_parser.dir/check_qt6_distinguished_name_parser_autogen/mocs_compilation.cpp.o
+[618/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_distinguished_name_parser.dir/check_distinguished_name_parser.cpp.o
+[619/679] Linking CXX executable qt6/tests/check_qt6_distinguished_name_parser
+[620/679] Automatic MOC for target check_qt6_cidfontswidthsbuilder
+[621/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_cidfontswidthsbuilder.dir/check_qt6_cidfontswidthsbuilder_autogen/mocs_compilation.cpp.o
+[622/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_utf8document.dir/check_utf8document.cpp.o
+[623/679] Linking CXX executable qt6/tests/check_qt6_utf8document
+[624/679] Automatic MOC for target check_qt6_overprint
+[625/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_overprint.dir/check_qt6_overprint_autogen/mocs_compilation.cpp.o
+[626/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_overprint.dir/check_overprint.cpp.o
+[627/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_cidfontswidthsbuilder.dir/check_cidfontswidthsbuilder.cpp.o
+[628/679] Linking CXX executable qt6/tests/check_qt6_cidfontswidthsbuilder
+[629/679] Linking CXX executable qt6/tests/check_qt6_overprint
+[630/679] Automatic MOC for target check_qt6_endoflines
+[631/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_endoflines.dir/check_qt6_endoflines_autogen/mocs_compilation.cpp.o
+[632/679] Automatic MOC for target check_qt6_pagelabelinfo
+[633/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_pagelabelinfo.dir/check_qt6_pagelabelinfo_autogen/mocs_compilation.cpp.o
+[634/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_endoflines.dir/check_endoflines.cpp.o
+[635/679] Linking CXX executable qt6/tests/check_qt6_endoflines
+[636/679] Automatic MOC for target check_qt6_strings
+[637/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_strings.dir/check_qt6_strings_autogen/mocs_compilation.cpp.o
+[638/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_pagelabelinfo.dir/check_pagelabelinfo.cpp.o
+[639/679] Linking CXX executable qt6/tests/check_qt6_pagelabelinfo
+[640/679] Automatic MOC for target poppler_qt6viewer
+[641/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/poppler_qt6viewer_autogen/mocs_compilation.cpp.o
+[642/679] Building CXX object qt6/tests/CMakeFiles/check_qt6_strings.dir/check_strings.cpp.o
+[643/679] Linking CXX executable qt6/tests/check_qt6_strings
+[644/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/abstractinfodock.cpp.o
+[645/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/documentobserver.cpp.o
+[646/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/embeddedfiles.cpp.o
+[647/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/fonts.cpp.o
+[648/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/info.cpp.o
+[649/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/main_viewer.cpp.o
+[650/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/metadata.cpp.o
+[651/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/navigationtoolbar.cpp.o
+[652/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/optcontent.cpp.o
+[653/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/pageview.cpp.o
+[654/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/permissions.cpp.o
+[655/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/thumbnails.cpp.o
+[656/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/toc.cpp.o
+[657/679] Building CXX object qt6/demos/CMakeFiles/poppler_qt6viewer.dir/viewer.cpp.o
+[658/679] Linking CXX executable qt6/demos/poppler_qt6viewer
+[659/679] Building CXX object cpp/CMakeFiles/poppler-cpp.dir/poppler-embedded-file.cpp.o
+[660/679] Building CXX object cpp/CMakeFiles/poppler-cpp.dir/poppler-global.cpp.o
+[661/679] Building CXX object cpp/CMakeFiles/poppler-cpp.dir/poppler-image.cpp.o
+[662/679] Building CXX object cpp/CMakeFiles/poppler-cpp.dir/poppler-font.cpp.o
+[663/679] Building CXX object cpp/CMakeFiles/poppler-cpp.dir/poppler-page-renderer.cpp.o
+[664/679] Building CXX object cpp/CMakeFiles/poppler-cpp.dir/poppler-page-transition.cpp.o
+[665/679] Building CXX object cpp/CMakeFiles/poppler-cpp.dir/poppler-page.cpp.o
+[666/679] Building CXX object cpp/CMakeFiles/poppler-cpp.dir/poppler-private.cpp.o
+[667/679] Building CXX object cpp/CMakeFiles/poppler-cpp.dir/poppler-rectangle.cpp.o
+[668/679] Building CXX object cpp/CMakeFiles/poppler-cpp.dir/poppler-version.cpp.o
+[669/679] Building CXX object cpp/CMakeFiles/poppler-cpp.dir/poppler-toc.cpp.o
+[670/679] Linking CXX shared library cpp/libpoppler-cpp.so.3.1.0
+[671/679] Creating library symlink cpp/libpoppler-cpp.so.3 cpp/libpoppler-cpp.so
+[672/679] Building CXX object cpp/tests/CMakeFiles/poppler-dump.dir/__/__/utils/parseargs.cc.o
+[673/679] Building CXX object cpp/tests/CMakeFiles/poppler-dump.dir/poppler-dump.cpp.o
+[674/679] Linking CXX executable cpp/tests/poppler-dump
+[675/679] Building CXX object cpp/tests/CMakeFiles/poppler-render.dir/poppler-render.cpp.o
+[676/679] Building CXX object cpp/tests/CMakeFiles/poppler-render.dir/__/__/utils/parseargs.cc.o
+[677/679] Building CXX object cpp/tests/CMakeFiles/poppler-alpha-bg-test.dir/poppler-alpha-bg-test.cpp.o
+[678/679] Linking CXX executable cpp/tests/poppler-render
+[679/679] Linking CXX executable cpp/tests/poppler-alpha-bg-test
+
+Script done on 2026-10-16 02:03:12-04:00 [COMMAND_EXIT_CODE="0"]

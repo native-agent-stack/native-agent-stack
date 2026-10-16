@@ -1,0 +1,281 @@
+Script started on 2026-10-16 02:06:22-04:00 [COMMAND="docker --config <SCRATCH>/docker-config exec final-prep-poppler-2610 ctest --test-dir /work/poppler-build --output-on-failure" <not executed on terminal>]
+Internal ctest changing into directory: /work/poppler-build
+Test project /work/poppler-build
+        Start   1: poppler-check-text
+  1/136 Test   #1: poppler-check-text .......................................   Passed    0.04 sec
+        Start   2: poppler-check-bb-shapes+attachments.pdf
+  2/136 Test   #2: poppler-check-bb-shapes+attachments.pdf ..................   Passed    0.02 sec
+        Start   3: poppler-check-bb-orientation.pdf
+  3/136 Test   #3: poppler-check-bb-orientation.pdf .........................   Passed    0.03 sec
+        Start   4: poppler-check-bb-xr01.pdf
+  4/136 Test   #4: poppler-check-bb-xr01.pdf ................................   Passed    0.02 sec
+        Start   5: poppler-check-bb-xr02.pdf
+  5/136 Test   #5: poppler-check-bb-xr02.pdf ................................   Passed    0.02 sec
+        Start   6: poppler-check-bb-russian.pdf
+  6/136 Test   #6: poppler-check-bb-russian.pdf .............................   Passed    0.02 sec
+        Start   7: poppler-check-bb-vis_policy_test.pdf
+  7/136 Test   #7: poppler-check-bb-vis_policy_test.pdf .....................   Passed    0.02 sec
+        Start   8: poppler-check-bb-searchAcrossLines.pdf
+  8/136 Test   #8: poppler-check-bb-searchAcrossLines.pdf ...................   Passed    0.02 sec
+        Start   9: poppler-check-bb-deseret.pdf
+  9/136 Test   #9: poppler-check-bb-deseret.pdf .............................   Passed    0.02 sec
+        Start  10: poppler-check-bb-fieldWithUtf16Names.pdf
+ 10/136 Test  #10: poppler-check-bb-fieldWithUtf16Names.pdf .................   Passed    0.02 sec
+        Start  11: poppler-check-bb-bug7063.pdf
+ 11/136 Test  #11: poppler-check-bb-bug7063.pdf .............................   Passed    0.02 sec
+        Start  12: poppler-check-bb-WithActualText.pdf
+ 12/136 Test  #12: poppler-check-bb-WithActualText.pdf ......................   Passed    0.02 sec
+        Start  13: poppler-check-bb-Issue637.pdf
+ 13/136 Test  #13: poppler-check-bb-Issue637.pdf ............................   Passed    0.02 sec
+        Start  14: poppler-check-bb-truetype.pdf
+ 14/136 Test  #14: poppler-check-bb-truetype.pdf ............................   Passed    0.02 sec
+        Start  15: poppler-check-bb-form_set_icon.pdf
+ 15/136 Test  #15: poppler-check-bb-form_set_icon.pdf .......................   Passed    0.02 sec
+        Start  16: poppler-check-bb-imageretrieve+attachment.pdf
+ 16/136 Test  #16: poppler-check-bb-imageretrieve+attachment.pdf ............   Passed    0.02 sec
+        Start  17: poppler-check-bb-checkbox_issue_159.pdf
+ 17/136 Test  #17: poppler-check-bb-checkbox_issue_159.pdf ..................   Passed    0.02 sec
+        Start  18: poppler-check-bb-NestedLayers.pdf
+ 18/136 Test  #18: poppler-check-bb-NestedLayers.pdf ........................   Passed    0.02 sec
+        Start  19: poppler-check-bb-A6EmbeddedFiles.pdf
+ 19/136 Test  #19: poppler-check-bb-A6EmbeddedFiles.pdf .....................   Passed    0.02 sec
+        Start  20: poppler-check-bb-latex-hyperref-checkbox-issue-655.pdf
+ 20/136 Test  #20: poppler-check-bb-latex-hyperref-checkbox-issue-655.pdf ...   Passed    0.02 sec
+        Start  21: poppler-check-bb-utf16le-annot.pdf
+ 21/136 Test  #21: poppler-check-bb-utf16le-annot.pdf .......................   Passed    0.02 sec
+        Start  22: poppler-check-bb-type3.pdf
+ 22/136 Test  #22: poppler-check-bb-type3.pdf ...............................   Passed    0.03 sec
+        Start  23: embed-png-g1
+ 23/136 Test  #23: embed-png-g1 .............................................   Passed    0.02 sec
+        Start  24: embed-png-g2
+ 24/136 Test  #24: embed-png-g2 .............................................   Passed    0.01 sec
+        Start  25: embed-png-g4
+ 25/136 Test  #25: embed-png-g4 .............................................   Passed    0.01 sec
+        Start  26: embed-png-g8
+ 26/136 Test  #26: embed-png-g8 .............................................   Passed    0.01 sec
+        Start  27: embed-png-g16
+ 27/136 Test  #27: embed-png-g16 ............................................   Passed    0.01 sec
+        Start  28: embed-png-ga8
+ 28/136 Test  #28: embed-png-ga8 ............................................   Passed    0.01 sec
+        Start  29: embed-png-ga16
+ 29/136 Test  #29: embed-png-ga16 ...........................................   Passed    0.01 sec
+        Start  30: embed-png-palette
+ 30/136 Test  #30: embed-png-palette ........................................   Passed    0.01 sec
+        Start  31: embed-png-rgb8
+ 31/136 Test  #31: embed-png-rgb8 ...........................................   Passed    0.01 sec
+        Start  32: embed-png-rgb16
+ 32/136 Test  #32: embed-png-rgb16 ..........................................   Passed    0.02 sec
+        Start  33: embed-png-rgba8
+ 33/136 Test  #33: embed-png-rgba8 ..........................................   Passed    0.02 sec
+        Start  34: embed-png-rgba16
+ 34/136 Test  #34: embed-png-rgba16 .........................................   Passed    0.01 sec
+        Start  35: embed-malformed-png
+ 35/136 Test  #35: embed-malformed-png ......................................   Passed    0.01 sec
+        Start  36: embed-jpeg
+ 36/136 Test  #36: embed-jpeg ...............................................   Passed    0.01 sec
+        Start  37: embed-malformed-jpeg
+ 37/136 Test  #37: embed-malformed-jpeg .....................................   Passed    0.01 sec
+        Start  38: signature/valid/detached.pdf
+ 38/136 Test  #38: signature/valid/detached.pdf .............................   Passed    0.02 sec
+        Start  39: signature/valid/etsi.pdf
+ 39/136 Test  #39: signature/valid/etsi.pdf .................................   Passed    0.02 sec
+        Start  40: signature/valid/etsi_esscertid_01.pdf
+ 40/136 Test  #40: signature/valid/etsi_esscertid_01.pdf ....................   Passed    0.02 sec
+        Start  41: signature/valid/etsi_esscertid_02.pdf
+ 41/136 Test  #41: signature/valid/etsi_esscertid_02.pdf ....................   Passed    0.02 sec
+        Start  42: signature/valid/etsi_esscertid_03.pdf
+ 42/136 Test  #42: signature/valid/etsi_esscertid_03.pdf ....................   Passed    0.02 sec
+        Start  43: signature/valid/sha1.pdf
+ 43/136 Test  #43: signature/valid/sha1.pdf .................................   Passed    0.02 sec
+        Start  44: signature/valid/sha1_mixed_functions.pdf
+ 44/136 Test  #44: signature/valid/sha1_mixed_functions.pdf .................   Passed    0.02 sec
+        Start  45: signature/invalid/detached_rsa_mismatch.pdf
+ 45/136 Test  #45: signature/invalid/detached_rsa_mismatch.pdf ..............   Passed    0.02 sec
+        Start  46: signature/invalid/etsi_esscertid_04.pdf
+ 46/136 Test  #46: signature/invalid/etsi_esscertid_04.pdf ..................   Passed    0.02 sec
+        Start  47: signature/invalid/etsi_esscertid_05.pdf
+ 47/136 Test  #47: signature/invalid/etsi_esscertid_05.pdf ..................   Passed    0.02 sec
+        Start  48: signature/invalid/etsi_esscertid_06.pdf
+ 48/136 Test  #48: signature/invalid/etsi_esscertid_06.pdf ..................   Passed    0.02 sec
+        Start  49: signature/invalid/etsi_esscertid_07.pdf
+ 49/136 Test  #49: signature/invalid/etsi_esscertid_07.pdf ..................   Passed    0.02 sec
+        Start  50: signature/invalid/etsi_esscertid_08.pdf
+ 50/136 Test  #50: signature/invalid/etsi_esscertid_08.pdf ..................   Passed    0.02 sec
+        Start  51: signature/invalid/etsi_esscertid_09.pdf
+ 51/136 Test  #51: signature/invalid/etsi_esscertid_09.pdf ..................   Passed    0.02 sec
+        Start  52: signature/invalid/etsi_esscertid_10.pdf
+ 52/136 Test  #52: signature/invalid/etsi_esscertid_10.pdf ..................   Passed    0.02 sec
+        Start  53: signature/invalid/etsi_esscertid_11.pdf
+ 53/136 Test  #53: signature/invalid/etsi_esscertid_11.pdf ..................   Passed    0.02 sec
+        Start  54: signature/invalid/etsi_rsa_mismatch.pdf
+ 54/136 Test  #54: signature/invalid/etsi_rsa_mismatch.pdf ..................   Passed    0.02 sec
+        Start  55: signature/invalid/mismatch_detached_vs_sha1.pdf
+ 55/136 Test  #55: signature/invalid/mismatch_detached_vs_sha1.pdf ..........   Passed    0.02 sec
+        Start  56: signature/invalid/mismatch_etsi_vs_sha1.pdf
+ 56/136 Test  #56: signature/invalid/mismatch_etsi_vs_sha1.pdf ..............   Passed    0.02 sec
+        Start  57: signature/invalid/mismatch_sha1_vs_detached.pdf
+ 57/136 Test  #57: signature/invalid/mismatch_sha1_vs_detached.pdf ..........   Passed    0.02 sec
+        Start  58: signature/invalid/sha1_rsa_mismatch.pdf
+ 58/136 Test  #58: signature/invalid/sha1_rsa_mismatch.pdf ..................   Passed    0.02 sec
+        Start  59: signature/digest_mismatch/detached_hash_mismatch.pdf
+ 59/136 Test  #59: signature/digest_mismatch/detached_hash_mismatch.pdf .....   Passed    0.02 sec
+        Start  60: signature/digest_mismatch/etsi_hash_mismatch.pdf
+ 60/136 Test  #60: signature/digest_mismatch/etsi_hash_mismatch.pdf .........   Passed    0.02 sec
+        Start  61: signature/digest_mismatch/sha1_function_mismatch.pdf
+ 61/136 Test  #61: signature/digest_mismatch/sha1_function_mismatch.pdf .....   Passed    0.02 sec
+        Start  62: signature/digest_mismatch/sha1_hash_mismatch.pdf
+ 62/136 Test  #62: signature/digest_mismatch/sha1_hash_mismatch.pdf .........   Passed    0.02 sec
+        Start  63: nss-sign-rsa-shortchain
+ 63/136 Test  #63: nss-sign-rsa-shortchain ..................................   Passed    0.04 sec
+        Start  64: nss-verify-rsa-shortchain
+ 64/136 Test  #64: nss-verify-rsa-shortchain ................................   Passed    0.02 sec
+        Start  65: nss-sign-rsa-moderatechain
+ 65/136 Test  #65: nss-sign-rsa-moderatechain ...............................   Passed    0.04 sec
+        Start  66: nss-verify-rsa-moderatechain
+ 66/136 Test  #66: nss-verify-rsa-moderatechain .............................   Passed    0.02 sec
+        Start  67: nss-sign-rsa-longchain
+ 67/136 Test  #67: nss-sign-rsa-longchain ...................................   Passed    0.04 sec
+        Start  68: nss-verify-rsa-longchain
+ 68/136 Test  #68: nss-verify-rsa-longchain .................................   Passed    0.02 sec
+        Start  69: nss-sign-rsa-monster
+ 69/136 Test  #69: nss-sign-rsa-monster .....................................   Passed    0.03 sec
+        Start  70: nss-verify-rsa-monster
+ 70/136 Test  #70: nss-verify-rsa-monster ...................................   Passed    0.02 sec
+        Start  71: nss-sign-ecdsa-shortchain
+ 71/136 Test  #71: nss-sign-ecdsa-shortchain ................................   Passed    0.02 sec
+        Start  72: nss-verify-ecdsa-shortchain
+ 72/136 Test  #72: nss-verify-ecdsa-shortchain ..............................   Passed    0.03 sec
+        Start  73: nss-sign-ecdsa-moderatechain
+ 73/136 Test  #73: nss-sign-ecdsa-moderatechain .............................   Passed    0.02 sec
+        Start  74: nss-verify-ecdsa-moderatechain
+ 74/136 Test  #74: nss-verify-ecdsa-moderatechain ...........................   Passed    0.02 sec
+        Start  75: nss-sign-ecdsa-longchain
+ 75/136 Test  #75: nss-sign-ecdsa-longchain .................................   Passed    0.02 sec
+        Start  76: nss-verify-ecdsa-longchain
+ 76/136 Test  #76: nss-verify-ecdsa-longchain ...............................   Passed    0.03 sec
+        Start  77: nss-sign-ecdsa-compressed
+ 77/136 Test  #77: nss-sign-ecdsa-compressed ................................   Passed    0.02 sec
+        Start  78: fontsubsetting-basic-test
+ 78/136 Test  #78: fontsubsetting-basic-test ................................   Passed    0.27 sec
+        Start  79: check_qt5_attachments
+ 79/136 Test  #79: check_qt5_attachments ....................................   Passed    0.04 sec
+        Start  80: check_qt5_dateConversion
+ 80/136 Test  #80: check_qt5_dateConversion .................................   Passed    0.02 sec
+        Start  81: check_qt5_fonts
+ 81/136 Test  #81: check_qt5_fonts ..........................................   Passed    0.04 sec
+        Start  82: check_qt5_links
+ 82/136 Test  #82: check_qt5_links ..........................................   Passed    0.02 sec
+        Start  83: check_qt5_annotations
+ 83/136 Test  #83: check_qt5_annotations ....................................   Passed    0.06 sec
+        Start  84: check_qt5_metadata
+ 84/136 Test  #84: check_qt5_metadata .......................................   Passed    0.04 sec
+        Start  85: check_qt5_optcontent
+ 85/136 Test  #85: check_qt5_optcontent .....................................   Passed    0.03 sec
+        Start  86: check_qt5_forms
+ 86/136 Test  #86: check_qt5_forms ..........................................   Passed    0.03 sec
+        Start  87: check_qt5_pagelayout
+ 87/136 Test  #87: check_qt5_pagelayout .....................................   Passed    0.02 sec
+        Start  88: check_qt5_pagemode
+ 88/136 Test  #88: check_qt5_pagemode .......................................   Passed    0.02 sec
+        Start  89: check_qt5_password
+ 89/136 Test  #89: check_qt5_password .......................................   Passed    0.09 sec
+        Start  90: check_qt5_permissions
+ 90/136 Test  #90: check_qt5_permissions ....................................   Passed    0.02 sec
+        Start  91: check_qt5_search
+ 91/136 Test  #91: check_qt5_search .........................................   Passed    0.09 sec
+        Start  92: check_qt5_actualtext
+ 92/136 Test  #92: check_qt5_actualtext .....................................   Passed    0.10 sec
+        Start  93: check_qt5_lexer
+ 93/136 Test  #93: check_qt5_lexer ..........................................   Passed    0.02 sec
+        Start  94: check_qt5_internal_outline
+ 94/136 Test  #94: check_qt5_internal_outline ...............................   Passed    0.03 sec
+        Start  95: check_qt5_goostring
+ 95/136 Test  #95: check_qt5_goostring ......................................   Passed    0.02 sec
+        Start  96: check_qt5_object
+ 96/136 Test  #96: check_qt5_object .........................................   Passed    0.99 sec
+        Start  97: check_qt5_stroke_opacity
+ 97/136 Test  #97: check_qt5_stroke_opacity .................................   Passed    0.03 sec
+        Start  98: check_qt5_utf_conversion
+ 98/136 Test  #98: check_qt5_utf_conversion .................................   Passed    0.02 sec
+        Start  99: check_qt5_outline
+ 99/136 Test  #99: check_qt5_outline ........................................   Passed    0.02 sec
+        Start 100: check_qt5_signature_basics
+100/136 Test #100: check_qt5_signature_basics ...............................   Passed    0.03 sec
+        Start 101: check_qt5_utf8document
+101/136 Test #101: check_qt5_utf8document ...................................   Passed    0.02 sec
+        Start 102: check_qt5_distinguished_name_parser
+102/136 Test #102: check_qt5_distinguished_name_parser ......................   Passed    0.01 sec
+        Start 103: check_qt5_cidfontswidthsbuilder
+103/136 Test #103: check_qt5_cidfontswidthsbuilder ..........................   Passed    0.01 sec
+        Start 104: check_qt5_overprint
+104/136 Test #104: check_qt5_overprint ......................................   Passed    0.03 sec
+        Start 105: check_qt5_pagelabelinfo
+105/136 Test #105: check_qt5_pagelabelinfo ..................................   Passed    0.02 sec
+        Start 106: check_qt5_strings
+106/136 Test #106: check_qt5_strings ........................................   Passed    0.02 sec
+        Start 107: check_qt6_attachments
+107/136 Test #107: check_qt6_attachments ....................................   Passed    0.04 sec
+        Start 108: check_qt6_dateConversion
+108/136 Test #108: check_qt6_dateConversion .................................   Passed    0.02 sec
+        Start 109: check_qt6_fonts
+109/136 Test #109: check_qt6_fonts ..........................................   Passed    0.04 sec
+        Start 110: check_qt6_links
+110/136 Test #110: check_qt6_links ..........................................   Passed    0.03 sec
+        Start 111: check_qt6_annotations
+111/136 Test #111: check_qt6_annotations ....................................   Passed    0.06 sec
+        Start 112: check_qt6_metadata
+112/136 Test #112: check_qt6_metadata .......................................   Passed    0.04 sec
+        Start 113: check_qt6_optcontent
+113/136 Test #113: check_qt6_optcontent .....................................   Passed    0.03 sec
+        Start 114: check_qt6_forms
+114/136 Test #114: check_qt6_forms ..........................................   Passed    0.03 sec
+        Start 115: check_qt6_pagelayout
+115/136 Test #115: check_qt6_pagelayout .....................................   Passed    0.02 sec
+        Start 116: check_qt6_pagemode
+116/136 Test #116: check_qt6_pagemode .......................................   Passed    0.02 sec
+        Start 117: check_qt6_password
+117/136 Test #117: check_qt6_password .......................................   Passed    0.09 sec
+        Start 118: check_qt6_permissions
+118/136 Test #118: check_qt6_permissions ....................................   Passed    0.02 sec
+        Start 119: check_qt6_search
+119/136 Test #119: check_qt6_search .........................................   Passed    0.10 sec
+        Start 120: check_qt6_actualtext
+120/136 Test #120: check_qt6_actualtext .....................................   Passed    0.10 sec
+        Start 121: check_qt6_lexer
+121/136 Test #121: check_qt6_lexer ..........................................   Passed    0.02 sec
+        Start 122: check_qt6_internal_outline
+122/136 Test #122: check_qt6_internal_outline ...............................   Passed    0.02 sec
+        Start 123: check_qt6_goostring
+123/136 Test #123: check_qt6_goostring ......................................   Passed    0.02 sec
+        Start 124: check_qt6_object
+124/136 Test #124: check_qt6_object .........................................   Passed    0.95 sec
+        Start 125: check_qt6_stroke_opacity
+125/136 Test #125: check_qt6_stroke_opacity .................................   Passed    0.03 sec
+        Start 126: check_qt6_utf_conversion
+126/136 Test #126: check_qt6_utf_conversion .................................   Passed    0.02 sec
+        Start 127: check_qt6_outline
+127/136 Test #127: check_qt6_outline ........................................   Passed    0.02 sec
+        Start 128: check_qt6_signature_basics
+128/136 Test #128: check_qt6_signature_basics ...............................   Passed    0.04 sec
+        Start 129: check_qt6_signature_basics_pgp
+129/136 Test #129: check_qt6_signature_basics_pgp ...........................   Passed    0.02 sec
+        Start 130: check_qt6_utf8document
+130/136 Test #130: check_qt6_utf8document ...................................   Passed    0.02 sec
+        Start 131: check_qt6_distinguished_name_parser
+131/136 Test #131: check_qt6_distinguished_name_parser ......................   Passed    0.01 sec
+        Start 132: check_qt6_cidfontswidthsbuilder
+132/136 Test #132: check_qt6_cidfontswidthsbuilder ..........................   Passed    0.01 sec
+        Start 133: check_qt6_overprint
+133/136 Test #133: check_qt6_overprint ......................................   Passed    0.03 sec
+        Start 134: check_qt6_endoflines
+134/136 Test #134: check_qt6_endoflines .....................................   Passed    0.02 sec
+        Start 135: check_qt6_pagelabelinfo
+135/136 Test #135: check_qt6_pagelabelinfo ..................................   Passed    0.02 sec
+        Start 136: check_qt6_strings
+136/136 Test #136: check_qt6_strings ........................................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 136
+
+Total Test time (real) =   5.62 sec
+
+Script done on 2026-10-16 02:06:28-04:00 [COMMAND_EXIT_CODE="0"]

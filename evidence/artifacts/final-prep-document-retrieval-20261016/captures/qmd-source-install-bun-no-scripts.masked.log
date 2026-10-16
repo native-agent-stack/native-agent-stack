@@ -1,0 +1,6 @@
+Script started on 2026-10-16 01:48:06-04:00 [COMMAND="mise exec node@24.21.0 bun@1.4.2 -- env XDG_CACHE_HOME=<SCRATCH>/qmd-cache XDG_CONFIG_HOME=<SCRATCH>/qmd-config BUN_INSTALL_CACHE_DIR=<SCRATCH>/bun-cache bun install --frozen-lockfile --ignore-scripts" <not executed on terminal>]
+bun install v1.4.2 (744846f84)
+
+Checked 228 installs across 304 packages (no changes) [62.00ms]
+
+Script done on 2026-10-16 01:48:06-04:00 [COMMAND_EXIT_CODE="0"]

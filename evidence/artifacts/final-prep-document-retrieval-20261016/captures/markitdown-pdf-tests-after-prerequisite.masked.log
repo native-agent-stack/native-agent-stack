@@ -1,0 +1,14 @@
+Script started on 2026-10-16 01:52:24-04:00 [COMMAND="<SCRATCH>/prefixes/markitdown/bin/python -m pytest --override-ini addopts= --disable-warnings -ra tests/test_pdf_memory.py" <not executed on terminal>]
+============================= test session starts ==============================
+platform linux -- Python 3.13.16, pytest-9.1.1, pluggy-1.7.0
+rootdir: <SCRATCH>/sources/markitdown/packages/markitdown
+configfile: pyproject.toml
+collecting ... 
+collecting 6 items                                                             
+collected 8 items                                                              
+
+tests/test_pdf_memory.py ........                                        [100%]
+
+========================= 8 passed in 74.50s (0:01:14) =========================
+
+Script done on 2026-10-16 01:53:39-04:00 [COMMAND_EXIT_CODE="0"]

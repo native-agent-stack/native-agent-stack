@@ -1,0 +1,5 @@
+Script started on 2026-10-16 02:07:06-04:00 [COMMAND="git ls-remote --tags https://github.com/microsoft/markitdown refs/tags/v0.1.8 refs/tags/v0.1.8^{}" <not executed on terminal>]
+c2ac3b7d55bfa3751af12f2dce5dbf62a26266cc	refs/tags/v0.1.8
+b8f79c57ebc0044be41323d89b2a45d3fda8460e	refs/tags/v0.1.8^{}
+
+Script done on 2026-10-16 02:07:06-04:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,80 @@
+Script started on 2026-10-16 01:53:53-04:00 [COMMAND="mise exec node@24.21.0 -- env XDG_CACHE_HOME=<SCRATCH>/qmd-cache QMD_CONFIG_DIR=<SCRATCH>/qmd-config <SCRATCH>/prefixes/qmd-verified/bin/qmd get qmd://vendor-smoke/api-design-principles.md" <not executed on terminal>]
+qmd://vendor-smoke/api-design-principles.md  #762e73
+---
+
+1: # API Design Principles
+2: 
+3: ## Introduction
+4: 
+5: Good API design is crucial for developer experience. This document outlines the core principles we follow when designing REST APIs.
+6: 
+7: ## Principle 1: Use Nouns, Not Verbs
+8: 
+9: URLs should represent resources, not actions. Use HTTP methods to indicate the action.
+10: 
+11: **Good:**
+12: - GET /users/123
+13: - POST /orders
+14: - DELETE /products/456
+15: 
+16: **Bad:**
+17: - GET /getUser?id=123
+18: - POST /createOrder
+19: - GET /deleteProduct/456
+20: 
+21: ## Principle 2: Use Plural Nouns
+22: 
+23: Always use plural nouns for consistency.
+24: 
+25: - /users (not /user)
+26: - /orders (not /order)
+27: - /products (not /product)
+28: 
+29: ## Principle 3: Hierarchical Relationships
+30: 
+31: Express relationships through URL hierarchy.
+32: 
+33: - GET /users/123/orders - Get all orders for user 123
+34: - GET /users/123/orders/456 - Get specific order 456 for user 123
+35: 
+36: ## Principle 4: Filtering and Pagination
+37: 
+38: Use query parameters for filtering, sorting, and pagination.
+39: 
+40: - GET /products?category=electronics&sort=price&page=2&limit=20
+41: 
+42: ## Principle 5: Versioning
+43: 
+44: Always version your APIs. We prefer URL versioning.
+45: 
+46: - /v1/users
+47: - /v2/users
+48: 
+49: ## Principle 6: Error Handling
+50: 
+51: Return consistent error responses with appropriate HTTP status codes.
+52: 
+53: ```json
+54: {
+55:   "error": {
+56:     "code": "VALIDATION_ERROR",
+57:     "message": "Email format is invalid",
+58:     "field": "email"
+59:   }
+60: }
+61: ```
+62: 
+63: ## Principle 7: Rate Limiting
+64: 
+65: Implement rate limiting and communicate limits via headers:
+66: 
+67: - X-RateLimit-Limit: 1000
+68: - X-RateLimit-Remaining: 999
+69: - X-RateLimit-Reset: 1640000000
+70: 
+71: ## Conclusion
+72: 
+73: Following these principles leads to APIs that are intuitive, consistent, and easy to maintain. Remember: the best API is one that developers can use without reading documentation.
+74: 
+
+Script done on 2026-10-16 01:53:53-04:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,5 @@
+Script started on 2026-10-16 01:48:05-04:00 [COMMAND="mise exec node@24.21.0 bun@1.4.2 -- env XDG_CACHE_HOME=<SCRATCH>/qmd-cache XDG_CONFIG_HOME=<SCRATCH>/qmd-config npm --userconfig=<SCRATCH>/npm-user.rc --globalconfig=<SCRATCH>/npm-global.rc --cache <SCRATCH>/npm-cache install --global --prefix <SCRATCH>/prefixes/qmd-verified @tobilu/qmd@2.8.3 --registry https://registry.npmjs.org --allow-scripts=node-llama-cpp,tree-sitter-go,tree-sitter-python,tree-sitter-rust,tree-sitter-typescript,tree-sitter-javascript --no-audit --no-fund" <not executed on terminal>]
+
+added 159 packages in 16s
+
+Script done on 2026-10-16 01:48:21-04:00 [COMMAND_EXIT_CODE="0"]

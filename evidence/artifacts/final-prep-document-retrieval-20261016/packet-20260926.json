@@ -1,0 +1,598 @@
+{
+ "candidates": [
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c1",
+   "name": "Docling",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/foundation-memory.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/docling-project/docling",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c2",
+   "name": "huggingface/sentence-transformers",
+   "newcomer": true,
+   "note": "The supported successor recommended by ColPali upstream offers direct page-image retrieval for charts and layouts that text extraction can lose, plus late-interaction text retrieval. It is a plausible QMD complement, provided results resolve to the original file/body. Financial retrieval gains remain unproven.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/huggingface/sentence-transformers",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "context-hub",
+   "decisions": [
+    {
+     "capability": "Retrieve selected curated developer documentation",
+     "evidence_scope": "Retained native Context Hub search/retrieval supports its selected developer-document operation.",
+     "id": "curated-developer-docs",
+     "limitations": [
+      "This is not a claim that all external documentation is current or indexed."
+     ],
+     "next_gap": "Recheck the relevant source revision when its API or requirement changes.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    }
+   ],
+   "evidence_kind": "mixed",
+   "evidence_refs": [
+    "docs/token-native-saturation.md",
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c3",
+   "name": "Context Hub",
+   "pin": "0.1.4",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "registered_receipts": [
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "component-history",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/component-history.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-native-retained-functional-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-native-retained-functional-20260920.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/andrewyng/context-hub",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.1.4",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-05-31",
+    "released_at": "2026-04-27",
+    "renamed_to": null,
+    "stars": 13983
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "poppler",
+   "decisions": [
+    {
+     "capability": "Convert supported local documents into bounded source evidence",
+     "evidence_scope": "Selected HTML conversion passed; native Poppler preserved three designed PDF pages, twenty-four cells and twelve positive/absent queries on Mac and WSL.",
+     "id": "source-document-conversion",
+     "limitations": [
+      "Base MarkItDown HTML acceptance does not imply optional PDF/Office extras.",
+      "The designed born-digital PDF fixture does not qualify OCR, arbitrary layouts or semantic retrieval."
+     ],
+     "next_gap": "Freeze a representative layout/OCR protocol before extending the claim.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c4",
+   "name": "Poppler",
+   "pin": "26.09.0",
+   "pin_behind_upstream": null,
+   "recipe_ref": "blueprints/convergence-practice/document-ingestion/README.md",
+   "registered_receipts": [
+    {
+     "id": "mac-native-document-ingestion-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/convergence-practice/document-ingestion/receipt.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "wsl-document-ingestion-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/wsl-document-ingestion-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/tsdgeos/poppler_mirror",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": null,
+    "license": "GPL-2.0",
+    "prerelease": null,
+    "pushed_at": "2026-09-13",
+    "released_at": null,
+    "renamed_to": null,
+    "stars": 61
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c5",
+   "name": "LlamaIndex",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/foundation-memory.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/run-llama/llama_index",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c6",
+   "name": "opendatalab/mineru",
+   "newcomer": true,
+   "note": "The winners leave OCR, inferred layouts, arbitrary filings and MarkItDown's PDF/Office extras unqualified. Poppler acceptance covers only designed born-digital Latin pages. MinerU 4.0 (4.0.0 released 2026-09-16, 4.0.7 on 2026-09-23) is a local-first agent CLI. It parses PDFs, scans, DOC/DOCX, PPT/PPTX, XLS/XLSX, HTML/MHTML, EPUB and CSV in four tiers (flash, basic, standard, advanced) and keeps a local document library with `mineru find`/`search`. `mineru read` returns stable citation locators (doc:{id}/tier/page/block) plus page or block images, so an agent can re-read the original page or block before relying on a hit. That is this layer's read-the-original contract, which qmd+Poppler meets only for text. Default install: ONNX CPU small models plus a llama.cpp VLM. mineru[full] targets NVIDIA, and the default package is already the recommended one on macOS. Documents go remote only with an explicit --remote, and a local failure never falls back to remote. Measured: MinerU2.5-Pro-2605-1.2B (Apache-2.0 weights) scores 95.75 on OmniDocBench v1.6, a benchmark authored by the same lab (bias flagged). A competitor-run olmOCR-bench gives the MinerU pipeline 72.7 overall and 83.3 on born-digital pages. Flags: the code license is Apache-2.0 plus extra terms (a commercial licence is needed above 100M MAU or USD 20M monthly revenue; online services must give attribution; the licence terminates automatically on breach). Telemetry uploads stop only when explicitly disabled. The library needs a `mineru server` process to be managed. Patches ship at a high rate (8 releases in 8 days), so any trial pins an exact patch.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/opendatalab/mineru",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c7",
+   "name": "cinnamon/kotaemon",
+   "newcomer": true,
+   "note": "No gap is demonstrated; it is rejected. kotaemon is a Gradio chat-with-your-documents application. It delegates parsing to other loaders: its latest commit, 2026-05-30, added PaddleOCR loaders. It needs an LLM provider for answers, and a 2026-03-28 commit set a Cohere hosted reranker as the default. It publishes no retained retrieval benchmark. The default branch has no commits since 2026-05-30; v0.12.0 was released 2026-05-31. Decisive reason: it is an end-user RAG UI that duplicates qmd retrieval with a heavier, LLM-dependent stack, and development has stalled. The parsers it wraps (PaddleOCR, docling) are assessed directly above.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/cinnamon/kotaemon",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "markitdown",
+   "decisions": [
+    {
+     "capability": "Convert supported local documents into bounded source evidence",
+     "evidence_scope": "Selected HTML conversion passed; native Poppler preserved three designed PDF pages, twenty-four cells and twelve positive/absent queries on Mac and WSL.",
+     "id": "source-document-conversion",
+     "limitations": [
+      "Base MarkItDown HTML acceptance does not imply optional PDF/Office extras.",
+      "The designed born-digital PDF fixture does not qualify OCR, arbitrary layouts or semantic retrieval."
+     ],
+     "next_gap": "Freeze a representative layout/OCR protocol before extending the claim.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c8",
+   "name": "MarkItDown",
+   "pin": "0.1.8",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "registered_receipts": [
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "component-history",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/component-history.json"
+    },
+    {
+     "id": "markitdown-018-qualification-20260925",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/markitdown-018-qualification-20260925.json"
+    },
+    {
+     "id": "portable-cli-artifacts",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/portable-cli-artifacts.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-practice-artifacts-20260920",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/microsoft/markitdown",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.1.8",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 187046
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "qmd",
+   "decisions": [
+    {
+     "capability": "Reproduce native context-tool commands in a clean CI environment",
+     "evidence_scope": "Local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks; retained artifact/source hashes matched.",
+     "id": "clean-token-tool-ci",
+     "limitations": [
+      "CI acceptance covers these four tool fixtures, not live providers, GPU execution or a full new-PC stack."
+     ],
+     "next_gap": "Extend a specific missing native-tool CI behavior only with its own useful fixture.",
+     "review_status": "accepted_within_scope",
+     "selection": "conditional"
+    },
+    {
+     "capability": "Resolve persistent native command and MCP environments",
+     "evidence_scope": "Fresh native processes resolved selected commands/MCP servers and Claude startup hooks; restarted Desktop source retrieval has its own dated receipt.",
+     "id": "native-process-defaults",
+     "limitations": [
+      "Configuration presence does not prove an already-running task hot-reloaded it.",
+      "The Linux/WSL and Desktop process/configuration boundaries remain distinct."
+     ],
+     "next_gap": "Collect the specific new-host or changed-session activation evidence; do not copy account stores.",
+     "review_status": "accepted_within_scope",
+     "selection": "default"
+    },
+    {
+     "capability": "Search and read a named local Markdown corpus",
+     "evidence_scope": "Native scoped QMD search/get passed; the fixed twelve-query benchmark returned the intended source in eight top-three results. The current-clone catalog repair returned both selected handbook sources first, with exact source bodies and independent configuration review.",
+     "id": "scoped-document-bm25",
+     "limitations": [
+      "All four benchmark misses remain; exact source retrieval on a fixture does not establish arbitrary corpus recall.",
+      "The selected BM25 lane needs no downloaded embedding model."
+     ],
+     "next_gap": "Evaluate positive and absent queries for a new corpus.",
+     "review_status": "accepted_within_scope",
+     "selection": "default"
+    }
+   ],
+   "evidence_kind": "measured_comparison",
+   "evidence_refs": [
+    "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+    "docs/foundation-rd-readiness.md"
+   ],
+   "key": "c9",
+   "name": "QMD BM25",
+   "pin": "2.8.3",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "registered_receipts": [
+    {
+     "id": "native-research-efficiency-20260920",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/us-equities/research-efficiency/native-receipt.json"
+    },
+    {
+     "id": "qmd-bm25-retrieval-20260919",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/us-equities/retrieval-evaluation/receipt.json"
+    },
+    {
+     "id": "claude-host-practice-readback-20260928",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-host-practice-readback-20260928.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "codex-desktop-live-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/codex-desktop-live-20260920.json"
+    },
+    {
+     "id": "component-history",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/component-history.json"
+    },
+    {
+     "id": "desktop-cli-workflows",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/desktop-cli-workflows.json"
+    },
+    {
+     "id": "foundation-native-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-native-20260920.json"
+    },
+    {
+     "id": "foundation-rd-20260921",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/foundation-rd-20260921.json"
+    },
+    {
+     "id": "full-stack-convergence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/full-stack-convergence-20260921.json"
+    },
+    {
+     "id": "memory-landscape-lifecycle-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/memory-landscape-lifecycle-20260921.json"
+    },
+    {
+     "id": "native-catalog-retrieval-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-catalog-retrieval-20260920.json"
+    },
+    {
+     "id": "native-cli-gaps",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-cli-gaps.json"
+    },
+    {
+     "id": "native-dashboard-data-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-dashboard-data-20260921.json"
+    },
+    {
+     "id": "native-memory-rag-alignment-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-memory-rag-alignment-20260921.json"
+    },
+    {
+     "id": "native-returned-results-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-returned-results-20260921.json"
+    },
+    {
+     "id": "native-session-defaults-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-session-defaults-20260920.json"
+    },
+    {
+     "id": "native-token-ci-github-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-ci-github-20260920.json"
+    },
+    {
+     "id": "native-token-ci-local-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/native-token-ci-local-20260920.json"
+    },
+    {
+     "id": "portable-userspace-install-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/portable-userspace-install-20260921.json"
+    },
+    {
+     "id": "sota-convergence-20260922",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/sota-convergence-20260922.json"
+    },
+    {
+     "id": "token-practice-artifacts-20260920",
+     "kind": "artifact_measurement",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    },
+    {
+     "id": "wsl-retrieval-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/wsl-retrieval-20260920.json"
+    },
+    {
+     "id": "wsl-retrieval-retirement-20261003",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/wsl-retrieval-retirement-20261003.json"
+    }
+   ],
+   "repository": "https://github.com/tobi/qmd",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.8.3",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-09",
+    "released_at": "2026-08-16",
+    "renamed_to": null,
+    "stars": 30039
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c10",
+   "name": "arabold/docs-mcp-server",
+   "newcomer": true,
+   "note": "context-hub, the curated-developer-docs winner, keeps its curated content as Markdown in its own repository. That repository has no default-branch commits since 2026-06-27 (last push 2026-05-31; last release v0.1.4 on 2026-04-27), so its curated docs are not being refreshed upstream, and coverage is limited to what its registry authors choose. docs-mcp-server ('Grounded Docs', MIT, v3.2.0 on 2026-09-21) builds a private, local, version-specific index from official docs sites, GitHub repositories, local folders and zip archives. It is CLI-first, ships Agent Skills, and exposes an MCP endpoint. Search is full-text by default; embeddings are optional and Ollama is supported, so no credentials are needed. It also probes llms.txt. North-star docs (NautilusTrader 2.0, IBKR, Alpaca SDKs) could be grounded from their primary sources rather than a third-party registry. Flags: it documents telemetry, it needs Node/npx plus Playwright for hash-routed sites, and no measured quality comparison exists.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/arabold/docs-mcp-server",
+   "review_status": null,
+   "upstream": null
+  }
+ ],
+ "catalog": "foundation",
+ "checked_at": "2026-10-16",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "A sealed representative corpus/query set shows useful quality gains with acceptable repeated end-to-end latency, or layout/OCR failures justify a separately qualified parser.",
+ "group": null,
+ "layer_id": "document-retrieval",
+ "limitations": [
+  "The QMD diagnostic used one ordered run and an incompletely sealed expanded index; it is not a general retrieval ranking.",
+  "HTML/PDF fixtures do not qualify arbitrary Office documents, scans, tables or filing layouts. Context Hub's retained size comparison grew by 85 tokens."
+ ],
+ "registered_receipts_note": "registered_receipts lists the receipts manifests/evidence.json registers for a candidate's component: matched_by component_id when the receipt names its id, alias when it names the same component under its manifests/stack.json spelling, repository when the receipt names the only registered component with its repository and no other manifest component shares that repository. A receipt may name several components, and its kind is the registrant's label, not a checked evidence class: open it and judge what it actually ran for this component, as for evidence_refs.",
+ "requirement": "Find source-grounded Markdown/document content with controlled ingestion and retrieve the original body before relying on a result.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories. Read only the packet and files under the repository root: no memory stores, code indexes, MCP tools, web search, git history, or other checkouts or work directories, which can carry the verdict you must reach.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. Adoption, incumbency, installation, retained-control status, receipt count, packet position, license, stars and popularity are not evidence of fit; choose among adopted candidates on what their evidence shows was run. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Documents and ingestion",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale"
+ ]
+}

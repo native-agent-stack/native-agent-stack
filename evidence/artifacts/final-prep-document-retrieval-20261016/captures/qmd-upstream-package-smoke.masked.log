@@ -1,0 +1,13 @@
+Script started on 2026-10-16 01:48:50-04:00 [COMMAND="mise exec node@24.21.0 bun@1.4.2 -- env CI=true XDG_CACHE_HOME=<SCRATCH>/qmd-cache QMD_CONFIG_DIR=<SCRATCH>/qmd-config node scripts/package-smoke.mjs" <not executed on terminal>]
+==> build compiled package
+==> AST grammar runtime packages
+ok tree-sitter-typescript/tree-sitter-typescript.wasm -> <SCRATCH>/sources/qmd/node_modules/tree-sitter-typescript/tree-sitter-typescript.wasm
+ok tree-sitter-typescript/tree-sitter-tsx.wasm -> <SCRATCH>/sources/qmd/node_modules/tree-sitter-typescript/tree-sitter-tsx.wasm
+ok tree-sitter-python/tree-sitter-python.wasm -> <SCRATCH>/sources/qmd/node_modules/tree-sitter-python/tree-sitter-python.wasm
+ok tree-sitter-go/tree-sitter-go.wasm -> <SCRATCH>/sources/qmd/node_modules/tree-sitter-go/tree-sitter-go.wasm
+ok tree-sitter-rust/tree-sitter-rust.wasm -> <SCRATCH>/sources/qmd/node_modules/tree-sitter-rust/tree-sitter-rust.wasm
+==> compiled CLI under Node
+==> package wrapper
+==> compiled CLI under Bun
+
+Script done on 2026-10-16 01:48:54-04:00 [COMMAND_EXIT_CODE="0"]
