@@ -205,9 +205,23 @@
             "url": {
               "$ref": "#/$defs/url"
             },
+            "repository": {
+              "$ref": "#/$defs/url"
+            },
+            "pin": {
+              "$ref": "#/$defs/text"
+            },
+            "pin_kind": {
+              "const": "model"
+            },
             "read_at": {
               "$ref": "#/$defs/time"
             }
+          },
+          "dependentRequired": {
+            "repository": ["pin"],
+            "pin": ["repository"],
+            "pin_kind": ["repository", "pin"]
           }
         },
         {
@@ -223,7 +237,21 @@
             },
             "path": {
               "$ref": "#/$defs/path"
+            },
+            "repository": {
+              "$ref": "#/$defs/url"
+            },
+            "pin": {
+              "$ref": "#/$defs/text"
+            },
+            "pin_kind": {
+              "const": "model"
             }
+          },
+          "dependentRequired": {
+            "repository": ["pin"],
+            "pin": ["repository"],
+            "pin_kind": ["repository", "pin"]
           }
         }
       ]

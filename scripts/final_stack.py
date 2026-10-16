@@ -1074,7 +1074,7 @@ def build_document(root: Path) -> dict:
             "source": entry["source"],
             "status": layer_status(bool(covering), state if is_landscape else None, convergence),
             "terminal_state": resolved_terminal,
-            "angles": angle_records.summary(angle_inputs.get(key)),
+            "angles": angle_records.summary(angle_inputs.get(key), sources=sources),
             "verdict": build_verdict(row, matrix_row, registry, reopened_by, root=root) if is_landscape else None,
             "winners": winners,
             "alternates": [{field: alternative.get(field) for field in

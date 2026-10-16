@@ -28,8 +28,9 @@ URLs first pass jsonschema's supported RFC 3986 validator, pinned as the require
 `rfc3986-validator==0.1.1` dependency in `.github/requirements-ci.txt`, then
 CPython's URL parser checks the scheme, host, userinfo and port. Direct URI
 validation remains active when optional `FormatChecker` registrations are
-absent; clean errors never echo a rejected value. A screened candidate needs a resolved full commit
-or release identity; unknown, whitespace and malformed pins cannot qualify A1.
+absent; clean errors never echo a rejected value. A screened candidate needs a
+resolved full commit, release identity or explicitly sourced versioned model
+identity; unknown, whitespace and malformed pins cannot qualify A1.
 
 | Angle | Meaning | Default weight |
 | --- | --- | --- |
@@ -89,6 +90,31 @@ registered exact mirror commits with lazy fetch and optional locks disabled.
 UNMIRRORED and unresolved pins remain explicit gaps. Private coordination
 inputs, account details and their digests are not publication sources.
 
+A screened A1 needs at least one citation whose `repository` and `pin` equal
+the candidate's complete current values. A repository citation already names
+both. A URL or receipt citation can additionally record those two fields;
+they must be present together. This binding includes release text and any
+recorded source commit. Changing the repository or pin while retaining the
+old citations refuses validation and derives `INSUFFICIENT`.
+
+For a provider model, the bound URL or receipt citation also declares
+`pin_kind: model`. Exact provider snapshots, including historical IDs, are
+documented at the pinned SDK sources and official snapshot/versioning references in the
+[identity decision](../../../docs/decisions/2026-10-15-a1-identity-binding.md).
+Floating aliases, unverified names, and model-typed software version strings
+cannot pass. Adding another snapshot requires its pinned provider evidence;
+a numeric name is insufficient. An older exactly pinned snapshot is not
+refused for age; currency is separate maintenance, with no age or generation
+cutoff here. A citation for a different recognized snapshot reports a
+current-identity mismatch.
+
+For a receipt, the native source loader must read the receipt's own repository
+and full pin, which must match the candidate. Relabelling a foreign receipt
+does not bind it, and derivation without a loader cannot count receipt-only
+A1 evidence. These checks do not contact a provider, authenticate a page,
+prove capability, or complete a screen. Existing unscreened routes retain
+their evidence gaps.
+
 A2 retains OpenSSF Scorecard's published result plus GitHub release and CI
 snapshots. A missing Scorecard result remains a gap. Its assessed commit can
 also differ from the capability pin. A3 uses deps.dev's project fields; a
@@ -108,7 +134,13 @@ records those artifacts' hashes; it does not reproduce an upstream metric.
 A comparative flag over a smoke receipt fails the check. No initial record
 claims this comparative evidence.
 
-## FINAL is an explicit, separately checked state
+## Historical FINAL contract (inactive during redesign)
+
+The rules in this section are inactive. The current generation and admission
+entry points refuse every FINAL claim with `admission under redesign`; see
+[`landscape.refuse_final` at 0d87fdae](https://github.com/native-agent-stack/native-agent-stack/blob/0d87fdae8b19fc4825401d8bf03c687a301f9e98/scripts/landscape.py#L26-L29).
+The separate evidence-qualification work does not authorize admission. These
+historical predicates must not be used as a current acceptance policy.
 
 The existing component-matrix `current` and `converged` statuses remain
 distinct from the protocol's `FINAL`. A landscape row or its angle record

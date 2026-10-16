@@ -1037,7 +1037,9 @@ def _angle_fixture() -> dict:
             "verdict": "CONVERGED", "provisional": True, "measure_next": None,
             "angles": {angle: {"score": "+" if angle != "A6" else "U", "read_at": stamp,
                                 "sources": [{"kind": "url", "url": "https://example.org/fixture",
-                                             "read_at": stamp}] if angle != "A6" else [],
+                                             "read_at": stamp,
+                                             **({"repository": "https://github.com/example/widget", "pin": COMMIT_A}
+                                                if angle == "A1" else {})}] if angle != "A6" else [],
                                 "note": "Synthetic source control."}
                        for angle in ("A1", "A2", "A3", "A4", "A5", "A6")},
         }],
@@ -1217,6 +1219,23 @@ class AngleEnforcementTests(FixtureTestCase):
         document = fs.build_document(root)
         self.assertTrue(all(p in document["sources"] for p in native_paths))
         self.assertFalse(self.layer(document, "layer-a")["angles"]["candidates"][0]["provisional"])
+
+    def test_a1_receipt_identity_is_preserved_in_the_native_summary(self):
+        root, path, record = self.prepare()
+        candidate = record["candidates"][0]
+        receipt = "evidence/artifacts/fixture/a1.json"
+        candidate["angles"]["A1"]["sources"] = [{
+            "kind": "receipt", "path": receipt,
+            "repository": candidate["repository"], "pin": candidate["pin"],
+        }]
+        _write_json(root / receipt, {"repository": candidate["repository"], "pin": candidate["pin"]})
+        _write_json(path, record)
+        document = fs.build_document(root)
+        self.assertEqual(self.layer(document, "layer-a")["angles"]["candidates"][0]["verdict"], "CONVERGED")
+        self.assertIn(receipt, document["sources"])
+        _write_json(root / receipt, {"repository": candidate["repository"], "pin": COMMIT_B})
+        with self.assertRaisesRegex(fs.FinalStackError, "A1 evidence.*current repository and pin"):
+            fs.build_document(root)
 
 
 class RepositoryTests(unittest.TestCase):
