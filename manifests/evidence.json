@@ -11568,8 +11568,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "1d617390cb65971935836b0a5732155ca7748f9ff79fe1223bbb9480d512fad8",
-      "bytes": 1256
+      "sha256": "e4bd91b86d2d6cfe56e0c9a07de5a6bf2141c9c1f717bcb00760bf4c55ea6613",
+      "bytes": 1364
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11635,6 +11635,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261014-pr1094-rebase-delta.json",
       "sha256": "5f81fe355c0fc06bff935047a6ea27ef16588917a9a537710d7692a0e1ec5872",
       "bytes": 16981
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261016-pr1201-delta.json",
+      "sha256": "81539f7995c93ad9f413918021f2f81721454e7bf3a2ed360eb74da439a9448a",
+      "bytes": 55094
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -19353,8 +19358,8 @@
     },
     {
       "path": "docs/decisions/2026-10-16-model-route-currency-consistency.md",
-      "sha256": "bd6dd83f6420e381d54adc25dfd0dbae97dc29735038e3718d2a9f2b8973eb7b",
-      "bytes": 14919
+      "sha256": "a29f51eb8e12f6e6c363b312ce54870c01ca09cbc2499a6d99e194207b422f20",
+      "bytes": 15688
     },
     {
       "path": "docs/decisions/2026-10-16-nautilus-rc5-run-source-pin.md",
@@ -63053,8 +63058,8 @@
     },
     {
       "path": "scripts/verdict_review_gate.py",
-      "sha256": "e93527dc1ecb9a67c90254d5f6a21293e36e7aa5a1e1dee45b7e42a4eaba5db7",
-      "bytes": 100431
+      "sha256": "8e9b5f66dbc6a26b494f3411ddf953ea58ba0cc47a6bc5d3e54fb9c054e69d90",
+      "bytes": 100463
     },
     {
       "path": "scripts/verify_nautilus_ci.py",

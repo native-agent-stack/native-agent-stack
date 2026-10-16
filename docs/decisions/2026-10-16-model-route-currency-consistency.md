@@ -53,6 +53,17 @@ The union of route and component identities must equal the retained `discovery["
 
 Component-only proposals such as the gateway reference an existing package row. A component-only table may omit `routes`. GitHub identity comparisons reuse `scripts/host_receipts.py`'s `normalize_repository()`; this accepts case and equivalent URL forms while retaining the exact proposal spelling for coverage. PyPI project names use the existing `scripts/starred_protected.py::package_name()` PEP 503 normalizer: lowercase and collapse runs of `.`, `_`, and `-` to `-`. Scheme, host and project-path shape are still checked, and exact retained proposal spelling remains the separate coverage key. A model route cannot be relabeled as an unrelated component to bypass its row reference. Missing fields fail consistency; an older selected model still passes with a notice. The table also follows the ordinary evidence-registration rules.
 
+That normalizer dependency is declared in the verdict gate's `TRUST_PATHS`. The
+native advisory observation is appended under the existing
+[dated-delta contract](../../blueprints/runtime-workers/openhands/evidence/advisory-gate-deltas.md),
+using `GitTree` and `derive_ci_protected` at published commit
+`cc308901f327b04cdd47c356d0726b00c88f0f07`. It derives 354 entries, including
+one new conservative entry at `scripts/starred_protected.py:71`. This is static
+accounting for the imported module's path-shape helper, not a claim that the
+normalizer executes it or reads a filesystem path. Earlier baselines/deltas
+remain unchanged, and the advisory grants no execution permission. Both existing
+inventory checks failed before these registrations and passed after them.
+
 ## Inventory refresh proposal
 
 Add held entries for GPT-6 Luna, Claude Haiku 5.5, Muse Wonder, Muse Wonder Full and hosted Muse Spark 1.3. The [source record](../../evidence/artifacts/model-route-currency-consistency-20261016/sources.json) retains the provider model pins, dated launch sources and bounded public excerpts.
