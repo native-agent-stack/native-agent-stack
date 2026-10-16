@@ -574,6 +574,12 @@ PUBLIC_DIGESTS = {
         "github/docs@be38ec5d:content/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners.md",
     "b5451303e7dab0894f4d7eaa51cb3dc71694586f7ac1304206f36ef456b988cf": "github/docs@be38ec5d:src/rest/data/fpt-2022-11-28/deployments.json",
     "6d62454c79ea8c3527fe78cee53dc0d5919f094d35176986207950cbd80c96e2": "git/git@v2.53.0:Documentation/git-interpret-trailers.adoc",
+    # #1194's reads (2026-10-16): the ruleset's required status checks (the local upstream mirror, clean at github/docs@be38ec5d), and
+    # horizon_land.sh as #1194's first head published it, which the pull request's body cites
+    "1d1dad8bfbc0cc3ec1905193b12292d4e6e780c6ec9d3db7ee0f4b154d24f00b":
+        "github/docs@be38ec5d:content/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.md",
+    "3320c5ab0a312307fa47487a8d154f3fb138b32db41d1bcf1f54bf25f8582ce3": "native-agent-stack/native-agent-stack@34add438:tools/landing/horizon_land.sh, "
+        "https://github.com/native-agent-stack/native-agent-stack/blob/34add43827b7516de8f8b19d8cb92f473e374849/tools/landing/horizon_land.sh",
 }
 
 
@@ -604,6 +610,14 @@ PUBLIC_COMMITS = {
     "67ad42147a7acc2af6074753ebd03d904476118f": "git/git: the upstream mirror",
     "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd": "cli/cli: the upstream mirror",
     "f359d43b406057f1a8cdbc4ea93b827642c162e6": "anthropics/claude-plugins-official",
+    # #1194 (horizon_land.sh), each read on GitHub on 2026-10-16 with `gh api repos/native-agent-stack/native-agent-stack/commits/<id>` (#1194's
+    # GPT read, P3: the pull request body's guard refused the pull request's own public commits)
+    "8053f14e7e0817d2502dff2bb284bfb7e1b0152f": "native-agent-stack/native-agent-stack: #1194's base, "
+                                                "https://github.com/native-agent-stack/native-agent-stack/commit/8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+    "a93ba0b8c289bbcc1ba43c8a044c0f50ffc32e52": "native-agent-stack/native-agent-stack: main at #1194's first reads, "
+                                                "https://github.com/native-agent-stack/native-agent-stack/commit/a93ba0b8c289bbcc1ba43c8a044c0f50ffc32e52",
+    "34add43827b7516de8f8b19d8cb92f473e374849": "native-agent-stack/native-agent-stack: #1194's first head, "
+                                                "https://github.com/native-agent-stack/native-agent-stack/commit/34add43827b7516de8f8b19d8cb92f473e374849",
 }
 HEX_FULL = re.compile(r"(?<![0-9A-Fa-f])[0-9A-Fa-f]{64}(?![0-9A-Fa-f])")
 HEX_MARKED = re.compile(r"(?<![0-9A-Fa-f])([0-9A-Fa-f]{6,})…")  # a prefix written `<hex>…`
@@ -1208,6 +1222,9 @@ class ScriptTextTests(LandingCase):
                                                       "HZ_POSTED=1", 'hz_post "$CTX_CI" "$D_CI"', 'hz_post "$CTX_CLAUDE" "$D_CLAUDE"',
                                                       'hz_post "$CTX_GPT" "$D_GPT"'])
         self.assertEqual(sum(1 for line in lines if line.startswith("trap ")), 4)
+        # #1194's CC read, P3: the revocation ignores a second HUP, INT or TERM, its first statement
+        revoke = lines.index("hz_revoke() {")
+        self.assertEqual(lines[revoke + 1], "  trap '' HUP INT TERM")
         self.assertEqual(sum(1 for line in lines if "--method POST" in line and not line.lstrip().startswith("#")), 2, "hz_post and hz_revoke")
         merge = next(i for i, line in enumerate(lines) if line.startswith("out=$(gh pr merge "))
         self.assertEqual(lines[merge + 1], "HZ_MERGED=1")
@@ -1225,7 +1242,12 @@ class ScriptTextTests(LandingCase):
         for cited in ("api.github.com.json:79201-79205", "commits.json:10906", "deployments.json:6234", "api.github.com.json:79208",
                       "api.github.com.json:79150-79214", "pkg/cmd/api/api.go:104-110, :293, :295, :329-331", "about-code-owners.md:36, :44",
                       "api.github.com.json:53272-53329", ":147966-147968", '"Any trap on EXIT is executed before', "until the command completes",
-                      "nas_land.sh:392-404", "nas_land.sh:365-372", "nas_land.sh:174-176", "nas_land.sh:673-674", "merge.go:146-153"):
+                      "nas_land.sh:392-404", "nas_land.sh:365-372", "nas_land.sh:174-176", "nas_land.sh:673-674", "merge.go:146-153",
+                      # #1194's reads: the ruleset's mechanics, the base, the merge state's enum and the PROPOSAL label
+                      "available-rules-for-rulesets.md:188-193", "(:176)", "(:178)", "about-code-owners.md:44", "http.go:47-50, :77-80",
+                      "schema.docs.graphql:26511-26554", "(:26551-26553)", "measured on us-equities-trading #58, not documented by GitHub",
+                      "PROPOSAL (the enforcement design of #1195's decision record",
+                      "docs/decisions/2026-10-15-horizon-runtime-ecosystem-repository.md"):
             with self.subTest(cited=cited):
                 self.assertIn(cited, " ".join(line.lstrip("# ") for line in self.horizon.lines))
 
@@ -4707,17 +4729,18 @@ class HorizonEndToEndTests(LandingCase):
             git(self.repo, "update-ref", "refs/remotes/origin/main", self.main)
 
     def land(self, *, head=None, read=None, args=None, merge_state="CLEAN", draft=False, statuses=None, claude=None, gpt=None, muse=None,
-             receipts=None, unset=(), main=None, **extra):
+             receipts=None, unset=(), main=None, base="main", coord=None, **extra):
         """Run horizon_land.sh; returns (exit code, stdout+stderr, the fake commands' log lines, the run directory). The verdicts and the
-        receipt default to accepted ones for the read head (default: the head served); `unset` names inputs to leave out, and `main` is
-        origin's main for the run."""
+        receipt default to accepted ones for the read head (default: the head served); `unset` names inputs to leave out, `main` is
+        origin's main for the run and `base` the pull request's base. LANDING_COORD is the run's own (`coord` overrides it), since a merged
+        landing leaves its receipt there, one for each pull request and head."""
         run = self.dir / f"horizon-run-{next(self.counter)}"
         run.mkdir()
         head = head or self.head
         read = read or head
-        (run / "prview.json").write_text(json.dumps({"headRefOid": head, "isDraft": draft, "mergeStateStatus": merge_state, "statusCheckRollup": [],
-                                                     "state": "MERGED", "mergeCommit": {"oid": "f" * 40}, "mergedAt": "2026-10-15T00:00:00Z"}),
-                                         encoding="utf-8")
+        (run / "prview.json").write_text(json.dumps({"headRefOid": head, "baseRefName": base, "isDraft": draft, "mergeStateStatus": merge_state,
+                                                     "statusCheckRollup": [], "state": "MERGED", "mergeCommit": {"oid": "f" * 40},
+                                                     "mergedAt": "2026-10-15T00:00:00Z"}), encoding="utf-8")
         (run / "statuses.json").write_text(json.dumps(statuses or []), encoding="utf-8")
         files = {"claude.md": f"# Claude read\n\nFamily: claude\nVerdict: PASS at {read}\n" if claude is None else claude,
                  "gpt.md": f"# GPT read\n\nFamily: gpt\nVerdict: PASS at {read}\n" if gpt is None else gpt,
@@ -4732,7 +4755,7 @@ class HorizonEndToEndTests(LandingCase):
         settings = {key: value for key, value in {**inputs, **extra}.items() if key not in unset}
         environment = self.env(**{"HOME": str(self.home), "FAKE_LOG": str(run / "log"), "FAKE_PRVIEW": str(run / "prview.json"),
                                   "FAKE_STATUSES": str(run / "statuses.json"), "LANDING_HORIZON_REPO": str(self.repo),
-                                  "LANDING_COORD": str(self.dir / "coord"), "TMPDIR": str(run), **settings})
+                                  "LANDING_COORD": str(coord or run / "coord"), "TMPDIR": str(run), **settings})
         with self.on_main(main or self.main):
             done = subprocess.run([str(self.horizon.path), *(args if args is not None else [PR, read[:12]])], capture_output=True, text=True,
                                   env=environment, cwd=self.dir, timeout=120)
@@ -4762,13 +4785,24 @@ class HorizonEndToEndTests(LandingCase):
         self.assertEqual((code, self.posts(log, "success"), self.merges(log)), (expected, [], []), out)
         self.assertIn(phrase, out)
 
+    def published(self, log):
+        """Everything the landing published on GitHub: each status POST's description and the squash body of the merge call."""
+        return [description for *_, description in self.posts(log)] + ([self.body(log)] if self.merges(log) else [])
+
+    def receipt(self, run, head=None):
+        """The landing receipt the run left under its LANDING_COORD, as (its mode, its JSON), or None."""
+        path = run / "coord/horizon-landings" / f"{PR}-{(head or self.head)[:12]}.json"
+        if not path.exists():
+            return None
+        return stat.S_IMODE(path.stat().st_mode), json.loads(path.read_text(encoding="utf-8"))
+
     def test_a_landing_posts_the_three_statuses_after_every_check_and_merges_pinned_to_the_head(self):
         code, out, log, run = self.land()
         self.assertEqual(code, 0, out)
-        ci, claude, gpt = ((run / name).read_bytes() for name in ("ci.txt", "claude.md", "gpt.md"))
-        descriptions = [f"receipts sha256 {hz_sha(f'{hz_sha(ci)}  ci.txt' + chr(10))}", f"claude.md sha256 {hz_sha(claude)}",
-                        f"gpt.md sha256 {hz_sha(gpt)}"]
+        descriptions = ["ci.txt", "claude.md", "gpt.md"]  # #1194's GPT read, P1: names only
         self.assertEqual(self.posts(log), [(self.head, "success", context, text) for context, text in zip(HZ_CONTEXTS, descriptions)])
+        self.assertIn(f"#{PR} merged at {self.head[:8]}: merge commit {'f' * 12}", out)
+        self.assertIn(f"#{PR} landing receipt {PR}-{self.head[:12]}.json written under LANDING_COORD/horizon-landings (0400", out)
         self.assertEqual(self.revoked(log), [], "a landing that merged revokes nothing")
         index = {kind: [i for i, line in enumerate(log) if test(line)] for kind, test in {
             "errors": lambda line: line.startswith(f"gh api repos/{HORIZON_REPO}/codeowners/errors?ref={self.main} "),
@@ -4801,11 +4835,9 @@ class HorizonEndToEndTests(LandingCase):
                 self.assertEqual(code, 0, out)
                 body = self.body(log)
                 self.assertTrue(body.startswith(offered + "\n\nLander-head: "))
-                ci, claude, gpt, muse_bytes = ((run / f).read_bytes() for f in ("ci.txt", "claude.md", "gpt.md", "muse.md"))
-                expected = [f"Lander-head: {self.head}", f"Lander-local-ci: receipts sha256 {hz_sha(f'{hz_sha(ci)}  ci.txt' + chr(10))}",
-                            f"Lander-local-ci-receipt: ci.txt sha256 {hz_sha(ci)}", f"Lander-verdict-claude: claude.md sha256 {hz_sha(claude)}",
-                            f"Lander-verdict-gpt: gpt.md sha256 {hz_sha(gpt)}",
-                            f"Lander-verdict-muse: TRIAL CHANGES_REQUESTED muse.md sha256 {hz_sha(muse_bytes)}",
+                # names only (#1194's GPT read, P1); CODEOWNERS keeps its sha256, its preimage being main's own published file
+                expected = [f"Lander-head: {self.head}", "Lander-local-ci: ci.txt", "Lander-verdict-claude: claude.md", "Lander-verdict-gpt: gpt.md",
+                            "Lander-verdict-muse: TRIAL CHANGES_REQUESTED muse.md",
                             f"Lander-codeowners: .github/CODEOWNERS sha256 {hz_sha(self.owners)} satisfied"]
                 message = f"The change (#{PR})\n\n{body}\n"
                 parsed = subprocess.run(["git", "interpret-trailers", "--parse", "--no-divider"], input=message, capture_output=True, text=True,
@@ -4816,9 +4848,10 @@ class HorizonEndToEndTests(LandingCase):
                 self.assertEqual(plain, [] if "---" in offered else expected)
                 self.assertEqual(body.split("\n\n")[-1], "\n".join(expected), "the trailers are the last paragraph")
 
-    def test_two_receipt_files_are_bound_by_one_digest_and_listed_one_by_one(self):
-        # local-ci's description is "receipts sha256 <x>", x the sha256 of sha256sum's lines "<sha256>  <file name>" of the files in their
-        # order; across the files, in that order, the last line for a command counts.
+    def test_two_receipt_files_are_named_in_order_and_bound_locally(self):
+        # local-ci's description and its trailer are the receipts' names, one space apart; their digests stay local, in the landing receipt,
+        # with the sha256 of sha256sum's lines "<sha256>  <file name>" of the files in their order, which the final gate compares. Across the
+        # files, in that order, the last line for a command counts.
         first = self.write("ci-1.txt", f"CI: exit 1 at {self.head}: python3 -m unittest\nCI: exit 0 at {self.head}: {HZ_REQUIRED}\n")
         second = self.write("ci-2.txt", f"CI: exit 0 at {self.head}: python3 -m unittest\r\n")
         with self.subTest(case="the first file alone: its unittest line is exit 1"):
@@ -4827,14 +4860,23 @@ class HorizonEndToEndTests(LandingCase):
         with self.subTest(case="the second file's later line wins"):
             code, out, log, run = self.land(LOCAL_CI_RECEIPTS=f"{first}:{second}")
             self.assertEqual(code, 0, out)
+            names = f"{first.name} {second.name}"
+            self.assertEqual(self.posts(log)[0][2:], ("lander/local-ci", names))
+            self.assertIn(f"Lander-local-ci: {names}" + chr(10), self.body(log))
             a, b = hz_sha(first.read_bytes()), hz_sha(second.read_bytes())
-            lines = f"{a}  {first.name}" + chr(10) + f"{b}  {second.name}" + chr(10)
-            self.assertEqual(self.posts(log)[0][2:], ("lander/local-ci", f"receipts sha256 {hz_sha(lines)}"))
-            self.assertIn(f"Lander-local-ci-receipt: {first.name} sha256 {a}" + chr(10) + f"Lander-local-ci-receipt: {second.name} sha256 {b}" + chr(10),
-                          self.body(log))
+            mode, kept = self.receipt(run)
+            self.assertEqual(kept["local_ci_receipts"], [{"sha256": a, "name": first.name}, {"sha256": b, "name": second.name}])
+            self.assertEqual(kept["local_ci_sha256"], hz_sha(f"{a}  {first.name}" + chr(10) + f"{b}  {second.name}" + chr(10)))
         with self.subTest(case="in the other order the first file's exit 1 is the last line"):
             code, out, log, run = self.land(LOCAL_CI_RECEIPTS=f"{second}:{first}")
             self.stopped(code, out, log, 5, "1 of the 2 commands")
+        with self.subTest(case="three names of 60 characters do not fit 140: exit 2 before any POST"):
+            longs = [self.dir / f"{letter * 56}.txt" for letter in "xyz"]
+            for path in longs:
+                path.write_text(f"CI: exit 0 at {self.head}: {HZ_REQUIRED}\n", encoding="utf-8")
+            code, out, log, run = self.land(LOCAL_CI_RECEIPTS=":".join(map(str, longs)))
+            self.stopped(code, out, log, 2, "a status description would be longer than 140 characters")
+            self.assertEqual(self.posts(log), [])
 
     def test_inputs_and_arguments_of_another_form_stop_before_any_call(self):
         cases = [("no arguments", {"args": []}), ("one argument", {"args": [PR]}), ("three arguments", {"args": [PR, self.head[:12], "x"]}),
@@ -4859,12 +4901,12 @@ class HorizonEndToEndTests(LandingCase):
             with self.subTest(refused=name, line="names the variable"):
                 code, out, log, run = self.land(**{name: ""})
                 self.assertIn(f"#{PR} {name} is set, but ", out)
-        with self.subTest(case="a file name of 60 characters, the longest: its description has 132"):
+        with self.subTest(case="a file name of 60 characters, the longest: its description is the name"):
             long = self.dir / ("g" * 57 + ".md")
             long.write_text(f"Family: gpt\nVerdict: PASS at {self.head}\n", encoding="utf-8")
             code, out, log, run = self.land(HORIZON_GPT_VERDICT=str(long))
             self.assertEqual(code, 0, out)
-            self.assertEqual(len(self.posts(log)[2][3]), 60 + 8 + 64)
+            self.assertEqual(self.posts(log)[2][3], long.name)
 
     def test_verdicts_of_another_family_head_or_word_stop_with_2_before_any_change_on_github(self):
         h, h8 = self.head, self.head[:8]
@@ -5044,6 +5086,9 @@ class HorizonEndToEndTests(LandingCase):
             ("main moves", at_lookup(f"git --git-dir={q(self.origin)} update-ref refs/heads/main {self.moved}"), 13,
              f"origin/main moved from {self.main[:8]} to {self.moved[:8]} (final gate)"),
             ("the head moves", preview(f'.headRefOid = "{self.rebased}"'), 3, f"head moved to {self.rebased} at the final gate"),
+            # #1194's GPT read, P2: a late retarget after the posts merged at 34add438 (exit 0, one merge)
+            ("the pull request is retargeted to another branch", preview('.baseRefName = "release-zq7"'), 13,
+             "the pull request's base is not main at the final gate (its name withheld)"),
             ("BLOCKED", preview('.mergeStateStatus = "BLOCKED"'), 8, "BLOCKED by the ruleset at the final gate; unresolved review threads: 0"),
             ("an unknown merge state", preview('.mergeStateStatus = "UNKNOWN"'), 6, "the merge state is UNKNOWN at the final gate"),
             ("the combined status unreadable", {"FAKE_FAIL": "api repos/*/commits/*/status[?]*", "FAKE_FAIL_STDOUT": ADDRESS}, 5,
@@ -5089,8 +5134,8 @@ class HorizonEndToEndTests(LandingCase):
         end = log.index(self.merges(log)[0])
         kinds = []
         for line in log[start + 1:end]:
-            if line == f"gh pr view {PR} -R {HORIZON_REPO} --json headRefOid --jq .headRefOid":
-                kind = "head"
+            if line == f"gh pr view {PR} -R {HORIZON_REPO} --json headRefOid,baseRefName --jq [.headRefOid, .baseRefName] | @tsv":
+                kind = "head and base"
             elif line == f"gh api repos/{HORIZON_REPO}/commits/{self.head}/status?per_page=100 --paginate --slurp":
                 kind = "statuses"
             elif re.fullmatch(rf"git -C \S+ (ls-tree {self.main} -- \S+|cat-file (-s|blob) [0-9a-f]{{40}})", line) or \
@@ -5106,7 +5151,7 @@ class HorizonEndToEndTests(LandingCase):
                 kind = line
             if not (kinds and kinds[-1] == kind):
                 kinds.append(kind)
-        self.assertEqual(kinds, ["head", "statuses", "codeowners", "main", "ancestry", "merge state"])
+        self.assertEqual(kinds, ["head and base", "statuses", "codeowners", "main", "ancestry", "merge state"])
 
     def test_a_draft_is_marked_ready_after_the_local_checks_and_before_the_posts(self):
         code, out, log, run = self.land(draft=True)
@@ -5124,8 +5169,8 @@ class HorizonEndToEndTests(LandingCase):
         hook = f"touch {q(marker)}; {q(self.real_sleep)} 2"
         run = self.dir / f"horizon-run-{next(self.counter)}"
         run.mkdir()
-        (run / "prview.json").write_text(json.dumps({"headRefOid": self.head, "isDraft": False, "mergeStateStatus": "CLEAN",
-                                                     "state": "OPEN", "mergeCommit": None}), encoding="utf-8")
+        (run / "prview.json").write_text(json.dumps({"headRefOid": self.head, "baseRefName": "main", "isDraft": False,
+                                                     "mergeStateStatus": "CLEAN", "state": "OPEN", "mergeCommit": None}), encoding="utf-8")
         (run / "statuses.json").write_text("[]", encoding="utf-8")
         for name, text in (("claude.md", f"Family: claude\nVerdict: PASS at {self.head}\n"), ("gpt.md", f"Family: gpt\nVerdict: PASS at {self.head}\n"),
                            ("ci.txt", f"CI: exit 0 at {self.head}: {HZ_REQUIRED}\n")):
@@ -5155,17 +5200,18 @@ class HorizonEndToEndTests(LandingCase):
 
     def test_the_landing_lock_is_horizons_own(self):
         import fcntl
-        locks = self.dir / "coord/command-center/landing-locks"
+        coord = self.dir / f"lock-coord-{next(self.counter)}"
+        locks = coord / "command-center/landing-locks"
         locks.mkdir(parents=True, exist_ok=True)
         with open(locks / "horizon.lock", "a", encoding="utf-8") as held:
             fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            code, out, log, run = self.land()
+            code, out, log, run = self.land(coord=coord)
         self.assertEqual((code, log), (14, []), out)
         self.assertIn("another landing of horizon holds the landing lock: stop, nothing merged", out)
         with open(locks / "native-agent-stack.lock", "a", encoding="utf-8") as nas, open(locks / "us-equities-trading.lock", "a", encoding="utf-8") as uet:
             fcntl.flock(nas, fcntl.LOCK_EX | fcntl.LOCK_NB)
             fcntl.flock(uet, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            code, out, log, run = self.land()
+            code, out, log, run = self.land(coord=coord)
         self.assertEqual((code, len(self.merges(log))), (0, 1), out)
 
     def test_a_trial_muse_verdict_never_gates_and_is_recorded(self):
@@ -5175,7 +5221,8 @@ class HorizonEndToEndTests(LandingCase):
             with self.subTest(muse=name):
                 code, out, log, run = self.land(muse=text)
                 self.assertEqual((code, len(self.merges(log))), (0, 1), out)
-                self.assertIn(f"Lander-verdict-muse: TRIAL {word} muse.md sha256 {hz_sha(text)}", self.body(log))
+                self.assertIn(f"Lander-verdict-muse: TRIAL {word} muse.md" + chr(10), self.body(log))
+                self.assertEqual(self.receipt(run)[1]["verdicts"]["muse"], {"name": "muse.md", "sha256": hz_sha(text), "word": word, "trial": True})
                 self.assertEqual([p[2] for p in self.posts(log)], list(HZ_CONTEXTS), "Muse has no status")
         code, out, log, run = self.land()
         self.assertNotIn("Lander-verdict-muse", self.body(log), "no Muse line without a Muse verdict")
@@ -5203,7 +5250,8 @@ class HorizonEndToEndTests(LandingCase):
             with self.subTest(family=family, gates_done="the full head"):
                 code, out, log, run = self.land(GATES_DONE=str(full), **{family: text})
                 self.assertEqual((code, len(self.merges(log))), (0, 1), out)
-                self.assertIn(f"Lander-gates-done: {full.name} sha256 {hz_sha(full.read_bytes())}" + chr(10) + "Lander-codeowners: ", self.body(log))
+                self.assertIn(f"Lander-gates-done: {full.name}" + chr(10) + "Lander-codeowners: ", self.body(log))
+                self.assertEqual(self.receipt(run)[1]["gates_done"], {"name": full.name, "sha256": hz_sha(full.read_bytes())})
                 self.assertIn(f"a stated landing gate is receipted by {full.name}", out)
         spaced = self.dir / "gates done.txt"
         spaced.write_text(f"gates done at {h}\n", encoding="utf-8")
@@ -5238,6 +5286,137 @@ class HorizonEndToEndTests(LandingCase):
                 self.assertIn(phrase, out)
                 self.assertEqual(len(self.posts(log, "success")), 3, "the statuses were posted before the flip")
                 self.assertEqual(self.revoked(log), HZ_REVOKED)
+
+    def test_no_digest_of_a_private_file_is_published_and_the_landing_receipt_keeps_them(self):
+        # #1194's GPT read, P1: the statuses and the trailers published each private file's sha256, an offline oracle for its bytes (one held a
+        # home path). Names only now: no digest of a verdict, GATES_DONE or a receipt, nor any 7-digit prefix of one, in a status
+        # description or the squash body; the landing receipt, local and 0400, keeps them. At 34add438 each private digest was published.
+        h = self.head
+        home = "/home/example/private-notes"  # synthetic
+        texts = {"claude": f"# Claude read of {home}\n\nFamily: claude\nThis is a landing gate: run it.\nVerdict: PASS at {h}\n",
+                 "gpt": f"# GPT read, notes at {home}/gpt.txt\n\nFamily: gpt\nVerdict: PASS at {h}\n",
+                 "muse": f"# Muse read under {home}\n\nFamily: muse\nVerdict: PASS at {h}\n",
+                 "receipts": f"CI: exit 0 at {h}: {HZ_REQUIRED}\nCI: exit 0 at {h}: python3 {home}/check.py\n"}
+        gates = self.write("gates-done.txt", f"gates done at {h} in {home}\n")
+        code, out, log, run = self.land(GATES_DONE=str(gates), **texts)
+        self.assertEqual((code, len(self.merges(log))), (0, 1), out)
+        files = {"claude.md": (run / "claude.md").read_bytes(), "gpt.md": (run / "gpt.md").read_bytes(), "muse.md": (run / "muse.md").read_bytes(),
+                 "ci.txt": (run / "ci.txt").read_bytes(), gates.name: gates.read_bytes()}
+        digests = {name: hz_sha(data) for name, data in files.items()}
+        digests["the receipts' combined digest"] = hz_sha(f"{digests['ci.txt']}  ci.txt" + chr(10))
+        published = self.published(log)
+        self.assertEqual(len(published), 4, "three descriptions and the squash body")
+        for name, digest in digests.items():
+            for text in published:
+                with self.subTest(file=name):
+                    self.assertNotIn(digest[:7], text.lower(), "no digest of a private file, nor its 7-digit prefix, is published")
+        for text in published:
+            self.assertNotIn(home, text)
+            self.assertEqual({run_ for run_ in re.findall(r"[0-9A-Fa-f]{7,}", text) if run_.lower() not in (h, hz_sha(self.owners))}, set(),
+                             "the only hex published is the head and CODEOWNERS' sha256, whose preimage is main's own file")
+        mode, kept = self.receipt(run)
+        self.assertEqual(mode, 0o400)
+        self.assertEqual((kept["repository"], kept["pull_request"], kept["head"], kept["base"], kept["main"], kept["merge_commit"]),
+                         (HORIZON_REPO, int(PR), h, "main", self.main, "f" * 40))
+        self.assertEqual(kept["statuses"], dict(zip(HZ_CONTEXTS, ("ci.txt", "claude.md", "gpt.md"))))
+        self.assertEqual(kept["verdicts"], {"claude": {"name": "claude.md", "sha256": digests["claude.md"]},
+                                            "gpt": {"name": "gpt.md", "sha256": digests["gpt.md"]},
+                                            "muse": {"name": "muse.md", "sha256": digests["muse.md"], "word": "PASS", "trial": True}})
+        self.assertEqual(kept["gates_done"], {"name": gates.name, "sha256": digests[gates.name]})
+        self.assertEqual(kept["local_ci_receipts"], [{"sha256": digests["ci.txt"], "name": "ci.txt"}])
+        self.assertEqual(kept["local_ci_sha256"], digests["the receipts' combined digest"])
+        self.assertEqual(kept["codeowners"], {"path": ".github/CODEOWNERS", "sha256": hz_sha(self.owners)})
+        self.assertNotIn(str(run), out, "the receipt's path is not printed")
+
+    def test_the_landing_receipts_place_is_checked_before_any_post_and_written_once(self):
+        # The receipt's place is a local check before ready and the posts (exit 7, nothing posted); a write that fails after the merge is
+        # exit 16 (merged, its statuses kept).
+        with self.subTest(case="a receipt already there for this pull request and head"):
+            coord = self.dir / f"taken-{next(self.counter)}"
+            (coord / "horizon-landings").mkdir(parents=True)
+            (coord / f"horizon-landings/{PR}-{self.head[:12]}.json").write_text("{}\n", encoding="utf-8")
+            code, out, log, run = self.land(coord=coord, draft=True)
+            self.stopped(code, out, log, 7, f"the landing receipt {PR}-{self.head[:12]}.json cannot be written under LANDING_COORD/horizon-landings")
+            self.assertEqual((self.posts(log), [line for line in log if line.startswith("gh pr ready")]), ([], []))
+        with self.subTest(case="a place that cannot be made"):
+            blocker = self.dir / f"blocker-{next(self.counter)}"
+            blocker.write_text("not a directory\n", encoding="utf-8")
+            code, out, log, run = self.land(coord=blocker)
+            self.assertEqual((code, self.merges(log)), (14, []), out)  # the lock under it cannot be opened first
+        with self.subTest(case="a receipt directory that cannot be made"):
+            coord = self.dir / f"no-dir-{next(self.counter)}"
+            coord.mkdir()
+            (coord / "horizon-landings").write_text("a file\n", encoding="utf-8")
+            code, out, log, run = self.land(coord=coord)
+            self.stopped(code, out, log, 7, "cannot be written under LANDING_COORD/horizon-landings (path withheld)")
+            self.assertEqual(self.posts(log), [])
+            self.assertNotIn(str(coord), out)
+        with self.subTest(case="the write fails after the merge: exit 16, merged, the statuses kept"):
+            hook = f'mkdir -p "$LANDING_COORD/horizon-landings" && : > "$LANDING_COORD/horizon-landings/{PR}-{self.head[:12]}.json"'
+            code, out, log, run = self.land(FAKE_GH_HOOK_ON="pr merge *", FAKE_GH_HOOK=hook)
+            self.assertEqual((code, len(self.merges(log)), self.revoked(log)), (16, 1, []), out)
+            self.assertIn(f"merged, but the landing receipt {PR}-{self.head[:12]}.json could not be written", out)
+
+    def test_a_pull_request_whose_base_is_not_main_is_refused_before_the_posts(self):
+        # #1194's GPT read, P2: CODEOWNERS and the ancestry are read at main, while the merge pins the head alone (cli v2.102.0
+        # pkg/cmd/pr/merge/http.go:47-50, :77-80), so a pull request whose base is another branch is refused (13), its base's name not
+        # printed. The late retarget is a final-gate flip (below). At 34add438 both landed.
+        for name, base in (("another branch", "release-zq7"), ("no base in the reply", None)):
+            with self.subTest(base=name):
+                code, out, log, run = self.land(base=base, draft=True)
+                self.stopped(code, out, log, 13, "the pull request's base is not main before any status is posted (its name withheld)")
+                self.assertEqual((self.posts(log), [line for line in log if line.startswith("gh pr ready")]), ([], []))
+                self.assertNotIn("release-zq7", out)
+        with self.subTest(control="a pull request on main lands"):
+            code, out, log, run = self.land(base="main")
+            self.assertEqual((code, len(self.merges(log))), (0, 1), out)
+
+    def test_the_full_head_must_be_a_whole_word_in_a_verdict_and_in_gates_done(self):
+        # #1194's GPT read, P3: the full-head check ended at any character that was not a lower-case hex digit, so head+"A" passed (exit 0 at
+        # 34add438). The head must end the line or be followed by a character that is no letter, digit or "_".
+        h = self.head
+        for name, ending in (("an upper-case hex digit", "A"), ("a letter that is no hex digit", "G"), ("a digit", "0"), ("an underscore", "_")):
+            with self.subTest(verdict=name):
+                code, out, log, run = self.land(gpt=f"Family: gpt\nVerdict: PASS at {h}{ending}\n")
+                self.stopped(code, out, log, 2, "must name the full head")
+        for name, ending in (("a full stop", "."), ("a space and a note", " (after the fix)"), ("a CR", "\r"), ("a comma", ", the rest")):
+            with self.subTest(lands=name):
+                code, out, log, run = self.land(gpt=f"Family: gpt\nVerdict: PASS at {h}{ending}\n")
+                self.assertEqual((code, len(self.merges(log))), (0, 1), out)
+        stated = f"Family: gpt\nThis is a landing gate: run it.\nVerdict: PASS at {h}\n"
+        for name, text, expected in (("head+A", f"gates done at {h}A\n", 2), ("head at the end of the file", f"gates done at {h}", 0),
+                                     ("head then a newline", f"{h}\nall gates done\n", 0)):
+            with self.subTest(gates_done=name):
+                gates = self.write("gates.txt", text)
+                code, out, log, run = self.land(gpt=stated, GATES_DONE=str(gates))
+                if expected:
+                    self.stopped(code, out, log, 2, "does not name the full head")
+                else:
+                    self.assertEqual((code, len(self.merges(log))), (0, 1), out)
+
+    def test_after_the_merge_nothing_gh_returned_is_printed_and_a_failed_read_is_exit_12(self):
+        # #1194's GPT read, P3: the view after the merge was echoed whole and unchecked (a failed call printed its stdout and the landing
+        # exited 0). It is read for the merge commit alone, typed; a failed read is exit 12, and the receipt is still written (merge_commit null).
+        sentinel = "STDOUT-SENTINEL-49d1"
+        for name, options in (("the call fails", {"FAKE_FAIL": "pr view * state,mergeCommit *", "FAKE_FAIL_STDOUT": sentinel,
+                                                  "FAKE_FAIL_STDERR": f"gh: {sentinel}"}),
+                              ("the reply is of another state", {"FAKE_GH_HOOK_ON": "pr merge *", "FAKE_GH_HOOK":
+                               'jq \'.state = "OPEN"\' "$FAKE_PRVIEW" > "$FAKE_PRVIEW.x" && mv "$FAKE_PRVIEW.x" "$FAKE_PRVIEW"'})):
+            with self.subTest(case=name):
+                code, out, log, run = self.land(**options)
+                self.assertEqual((code, len(self.merges(log)), self.revoked(log)), (12, 1, []), out)
+                self.assertIn("merged, but the merge commit could not be read (output withheld)", out)
+                self.assertNotIn(sentinel, out)
+                self.assertIsNone(self.receipt(run)[1]["merge_commit"])
+
+    def test_a_second_signal_during_the_revocation_does_not_cut_it(self):
+        # #1194's CC read, P3: hz_revoke ignores HUP, INT and TERM first. Here the landing stops with 8 (BLOCKED after the posts), and while its
+        # first revocation POST runs, the fake gh sends the landing a TERM (the gh's parent, read from /proc). The three failures are posted
+        # and the exit stays 8.
+        hook = 'kill -TERM "$(cut -d" " -f4 /proc/$PPID/stat)"'
+        code, out, log, run = self.land(merge_state="BLOCKED", FAKE_GH_HOOK_ON="*state=failure -f context=lander/local-ci*", FAKE_GH_HOOK=hook)
+        self.assertEqual((code, self.merges(log)), (8, []), out)
+        self.assertEqual(self.revoked(log), HZ_REVOKED)
 
     def test_the_author_lookup_failing_stops_with_11_and_revokes(self):
         code, out, log, run = self.land(FAKE_USER_TYPE="Organization")

@@ -296,58 +296,90 @@ expected head:
   item), which would move the verdicts into checks GitHub enforces at the merge.
 - **What the lock closes:** concurrent landings by our tooling, so our own landings no longer move main under each other's validated
   base; a merge made out of band (the web UI, another tool) is not covered.
-- **`horizon_land.sh` (below):** GitHub enforces its three required statuses at the merge, but only their contexts and states, not who
-  posted them or what they describe; its local reads are narrowed to seconds in the same way, and the closure path is the same App identity.
+- **`horizon_land.sh` (below):** GitHub enforces its three required statuses at the merge: "all required status checks must pass", and
+  "Any person or integration with write permissions to a repository can set the state of any status check", unless an app is selected as
+  the expected source (`github/docs@be38ec5d`
+  `content/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.md:176`, `:178`).
+  So it checks the contexts' states, not who posted them; that it weighs nothing of what a status describes is not stated there
+  (PROPOSAL). Its local reads are narrowed to seconds in the same way, and the closure path is the same App identity.
 
 **`horizon_land.sh <pr> <read-head-prefix>`** (2026-10-15) lands a pull request of `seathatflowsinourveins/horizon`, a private repository
 with no hosted CI, no `scripts/validate.py`, no `manifests/evidence.json` and no Codex connector. Its main carries an active ruleset: a pull
 request (squash merges only, no approval, review threads resolved), no deletion or force push, a linear history, and three required commit
-statuses, strict (the branch up to date) and with no app identity: `lander/local-ci`, `lander/verdict-claude` and `lander/verdict-gpt`. The
-lander is the only merge path: it checks the local evidence, posts those statuses at the exact head and merges pinned to it. `R` is fixed (no
-`LANDING_REPO`), and the merging account is the other landers' (`LG_AUTHOR_LOGIN`). Its inputs are variables, each a file named by its path,
-as `nas_land.sh`'s verdict files are named (its arguments): `HORIZON_CLAUDE_VERDICT` and `HORIZON_GPT_VERDICT` (required),
+statuses, `lander/local-ci`, `lander/verdict-claude` and `lander/verdict-gpt`, strict ("The topic branch **must** be up to date with the base
+branch before merging", `available-rules-for-rulesets.md:188-193`, above) and with no app selected as their source (`:178`). The ruleset is the
+owner's; the lander does not read it, and these are its settings as the CC records them. **PROPOSAL** (the enforcement design, #1195's decision
+record `docs/decisions/2026-10-15-horizon-runtime-ecosystem-repository.md`): the lander is the merge path; it checks the local evidence,
+posts those statuses at the exact head and merges pinned to it. The residual, plainly: GitHub checks only the three contexts' states, and any
+account with write access can set one (`:178`), so a merge made in the web UI after the lander's posts is not refused (Known gaps). `R` is
+fixed (no `LANDING_REPO`), and the merging account is the other landers' (`LG_AUTHOR_LOGIN`). Its inputs are variables, each a file named by
+its path, as `nas_land.sh`'s verdict files are named (its arguments): `HORIZON_CLAUDE_VERDICT` and `HORIZON_GPT_VERDICT` (required),
 `HORIZON_MUSE_VERDICT` (optional, a TRIAL) and `LOCAL_CI_RECEIPTS` (required, colon-separated, so a path cannot hold `:` or a newline). Only the
-file name is published (in the statuses and the trailers) and printed, never the path, and it must be 1 to 60 of `A-Z a-z 0-9 . _ -`. In
-order:
+file name is published (in the statuses and the trailers) and printed, never the path, and it must be 1 to 60 of `A-Z a-z 0-9 . _ -`; the
+files' digests are not published at all ("The statuses", below). In order:
 
 1. before any call (exit 2): the two arguments (the pull request a number, the read head prefix 7 to 40 lower-case hex digits), the inputs,
    and the inputs of the other two landers refused when set, an empty value included (`uet_land.sh`'s `${VAR+x}` form, "A nas input in a uet
    landing", above): `SQUASH_BODY_FILE`, `LOCAL_REVIEW_ADJUDICATION`, `LOCAL_REVIEW_WAIVER`, `LOCAL_REVIEWS`, `CODEX_LOCAL_REVIEW`,
    `GPT_VERDICT` and `VERDICT_FILES`, each named in one line as the input of the lander it belongs to;
 2. the landing lock, its own `horizon.lock` (exit 14, nothing run; "The landing lock", above), the fetch and the read head (exit 3);
-3. the pull request's head must be the read head: there is no head-following, and any move stops with exit 3;
+3. the pull request's head must be the read head: there is no head-following, and any move stops with exit 3; and its base, read with the
+   head, must be main (exit 13, the base's name not printed; #1194's GPT read, P2): CODEOWNERS and the ancestry are read at main, a pull
+   request uses "the version of `CODEOWNERS` from the base branch of the pull request" (`about-code-owners.md:44`, "CODEOWNERS", below), and the
+   merge pins the head alone (gh builds `MergePullRequestInput` from the pull request's id and sets `expectedHeadOid`, with no base:
+   `cli/cli@v2.102.0` `pkg/cmd/pr/merge/http.go:47-50`, `:77-80`), so a pull request retargeted to another branch is refused, here and at the
+   final gate;
 4. strict, and never `update-branch`: `origin/main`, read with `git ls-remote`, must be an ancestor of the head (`git merge-base
    --is-ancestor`) and GitHub must report neither BEHIND nor DIRTY, otherwise exit 13 and "rebase onto main, rerun the local CI at the new
    head, and get both verdicts for it" (an unreadable main is exit 13 too). The branch is never updated here (no `gh pr update-branch`): an
    update is a new head that no receipt and no verdict names;
 5. the verdicts (and `GATES_DONE` when one states a landing gate), the receipts and main's CODEOWNERS (below), local reads and GitHub's
-   CODEOWNERS errors;
+   CODEOWNERS errors, and the place of the landing receipt (below; exit 7);
 6. a draft marked ready (exit 7 when it cannot be). This comes after the local refusals and not before them, where the design pass of
    2026-10-15 had it: a refused landing then changes nothing on GitHub, the order of cheap reads before slow steps ("One final gate after every
    slow step", above), and no Codex review waits on a ready event here;
 7. the three statuses posted (below; exit 15 when a POST fails), the EXIT trap set right before the first;
 8. the merge state polled until CLEAN (below), the squash body and its trailers (below), the no-reply author address (exit 11), the final
-   gate (below), the squash merge pinned with `--match-head-commit` (exit 7), and the author check (exit 12).
+   gate (below), the squash merge pinned with `--match-head-commit` (exit 7), the merge commit read (exit 12; nothing of the reply printed but
+   its typed id), the landing receipt written (exit 16) and the author check (exit 12).
 
 **The statuses (`horizon_land.sh`).** Each is posted at the head as `gh api repos/<owner>/<name>/statuses/<head> --method POST -f
 state=success -f context=<context> -f description=<description>`, its output dropped (nothing `gh` or its API returned is printed, #975 P2-2).
-A verdict's description is `<file name> sha256 <its sha256>`, and `lander/local-ci`'s is `receipts sha256 <x>`, where `x` is the sha256 of the
-lines `<sha256>  <file name>` (sha256sum's form, two spaces) of the receipt files in their order, so one digest binds every receipt. The REST
-description gives a commit status's description no maximum ("A short description of the status.", `github/rest-api-description@58b1e0c0`
+Each description is a NAME: a verdict's is its file name, and `lander/local-ci`'s the receipt files' names in their order, one space apart
+(a name holds no space). No digest is published, in a status or in a trailer (#1194's GPT read, P1): the verdicts, `GATES_DONE` and the
+receipts are private files, one can hold a home path, and a digest of private bytes is an offline oracle for them (correction #161; at
+34add438 the descriptions were `<file name> sha256 <its sha256>` and `receipts sha256 <x>`). A digest is published only beside its complete
+preimage, which none of these is, so their sha256 stay local: the final gate compares them, and the landing receipt keeps them (below).
+The REST description gives a commit status's description no maximum ("A short description of the status.", `github/rest-api-description@58b1e0c0`
 `api.github.com.json:79201-79205`, and the docs' REST data at `be38ec5d` say the same, `commits.json:10906`); the one maximum the docs state,
 140 characters, is a deployment status's (`deployments.json:6234`). The lander borrows it as its own ceiling and refuses a longer description
-before any POST (exit 2); with a file name of 60 characters at most, a description has at most 132. The live limit is not measured (no POST
-was made here), and a server that cut a description short would fail the final gate's exact read (exit 5). A context is case-insensitive
-("This field is case-insensitive", `:79208`), so the lander compares contexts in lower case.
+before any POST (exit 2): a verdict's name has 60 characters at most, and two receipt names of 60 fit, three do not. The live limit is not
+measured (no POST was made here), and a server that cut a description short would fail the final gate's exact read (exit 5). A context is
+case-insensitive ("This field is case-insensitive", `:79208`), so the lander compares contexts in lower case.
 
 The EXIT trap is set right before the first POST: unless the merge succeeded, it posts `state=failure` for each of the three contexts, so no
 success the lander posted outlives a landing that stopped, whatever stopped it. bash runs the trap on every exit ("Any trap on EXIT is
 executed before the shell terminates", the installed `bash(1)`, `exit`), keeping the exit status (measured), and HUP, INT and TERM are trapped
 to exit 129, 130 and 143, so a signal revokes too, once the command bash waits for completes ("it will not execute the trap until the
 command completes", `bash(1)`, SIGNALS; measured: a SIGTERM during the author lookup exits 143 and posts the three failures). A `$(...)`
-subshell does not run it (measured). The merge's success is recorded on the line after the merge call, before the author check, so exit 12
-leaves a merged head's statuses alone. A revocation that fails says which context to revoke by hand. A landing posts one status for each
-context and a stopped one a second; GitHub allows 1000 for a head and a context (`api.github.com.json:79153`).
+subshell does not run it (measured). The revocation's first statement is `trap '' HUP INT TERM` (#1194's CC read, P3): a second signal
+during it would otherwise run its `exit` trap after the POST it waits for and cut the POSTs still to come (measured: with it, a TERM sent
+during the first revocation POST leaves all three posted and the exit code the stop's). The merge's success is recorded on the line after the
+merge call, before the author check, so exit 12 and 16 leave a merged head's statuses alone. A revocation that fails says which context to
+revoke by hand. A landing posts one status for each context and a stopped one a second; GitHub allows 1000 for a head and a context
+(`api.github.com.json:79153`).
+
+**The landing receipt (`horizon_land.sh`; #1194's GPT read, P1).** The digests the statuses and the trailers no longer publish are kept in
+one LOCAL file, `$LANDING_COORD/horizon-landings/<pr>-<the head's first 12 digits>.json`, written once after the merge, mode 0400, never
+printed (the messages name the file, never its path) and never published. It holds the repository, the pull request, the head, the base
+(`main`) and main's commit, the merge commit (`null` when it could not be read), the time, the three descriptions posted, each file's name
+and sha256 (the Claude, GPT and Muse verdicts, the Muse word, `GATES_DONE`, each CI receipt), the receipts' combined sha256 (that of the
+lines `<sha256>  <file name>` of the files in their order, sha256sum's form) and CODEOWNERS' path and sha256. The planned self-audit binds
+main's trailers, which hold the names and the head, to it. Its place is checked with the other local reads, before `ready` and the posts:
+the directory made (mode 0700) and writable, and no receipt there yet for this pull request and head, otherwise exit 7 and nothing posted.
+The file is created exclusively (bash's `set -C`, noclobber, which refuses a file or a symlink that is there; measured with bash 5.3.9: a
+second write and a dangling symlink were refused, and the mode was 0400 under `umask 0277`); a write that fails after the merge is exit 16
+(merged, the statuses kept). The landing that stops before its merge writes none.
 
 **The CI receipts (`LOCAL_CI_RECEIPTS`).** Each file is read once, as `nas_land.sh` reads a record (`nas_read`; a NUL byte refused, exit 2, as
 a missing or unreadable file), and only its lines `CI: exit <code> at <40 hex digits>: <command>` count, a trailing CR dropped; a line for
@@ -357,10 +389,12 @@ tests/hooks_test.sh`, fixed in the script: it must have a line at the head, and 
 (Known gaps).
 
 **The verdicts and their families.** `HORIZON_CLAUDE_VERDICT` and `HORIZON_GPT_VERDICT` each name one family's verdict, read once (a NUL byte,
-a missing or an unreadable file: exit 2), and the digest the lander posts is that of the bytes it judged in that read. Each must be accepted
-as `nas_land.sh` accepts a verdict file (correction #136, `lg_verdict_text_ok`: CHANGES_REQUESTED on line 1 or as the last Gate line/Verdict
-line naming the head refuses) and, stricter, that last line must name the full head, as `Verdict: PASS at <40 hex digits>` (or ACK, or a
-`Gate line:`): an 8-digit prefix alone, which `nas_land.sh` accepts, is refused here, as is line 1's Astra layout alone. The last line that
+a missing or an unreadable file: exit 2), and the digest the lander keeps (locally: the final gate, the landing receipt) is that of the bytes
+it judged in that read. Each must be accepted as `nas_land.sh` accepts a verdict file (correction #136, `lg_verdict_text_ok`:
+CHANGES_REQUESTED on line 1 or as the last Gate line/Verdict line naming the head refuses) and, stricter, that last line must name the full
+head as a whole word, as `Verdict: PASS at <40 hex digits>` (or ACK, or a `Gate line:`), the head followed by the end of the line or by a
+character that is no letter, digit or `_` (#1194's GPT read, P3: at 34add438 only a lower-case hex digit was excluded, so the head and an
+`A` passed): an 8-digit prefix alone, which `nas_land.sh` accepts, is refused here, as is line 1's Astra layout alone. The last line that
 starts with `Family:` must read exactly `Family: claude` or `Family: gpt`, and the two files must differ in their sha256 (one file in both
 slots is one read, not two). `HORIZON_MUSE_VERDICT` is a TRIAL: when it is set, its file must be there, readable and of `Family: muse`
 (exit 2 otherwise; a set but empty value names no file), and its word, that of its last Gate line/Verdict line for the full head (`none`
@@ -373,14 +407,17 @@ shared block's `lg_receipt_ok` decides, given the 40 digits (the receipt's text 
 which `nas_land.sh` takes, is refused. A verdict of any of the three families counts, Muse's TRIAL one included (fail closed). Without a
 receipt, or with one that does not name the full head, is missing or unreadable, holds a NUL byte or has a file name of another form, the
 landing stops with exit 2 before anything changes on GitHub (before `ready` and the posts). The receipt is then read once more (a NUL byte
-stops), and the sha256 of those bytes, which must name the head too, is recorded as `Lander-gates-done` and compared at the final gate,
-where the whole check runs again: exit 7 when the bytes changed, 2 when the receipt no longer passes. Without a stated gate `GATES_DONE` is
-not read, as in `nas_land.sh`.
+stops), and those bytes must name the full head as a whole word too (the verdicts' rule, above, so `<head>A` is refused); their sha256 stays
+local, compared at the final gate, where the whole check runs again (exit 7 when the bytes changed, 2 when the receipt no longer passes),
+and kept in the landing receipt, while `Lander-gates-done` names the file alone. Without a stated gate `GATES_DONE` is not read, as in
+`nas_land.sh`.
 
 **CODEOWNERS (`horizon_land.sh`).** GitHub takes the file from `.github/`, the top level or `docs/`, "in that order", the first it finds, and a
 pull request uses "the version of `CODEOWNERS` from the base branch" (`github/docs@be38ec5d`
 `content/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners.md:36`, `:44`), so the
-lander reads it at the main that `git ls-remote` gave, never at the head: a pull request's own edit of it counts for nothing. v1 accepts only
+lander reads it at the main that `git ls-remote` gave, never at the head, and requires the pull request's base to be main, before the posts
+and at the final gate (step 3, above): a pull request's own edit of it counts for nothing, and one retargeted to a branch of another
+CODEOWNERS is refused (13). v1 accepts only
 a file each of whose rules is owned by the merging account alone (`@<LG_AUTHOR_LOGIN>`, in any letter case; the repository is an account's,
 with no teams): a comment line starts with `#` and an inline comment with a word that does (`:99`), and a rule with another owner, a team, an
 address or no owner (`:140-146`), a file with no rule, none in the three places, one that is not a regular file, holds a NUL byte or has 3 MB
@@ -395,30 +432,38 @@ read as `nas_land.sh` reads it, "The squash body", above; exit 7 when the read f
 
 ```
 Lander-head: <the head>
-Lander-local-ci: receipts sha256 <x>
-Lander-local-ci-receipt: <file name> sha256 <sha256>                (one line for each receipt file, in their order)
-Lander-verdict-claude: <file name> sha256 <sha256>
-Lander-verdict-gpt: <file name> sha256 <sha256>
-Lander-verdict-muse: TRIAL <word> <file name> sha256 <sha256>       (only when HORIZON_MUSE_VERDICT is set)
-Lander-gates-done: <file name> sha256 <sha256>                      (only when a verdict states a landing gate)
+Lander-local-ci: <receipt file name> [<receipt file name> ...]      (in their order, one space apart)
+Lander-verdict-claude: <file name>
+Lander-verdict-gpt: <file name>
+Lander-verdict-muse: TRIAL <word> <file name>                       (only when HORIZON_MUSE_VERDICT is set)
+Lander-gates-done: <file name>                                      (only when a verdict states a landing gate)
 Lander-codeowners: <path> sha256 <sha256 of main's CODEOWNERS> satisfied
 ```
 
-Each `Lander-<context>` line holds the description posted for `lander/<context>`, so a self-audit compares the trailers with the statuses at
-`Lander-head`. The merge takes the body as `--body`, as `nas_land.sh` does (`--body-file` would be read again when the merge call starts,
+Names only, and the head (#1194's GPT read, P1): no private file's digest. CODEOWNERS keeps its sha256, its preimage being main's own file,
+published where the trailer is. Each `Lander-<context>` line holds the description posted for `lander/<context>`, so a self-audit compares
+the trailers with the statuses at `Lander-head`, and binds the names to their digests in the landing receipt (above), which is local. At
+34add438 these lines carried each file's sha256 and one `Lander-local-ci-receipt` line for each receipt. The merge takes the body as
+`--body`, as `nas_land.sh` does (`--body-file` would be read again when the merge call starts,
 `merge.go:146-153`). Read the trailers with `git log -1 --format='%(trailers)' <merge>` or `git interpret-trailers --parse --no-divider`: a
 `---` line in the offered body ends the message for a plain `--parse` (`--no-divider`: "Do not treat `---` as the end of the commit
 message", `git/git@v2.53.0` `Documentation/git-interpret-trailers.adoc:181-184`; measured with git 2.53.0: a plain `--parse` printed none of
 them, the other two all). The paragraph is all trailers after a blank line (`:88-92`).
 
-**Its final gate.** Right before the merge, fast reads only, in this order: the head (the read head, exit 3); the verdicts, `GATES_DONE` and
-the receipts (their acceptance, exit 2 and 5, then each sha256 equal to the one posted or recorded, exit 7); the combined status at the head, read
-as `tcc_read_gate` reads it (every page, `gh`'s exit code kept apart): each of the three contexts listed once, success, with exactly the
-description the lander posted, and no other `lander/` context (exit 5, and nothing of the reply printed); main's CODEOWNERS (exit 8);
-`origin/main` by `git ls-remote`, which must be the main read at the start and an ancestor of the head (exit 13); the merge state, which must
-be CLEAN (BLOCKED exit 8, BEHIND or DIRTY exit 13, any other exit 6). Before it, after the POSTs, the merge state is polled for up to two
-minutes (12 reads, 10 s apart) until CLEAN: GitHub recomputes it after the statuses (a lag of the same kind as uet#58's, `nas_land.sh:242-245`),
-so a BLOCKED or UNKNOWN right after them is read again, while BEHIND or DIRTY stops at once (13); a block that lasts is exit 8, with the
+**Its final gate.** Right before the merge, fast reads only, in this order: the head and the base, in one read (the read head, exit 3, and
+main, exit 13); the verdicts, `GATES_DONE` and the receipts (their acceptance, exit 2 and 5, then each sha256 equal to the one kept when the
+statuses were posted, exit 7); the combined status at the head, read as `tcc_read_gate` reads it (every page, `gh`'s exit code kept apart):
+each of the three contexts listed once, success, with exactly the description the lander posted, and no other `lander/` context (exit 5,
+and nothing of the reply printed); main's CODEOWNERS (exit 8); `origin/main` by `git ls-remote`, which must be the main read at the start
+and an ancestor of the head (exit 13); the merge state, which must be CLEAN (BLOCKED exit 8, BEHIND or DIRTY exit 13, any other exit 6).
+The states are those of GraphQL's `MergeStateStatus` (`github/docs@be38ec5d` `src/graphql/data/fpt/schema.docs.graphql:26511-26554`, the
+bytes of the schema cited above, sha256 `3ed09565…`): BEHIND "The head ref is out of date." (`:26513-26515`), BLOCKED "The merge is
+blocked." (`:26518-26520`), CLEAN "Mergeable and passing commit status." (`:26523-26525`), DIRTY "The merge commit cannot be cleanly
+created." (`:26528-26530`), UNKNOWN "The state cannot currently be determined." (`:26546-26548`) and UNSTABLE "Mergeable with non-passing
+commit status." (`:26551-26553`), which GitHub would merge and the lander refuses (6, fail closed). Before it, after the POSTs, the merge
+state is polled for up to two minutes (12 reads, 10 s apart) until CLEAN. That GitHub's recomputation after the statuses lags is measured on
+us-equities-trading #58, not documented by GitHub (there an update-branch's head reached the API views 6 s apart, `nas_land.sh:242-245`), so
+a BLOCKED or UNKNOWN right after the posts is read again, while BEHIND or DIRTY stops at once (13); a block that lasts is exit 8, with the
 count of unresolved review threads (the query as `nas_land.sh` builds it, owner and name from `R`), and any other state exit 6.
 
 ## Variables
@@ -440,11 +485,11 @@ count of unresolved review threads (the query as `nas_land.sh` builds it, owner 
 | `LOCAL_REVIEW_ADJUDICATION` | none | `nas_land.sh`, through `codex_gate.py`; refused by `uet_land.sh` and `horizon_land.sh` | with a local review set, the CC's adjudication record: it decides a `codex-review` that says `patch is incorrect` with only P2 and P3 findings, at least one, its last `Adjudication:` line bound to that file's sha256, the pull request and the read head, each finding listed after it with its disposition ("Local reviews"); set where no review says `patch is incorrect`, the gate gives 4; the squash body records it (the CC's ruling of 2026-10-13); in `nas_land.sh` an empty value is none with a local review set, and with none set (the waiver path) it stops with exit 2 before any call, an empty value included; `uet_land.sh` and `horizon_land.sh` stop with exit 2 before any call when it is set, an empty value included ("A nas input in a uet landing", above) |
 | `LG_ADJUDICATION_SHA256` | unset when `nas_land.sh` starts | `nas_land.sh`, for `codex_gate.py` | not an input: `nas_land.sh` sets it to the review file's sha256 that the record named at its first read, and the gate then adjudicates only the file whose bytes have it (#1075; "Local reviews") |
 | `SQUASH_BODY_FILE` | none | `nas_land.sh`; refused by `uet_land.sh` and `horizon_land.sh` | the squash commit's body; when set, a readable, non-empty regular file other than `-` whose content is UTF-8 text of at most 64 KiB without a NUL byte, or exit 2 before any call; read again when the body is built and at the final gate (exit 7); passed as `--body`, alone or before a waiver's or an adjudication's line ("The squash body"); `uet_land.sh` and `horizon_land.sh` stop with exit 2 before any call when it is set, an empty value included |
-| `LANDING_COORD` | `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/coordination` | all three | coordination tree; a status description `PASS: trading-cc/reads/<record>.md` names `$LANDING_COORD/trading-cc/reads/<record>.md` |
+| `LANDING_COORD` | `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/coordination` | all three | coordination tree; a status description `PASS: trading-cc/reads/<record>.md` names `$LANDING_COORD/trading-cc/reads/<record>.md`; `horizon_land.sh` keeps its landing receipts, local and 0400, in `$LANDING_COORD/horizon-landings/<pr>-<head12>.json` ("The landing receipt", above) |
 | `LANDING_GATE` | `codex_gate.py` in the directory of the script, symlinks resolved (`readlink -f "$0"`) | `uet_land.sh` and `nas_land.sh` | the Codex gate; it works through a symlink or a wrapper that `exec`s the real path, and not when the script is read from a pipe or a process substitution (set this variable then) |
 | `LANDING_LOCK_DIR` | `$LANDING_COORD/command-center/landing-locks` | all three | where the landing lock of each repository is kept (`us-equities-trading.lock`, `native-agent-stack.lock`, `horizon.lock`); created when missing, and outside every worktree |
 | `VERDICT_FILES` | none | `uet_land.sh`; refused by `horizon_land.sh` | space-separated verdict files that each must name the read head |
-| `GATES_DONE` | none | all three | receipt naming the read head; required when a verdict file states a landing gate (correction #121); `horizon_land.sh` requires it to name the full head, reads it again at the final gate (exit 7 when its bytes changed) and records it (`Lander-gates-done`) |
+| `GATES_DONE` | none | all three | receipt naming the read head; required when a verdict file states a landing gate (correction #121); `horizon_land.sh` requires it to name the full head as a whole word, reads it again at the final gate (exit 7 when its bytes changed), names it in `Lander-gates-done` and keeps its sha256 in the landing receipt |
 | `GPT_VERDICT` | none | `uet_land.sh`; refused by `horizon_land.sh` | the co-op's verdict file accepted instead of Codex when `codex_gate.py` exits 5 |
 | `TMPDIR` | `/tmp` | all three | where a failed merge keeps gh's output (`merge-fail-XXXXXX`, mode 0600), and `nas_land.sh` the validation's output (`nas-validate-XXXXXX`, kept when it fails) |
 | `LANDING_PROHIBITED_NAMES` | none | the tests only | comma-separated identities that must not appear in any form under `tools/landing` (see Tests) |
@@ -483,25 +528,28 @@ after each of three validations, moved after the last validation (read at the fi
 (#975, new in round 3). The three scripts also exit 11 when the no-reply author address cannot be formed (nothing is merged), 12 when the
 merge landed but its commit's author is not that address or the commit could not be read (CC correction #148), and 14 when another
 landing of the same repository holds the landing lock or the lock cannot be opened or taken (nothing has run; #975 round 4).
-`horizon_land.sh` (2026-10-15; nothing is merged on any code but 0 and 12): 2 an argument or an input, before any call (the usage, a pull
+`horizon_land.sh` (2026-10-15; nothing is merged on any code but 0, 12 and 16): 2 an argument or an input, before any call (the usage, a pull
 request that is not a number, a read head prefix that is not 7 to 40 lower-case hex digits, `HORIZON_CLAUDE_VERDICT`, `HORIZON_GPT_VERDICT`
 or `LOCAL_CI_RECEIPTS` unset or empty, `HORIZON_MUSE_VERDICT` set but empty, a file name of another form, a newline or an empty name in
 `LOCAL_CI_RECEIPTS`, any input of `nas_land.sh` or `uet_land.sh` set, an empty value included), and after the lock a verdict or a receipt
 missing, unreadable or holding a NUL byte, the same bytes in both verdict slots, a verdict of another family, one that `nas_land.sh`'s
-acceptance refuses or whose last Gate line/Verdict line does not name the full head with PASS or ACK, a verdict that states a landing gate
-without a `GATES_DONE` naming the full head (a receipt missing, unreadable, holding a NUL byte or of another file name form included;
-correction #121), each also at the final gate, or a status description over 140 characters; 3 the read head not resolvable, or not the pull
-request's head (also at the final gate); 5 the receipts
+acceptance refuses or whose last Gate line/Verdict line does not name the full head, as a whole word, with PASS or ACK, a verdict that states
+a landing gate without a `GATES_DONE` naming the full head as a whole word (a receipt missing, unreadable, holding a NUL byte or of another
+file name form included; correction #121), each also at the final gate, or a status description over 140 characters; 3 the read head not
+resolvable, or not the pull request's head (also at the final gate); 5 the receipts
 (the required command with no line at the head, or a command whose last line there is not `exit 0`, also at the final gate) or, at the final
 gate, the statuses (unreadable, a context missing, of another state or description or listed twice, or another `lander/` context); 6 the
 merge state not settled, neither CLEAN, BLOCKED, BEHIND nor DIRTY after the two-minute poll or at the final gate; 7 ready, the squash body
-or the merge failed, or a verdict, a receipt or `GATES_DONE` changed after the statuses were posted (the Muse verdict after the body recorded
-it); 8 BLOCKED
+or the merge failed, the landing receipt's place not writable or taken (before any post), or a verdict, a receipt or `GATES_DONE` changed
+after the statuses were posted (the Muse verdict after the body recorded it); 8 BLOCKED
 (after the poll or at the final gate) or main's CODEOWNERS (none in the three places, not a regular file, a NUL byte, 3 MB or more, no rule,
-a rule with another owner, a team, an address or none, GitHub's errors not 0 or unreadable, or read otherwise at the final gate); 13 not up
-to date (origin/main not an ancestor of the head, or GitHub BEHIND or DIRTY), origin/main unreadable, or moved (final gate); 15 a status POST
-failed; 129 a hangup, 130 an interrupt and 143 a termination signal (128 and the signal's number); 11, 12 and 14 as above. Every code after
-the first POST, but 0 and 12, revokes the three statuses (the EXIT trap, "The statuses", above).
+a rule with another owner, a team, an address or none, GitHub's errors not 0 or unreadable, or read otherwise at the final gate); 12 merged,
+but the merge commit could not be read (the landing receipt then records none) or its author is not the no-reply address; 13 not up to date
+(origin/main not an ancestor of the head, or GitHub BEHIND or DIRTY), origin/main unreadable, or moved (final gate), or a base other than
+main (before any post and at the final gate; #1194's GPT read, P2); 15 a status POST failed; 16 merged, but the landing receipt could not be
+written (its place was free and writable before the posts; the statuses are kept); 129 a hangup, 130 an interrupt and 143 a termination
+signal (128 and the signal's number); 11 and 14 as above. Every code after the first POST, but 0, 12 and 16, revokes the three statuses (the
+EXIT trap, "The statuses", above).
 `codex_gate.py`: 0, 3, 4 and 5 as above; a gate that fails itself exits 4, which both scripts stop on with 9. With a local review set
 ("Local reviews"): 0 (every file a review of the read head or of a head with its change, every `codex-review` completed with `patch is
 correct` and no P0 or P1 finding, or one that says `patch is incorrect` with only P2 and P3 findings, at least one, and that the CC's
@@ -792,7 +840,7 @@ scripts that is neither a tracked file's, a named public artifact's nor a named 
 | --- | --- |
 | `uet_land.sh` | `95a4e1634b6a53b14d7736d2d40a3f0058a15aec9c9178e528ca44cfb74324ce` (441 lines) |
 | `nas_land.sh` | `1ca0dabc6c535a08fb45f6956cf4549cc956ca6b25e798bb60c6a95cd398f511` (690 lines) |
-| `horizon_land.sh` | `3320c5ab0a312307fa47487a8d154f3fb138b32db41d1bcf1f54bf25f8582ce3` (659 lines) |
+| `horizon_land.sh` | `133dab4cfd8da99a695753c9aea2e40f9f1c582bda6d2ee158cbb39c8d96a9a2` (749 lines) |
 | `codex_gate.py` | `7afaa831c0763dd14c584d76b17465fa50993656cd63eec9fd0c4412fddb74b2` (559 lines) |
 | `review_normalize.py` | `b553d9cb67ca196bd587e980e01295e28e8ea0e2bcb3d0015fc5d040735a1594` (348 lines) |
 
@@ -880,18 +928,27 @@ and 4). These stay until a change with its own tests fixes them:
   counts and words are such words, so a digest prefix written bare that happens to have no letter (or no digit) passes; written with `…`
   it is checked whatever its digits. A pull request's body is checked only when `LANDING_PR_BODY` names it (below).
 - `horizon_land.sh` (2026-10-15):
-  - A commit status carries no app identity: anyone with push access can post a `lander/` success at a head ("Users with push access in a
-    repository can create commit statuses", `api.github.com.json:79153`), and the ruleset then admits a merge whoever made it. The ruleset is
-    the backstop and the lander's local checks are the gate; the final gate's exact-description read narrows a forged status to a landing by
-    the lander, and a merge made in the web UI after someone posted the three is not covered. The closure path is the review App of
-    `docs/decisions/2026-10-09-review-verdict-app-identity.md`, as for the other landers.
+  - The enforcement design, the lander as the merge path, is a PROPOSAL (#1195's decision record,
+    `docs/decisions/2026-10-15-horizon-runtime-ecosystem-repository.md`). A commit status carries no app identity: "Any person or integration
+    with write permissions to a repository can set the state of any status check" (`available-rules-for-rulesets.md:178`; "Users with push
+    access in a repository can create commit statuses", `api.github.com.json:79153`), and the ruleset then admits a merge whoever made it.
+    GitHub checks only the three contexts' states, so a merge made in the web UI after the lander's posts, or after anyone posted the three,
+    is not refused. The ruleset is the backstop and the lander's local checks are the gate; the final gate's exact-description read narrows
+    a forged status to a landing by the lander. The closure path is the review App of `docs/decisions/2026-10-09-review-verdict-app-identity.md`,
+    whose app can be selected as the statuses' expected source (`:178`), as for the other landers.
+  - The digests of the private files are local only (the landing receipt), so the self-audit that binds main's trailers to them needs the
+    host's `LANDING_COORD`: a host lost with its coordination tree loses them, and the trailers alone then bind names and the head, not bytes.
   - The receipts are claims the lander does not re-run: a `CI:` line says what ran and how it ended, and nothing binds it to a run.
   - A SIGKILL, or the host lost, between the first POST and the merge leaves the posted successes standing (no trap runs): post `failure`
     for each `lander/` context at that head by hand before anything else merges.
   - Unmeasured: the live limit of a status description (the 140-character ceiling is borrowed from deployment statuses) and the
     `codeowners/errors` endpoint, which no landing has called yet (its use follows the REST description at `58b1e0c0`).
-  - A merge state other than CLEAN stops the landing (6, 8 or 13), UNSTABLE (a status outside the ruleset that is failing) included, which
-    GitHub would merge: fail closed. A recomputation slower than the two-minute poll stops it too, and the next run posts the statuses again.
+  - A merge state other than CLEAN stops the landing (6, 8 or 13), UNSTABLE ("Mergeable with non-passing commit status.",
+    `schema.docs.graphql:26551-26553`: a status outside the ruleset that is failing) included, which GitHub would merge: fail closed. The
+    two-minute poll rests on a lag measured on us-equities-trading #58, not documented by GitHub; a recomputation slower than it stops the
+    landing too, and the next run posts the statuses again.
+  - A revocation POST that fails (the API refusing, the network lost) leaves that context's success standing; the line says which, to post
+    `failure` for it by hand.
   - CODEOWNERS v1 takes the merging account alone: a team, an address or another account stops the landing (8), and the patterns are not
     matched against the change (every rule must be the account's). GitHub's errors count is the only check of how GitHub reads the file.
   - `G`, the clone path, is expanded unquoted, as `U` and `G` are in the other two (above).
@@ -1105,7 +1162,8 @@ errors):
   are in the pull request):
   - a landing: the three POSTs at the head after every check, with their descriptions, then the combined-status read, then the squash merge
     pinned to the head with `-R seathatflowsinourveins/horizon`, and no Codex gate, validation, check-run read, `update-branch` or `ready`;
-    two receipt files bound by one digest, the later line for a command winning; the trailers read back by `git interpret-trailers --parse
+    two receipt files named in their order and bound locally by one digest (in the landing receipt since #1194's reads, published in the
+    description before), the later line for a command winning; the trailers read back by `git interpret-trailers --parse
     --no-divider`, and by a plain `--parse` unless the offered body holds a `---` line;
   - refusals with no status posted and nothing merged: each argument and input of another form, and each input of the other landers set, an
     empty value included, before any call; a verdict missing, unreadable, holding a NUL byte, of another family, of the 8-digit prefix alone
@@ -1134,10 +1192,20 @@ errors):
   - correction #121 (the CC's ruling of 2026-10-15), each failing against the script as it stood before the ruling, which read no
     `GATES_DONE` (16 failures in these 3 tests): a verdict of each family that states a landing gate stops with 2 without `GATES_DONE`
     (before `ready` and the posts) and with one that names the 8-digit prefix alone (which `nas_land.sh`'s `lg_receipt_ok` takes: the
-    control), and lands with one that names the full head, recorded as `Lander-gates-done`; a receipt missing, empty, holding a NUL byte or
+    control), and lands with one that names the full head, named in `Lander-gates-done`; a receipt missing, empty, holding a NUL byte or
     of another file name form stops with 2; without a stated gate `GATES_DONE` is not read (the control); `GATES_DONE` flipped after the
     posts stops with 7 when its bytes changed and with 2 when it is gone, each with the three failures; and the text: nas's four phrases,
-    `lg_receipt_ok` given the full head, the check inside `verdict_gate` and the final gate's comparison.
+    `lg_receipt_ok` given the full head, the check inside `verdict_gate` and the final gate's comparison;
+  - #1194's two reads (the GPT read and the CC's, 2026-10-16), each failing against `horizon_land.sh` at 34add438 unless it says otherwise
+    (measured with the module of this change against that script; the counts are in the pull request): no digest of a verdict, Muse's,
+    `GATES_DONE` or a receipt, all holding a synthetic home path, nor a 7-digit prefix of one, in a status description or the squash body, and
+    no hex there but the head and CODEOWNERS' sha256, while the landing receipt (0400) keeps every one; the receipt's place taken or not
+    makeable (7, nothing posted) and its write failing after the merge (16, the statuses kept); a pull request based on another branch or of
+    no base (13, before `ready` and the posts, its name not printed) and one retargeted after the posts (13, a final-gate flip with the three
+    failures; a main-based control lands); the full head followed by `A`, `G`, `0` or `_` refused in a verdict and `A` in `GATES_DONE`, and a
+    full stop, a space, a CR or a comma after it landing; the view after the merge failing with a sentinel on stdout, or of another state (12,
+    the sentinel not printed, the receipt written with no merge commit); a TERM during the first revocation POST (the three failures, the exit
+    the stop's 8); and the text: the trap's first line, the PROPOSAL label and the new citations.
 
 ## Upstream sources for the #975 corrections
 
@@ -1246,10 +1314,10 @@ bash 5.3.9 (Ubuntu's `bash` 5.3-2ubuntu1, whose `bash.1.gz` is the manual quoted
 | A NUL byte read in bash (the Claude read's P3-1) | the installed `bash(1)`, Ubuntu's `bash` 5.3-2ubuntu1, `read` (UNMIRRORED: the installed manual, not a pinned upstream file) | "If *delim* is the empty string, **read** will terminate a line when it reads a NUL character", and "Other than the case where *delim* is the empty string, **read** ignores any NUL characters in the input"; `help read`: "The return code is zero, unless end-of-file is encountered", so `nas_read`'s zero is a NUL and a non-zero the end of the file |
 | Strict UTF-8 (Astra's P2-1) | `python/cpython@v3.13.16`, measured with Python 3.13.16 and glibc 2.43's `iconv -f UTF-8 -t UTF-8` | of 13 probes Python's strict decoder and `iconv` agreed on 11; `iconv` took a code point above U+10FFFF (`f4 90 80 80`) and an `f5` lead byte that Python refuses, so `SB_READER` decodes with Python, as `codex_gate.py` decodes a record |
 
-2026-10-15, `horizon_land.sh`. Read on 2026-10-15 in the local upstream mirrors, clean at their commits: `github/rest-api-description` at
-`58b1e0c00b39`, `github/docs` at `be38ec5d`, `git/git` at `v2.53.0` (the commit `67ad4214`), and `cli/cli`, whose `pkg/cmd/api/api.go` is the
-bytes cited above for `v2.102.0`; and in the installed bash 5.3 (Ubuntu's `bash` 5.3-2ubuntu1, bash 5.3.9) and git 2.53.0, where it says
-measured:
+2026-10-15, `horizon_land.sh`. Read on 2026-10-15, and for #1194's reads on 2026-10-16, in the local upstream mirrors, clean at their
+commits: `github/rest-api-description` at `58b1e0c00b39`, `github/docs` at `be38ec5d`, `git/git` at `v2.53.0` (the commit `67ad4214`), and
+`cli/cli`, whose `pkg/cmd/api/api.go` is the bytes cited above for `v2.102.0` and whose `v2.102.0` mirror (`fc4b137c`) holds
+`pkg/cmd/pr/merge/http.go`; and in the installed bash 5.3 (Ubuntu's `bash` 5.3-2ubuntu1, bash 5.3.9) and git 2.53.0, where it says measured:
 
 | Mechanism | Source at the pin, sha256 | Lines read and what they say |
 | --- | --- | --- |
@@ -1259,4 +1327,7 @@ measured:
 | Where GitHub reads CODEOWNERS, and how | `github/docs@be38ec5d:content/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners.md`, `700caf36acb0755221f0eddf85bbf5dd9096e1c7965eb1daa126937e09c653e9` | `:36` the file in `.github/`, the root or `docs/`; GitHub "will search for them in that order and use the first one it finds"; `:44` "pull requests use the version of `CODEOWNERS` from the base branch of the pull request"; `:52` a file of 3 MB or more "will not be loaded"; `:79` "If any line in your CODEOWNERS file contains invalid syntax, that line will be skipped", and the errors are "accessible via the API"; `:99` an inline comment after the owners; `:140-146` a pattern whose owners are left empty: "Without an owner, changes to `apps/github` can be made with the approval of any user who has write access" |
 | GitHub's CODEOWNERS errors | `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e4…` | `:53272-53329` `GET /repos/{owner}/{repo}/codeowners/errors`, "List CODEOWNERS errors" (`repos/codeowners-errors`), with `ref`, "A branch, tag or commit name used to determine which version of the CODEOWNERS file to use", and a 404 "Resource not found"; `:147909-147969` the `codeowners-errors` schema, an `errors` list required at `:147966-147968`, each error's `line`, `column`, `source`, `kind`, `suggestion`, `message` and `path`. The lander reads the count alone |
 | The trailers, and a `---` line | `git/git@v2.53.0:Documentation/git-interpret-trailers.adoc`, `6d62454c79ea8c3527fe78cee53dc0d5919f094d35176986207950cbd80c96e2` | `:44-49` a "---" divider line, and what follows it, is not part of the message "unless `--no-divider` is specified"; `:88-92` trailers are a group of lines that is all trailers (or holds at least 25%) and is "preceded by one or more empty (or whitespace-only) lines"; `:181-184` `--no-divider`: "Do not treat `---` as the end of the commit message". Measured with git 2.53.0: a body with a `---` line gave a plain `--parse` no trailer, and `--parse --no-divider` and `git log --format='%(trailers)'` every one |
+| A ruleset's required status checks (#1194's CC read) | `github/docs@be38ec5d:content/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.md`, `1d1dad8bfbc0cc3ec1905193b12292d4e6e780c6ec9d3db7ee0f4b154d24f00b` | `:172` "Required status checks can be checks or statuses"; `:174` "You can use the commit status API to allow external services to mark commits with an appropriate status"; `:176` "all required status checks must pass before collaborators can merge changes into the branch or tag"; `:178` "Any person or integration with write permissions to a repository can set the state of any status check in the repository", unless an app is selected "as the expected source of status updates" ("If the status is set by any other person or integration, merging won't be allowed"); `:188-193` "loose" or "strict": strict is "The **Require branches to be up to date before merging** checkbox is checked", "The topic branch **must** be up to date with the base branch before merging", and "This is the default behavior for required status checks". Nothing there says a status's description counts for nothing (PROPOSAL) |
+| The merge pins the head, not the base (#1194's GPT read, P2) | `cli/cli@v2.102.0:pkg/cmd/pr/merge/http.go`, `17eb5418…` (the local upstream mirror at `fc4b137c`, clean) | `:47-50` `mergePullRequest` builds `MergePullRequestInput` from `PullRequestID`, `:52-75` the method, author, headline and body, `:77-80` `ExpectedHeadOid` when given; no base field |
+| The merge states (#1194's CC read) | `github/docs@be38ec5d:src/graphql/data/fpt/schema.docs.graphql`, `3ed09565…` (the bytes of the schema cited above) | `:26511-26554` `enum MergeStateStatus`: BEHIND "The head ref is out of date." (`:26513-26515`), BLOCKED "The merge is blocked." (`:26518-26520`), CLEAN "Mergeable and passing commit status." (`:26523-26525`), DIRTY "The merge commit cannot be cleanly created." (`:26528-26530`), DRAFT deprecated (`:26533-26538`), HAS_HOOKS (`:26541-26543`), UNKNOWN "The state cannot currently be determined." (`:26546-26548`), UNSTABLE "Mergeable with non-passing commit status." (`:26551-26553`) |
 | The EXIT trap and the signals | the installed `bash(1)`, Ubuntu's `bash` 5.3-2ubuntu1 (UNMIRRORED: the installed manual, not a pinned upstream file) | `exit`: "Any trap on EXIT is executed before the shell terminates"; SIGNALS: "If bash is waiting for a command to complete and receives a signal for which a trap has been set, it will not execute the trap until the command completes"; `trap`: for EXIT (0) the action "is executed on exit from the shell". Measured with bash 5.3.9: the EXIT trap keeps the exit status (an `exit 7` stayed 7); a `$(...)` subshell's exit does not run it; a SIGTERM while a child runs exits 143 and runs it, with a TERM trap and without one; `read -r -d ''` keeps a file's bytes exactly (a CR, bytes that are not UTF-8, trailing newlines) under C.UTF-8 and under C |
