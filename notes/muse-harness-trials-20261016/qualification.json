@@ -1,0 +1,45 @@
+{
+  "schema": "native-stack/muse-harness-trials-summary/1",
+  "status": "PROPOSED_TRIAL_PENDING_TWO_FAMILY_REVIEW",
+  "source_base": "fa6cf1a2360bbd1be810045819f222e4432e12bc",
+  "model": "mc/muse-wonder-full-1.0",
+  "non_gate": true,
+  "default_promoted": false,
+  "live_outcomes": {
+    "ns-pi-muse": {"first": "FAIL", "prefix_retry": "FAIL", "native_bridge_retry": "PASS"},
+    "ns-opencode-muse": {"first": "FAIL", "dependencies_retry": "PASS"},
+    "ns-claude-muse": {"first": "FAIL", "strict_mcp_retry": "PASS"},
+    "ns-codex-muse": {"first": "FAIL", "qualification": "UNQUALIFIED_NO_REAL_TASK_USE"}
+  },
+  "model_free_tests": {
+    "command": "python3 -B -m unittest tests.test_runtime_profiles tests.test_muse_runtime_profiles tests.test_muse_auxiliary_resources tests.test_muse_cli_harness",
+    "exit_code": 0,
+    "tests": 92,
+    "skips": 0
+  },
+  "fail_before_controls": [
+    "test_opencode_executes_qualified_target_not_unmounted_alias: real namespace exit1 before fix and0 after",
+    "test_opencode_admits_only_the_named_mcp_executable_alias: real namespace missing entrypoint before fix; passes after while sibling stays absent",
+    "test_pi_muse_uses_vendor_context_mode_bridge_names_without_extra_grants: assertion failed before native name mapping",
+    "test_pi_muse_preserves_native_context_package_alongside_role_package: in-memory package omission mutant yields one assertion failure, zero errors",
+    "test_muse_child_environment_keeps_only_process_context: inherited synthetic provider/private variables fail the assertion before allowlist",
+    "auxiliary missing dependency and physical JS path controls: each in-memory mutation yields one intended assertion failure, zero errors",
+    "native CLI exact strict MCP registration, canonical memory path, role names, complete Codex transport and retry-limit controls: failed before their corrections",
+    "native CLI receipt controls distinguish attempted, successful, failed and unresolved calls"
+  ],
+  "native_controls_without_inference": {
+    "pi": "vendor bridge and native role filter expose exactly four Context Mode actions",
+    "opencode": "all10 admitted MCP servers connect inside actual namespace; RTK0.51.0 executes;28 reviewed public read resources",
+    "claude": "official SDK no-prompt strict MCP initialization connects Context Mode and lists canonical skill",
+    "codex": "native app-server with exact job overrides lists canonical skill and exactly four Context Mode actions; separate config/read confirms future provider retry limits0/0"
+  },
+  "limitations": [
+    "Synthetic prompted use does not establish organic usage or campaign capability",
+    "Runtime/gateway-reported model fields are not independent upstream attestation",
+    "Requested max effort does not attest unobserved upstream wire effort",
+    "Subscription billing is unmeasured and cost remains null",
+    "No native Muse builder/reviewer launch or provider/account change",
+    "No web discovery qualification or unsupplied non-gate assignment",
+    "Codex protocol failure remains unresolved; no retry by chance"
+  ]
+}

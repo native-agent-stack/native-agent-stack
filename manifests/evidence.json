@@ -19342,6 +19342,11 @@
       "bytes": 9884
     },
     {
+      "path": "docs/decisions/2026-10-16-muse-subscription-harness-trials.md",
+      "sha256": "2221bdcd30aac11af9fbc49a0fa92f4cf37a82b931381ab5c743c5a210c57ea4",
+      "bytes": 10695
+    },
+    {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
       "sha256": "f646835af1648cfab7798f64626141c3964dfba4799d780dc728ea27f91f7f6c",
       "bytes": 15393
@@ -61862,6 +61867,66 @@
       "bytes": 4900
     },
     {
+      "path": "notes/muse-harness-trials-20261016/CLI-ROUTE-SCREEN.md",
+      "sha256": "412c6856b897abf2a1a9eb90b0351b8eb1c800a3429efa22a9b99f6f93ca8373",
+      "bytes": 13222
+    },
+    {
+      "path": "notes/muse-harness-trials-20261016/PREPARATION-CORRECTION.md",
+      "sha256": "b1f975e291fb59f821bac1f291062b36ecc35f6a8d8050561f96d5442d5f9483",
+      "bytes": 5531
+    },
+    {
+      "path": "notes/muse-harness-trials-20261016/PREREG.md",
+      "sha256": "76fe7905a2345d4a28b3f35baa30fda86f20db307abee11c573f617031ad2fa9",
+      "bytes": 5765
+    },
+    {
+      "path": "notes/muse-harness-trials-20261016/qualification.json",
+      "sha256": "115ce7fb36e55fdab1d1aadd799cb854b5a958a16d686563427b4a106c94f4f9",
+      "bytes": 3097
+    },
+    {
+      "path": "notes/muse-harness-trials-20261016/receipts/claude-muse-first.json",
+      "sha256": "f05f82f9d7516a4a88d3fb4cac7331a57fb81262dcb30eb0439713385ca2d854",
+      "bytes": 945
+    },
+    {
+      "path": "notes/muse-harness-trials-20261016/receipts/claude-muse-strict-mcp-retry.json",
+      "sha256": "402e2dfbc49af701f64eb73c5b54f46c35f87ab707186be274aeb87e683092c4",
+      "bytes": 1420
+    },
+    {
+      "path": "notes/muse-harness-trials-20261016/receipts/codex-muse-first.json",
+      "sha256": "67e0dae78959c01f47cfecf900cbb0c16f9b5643d4ca929b534704c79b03f4a7",
+      "bytes": 1323
+    },
+    {
+      "path": "notes/muse-harness-trials-20261016/receipts/opencode-muse-dependencies-retry.json",
+      "sha256": "29d39eb02b6cc4bf0384fab5607df116760e13d8a91128c8dcd7c4b35fb57804",
+      "bytes": 1452
+    },
+    {
+      "path": "notes/muse-harness-trials-20261016/receipts/opencode-muse-first.json",
+      "sha256": "66a84431d90edf0af6ef6617bf472d3f097f3299bdcec10f13389fa40fa44e66",
+      "bytes": 749
+    },
+    {
+      "path": "notes/muse-harness-trials-20261016/receipts/pi-muse-first.json",
+      "sha256": "69369f743faeeea0cfa8f86c03ea92ffa08a048eee9512dd4c3c749c987b997c",
+      "bytes": 1025
+    },
+    {
+      "path": "notes/muse-harness-trials-20261016/receipts/pi-muse-native-bridge-retry.json",
+      "sha256": "5db0b704e0ab5bbbc2162ae8c8df8e2f9ac4d799d22bc4d020841979d80364b2",
+      "bytes": 1558
+    },
+    {
+      "path": "notes/muse-harness-trials-20261016/receipts/pi-muse-prefix-retry.json",
+      "sha256": "7b774684d58c0b07e2d724b79c0fdc934cea74870a184c8b1b2281d73075dd83",
+      "bytes": 1025
+    },
+    {
       "path": "notes/muse-requal-149-20261015/receipt.md",
       "sha256": "d7faddf87cc2e95dcf9808de413eeaa577c94687e092dcb5781f0a2472d46152",
       "bytes": 13374
@@ -64122,6 +64187,16 @@
       "bytes": 16325
     },
     {
+      "path": "tests/test_muse_auxiliary_resources.py",
+      "sha256": "c0e64f1d6ee44faef6af931ff98bfde5d02456a00ecc6df2ae3324c231b2e709",
+      "bytes": 7963
+    },
+    {
+      "path": "tests/test_muse_cli_harness.py",
+      "sha256": "a3beb727792baef1ae6dcda274668833ccb4b44bfa39472de37ba172db1c46ba",
+      "bytes": 16916
+    },
+    {
       "path": "tests/test_muse_file_fence.py",
       "sha256": "12e498dc0c7c0d04b9553326e29c73d618d39bd82fc3a9860f69e50295e18edb",
       "bytes": 34078
@@ -64130,6 +64205,11 @@
       "path": "tests/test_muse_runtime_currency.py",
       "sha256": "2a2baaa2884474cb67f628de9b947a72753ba462a2ce7796b35893a40ed07cb9",
       "bytes": 6070
+    },
+    {
+      "path": "tests/test_muse_runtime_profiles.py",
+      "sha256": "f5302357a65e103d43855c17b2004cd15ceb532f15ace8144acc72feeced42ff",
+      "bytes": 10173
     },
     {
       "path": "tests/test_muse_toolchain_dirs.py",
@@ -64533,7 +64613,7 @@
     },
     {
       "path": "tests/test_runtime_profiles.py",
-      "sha256": "9f1e3d9379d8a2d6e0653e6b72817a08224d5d749d7557a2b1c5f0f77bfdc599",
+      "sha256": "5df8481285fb72ca7ce786c9a15b5d4a91ccde65e235e8aac0c34601ecadf114",
       "bytes": 87148
     },
     {
@@ -64987,6 +65067,16 @@
       "bytes": 24847
     },
     {
+      "path": "tools/adoption/muse_auxiliary_resources.py",
+      "sha256": "4fa49420410d9bd2c02c584e5ab4db499017560606b42e9ae8697aab1d749982",
+      "bytes": 9594
+    },
+    {
+      "path": "tools/adoption/muse_cli_harness.py",
+      "sha256": "70195636e7d0e8c35aa626cd94f68efc1d605c5f5509381e29ce5c13bbc51dbe",
+      "bytes": 28735
+    },
+    {
       "path": "tools/adoption/new_wsl_client_config.py",
       "sha256": "39e0117f266941b660dc4819891c18012a4935dcc4fb9624c5e56272e91d64b6",
       "bytes": 166110
@@ -65013,8 +65103,8 @@
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "5e4628636e3f7b6a944ed5383803381007a3d15c80668d5271d90e869ec95081",
-      "bytes": 105423
+      "sha256": "557c434af9c6e07bbbabfd896296326e96bdd3253ecf811344ddb450ce03ffad",
+      "bytes": 114990
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",

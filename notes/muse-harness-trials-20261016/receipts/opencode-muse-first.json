@@ -1,0 +1,21 @@
+{
+  "schema": "native-stack/muse-harness-qualification/1",
+  "lane": "ns-opencode-muse",
+  "attempt": "first",
+  "qualification": "FAIL",
+  "reason": "native namespace could not execute unmounted npm entrypoint alias",
+  "runtime": "opencode",
+  "runtime_version": "1.18.35",
+  "requested_model": "mc/muse-wonder-full-1.0",
+  "runtime_reported_model_ids": [],
+  "runtime_exit_code": 1,
+  "tracker_exit_code": 0,
+  "native_event_count": 0,
+  "completed_tool_counts": {},
+  "deterministic_result_pass": false,
+  "required_context_mode_invoked": false,
+  "worktree_isolation": "fresh worktree removed cleanly after failed startup",
+  "model_request_established": false,
+  "cost_usd": null,
+  "private_custody_name": "ns-opencode-muse-first-20261016"
+}

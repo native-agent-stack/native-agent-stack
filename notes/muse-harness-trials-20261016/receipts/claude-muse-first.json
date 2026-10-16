@@ -1,0 +1,23 @@
+{
+  "schema": "native-stack/muse-harness-qualification/1",
+  "lane": "ns-claude-muse",
+  "attempt": "first",
+  "started_utc": "2026-10-16T05:16:07Z",
+  "finished_utc": "2026-10-16T05:19:43Z",
+  "qualification": "FAIL",
+  "reason": "strict headless configuration omitted the required Context Mode server and canonical skill was not read",
+  "runtime_version": "2.1.301",
+  "requested_model": "mc/muse-wonder-full-1.0",
+  "runtime_reported_model_ids": ["mc/muse-wonder-full-1.0", "muse-wonder-full-1.0"],
+  "identity_basis": "runtime-or-gateway-reported; upstream-unverified",
+  "runtime_exit_code": 0,
+  "native_event_count": 33,
+  "terminal_event_count": 1,
+  "completed_tool_results": 8,
+  "canonical_skill_read": false,
+  "required_context_mode_invoked": false,
+  "deterministic_result_pass": true,
+  "cost_usd": null,
+  "cost_basis": "subscription usage; billed cost not measured",
+  "private_custody_name": "ns-claude-muse-first-20261016"
+}

@@ -1276,7 +1276,7 @@ let input=''; process.stdin.on('data',x=>input+=x); process.stdin.on('end',()=>{
                                       fragment=root / "Fragments/native-stack/runtimes.json")
             profiles.install_launchers(args)
             fragment = json.loads(args.fragment.read_text())
-            self.assertEqual(len(fragment["profiles"]), 4)
+            self.assertEqual(len(fragment["profiles"]), 6)
             self.assertTrue(all("updates" not in item for item in fragment["profiles"]))
             self.assertTrue(all("wsl.exe" in item["commandline"] for item in fragment["profiles"]))
             self.assertFalse((root / "settings.json").exists())

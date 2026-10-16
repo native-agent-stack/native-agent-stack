@@ -36,11 +36,14 @@ import threading
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
-PROFILES = ("pi-claude", "pi-gpt", "opencode-claude", "opencode-gpt")
+PROFILES = ("pi-claude", "pi-gpt", "opencode-claude", "opencode-gpt", "pi-muse", "opencode-muse")
+CLI_PROFILES = ('claude-muse', 'codex-muse')
+ALL_PROFILES = PROFILES + CLI_PROFILES
 ROLES = ("evidence-reviewer", "security-reviewer", "stack-researcher", "source-scout",
          "stack-verifier", "isolated-builder")
 CLAUDE_MODEL = "claude-opus-5-5"
 GPT_MODEL = "cx/gpt-6.1-sol"
+MUSE_MODEL = "mc/muse-wonder-full-1.0"
 GATEWAY = "http://127.0.0.1:21128/v1"
 SUPERPOWERS = "bb92a77741419a4ab5f06e711a283343f1ada0c3"
 SUPERPOWERS_PLUGIN = "superpowers@git+https://github.com/obra/superpowers.git#" + SUPERPOWERS
@@ -208,7 +211,7 @@ def role_source(name: str) -> tuple[dict, str]:
     return metadata, pieces[2].strip() + "\n" + (ROLE_VERDICT if "reviewer" in name else "")
 
 
-def granted_tools(metadata: dict, runtime: str) -> tuple[list[str], list[str]]:
+def granted_tools(metadata: dict, runtime: str, *, native_context_mode=False) -> tuple[list[str], list[str]]:
     """Translate only known exact grants; an absent equivalent is omitted.
 
     Pi docs/mcp.md:77 names tools mcp__<server>__<tool>. OpenCode's native
@@ -233,6 +236,12 @@ def granted_tools(metadata: dict, runtime: str) -> tuple[list[str], list[str]]:
             # Claude plugin prefixes identify the same canonical MCP server.
             if server.startswith("plugin_context-mode"):
                 server = "context-mode"
+            if runtime == 'pi' and native_context_mode and server == 'context-mode':
+                # context-mode1.0.169 build/adapters/pi/mcp-bridge.js:858-870
+                # registers the vendor tool's bare name through pi.registerTool.
+                # Pi's native --tools matcher still narrows this to role grants.
+                permitted.add(native_name(action, runtime, pattern=True))
+                continue
             prefix = "mcp__" + native_name(server) + "__" if runtime == "pi" else native_name(server, runtime) + "_"
             permitted.add(prefix + native_name(action, runtime, pattern=True))
         else:
@@ -293,6 +302,21 @@ def opencode_mcp(servers: dict) -> dict:
     return converted
 
 
+def muse_child_environment(runtime_environment: dict) -> dict:
+    """Process context for a subscription-only trial, without provider secrets."""
+    context = {key: os.environ[key] for key in ('PATH', 'HOME', 'USER', 'LOGNAME',
+               'LANG', 'LC_ALL', 'TERM', 'DISPLAY', 'WAYLAND_DISPLAY', 'XDG_RUNTIME_DIR')
+               if key in os.environ}
+    return {**context, **runtime_environment}
+
+
+def route_model(route: str) -> str:
+    try:
+        return {"claude": CLAUDE_MODEL, "gpt": GPT_MODEL, "muse": MUSE_MODEL}[route]
+    except KeyError:
+        raise ProfileError('unknown model route') from None
+
+
 def pi_models(route: str, *, role_scope=None) -> dict:
     # earendil-works/pi@04566631 packages/coding-agent/docs/models.md:67;
     # schemas/models.schema.json:107-110,272-275 accepts native maxTokens.
@@ -300,6 +324,7 @@ def pi_models(route: str, *, role_scope=None) -> dict:
     # anthropic-messages.ts:1162 and openai-responses.ts:340-341 send it.
     # Claude Opus5.5 vendor overview max output128K; OmniRoute /v1/models
     # cx/gpt-6.1-sol max_output_tokens128000. Use a bounded32K builder/researcher budget.
+    model_id = route_model(route)
     max_tokens = 32768 if role_scope in ("builder", "researcher") else 8192
     if route == "claude":
         return {"providers": {"anthropic": {
@@ -308,23 +333,32 @@ def pi_models(route: str, *, role_scope=None) -> dict:
     return {"providers": {"omniroute": {
         "baseUrl": GATEWAY, "api": "openai-responses", "apiKey": "local",
         "headers": {"x-omniroute-session-id": "${NS_RUNTIME_REQUEST_ID}"},
-        "models": [{"id": GPT_MODEL, "name": "OmniRoute GPT-6.1 Sol", "reasoning": True,
-                    "input": ["text"], "contextWindow": 258400, "maxTokens": max_tokens,
-                    "cost": {"input": 2, "output": 10, "cacheRead": 0.1, "cacheWrite": 2.5}}],
+        "models": [{"id": model_id, "name": "Muse Wonder Full (trial)" if route == "muse" else "OmniRoute GPT-6.1 Sol", "reasoning": True,
+                    **({"thinkingLevelMap": {"xhigh": "xhigh", "max": "max"}} if route == "muse" else {}),
+                    # 200000 is the muse-code registry's configured default,
+                    # not a measured Full capacity claim. Pricing is unknown;
+                    # zero placeholders are never reported as measured cost.
+                    "input": ["text"], "contextWindow": 200000 if route == "muse" else 258400, "maxTokens": max_tokens,
+                    "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0} if route == "muse" else
+                            {"input": 2, "output": 10, "cacheRead": 0.1, "cacheWrite": 2.5}}],
     }}}
 
 
 def opencode_provider(route: str) -> dict:
+    model_id = route_model(route)
     if route == "claude":
         return {"anthropic": {"options": {"apiKey": "{env:ANTHROPIC_API_KEY}",
                 "headers": {"x-client-request-id": "{env:NS_RUNTIME_REQUEST_ID}"}}}}
     return {"omniroute": {"npm": "@ai-sdk/openai", "name": "OmniRoute loopback",
             "options": {"baseURL": GATEWAY, "apiKey": "local",
                         "headers": {"x-omniroute-session-id": "{env:NS_RUNTIME_REQUEST_ID}"}},
-            "models": {GPT_MODEL: {"name": "GPT-6.1 Sol", "reasoning": True,
-                       "limit": {"context": 258400, "output": 8192},
-                       "options": {"reasoningEffort": "high"},
-                       "cost": {"input": 2, "output": 10, "cache_read": 0.1, "cache_write": 2.5}}}}}
+            "models": {model_id: {"name": "Muse Wonder Full (trial)" if route == "muse" else "GPT-6.1 Sol", "reasoning": True,
+                       **({"variants": {"max": {"reasoningEffort": "max", "reasoningSummary": "auto",
+                                                    "include": ["reasoning.encrypted_content"]}}} if route == "muse" else {}),
+                       "limit": {"context": 200000 if route == "muse" else 258400, "output": 8192},
+                       "options": {"reasoningEffort": "max" if route == "muse" else "high"},
+                       "cost": {"input": 0, "output": 0, "cache_read": 0, "cache_write": 0} if route == "muse" else
+                               {"input": 2, "output": 10, "cache_read": 0.1, "cache_write": 2.5}}}}}
 
 
 def profile_environment(profile: str, state: Path, role_scope: str | None = None, auxiliary_root: Path | None = None) -> dict:
@@ -420,6 +454,20 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
         if name in servers:
             excluded_servers[name] = "awaiting committed route/pin or lane grant"
             servers.pop(name)
+    auxiliary_resources = None
+    if profile == 'opencode-muse' and wsl:
+        from muse_auxiliary_resources import qualify_auxiliary_resources
+        auxiliary_resources = qualify_auxiliary_resources(
+            home=home, eco_root=eco_root, profile_root=destination,
+            local_commands={name: [server['command'], *server.get('args', [])]
+                            for name, server in servers.items()
+                            if server.get('type', 'stdio') == 'stdio'})
+        for name, command in auxiliary_resources['local_server_commands'].items():
+            servers[name] = {**servers[name], 'command': command[0], 'args': command[1:]}
+        for name, server in servers.items():
+            if server.get('type', 'stdio') == 'stdio':
+                servers[name] = {**server, 'env': {**server.get('env', {}),
+                                                **auxiliary_resources['environment']}}
     token_environment = profile_environment(profile, state, role_scope)
     servers["context-mode"] = {**servers["context-mode"],
         "args": [str(context_mode_package(destination) / "start.mjs")],
@@ -437,7 +485,7 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
     for name in ROLES:
         metadata, prompt = role_source(name)
         preloads = role_preloads(metadata, home, destination)
-        tools, omitted = granted_tools(metadata, runtime)
+        tools, omitted = granted_tools(metadata, runtime, native_context_mode=profile == 'pi-muse')
         roles[name] = {"tools": tools, "omitted_unmapped_tools": omitted,
                        "preloads": preloads,
                        "source": "adoption/agents/claude/" + name + ".md"}
@@ -480,7 +528,7 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
                                               "It changes no other role tool fence.\n"
                                               + "".join("\n\n{file:" + skill["path"] + "}" for skill in preloads),
                                     "permission": permissions,
-                                    "options": {"reasoningEffort": "xhigh" if route == "claude" else "high"}}
+                                    "options": {"reasoningEffort": "max" if route == "muse" else "xhigh" if route == "claude" else "high"}}
     if runtime == "pi":
         private_write(destination / "agent/models.json", json.dumps(pi_models(route, role_scope=role_scope), indent=2) + "\n")
         # Strict role sessions use direct tools. Deferred activation and
@@ -492,13 +540,14 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
             "retry": {"enabled": False, "provider": {"maxRetries": 0}},
             "cacheWarming": "off", "enableInstallTelemetry": False,
             "skills": [str(context_mode_package(destination) / "skills/context-mode")],
+            **({'packages': [str(context_mode_package(destination))]} if route == 'muse' else {}),
         }, indent=2) + "\n")
         (destination / "sessions").mkdir(mode=0o700)
     else:
         config = {"$schema": "https://opencode.ai/config.json", "provider": opencode_provider(route),
                   "experimental": {"openTelemetry": True},
                   "skills": {"paths": [str(context_mode_package(destination) / "skills/context-mode")]},
-                  "model": "anthropic/" + CLAUDE_MODEL if route == "claude" else "omniroute/" + GPT_MODEL,
+                  "model": ("anthropic/" if route == "claude" else "omniroute/") + route_model(route),
                   "enabled_providers": ["anthropic" if route == "claude" else "omniroute"],
                   "share": "disabled", "snapshot": False, "autoupdate": False,
                   "mcp": opencode_mcp(servers),
@@ -506,7 +555,7 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
                   "agent": {name: value["agent"] for name, value in roles.items()}}
         config["agent"]["title"] = {"disable": True}
         config["agent"]["summary"] = {"disable": True}
-        config["agent"]["build"] = {"options": {"reasoningEffort": "xhigh" if route == "claude" else "high"}}
+        config["agent"]["build"] = {"options": {"reasoningEffort": "max" if route == "muse" else "xhigh" if route == "claude" else "high"}}
         if role_scope and ROLE_SCOPES[role_scope][1]:
             # obra/superpowers@bb92a777 .opencode/INSTALL.md:15: the native
             # V1 plugin manager installs pinned Git dependencies. Native skill
@@ -516,19 +565,32 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
         # Agent Skills paths; no copied skills or rewritten skill bodies.
         private_write(destination / "config/opencode/opencode.json", json.dumps(config, indent=2) + "\n")
     metadata = {"schema_version": 1, "profile": profile, "role_scope": role_scope, "status": "trial",
-                "model": CLAUDE_MODEL if route == "claude" else GPT_MODEL,
-                "effort": "xhigh" if route == "claude" else "high",
+                "model": route_model(route),
+                "effort": "max" if route == "muse" else "xhigh" if route == "claude" else "high",
                 "pi_bin": str(pi_bin), "opencode_bin": str(opencode_bin), "runtime_version": qualified_version,
                 "roles": {name: {k: v for k, v in item.items() if k != "agent"} for name, item in roles.items()},
                 "canonical_mcp_sources": [str(p.relative_to(ROOT)) if p.is_relative_to(ROOT) else str(p)
                                           for p in templates], "mcp_server_names": sorted(servers)}
     metadata["excluded_mcp_servers"] = excluded_servers
+    if auxiliary_resources is not None:
+        metadata['qualified_auxiliary_read_paths'] = auxiliary_resources['qualified_auxiliary_read_paths']
+        metadata['qualified_auxiliary_environment'] = auxiliary_resources['environment']
+        metadata['qualified_auxiliary_pins'] = auxiliary_resources['pins']
     metadata["auxiliary_root"] = str(auxiliary_root) if auxiliary_root else None
     metadata["tier1_input"] = str(tier1_input) if tier1_input else None
     metadata["tier1_slots"] = [s["layer_id"] for s in tier1["slots"]] if tier1 else []
     metadata["skills_bin"] = str(skills_bin) if skills_bin else None
     metadata["tier2"] = "unmodified skills find; SKILLS_API_URL unset uses skills.sh; pinned project installs via install_skills.py --project-dir"
     metadata["skill_sources"] = {"context-mode": "mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b"}
+    if route == 'muse':
+        # npm1.0.169 has no gitHead. Its release tag names this source;
+        # the prior retained6f0cc source is later and shares the Pi adapter.
+        metadata['skill_sources']['context-mode'] = 'mksglu/context-mode@589d8214d56740a28b5f7bf63167743d586b0b40'
+        metadata['context_mode_artifact'] = {
+            'package': 'context-mode@1.0.169',
+            'release_source': metadata['skill_sources']['context-mode'],
+            'integrity': 'sha512-94JIaFuLjF9SO2BsGTrbGtyT44K95+9OC8BdbaL/UT76xOkanJLfUR5CzmNw+GELXZQqH4nBrKg9wjBnSFkVnQ==',
+            'source_binding': 'release tag and relevant adapter bytes verified; npm supplies no gitHead'}
     if role_scope and ROLE_SCOPES[role_scope][1]:
         metadata["skill_sources"].update({name: "obra/superpowers@" + SUPERPOWERS for name in SUPERPOWERS_SKILLS})
     private_write(destination / "profile.json", json.dumps(metadata, indent=2) + "\n")
@@ -582,7 +644,7 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
         # re-exposes its whole skill directory after package resource filters.
         # Preserve it unchanged; measure listing size instead of claiming an
         # unsupported per-skill CLI filter.
-        value["packages"] = [package]
+        value["packages"] = ([str(context_mode_package(destination))] if route == 'muse' else []) + [package]
         # This is the newly owned per-profile configuration, not a host file;
         # package resource filtering is Pi docs/packages.md:94-119.
         settings.write_text(json.dumps(value, indent=2) + "\n")
@@ -999,6 +1061,59 @@ def inference_facts(log: Path, runtime: str):
             "invoice_verified": False}
 
 
+def muse_model_identity(logs: list[Path], runtime: str, meta: dict, workspace: Path, env: dict) -> dict:
+    """Native identity facts only, never upstream-model attestation.
+
+    Pi normalizes assistant.model from its model configuration. OpenCode's
+    supported export supplies assistant info.modelID (53d1eabb export.ts:284).
+    Raw exports remain transient, with the same profile-only collection policy
+    as the existing interactive tracker. No header or native output is emitted.
+    """
+    models, sessions, errors = set(), set(), []
+    for log in logs:
+        for line in log.read_text(errors='replace').splitlines():
+            try:
+                event = json.loads(line)
+            except ValueError:
+                continue
+            if not isinstance(event, dict):
+                continue
+            if runtime == 'pi' and event.get('type') == 'message_end':
+                message = event.get('message') or {}
+                if isinstance(message, dict) and message.get('role') == 'assistant':
+                    value = message.get('model')
+                    if isinstance(value, str) and re.fullmatch(r'[A-Za-z0-9_./-]{1,200}', value):
+                        models.add(value)
+            elif runtime == 'opencode':
+                value = event.get('sessionID')
+                if isinstance(value, str) and re.fullmatch(r'ses_[A-Za-z0-9_-]{1,90}', value):
+                    sessions.add(value)
+    for session in sorted(sessions):
+        try:
+            with tempfile.TemporaryFile(mode='w+') as stream:
+                result = subprocess.run([meta['opencode_bin'], 'export', session], cwd=workspace,
+                                        env=env, stdout=stream, stderr=subprocess.DEVNULL, timeout=30)
+                if result.returncode:
+                    errors.append('session_export_failed')
+                    continue
+                stream.seek(0)
+                exported = json.load(stream)
+            if exported.get('info', {}).get('id') != session:
+                errors.append('foreign_export_refused')
+                continue
+            for message in exported.get('messages', []):
+                info = message.get('info', {})
+                value = info.get('modelID')
+                if (info.get('role') == 'assistant' and info.get('sessionID') == session
+                        and isinstance(value, str) and re.fullmatch(r'[A-Za-z0-9_./-]{1,200}', value)):
+                    models.add(value)
+        except (OSError, ValueError, TypeError, AttributeError, subprocess.SubprocessError):
+            errors.append('session_identity_unavailable')
+    return {'requested_model': meta['model'], 'runtime_reported_model_ids': sorted(models),
+            'model_identity_basis': 'native normalized model metadata; gateway may echo requested ID; upstream identity unverified',
+            'model_identity_collection_errors': errors}
+
+
 def fresh_worktree(repository: Path, profile: str) -> Path:
     run_id = uuid.uuid4().hex[:12]
     branch = "runtime/" + profile + "-" + run_id
@@ -1106,6 +1221,15 @@ def opencode_filesystem_roots(root: Path, workspace: Path, meta: dict, role: str
     # files. Their installer path never implies a package/home ancestor.
     dependencies = {str(binary), "/usr", "/bin", "/lib", "/lib64", "/sbin",
                     "/etc/ssl", "/etc/ca-certificates", "/etc/resolv.conf", "/etc/hosts"}
+    # Generated native MCP configuration names executable files, sometimes
+    # through an installed symlink. Preserve that exact entrypoint alongside
+    # its target; never infer or grant the executable's private parent tree.
+    for server in config.get('mcp', {}).values():
+        command = server.get('command') if isinstance(server, dict) else None
+        if isinstance(server, dict) and server.get('type') == 'local' and isinstance(command, list) and command:
+            entrypoint = Path(command[0])
+            if entrypoint.is_absolute() and entrypoint.is_file():
+                dependencies.add(str(entrypoint))
     for executable in (sys.executable, shutil.which("node"), shutil.which("uv")):
         if executable:
             dependencies.add(str(Path(executable).resolve()))
@@ -1212,6 +1336,9 @@ def cleanup_worktree(repository: Path, workspace: Path) -> dict:
 
 def launch(args):
     profile = args.profile
+    if profile in CLI_PROFILES:
+        from muse_cli_harness import launch as cli_launch
+        return cli_launch(args)
     runtime, route = profile.split("-")
     root = owned_destination(args.state_root / profile)
     role_scope = next((scope for scope, (name, _) in ROLE_SCOPES.items() if name == args.role), None)
@@ -1235,6 +1362,7 @@ def launch(args):
     workspace = resumed["workspace"] if resumed else fresh_worktree(args.repository.resolve(), profile)
     aux = Path(meta["auxiliary_root"]) if meta.get("auxiliary_root") else None
     runtime_env = profile_environment(profile, args.state_root, role_scope, aux)
+    runtime_env.update(meta.get('qualified_auxiliary_environment', {}))
     runtime_env["CONTEXT_MODE_PROJECT_DIR"] = str(workspace)
     runtime_env["CLAUDE_PROJECT_DIR"] = str(workspace)
     if runtime == "opencode":
@@ -1252,7 +1380,7 @@ def launch(args):
         runtime_env["PATH"] = str(Path(meta["skills_bin"]).parent) + os.pathsep + runtime_env["PATH"]
     if meta.get("tier1_input"):
         runtime_env["NS_TIER1_INPUT"] = meta["tier1_input"]
-    env = {**os.environ, **runtime_env,
+    env = {**(muse_child_environment(runtime_env) if route == 'muse' else {**os.environ, **runtime_env}),
            "NS_RUNTIME_REQUEST_ID": "ns-run-" + profile + "-" + uuid.uuid4().hex}
     title = "native-stack " + profile + " trial"
     if not args.print:
@@ -1282,7 +1410,9 @@ def launch(args):
     else:
         if args.role and args.role not in ROLES:
             raise ProfileError("unknown role")
-        command = [meta["opencode_bin"]]
+        # The namespace admits the version-checked executable target as a
+        # named file, not the npm .bin symlink or its private parent tree.
+        command = [str(Path(meta["opencode_bin"]).resolve())]
         if args.print:
             command += ["run", "--dir", str(workspace), "--format", "json", "--title", "runtime-" + uuid.uuid4().hex]
         command += ["--model", ("anthropic/" if route == "claude" else "omniroute/") + meta["model"],
@@ -1386,7 +1516,8 @@ def launch(args):
                     facts.append(fact)
                     logs.append(log)
                     attempts.append({"run": run.name, "credential_loader_id": slot, "outcome": outcome,
-                                     "runtime_exit_code": exit_code, "native_cost_usd": facts[-1]["native_cost_usd"],
+                                     "runtime_exit_code": exit_code,
+                                     "native_cost_usd": None if route == "muse" else facts[-1]["native_cost_usd"],
                                      "completed_native_steps": facts[-1]["completed_native_steps"],
                                      "spend_known": not in_flight})
                     if ledger:
@@ -1455,14 +1586,20 @@ def launch(args):
         tracker_code = 0
         private_write(run / "invocations.json", json.dumps(report, indent=2) + "\n")
         head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=workspace, text=True).strip()
+        inference = combined_facts(facts)
+        if route == 'muse':
+            inference.update(native_cost_usd=None, cost_basis='subscription; token prices and billed cost unmeasured')
+        model_identity = muse_model_identity(logs, runtime, meta, workspace, env) if route == 'muse' else {}
         private_write(run / "receipt.json", json.dumps({
             "schema_version": 1, "status": "trial", "profile": profile, "role": args.role,
+            "workspace": str(workspace), "runtime_version": meta.get('runtime_version'),
             "started_at": started, "finished_at": utc(), "head": head,
             "request_label": env["NS_RUNTIME_REQUEST_ID"], "model": meta["model"],
             "credential_loader_id": slot if route == "claude" else None,
             "credit_refused_slots": refused_slots,
             "attempts": attempts, "resume": resume, "resumed_from": resumed["receipt_run"] if resumed else None,
-            "inference": combined_facts(facts),
+            "inference": inference,
+            **model_identity,
             "runtime_exit_code": exit_code, "tracker_exit_code": tracker_code,
             "invocations": report, "publication_boundary": "derived facts only; native state remains private",
             "configured_preloads": [{"name": p["name"], "source": p["source"]}
@@ -1608,7 +1745,8 @@ def install_launchers(args):
             os.replace(replacement, path)
         else:
             private_write(path, content, 0o700)
-    for profile in PROFILES:
+    selected = getattr(args, 'profile', None) or PROFILES
+    for profile in selected:
         command = [sys.executable, str(Path(__file__).resolve()), "launch", profile,
                    "--state-root", str(args.state_root), "--repository", str(args.repository)]
         launcher(root / ("ns-" + profile), "#!/usr/bin/env bash\nexec " + shlex.join(command) + ' "$@"\n')
@@ -1619,7 +1757,7 @@ def install_launchers(args):
     # and Fragment installation. This is a new fragment, never settings.json.
     fragment = {"profiles": [{"name": "NativeStack " + profile + " (trial)",
                                "commandline": 'wsl.exe --exec sh -lc "exec $HOME/.local/bin/ns-' + profile + '"',
-                               "tabTitle": profile + " trial"} for profile in PROFILES]}
+                               "tabTitle": profile + " trial"} for profile in selected]}
     content = json.dumps(fragment, indent=2) + "\n"
     if not (args.fragment.is_file() and not args.fragment.is_symlink() and args.fragment.read_text() == content):
         private_write(args.fragment, content)
@@ -1642,6 +1780,10 @@ def parser():
     prepare.add_argument("--mcp-template", type=Path, action="append", required=True)
     prepare.add_argument("--pi-bin", type=Path, required=True)
     prepare.add_argument("--opencode-bin", type=Path, required=True)
+    prepare.add_argument('--claude-bin', type=Path)
+    prepare.add_argument('--codex-bin', type=Path)
+    prepare.add_argument('--profile', action='append', choices=ALL_PROFILES,
+                         help='prepare only the named trial profiles; native CLI routes require explicit selection')
     prepare.add_argument("--rtk-source", type=Path, required=True)
     prepare.add_argument("--wsl-render", action="store_true",
                          help="render canonical MCP through new_wsl_client_config's WSL map first")
@@ -1654,7 +1796,7 @@ def parser():
     prepare.add_argument("--skills-bin", type=Path,
                          help="existing pinned vendor Skills CLI for Tier2 find and run-scoped install")
     run = sub.add_parser("launch")
-    run.add_argument("profile", type=profile_name, choices=PROFILES)
+    run.add_argument("profile", type=profile_name, choices=ALL_PROFILES)
     run.add_argument("--state-root", type=Path, required=True)
     run.add_argument("--repository", type=Path, required=True)
     run.add_argument("--role", choices=ROLES, default="isolated-builder")
@@ -1667,7 +1809,7 @@ def parser():
     lane = sub.add_parser("run", help="ns-run <profile> <role> <brief-file>")
     lane.add_argument("--state-root", type=Path, required=True)
     lane.add_argument("--repository", type=Path, required=True)
-    lane.add_argument("profile", type=profile_name, choices=PROFILES)
+    lane.add_argument("profile", type=profile_name, choices=ALL_PROFILES)
     lane.add_argument("role", choices=("builder", "reviewer", "auditor", "researcher"))
     lane.add_argument("brief", type=Path, nargs="?", help="required unless --resume is given")
     lane.add_argument("--timeout-seconds", type=int, default=900)
@@ -1678,6 +1820,7 @@ def parser():
     install.add_argument("--home", type=Path, default=Path.home())
     install.add_argument("--state-root", type=Path, required=True)
     install.add_argument("--repository", type=Path, required=True)
+    install.add_argument('--profile', action='append', choices=ALL_PROFILES)
     install.add_argument("--fragment", type=Path, required=True)
     install.add_argument("--update-owned", action="store_true",
                          help="replace only launchers whose exact exec prefix identifies this generator")
@@ -1688,7 +1831,11 @@ def main(argv=None):
     args = parser().parse_args(argv)
     try:
         if args.command == "prepare":
-            for profile in PROFILES:
+            for profile in args.profile or PROFILES:
+                if profile in CLI_PROFILES:
+                    from muse_cli_harness import prepare as cli_prepare
+                    print(json.dumps(cli_prepare(args, profile)))
+                    continue
                 for scope in [None, *ROLE_SCOPES] if args.role_scoped else [None]:
                     print(json.dumps(render(profile, state=args.state_root, home=args.home,
                                             eco_root=args.eco_root, templates=args.mcp_template,
