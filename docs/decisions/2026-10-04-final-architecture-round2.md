@@ -4,11 +4,11 @@
 
 ## Authority
 
-The owner's decision of 2026-10-04 (about 20:50Z), quoted verbatim:
+The owner's decision of 2026-10-04 (about 20:50Z), in a dated paraphrase; the exact words stay in the command center's private records (the no-owner-quote rule of 2026-10-14 supersedes the earlier verbatim quotation):
 
-> with the repos quality itself resolute our architecture with the sota repos's own quality and finalize for the architecture for us to clean install
+> the owner, 2026-10-04 (paraphrased): they asked for the architecture to be resolved by the candidate repositories' own quality and finalized for the clean install.
 
-It set the rule in `docs/decisions/2026-10-04-repository-quality-rule.md`: documented gaps are filled by the candidate repository's own quality evidence, with no new local trial. **The owner decided the rule; the tools below were named by decide round 2 and its Opus verification.** The owner named no tool here, except that the hcom row follows the posture the lanes converged on from the owner's 2026-10-03 answer, quoted verbatim in [the Q11 record](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684): "we need full sota convergneced llm native automation at highest quality".
+It set the rule in `docs/decisions/2026-10-04-repository-quality-rule.md`: documented gaps are filled by the candidate repository's own quality evidence, with no new local trial. **The owner decided the rule; the tools below were named by decide round 2 and its Opus verification.** The owner named no tool here, except that the hcom row follows the posture the lanes converged on from the owner's 2026-10-03 answer in [the Q11 record](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684) (the owner, 2026-10-03 (paraphrased): they asked for fully converged, state-of-the-art, LLM-native automation at the highest quality).
 
 ## Method
 

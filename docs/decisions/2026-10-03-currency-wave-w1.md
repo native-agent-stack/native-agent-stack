@@ -213,7 +213,7 @@ path. Its next dispatch/tag result must be retained as that path's first
 execution. This repair neither dispatches those workflows nor infers their
 results from local structural checks.
 
-**Dated history (2026-10-03 W1 repair scope and handoff).** The following text is retained as written; its current-tense configuration-owner statements are superseded by the October 5 merge record below.
+**Dated history (2026-10-03 W1 repair scope and handoff).** The following text is retained as written, except that on 2026-10-16 its role owners are named as lanes, so a role is not read as the owner; its current-tense configuration-lane statements are superseded by the October 5 merge record below.
 
 > Off-limit configuration-owner files, including `adoption/new-wsl-profile.json`,
 > all `blueprints/us-equities/` files, historical receipts, prior decisions,
@@ -222,17 +222,17 @@ results from local structural checks.
 > restored to its base 0.161.0 text in R642. Reports may display the intentional
 > difference between current stack pins and older sealed landscape winners.
 >
-> Owner handoffs for the next unit:
+> Handoffs for the next unit:
 >
-> - The configuration owner must reconcile `adoption/new-wsl-profile.json`:
+> - The configuration lane must reconcile `adoption/new-wsl-profile.json`:
 >   it carries Inspector 2.9.0, Worktrunk 0.80.0 and Collector 0.162.0, while
 >   playwright-cli 0.1.21 and Syft 1.52.0 remain older than the W1 selections.
 >   Its mcporter 0.14.1 agrees with R642b's hold. This file is outside the repair's edit scope.
-> - The trading owner must update the canonical
+> - The trading lane must update the canonical
 >   `blueprints/us-equities/supply-chain/README.md` recipe for Syft 1.54.0,
 >   including its 1.52.0 archive/hash instructions, using the W1 receipt's
 >   publisher checksum URL and `54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860`.
->   The trading owner also owns the Collector version comment in
+>   The trading lane also owns the Collector version comment in
 >   `observability/paper-trading-live/collector-paper-trading.yaml`.
 > - The coordinator supplies the required CI buckets, macOS result, hosted
 >   secret scans, PR labels/body and any required trading acknowledgement for

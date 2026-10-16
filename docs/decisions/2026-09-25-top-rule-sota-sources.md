@@ -17,12 +17,11 @@ based on `origin/main@0074a0c3`.
 
 The owner's September 25 decision requires every layer, component and action to have a maintained SOTA
 repository or published reference: install directly, or build only from a cited reference implementation.
-They made this the first rule in the instruction files; a missing source requires stopping and reporting. This record's decided wording follows:
-
-> **Top rule: never self-write without a SOTA source.** Every layer, component and action comes from a maintained
-> SOTA repository or published reference: install it directly, or build only from a cited reference implementation,
-> and name that source (repository, pin, file or paper) for every action. With no SOTA source, stop and report
-> instead of writing one.
+They made this the first rule in the instruction files; a missing source requires stopping and reporting. The rule's
+own wording is the first rule of `AGENTS.md` at 7bbb021eb97d77ef9f41336a18364d1ee5050f6e, the commit that added this
+record. In other words (restated 2026-10-16): each action records where it comes from, by repository and pin, file or
+paper; it adopts that source as shipped or follows a cited reference implementation; and where no such source exists,
+the work halts and the gap is reported rather than filled by hand.
 
 The `sota-sources` job fails a pull request whose description has no non-empty "SOTA sources" section (`##` or
 `###`). It reads the description from the `pull_request` payload through [actions/github-script v9.0.0 at `3a2844b7`](https://github.com/actions/github-script/blob/3a2844b7e9c422d3c10d287c895573f7108da1b3/README.md),

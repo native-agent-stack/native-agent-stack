@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 from contextlib import redirect_stderr, redirect_stdout
+import importlib.util
 import io
 import json
 import os
@@ -62,6 +63,56 @@ def all_strings(value):
     elif isinstance(value, list):
         for child in value:
             yield from all_strings(child)
+
+
+# Owner chat is paraphrased on publication, never quoted (the GPT read of #1128 at bd3eecfe5, blocker 1): the handbook
+# copies each manifest slot whole (scripts/build_new_wsl_handbook.py, the "record" of every default slot), and the manifest
+# copies the layer-consensus record's rows and amendments, so a quotation in that record reached the handbook. The check is
+# structural, as tests/test_session_relaunch.py PublicationSurfaces checks its files, so no owner text is held here.
+CONSENSUS_SOURCE = "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json"
+ASSEMBLER = "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py"
+QUOTE_MARKS = ('"', "“", "”")
+# The owner or the user as a speaker; a slot or a setting named after them (memory-owner, user-config) is not one.
+SPEAKER = r"(?<![\w-])(?:owner|user)(?:'s|’s)?(?![\w-])"
+# The words that introduce what a speaker said.
+SPEECH = (r"(?<![\w-])(?:ask(?:s|ed|ing)?|answer(?:s|ed)?|request(?:s|ed)?|said|says|told|wrote|words|"
+          r"quot(?:e|es|ed|ing)|verbatim)(?![\w-])")
+# Within one sentence and one table cell: the speaker and a speech word close together, then a quote mark ("the owner asking
+# for ...", "the user's answer, quoted: ...", "the owner wrote ..."), or a closing quote mark followed by them ("..., the
+# owner said"). A gap never crosses a quote mark or a table cell's pipe.
+GAP = "[^\"“”|]"
+ATTRIBUTION = re.compile(rf"(?:{SPEAKER}{GAP}{{0,80}}?{SPEECH}|{SPEECH}{GAP}{{0,80}}?{SPEAKER}){GAP}{{0,160}}?[\"“”]"
+                         rf"|[\"“”]{GAP}{{0,30}}?{SPEAKER}{GAP}{{0,30}}?{SPEECH}", re.IGNORECASE)
+SENTENCE_BREAK = re.compile(r"(?<=[.!?])\s+|\n\s*\n")
+WORDS_FIELDS = {"verbatim", "quote", "quotation", "words"}
+
+
+def attributed_quotations(text):
+    """How many sentences of the text attribute a double-quoted span to the owner or the user (ATTRIBUTION). A quotation in
+    protocol or contract text, a critic's finding or a command line has no such speaker and passes."""
+    return sum(1 for sentence in SENTENCE_BREAK.split(text) if ATTRIBUTION.search(sentence))
+
+
+def owner_quotations(value, kept=frozenset(), path=""):
+    """The locators of every owner quotation in a JSON value, never its text: a field that holds the owner's words
+    (owner_verbatim and the like, or verbatim in an object of the owner's decision) and a string with an attributed
+    quotation. `kept` names paths a separately defined contract requires; none is kept since the relay contract carries
+    a dated paraphrase (command center ruling 2026-10-15T12:38Z)."""
+    found = []
+    if isinstance(value, dict):
+        owners = value.get("kind") == "owner_decision" or bool(re.search(SPEAKER, str(value.get("by", "")), re.IGNORECASE))
+        for key, child in value.items():
+            where = f"{path}/{key}"
+            words = re.fullmatch(r"owner_(?:verbatim|quote|quotation|words)", key) or (owners and key in WORDS_FIELDS)
+            if words and where not in kept and isinstance(child, str) and child.strip():
+                found.append(f"{where}: a field that holds the owner's words")
+            found += owner_quotations(child, kept, where)
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            found += owner_quotations(child, kept, f"{path}/{index}")
+    elif isinstance(value, str) and attributed_quotations(value):
+        found.append(f"{path}: a quotation attributed to the owner or the user")
+    return found
 
 
 class NewWslHandbookTests(unittest.TestCase):
@@ -1733,6 +1784,21 @@ class NewWslHandbookTests(unittest.TestCase):
                           "projected_tools": len(data["tools"]),
                           "canonical_package_ids": sum(1 for tool in data["tools"] if tool.get("package_id"))})
 
+    def test_each_supersession_reason_binds_only_the_entry_it_supersedes(self):
+        """The local Codex review of #1161 at e0ff2abb (P2-B): a regeneration's reason was also attached to an older,
+        undated history entry, so two different output pairs claimed one supersession. History entries are append-only:
+        a reason belongs to one entry, and a reason that cites a date sits on an entry superseded no earlier than it."""
+        history = json.loads(self.committed("evidence/artifacts/new-wsl-handbook-20261001/receipt.json"))["previous_outputs"]
+        reasons = [entry.get("reason") for entry in history]
+        self.assertEqual(sorted({i for i, reason in enumerate(reasons) if reason and reasons.count(reason) > 1}), [],
+                         "entries that share one supersession reason")
+        for index, entry in enumerate(history):
+            dates = re.findall(r"\b(\d{4}-\d{2}-\d{2})", entry.get("reason") or "")
+            if dates:
+                with self.subTest(entry=index):
+                    self.assertTrue(entry.get("superseded_at_utc"), "a dated reason on an entry with no supersession time")
+                    self.assertGreaterEqual(entry["superseded_at_utc"][:10], max(dates))
+
     def test_check_fails_after_a_one_byte_change_to_either_output_or_to_the_manifest(self):
         self.real_tree()
         self.assertEqual(self.public_cli().returncode, 0)
@@ -1762,6 +1828,88 @@ class NewWslHandbookTests(unittest.TestCase):
                 manifest.write_bytes(original)
                 self.assertEqual(self.public_cli(mode="--check").returncode, 0)
 
+
+class OwnerQuotationTests(unittest.TestCase):
+    """The generated handbook and the canonical inputs it projects carry no owner quotation (owner_quotations above)."""
+
+    maxDiff = None  # a failure lists every locator; a locator never holds the quoted text
+    # Invented owner prose for the fixtures; no record holds it.
+    WORDS = "keep the lanterns lit on every shelf"
+
+    def test_a_quoted_owner_field_or_sentence_is_found_and_reported_without_its_text(self):
+        cases = {
+            "a field of the owner's words": {"amendment": {"date_utc": "2026-01-02", "by": "the owner's decision",
+                                                           "decision": "the owner wants the fixture lanes lit",
+                                                           "owner_verbatim": self.WORDS}},
+            "an owner decision's words": {"authority": {"kind": "owner_decision", "date_utc": "2026-01-02",
+                                                        "decision": "light the fixture lanes", "verbatim": self.WORDS,
+                                                        "relayed_by": "fixture-records.json owner_decisions[0]"}},
+            "a quoted request": {"reason": f'A(3): the amendment quotes the owner asking for "{self.WORDS}"; it names no tool.'},
+            "a quoted answer": {"posture": f"from the user's answer on the posture question, quoted: “{self.WORDS}”; "
+                                           "record: https://example.invalid/answer"},
+            "a quotation before its speaker": {"note": f'"{self.WORDS}," the owner said.'},
+        }
+        for label, value in cases.items():
+            with self.subTest(case=label):
+                found = owner_quotations(value)
+                self.assertEqual(len(found), 1, found)
+                self.assertNotIn(self.WORDS, found[0])
+        self.assertEqual(attributed_quotations(f'Notes.\n\nThe owner wrote "{self.WORDS}" to the lane.'), 1)
+
+    def test_the_custody_tavily_change_states_the_owner_decision_in_other_words(self):
+        """GPT fix3r at fd51f88d (#1161), its blocker at wave2-records.json:274: change 12 kept the earlier wording under a
+        paraphrase label. It now states the 2026-09-26 decision in other words; this pins the new public text only."""
+        records = json.loads((ROOT / "evidence" / "artifacts" / "new-wsl-layer-consensus-20261002" / "wave2-records.json")
+                             .read_text(encoding="utf-8"))
+        change = records["layers"]["custody"]["ruling"]["changes"]["12"]
+        self.assertIn("On 2026-09-26 the owner decided that this stack makes no further use of Tavily's paid search (their "
+                      "decision, restated here in other words on 2026-10-15)", change)
+        self.assertNotIn("(paraphrased 2026-10-15)", change)
+        self.assertEqual(owner_quotations({"change": change}), [])
+
+    def test_a_dated_paraphrase_and_separately_defined_protocol_text_pass(self):
+        paraphrase = "the owner, 2026-01-02 (paraphrased): they asked that every fixture lane stay lit"
+        value = {"amendment": {"date_utc": "2026-01-02", "by": "the owner's decision, then direct consensus of both families",
+                               "decision": "the owner wants the fixture lanes lit; the transport is measured first",
+                               "owner_paraphrase": paraphrase,
+                               "text": "The row's first condition, the owner's decision, is answered.",
+                               "contract": 'Runs count "persisted", "delivered" and "acknowledged" separately; the owner '
+                                           'receives the counts.'},
+                 "reason": f"A(3): the amendment records the request; {paraphrase}; it names no tool.",
+                 "install": 'in one environment shared with the fixture owner: pip install "fixture==1.0"',
+                 "critic": 'the round-1 critic recorded "fixture gap" as holding',
+                 "memory": 'the memory-owner row quotes the release notes: "fixture notes"'}
+        self.assertEqual(owner_quotations(value), [])
+        self.assertEqual(attributed_quotations(paraphrase + '. The contract counts "delivered" runs.'), 0)
+        # A verbatim field in an owner decision is always a finding: the relay contract carries a dated paraphrase.
+        relayed = {"authority": {"kind": "owner_decision", "verbatim": self.WORDS}}
+        self.assertEqual(owner_quotations(relayed), ["/authority/verbatim: a field that holds the owner's words"])
+
+    def test_the_canonical_inputs_and_the_generated_handbook_carry_no_owner_quotation(self):
+        consensus = json.loads((ROOT / CONSENSUS_SOURCE).read_text(encoding="utf-8"))
+        found = [CONSENSUS_SOURCE + where for where in owner_quotations(consensus)]
+        for name in (DEFAULTS_SOURCE, handbook.OUTPUTS[1]):
+            found += [name + where for where in owner_quotations(json.loads((ROOT / name).read_text(encoding="utf-8")))]
+        markdown = attributed_quotations((ROOT / handbook.OUTPUTS[0]).read_text(encoding="utf-8"))
+        if markdown:
+            found.append(f"{handbook.OUTPUTS[0]}: {markdown} sentences attribute a quotation to the owner or the user")
+        self.assertEqual(found, [], "paraphrase owner chat with its date ('the owner, <date> (paraphrased): ...'); never quote it")
+
+
+    def test_the_relaying_decision_records_carry_the_paraphrase_not_the_words(self):
+        # Command center ruling 2026-10-15T12:38Z (P1): each owner batch's committed relaying decision record states the
+        # batch's dated paraphrase as a block quote and calls nothing the owner's verbatim words.
+        consensus = json.loads((ROOT / CONSENSUS_SOURCE).read_text(encoding="utf-8"))
+        for key, batch in consensus.items():
+            if not (re.fullmatch(r"wave[0-9]+", key) and isinstance(batch, dict)
+                    and (batch.get("authority") or {}).get("kind") == "owner_decision"):
+                continue
+            authority = batch["authority"]
+            with self.subTest(batch=key):
+                self.assertNotIn("verbatim", authority)
+                text = (ROOT / authority["relayed_by"]).read_text(encoding="utf-8")
+                self.assertIn("\n> " + authority["paraphrase"] + "\n", text)
+                self.assertIsNone(re.search(r"(?:quoted|order,) verbatim", text))
 
 if __name__ == "__main__":
     unittest.main()

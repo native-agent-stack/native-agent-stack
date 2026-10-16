@@ -19,6 +19,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from tests.test_adoption_bootstrap import sha256sum_checks_like_gnu  # helpers only; its test classes run there
+from tests.test_new_wsl_handbook import attributed_quotations  # helper only; its test classes run there
 
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001"
@@ -1065,7 +1066,12 @@ class Manifest(unittest.TestCase):
         self.assertIn(self.consensus["rule"], text)
         self.assertIn(self.wave2["interim_rule"], text)
         self.assertIn(self.wave2["no_install_rule_exception"], text)
-        self.assertNotIn(self.consensus["authorization"]["verbatim"], text)
+        # The owner's sentence is a dated paraphrase in the consensus record (the GPT read of #1128 at bd3eecfe5, blocker 1),
+        # and the decision record attributes no quotation to the owner or the user.
+        authorization = self.consensus["authorization"]
+        self.assertNotIn("verbatim", authorization)
+        self.assertTrue(authorization["paraphrase"].startswith("the owner, 2026-10-02 (paraphrased): "))
+        self.assertEqual(attributed_quotations(text), 0)
         normalized = " ".join(text.split()).casefold()
         for clause in self.consensus["authorization"]["reading"].split("; "):
             self.assertIn(clause.casefold(), normalized)
@@ -1146,11 +1152,15 @@ class Manifest(unittest.TestCase):
                 self.assertEqual(set(interim["reviews"]), {"claude", "gpt"})
                 self.assertTrue(interim["decided_by"].strip())
         # The GPT family's standing position is carried as it was: it disagreed on the context layer and recommended the
-        # holds that the owner's decision lifted; the owner's own words are quoted where the relaying record quotes them.
+        # holds that the owner's decision lifted; the owner's words are a dated paraphrase, never a quotation (the GPT read
+        # of #1128 at bd3eecfe5, blocker 1), and the hashed relaying record holds the decision.
         self.assertIn("disagreed", self.interims["context-supply"]["reviews"]["gpt"])
         for sid in ("memory-owner", "code-search"):
             self.assertIn("hold", self.interims[sid]["reviews"]["gpt"])
-        self.assertIn("context mode", self.interims["context-supply"]["authority"]["verbatim"])
+        paraphrase = self.interims["context-supply"]["authority"]["paraphrase"]
+        self.assertTrue(paraphrase.startswith("the owner, 2026-10-03 (paraphrased): "), paraphrase)
+        self.assertIn("context mode", paraphrase)
+        self.assertNotIn("verbatim", self.interims["context-supply"]["authority"])
         self.assertIn("definitive", self.interims["context-supply"]["label"])
         self.assertIn("never removed automatically", self.interims["context-supply"]["decided_by"])
         # The memory server listens where the host and client templates point (wave-2 synthesis X5), not on 21374.
@@ -1206,6 +1216,9 @@ class Manifest(unittest.TestCase):
              "consensus memory-owner: an interim's authority is one of owner_decision, direct_consensus, not consensus"),
             ("an owner's decision without its decision", lambda e, b: e["interim"]["authority"].pop("decision"), "memory-owner",
              "consensus memory-owner: the owner's decision needs its decision"),
+            ("an owner's decision carrying the owner's words",
+             lambda e, b: e["interim"]["authority"].update(verbatim="INSTALL EVERYTHING"), "memory-owner",
+             "consensus memory-owner: an owner decision carries a dated paraphrase, never the owner's words (verbatim)"),
             ("a direct consensus with one acknowledgement",
              lambda e, b: e["interim"].update(authority={"kind": "direct_consensus", "acknowledgements": [
                  {"family": "claude", "url": "https://github.com/example/example/pull/1#issuecomment-1"}]}), "memory-owner",
@@ -1481,8 +1494,13 @@ class Manifest(unittest.TestCase):
         self.assertEqual(ref["path"], "docs/decisions/2026-10-04-token-full-stack-owner-default.md")
         self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
         text = (ROOT / ref["path"]).read_text(encoding="utf-8")
-        self.assertIn(authority["verbatim"], text)
-        self.assertTrue(authority["verbatim"].startswith("WE NEED TO ENABLE FULL SOTA STACKS FOR THE TOKEN EFFICIENCY REPOS "))
+        # The record states the order as one block quote of the batch's dated paraphrase; the owner's exact words stay in
+        # the command center's private record, which relay_record names by name and location only, never by a digest
+        # (command center ruling 2026-10-15T12:38Z; the no-owner-quote rule of 2026-10-14).
+        self.assertNotIn("verbatim", authority)
+        self.assertTrue(authority["paraphrase"].startswith(f"the owner, {authority['date_utc']} (paraphrased): "))
+        self.assertIn("\n> " + authority["paraphrase"] + "\n", text)
+        self.assertIsNone(re.search(r"[0-9a-f]{7,}|sha256", authority["relay_record"]))
         for sid in WAVE3_OWNER_ADDED + sorted((OWNER_DEFAULTS - {"promptfoo"} - WAVE5_OWNER_DEFAULTS) | OWNER_INTERIM):
             self.assertIn(f"`{sid}`", text, sid)
         for key in ("owner_rule", "no_install_rule_exception"):
@@ -1502,7 +1520,7 @@ class Manifest(unittest.TestCase):
         ref = batch["records"]["decision_record"]
         self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
         text = (ROOT / ref["path"]).read_text(encoding="utf-8")
-        self.assertIn(batch["authority"]["verbatim"], text)
+        self.assertIn("\n> " + batch["authority"]["paraphrase"] + "\n", text)
         self.assertIn("`promptfoo`", text)
         self.assertIn("https://github.com/promptfoo/promptfoo", text)
         self.assertEqual((batch["acknowledgements"], batch["acknowledgements_owed"]), ([], []))
@@ -1511,7 +1529,7 @@ class Manifest(unittest.TestCase):
         self.assertEqual(ref["path"], "docs/decisions/2026-10-04-final-architecture-round2.md")
         self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
         text = (ROOT / ref["path"]).read_text(encoding="utf-8")
-        self.assertIn(batch["authority"]["verbatim"], text)
+        self.assertIn("\n> " + batch["authority"]["paraphrase"] + "\n", text)
         for sid in WAVE5_OWNER_ADDED + sorted(WAVE5_OWNER_DEFAULTS):
             self.assertIn(f"`{sid}`", text, sid)
         self.assertEqual((batch["acknowledgements"], batch["acknowledgements_owed"]), ([], []))
@@ -1547,6 +1565,11 @@ class Manifest(unittest.TestCase):
         def added(doc, sid="command-output"):
             return next(row for row in doc["wave3"]["add_rows"] if row["slot_id"] == sid)
 
+        # A dated record name is not a digest (the local review of #1161 at c95453a1, P2; the command center's adjudication
+        # at e21a7b61): a relay record named with an eight-digit date assembles.
+        self.assertIsNone(attempt(lambda d: w3(d)["authority"].update(
+            relay_record="the command center's coordination records of 20261004 (outside the repository)")))
+
         def amended(doc, sid):
             return next(entry for entry in doc["wave3"]["amend_rows"] if entry["slot_id"] == sid)
 
@@ -1559,16 +1582,37 @@ class Manifest(unittest.TestCase):
              "consensus wave3: an owner batch owes no acknowledgement; its authority is the owner's decision"),
             ("an authority of another kind", lambda d: w3(d)["authority"].update(kind="direct_consensus"),
              "consensus wave3: an owner batch's authority is an owner_decision, not direct_consensus"),
-            ("an authority without its words", lambda d: w3(d)["authority"].pop("verbatim"),
-             "consensus wave3: the owner's decision needs exactly kind, date_utc, decision, verbatim, relayed_by, rule_basis"),
+            ("an authority without its paraphrase", lambda d: w3(d)["authority"].pop("paraphrase"),
+             "consensus wave3: the owner's decision needs exactly kind, date_utc, decision, paraphrase, relay_record, relayed_by, "
+             "rule_basis"),
+            ("the owner's words coming back", lambda d: w3(d)["authority"].update(verbatim="INSTALL EVERYTHING"),
+             "consensus wave3: the owner's decision needs exactly kind, date_utc, decision, paraphrase, relay_record, relayed_by, "
+             "rule_basis"),
+            ("an undated paraphrase", lambda d: w3(d)["authority"].update(paraphrase="install everything"),
+             "consensus wave3: the owner's paraphrase begins 'the owner, 2026-10-04 (paraphrased): '"),
+            ("a paraphrase that is only its prefix",
+             lambda d: w3(d)["authority"].update(paraphrase="the owner, 2026-10-04 (paraphrased): "),
+             "consensus wave3: the owner's paraphrase states nothing after 'the owner, 2026-10-04 (paraphrased): '"),
+            ("a relay record named by a base64 digest",
+             lambda d: w3(d)["authority"].update(relay_record="private note Zq9XwVtRuYpLkMnBvCxZ8wQ"),
+             "consensus wave3: relay_record names the private record by name and location, never by a digest"),
+            ("a relay record named by a hex digest prefix",
+             lambda d: w3(d)["authority"].update(relay_record="private note a1b2c3d4e5"),
+             "consensus wave3: relay_record names the private record by name and location, never by a digest"),
+            ("a relay record named by an SRI digest",
+             lambda d: w3(d)["authority"].update(relay_record="private note sha512-" + "Ab3" * 10 + "=="),
+             "consensus wave3: relay_record names the private record by name and location, never by a digest"),
+            ("a relay record named by a digest", lambda d: w3(d)["authority"].update(relay_record="private note 0123456789abcdef"),
+             "consensus wave3: relay_record names the private record by name and location, never by a digest"),
             ("an authority dated otherwise", lambda d: w3(d)["authority"].update(date_utc="2026-10-05"),
              "consensus wave3: the owner's decision is dated 2026-10-05, and the batch 2026-10-04"),
             ("a relaying record that is not hashed", lambda d: w3(d)["authority"].update(relayed_by="docs/other.md"),
              "consensus wave3: the owner's decision is relayed by docs/other.md, which is not one of the batch's hashed records"),
             ("a relaying record whose hash differs", lambda d: w3(d)["records"]["decision_record"].update(sha256="0" * 64),
              f"consensus wave3.records.decision_record: evidence sha256 mismatch: {record}"),
-            ("words the record does not quote", lambda d: w3(d)["authority"].update(verbatim="INSTALL EVERYTHING"),
-             f"consensus wave3: {record} does not quote the owner's words verbatim"),
+            ("a paraphrase the record does not state",
+             lambda d: w3(d)["authority"].update(paraphrase="the owner, 2026-10-04 (paraphrased): install everything"),
+             f"consensus wave3: {record} does not state the batch's paraphrase of the owner's decision"),
             ("a slot the record does not name", lambda d: added(d).update(slot_id="unnamed-slot"),
              f"consensus wave3: {record} does not name the slot unnamed-slot"),
             ("a repository the record does not name", lambda d: added(d).update(repository="https://github.com/example/unnamed"),

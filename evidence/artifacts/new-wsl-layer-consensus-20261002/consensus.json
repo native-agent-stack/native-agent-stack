@@ -21,7 +21,7 @@
  "method": "Leads came from the research runtime on the live web (GPT Researcher 3.7.0 on a local model; reports are leads, not facts). The Claude lane re-read every fact it used from GitHub by script and wrote proposals for seven layers and for the skills rows. The Codex lane decided each one independently from its own reading of the primary sources (its consequential decisions on its stronger model at maximum effort) and corrected two statements of the proposals. The acknowledgements are public comments on pull request 608, and each one listed under records says what its comment covers.",
  "authorization": {
   "by": "the owner",
-  "verbatim": "you can reseach  consensus wit hlive codex session, we need frictionless seamless llm native workflow",
+  "paraphrase": "the owner, 2026-10-02 (paraphrased): they allowed the research to be settled by consensus with a running Codex session, and asked for a workflow that is native to language models and runs without friction",
   "said": "2026-10-02, shortly before 17:59:40Z (the time stamp of the request note that relays it)",
   "reading": "the two lanes settle research results between themselves and bring the owner only what needs a sign-in, a grant or capacity; it grants no permission, sign-in or capacity to either lane"
  },
@@ -29,11 +29,11 @@
  "records": {
   "claude_proposals": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-proposals.md",
-   "sha256": "cd7b99553cc8d9c608262e47e709add19819aef84c06bbf35b84787f5969e832"
+   "sha256": "f59c7621f4fbb6cf50dbfaecc954e652137dbfc17c5eacf668dd9c90f49ca93a"
   },
   "claude_request": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-request.md",
-   "sha256": "d939a5b4ee1433a0f68250c334fbe5bce1759279c19e2a9a21ca2c21d00af005"
+   "sha256": "88209714852e1499cd32cb985a5081e5917bf00715a550e0afb1c2c5abc7a129"
   },
   "codex_decisions": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/codex-decisions.md",
@@ -395,7 +395,7 @@
     "date_utc": "2026-10-02",
     "by": "the owner's decision, then direct consensus of both model families on the arms",
     "decision": "the owner wants messaging between sessions and between the two clients; the transport is measured before one is selected",
-    "owner_verbatim": "need to be passwardless seamless workflow,passwardmangement and llm native is a must,bypasspremission seamless across session messaging, claude-codex messaging etc",
+    "owner_paraphrase": "the owner, 2026-10-02 (paraphrased): they require a workflow without password prompts, with password management, native to language models and running with permission prompts bypassed, and messaging across sessions, including between Claude and Codex",
     "text": "The row's first condition, the owner's decision on the permission posture, is answered. Native Claude Code covers Claude to Claude; cross-vendor delivery was not established by the reviewed native sources. Concord MCP, an arm of the earlier text, is not among the agreed arms. The earlier message-count contract is amended with the owner before a run.",
     "arms": [
      {
@@ -518,7 +518,7 @@
   "records": {
    "wave2_records": {
     "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-    "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+    "sha256": "e337a50b2d0523e72576f597a85bb9dfcc5780fa8be9284180546c10cd1b4df8"
    }
   },
   "acknowledgements": [
@@ -634,7 +634,7 @@
      "records": [
       {
        "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-       "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+       "sha256": "e337a50b2d0523e72576f597a85bb9dfcc5780fa8be9284180546c10cd1b4df8"
       }
      ],
      "configuration": {
@@ -683,7 +683,7 @@
      "records": [
       {
        "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-       "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+       "sha256": "e337a50b2d0523e72576f597a85bb9dfcc5780fa8be9284180546c10cd1b4df8"
       }
      ],
      "configuration": {
@@ -723,7 +723,7 @@
       "kind": "owner_decision",
       "date_utc": "2026-10-03",
       "decision": "use context-mode in both clients of the destination (the owner's pin that the wave-2 ruling for the context layer adopts)",
-      "verbatim": "please always use the sota gpt powered sota sdks, runtime for the research, context mode etc, we are evolve beyond simple action of web search",
+      "paraphrase": "the owner, 2026-10-03 (paraphrased): they asked that research always run on the leading GPT-powered SDKs and runtimes, context mode among them, since plain web searching no longer suffices",
       "relayed_by": "wave2-records.json owner_decisions[1]"
      },
      "reviews": {
@@ -733,7 +733,7 @@
      "records": [
       {
        "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-       "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+       "sha256": "e337a50b2d0523e72576f597a85bb9dfcc5780fa8be9284180546c10cd1b4df8"
       }
      ],
      "configuration": {
@@ -768,14 +768,15 @@
    "kind": "owner_decision",
    "date_utc": "2026-10-04",
    "decision": "install the full token-efficiency stack (the core rows of docs/token-efficiency-stack.json with RTK, context-mode and the token-lane carriers) cleanly on the new distribution, as the default every future session launches and invokes",
-   "verbatim": "WE NEED TO ENABLE FULL SOTA STACKS FOR THE TOKEN EFFICIENCY REPOS INSTALL CLEANLY MAKE SURETHEY LIVE SEAMLESSLY AS OUR NATIVE WORKFLWO FOR FUTURE SESSION DEFAULT TO LAUNCH AND INVOKE ,CLENA RESOLUTE AND REPORT THE MAIN SESSION WHEN READY with real new session launched e2e monitor invoke rate and upstream commands e2e with using of the sota related full lifecycle skills, the token save is essential layer make sure we are monitored token use and sota token save repos invoke rate with new session launched e2e m keep resolute untill the upstream are fully resoluted and live within our native workflow including ultracode subagent,experimental agent team in our wsl with upstream commands for showing the real saved and sota resoluted practices upstream clean installed",
+   "paraphrase": "the owner, 2026-10-04 (paraphrased): they asked for the full state-of-the-art token-efficiency stack to be enabled and installed cleanly, so that it runs seamlessly as the native workflow that future sessions launch and invoke by default; for a report to the main session when it is ready, proven end to end with a newly launched session, monitored invoke rates and token use, and upstream commands, using the related full-lifecycle skills; and for the work to continue until the upstream tools are fully resolved and live in the native workflow, including ultracode subagents and the experimental agent teams, with upstream commands that show the real savings.",
+   "relay_record": "the command center's private coordination records of 2026-10-04: the harness relay to session wsl-architecture-design and the coordination brief of session native-agent-stack-99 (outside the repository)",
    "relayed_by": "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
    "rule_basis": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md, section Overturn: 'For the rule: the user asks again for arms on the clean install'; wave2.interim_rule: 'The authority is the owner's dated decision, as the record that relays it states it'"
   },
   "records": {
    "decision_record": {
     "path": "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
-    "sha256": "d6d0ba48d8881d746bdb9d4dc214339c2f8dba9842fad4152675437811a818d5"
+    "sha256": "1626395038cd777cddf48a84d6becc09d91ee3dce8ff4c1010ff2ad8e05f6c7c"
    }
   },
   "acknowledgements": [],
@@ -1368,22 +1369,23 @@
    "kind": "owner_decision",
    "date_utc": "2026-10-04",
    "decision": "fill documented gaps by the candidate repository's own quality evidence, without a new local trial, and finalize the architecture for the clean install (the repository-quality rule, applied by decide round 2)",
-   "verbatim": "with the repos quality itself resolute our architecture with the sota repos's own quality and finalize for the architecture for us to clean install",
+   "paraphrase": "the owner, 2026-10-04 (paraphrased): they asked for the architecture to be resolved by the candidate repositories' own quality and finalized for the clean install.",
+   "relay_record": "the command center's private coordination records of 2026-10-04, about 20:50Z (outside the repository)",
    "relayed_by": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
    "rule_basis": "docs/decisions/2026-10-04-repository-quality-rule.md (decide round 2); amendment 4's owner default (wave3.owner_rule)"
   },
   "records": {
    "decision_record": {
     "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
-    "sha256": "e60ca8cf00843aafeee60871ee638252c2a942688653c79669b6a96bccaadb4a"
+    "sha256": "c858c7d3940d1810dc905f6cb15424faf6f4a14076b9fba804c4764d5e3d6e5c"
    },
    "quality_rule": {
     "path": "docs/decisions/2026-10-04-repository-quality-rule.md",
-    "sha256": "b11fac1ba8dfa8b64a1a1c53c24fe5bea69228e74c7142aa38ec169890326e91"
+    "sha256": "c41afa0a75982730f34ab05868e56403e56cee9ecc3d1884ccc9619a86184931"
    },
    "round2_extract": {
     "path": "evidence/artifacts/new-wsl-fix-wave-20261004/repository-quality-promptfoo.json",
-    "sha256": "92b70fde74999cb3ae8f00462b01ce92a3a0a649dbc1380bc00619d7b1d7c6bc"
+    "sha256": "52a4d37f9d2c23e4c830c17f64095eb8c61c9c1f951114ba02a9fe4f753aef40"
    }
   },
   "acknowledgements": [],
@@ -1433,22 +1435,23 @@
    "kind": "owner_decision",
    "date_utc": "2026-10-04",
    "decision": "fill documented gaps by the candidate repository's own quality evidence, without a new local trial, and finalize the architecture for the clean install (the repository-quality rule); decide round 2 and its Opus verification named the owners",
-   "verbatim": "with the repos quality itself resolute our architecture with the sota repos's own quality and finalize for the architecture for us to clean install",
+   "paraphrase": "the owner, 2026-10-04 (paraphrased): they asked for the architecture to be resolved by the candidate repositories' own quality and finalized for the clean install.",
+   "relay_record": "the command center's private coordination records of 2026-10-04, about 20:50Z (outside the repository)",
    "relayed_by": "docs/decisions/2026-10-04-final-architecture-round2.md",
    "rule_basis": "docs/decisions/2026-10-04-repository-quality-rule.md (decide round 2); amendment 4's owner rows and owner defaults (wave3.owner_rule)"
   },
   "records": {
    "decision_record": {
     "path": "docs/decisions/2026-10-04-final-architecture-round2.md",
-    "sha256": "98b57badb6779c9ef09c7ad3ba54773c1428042fe3cdf6f39362259741d10768"
+    "sha256": "02d6697f05f15fb09300d9692db3d16c2240411f18ca6493ce49e3626bed25bf"
    },
    "quality_rule": {
     "path": "docs/decisions/2026-10-04-repository-quality-rule.md",
-    "sha256": "b11fac1ba8dfa8b64a1a1c53c24fe5bea69228e74c7142aa38ec169890326e91"
+    "sha256": "c41afa0a75982730f34ab05868e56403e56cee9ecc3d1884ccc9619a86184931"
    },
    "round2_extract": {
     "path": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
-    "sha256": "45cd2b5c580d6f65aaf8eafd80d9412295e40de275dc8a5356d08f8deadb05a7"
+    "sha256": "02027aa9d99764842ea783988af9d4bf37f424e38a128c65267df4dfd3bf7945"
    }
   },
   "acknowledgements": [],
@@ -1614,7 +1617,7 @@
       "outcome": "owner_default",
       "by": "the owner's repository-quality rule of 2026-10-04",
       "batch": "wave5",
-      "reason": "Decide round 2 applied the owner's repository-quality rule to the gap workers/agent-messaging; its Opus verification named hcom against live upstream. Uphold: the critic's revised verdict (hcom) survives refutation.\n\n(1) Requirement gate. Met under A(1), two-client Claude Code plus Codex work, and A(3): the 2026-10-02 amendment quotes the owner asking for \"claude-codex messaging\", and the user's Q11 answer is quoted verbatim in https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684: \"we need full sota convergneced llm native automation at highest quality\"; that answer names no tool.\n\n(2) hcom passes every candidate gate:\n- Maintained: not archived; main commit 2026-10-04; release 2026-10-01.\n- Linux x86_64 install: documented, with a checksum-verifying installer; the source has explicit WSL detection.\n- Self-hosted: local SQLite. The relay stays inactive until",
+      "reason": "Decide round 2 applied the owner's repository-quality rule to the gap workers/agent-messaging; its Opus verification named hcom against live upstream. Uphold: the critic's revised verdict (hcom) survives refutation.\n\n(1) Requirement gate. Met under A(1), two-client Claude Code plus Codex work, and A(3): the 2026-10-02 amendment records the owner's request (the owner, 2026-10-02 (paraphrased): they asked for messaging between Claude and Codex), and the owner's Q11 answer is recorded at https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684 (the owner, 2026-10-03 (paraphrased): they need automation built natively around language models, converged on the current state of the art, at the best quality available); that answer names no tool.\n\n(2) hcom passes every candidate gate:\n- Maintained: not archived; main commit 2026-10-04; release 2026-10-01.\n- Linux x86_64 install: documented, with a checksum-verifying installer; the source has explicit WSL detection.\n- Self-hosted: local SQLite. The relay stays inactive until",
       "pin": "aannoo/hcom tag v0.7.27 = commit 2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b, published 2026-10-01T02:11:55Z. hcom-installer.sh sha256 3bc057fcd763748c32fae0ae25e150abf2b1df0d4c9451432c28f4ddde176a98, which equals the release API asset digest. hcom-x86_64-unknown-linux-gnu.tar.gz sha256 8ae97ff6fef63c637d66ddf882651aadd035bd74ae26c0787743869c20a5391d; the installer embeds this value and checks it with verify_checksum (installer L313, L374-375). Installs to ~/.local/bin; receipt goes to ~/.config/hcom. The upstream alternative is uv tool install hcom==0.7.27 (PyPI manylinux x86_64 wheel; no provenance). Re-pin at the first release that closes issue 151.",
       "install": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh | sh",
       "overturn": "the preregistered messaging measurement (prereg r3 of 2026-10-03, never started), or the verdict's paired Harbor comparison against a released agmsg; revert to configuring the native incumbents if both upstreams document a native cross-client ingress; each reports to the owner and removes nothing by itself",
@@ -1634,7 +1637,7 @@
        "the command-center ledger stays the authorization record for any [cc-msg v1] item hcom carries",
        "re-read hcom's safe list (src/hooks/common.rs) at every pin bump; re-pin at the first release that closes issue 151"
       ],
-      "posture": "the hcom posture both lanes converged on (2026-10-03; Codex root source-accept), from the owner's answer on the posture question, quoted: \"we need full sota convergneced llm native automation at highest quality\"; verbatim record: https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684"
+      "posture": "the hcom posture both lanes converged on (2026-10-03; Codex root source-accept), from the owner's answer on the posture question (the owner, 2026-10-03 (paraphrased): they need automation built natively around language models, converged on the current state of the art, at the best quality available); record of the answer: https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684"
      }
     }
    },
@@ -1656,7 +1659,7 @@
       "outcome": "owner_default",
       "by": "the owner's repository-quality rule of 2026-10-04",
       "batch": "wave5",
-      "reason": "Decide round 2 applied the owner's repository-quality rule to the gap web-research/playwright-cli; its Opus verification named Chrome DevTools MCP against live upstream. I upheld the converged verdict. The evidence supports Chrome DevTools MCP 1.10.1 through its MCP interface under criteria-quality.txt rule D(1).\n\n(1) Requirement gate: met three ways. A(1): agent browser automation serves the two-client coding and research scope. A(2): the round-1 critics agreed one browser tool is needed (definitive-manifest resolution: \"both critics agree on one browser tool, not two\"). A(3): the repository-quality rule is quoted verbatim in docs/decisions/2026-10-04-repository-quality-rule.md; the earlier 20:45Z packet gloss is a coordinator summary, not the user's words.\n\n(2) Candidate gates, re-checked live on 2026-10-04, all pass:\n- Unarchive",
+      "reason": "Decide round 2 applied the owner's repository-quality rule to the gap web-research/playwright-cli; its Opus verification named Chrome DevTools MCP against live upstream. I upheld the converged verdict. The evidence supports Chrome DevTools MCP 1.10.1 through its MCP interface under criteria-quality.txt rule D(1).\n\n(1) Requirement gate: met three ways. A(1): agent browser automation serves the two-client coding and research scope. A(2): the round-1 critics agreed one browser tool is needed (definitive-manifest resolution: \"both critics agree on one browser tool, not two\"). A(3): the repository-quality rule is stated, in a dated paraphrase, in docs/decisions/2026-10-04-repository-quality-rule.md; the earlier 20:45Z packet gloss is a coordinator summary, not the user's words.\n\n(2) Candidate gates, re-checked live on 2026-10-04, all pass:\n- Unarchive",
       "pin": "chrome-devtools-mcp@1.10.1 on npm. Tag chrome-devtools-mcp-v1.10.1 = commit e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df, published 2026-09-23T10:37:16Z; still the latest release when checked on 2026-10-04. npm gitHead matches the tag, with SLSA v1 provenance and 2 registry signatures; engines node ^20.19.0 || ^22.12.0 || >=23. The browser is google-chrome-stable amd64 and cannot be pinned through the upstream route: the README requires \"current stable version or newer\", so the host receipt should record the installed Chrome version.",
       "install": "1) Linux-side Chrome, from the upstream WSL section (docs/troubleshooting.md#wsl at tag chrome-devtools-mcp-v1.10.1): wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && sudo dpkg -i google-chrome-stable_current_amd64.deb (if dpkg reports unmet dependencies, the standard Debian fix-up is sudo apt-get -f install; that step is not in the upstream text and is not verified on Ubuntu 26.04). 2) Claude Code, from docs/client-configurations.md:71 with @latest replaced by the pin; the -- separator lets the server flags reach npx: claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics. 3) Codex, from docs/client-configurations.md:109: codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics. Every flag is documented upstream. --isolated is the a",
       "overturn": "the slot's named comparison, run through upstream Harbor: the adopted MCP interface against Playwright CLI 0.1.22 on the same 20 browser tasks; it reports to the owner and removes nothing by itself",

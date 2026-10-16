@@ -3,22 +3,40 @@
  "copied_utc": "2026-10-02",
  "copies": {
   "claude-proposals.md": {
-   "sha256": "cd7b99553cc8d9c608262e47e709add19819aef84c06bbf35b84787f5969e832",
+   "sha256": "f59c7621f4fbb6cf50dbfaecc954e652137dbfc17c5eacf668dd9c90f49ca93a",
    "original_sha256": "116932940653053f5f24c16b8649ed399a61bf7444801d99dff7635033f79b3d",
    "original_bytes": 7805,
    "paragraphs_left_out": 0,
    "replacements": [
-    {"replaced_by": "the lane's private state folder (not published)", "what": "a path in the lane's private state folder", "times": 1}
+    {
+     "replaced_by": "the lane's private state folder (not published)",
+     "what": "a path in the lane's private state folder",
+     "times": 1
+    },
+    {
+     "replaced_by": "a dated paraphrase (the no-owner-quote rule of 2026-10-14; applied 2026-10-15, earlier commits keep the original wording)",
+     "what": "the user's words quoted in item 7",
+     "times": 1
+    }
    ]
   },
   "claude-request.md": {
-   "sha256": "d939a5b4ee1433a0f68250c334fbe5bce1759279c19e2a9a21ca2c21d00af005",
+   "sha256": "88209714852e1499cd32cb985a5081e5917bf00715a550e0afb1c2c5abc7a129",
    "original_sha256": "2d7e04e8226b83c87cc81de20856cd99621f9341cdb0d37c73dbe74aef92e9a7",
    "original_bytes": 2858,
    "paragraphs_left_out": 1,
    "left_out": "one operational request about a running session on the destination distribution; it carries no decision",
    "replacements": [
-    {"replaced_by": "the lane's private state folder (not published)", "what": "a path in the lane's private state folder", "times": 1}
+    {
+     "replaced_by": "the lane's private state folder (not published)",
+     "what": "a path in the lane's private state folder",
+     "times": 1
+    },
+    {
+     "replaced_by": "a dated paraphrase (the no-owner-quote rule of 2026-10-14; applied 2026-10-15, earlier commits keep the original wording)",
+     "what": "the user's words quoted in the opening paragraph and in item 3",
+     "times": 2
+    }
    ]
   },
   "codex-decisions.md": {
@@ -27,7 +45,11 @@
    "original_bytes": 18621,
    "paragraphs_left_out": 0,
    "replacements": [
-    {"replaced_by": "the measurement distribution's", "what": "the name of the throwaway distribution, in the possessive", "times": 1}
+    {
+     "replaced_by": "the measurement distribution's",
+     "what": "the name of the throwaway distribution, in the possessive",
+     "times": 1
+    }
    ],
    "note": "the Codex lane extended this note after its first version; the copy is the version of 2026-10-02T18:57:10Z, which holds the seven layer decisions, the three skills rows, the research skill's dependency review and the scoped dispositions of newly found repositories. The Codex lane's comments 5959059286 (18:45:13Z) and 5959205007 (18:51:56Z) came before this version and are not acknowledgements of the scoped dispositions; the Claude lane agreed to those dispositions as this version states them in comment 5959684384 (19:16:53Z), and the Codex lane recorded receipt of that agreement in comment 5959996494 (19:35:35Z)"
   }

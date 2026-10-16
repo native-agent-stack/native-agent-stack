@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
-    "docs/new-wsl-handbook.json": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474"
+    "docs/new-wsl-handbook.md": "62008dc65fb9d3b9bf453ff7b155005b3e5e7eedcba1dfb13489384659b62b97",
+    "docs/new-wsl-handbook.json": "196f6288c710867141e0ab9052b8d0f6a129bdc55519f125b19f14a294202c15"
   },
   "inventory": {
     "layers": 37,
@@ -1054,6 +1054,102 @@
       "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
       "evidence_class": "local_integration",
       "scope": "Regenerated through the unchanged native builder after the Harbor stack-component registration changed two hashed inputs: the adoption recipe map gained harbor, and the architecture edition's Nemotron revision citation moved from stack line 2118 to 2141 (the cited revision is unchanged). No host, model or provider acceptance."
+    },
+    {
+      "recorded_at_utc": "2026-10-15T11:18:29Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "fc76c9cd638086fea49f99d423796cfbf6e474ba54a3c9ab15ae3f78b469b920",
+        "docs/new-wsl-handbook.json": "4a43c627140093b4c758eaa75134242917fca1ca98a68984762ba9f2c4559299"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "evidence_class": "local_integration",
+      "scope": "Regenerated through the unchanged native builder after the layer-consensus record replaced its owner quotations with dated, attributed paraphrases (the GPT read of #1128 at bd3eecfe5, blocker 1) and assemble_manifest.py rebuilt the definitive manifest from it; the agent-messaging and context-supply records of the handbook carry the paraphrases. No host, model or provider acceptance."
+    },
+    {
+      "recorded_at_utc": "2026-10-15T12:42:29Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "b773dfad62ffca3097e50ebebb7f1dd7e0d5be146bdb440b10c082e29eeeb371",
+        "docs/new-wsl-handbook.json": "383694f6c9eefd566b84204e77e0fb5749024a675555cf8a4900551669d6995c"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "evidence_class": "local_integration",
+      "scope": "relay-contract scrub (command center ruling 2026-10-15T12:38Z): the owner batches' authority carries a dated paraphrase and relay_record; the three relaying decision records state the paraphrase; regenerated through the builders"
+    },
+    {
+      "recorded_at_utc": "2026-10-15T13:43:29Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "289f893c75470e87f71b83be6a16c90d4690d58fd2670c101c5c193c1eba5066",
+        "docs/new-wsl-handbook.json": "1a2eea1707c9828de37bee2bed4d655c7d57512f401a0b845eaa493863ab6e80"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "evidence_class": "local_integration",
+      "scope": "repo-wide owner-quote scrub, commit 3 of #1161: the records the consensus hashes carry dated paraphrases; regenerated through the builders"
+    },
+    {
+      "recorded_at_utc": "2026-10-15T14:53:58Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "97cca087e9d2c7289adc0d0ceee7c3f2ed3be95c2bfd06d62ff859b6b595749a",
+        "docs/new-wsl-handbook.json": "910fc5628b05a30a525f8945f7caea33f81454bb053db9755dae1d0ea786bc5e"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "evidence_class": "local_integration",
+      "scope": "final owner-quote scrub commit of #1161 (CC adjudication 2026-10-15T14:52Z): the remaining relayed sentence and single-quoted owner words carry dated paraphrases; regenerated through the builders"
+    },
+    {
+      "recorded_at_utc": "2026-10-15T16:08:37Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "3dbc136e7477a25691d15759f486e9fd403e409c400cfc4d6bb76bb460fe671f",
+        "docs/new-wsl-handbook.json": "cf1b6a84861bdeb0cff55420351ba0db4831e9a6e075e9a19ecd47d09c7aa40a"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "evidence_class": "local_integration",
+      "scope": "final adjudicated owner-quote scrub commit of #1161 (CC adjudication 2026-10-15T15:51Z): possessive owner attributions in the hashed records carry dated paraphrases; regenerated through the builders"
+    },
+    {
+      "recorded_at_utc": "2026-10-15T20:21:03Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "62008dc65fb9d3b9bf453ff7b155005b3e5e7eedcba1dfb13489384659b62b97",
+        "docs/new-wsl-handbook.json": "196f6288c710867141e0ab9052b8d0f6a129bdc55519f125b19f14a294202c15"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "evidence_class": "local_integration",
+      "scope": "blocker commit of #1161 after the GPT fix3r read at fd51f88d: the custody ruling's change 12 states the owner's 2026-09-26 decision in other words; its hashed bindings, the manifest and the handbook regenerated through the builders"
     }
   ],
   "previous_outputs": [
@@ -1262,6 +1358,60 @@
         "docs/new-wsl-handbook.json": "fe0b6628bc589e59dc71a5a0fb6805ecab067e3f06043702919bf7f09ef9cba4"
       },
       "reason": "Harbor stack-component registration changes two hashed handbook inputs (adoption recipe map; architecture Nemotron stack-line citation); the previous maintained output binding is preserved as historical evidence."
+    },
+    {
+      "superseded_at_utc": "2026-10-15T11:18:29Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
+        "docs/new-wsl-handbook.json": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474"
+      },
+      "reason": "The layer-consensus record's owner quotations became dated, attributed paraphrases (the GPT read of #1128 at bd3eecfe5, blocker 1), which changes the definitive manifest and both outputs; the previous maintained output binding is preserved as historical evidence."
+    },
+    {
+      "superseded_at_utc": "2026-10-15T12:42:29Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "fc76c9cd638086fea49f99d423796cfbf6e474ba54a3c9ab15ae3f78b469b920",
+        "docs/new-wsl-handbook.json": "4a43c627140093b4c758eaa75134242917fca1ca98a68984762ba9f2c4559299"
+      },
+      "reason": "The relay contract moved to a dated paraphrase plus relay_record, and the three relaying decision records state the paraphrases (the command center's ruling of 2026-10-15T12:38Z), which changed the regenerated outputs."
+    },
+    {
+      "superseded_at_utc": "2026-10-15T13:37:24Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "b773dfad62ffca3097e50ebebb7f1dd7e0d5be146bdb440b10c082e29eeeb371",
+        "docs/new-wsl-handbook.json": "383694f6c9eefd566b84204e77e0fb5749024a675555cf8a4900551669d6995c"
+      },
+      "reason": "The remaining owner sentences in the records the consensus hashes became dated paraphrases (the command center's FULL read of #1161 at c95453a1), which changed the regenerated outputs."
+    },
+    {
+      "superseded_at_utc": "2026-10-15T14:53:58Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "289f893c75470e87f71b83be6a16c90d4690d58fd2670c101c5c193c1eba5066",
+        "docs/new-wsl-handbook.json": "1a2eea1707c9828de37bee2bed4d655c7d57512f401a0b845eaa493863ab6e80"
+      },
+      "reason": "The last relayed owner sentence and single-quoted owner words in the hashed records became dated paraphrases (the command center's adjudication of #1161 at 9371e2ad), which changed the regenerated outputs."
+    },
+    {
+      "superseded_at_utc": "2026-10-15T16:01:04Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "97cca087e9d2c7289adc0d0ceee7c3f2ed3be95c2bfd06d62ff859b6b595749a",
+        "docs/new-wsl-handbook.json": "910fc5628b05a30a525f8945f7caea33f81454bb053db9755dae1d0ea786bc5e"
+      },
+      "reason": "Possessive owner attributions in the hashed records (the user's requirement, direction or directive followed by quoted words) became dated paraphrases (the command center's adjudication of #1161 at e21a7b61), which changed the regenerated outputs."
+    },
+    {
+      "superseded_at_utc": "2026-10-15T20:21:03Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "3dbc136e7477a25691d15759f486e9fd403e409c400cfc4d6bb76bb460fe671f",
+        "docs/new-wsl-handbook.json": "cf1b6a84861bdeb0cff55420351ba0db4831e9a6e075e9a19ecd47d09c7aa40a"
+      },
+      "reason": "The custody ruling's change 12 in the wave-2 records kept earlier wording under a paraphrase label and now states the owner's 2026-09-26 decision in other words (the GPT fix3r read of #1161 at fd51f88d), which changed the regenerated outputs."
     }
   ]
 }
