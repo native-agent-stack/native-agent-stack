@@ -27,6 +27,22 @@ platforms' own views through their MCP servers and native CLIs. The command cent
 They bind the fleet-view and orchestration rows here and the framework rows of the framework change. The platform MCP and
 CLI candidates are screened by the co-op; a row names only a converged winner, and anything else stays a PROPOSAL.
 
+At 21:02 ET on 2026-10-15 the owner asked whether memory and retrieval for the latest models, and Hindsight, were covered on
+the new host. The command center's gap-routing record of 2026-10-16 (01:08Z, a coordination record cited by name and date)
+routed two memory rows here as PROPOSALs into the durable-memory and semantic-rag work:
+
+- **Per-family memory wiring with invoke evidence** (PROPOSAL): memory wired and used by every model family's workers, not
+  only Claude Code sessions: the Codex and GPT lanes, Muse through its fence, the SDK workers and the researchers. The
+  layer-resolution protocol's FINAL condition 4 asks for invoke evidence in the measured window, or a recorded reason a
+  winner is not invoked, so a zero-call family is a wiring defect or a retired role.
+- **A SCHEDULED comparison of Hindsight against ai-memory** (PROPOSAL): ai-memory is the durable-memory layer's recorded
+  winner (`catalogs/landscape/foundation.json` `/layers/7`) and Hindsight its recorded alternate. Under the protocol's
+  SCHEDULED state (lines 87-96 of the protocol record: one preregistered comparison with a frozen scope, a readiness trigger
+  and a fixed decision rule, retained before the run), measured with the layer's own harness.
+
+**Readiness:** both wait for model-routes, which decides the model behind each role: #1177 (the GPT half) and #1188 (the
+Claude half) merged. The wiring row also takes the durable-memory screen rows of #1193.
+
 ## Step 1: layer verdicts read
 
 At `origin/main` 8053f14e7 (`catalogs/landscape/foundation.json`, every row `recorded`, wave 20260922 in
