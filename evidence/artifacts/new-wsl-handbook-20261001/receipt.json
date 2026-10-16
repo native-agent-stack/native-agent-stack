@@ -1228,8 +1228,7 @@
         "profile_entries": 78,
         "projected_tools": 82,
         "canonical_package_ids": 25
-      },
-      "reason": "The relay contract moved to a dated paraphrase plus relay_record, and the three relaying decision records state the paraphrases (the command center's ruling of 2026-10-15T12:38Z), which changed the regenerated outputs."
+      }
     },
     {
       "superseded_at_utc": "2026-10-08T17:42:22Z",

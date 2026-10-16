@@ -1784,6 +1784,21 @@ class NewWslHandbookTests(unittest.TestCase):
                           "projected_tools": len(data["tools"]),
                           "canonical_package_ids": sum(1 for tool in data["tools"] if tool.get("package_id"))})
 
+    def test_each_supersession_reason_binds_only_the_entry_it_supersedes(self):
+        """The local Codex review of #1161 at e0ff2abb (P2-B): a regeneration's reason was also attached to an older,
+        undated history entry, so two different output pairs claimed one supersession. History entries are append-only:
+        a reason belongs to one entry, and a reason that cites a date sits on an entry superseded no earlier than it."""
+        history = json.loads(self.committed("evidence/artifacts/new-wsl-handbook-20261001/receipt.json"))["previous_outputs"]
+        reasons = [entry.get("reason") for entry in history]
+        self.assertEqual(sorted({i for i, reason in enumerate(reasons) if reason and reasons.count(reason) > 1}), [],
+                         "entries that share one supersession reason")
+        for index, entry in enumerate(history):
+            dates = re.findall(r"\b(\d{4}-\d{2}-\d{2})", entry.get("reason") or "")
+            if dates:
+                with self.subTest(entry=index):
+                    self.assertTrue(entry.get("superseded_at_utc"), "a dated reason on an entry with no supersession time")
+                    self.assertGreaterEqual(entry["superseded_at_utc"][:10], max(dates))
+
     def test_check_fails_after_a_one_byte_change_to_either_output_or_to_the_manifest(self):
         self.real_tree()
         self.assertEqual(self.public_cli().returncode, 0)

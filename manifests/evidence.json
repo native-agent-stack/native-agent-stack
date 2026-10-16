@@ -44468,8 +44468,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "d6d9ffe8377c38da0c5b8e4f014ec1b8eb859353d848a3c52d97f2ea22ac1588",
-      "bytes": 88721
+      "sha256": "abfefe0925521bd3cad215632ec7ac77df8c8f75e6f5e5eed8cdc70ab99e56b7",
+      "bytes": 88483
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -64463,8 +64463,8 @@
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "66b02f49c3c4de2dac9ecf64f37ea6741f4fe343f58c788df7c2cfa53f3040be",
-      "bytes": 117512
+      "sha256": "f215f39465e068d749cb9e1bfb57390f6b7eeec80ad519c2d757d223ea229049",
+      "bytes": 118743
     },
     {
       "path": "tests/test_new_wsl_profile.py",
