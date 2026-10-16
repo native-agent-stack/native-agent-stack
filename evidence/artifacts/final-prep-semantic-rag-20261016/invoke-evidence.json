@@ -47,11 +47,25 @@
       "return_codes": [
         0,
         0,
-        0
+        null
       ],
       "synthetic": true,
       "synthetic_scope": "Native storage/upsert/recovery operations on synthetic fixture vectors, not representative source/model quality.",
-      "f2_status": "Native bounded invoke observed; full role E2E remains GAP"
+      "f2_status": "Native CLI observed; HTTP outcomes mixed; full semantic-role E2E remains GAP.",
+      "return_code_gap": "Per-call HTTP statuses and the Qdrant child process exit code are distinct. The latter was not captured; do not substitute the parent test script's rc.",
+      "http_outcomes_ref": "evidence/artifacts/final-prep-semantic-rag-20261016/qdrant-http-outcomes.json",
+      "http_status_counts": {
+        "200": 270,
+        "400": 8,
+        "404": 4
+      },
+      "http_status_kind": "Derived index of native access-log HTTP responses, not process exit codes.",
+      "parent_test_outcome": {
+        "command_id": "socraticode-offline-integration",
+        "return_code": 0,
+        "source": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json",
+        "scope": "Parent test process only; not every API response or child server exit."
+      }
     },
     {
       "id": "vllm",

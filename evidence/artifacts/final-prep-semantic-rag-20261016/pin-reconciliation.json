@@ -171,7 +171,8 @@
           "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stdout:155"
         ],
         "source_pin_capture": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-pin.stdout:1",
-        "hash_capture": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/public-artifact-hashes.stdout:2"
+        "hash_capture": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/public-artifact-hashes.stdout:2",
+        "ordered_source_lock_verification": "evidence/artifacts/final-prep-semantic-rag-20261016/artifact-verification.json"
       },
       "drift": [
         "1.14.0 verdict/macOS versus 1.15.0 Linux run/recipe versus proposed/tested 1.16.0.",
@@ -302,8 +303,9 @@
           "url": "https://api.github.com/repos/qdrant/qdrant/releases/tags/v1.19.1",
           "read_at": "2026-10-16T05:24:37.223259+00:00"
         },
-        "verification": "Official release digest matched the downloaded public asset; scratch native --version/help and two upstream offline integration files ran. The latter use synthetic/precomputed vectors, not model-backed retrieval.",
-        "hash_capture": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/public-artifact-hashes.stdout:1"
+        "verification": "Official published release digest equals a new sequentially downloaded archive hash, begun strictly after download completion. The original early download completion was not captured; no retroactive timing claim.",
+        "hash_capture": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/public-artifact-hashes.stdout:1",
+        "ordered_capture": "evidence/artifacts/final-prep-semantic-rag-20261016/artifact-verification.json"
       },
       "drift": [
         "Generated run pin has no commit; manifest supplies the full 1.19.1 source identity.",

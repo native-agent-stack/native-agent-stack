@@ -22888,13 +22888,68 @@
     },
     {
       "path": "evidence/artifacts/final-prep-semantic-rag-20261016/README.md",
-      "sha256": "4d9a5763fd0ddc6e8d51d393790516da25359c2fa6fd391fb77dfd73289dba4b",
-      "bytes": 15607
+      "sha256": "7f22c786a06896bb2c9b99ef889e4adccfd3e3e552e62fee8c5341d75c23346b",
+      "bytes": 19022
     },
     {
       "path": "evidence/artifacts/final-prep-semantic-rag-20261016/angle-record-draft.json",
-      "sha256": "034120df0da52413c5d03030dfe539232d114621cff3669fddc73b8d1f7dae8f",
-      "bytes": 28958
+      "sha256": "c2a512b920cfddd57433ce1da92fb55bfceaea514e6b15f67a1c7a84436c2be0",
+      "bytes": 29162
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/artifact-verification.json",
+      "sha256": "c0daef2446015de18b3c491b3e1dd534800b26badc6718938aaf87a99f5eaebb",
+      "bytes": 2474
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-download.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-download.stdout",
+      "sha256": "df4889ce15f229895f7d9a80685bf7b1c0eba915fa2c9b751c798b6936574671",
+      "bytes": 37
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-release-metadata.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-release-metadata.stdout",
+      "sha256": "cf3652f2e81e4c7b453383731eacacf0acb8cdc199c94ddba1f31356f99d3505",
+      "bytes": 22429
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-sha256.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-sha256.stdout",
+      "sha256": "3b12585850455cc994cfd1b280b267c977ff5fcdb454f0e92a0a9300e4bd47cc",
+      "bytes": 106
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-socraticode-lock-download.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-socraticode-lock-download.stdout",
+      "sha256": "ec0da67abb3f5e73e097e3a300d89e2dd29f4c3ca342b09c27138c634d2e4b8e",
+      "bytes": 35
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-socraticode-lock-sha256.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-socraticode-lock-sha256.stdout",
+      "sha256": "f106e8586d931f6c651b99f74feb39e24d3f542bdfff5af36e33126fa3c09e05",
+      "bytes": 217
     },
     {
       "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/lane-packets.stderr",
@@ -23108,13 +23163,13 @@
     },
     {
       "path": "evidence/artifacts/final-prep-semantic-rag-20261016/integrity-audit.json",
-      "sha256": "3488826797d9cec4a0af4fe0ce5080559e54027c66828079cdda5f26ead961df",
-      "bytes": 11517
+      "sha256": "80da27c74c52ffb9a0003ae27106a8137769c331cb5d0f259f69b40122b5d492",
+      "bytes": 15448
     },
     {
       "path": "evidence/artifacts/final-prep-semantic-rag-20261016/invoke-evidence.json",
-      "sha256": "121f423873e94d8df6ea97bcbd44eed846b1e1968f06096721e96bcce9151cb6",
-      "bytes": 3552
+      "sha256": "c700c61a392b2a73a74adaeb85196d30d8763602284f14760c5e3ea368eaef45",
+      "bytes": 4366
     },
     {
       "path": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py",
@@ -23123,8 +23178,8 @@
     },
     {
       "path": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json",
-      "sha256": "73c0fb2dd61b2576e08ebcfc1b27e04d872a356d4b165367800c8d726e90209c",
-      "bytes": 54531
+      "sha256": "9ed042089739c4d159aa003df4b268f9f853e8e889fd1da526278e82d3ce7280",
+      "bytes": 68295
     },
     {
       "path": "evidence/artifacts/final-prep-semantic-rag-20261016/offline-integration.sh",
@@ -23138,8 +23193,13 @@
     },
     {
       "path": "evidence/artifacts/final-prep-semantic-rag-20261016/pin-reconciliation.json",
-      "sha256": "5a3d146062e9c2b5745548bd4ef9c654dbfcc3b1853df166b303acaa774fe8a3",
-      "bytes": 26645
+      "sha256": "5d1bf62dd8fee1d08629aec44fa854b78a7ca3612efc777387308ef24f36ff56",
+      "bytes": 26880
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/qdrant-http-outcomes.json",
+      "sha256": "8750486781f32afc153e496de1db39719636b200355f5a07b0f5177b1ab1e932",
+      "bytes": 40250
     },
     {
       "path": "evidence/artifacts/final-prep-semantic-rag-20261016/vllm-0.31.0.requirements.lock",

@@ -141,7 +141,7 @@
       "angles": {
         "A1": {
           "score": "0",
-          "read_at": "2026-10-16T05:49:00Z",
+          "read_at": "2026-10-16T08:42:47Z",
           "sources": [
             {
               "kind": "repo",
@@ -153,9 +153,13 @@
             {
               "kind": "receipt",
               "path": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-semantic-rag-20261016/qdrant-http-outcomes.json"
             }
           ],
-          "note": "Official 1.19.1 version/help and real isolated Qdrant calls in two upstream SocratiCode integration files pass; vectors are synthetic/precomputed. Qdrant's own full snapshot/recovery/cluster E2E is absent."
+          "note": "Version/help and the parent two-file synthetic-vector test pass. Access log records 270 HTTP 200, eight 400 and four 404 responses; child rc missing. Reused scratch raft state and omitted upstream files prevent a broader E2E claim."
         },
         "A2": {
           "score": "U",
@@ -666,8 +670,8 @@
       "candidate_id": "qdrant",
       "run_pin": "1.19.1@6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
       "e2e_receipt": null,
-      "invoke_receipt": "evidence/artifacts/final-prep-semantic-rag-20261016/invoke-evidence.json",
-      "not_invoked_reason": "Native CLI and isolated synthetic-vector integration invocation observed; complete semantic/model-backed role invocation remains a gap."
+      "invoke_receipt": null,
+      "not_invoked_reason": "CLI invocations and mixed HTTP outcomes in synthetic-vector integration are captured; child rc is missing. Parent test rc does not supply a complete component invoke receipt. Full semantic-role invocation remains a gap."
     },
     {
       "candidate_id": "vllm",

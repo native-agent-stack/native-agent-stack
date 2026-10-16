@@ -2,7 +2,10 @@
 import importlib.util
 import hashlib
 import json
+import datetime
+import re
 import sys
+from unittest.mock import patch
 from pathlib import Path
 import unittest
 
@@ -56,6 +59,55 @@ class CaptureMaskTests(unittest.TestCase):
 
 
 class PublishedCaptureContractTests(unittest.TestCase):
+    def test_http_outcome_index_preserves_every_native_status(self):
+        root = Path(__file__).resolve().parents[1]
+        outcome = json.loads((MODULE.parent / "qdrant-http-outcomes.json").read_text())
+        lines = (root / outcome["source"]).read_text().splitlines()
+        pattern = re.compile(r'"(\S+) (\S+) HTTP/[^\"]+" (\d{3}) ')
+        native = []
+        for line_number, line in enumerate(lines, 1):
+            if "actix_web::middleware::logger" in line:
+                match = pattern.search(line)
+                self.assertIsNotNone(match)
+                native.append({"line": line_number, "method": match[1], "target": match[2], "status": int(match[3])})
+        self.assertEqual(outcome["requests"], native)
+        self.assertEqual(len(native), outcome["request_count"])
+        for status, count in outcome["counts"].items():
+            self.assertEqual(sum(row["status"] == int(status) for row in native), count)
+
+    def test_download_hashes_match_published_sources_and_follow_completion(self):
+        root = Path(__file__).resolve().parents[1]
+        verification = json.loads((MODULE.parent / "artifact-verification.json").read_text())
+        native = json.loads((MODULE.parent / "native-checks.json").read_text())
+        commands = {row["name"]: row for row in native["commands"]}
+        for binding in verification["bindings"]:
+            download = commands[binding["download_command"]]
+            hashed = commands[binding["hash_command"]]
+            self.assertEqual(download["return_code"], 0)
+            self.assertEqual(hashed["return_code"], 0)
+            self.assertEqual(binding["download_finished_at"], download["finished_at"])
+            self.assertEqual(binding["hash_started_at"], hashed["started_at"])
+            self.assertLess(datetime.datetime.fromisoformat(download["finished_at"]), datetime.datetime.fromisoformat(hashed["started_at"]))
+            self.assertEqual(binding["actual_sha256"], binding["expected_sha256"])
+            for key, expected in [("actual_source", binding["actual_sha256"]), ("expected_source", binding["expected_sha256"])]:
+                path, number = binding[key].rsplit(":", 1)
+                line = (root / path).read_text().splitlines()[int(number) - 1]
+                self.assertIn(expected, line)
+
+    def test_corrupt_supporting_stream_hash_is_rejected(self):
+        record = json.loads((MODULE.parent / "native-checks.json").read_text())
+        record["supporting_service_streams"][0]["sha256"] = "0" * 64
+        with patch.object(json, "loads", return_value=record):
+            with self.assertRaises(AssertionError):
+                self.test_complete_published_streams_match_recorded_hashes()
+
+    def test_uncaptured_child_status_is_not_parent_success(self):
+        native = json.loads((MODULE.parent / "native-checks.json").read_text())
+        invoke = json.loads((MODULE.parent / "invoke-evidence.json").read_text())
+        qdrant = next(row for row in invoke["components"] if row["id"] == "qdrant")
+        self.assertTrue(all(row["return_code"] is None for row in native["supporting_service_streams"]))
+        self.assertIsNone(qdrant["return_codes"][2])
+
     def test_complete_published_streams_match_recorded_hashes(self):
         root = Path(__file__).resolve().parents[1]
         record = json.loads((MODULE.parent / "native-checks.json").read_text())
@@ -69,6 +121,13 @@ class PublishedCaptureContractTests(unittest.TestCase):
                 self.assertEqual(len(raw), stream["bytes"])
                 self.assertEqual(hashlib.sha256(raw).hexdigest(), stream["sha256"])
                 self.assertFalse(stream["raw_digest_published"])
+        for stream in record["supporting_service_streams"]:
+            raw = (root / stream["path"]).read_bytes()
+            self.assertEqual(len(raw), stream["bytes"])
+            self.assertEqual(hashlib.sha256(raw).hexdigest(), stream["sha256"])
+            self.assertFalse(stream["raw_digest_published"])
+            self.assertIsNone(stream["return_code"])
+            self.assertTrue(stream["return_code_gap"])
 
     def test_reported_counts_have_exact_native_line_witnesses(self):
         root = Path(__file__).resolve().parents[1]
