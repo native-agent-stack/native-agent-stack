@@ -1,0 +1,11 @@
+{
+ "application": "syft",
+ "buildDate": "2026-10-01T20:48:12Z",
+ "compiler": "gc",
+ "gitCommit": "cc326e45a6213360266dda4b30cc68095946d676",
+ "gitDescription": "v1.54.0",
+ "goVersion": "go1.26.8",
+ "platform": "linux/amd64",
+ "schemaVersion": "16.1.11",
+ "version": "1.54.0"
+}

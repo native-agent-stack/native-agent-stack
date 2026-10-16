@@ -1,0 +1,10 @@
+{
+  "ref": "refs/tags/v1.30.1",
+  "node_id": "REF_kwDOMlil3bFyZWZzL3RhZ3MvdjEuMzAuMQ",
+  "url": "https://api.github.com/repos/zizmorcore/zizmor/git/refs/tags/v1.30.1",
+  "object": {
+    "sha": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+    "type": "commit",
+    "url": "https://api.github.com/repos/zizmorcore/zizmor/git/commits/99a054ed9283c90abdd2d5b9fb5101d27dde9783"
+  }
+}

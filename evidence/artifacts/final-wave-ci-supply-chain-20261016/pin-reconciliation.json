@@ -1,0 +1,339 @@
+{
+  "schema_version": 1,
+  "classification": "F1 source reconciliation and proposed run identities; not a native receipt",
+  "base_commit": "30542e70560147c19049016d19aa3f264515c92f",
+  "scope": "One proposed run identity per existing winner; source/version drifts remain explicit. Does not update a catalog, runtime manifest, installed tool or FINAL state.",
+  "winners": [
+    {
+      "id": "zizmor",
+      "proposal": {
+        "version": "1.30.1",
+        "commit": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+        "reason": "Use the committed run identity to fill its evidence gap; a newer screened version is not silently promoted.",
+        "sources": [
+          {
+            "path": "manifests/stack.json",
+            "line": 1592,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          },
+          {
+            "path": "manifests/stack.json",
+            "line": 1610,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          },
+          {
+            "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-tag-source/stdout.txt",
+            "line": 6
+          }
+        ]
+      },
+      "sources": [
+        {
+          "kind": "catalog_verdict",
+          "value": "1.30.1",
+          "source": {
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 5154,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          }
+        },
+        {
+          "kind": "run_pin",
+          "value": "1.30.1 / 99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 11405,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            },
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 11407,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            }
+          ]
+        },
+        {
+          "kind": "clean_install_plan",
+          "value": "zizmor listed, no version",
+          "source": {
+            "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+            "line": 130,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          }
+        },
+        {
+          "kind": "latest_registered_native_record",
+          "value": "claude-repository-evidence-20260921; component listed, this line does not identify an executed binary version",
+          "sources": [
+            {
+              "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+              "line": 62,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            },
+            {
+              "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+              "line": 75,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            }
+          ]
+        },
+        {
+          "kind": "last_component_specific_pin_bearing_receipt",
+          "value": "1.30.1; historical reported value only",
+          "source": {
+            "path": "evidence/receipts/native-linux-zizmor-20260920.json",
+            "line": 19,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          }
+        },
+        {
+          "kind": "installed_host_observation",
+          "value": "zizmor 1.30.1",
+          "sources": [
+            {
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-zizmor-version/stdout.txt",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-zizmor-version/receipt.json",
+              "line": 38
+            }
+          ]
+        },
+        {
+          "kind": "new_scratch_observation",
+          "value": "zizmor 1.30.1",
+          "sources": [
+            {
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-version/stdout.txt",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-version/receipt.json",
+              "line": 38
+            }
+          ]
+        }
+      ],
+      "drifts": [
+        "No version drift among verdict/run/observed host in the selected identity. The separate A1 screen examined 1.31.0; that candidate pin is not substituted into this run.",
+        "The binary reports a version, not its source commit. GitHub's tag binds the source commit; wheel-to-source build provenance was not independently verified."
+      ]
+    },
+    {
+      "id": "syft",
+      "proposal": {
+        "version": "1.54.0",
+        "commit": "cc326e45a6213360266dda4b30cc68095946d676",
+        "reason": "Use the current committed run/stack/CI version; retain the older verdict and newer host version as drifts instead of changing defaults.",
+        "sources": [
+          {
+            "path": "manifests/stack.json",
+            "line": 1418,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          },
+          {
+            "path": "manifests/stack.json",
+            "line": 1421,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          },
+          {
+            "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-tag-object-source/stdout.txt",
+            "line": 11
+          }
+        ]
+      },
+      "sources": [
+        {
+          "kind": "catalog_verdict",
+          "value": "1.52.0",
+          "source": {
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 5176,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          }
+        },
+        {
+          "kind": "run_pin",
+          "value": "1.54.0 / cc326e45a6213360266dda4b30cc68095946d676",
+          "sources": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 11313,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            },
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 11315,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            }
+          ]
+        },
+        {
+          "kind": "clean_install_plan",
+          "value": "syft listed, no version",
+          "source": {
+            "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+            "line": 130,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          }
+        },
+        {
+          "kind": "last_registered_component_qualification",
+          "value": "1.54.0; retained 2026-10-03 report, not a fresh native capture",
+          "sources": [
+            {
+              "path": "evidence/receipts/syft-1540-qualification-20261003.json",
+              "line": 5,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            },
+            {
+              "path": "evidence/receipts/syft-1540-qualification-20261003.json",
+              "line": 20,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            },
+            {
+              "path": "evidence/receipts/syft-1540-qualification-20261003.json",
+              "line": 43,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            }
+          ]
+        },
+        {
+          "kind": "installed_host_observation",
+          "value": "1.54.1; source commit is masked in the published derivative",
+          "sources": [
+            {
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-syft-version/stdout.txt",
+              "line": 10
+            },
+            {
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-syft-version/receipt.json",
+              "line": 40
+            }
+          ]
+        },
+        {
+          "kind": "new_scratch_observation",
+          "value": "1.54.0 / cc326e45a6213360266dda4b30cc68095946d676",
+          "sources": [
+            {
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-version/stdout.txt",
+              "line": 5
+            },
+            {
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-version/stdout.txt",
+              "line": 10
+            },
+            {
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-version/receipt.json",
+              "line": 40
+            }
+          ]
+        }
+      ],
+      "drifts": [
+        "Verdict 1.52.0 differs from run/stack/CI 1.54.0.",
+        "Host 1.54.1 differs from proposed scratch/run 1.54.0; the host is not downgraded.",
+        "Native binary gitCommit matches the annotated release tag's peeled source commit; checksum-based installer integrity is not independent signature/provenance verification."
+      ]
+    },
+    {
+      "id": "actions-attest",
+      "proposal": {
+        "version": "4.2.2",
+        "commit": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+        "reason": "Use the exact full action SHA already selected by the committed publication workflow; no new action version is proposed.",
+        "sources": [
+          {
+            "path": ".github/workflows/publish-catalog.yml",
+            "line": 145,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          },
+          {
+            "path": ".github/workflows/publish-catalog.yml",
+            "line": 152,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          },
+          {
+            "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/attest-tag-source/stdout.txt",
+            "line": 6
+          }
+        ]
+      },
+      "sources": [
+        {
+          "kind": "catalog_verdict",
+          "value": "unpinned",
+          "source": {
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 5187,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          }
+        },
+        {
+          "kind": "run_pin",
+          "value": "absent; run_reason=unpinned",
+          "source": {
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 5186,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          }
+        },
+        {
+          "kind": "clean_install_plan",
+          "value": "candidate:actions-attest listed, no version",
+          "source": {
+            "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+            "line": 130,
+            "commit": "30542e70560147c19049016d19aa3f264515c92f"
+          }
+        },
+        {
+          "kind": "workflow_pin",
+          "value": "v4.2.2 full SHA",
+          "sources": [
+            {
+              "path": ".github/workflows/publish-catalog.yml",
+              "line": 145,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            },
+            {
+              "path": ".github/workflows/publish-catalog.yml",
+              "line": 152,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            }
+          ]
+        },
+        {
+          "kind": "committed_selection_record",
+          "value": "4.2.2 / 1e69f48acb82d1966a394da916b4c1698aa569d6; selection/acceptance text, not a native execution capture",
+          "sources": [
+            {
+              "path": "catalogs/foundation/automation.json",
+              "line": 148,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            },
+            {
+              "path": "catalogs/foundation/automation.json",
+              "line": 149,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            },
+            {
+              "path": "catalogs/foundation/automation.json",
+              "line": 152,
+              "commit": "30542e70560147c19049016d19aa3f264515c92f"
+            }
+          ]
+        }
+      ],
+      "drifts": [
+        "Catalog and run registration are unpinned/absent while the committed workflow is pinned.",
+        "No registered component-specific native actions-attest receipt was found in manifests/evidence.json; workflow configuration is not an execution receipt.",
+        "Not a host CLI: no installed-host --version or native local invocation is fabricated."
+      ],
+      "gap": "Live GitHub OIDC/Sigstore signing and upload are excluded; E2E/F2 requires a separately authorized hosted capture."
+    }
+  ]
+}

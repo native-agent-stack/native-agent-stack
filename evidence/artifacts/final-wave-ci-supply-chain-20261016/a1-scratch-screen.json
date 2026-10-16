@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "scope": "Only an isolated Linux x86_64 scratch trial is admitted. No host installation, macOS acceptance, worker route or FINAL/default is admitted.",
+  "base_commit": "30542e70560147c19049016d19aa3f264515c92f",
+  "capture_policy": "Native sources are retained privately; citations under captures/ resolve to deterministic labelled masked derivatives. Result fields below are source-review judgments, not execution results.",
+  "candidates": [
+    {
+      "id": "zizmor",
+      "pin": "1.30.1@99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+      "result": "PASS",
+      "trial_scope": "Vendor uv tool install of the public release wheel into scratch, upstream help smoke and offline upstream workflow fixtures.",
+      "requirements": [
+        {
+          "id": "maintenance",
+          "result": "PASS",
+          "reason": "Primary repository metadata reports not archived and current push activity; activity is not an engineering-quality score.",
+          "source": "captures/metadata-zizmor/stdout.txt:70,88 (pushed_at, archived)"
+        },
+        {
+          "id": "platform",
+          "result": "PASS",
+          "reason": "PyPI release provides Python >=3.10 manylinux_2_28_x86_64 wheel; retained local runtime reports Linux x86_64/glibc 2.43.",
+          "sources": [
+            "captures/zizmor-package-metadata/stdout.txt:1 (requires_python and wheel filename)",
+            "captures/host-platform/stdout.txt:1",
+            "captures/host-libc/stdout.txt:1"
+          ]
+        },
+        {
+          "id": "install",
+          "result": "PASS",
+          "reason": "Pinned docs support uv tool install; actual install is restricted to owned tool/bin/cache prefixes with no inherited credentials.",
+          "source": "zizmorcore/zizmor@99a054ed9283c90abdd2d5b9fb5101d27dde9783:docs/installation.md:25-42"
+        },
+        {
+          "id": "headless-smoke",
+          "result": "PASS",
+          "reason": "Upstream quickstart explicitly checks installation with zizmor -h and scans file inputs.",
+          "source": "zizmorcore/zizmor@99a054ed9283c90abdd2d5b9fb5101d27dde9783:docs/quickstart.md:3,21-30"
+        },
+        {
+          "id": "offline",
+          "result": "PASS",
+          "reason": "--offline forbids Internet access; local fixtures only.",
+          "source": "zizmorcore/zizmor@99a054ed9283c90abdd2d5b9fb5101d27dde9783:docs/usage.md:139-175"
+        },
+        {
+          "id": "fixture",
+          "result": "PASS",
+          "reason": "Use unmodified upstream write-all and empty-permission fixtures as inert scanner inputs; never execute them as workflows.",
+          "source": "zizmorcore/zizmor@99a054ed9283c90abdd2d5b9fb5101d27dde9783:crates/zizmor/tests/integration/audit/excessive_permissions.rs:115-155"
+        }
+      ]
+    },
+    {
+      "id": "syft",
+      "pin": "1.54.0@cc326e45a6213360266dda4b30cc68095946d676",
+      "result": "PASS",
+      "trial_scope": "Vendor installer in scratch bin, local filesystem SBOM smoke on the scratch tool prefix.",
+      "requirements": [
+        {
+          "id": "maintenance",
+          "result": "PASS",
+          "reason": "Primary repository metadata reports not archived and current push activity.",
+          "source": "captures/metadata-syft/stdout.txt:70,88 (pushed_at, archived)"
+        },
+        {
+          "id": "platform",
+          "result": "PASS",
+          "reason": "Pinned installer maps x86_64 to amd64 and the local OS to Linux; only this local target is screened.",
+          "source": "anchore/syft@cc326e45a6213360266dda4b30cc68095946d676:install.sh:148,448,467-469"
+        },
+        {
+          "id": "install",
+          "result": "PASS",
+          "reason": "Installer accepts explicit tag and -b prefix. The retained pinned script runs with DOWNLOAD_TAG_INSTALL_SCRIPT=false to avoid a second mutable script fetch.",
+          "source": "anchore/syft@cc326e45a6213360266dda4b30cc68095946d676:install.sh:25,817-821,865-873"
+        },
+        {
+          "id": "headless-smoke",
+          "result": "PASS",
+          "reason": "README documents scanning a local project directory and selecting JSON SBOM outputs.",
+          "source": "anchore/syft@cc326e45a6213360266dda4b30cc68095946d676:README.md:46-61"
+        },
+        {
+          "id": "isolation",
+          "result": "PASS",
+          "reason": "Selected prefix, workdir, temporary/config/cache/data directories are inside scratch; environment is explicitly constructed, with no inherited credential variables and no HOME override.",
+          "source": "capture.py:54-67 (explicit environment construction; no inherited environment)"
+        }
+      ]
+    },
+    {
+      "id": "actions-attest",
+      "pin": "4.2.2@1e69f48acb82d1966a394da916b4c1698aa569d6",
+      "result": "GAP",
+      "trial_scope": "Source review only; no live signing or upload.",
+      "blocker": "Attestation requires Sigstore certificate issuance, GitHub API upload and workflow OIDC. These live services are excluded by this task.",
+      "sources": [
+        "actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6:README.md:11-18",
+        "actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6:README.md:64-74"
+      ]
+    }
+  ],
+  "license_note": "Compliance metadata alone never changes results; per-candidate notes are in the angle draft."
+}

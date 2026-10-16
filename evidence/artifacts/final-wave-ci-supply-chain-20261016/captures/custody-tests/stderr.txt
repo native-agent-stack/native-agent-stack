@@ -1,0 +1,14 @@
+test_derivative_reproduces_and_has_only_published_hashes (test_capture_mask.CaptureMaskTests.test_derivative_reproduces_and_has_only_published_hashes) ... ok
+test_empty_stream_stays_empty (test_capture_mask.CaptureMaskTests.test_empty_stream_stays_empty) ... ok
+test_existing_capture_and_output_are_never_overwritten (test_capture_mask.CaptureMaskTests.test_existing_capture_and_output_are_never_overwritten) ... ok
+test_longest_prefix_preserves_nonprivate_bytes (test_capture_mask.CaptureMaskTests.test_longest_prefix_preserves_nonprivate_bytes) ... ok
+test_masking_is_idempotent (test_capture_mask.CaptureMaskTests.test_masking_is_idempotent) ... ok
+test_native_binary_streams_and_failure_status_are_preserved (test_capture_mask.CaptureMaskTests.test_native_binary_streams_and_failure_status_are_preserved) ... ok
+test_private_digest_is_masked_and_public_commit_retained (test_capture_mask.CaptureMaskTests.test_private_digest_is_masked_and_public_commit_retained) ... ok
+test_sbom_digest_prefixes_are_masked (test_capture_mask.CaptureMaskTests.test_sbom_digest_prefixes_are_masked) ... ok
+test_tampered_raw_is_rejected (test_capture_mask.CaptureMaskTests.test_tampered_raw_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.132s
+
+OK

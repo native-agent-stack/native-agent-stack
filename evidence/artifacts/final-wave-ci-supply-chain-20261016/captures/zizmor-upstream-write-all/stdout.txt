@@ -1,0 +1,53 @@
+[
+  {
+    "ident": "excessive-permissions",
+    "desc": "overly broad permissions",
+    "url": "https://docs.zizmor.sh/audits/#excessive-permissions",
+    "determinations": {
+      "confidence": "High",
+      "severity": "High",
+      "persona": "Regular"
+    },
+    "locations": [
+      {
+        "symbolic": {
+          "key": {
+            "Local": {
+              "verbatim_path": "<SCRATCH>/inputs/workflow-write-all.yml"
+            }
+          },
+          "annotation": "uses write-all permissions",
+          "route": {
+            "route": [
+              {
+                "Key": "permissions"
+              }
+            ]
+          },
+          "feature_kind": "Normal",
+          "kind": "Primary"
+        },
+        "concrete": {
+          "location": {
+            "start_point": {
+              "row": 4,
+              "column": 0
+            },
+            "end_point": {
+              "row": 4,
+              "column": 22
+            },
+            "offset_span": {
+              "start": 36,
+              "end": 58
+            }
+          },
+          "feature": "permissions: write-all",
+          "comments": []
+        }
+      }
+    ],
+    "ignored": false,
+    "fixes": []
+  }
+]

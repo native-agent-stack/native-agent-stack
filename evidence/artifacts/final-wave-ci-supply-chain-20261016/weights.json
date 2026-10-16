@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "catalog": "foundation",
+  "layer_id": "ci-supply-chain",
+  "base_commit": "30542e70560147c19049016d19aa3f264515c92f",
+  "weights_stated_at": "2026-10-16T06:22:05Z",
+  "weights": {
+    "A1": 0.2,
+    "A2": 0.2,
+    "A3": 0.15,
+    "A4": 0.15,
+    "A5": 0.2,
+    "A6": 0.1
+  },
+  "published_evaluations_available": null,
+  "disclosure": "Preparation only; FINAL admission remains closed. Restated after resume with a retained native UTC clock capture (captures/clock-weights/stdout.txt:1). Supersedes the earlier unretained clock observation without backdating. Prior verdicts/screens were known; fresh scoring sources follow this timestamp. Native installs/smokes are A1, not comparative A6. These weights are declarations, not measurements.",
+  "authority": "final-wave-layer-prep.brief-20261016.md; named coordination record only",
+  "sources": [
+    "catalogs/landscape/angles/README.md:36-41 at 30542e70560147c19049016d19aa3f264515c92f (ordered A1-A6 weights)",
+    "catalogs/landscape/angles/README.md:21-27 at 30542e70560147c19049016d19aa3f264515c92f (time ordering)",
+    "captures/clock-weights/stdout.txt:1 (native clock; masked derivative)"
+  ]
+}

@@ -22887,6 +22887,741 @@
       "bytes": 319713
     },
     {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/README.md",
+      "sha256": "ab4c8353b00a031fc20e07e355bd0c95238bbf7b2b111490766f16755291d965",
+      "bytes": 15730
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/a1-scratch-screen.json",
+      "sha256": "74c854da0b28c9914cc20b2d54e965fa3a81b5f87be1d115ae9d60c8f31be63b",
+      "bytes": 5377
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/angle-draft.json",
+      "sha256": "4f0034c17a022bdb54147b7db0298896be071abc1fc8b82ffe8ba2658a760778",
+      "bytes": 37360
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/capture.py",
+      "sha256": "4d58fbea3b67cf0f30d0ba36d955efcf79e986a9cc8cb50abc7ef9f0e0910209",
+      "bytes": 3503
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/attest-ci-source/receipt.json",
+      "sha256": "c7e1f0f2663f3de14f4cb886152833fb5c4a2a5c57ead570dd3d4d6df87a5ade",
+      "bytes": 1977
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/attest-ci-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/attest-ci-source/stdout.txt",
+      "sha256": "221767f43cc74afbd71dc9531af4e8e7494d94f3530acfbd749e09105c7d2c8d",
+      "bytes": 2757
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/attest-readme-source/receipt.json",
+      "sha256": "b3d2ad9f08f54ccc3c429c8a9013d92c9547ed0bd62246793a50dc6be80a9964",
+      "bytes": 1983
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/attest-readme-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/attest-readme-source/stdout.txt",
+      "sha256": "11f3ffb042f4ecad2084e722340e1e3c969df18f5d0d1e927ffde93984cc0bea",
+      "bytes": 15741
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/attest-tag-source/receipt.json",
+      "sha256": "3277b4d103577ef5ccc24afe24a152b40a9c88c2893b9471c7c159a337efe438",
+      "bytes": 1939
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/attest-tag-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/attest-tag-source/stdout.txt",
+      "sha256": "ce0e44afa6e2fae0d181c4ec3f0876fe913e928bd8d720b20b4ce335e5bae648",
+      "bytes": 368
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/clock-weights/receipt.json",
+      "sha256": "8b5a86ab7e54719172c626c9dc25cd90dfa23432dc0017f5e6c97adf812fc753",
+      "bytes": 1811
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/clock-weights/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/clock-weights/stdout.txt",
+      "sha256": "691964840d66cfbb1bb4058c60d101c562c0215808eb6c28bcf036953455541a",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/custody-tests-final/receipt.json",
+      "sha256": "f8ff6414809ebfc9618970c38ef778a431d70c498cbb01dcf54c788df08b2cc1",
+      "bytes": 1910
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/custody-tests-final/stderr.txt",
+      "sha256": "9050e0204ea9d4db06d04ad5b38196c64fd0015411ddbb7efbd50c9d63157053",
+      "bytes": 1463
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/custody-tests-final/stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/custody-tests/receipt.json",
+      "sha256": "e62968e188775a27f064d6cf86227b7068cef7dfbc6a72603ea032e4735ca295",
+      "bytes": 1957
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/custody-tests/stderr.txt",
+      "sha256": "09e2c3b58715d8f009153d270edbcaff42590c56ac52f7ab949e9112e5253c29",
+      "bytes": 1294
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/custody-tests/stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-libc/receipt.json",
+      "sha256": "beea749b609af1f99378f655b0eb166ed2a60a9bd3da7de77bfd2a1e762c09f8",
+      "bytes": 1793
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-libc/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-libc/stdout.txt",
+      "sha256": "b9e88445cd5c3e93c1fd887ced19dc71d9cb6d08bda471076dbf3540668eb9d2",
+      "bytes": 11
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-platform/receipt.json",
+      "sha256": "6ea90a60a90b55d2789ae6f20b7526b677325ae8ede0a1f3f3736ac9c24501c4",
+      "bytes": 1795
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-platform/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-platform/stdout.txt",
+      "sha256": "e0109ce4bb09317acfe73f0503e7a62845d527bbceef3fd629b64be2778a1c7c",
+      "bytes": 13
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-syft-version/receipt.json",
+      "sha256": "02651755af3efb859f6acb88dd7329653c1b418bc3320de1ed5af55d85609a0f",
+      "bytes": 1857
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-syft-version/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-syft-version/stdout.txt",
+      "sha256": "2b0acf80d81a4ba2d0ffd56570d26ae583257d90fbebfad68fa2ee2da10a42c8",
+      "bytes": 252
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-zizmor-version/receipt.json",
+      "sha256": "4f91062fe3981925beeec7fab496975f901affb964d2868ac62a1ae84957b795",
+      "bytes": 1849
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-zizmor-version/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/host-zizmor-version/stdout.txt",
+      "sha256": "8cfc3f0c3c0ae916a8a78253f6057469baa07a95c8bc6fa7a0589bad2bfd3c53",
+      "bytes": 14
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/lane-packets/receipt.json",
+      "sha256": "7288e8c6e8267236c1513a7d9c1649994c98b1af70450c14e37d3fda0075461f",
+      "bytes": 2130
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/lane-packets/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/lane-packets/stdout.txt",
+      "sha256": "e55e5ef60719151581aaf068936fdfdbf062ceed73b28904267617c62b2938cc",
+      "bytes": 762
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/mask-uuid-regression-before/receipt.json",
+      "sha256": "1758ffc9370d3e2b954c80fbed0f42a811c5e2b6076c812be46bbb3340a79e43",
+      "bytes": 2005
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/mask-uuid-regression-before/stderr.txt",
+      "sha256": "51a458d6ef7d61cda60d971dffc61ff98e9062986055008ba2b0dd2b35a48110",
+      "bytes": 1109
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/mask-uuid-regression-before/stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-actions-attest/receipt.json",
+      "sha256": "18cdcea41bdecd7305802bbe57f0413c505649802c5554bd8b52088fc1548870",
+      "bytes": 1933
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-actions-attest/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-actions-attest/stdout.txt",
+      "sha256": "0c3771cc74a9a66f38ea9c9e13837289da804e25b8a1f200e61b9b5aeeca5ac5",
+      "bytes": 13002
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-aikidosec-safe-chain/receipt.json",
+      "sha256": "284cb74ed6f2e1c45e5d1c1ea624f92a58ed6f143ec5a9dd94e939f30ee797ea",
+      "bytes": 1950
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-aikidosec-safe-chain/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-aikidosec-safe-chain/stdout.txt",
+      "sha256": "3df7cf1932a86772f84c0472b033fd4ec4daf83e35fa5369c21f074125528d44",
+      "bytes": 7021
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-boostsecurityio-poutine/receipt.json",
+      "sha256": "d54653408629333a4546caca43dbcacb69f21d97b817430b8a5573d83de0ef49",
+      "bytes": 1959
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-boostsecurityio-poutine/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-boostsecurityio-poutine/stdout.txt",
+      "sha256": "c600e9672c867811832d111512c946c81374b37619565283be2b277f7303a956",
+      "bytes": 7454
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-datadog-supply-chain-firewall/receipt.json",
+      "sha256": "c2a37789adfc7dc117da427346ae295259a97ea9b6c392ca8e6cf73333b01199",
+      "bytes": 1977
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-datadog-supply-chain-firewall/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-datadog-supply-chain-firewall/stdout.txt",
+      "sha256": "b0ce715a8afe6b0ddfb1efa59a8fbb9854dda6678449289de73a370d66f57820",
+      "bytes": 7674
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-kjanat-actionlint/receipt.json",
+      "sha256": "daf31f4e19cc8b03288626130eda63469ce542b1b6879de506de7d0bfc4617ca",
+      "bytes": 1942
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-kjanat-actionlint/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-kjanat-actionlint/stdout.txt",
+      "sha256": "f807418b50496acc05b31874a27bdccdb7eb516557bc65f972e0e7cfc0b890df",
+      "bytes": 17356
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-rhysd-actionlint/receipt.json",
+      "sha256": "e0d84b13114f514af3a2d360d3cc946984464facbae14b1a196c5cfd4324fe0c",
+      "bytes": 1938
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-rhysd-actionlint/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-rhysd-actionlint/stdout.txt",
+      "sha256": "2a05e3d8ac869f48c3848a31133d9716f0790f3e35b055aaa5d44aefe99cb02e",
+      "bytes": 5698
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-socketdev-sfw-free/receipt.json",
+      "sha256": "966dcddf302fa8d1abf6bb85648731d3857cdfc73fb7dd71c9548e53f7b2a844",
+      "bytes": 1944
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-socketdev-sfw-free/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-socketdev-sfw-free/stdout.txt",
+      "sha256": "828e24cc1114f3aaa01717a078f5b89900a97665b87a35e8cab087ad380fa16d",
+      "bytes": 6883
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-syft/receipt.json",
+      "sha256": "a16a3e388a822c50cc53f41917adfcfe10b11e79b2d4f78ad2a61a88aadbcecf",
+      "bytes": 1910
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-syft/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-syft/stdout.txt",
+      "sha256": "219d857153953aa44c129b906d0f8deddaef8295fbfc523364436bfafd2b5ab0",
+      "bytes": 7028
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-zizmor/receipt.json",
+      "sha256": "50a674688471fa2ffdfa8c3bef55eeb9e5e299c94e368104d32cac76cac24fcf",
+      "bytes": 1919
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-zizmor/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-zizmor/stdout.txt",
+      "sha256": "96dade3f8d3ee403925026dc4f91b89a81d40de8537e1cd3613b2a37e66f668f",
+      "bytes": 6895
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-ci-source/receipt.json",
+      "sha256": "9a51dd4767ac79adafbdaf790433a8eb209e76edbaa24eac51dacd789205d9c1",
+      "bytes": 1966
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-ci-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-ci-source/stdout.txt",
+      "sha256": "963f44ffb06018daed25acf04f73f9b27ac0666eb05a35f750906dc2c3e685f7",
+      "bytes": 364
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-filesystem-invoke/receipt.json",
+      "sha256": "4bfa25e3057c81febaa5d9d4506442ff2c47304c2578dc69eb79227315adc5a0",
+      "bytes": 1988
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-filesystem-invoke/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-filesystem-invoke/stdout.txt",
+      "sha256": "977611c84d6a35d0770b6f4aa2364adb9f863438b3f171d3bd88324215425adc",
+      "bytes": 11003
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-install/receipt.json",
+      "sha256": "0c944c653f6026fa96418c799a0f934278fba4583227b744f59d884f99d0cbea",
+      "bytes": 1860
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-install/stderr.txt",
+      "sha256": "55559df9f9727e596f394861996002debd58bd7e7c9de40660256584a0b697c1",
+      "bytes": 164
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-install/stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-installer-source/receipt.json",
+      "sha256": "2d6f64635e0e111b88e7fd9c72076467112fb669bbb04538566c3816cd8e4d37",
+      "bytes": 1984
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-installer-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-installer-source/stdout.txt",
+      "sha256": "787fe2aa12311f7dd8e1d9337dfc6e25f091396c958937293a2d3c0eca2ff8ce",
+      "bytes": 24969
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-readme-source/receipt.json",
+      "sha256": "9f71895e755c89f34c168e218d54deccaf00b7ce3c77bb884ff77e068bb2aadb",
+      "bytes": 1976
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-readme-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-readme-source/stdout.txt",
+      "sha256": "0d6d43f2b335eb9a02d869c20290fb4bbbd3e0a6642b1444c8c99d44184498f6",
+      "bytes": 6125
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-release/receipt.json",
+      "sha256": "e9548900ea566145ceafd0c2f89653fb19989a67d68847c83fbfc66c3f2af1f5",
+      "bytes": 1931
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-release/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-release/stdout.txt",
+      "sha256": "1ae9896c4e2589bb4358fd548aa2d25d7ffe2b7dc7baaeb911536b7906dc3dc4",
+      "bytes": 69286
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-tag-object-source/receipt.json",
+      "sha256": "db2b8f96ae38e29560f9f6ce39cbd74875ad6c59dee13375ed7f0b4327b3c081",
+      "bytes": 1977
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-tag-object-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-tag-object-source/stdout.txt",
+      "sha256": "dee804f32b923b2b117cc7ae1417ac8894fe6d992589304c1d1b8baa40620a8c",
+      "bytes": 797
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-tag-source/receipt.json",
+      "sha256": "b92e7f78d1560d0794f5243e6635c3eda5b0dbbfb5f7611b7ba4a7f33f903e9c",
+      "bytes": 1934
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-tag-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-tag-source/stdout.txt",
+      "sha256": "d9044e50c11df3cf2c25bccfcbb8c0beec595beb45013a3c10dd2823afef3361",
+      "bytes": 368
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-version/receipt.json",
+      "sha256": "b44a43430dfa70fa79e0ef20dd136cb0e9a0b00b3c47661d2e7573c49c4d555b",
+      "bytes": 1815
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-version/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-version/stdout.txt",
+      "sha256": "ede99b38c6d6c13875f7a5b19378dd561295c30ac3e441fe5698e3913d756a37",
+      "bytes": 277
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-ci-source/receipt.json",
+      "sha256": "8ebcfb1fdd1b774c16e0e9f54ccd07f7815ab8e60b45166dacf5770afe47926a",
+      "bytes": 1992
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-ci-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-ci-source/stdout.txt",
+      "sha256": "eb5958aa8007213954a3e2bda038a2cad950d3b9f3838f61426bcb208034594d",
+      "bytes": 3689
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-fixture-empty-source/receipt.json",
+      "sha256": "f0f871b036037675cf8c244704a2878337093199d8fabd9e348883bb5927010e",
+      "bytes": 2077
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-fixture-empty-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-fixture-empty-source/stdout.txt",
+      "sha256": "d47e9e2e7c5dc2e2f9a0e398a6113d207e25c6a3d26f39fc07bab0b5eade0ac6",
+      "bytes": 537
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-fixture-write-source/receipt.json",
+      "sha256": "9e9b150139f3ad1897396b2324c20f3e237f3bcd0ca9f4576eaff336e4237a8b",
+      "bytes": 2075
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-fixture-write-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-fixture-write-source/stdout.txt",
+      "sha256": "3b12228e849ab715821e9aa1ebd02862745577a6743233b96f3985c1d315f74c",
+      "bytes": 435
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-install-source/receipt.json",
+      "sha256": "47bb703af4e78861c4a1dace0741393e56cda5251a9b53fe6ee57efb89cb5918",
+      "bytes": 1998
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-install-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-install-source/stdout.txt",
+      "sha256": "24d83d696e4d80dad9c9daaa94b35c07027c096a7b2201b4b0798ca051b30c90",
+      "bytes": 4977
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-install/receipt.json",
+      "sha256": "07e5797da235ec87e64fb432fcab27da375c0022dbe6ca1d18c5f2b73fe38e9a",
+      "bytes": 2048
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-install/stderr.txt",
+      "sha256": "af1f218137e645076f3bd0a9e550523dedd96dc3b0a5a117c595b9d13e5da97a",
+      "bytes": 213
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-install/stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-package-metadata/receipt.json",
+      "sha256": "88aaae081f8c23389dff60c89f8c93d315fd2db9b9f625d9325bbac0f10f7aa2",
+      "bytes": 1930
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-package-metadata/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-package-metadata/stdout.txt",
+      "sha256": "25893221350b71ba6b56a25d33aa7271500aff00c5112c56a21a997562614305",
+      "bytes": 12137
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-quickstart-source/receipt.json",
+      "sha256": "c7b52f30bf10bcee51301b7eac7e50cdf1df06d7e049ea51d76570988827ee00",
+      "bytes": 2002
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-quickstart-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-quickstart-source/stdout.txt",
+      "sha256": "0647c314693a82eeac2184f68a990b3223046d707be03917ed8650992ac213ef",
+      "bytes": 3269
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-repository-invoke/receipt.json",
+      "sha256": "2e4531c48b59138fd76449596571ba7ba3003b652f073904c46475f987c023dc",
+      "bytes": 2053
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-repository-invoke/stderr.txt",
+      "sha256": "aa4087161d51e0137089f9ee9b20dbc038f7bc0840c2d512a89e4190008f939c",
+      "bytes": 2173
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-repository-invoke/stdout.txt",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-tag-source/receipt.json",
+      "sha256": "163953d4c3bf5bbd39859cbda42d6c42188b47f9f57319353c7cdbd0268c3d29",
+      "bytes": 1943
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-tag-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-tag-source/stdout.txt",
+      "sha256": "045579a4703d77e807069f79394d04bba93eae76e1f43c0a598efbe1155d6bb7",
+      "bytes": 378
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-empty-perms/receipt.json",
+      "sha256": "4ca15d9c518b1d7a7e7fa5cf8f90ccf419f4efd37e6ce666b75f0fb4e5cab164",
+      "bytes": 1976
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-empty-perms/stderr.txt",
+      "sha256": "c91889314d2cea9f9bdfcaf6da77feb825ebe1c34f5e2ffccfe0ad496e4b391f",
+      "bytes": 112
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-empty-perms/stdout.txt",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-help-smoke/receipt.json",
+      "sha256": "deb1c36d225f9ecf7d70d10cc1aeac2e336bde79aacde69998520bc72acb88a6",
+      "bytes": 1819
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-help-smoke/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-help-smoke/stdout.txt",
+      "sha256": "40dc69d5dc72d799cde41c9cc632808cccefdcaaadc95b1f28abaa449e555d19",
+      "bytes": 3294
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-tests-source/receipt.json",
+      "sha256": "2e207717e08eb2fd8ffbee7dba4b5d0aba3f363a5d63a13d0653702943b936cc",
+      "bytes": 2055
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-tests-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-tests-source/stdout.txt",
+      "sha256": "fb68467d5a482a119bb0b82c5bf4ff3abe081e18a0ea7970408274e5964c685e",
+      "bytes": 10794
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-write-all/receipt.json",
+      "sha256": "16828503cd339c3ee6be704d645f3b86222f25bc49fc7e4fa119f8ad5c33c0e8",
+      "bytes": 1974
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-write-all/stderr.txt",
+      "sha256": "5c68be29c9c3485b70b35428fd679afa5263abd76f11feb64125480218f3e2a4",
+      "bytes": 110
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-write-all/stdout.txt",
+      "sha256": "43e849bc12cf867a7b753cca49c2289561b9a4b4ac8fd63be06471ff6d929ad6",
+      "bytes": 1203
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-usage-source/receipt.json",
+      "sha256": "c6ecc1900c41ec6bea16ab19551111102b15e850b5f510e095617ade4209c4b3",
+      "bytes": 1988
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-usage-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-usage-source/stdout.txt",
+      "sha256": "4c7dd6b8cf73efc53651b5dcd17dedacdd24b4f2102930a91fc9819bf7661627",
+      "bytes": 36870
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-version/receipt.json",
+      "sha256": "7dbc179d5d56971d777bc7bae1b807f1939cc8bf47ca6935f62c0fa4936d5694",
+      "bytes": 1800
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-version/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-version/stdout.txt",
+      "sha256": "8cfc3f0c3c0ae916a8a78253f6057469baa07a95c8bc6fa7a0589bad2bfd3c53",
+      "bytes": 14
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/mask-before-uuid.py.txt",
+      "sha256": "4ae6c55ce5e6f0f08db13173dab1614f67017d1443da3e41ba3cfe9c612ffe11",
+      "bytes": 4002
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/mask.py",
+      "sha256": "1c846c8b38bb61f5e3bec439d5270700b232343c17550a84b81df34680825636",
+      "bytes": 4280
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/pin-reconciliation.json",
+      "sha256": "8d4139fca2e08b698cf2e098b9837d89c61612ac99f7517de7c2310cf3814094",
+      "bytes": 12549
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/resolution-inputs.json",
+      "sha256": "c43b96f3ff4ab6faa7d165970e3b3c0574dadd68b1d2dc0813ec81e1de694621",
+      "bytes": 10274
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/run-bindings.json",
+      "sha256": "a67618f08086e69614a6f17163a0ccb180c7c32bfbdcfe3180acba6bf4b3059e",
+      "bytes": 6840
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/source-index.json",
+      "sha256": "873c99f444d25dd9dcdd9a39bc8f2cf4756c062e6b6a93c3f838f52f22e6efe7",
+      "bytes": 12981
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/test_capture_mask.py",
+      "sha256": "816555c07b4076acfa8b18e62e9344dd16d4990b92ccd0b90e62c6dcca09d8eb",
+      "bytes": 4321
+    },
+    {
+      "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/weights.json",
+      "sha256": "6468d4aa86cd69c50cbd970228d40004c4fd9f6782a6059f763eb53098616b3e",
+      "bytes": 1184
+    },
+    {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
       "sha256": "ff34c3db7e67e4d96e9a1d0d154a0c7e8c01f42eade511302f963ad05a1d2c4c",
       "bytes": 6271

@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+"""Deterministic masking of native captures; no model or heuristic summarization.
+
+Policy: literal private prefixes become marked placeholders; hex digest-shaped
+tokens (16 through 128 hex chars) become <MASKED_DIGEST>, except explicitly listed
+PUBLIC source commits. All remaining stream bytes, including invalid UTF-8,
+line endings, empty output and diagnostics, are preserved.
+The private raw hash is verified, never copied into the public metadata.
+Source: Python 3.14 bytes.replace, re.sub, hashlib and json docs, read 2026-10-16.
+"""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import re
+
+
+DIGEST = re.compile(rb"(?<![0-9A-Za-z])[0-9a-fA-F]{16,128}(?![0-9A-Za-z])")
+
+
+def mask_bytes(raw, replacements, public_commits=()):
+    result = raw
+    for old, new in sorted(replacements, key=lambda item: len(item[0]), reverse=True):
+        if not old or not new.startswith(b"<") or not new.endswith(b">"):
+            raise ValueError("literal values require nonempty keys and marked placeholders")
+        result = result.replace(old, new)
+    allowed = set(public_commits)
+    return DIGEST.sub(lambda m: m[0] if m[0] in allowed else b"<MASKED_DIGEST>", result)
+
+
+def publish(raw_root, output, replacements, public_commits=()):
+    source = Path(raw_root)
+    destination = Path(output)
+    destination.mkdir(parents=True, exist_ok=False)
+    captures = []
+    for record_file in sorted(source.glob("*/capture.json")):
+        data = json.loads(record_file.read_text())
+        name = record_file.parent.name
+        target = destination / name
+        target.mkdir()
+        metadata = {k: data[k] for k in ("schema_version", "capture_name", "argv", "cwd",
+                    "environment", "started_at", "finished_at", "exit_code")}
+        metadata = json.loads(mask_bytes(json.dumps(metadata, ensure_ascii=False).encode(),
+                                         replacements, public_commits))
+        metadata.update({"classification": "masked derivative of a native capture",
+                         "raw_capture_name": name,
+                         "masking_rule": "../../mask.py",
+                         "command_placeholders": "Marked <...> values replace private path prefixes; exact argv/cwd/environment remain in private capture.",
+                         "streams": {}})
+        for stream in ("stdout", "stderr"):
+            raw = (record_file.parent / (stream + ".bin")).read_bytes()
+            if hashlib.sha256(raw).hexdigest() != data["streams"][stream]["raw_sha256_private"]:
+                raise ValueError("raw capture integrity mismatch")
+            if len(raw) != data["streams"][stream]["bytes"]:
+                raise ValueError("raw capture length mismatch")
+            masked = mask_bytes(raw, replacements, public_commits)
+            filename = stream + ".txt"
+            (target / filename).write_bytes(masked)
+            metadata["streams"][stream] = {
+                "file": filename, "published_bytes": len(masked),
+                "published_sha256": hashlib.sha256(masked).hexdigest()}
+        (target / "receipt.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+        captures.append(name)
+    return captures
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--raw-root", required=True)
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--private-map", required=True,
+                        help="private JSON with replacements and public_commits; never publish it")
+    args = parser.parse_args()
+    config = json.loads(Path(args.private_map).read_text())
+    pairs = [(x["literal"].encode(), x["placeholder"].encode()) for x in config["replacements"]]
+    allow = [x.encode() for x in config["public_commits"]]
+    names = publish(args.raw_root, args.output, pairs, allow)
+    print(json.dumps({"status": "masked", "captures": names, "count": len(names)}))
+
+
+if __name__ == "__main__":
+    main()
