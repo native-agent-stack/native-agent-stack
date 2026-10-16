@@ -16,6 +16,14 @@ aligned. Route-binding shape and PyPI mismatch guards now have explicit negative
 controls. The three-gap, prior-history and rendering failures were reproduced
 at `1b62f8e7d501846abb974622c89111f6f794ae9b` before the correction.
 
+The later `review_output.json` for `4107f379529411c87e4cd5568d4ee57139a582c3`
+identified two further boundaries. Cached findings now require the same resolved
+checkout identity; foreign, absent and malformed cache roots are rejected for
+retention. JSON recursion failures become inventory coverage gaps. Both were
+reproduced before the fix: three cache-root assertions failed and the deep JSON
+case raised `RecursionError` before aggregation. The existing same-checkout
+retention and unavailable-history controls remain passing.
+
 | Round-3 finding | Disposition | Evidence or boundary |
 | --- | --- | --- |
 | Gateway proposal could borrow a valid route ID | Fixed | Registry entries declare route kind and exact retained identities; the C2 repository must agree. The gateway relabel fixture returned success before the fix and now fails. |

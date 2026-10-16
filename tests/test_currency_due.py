@@ -560,6 +560,63 @@ class CountTests(unittest.TestCase):
                 self.assertEqual(saved["details"][-1]["model_inventory_findings"], "prior findings unavailable")
                 self.assertNotIn("models_past_window", saved["due"])
 
+    def test_cached_inventory_must_be_bound_to_the_current_checkout(self):
+        first = Checkout(self, "first")
+        path = first.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps({
+            "schema_version": 1, "inventory_status": "complete",
+            "policy": {"max_release_age_days": 42, "max_landscape_age_days": 7, "refresh_lead_days": 2},
+            "packages": [], "models": [{
+                "id": "reader", "role": "document reading", "consumer": "fixture", "model_id": "vendor/model",
+                "revision": "a" * 40, "release_date": "2026-08-01", "checked_at": "2026-09-30",
+                "release_source": "https://huggingface.co/vendor/model", "status": "in_use",
+                "release_line": {"kind": "huggingface", "repository": "vendor/model", "ref": "main"},
+            }],
+        }))
+        code, stdout, stderr = first.run("--json")
+        self.assertEqual(code, 0, stderr)
+        previous = json.loads(first.due_file.read_text())
+        self.assertEqual(previous["due"]["models_past_window"], 1)
+        second = Checkout(self, "second")
+        second.state = first.state
+        path = second.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        path.write_text("{")
+        second.set(STALENESS, staleness_report(("codex", ["stale"])))
+        for cached_root in (previous["root"], None, []):
+            with self.subTest(root_kind=type(cached_root).__name__):
+                cached = {**previous, "root": cached_root}
+                if cached_root is None:
+                    cached.pop("root")
+                second.due_file.write_text(json.dumps(cached))
+                code, stdout, stderr = second.run("--json")
+                self.assertEqual(code, 0, stderr)
+                saved = json.loads(second.due_file.read_text())
+                self.assertEqual(saved["root"], str(second.root))
+                self.assertEqual(saved["due"]["stale_receipts"], 1)
+                self.assertNotIn("models_past_window", saved["due"])
+                self.assertFalse(any(item["kind"] == "model_past_window" for item in saved["details"]))
+                self.assertEqual(saved["details"][-1]["model_inventory_findings"],
+                                 "prior findings not bound to this checkout")
+
+    def test_inventory_parser_depth_failure_is_a_gap_and_preserves_other_counts(self):
+        checkout = Checkout(self)
+        path = checkout.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        # Match the existing read_record parser-depth control. The C decoder can
+        # exceed Python's recursion limit before reaching its own stack guard.
+        depth = 200000
+        path.write_text('{"schema_version":1,"models":' + "[" * depth + "0" + "]" * depth + "}")
+        checkout.set(STALENESS, staleness_report(("codex", ["stale"])))
+        code, stdout, stderr = checkout.run("--json")
+        self.assertEqual(code, 0, stderr)
+        self.assertNotIn("Traceback", stderr)
+        saved = json.loads(checkout.due_file.read_text())
+        self.assertEqual(saved["due"]["stale_receipts"], 1)
+        self.assertEqual(saved["details"][-1]["model_inventory"], "unknown")
+        self.assertIn("model inventory unreadable", cd.gaps_of(saved))
+
     def test_gap_remains_visible_when_counts_need_truncation(self):
         line = cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 10 ** 20),
                                "python3 " + "x" * 90, pointers=["cat /x"],

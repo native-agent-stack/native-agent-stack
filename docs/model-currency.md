@@ -59,8 +59,11 @@ records and invalid or missing source URLs still fail publication validation.
 
 An unreadable or structurally invalid inventory is a `model inventory unreadable`
 coverage gap in the daily collector. It carries forward the last readable
-inventory's count and findings, marked as retained, alongside any new known
-counts. The session notice shows the gap beside the counts; it does not claim
+inventory's count and findings from the same resolved checkout, marked as
+retained, alongside any new known counts. A foreign, missing or malformed cached
+checkout identity makes those prior findings unavailable. JSON parser-depth
+failures also become inventory coverage gaps rather than aborting collection.
+The session notice shows the gap beside the counts; it does not claim
 that retained findings were freshly verified. If the previous due file cannot
 be read safely, the report marks its prior findings unavailable and still writes
 current known counts. With no known counts and incomplete coverage, the existing

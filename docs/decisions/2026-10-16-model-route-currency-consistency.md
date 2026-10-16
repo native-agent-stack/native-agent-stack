@@ -23,6 +23,16 @@ The daily collector uses the same `model_currency_due` projection and persists `
 
 The notice budget cannot stop collection. It tries full gap phrases, compact named gaps and a coverage-gap count with the actual supplied command/pointers. If no real command fits, the bounded notice omits its inline command; the report still contains `details_command` and all coverage fields. This supersedes the earlier `summary_line` path-length failure at `1b62f8e7d501846abb974622c89111f6f794ae9b:scripts/currency_due.py:438-447`. Three simultaneous gaps, long paths, unreadable prior state and retained-origin rendering have fail-first controls. Existing route-kind/identity-shape and PyPI mismatch guards gain explicit negative tests without claiming baseline defects.
 
+Retention also requires the cached report's `root` to equal the current report's
+resolved checkout identity. Foreign, missing and malformed identities cannot
+supply model findings for a different checkout. `inventory_due` catches JSON
+`RecursionError` at the inventory boundary, following the existing `read_record`
+parser handling at `4107f379529411c87e4cd5568d4ee57139a582c3:scripts/currency_due.py:287`.
+Fail-first controls use two real fixture checkouts sharing one state directory
+and the existing 200,000-level malformed-JSON pattern. The corrected collector
+preserves unrelated known counts and labels the inventory gap. These are local
+integration tests, not model or host qualification.
+
 For already reviewed inputs, read the carried angle candidates and, when present, #1177's `sweep-manifest.json`. Match their stable IDs through the new mapping; retain their historical bytes and votes. Known `cx/`, `codex/`, `mc/` and `muse-code/` prefixes are removed only for the comparison notice. A non-model placeholder on the rejected Muse foreign-subscription route remains visible as a difference notice; its binding names the Full family for traceability and does not qualify that route.
 
 ## C2 publication contract

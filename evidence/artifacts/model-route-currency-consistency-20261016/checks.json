@@ -2,9 +2,23 @@
   "schema_version": 1,
   "evidence_class": "local_integration",
   "date": "2026-10-16",
-  "tests_command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 -B -m unittest tests.test_currency_due tests.test_model_currency -q",
-  "observed_test_count": 153,
+  "tests_command": "python3 -B -m unittest tests.test_currency_due -q",
+  "execution_mode": "Detached user systemd unit at CPUWeight=idle; private raw stdout/stderr and an explicit exit file retained by the lane runner.",
+  "observed_test_count": 105,
   "result": "passed",
+  "cache_identity_and_parser_depth_followup": {
+    "base": "4107f379529411c87e4cd5568d4ee57139a582c3",
+    "review": "review_output.json (private review cited by name only)",
+    "fail_first": {"tests": 2, "assertion_failures": 3, "errors": 1, "error_class": "RecursionError"},
+    "cases": [
+      "Two fixture checkouts share state; foreign, absent and malformed cached root identities must not carry model findings into the second checkout.",
+      "The existing 200,000-level malformed-JSON pattern must become an inventory coverage gap while unrelated stale-receipt counts are persisted."
+    ],
+    "focused_green": {"tests": 4, "exit_code": 0, "scope": "Both new cases plus existing same-checkout retention and unavailable-history controls."},
+    "full_currency_suite": {"tests": 105, "exit_code": 0},
+    "private_logs": ["cache-depth-red2/stdout.log", "cache-depth-red2/stderr.log", "cache-depth-red2/exit", "cache-depth-green/stderr.log", "cache-depth-suite/stderr.log", "cache-depth-suite/exit"],
+    "custody": "Private logs are named only; no log or process-metadata digest is published. No host/model qualification is claimed."
+  },
   "notice_budget_followup": {
     "base": "1b62f8e7d501846abb974622c89111f6f794ae9b",
     "review": "MICRO-delta-1b62f8e7.md; matching local review_output.json (names only)",

@@ -18148,8 +18148,8 @@
     },
     {
       "path": "docs/active-model-currency.md",
-      "sha256": "8f1902515696e39fcac3e7b07b59eb159262aa88044d73772b73b1af1789967a",
-      "bytes": 17680
+      "sha256": "e02269d4d1454356d1f303a1fd1ccd6da186f91215f915d6cb564167158739e1",
+      "bytes": 17837
     },
     {
       "path": "docs/automation-upgrade-evidence.json",
@@ -19358,8 +19358,8 @@
     },
     {
       "path": "docs/decisions/2026-10-16-model-route-currency-consistency.md",
-      "sha256": "a29f51eb8e12f6e6c363b312ce54870c01ca09cbc2499a6d99e194207b422f20",
-      "bytes": 15688
+      "sha256": "4c732a16736c63aaad79051d00cf67610b69047226897b370b63537378580d58",
+      "bytes": 16385
     },
     {
       "path": "docs/decisions/2026-10-16-nautilus-rc5-run-source-pin.md",
@@ -19658,8 +19658,8 @@
     },
     {
       "path": "docs/model-currency.md",
-      "sha256": "097a5cf44249af987efe23d7d2d507671c5c1f0e10df52fa1e39b5aff30f3987",
-      "bytes": 11372
+      "sha256": "cc02df169b2748963bec0afadb8bf5d3c815b30848d2a419f6dfa8f034c8f941",
+      "bytes": 11597
     },
     {
       "path": "docs/native-dashboard-data.md",
@@ -41543,13 +41543,13 @@
     },
     {
       "path": "evidence/artifacts/model-route-currency-consistency-20261016/checks.json",
-      "sha256": "edff3690addb13f48bf87458362b7b2dd9e35c88d45fbd13efdc569798e09c8f",
-      "bytes": 6609
+      "sha256": "419a050222ddfa7afe1c9211ff196dec63cdf6dcf0a7b8e25a20269779b24e45",
+      "bytes": 7826
     },
     {
       "path": "evidence/artifacts/model-route-currency-consistency-20261016/review-closure.md",
-      "sha256": "1af6b911c7467dd55d72c72c6be853064eac78ad138507b38eba36ba5ed88515",
-      "bytes": 7334
+      "sha256": "b006f90046f934d08816646b1b6ae0dc4530af9565d2132585b846c59485c074",
+      "bytes": 7864
     },
     {
       "path": "evidence/artifacts/model-route-currency-consistency-20261016/sources.json",
@@ -62873,8 +62873,8 @@
     },
     {
       "path": "scripts/currency_due.py",
-      "sha256": "7c1c760b282d017a5844cb9f0e37e937bb05e1e5f2baf3932ab44204f194a5c9",
-      "bytes": 62278
+      "sha256": "b2182c78aca3f2a53a729224af816e3f23bffd1fb0ce3e8a45c4bdd10a4bbd00",
+      "bytes": 62704
     },
     {
       "path": "scripts/env_freshness.py",
@@ -63908,8 +63908,8 @@
     },
     {
       "path": "tests/test_currency_due.py",
-      "sha256": "041d0ea4eee414a77599d6545e592263220e07070857fe35d6e60815f0c19510",
-      "bytes": 113689
+      "sha256": "b1e4fa1502541fa4a12af2cb098065e1bebe54c034b9cb9f3270a1d85cf63eb0",
+      "bytes": 117062
     },
     {
       "path": "tests/test_delisting_coverage.py",

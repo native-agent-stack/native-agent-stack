@@ -180,7 +180,9 @@ is a coverage gap alongside the current known counts. The collector writes
 known nonzero counts and otherwise retains the prior due file when a requested
 check cannot answer. It does not carry old selector findings forward as current
 observations. Inventory-age findings have a separate retention rule: recoverable
-prior findings are carried forward with their origin during an inventory gap.
+prior findings are carried forward with their origin during an inventory gap
+only when the cached report names the same resolved checkout. Foreign or absent
+checkout identities cannot supply retained findings for the current checkout.
 Unreadable prior history is marked unavailable and does not block current counts.
 It exits 0 for a coverage-only gap and 1 when known stale model selectors exist;
 the model CLI itself still returns 2 for an incomplete comparison. The

@@ -327,7 +327,7 @@ def inventory_due(root: Path, now_text: str) -> list[str] | None:
         if reader.errors or model_currency_problems(document, today, enforce_age=False):
             return None
         return model_currency_due(document, today)
-    except (OSError, UnicodeError, ValueError):
+    except (OSError, UnicodeError, ValueError, RecursionError):
         return None
 
 
@@ -934,6 +934,12 @@ def retain_inventory_findings(document: dict, due_file: Path, from_xdg: bool) ->
     if not isinstance(count, int) or isinstance(count, bool) or count < 0 or count != len(rows) \
             or any(not isinstance(item.get("finding"), str) for item in rows):
         coverage["model_inventory_findings"] = "prior findings unavailable"
+        return
+    # main() records its resolved checkout root. Compare that identity exactly;
+    # do not resolve an untrusted cached path or carry findings across checkouts.
+    current_root = document.get("root")
+    if not isinstance(current_root, str) or not current_root or previous.get("root") != current_root:
+        coverage["model_inventory_findings"] = "prior findings not bound to this checkout"
         return
     if count:
         document["due"][INVENTORY_KEY] = count
