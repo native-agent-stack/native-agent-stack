@@ -1,0 +1,399 @@
+{
+  "schema_version": 1,
+  "rule_version": "angle-convergence/2",
+  "catalog": "foundation",
+  "layer_id": "git-github-automation",
+  "weights": {
+    "A1": 0.2,
+    "A2": 0.2,
+    "A3": 0.15,
+    "A4": 0.15,
+    "A5": 0.2,
+    "A6": 0.1
+  },
+  "weights_stated_at": "2026-10-16T05:13:15.954815Z",
+  "weight_reason": "Existing repository default weights, with no optimization for observed results. Prior source leads were visible before this statement; final pinned source reads and assessment follow it. This is disclosed re-verification, not a blind comparison. The statement time is the observed modification time of the scratch weight record, before the fresh source reads.",
+  "published_evaluations_available": true,
+  "disclosure": "SINGLE-FAMILY GPT evidence preparation, after observing the retained verdicts and sources. Existing default weights were retained before the fresh recorded source reads; this is disclosed re-verification, not a blind or preregistered comparative trial. All five rows remain INSUFFICIENT. The co-op dispatches both families and adjudicates disputed dimensions. This draft is not an active catalogs/landscape/angles record, changes no default and admits no FINAL layer. Masked output is a deterministic derivative under the published script/test; generated indexes and source-review judgments are not measured tool output.",
+  "resolution_inputs": [
+    "catalogs/landscape/foundation.json",
+    "catalogs/landscape/final-stack.json",
+    "catalogs/sota-convergence/layer-verdict-waves.json",
+    "catalogs/sota-convergence/layer-verdicts-20260922.json",
+    "catalogs/saturation/ledger.json",
+    "catalogs/sota-convergence/manifest-20260923.json",
+    "catalogs/sota-convergence/manifest-20260926.json",
+    "catalogs/sota-convergence/manifest-20260929.json",
+    "evidence/artifacts/landscape-sweep-20260923/anthropics-claude-code-action.json",
+    "evidence/artifacts/landscape-sweep-20260926/returns.json",
+    "evidence/artifacts/landscape-sweep-20260929/returns.json",
+    "evidence/artifacts/final-prep-git-github-20261016/packet-projection.json",
+    "evidence/artifacts/final-prep-git-github-20261016/pin-reconciliation.json"
+  ],
+  "gaps": [
+    "A3 community consensus and A4 net usage remain unverified. A5 retains sem's existing vendor self-evaluation, which has no demonstrated pin binding and does not compare difftastic; it supplies no admission evidence.",
+    "A6 has no new matched comparative result. Local smokes do not establish comparative quality.",
+    "gh run pin differs from the plan/host; sealed gh verdict is unpinned and worktrunk verdict is older than its run pin.",
+    "Both cumulative survivors remain unresolved: claude-code-action and sem. Neither was installed or trialled.",
+    "Full upstream suites, authenticated PR lifecycle, organic-session use and macOS execution remain unmeasured in this preparation.",
+    "The per-component E2E files are derived indexes, not native receipts. Native install/local-smoke capture exists, but a FINAL-qualifying E2E receipt/disposition remains pending co-op review; final_evidence.e2e_receipt stays null.",
+    "Installed-version original-byte capture and separate native dirty-file-preservation capture are missing; text probes and driver assertions do not fill those gaps."
+  ],
+  "candidates": [
+    {
+      "id": "worktrunk",
+      "name": "worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "0.80.0",
+      "role": "Existing winner: owned Git worktree lifecycle",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "confounds": [
+        "One Linux x86_64 scratch; manual task-triggered smoke; no paired challenger, full suite or macOS run."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json"
+            }
+          ],
+          "note": "Capability at the resolved pin reproduced only within the receipt's documented local smoke scope; full layer requirements remain bounded by its named gaps. Native masked source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:226; the per-component .e2e.json file is a derived navigation index."
+        },
+        "A2": {
+          "score": "+",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/max-sixty/worktrunk",
+              "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+              "path": ".github/workflows/ci.yaml",
+              "line": 107
+            }
+          ],
+          "note": "Source-review judgment only: the pinned CI source documents a nextest suite (worktrunk) or an explicit native test command (gh/difftastic). No native CI result or fresh full-suite execution is inferred."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "No retained pin-specific independent community convergence measurement in this delta."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "Release download counts and task-triggered smoke invocations do not measure net production usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "No pin-bound published evaluation retained for this winner. The carried sem vendor self-report is scored separately; A5 weight stays at its stated value."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "No matched comparative run at these proposed pins; local smokes are A1, not A6."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Adjudicate sealed 0.79.0 versus run 0.80.0 using the fresh native lifecycle evidence; then fill A3-A6 without inferring convergence from install/smoke success."
+    },
+    {
+      "id": "gh",
+      "name": "gh",
+      "repository": "https://github.com/cli/cli",
+      "pin": "2.102.0",
+      "role": "Existing winner: GitHub CLI; local completion smoke only",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "confounds": [
+        "One Linux x86_64 scratch; manual task-triggered smoke; no paired challenger, full suite or macOS run."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json"
+            }
+          ],
+          "note": "Capability at the resolved pin reproduced only within the receipt's documented local smoke scope; full layer requirements remain bounded by its named gaps. Native masked source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:310; the per-component .e2e.json file is a derived navigation index."
+        },
+        "A2": {
+          "score": "+",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/cli/cli",
+              "pin": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+              "path": ".github/workflows/go.yml",
+              "line": 32
+            }
+          ],
+          "note": "Source-review judgment only: the pinned CI source documents a nextest suite (worktrunk) or an explicit native test command (gh/difftastic). No native CI result or fresh full-suite execution is inferred."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "No retained pin-specific independent community convergence measurement in this delta."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "Release download counts and task-triggered smoke invocations do not measure net production usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "No pin-bound published evaluation retained for this winner. The carried sem vendor self-report is scored separately; A5 weight stays at its stated value."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "No matched comparative run at these proposed pins; local smokes are A1, not A6."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Adjudicate proposed 2.102.0 versus canonical 2.101.0, then obtain credentialed disposable PR lifecycle evidence only in its separately authorized run."
+    },
+    {
+      "id": "difftastic",
+      "name": "difftastic",
+      "repository": "https://github.com/Wilfred/difftastic",
+      "pin": "0.71.0",
+      "role": "Existing winner: structural source diff",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "confounds": [
+        "One Linux x86_64 scratch; manual task-triggered smoke; no paired challenger, full suite or macOS run."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json"
+            }
+          ],
+          "note": "Capability at the resolved pin reproduced only within the receipt's documented local smoke scope; full layer requirements remain bounded by its named gaps. Native masked source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:366; the per-component .e2e.json file is a derived navigation index."
+        },
+        "A2": {
+          "score": "+",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/Wilfred/difftastic",
+              "pin": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+              "path": ".github/workflows/test.yml",
+              "line": 61
+            }
+          ],
+          "note": "Source-review judgment only: the pinned CI source documents a nextest suite (worktrunk) or an explicit native test command (gh/difftastic). No native CI result or fresh full-suite execution is inferred."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "No retained pin-specific independent community convergence measurement in this delta."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "Release download counts and task-triggered smoke invocations do not measure net production usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "No pin-bound published evaluation retained for this winner. The carried sem vendor self-report is scored separately; A5 weight stays at its stated value."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "No matched comparative run at these proposed pins; local smokes are A1, not A6."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Measure stable machine-readable output and frozen-fixture coverage against carried sem and plain git diff using the retained comparison rule; no new default follows from this sample smoke."
+    },
+    {
+      "id": "claude-code-action",
+      "name": "claude-code-action",
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "pin": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+      "role": "Carried 20260923 survivor: unattended GitHub review workflow; no installation or runner invocation",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "Source review only; no runner/credential or native survivor trial. Later sweep omission does not dispose of an earlier survivor."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anthropics/claude-code-action",
+              "pin": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+              "path": "README.md",
+              "line": 10
+            }
+          ],
+          "note": "Retained survivor source re-read at its resolved sweep tag; capability screen and comparative measurement remain unresolved."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "Unverified for this carried survivor in the bounded delta."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "Unverified for this carried survivor in the bounded delta."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "Unverified for this carried survivor in the bounded delta."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "Unverified for this carried survivor in the bounded delta."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "Unverified for this carried survivor in the bounded delta."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Resolve the retained source/capability dispute and complete the carried comparison before adoption or retirement. Co-op dispatches the two-family reads."
+    },
+    {
+      "id": "sem",
+      "name": "sem",
+      "repository": "https://github.com/ataraxy-labs/sem",
+      "pin": "4cfe1374f79631b01aca5746441d826738a15448",
+      "role": "Carried 20260926/20260929 survivor: stable machine-readable entity diff claim; no installation or trial",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "Source review only; no runner/credential or native survivor trial. Later sweep omission does not dispose of an earlier survivor."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/ataraxy-labs/sem",
+              "pin": "4cfe1374f79631b01aca5746441d826738a15448",
+              "path": "README.md",
+              "line": 157
+            }
+          ],
+          "note": "Retained survivor source re-read at its resolved sweep tag; capability screen and comparative measurement remain unresolved."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "Unverified for this carried survivor in the bounded delta."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "Unverified for this carried survivor in the bounded delta."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "Unverified for this carried survivor in the bounded delta."
+        },
+        "A5": {
+          "score": "0",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://ataraxy-labs.github.io/sem/agents.html",
+              "read_at": "2026-10-16T05:23:42.990875Z"
+            }
+          ],
+          "note": "Known vendor self-evaluation over 3 commits, 4 questions and 24 API calls using Claude Sonnet 4.5 versus raw git diff. It is not independent, not a difftastic comparison, and has no demonstrated binding to retained sem v0.25.0. Neutral evidence only; not run here."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:24.150009Z",
+          "sources": [],
+          "note": "Unverified for this carried survivor in the bounded delta."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Resolve the retained source/capability dispute and complete the carried comparison before adoption or retirement. Co-op dispatches the two-family reads."
+    }
+  ],
+  "final_evidence": [
+    {
+      "candidate_id": "worktrunk",
+      "run_pin": "0.80.0",
+      "e2e_receipt": null,
+      "invoke_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "not_invoked_reason": null
+    },
+    {
+      "candidate_id": "gh",
+      "run_pin": "2.102.0",
+      "e2e_receipt": null,
+      "invoke_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "not_invoked_reason": null
+    },
+    {
+      "candidate_id": "difftastic",
+      "run_pin": "0.71.0",
+      "e2e_receipt": null,
+      "invoke_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "not_invoked_reason": null
+    }
+  ],
+  "terminal_state": "NON_TERMINAL"
+}

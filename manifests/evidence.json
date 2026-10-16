@@ -22887,6 +22887,81 @@
       "bytes": 319713
     },
     {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/README.md",
+      "sha256": "8aad3fee980fa974b2a6487fc516f17c67ca65bd8a67966d21277641ee6b09d0",
+      "bytes": 14952
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/adjudication.json",
+      "sha256": "99b54a67288cfbdea2234407170727a72a68fda680583041c5ac874ba11abb0a",
+      "bytes": 5693
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "sha256": "b762c1945949016fdd6aaa0f6b011d5958661c23e09cb82167607d31ef76be98",
+      "bytes": 18234
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/difftastic.e2e.json",
+      "sha256": "0faf2ab9d77f6e73017b589034119e420da10f170cf75d2213db7e61f2bdc0bc",
+      "bytes": 7319
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/gh.e2e.json",
+      "sha256": "18dd8e2db4ea4aa5c7ac609ddc70fba58bf81c531c46e227c08446566f5d1a25",
+      "bytes": 7813
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/host-versions.json",
+      "sha256": "96ba645729dcbce3facc079e0a27fcc335c35993798a232d04a8771baa85bf1c",
+      "bytes": 2259
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/integrity-source-map.json",
+      "sha256": "9f70f73a705d961e0e297aa0b4ba0921442a37f4c639ae52ed997aec19115030",
+      "bytes": 27245
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/invokes.json",
+      "sha256": "04a71ff378b610498b6fefa3ed05d6fdcab8ed01786bd4d171dfd69d5d5a7508",
+      "bytes": 10626
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/mask_receipts.py",
+      "sha256": "9a3f9899835f1ca23f182f3549eab4a32495bc3ac8176c1b24a6db8988fe844b",
+      "bytes": 4146
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "sha256": "a56585e8208d60e1eef82e19a5b77e3f483941af8f3c45dd06efd7bb6ca33fea",
+      "bytes": 46000
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/packet-projection.json",
+      "sha256": "44301ddfb0e6685744732c6f8e9261a6bdd3dc5d74c5d56829d066728e9125e2",
+      "bytes": 7054
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/pin-reconciliation.json",
+      "sha256": "17742b38b3ca62d82df9eb469bb9a7ca2758e270a091ccd073770078aff3c896",
+      "bytes": 8421
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/source-reads.json",
+      "sha256": "4594688c333f0c7c4b48f3c9d93cf68828f6df318aac7d0b0287693d8e5e6698",
+      "bytes": 57786
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/test_mask_receipts.py",
+      "sha256": "845327f6dca9b36e8276cb8ee38816f091995db6f02077c9ca3cc2b35868a321",
+      "bytes": 4118
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/worktrunk.e2e.json",
+      "sha256": "2c3b895f190d9aa98a917e93a7ab965e74b6449988c84e6a3da5b3c3d217e99d",
+      "bytes": 10072
+    },
+    {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
       "sha256": "ff34c3db7e67e4d96e9a1d0d154a0c7e8c01f42eade511302f963ad05a1d2c4c",
       "bytes": 6271

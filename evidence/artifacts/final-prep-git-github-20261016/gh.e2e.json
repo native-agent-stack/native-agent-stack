@@ -1,0 +1,195 @@
+{
+  "kind": "native_evidence_index",
+  "repository": "https://github.com/cli/cli",
+  "pin": "2.102.0",
+  "resolved_commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+  "evidence_class": "derived_from_masked_native_capture",
+  "scope": "Derived navigation index over the real masked native install/local-smoke capture. This index contains no tool output and is not itself an E2E receipt or an acceptance verdict.",
+  "upstream_sources": [
+    {
+      "kind": "repo",
+      "repository": "https://github.com/cli/cli",
+      "pin": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "path": "docs/install_linux.md",
+      "line": 181
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/cli/cli",
+      "pin": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "path": "pkg/cmd/completion/completion.go",
+      "line": 1
+    }
+  ],
+  "commands": [
+    {
+      "id": "gh-download",
+      "command": "curl --fail --location --silent --show-error --proto =https --output <SCRATCH>/downloads/gh_2.102.0_linux_amd64.tar.gz https://github.com/cli/cli/releases/download/v2.102.0/gh_2.102.0_linux_amd64.tar.gz",
+      "started_at": "2026-10-16T05:15:41.522120+00:00",
+      "completed_at": "2026-10-16T05:15:41.726489+00:00",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 58,
+        "exit_code_line": 63,
+        "stdout_line": 65
+      },
+      "phase": "install"
+    },
+    {
+      "id": "gh-checksum",
+      "command": "sha256sum <SCRATCH>/downloads/gh_2.102.0_linux_amd64.tar.gz",
+      "started_at": "2026-10-16T05:15:41.726813+00:00",
+      "completed_at": "2026-10-16T05:15:41.743168+00:00",
+      "exit_code": 0,
+      "stdout_sha256": "960d7ea9dc76b768a58278612b165a9443253e55f413c4069935a2af05ba774c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 72,
+        "exit_code_line": 77,
+        "stdout_line": 79
+      },
+      "phase": "install"
+    },
+    {
+      "id": "gh-extract",
+      "command": "tar --extract --file <SCRATCH>/downloads/gh_2.102.0_linux_amd64.tar.gz --directory <SCRATCH>/prefix/gh --no-same-owner",
+      "started_at": "2026-10-16T05:15:41.744317+00:00",
+      "completed_at": "2026-10-16T05:15:42.320022+00:00",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 86,
+        "exit_code_line": 91,
+        "stdout_line": 93
+      },
+      "phase": "install"
+    },
+    {
+      "id": "gh-version",
+      "command": "<SCRATCH>/prefix/gh/gh_2.102.0_linux_amd64/bin/gh --version",
+      "started_at": "2026-10-16T05:15:44.052484+00:00",
+      "completed_at": "2026-10-16T05:15:44.142930+00:00",
+      "exit_code": 0,
+      "stdout_sha256": "a679442459bed23fdc13efb977dec3b17c3c923d8d48abc0d8e522182250955f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 156,
+        "exit_code_line": 161,
+        "stdout_line": 163
+      },
+      "phase": "smoke"
+    },
+    {
+      "id": "gh-pr-review-help",
+      "command": "<SCRATCH>/prefix/gh/gh_2.102.0_linux_amd64/bin/gh pr review --help",
+      "started_at": "2026-10-16T05:16:49.680743+00:00",
+      "completed_at": "2026-10-16T05:16:49.859954+00:00",
+      "exit_code": 0,
+      "stdout_sha256": "2206514450875b7d549831ab08162ae0e54baaa3c3c8a02f94902a29d9774bcf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 296,
+        "exit_code_line": 301,
+        "stdout_line": 303
+      },
+      "phase": "smoke"
+    },
+    {
+      "id": "gh-bash-completion",
+      "command": "<SCRATCH>/prefix/gh/gh_2.102.0_linux_amd64/bin/gh completion --shell bash",
+      "started_at": "2026-10-16T05:16:49.860765+00:00",
+      "completed_at": "2026-10-16T05:16:49.996740+00:00",
+      "exit_code": 0,
+      "stdout_sha256": "bedb7a78703840afe96a17e60b4c717ffc638aa5cf5760dc262ea337f580ecf5",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 310,
+        "exit_code_line": 315,
+        "stdout_line": 317
+      },
+      "phase": "smoke"
+    },
+    {
+      "id": "gh-bash-completion-parse",
+      "command": "bash -n <SCRATCH>/gh-completion.bash",
+      "started_at": "2026-10-16T05:16:49.997723+00:00",
+      "completed_at": "2026-10-16T05:16:50.003398+00:00",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 324,
+        "exit_code_line": 329,
+        "stdout_line": 331
+      },
+      "phase": "smoke"
+    }
+  ],
+  "limitations": [
+    "Completion generation and shell syntax validation exercise the native local CLI. PR create/review/merge, authenticated GitHub API operations and full upstream Go tests were not run.",
+    "Historical source/test/build qualification at the same pin is cited separately and is not a fresh suite run."
+  ],
+  "record_type": "derived_index_not_a_native_receipt",
+  "native_capture_ref": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+  "raw_capture_name": "git-github-native-command-capture-20261016",
+  "masking_rule": "evidence/artifacts/final-prep-git-github-20261016/mask_receipts.py",
+  "masking_test": "evidence/artifacts/final-prep-git-github-20261016/test_mask_receipts.py",
+  "derived_counts": {
+    "zero_exit_commands": 7,
+    "upstream_full_suite_tests_executed": 0
+  },
+  "derived_count_sources": [
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 58,
+      "exit_code_line": 63,
+      "stdout_line": 65
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 72,
+      "exit_code_line": 77,
+      "stdout_line": 79
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 86,
+      "exit_code_line": 91,
+      "stdout_line": 93
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 156,
+      "exit_code_line": 161,
+      "stdout_line": 163
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 296,
+      "exit_code_line": 301,
+      "stdout_line": 303
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 310,
+      "exit_code_line": 315,
+      "stdout_line": 317
+    },
+    {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 324,
+      "exit_code_line": 329,
+      "stdout_line": 331
+    }
+  ]
+}

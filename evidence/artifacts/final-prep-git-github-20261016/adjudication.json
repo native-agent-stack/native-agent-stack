@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "status": "TWO_FAMILY_READS_PENDING_COOP_DISPATCH",
+  "scope": "Five delta candidates, no landscape expansion",
+  "disputed_dimensions": [
+    {
+      "id": "F1-gh",
+      "question": "Reconcile canonical portable/run 2.101.0 with plan, committed upstream qualification, host and fresh smoke 2.102.0; the sealed gh winner is unpinned.",
+      "evidence": [
+        "evidence/artifacts/final-prep-git-github-20261016/pin-reconciliation.json",
+        "evidence/artifacts/final-prep-git-github-20261016/gh.e2e.json"
+      ]
+    },
+    {
+      "id": "F1-worktrunk",
+      "question": "Does the fresh 0.80.0 lifecycle/dirty-refusal evidence justify a new verdict pin replacing the historical 0.79.0 verdict?",
+      "evidence": [
+        "evidence/artifacts/final-prep-git-github-20261016/worktrunk.e2e.json"
+      ]
+    },
+    {
+      "id": "A1-sem-v-difftastic",
+      "question": "sem documents JSON output; difftastic 0.71.0 explicitly gates JSON behind DFT_UNSTABLE. The retained frozen-fixture/agent comparison must settle required coverage and token/accuracy outcomes.",
+      "evidence": [
+        "catalogs/sota-convergence/manifest-20260929.json",
+        "evidence/artifacts/landscape-sweep-20260926/returns.json",
+        "evidence/artifacts/final-prep-git-github-20261016/source-reads.json"
+      ]
+    },
+    {
+      "id": "A1-review-action",
+      "question": "The carried action supplies unattended PR review, while local gh help/completion does not exercise credentialed review automation. Resolve the per-repository runner role and retained comparison; no live action run was authorized here.",
+      "evidence": [
+        "catalogs/sota-convergence/manifest-20260923.json",
+        "evidence/artifacts/final-prep-git-github-20261016/source-reads.json"
+      ]
+    },
+    {
+      "id": "A3-A6",
+      "question": "No retained community/net-usage/evaluation/matched-measurement delta establishes the six-angle admission bar. Missing evidence remains U, without a negative capability claim or a popularity substitution.",
+      "evidence": [
+        "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json"
+      ]
+    }
+  ],
+  "readiness": "One evidence PR, exact head and co-op two-family review dispatch; no self-dispatched read or merge",
+  "final_admission": "CLOSED; this record prepares evidence only",
+  "named_gaps": [
+    "Full upstream Rust/Go suites not rerun; host cargo is absent and host go version exited 1. Local vendor smokes are fresh; historical suites remain historical.",
+    "No live GitHub credential/PR lifecycle or action runner connection.",
+    "No sem install, setup, login, hook or telemetry trial.",
+    "No cross-host or organic-session invoke census."
+  ],
+  "collector_attempts": [
+    {
+      "command": "python3 ${SCRATCH}/collect.py",
+      "exit_code": 1,
+      "reason": "First source lookup for share/man/man1/gh-completion.1 returned HTTP 404; replaced by pinned pkg/cmd/completion/completion.go."
+    },
+    {
+      "command": "python3 ${SCRATCH}/collect.py",
+      "exit_code": 1,
+      "reason": "Native worktrunk list exited 0; collector incorrectly treated the schema-2 JSON object as an array. Resume used items[].worktree.path, matching pinned src/commands/list/json_v2.rs:1. The stopped assertion is not an upstream defect."
+    },
+    {
+      "command": "python3 tools/sota-convergence/lane_packets.py --gap-receipts --withhold-labels [other arguments as in packet-projection.json]",
+      "exit_code": 2,
+      "reason": "Supported CLI refuses combining winner-bearing gap receipts with withheld-label packets. Successful generation removed --gap-receipts."
+    }
+  ],
+  "derived_summary": {
+    "completed_at": "2026-10-16T05:23:42.992075+00:00",
+    "command_count": 29,
+    "matched_expected_results": 27,
+    "worktrunk_final_worktree_count": 1,
+    "gh_completion_bash_syntax_valid": true,
+    "difftastic_same_exit": 0,
+    "difftastic_difference_exit": 1,
+    "full_upstream_suites": "NOT RUN; vendor binaries and documented local smokes only",
+    "github_authenticated_lifecycle": "NOT RUN; credentials/live GitHub operation excluded",
+    "collector_correction": "First orchestration pass stopped after native worktrunk-list-created exit 0: it treated Worktrunk schema-2 object as an array. Native command outputs were retained; resume used items[].worktree.path. This is a collector assertion correction, not an upstream defect or a new worktrunk run.",
+    "difftastic_json_gate_exit": 2,
+    "difftastic_json_gate_observed": true,
+    "classification": "Derived command arithmetic and private-driver observations; not an E2E or invoke receipt."
+  },
+  "capture_gaps": [
+    "No separate native filesystem capture for the private driver's dirty-file-preservation assertion; this past state cannot be re-captured after the driver removed the file.",
+    "Installed-version text-mode probes lack separate original-byte custody.",
+    "The masking-rule unit and custody tests ran locally; no separate public native test log is presented as a receipt."
+  ],
+  "masking_custody": {
+    "native_capture": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+    "raw_capture_name": "git-github-native-command-capture-20261016",
+    "script": "evidence/artifacts/final-prep-git-github-20261016/mask_receipts.py",
+    "test": "evidence/artifacts/final-prep-git-github-20261016/test_mask_receipts.py",
+    "independent_coop_reproduction": "PASS; co-op MASKED-REPRO CHECK PASS: byte-identical reproduction (cmp exit 0), seven masking/custody tests OK, private-locator scan zero hits. Private check cited by name only; no raw digest or locator published."
+  }
+}

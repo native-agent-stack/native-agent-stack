@@ -1,0 +1,1846 @@
+{
+  "schema_version": 1,
+  "reads": [
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md",
+      "read_at": "2026-10-16T05:15:38.764706+00:00",
+      "http_status": 200,
+      "public_source_sha256": "e627eb18fd1f383a0bbdc43531675fc2c93e6c8ab2290bc54c817ae23f4ad0aa",
+      "source_is_public": true,
+      "line_count": 267,
+      "excerpts": [
+        {
+          "line": 59,
+          "text": "      <td>Switch worktrees</td>"
+        },
+        {
+          "line": 60,
+          "text": "      <td data-label=\"Worktrunk\"><code>wt switch feat</code></td>"
+        },
+        {
+          "line": 61,
+          "text": "      <td data-label=\"Plain git\"><code>cd ../repo.feat</code></td>"
+        },
+        {
+          "line": 62,
+          "text": "    </tr>"
+        },
+        {
+          "line": 64,
+          "text": "      <td>Create + start Claude</td>"
+        },
+        {
+          "line": 65,
+          "text": "      <td data-label=\"Worktrunk\"><code>wt switch -c -x claude feat</code></td>"
+        },
+        {
+          "line": 66,
+          "text": "      <td data-label=\"Plain git\"><pre><code>git worktree add -b feat ../repo.feat && \\"
+        },
+        {
+          "line": 67,
+          "text": "cd ../repo.feat && \\"
+        },
+        {
+          "line": 71,
+          "text": "      <td>Clean up</td>"
+        },
+        {
+          "line": 72,
+          "text": "      <td data-label=\"Worktrunk\"><code>wt remove</code></td>"
+        },
+        {
+          "line": 73,
+          "text": "      <td data-label=\"Plain git\"><pre><code>cd ../repo && \\"
+        },
+        {
+          "line": 74,
+          "text": "git worktree remove ../repo.feat && \\"
+        },
+        {
+          "line": 78,
+          "text": "      <td>List with status</td>"
+        },
+        {
+          "line": 79,
+          "text": "      <td data-label=\"Worktrunk\"><code>wt list</code></td>"
+        },
+        {
+          "line": 80,
+          "text": "      <td data-label=\"Plain git\"><span class=\"cmd-compare-value\"><code>git worktree list</code> (paths only)</span></td>"
+        },
+        {
+          "line": 81,
+          "text": "    </tr>"
+        },
+        {
+          "line": 93,
+          "text": "- **[Share build caches](https://worktrunk.dev/step/#wt-step-copy-ignored)** — ten worktrees get `target/`, `node_modules/`, etc without building or copying them (on APFS, btrfs, and XFS)"
+        },
+        {
+          "line": 94,
+          "text": "- **[`wt list --full`](https://worktrunk.dev/list/#full-mode)** — [CI status](https://worktrunk.dev/list/#ci-status) and [AI-generated summaries](https://worktrunk.dev/list/#llm-summaries) per branch"
+        },
+        {
+          "line": 95,
+          "text": "- **[PR checkout](https://worktrunk.dev/switch/#pull-requests-and-merge-requests)** — `wt switch pr:123` to jump straight to a PR's branch"
+        },
+        {
+          "line": 96,
+          "text": "- **[Dev server per worktree](https://worktrunk.dev/tips-patterns/#dev-server-per-worktree)** — `hash_port` template filter gives each worktree a unique port"
+        },
+        {
+          "line": 97,
+          "text": "- **[Aliases](https://worktrunk.dev/extending/#aliases) & [per-branch variables](https://worktrunk.dev/config/#wt-config-state-vars)** — custom `wt <name>` commands and branch-scoped state for hook templates"
+        },
+        {
+          "line": 105,
+          "text": ""
+        },
+        {
+          "line": 106,
+          "text": "<!-- ⚠️ AUTO-GENERATED from docs/src/content/docs/worktrunk.md#install..next-steps — edit source to update -->"
+        },
+        {
+          "line": 107,
+          "text": ""
+        },
+        {
+          "line": 108,
+          "text": "## Install"
+        },
+        {
+          "line": 109,
+          "text": ""
+        },
+        {
+          "line": 110,
+          "text": "**Homebrew (macOS & Linux):**"
+        },
+        {
+          "line": 112,
+          "text": "```bash"
+        },
+        {
+          "line": 113,
+          "text": "brew install worktrunk && wt config shell install"
+        },
+        {
+          "line": 114,
+          "text": "```"
+        },
+        {
+          "line": 115,
+          "text": ""
+        },
+        {
+          "line": 120,
+          "text": "```bash"
+        },
+        {
+          "line": 121,
+          "text": "cargo install worktrunk && wt config shell install"
+        },
+        {
+          "line": 122,
+          "text": "```"
+        },
+        {
+          "line": 123,
+          "text": ""
+        },
+        {
+          "line": 126,
+          "text": ""
+        },
+        {
+          "line": 127,
+          "text": "**Windows.** `wt` defaults to Windows Terminal's command, so Winget additionally installs Worktrunk as `git-wt` to avoid the conflict:"
+        },
+        {
+          "line": 128,
+          "text": ""
+        },
+        {
+          "line": 129,
+          "text": "```bash"
+        },
+        {
+          "line": 130,
+          "text": "winget install max-sixty.worktrunk"
+        },
+        {
+          "line": 131,
+          "text": "git-wt config shell install"
+        },
+        {
+          "line": 132,
+          "text": "```"
+        },
+        {
+          "line": 133,
+          "text": ""
+        },
+        {
+          "line": 140,
+          "text": "```bash"
+        },
+        {
+          "line": 141,
+          "text": "sudo pacman -S worktrunk && wt config shell install"
+        },
+        {
+          "line": 142,
+          "text": "```"
+        },
+        {
+          "line": 143,
+          "text": ""
+        },
+        {
+          "line": 146,
+          "text": "```bash"
+        },
+        {
+          "line": 147,
+          "text": "conda install -c conda-forge worktrunk && wt config shell install"
+        },
+        {
+          "line": 148,
+          "text": "```"
+        },
+        {
+          "line": 149,
+          "text": ""
+        },
+        {
+          "line": 150,
+          "text": "Or with [Pixi](https://pixi.sh): `pixi global install worktrunk && wt config shell install`."
+        },
+        {
+          "line": 151,
+          "text": ""
+        },
+        {
+          "line": 152,
+          "text": "</details>"
+        },
+        {
+          "line": 158,
+          "text": "```console"
+        },
+        {
+          "line": 159,
+          "text": "$ wt switch --create feature-auth"
+        },
+        {
+          "line": 161,
+          "text": "```"
+        },
+        {
+          "line": 162,
+          "text": ""
+        },
+        {
+          "line": 163,
+          "text": "This creates a new branch and worktree, then switches to it. Do your work, then check all worktrees with [`wt list`](https://worktrunk.dev/list/):"
+        },
+        {
+          "line": 164,
+          "text": ""
+        },
+        {
+          "line": 165,
+          "text": "```console"
+        },
+        {
+          "line": 166,
+          "text": "$ wt list"
+        },
+        {
+          "line": 167,
+          "text": "  Branch        Status      HEAD±     main↕    main…±    Remote⇅  Commit    Age  Message"
+        },
+        {
+          "line": 168,
+          "text": "@ feature-auth  +   ↑      +27   -8   ↑1       +31                4bc72dc    2h  Add authenticatio…"
+        },
+        {
+          "line": 182,
+          "text": "gh pr create                      # or glab mr create"
+        },
+        {
+          "line": 183,
+          "text": "wt remove                         # after PR is merged"
+        },
+        {
+          "line": 184,
+          "text": "```"
+        },
+        {
+          "line": 185,
+          "text": ""
+        },
+        {
+          "line": 205,
+          "text": "```bash"
+        },
+        {
+          "line": 206,
+          "text": "wt switch -x claude -c feature-a -- 'Add user authentication'"
+        },
+        {
+          "line": 207,
+          "text": "wt switch -x claude -c feature-b -- 'Fix the pagination bug'"
+        },
+        {
+          "line": 208,
+          "text": "wt switch -x claude -c feature-c -- 'Write tests for the API'"
+        },
+        {
+          "line": 209,
+          "text": "```"
+        },
+        {
+          "line": 210,
+          "text": ""
+        },
+        {
+          "line": 211,
+          "text": "The `-x` flag runs a command after switching; arguments after `--` are passed to it. Configure [post-start hooks](https://worktrunk.dev/hook/#hook-types) to automate setup (install deps, start dev servers)."
+        },
+        {
+          "line": 212,
+          "text": ""
+        },
+        {
+          "line": 213,
+          "text": "## Next steps"
+        },
+        {
+          "line": 214,
+          "text": ""
+        },
+        {
+          "line": 215,
+          "text": "- Learn the core commands: [`wt switch`](https://worktrunk.dev/switch/), [`wt list`](https://worktrunk.dev/list/), [`wt merge`](https://worktrunk.dev/merge/), [`wt remove`](https://worktrunk.dev/remove/)"
+        },
+        {
+          "line": 216,
+          "text": "- Set up [hooks](https://worktrunk.dev/hook/) for automated setup"
+        },
+        {
+          "line": 217,
+          "text": "- Explore [LLM commit messages](https://worktrunk.dev/llm-commits/), [interactive"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": ".github/workflows/ci.yaml",
+      "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/b49ca7eea9b03145791a5b94eccaf9c59412ed37/.github/workflows/ci.yaml",
+      "read_at": "2026-10-16T05:15:38.802835+00:00",
+      "http_status": 200,
+      "public_source_sha256": "bd187c6d655c764c37a31d999a7aa8819645e333e22b561ad63a51c04e7b9b58",
+      "source_is_public": true,
+      "line_count": 233,
+      "excerpts": [
+        {
+          "line": 106,
+          "text": ""
+        },
+        {
+          "line": 107,
+          "text": "    # The full nextest suite (snapshots included) — CI's long-pole. The fast"
+        },
+        {
+          "line": 108,
+          "text": "    # pre-merge gates (lockfile/doctest/rustdoc) live in the `fast-checks` job,"
+        },
+        {
+          "line": 109,
+          "text": "    # so this job is now just the suite and can later be swapped for the"
+        },
+        {
+          "line": 134,
+          "text": "        name: junit-${{ matrix.name }}"
+        },
+        {
+          "line": 135,
+          "text": "        path: target/nextest/default/junit.xml"
+        },
+        {
+          "line": 136,
+          "text": ""
+        },
+        {
+          "line": 137,
+          "text": "    - name: 📊 Upload test results to Codecov"
+        },
+        {
+          "line": 141,
+          "text": "        token: ${{ secrets.CODECOV_TOKEN }}"
+        },
+        {
+          "line": 142,
+          "text": "        files: target/nextest/default/junit.xml"
+        },
+        {
+          "line": 143,
+          "text": "        report_type: test_results"
+        },
+        {
+          "line": 144,
+          "text": ""
+        },
+        {
+          "line": 145,
+          "text": "  # The pre-merge gates that aren't the nextest suite: Cargo.lock freshness,"
+        },
+        {
+          "line": 146,
+          "text": "  # doctests, and the rustdoc `-Dwarnings` build. Split out of `test` so the"
+        },
+        {
+          "line": 147,
+          "text": "  # full suite (the long-pole) can later be replaced on PRs by the"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/cli/cli",
+      "pin": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "path": "docs/install_linux.md",
+      "url": "https://raw.githubusercontent.com/cli/cli/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_linux.md",
+      "read_at": "2026-10-16T05:15:38.840311+00:00",
+      "http_status": 200,
+      "public_source_sha256": "6c54aef3c43dcfc99e6ab30dbf3f5875001997d99c2a1e3f52eba1553c793c5c",
+      "source_is_public": true,
+      "line_count": 485,
+      "excerpts": [
+        {
+          "line": 181,
+          "text": ""
+        },
+        {
+          "line": 182,
+          "text": "### Precompiled binaries"
+        },
+        {
+          "line": 183,
+          "text": ""
+        },
+        {
+          "line": 184,
+          "text": "[GitHub CLI releases](https://github.com/cli/cli/releases/latest) contain precompiled binaries for `386`, `amd64`, `arm64`, and `armv6` architectures."
+        },
+        {
+          "line": 185,
+          "text": ""
+        },
+        {
+          "line": 186,
+          "text": "## Community _(Unofficial)_"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/cli/cli",
+      "pin": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "path": ".github/workflows/go.yml",
+      "url": "https://raw.githubusercontent.com/cli/cli/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/.github/workflows/go.yml",
+      "read_at": "2026-10-16T05:15:38.877245+00:00",
+      "http_status": 200,
+      "public_source_sha256": "62af6adcecc4a334df5ec4abf19b1b673745a0d3fd1b91d5f75cb8ae5041db2c",
+      "source_is_public": true,
+      "line_count": 61,
+      "excerpts": [
+        {
+          "line": 1,
+          "text": "name: Unit and Integration Tests"
+        },
+        {
+          "line": 2,
+          "text": "on:"
+        },
+        {
+          "line": 3,
+          "text": "  push:"
+        },
+        {
+          "line": 30,
+          "text": ""
+        },
+        {
+          "line": 31,
+          "text": "      - name: Run unit and integration tests"
+        },
+        {
+          "line": 32,
+          "text": "        run: go test -race -tags=integration ./..."
+        },
+        {
+          "line": 33,
+          "text": ""
+        },
+        {
+          "line": 34,
+          "text": "      - name: Build"
+        },
+        {
+          "line": 36,
+          "text": ""
+        },
+        {
+          "line": 37,
+          "text": "  integration-tests:"
+        },
+        {
+          "line": 38,
+          "text": "    env:"
+        },
+        {
+          "line": 39,
+          "text": "      GH_TOKEN: ${{ github.token }}"
+        },
+        {
+          "line": 57,
+          "text": ""
+        },
+        {
+          "line": 58,
+          "text": "      - name: Run attestation command set integration tests"
+        },
+        {
+          "line": 59,
+          "text": "        shell: bash"
+        },
+        {
+          "line": 60,
+          "text": "        run: |"
+        },
+        {
+          "line": 61,
+          "text": "          ./test/integration/attestation-cmd/run-all-tests.sh \"${{ matrix.os }}\""
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/cli/cli",
+      "pin": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "path": "pkg/cmd/completion/completion.go",
+      "url": "https://raw.githubusercontent.com/cli/cli/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/pkg/cmd/completion/completion.go",
+      "read_at": "2026-10-16T05:15:38.957288+00:00",
+      "http_status": 200,
+      "public_source_sha256": "75b78fbb28c6eec21d28a463d0192dc5f7c613e4cd14bb313ecf7b7e264d1dbf",
+      "source_is_public": true,
+      "line_count": 99,
+      "excerpts": [
+        {
+          "line": 1,
+          "text": "package completion"
+        },
+        {
+          "line": 2,
+          "text": ""
+        },
+        {
+          "line": 3,
+          "text": "import ("
+        },
+        {
+          "line": 11,
+          "text": ""
+        },
+        {
+          "line": 12,
+          "text": "func NewCmdCompletion(io *iostreams.IOStreams) *cobra.Command {"
+        },
+        {
+          "line": 13,
+          "text": "\tvar shellType string"
+        },
+        {
+          "line": 14,
+          "text": ""
+        },
+        {
+          "line": 15,
+          "text": "\tcmd := &cobra.Command{"
+        },
+        {
+          "line": 16,
+          "text": "\t\tUse:   \"completion -s <shell>\","
+        },
+        {
+          "line": 17,
+          "text": "\t\tShort: \"Generate shell completion scripts\","
+        },
+        {
+          "line": 18,
+          "text": "\t\tLong: heredoc.Docf(`"
+        },
+        {
+          "line": 19,
+          "text": "\t\t\tGenerate shell completion scripts for GitHub CLI commands."
+        },
+        {
+          "line": 20,
+          "text": ""
+        },
+        {
+          "line": 21,
+          "text": "\t\t\tWhen installing GitHub CLI through a package manager, it's possible that"
+        },
+        {
+          "line": 22,
+          "text": "\t\t\tno additional shell configuration is necessary to gain completion support. For"
+        },
+        {
+          "line": 23,
+          "text": "\t\t\tHomebrew, see <https://docs.brew.sh/Shell-Completion>"
+        },
+        {
+          "line": 24,
+          "text": ""
+        },
+        {
+          "line": 25,
+          "text": "\t\t\tIf you need to set up completions manually, follow the instructions below. The exact"
+        },
+        {
+          "line": 26,
+          "text": "\t\t\tconfig file locations might vary based on your system. Make sure to restart your"
+        },
+        {
+          "line": 27,
+          "text": "\t\t\tshell before testing whether completions are working."
+        },
+        {
+          "line": 28,
+          "text": ""
+        },
+        {
+          "line": 29,
+          "text": "\t\t\t### bash"
+        },
+        {
+          "line": 30,
+          "text": ""
+        },
+        {
+          "line": 31,
+          "text": "\t\t\tFirst, ensure that you install %[1]sbash-completion%[1]s using your package manager."
+        },
+        {
+          "line": 32,
+          "text": ""
+        },
+        {
+          "line": 34,
+          "text": ""
+        },
+        {
+          "line": 35,
+          "text": "\t\t\t\teval \"$(gh completion -s bash)\""
+        },
+        {
+          "line": 36,
+          "text": ""
+        },
+        {
+          "line": 37,
+          "text": "\t\t\t### zsh"
+        },
+        {
+          "line": 38,
+          "text": ""
+        },
+        {
+          "line": 39,
+          "text": "\t\t\tGenerate a %[1]s_gh%[1]s completion script and put it somewhere in your %[1]s$fpath%[1]s:"
+        },
+        {
+          "line": 40,
+          "text": ""
+        },
+        {
+          "line": 41,
+          "text": "\t\t\t\tgh completion -s zsh > /usr/local/share/zsh/site-functions/_gh"
+        },
+        {
+          "line": 42,
+          "text": ""
+        },
+        {
+          "line": 51,
+          "text": ""
+        },
+        {
+          "line": 52,
+          "text": "\t\t\tGenerate a %[1]sgh.fish%[1]s completion script:"
+        },
+        {
+          "line": 53,
+          "text": ""
+        },
+        {
+          "line": 55,
+          "text": ""
+        },
+        {
+          "line": 56,
+          "text": "\t\t\t### PowerShell"
+        },
+        {
+          "line": 64,
+          "text": ""
+        },
+        {
+          "line": 65,
+          "text": "\t\t\t\tInvoke-Expression -Command $(gh completion -s powershell | Out-String)"
+        },
+        {
+          "line": 66,
+          "text": "\t\t`, \"`\"),"
+        },
+        {
+          "line": 67,
+          "text": "\t\tRunE: func(cmd *cobra.Command, args []string) error {"
+        },
+        {
+          "line": 69,
+          "text": "\t\t\t\tif io.IsStdoutTTY() {"
+        },
+        {
+          "line": 70,
+          "text": "\t\t\t\t\treturn cmdutil.FlagErrorf(\"error: the value for `--shell` is required\")"
+        },
+        {
+          "line": 71,
+          "text": "\t\t\t\t}"
+        },
+        {
+          "line": 72,
+          "text": "\t\t\t\tshellType = \"bash\""
+        },
+        {
+          "line": 73,
+          "text": "\t\t\t}"
+        },
+        {
+          "line": 74,
+          "text": ""
+        },
+        {
+          "line": 78,
+          "text": "\t\t\tswitch shellType {"
+        },
+        {
+          "line": 79,
+          "text": "\t\t\tcase \"bash\":"
+        },
+        {
+          "line": 80,
+          "text": "\t\t\t\treturn rootCmd.GenBashCompletionV2(w, true)"
+        },
+        {
+          "line": 81,
+          "text": "\t\t\tcase \"zsh\":"
+        },
+        {
+          "line": 82,
+          "text": "\t\t\t\treturn rootCmd.GenZshCompletion(w)"
+        },
+        {
+          "line": 83,
+          "text": "\t\t\tcase \"powershell\":"
+        },
+        {
+          "line": 84,
+          "text": "\t\t\t\treturn rootCmd.GenPowerShellCompletionWithDesc(w)"
+        },
+        {
+          "line": 85,
+          "text": "\t\t\tcase \"fish\":"
+        },
+        {
+          "line": 86,
+          "text": "\t\t\t\treturn rootCmd.GenFishCompletion(w, true)"
+        },
+        {
+          "line": 87,
+          "text": "\t\t\tdefault:"
+        },
+        {
+          "line": 88,
+          "text": "\t\t\t\treturn fmt.Errorf(\"unsupported shell type %q\", shellType)"
+        },
+        {
+          "line": 94,
+          "text": "\tcmdutil.DisableAuthCheck(cmd)"
+        },
+        {
+          "line": 95,
+          "text": "\tcmdutil.StringEnumFlag(cmd, &shellType, \"shell\", \"s\", \"\", []string{\"bash\", \"zsh\", \"fish\", \"powershell\"}, \"Shell type\")"
+        },
+        {
+          "line": 96,
+          "text": "\tcmdutil.DisableTelemetry(cmd)"
+        },
+        {
+          "line": 97,
+          "text": ""
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/Wilfred/difftastic",
+      "pin": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "path": "manual/src/installation.md",
+      "url": "https://raw.githubusercontent.com/Wilfred/difftastic/b7d119e90ac9f972f03f69508da765dacd302c0c/manual/src/installation.md",
+      "read_at": "2026-10-16T05:15:39.076266+00:00",
+      "http_status": 200,
+      "public_source_sha256": "a05c09aa500b683746b50832cc1d6a5f395dda794fdb7d8fb9051fa5e9d91358",
+      "source_is_public": true,
+      "line_count": 89,
+      "excerpts": [
+        {
+          "line": 2,
+          "text": ""
+        },
+        {
+          "line": 3,
+          "text": "Difftastic can be installed as pre-built binaries or using various package managers."
+        },
+        {
+          "line": 4,
+          "text": ""
+        },
+        {
+          "line": 5,
+          "text": "## Pre-Built Binaries"
+        },
+        {
+          "line": 6,
+          "text": ""
+        },
+        {
+          "line": 7,
+          "text": "Difftastic releases are published as [GitHub"
+        },
+        {
+          "line": 8,
+          "text": "releases](https://github.com/Wilfred/difftastic/releases) with"
+        },
+        {
+          "line": 9,
+          "text": "pre-built binaries for Windows, macOS and Linux. Open the [latest"
+        },
+        {
+          "line": 10,
+          "text": "release page](https://github.com/Wilfred/difftastic/releases/latest),"
+        },
+        {
+          "line": 11,
+          "text": "download the file matching your OS and CPU architecture, and extract"
+        },
+        {
+          "line": 12,
+          "text": "the `difft` executable application file."
+        },
+        {
+          "line": 13,
+          "text": ""
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/Wilfred/difftastic",
+      "pin": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "path": "manual/src/usage.md",
+      "url": "https://raw.githubusercontent.com/Wilfred/difftastic/b7d119e90ac9f972f03f69508da765dacd302c0c/manual/src/usage.md",
+      "read_at": "2026-10-16T05:15:39.154522+00:00",
+      "http_status": 200,
+      "public_source_sha256": "37a65981e8673e73ec33881e4f469e8207493778107c41f045d981144cee2b0e",
+      "source_is_public": true,
+      "line_count": 94,
+      "excerpts": [
+        {
+          "line": 12,
+          "text": "```bash"
+        },
+        {
+          "line": 13,
+          "text": "$ difft FIRST-FILE SECOND-FILE"
+        },
+        {
+          "line": 14,
+          "text": ""
+        },
+        {
+          "line": 15,
+          "text": "# For example:"
+        },
+        {
+          "line": 16,
+          "text": "$ difft sample_files/simple_1.js sample_files/simple_2.js"
+        },
+        {
+          "line": 17,
+          "text": "```"
+        },
+        {
+          "line": 18,
+          "text": ""
+        },
+        {
+          "line": 21,
+          "text": "```bash"
+        },
+        {
+          "line": 22,
+          "text": "$ difft FIRST-DIRECTORY SECOND-DIRECTORY"
+        },
+        {
+          "line": 23,
+          "text": ""
+        },
+        {
+          "line": 24,
+          "text": "# For example:"
+        },
+        {
+          "line": 41,
+          "text": "# For example:"
+        },
+        {
+          "line": 42,
+          "text": "$ cat sample_files/simple_1.js | difft - sample_files/simple_2.js"
+        },
+        {
+          "line": 43,
+          "text": "```"
+        },
+        {
+          "line": 44,
+          "text": ""
+        },
+        {
+          "line": 71,
+          "text": "```"
+        },
+        {
+          "line": 72,
+          "text": "$ difft --help"
+        },
+        {
+          "line": 73,
+          "text": "..."
+        },
+        {
+          "line": 74,
+          "text": "OPTIONS:"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/Wilfred/difftastic",
+      "pin": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/Wilfred/difftastic/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md",
+      "read_at": "2026-10-16T05:15:39.245242+00:00",
+      "http_status": 200,
+      "public_source_sha256": "395325cdaeef69a79d2d39befd278cf24a062f1e4a91848482dcb9613bf20c8f",
+      "source_is_public": true,
+      "line_count": 203,
+      "excerpts": [
+        {
+          "line": 163,
+          "text": "```"
+        },
+        {
+          "line": 164,
+          "text": "$ difft --check-only --exit-code before.js after.js"
+        },
+        {
+          "line": 165,
+          "text": "```"
+        },
+        {
+          "line": 166,
+          "text": ""
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/Wilfred/difftastic",
+      "pin": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "path": ".github/workflows/test.yml",
+      "url": "https://raw.githubusercontent.com/Wilfred/difftastic/b7d119e90ac9f972f03f69508da765dacd302c0c/.github/workflows/test.yml",
+      "read_at": "2026-10-16T05:15:39.348356+00:00",
+      "http_status": 200,
+      "public_source_sha256": "a5a44da7e99bf14a317fd8ac5d0ffb0ea0cc389023c24a2a0f210a0f4425dc99",
+      "source_is_public": true,
+      "line_count": 125,
+      "excerpts": [
+        {
+          "line": 60,
+          "text": "      # This runs tests that rely on the MIME database being present."
+        },
+        {
+          "line": 61,
+          "text": "      - run: cargo test -- --ignored"
+        },
+        {
+          "line": 62,
+          "text": ""
+        },
+        {
+          "line": 63,
+          "text": "  test_linux_latest_stable:"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/Wilfred/difftastic",
+      "pin": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "path": "src/options.rs",
+      "url": "https://raw.githubusercontent.com/Wilfred/difftastic/b7d119e90ac9f972f03f69508da765dacd302c0c/src/options.rs",
+      "read_at": "2026-10-16T05:15:39.446207+00:00",
+      "http_status": 200,
+      "public_source_sha256": "05231041e9a54f0cdf65a8bb95deaa0bc9893d7d412eca108eaa00af3877f390",
+      "source_is_public": true,
+      "line_count": 1094,
+      "excerpts": [
+        {
+          "line": 812,
+          "text": "        \"json\" => {"
+        },
+        {
+          "line": 813,
+          "text": "            if env::var(\"DFT_UNSTABLE\").is_err() {"
+        },
+        {
+          "line": 814,
+          "text": "                eprintln!(\"JSON output is an unstable feature and its format may change in future. To enable JSON output, set the environment variable DFT_UNSTABLE=yes.\");"
+        },
+        {
+          "line": 815,
+          "text": "                std::process::exit(EXIT_BAD_ARGUMENTS);"
+        },
+        {
+          "line": 816,
+          "text": "            }"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "retained_tag": "v1.0.233",
+      "resolved_commit": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+      "read_at": "2026-10-16T05:15:39.631438+00:00",
+      "role": "carried survivor; no installation or trial"
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "pin": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/anthropics/claude-code-action/8cf3482550831fb35a4fc3fbf7ca139cf8028b4c/README.md",
+      "read_at": "2026-10-16T05:15:39.748497+00:00",
+      "http_status": 200,
+      "public_source_sha256": "a381c47399445c97480d025a406f485644fdd5f4f7ffd880be0567ac2f7b4640",
+      "source_is_public": true,
+      "line_count": 71,
+      "excerpts": [
+        {
+          "line": 10,
+          "text": "- 🤖 **Interactive Code Assistant**: Claude can answer questions about code, architecture, and programming"
+        },
+        {
+          "line": 11,
+          "text": "- 🔍 **Code Review**: Analyzes PR changes and suggests improvements"
+        },
+        {
+          "line": 12,
+          "text": "- ✨ **Code Implementation**: Can implement simple fixes, refactoring, and even new features"
+        },
+        {
+          "line": 13,
+          "text": "- 💬 **PR/Issue Integration**: Works seamlessly with GitHub comments and PR reviews"
+        },
+        {
+          "line": 14,
+          "text": "- 🛠️ **Flexible Tool Access**: Access to GitHub APIs and file operations (additional tools can be enabled via configuration)"
+        },
+        {
+          "line": 15,
+          "text": "- 📋 **Progress Tracking**: Visual progress indicators with checkboxes that dynamically update as Claude completes tasks"
+        },
+        {
+          "line": 38,
+          "text": ""
+        },
+        {
+          "line": 39,
+          "text": "- **🔍 Automatic PR Code Review** - Full review automation"
+        },
+        {
+          "line": 40,
+          "text": "- **📂 Path-Specific Reviews** - Trigger on critical file changes"
+        },
+        {
+          "line": 41,
+          "text": "- **👥 External Contributor Reviews** - Special handling for new contributors"
+        },
+        {
+          "line": 42,
+          "text": "- **📝 Custom Review Checklists** - Enforce team standards"
+        },
+        {
+          "line": 43,
+          "text": "- **🔄 Scheduled Maintenance** - Automated repository health checks"
+        },
+        {
+          "line": 44,
+          "text": "- **🏷️ Issue Triage & Labeling** - Automatic categorization"
+        },
+        {
+          "line": 45,
+          "text": "- **📖 Documentation Sync** - Keep docs updated with code changes"
+        },
+        {
+          "line": 46,
+          "text": "- **🔒 Security-Focused Reviews** - OWASP-aligned security analysis"
+        },
+        {
+          "line": 47,
+          "text": "- **📊 DIY Progress Tracking** - Create tracking comments in automation mode"
+        },
+        {
+          "line": 48,
+          "text": ""
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "pin": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+      "path": "action.yml",
+      "url": "https://raw.githubusercontent.com/anthropics/claude-code-action/8cf3482550831fb35a4fc3fbf7ca139cf8028b4c/action.yml",
+      "read_at": "2026-10-16T05:15:39.822346+00:00",
+      "http_status": 200,
+      "public_source_sha256": "87b706489e63483c9c32c12af36467dd34e309becca35f7a8ead4d1e0664c4df",
+      "source_is_public": true,
+      "line_count": 459,
+      "excerpts": [
+        {
+          "line": 66,
+          "text": "  # Auth configuration"
+        },
+        {
+          "line": 67,
+          "text": "  anthropic_api_key:"
+        },
+        {
+          "line": 68,
+          "text": "    description: \"Anthropic API key (required for direct API, not needed for Bedrock/Vertex/Foundry)\""
+        },
+        {
+          "line": 69,
+          "text": "    required: false"
+        },
+        {
+          "line": 70,
+          "text": "  claude_code_oauth_token:"
+        },
+        {
+          "line": 71,
+          "text": "    description: \"Claude Code OAuth token (alternative to anthropic_api_key)\""
+        },
+        {
+          "line": 72,
+          "text": "    required: false"
+        },
+        {
+          "line": 73,
+          "text": "  anthropic_federation_rule_id:"
+        },
+        {
+          "line": 334,
+          "text": "        # Provider configuration"
+        },
+        {
+          "line": 335,
+          "text": "        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key || env.ANTHROPIC_API_KEY }}"
+        },
+        {
+          "line": 336,
+          "text": "        CLAUDE_CODE_OAUTH_TOKEN: ${{ inputs.claude_code_oauth_token || env.CLAUDE_CODE_OAUTH_TOKEN }}"
+        },
+        {
+          "line": 337,
+          "text": "        ANTHROPIC_FEDERATION_RULE_ID: ${{ inputs.anthropic_federation_rule_id }}"
+        },
+        {
+          "line": 338,
+          "text": "        ANTHROPIC_ORGANIZATION_ID: ${{ inputs.anthropic_organization_id }}"
+        },
+        {
+          "line": 438,
+          "text": "        PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}"
+        },
+        {
+          "line": 439,
+          "text": "        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}"
+        },
+        {
+          "line": 440,
+          "text": "      run: |"
+        },
+        {
+          "line": 441,
+          "text": "        BUN_BIN=\"${GITHUB_ACTION_PATH}/bin/bun\""
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/ataraxy-labs/sem",
+      "retained_tag": "v0.25.0",
+      "resolved_commit": "4cfe1374f79631b01aca5746441d826738a15448",
+      "read_at": "2026-10-16T05:15:40.060532+00:00",
+      "role": "carried survivor; no installation or trial"
+    },
+    {
+      "repository": "https://github.com/ataraxy-labs/sem",
+      "pin": "4cfe1374f79631b01aca5746441d826738a15448",
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/ataraxy-labs/sem/4cfe1374f79631b01aca5746441d826738a15448/README.md",
+      "read_at": "2026-10-16T05:15:40.185678+00:00",
+      "http_status": 200,
+      "public_source_sha256": "1fcf6533e3b0ed221538176396798eb8444601f0fd74fbb60a5555a31ed8c495",
+      "source_is_public": true,
+      "line_count": 599,
+      "excerpts": [
+        {
+          "line": 157,
+          "text": "# JSON output (for AI agents, CI pipelines)"
+        },
+        {
+          "line": 158,
+          "text": "sem diff --format json"
+        },
+        {
+          "line": 159,
+          "text": ""
+        },
+        {
+          "line": 160,
+          "text": "# Markdown output (for PRs, reports)"
+        },
+        {
+          "line": 167,
+          "text": "echo '[{\"filePath\":\"src/main.rs\",\"status\":\"modified\",\"beforeContent\":\"...\",\"afterContent\":\"...\"}]' \\"
+        },
+        {
+          "line": 168,
+          "text": "  | sem diff --stdin --format json"
+        },
+        {
+          "line": 169,
+          "text": ""
+        },
+        {
+          "line": 170,
+          "text": "# Only specific file types"
+        },
+        {
+          "line": 312,
+          "text": ""
+        },
+        {
+          "line": 313,
+          "text": "Local, cumulative counters: how many diffs `sem` has run in this environment and how much of that was noise filtered out. Nothing here leaves your machine (see [Telemetry](#telemetry)):"
+        },
+        {
+          "line": 314,
+          "text": ""
+        },
+        {
+          "line": 315,
+          "text": "```bash"
+        },
+        {
+          "line": 323,
+          "text": "```bash"
+        },
+        {
+          "line": 324,
+          "text": "sem setup"
+        },
+        {
+          "line": 325,
+          "text": "```"
+        },
+        {
+          "line": 326,
+          "text": ""
+        },
+        {
+          "line": 328,
+          "text": ""
+        },
+        {
+          "line": 330,
+          "text": ""
+        },
+        {
+          "line": 331,
+          "text": "To disable and go back to normal git diff (also removes the session hooks):"
+        },
+        {
+          "line": 363,
+          "text": ""
+        },
+        {
+          "line": 364,
+          "text": "Cloud is for what a laptop can't do. On a very large monorepo the first local graph build can take a few seconds; a shared team graph shouldn't be rebuilt per developer; and CI wants the graph without checking anything out. `sem login` connects those cases to sem cloud, which keeps a warm, pre-built graph for your registered repos and serves the heavy queries from it instead of rebuilding locally."
+        },
+        {
+          "line": 365,
+          "text": ""
+        },
+        {
+          "line": 366,
+          "text": "```bash"
+        },
+        {
+          "line": 367,
+          "text": "sem login                              # GitHub device flow, one time"
+        },
+        {
+          "line": 368,
+          "text": "sem impact myFunc --file src/foo.rs    # served from the cloud's warm graph"
+        },
+        {
+          "line": 369,
+          "text": "```"
+        },
+        {
+          "line": 381,
+          "text": "sem whoami          # show current cloud identity"
+        },
+        {
+          "line": 382,
+          "text": "sem cloud status    # cloud + telemetry state for this repo (offline; sends nothing)"
+        },
+        {
+          "line": 383,
+          "text": "sem cloud enable    # turn on cloud queries for a public repo (shows what's sent first)"
+        },
+        {
+          "line": 384,
+          "text": "sem cloud share     # same, with extra confirmation, for a private repo"
+        },
+        {
+          "line": 510,
+          "text": "```bash"
+        },
+        {
+          "line": 511,
+          "text": "sem diff --format json"
+        },
+        {
+          "line": 512,
+          "text": "```"
+        },
+        {
+          "line": 513,
+          "text": ""
+        },
+        {
+          "line": 576,
+          "text": ""
+        },
+        {
+          "line": 577,
+          "text": "## Telemetry"
+        },
+        {
+          "line": 578,
+          "text": ""
+        },
+        {
+          "line": 579,
+          "text": "Local by default: sem counts command names (e.g. `diff`, `impact`) on your own machine only, and in that mode nothing is ever uploaded. No code, file paths, repo names, or user identity is recorded, and no network call is made."
+        },
+        {
+          "line": 581,
+          "text": "```bash"
+        },
+        {
+          "line": 582,
+          "text": "sem telemetry preview   # see current mode and exactly what would be sent"
+        },
+        {
+          "line": 583,
+          "text": "sem telemetry on        # opt in: also upload counts to help improve sem"
+        },
+        {
+          "line": 584,
+          "text": "sem telemetry off       # record nothing at all"
+        },
+        {
+          "line": 585,
+          "text": "```"
+        },
+        {
+          "line": 586,
+          "text": ""
+        },
+        {
+          "line": 587,
+          "text": "`SEM_NO_TELEMETRY=1` or `DO_NOT_TRACK=1` force the record-nothing behavior regardless of mode. Development builds (anything run out of a `cargo build` `target/` directory) never record, so working on sem itself doesn't pollute the numbers."
+        },
+        {
+          "line": 588,
+          "text": ""
+        },
+        {
+          "line": 589,
+          "text": "## Contributing"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "component": "worktrunk",
+      "tag": "v0.80.0",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+      "read_at": "2026-10-16T05:15:41.329724+00:00",
+      "published_at": "2026-09-27T21:18:46Z",
+      "asset": {
+        "name": "worktrunk-x86_64-unknown-linux-musl.tar.xz",
+        "browser_download_url": "https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-x86_64-unknown-linux-musl.tar.xz",
+        "digest": "sha256:532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199",
+        "size": 8173256,
+        "download_count": 25873
+      },
+      "checksum_matches": true,
+      "prefix_scope": "isolated /var/tmp scratch; no host install"
+    },
+    {
+      "component": "gh",
+      "tag": "v2.102.0",
+      "repository": "https://github.com/cli/cli",
+      "url": "https://github.com/cli/cli/releases/tag/v2.102.0",
+      "read_at": "2026-10-16T05:15:42.320560+00:00",
+      "published_at": "2026-09-30T02:40:02Z",
+      "asset": {
+        "name": "gh_2.102.0_linux_amd64.tar.gz",
+        "browser_download_url": "https://github.com/cli/cli/releases/download/v2.102.0/gh_2.102.0_linux_amd64.tar.gz",
+        "digest": "sha256:bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386",
+        "size": 15319960,
+        "download_count": 614693
+      },
+      "checksum_matches": true,
+      "prefix_scope": "isolated /var/tmp scratch; no host install"
+    },
+    {
+      "component": "difftastic",
+      "tag": "0.71.0",
+      "repository": "https://github.com/Wilfred/difftastic",
+      "url": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+      "read_at": "2026-10-16T05:15:44.030646+00:00",
+      "published_at": "2026-09-18T22:57:29Z",
+      "asset": {
+        "name": "difft-0.71.0-x86_64-unknown-linux-musl.tar.gz",
+        "browser_download_url": "https://github.com/Wilfred/difftastic/releases/download/0.71.0/difft-0.71.0-x86_64-unknown-linux-musl.tar.gz",
+        "digest": "sha256:0a65e6715df992b0adae012e606bd9cc74fa6cfe90eaf13bbae165a0a19b3086",
+        "size": 11746371,
+        "download_count": 1704
+      },
+      "checksum_matches": true,
+      "prefix_scope": "isolated /var/tmp scratch; no host install"
+    },
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "src/commands/list/json_v2.rs",
+      "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/b49ca7eea9b03145791a5b94eccaf9c59412ed37/src/commands/list/json_v2.rs",
+      "read_at": "2026-10-16T05:19:32.656432+00:00",
+      "http_status": 200,
+      "public_source_sha256": "4adb0263490075a289da2985a00230a1008292e611d6137aa36cb3ca57fcae3f",
+      "source_is_public": true,
+      "line_count": 1732,
+      "excerpts": [
+        {
+          "line": 1,
+          "text": "//! Schema-2 JSON output for `wt list --format=json` and"
+        },
+        {
+          "line": 2,
+          "text": "//! `wt list statusline --format=json`."
+        },
+        {
+          "line": 3,
+          "text": "//!"
+        },
+        {
+          "line": 99,
+          "text": "    /// One entry per row, in table order."
+        },
+        {
+          "line": 100,
+          "text": "    pub items: Vec<JsonItemV2>,"
+        },
+        {
+          "line": 101,
+          "text": "}"
+        },
+        {
+          "line": 102,
+          "text": ""
+        },
+        {
+          "line": 161,
+          "text": "    #[serde(skip_serializing_if = \"Option::is_none\")]"
+        },
+        {
+          "line": 162,
+          "text": "    pub worktree: Option<JsonWorktreeV2>,"
+        },
+        {
+          "line": 163,
+          "text": ""
+        },
+        {
+          "line": 164,
+          "text": "    /// Relation to the default branch; absent on the default branch itself."
+        },
+        {
+          "line": 229,
+          "text": "    /// Filesystem path."
+        },
+        {
+          "line": 230,
+          "text": "    pub path: PathBuf,"
+        },
+        {
+          "line": 231,
+          "text": ""
+        },
+        {
+          "line": 232,
+          "text": "    /// This is the main worktree."
+        },
+        {
+          "line": 529,
+          "text": ""
+        },
+        {
+          "line": 530,
+          "text": "/// Build the schema-2 envelope."
+        },
+        {
+          "line": 531,
+          "text": "///"
+        },
+        {
+          "line": 532,
+          "text": "/// Vars come from the bulk config snapshot like schema 1 (see"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "dist-workspace.toml",
+      "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/b49ca7eea9b03145791a5b94eccaf9c59412ed37/dist-workspace.toml",
+      "read_at": "2026-10-16T05:19:32.753929+00:00",
+      "http_status": 200,
+      "public_source_sha256": "790cac49d6ccdbb2bd191a5c46d4c8a6469b493980b8f96e9abc539c84f5428e",
+      "source_is_public": true,
+      "line_count": 33,
+      "excerpts": [
+        {
+          "line": 9,
+          "text": "ci = \"github\""
+        },
+        {
+          "line": 10,
+          "text": "# The installers to generate for each app"
+        },
+        {
+          "line": 11,
+          "text": "# Note: The shell/powershell scripts attempt to add the install directory to PATH by"
+        },
+        {
+          "line": 12,
+          "text": "# modifying shell config files (.profile, .bashrc, etc.), which can cause \"Permission"
+        },
+        {
+          "line": 13,
+          "text": "# denied\" errors on non-standard setups. This is cargo-dist's default behavior and"
+        },
+        {
+          "line": 14,
+          "text": "# reasonable for most users. Users with custom shell configs can set"
+        },
+        {
+          "line": 15,
+          "text": "# WORKTRUNK_NO_MODIFY_PATH=1 or use Homebrew/cargo install instead."
+        },
+        {
+          "line": 16,
+          "text": "# See: https://github.com/max-sixty/worktrunk/issues/590"
+        },
+        {
+          "line": 17,
+          "text": "installers = [\"shell\", \"powershell\", \"homebrew\"]"
+        },
+        {
+          "line": 18,
+          "text": "# Homebrew tap repository"
+        },
+        {
+          "line": 19,
+          "text": "tap = \"max-sixty/homebrew-worktrunk\""
+        },
+        {
+          "line": 24,
+          "text": "# Target platforms to build apps for (Rust target-triple syntax)"
+        },
+        {
+          "line": 25,
+          "text": "targets = [\"aarch64-apple-darwin\", \"x86_64-apple-darwin\", \"aarch64-unknown-linux-musl\", \"x86_64-unknown-linux-musl\", \"x86_64-pc-windows-msvc\"]"
+        },
+        {
+          "line": 26,
+          "text": "# Whether to install an updater program"
+        },
+        {
+          "line": 27,
+          "text": "install-updater = false"
+        },
+        {
+          "line": 31,
+          "text": "features = [\"git-wt\"]"
+        },
+        {
+          "line": 32,
+          "text": "# Custom success message prompting shell integration"
+        },
+        {
+          "line": 33,
+          "text": "install-success-msg = \"Run 'wt config shell install' for shell integration.\""
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "docs/src/content/docs/worktrunk.md",
+      "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/b49ca7eea9b03145791a5b94eccaf9c59412ed37/docs/src/content/docs/worktrunk.md",
+      "read_at": "2026-10-16T05:19:32.852645+00:00",
+      "http_status": 200,
+      "public_source_sha256": "b7b5e46c482f79d2709682fc62b6bef768f3c76a6667c24189e3813f392116fc",
+      "source_is_public": true,
+      "line_count": 248,
+      "excerpts": [
+        {
+          "line": 120,
+          "text": ""
+        },
+        {
+          "line": 121,
+          "text": "## Install"
+        },
+        {
+          "line": 122,
+          "text": ""
+        },
+        {
+          "line": 123,
+          "text": "**Homebrew (macOS & Linux):**"
+        },
+        {
+          "line": 125,
+          "text": "```bash"
+        },
+        {
+          "line": 126,
+          "text": "brew install worktrunk && wt config shell install"
+        },
+        {
+          "line": 127,
+          "text": "```"
+        },
+        {
+          "line": 128,
+          "text": ""
+        },
+        {
+          "line": 133,
+          "text": "```bash"
+        },
+        {
+          "line": 134,
+          "text": "cargo install worktrunk && wt config shell install"
+        },
+        {
+          "line": 135,
+          "text": "```"
+        },
+        {
+          "line": 136,
+          "text": ""
+        },
+        {
+          "line": 139,
+          "text": ""
+        },
+        {
+          "line": 140,
+          "text": "**Windows.** `wt` defaults to Windows Terminal's command, so Winget additionally installs Worktrunk as `git-wt` to avoid the conflict:"
+        },
+        {
+          "line": 141,
+          "text": ""
+        },
+        {
+          "line": 142,
+          "text": "```bash"
+        },
+        {
+          "line": 143,
+          "text": "winget install max-sixty.worktrunk"
+        },
+        {
+          "line": 144,
+          "text": "git-wt config shell install"
+        },
+        {
+          "line": 145,
+          "text": "```"
+        },
+        {
+          "line": 146,
+          "text": ""
+        },
+        {
+          "line": 153,
+          "text": "```bash"
+        },
+        {
+          "line": 154,
+          "text": "sudo pacman -S worktrunk && wt config shell install"
+        },
+        {
+          "line": 155,
+          "text": "```"
+        },
+        {
+          "line": 156,
+          "text": ""
+        },
+        {
+          "line": 159,
+          "text": "```bash"
+        },
+        {
+          "line": 160,
+          "text": "conda install -c conda-forge worktrunk && wt config shell install"
+        },
+        {
+          "line": 161,
+          "text": "```"
+        },
+        {
+          "line": 162,
+          "text": ""
+        },
+        {
+          "line": 163,
+          "text": "Or with [Pixi](https://pixi.sh): `pixi global install worktrunk && wt config shell install`."
+        },
+        {
+          "line": 164,
+          "text": ""
+        },
+        {
+          "line": 165,
+          "text": "</details>"
+        },
+        {
+          "line": 235,
+          "text": ""
+        },
+        {
+          "line": 236,
+          "text": "The `-x` flag runs a command after switching; arguments after `--` are passed to it. Configure [post-start hooks](/hook/#hook-types) to automate setup (install deps, start dev servers)."
+        },
+        {
+          "line": 237,
+          "text": ""
+        },
+        {
+          "line": 238,
+          "text": "## Next steps"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    },
+    {
+      "kind": "publication",
+      "url": "https://ataraxy-labs.github.io/sem/agents.html",
+      "read_at": "2026-10-16T05:23:42.990875+00:00",
+      "http_status": 200,
+      "excerpts": [
+        {
+          "term": "Sonnet",
+          "text": "rst Principles GitHub llms.txt Agent accuracy Same questions about code changes, answered by Claude Sonnet 4.5. One gets sem diff JSON, the other gets raw git diff . Scored against ground truth across 3 commits (small, medium, large). sem diff git diff Q1: List added functions (F1) Q2: Files with modified entities (F1) Q3: Entity type counts (accuracy) Q4: Added/modified/deleted counts (exact) Overall average Why git diff fails agents Tested on 3"
+        },
+        {
+          "term": "24",
+          "text": "; text-decoration-color: var(--accent); } .container { max-width: 800px; margin: 0 auto; padding: 0 24px; } /* Nav */ nav { position: sticky; top: 0; background: var(--bg); z-index: 50; border-bottom: 1px solid var(--border); } nav .nav-inner { max-width: 860px; margin: 0 auto; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; } nav .logo { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; color: var"
+        },
+        {
+          "term": "commits",
+          "text": "net 4.5. One gets sem diff JSON, the other gets raw git diff . Scored against ground truth across 3 commits (small, medium, large). sem diff git diff Q1: List added functions (F1) Q2: Files with modified entities (F1) Q3: Entity type counts (accuracy) Q4: Added/modified/deleted counts (exact) Overall average Why git diff fails agents Tested on 3 commits from this repo. Each exposes a different failure mode when agents reason about raw line diffs."
+        },
+        {
+          "term": "questions",
+          "text": " sem Agents Benchmarks Cloud Changelog Details First Principles GitHub llms.txt Agent accuracy Same questions about code changes, answered by Claude Sonnet 4.5. One gets sem diff JSON, the other gets raw git diff . Scored against ground truth across 3 commits (small, medium, large). sem diff git diff Q1: List added functions (F1) Q2: Files with modified entities (F1) Q3: Entity type counts (accuracy) Q4: Added/modified/deleted counts (exact) Over"
+        },
+        {
+          "term": "git diff",
+          "text": "tions about code changes, answered by Claude Sonnet 4.5. One gets sem diff JSON, the other gets raw git diff . Scored against ground truth across 3 commits (small, medium, large). sem diff git diff Q1: List added functions (F1) Q2: Files with modified entities (F1) Q3: Entity type counts (accuracy) Q4: Added/modified/deleted counts (exact) Overall average Why git diff fails agents Tested on 3 commits from this repo. Each exposes a different failu"
+        }
+      ],
+      "scope": "Existing carried vendor self-evaluation; live page has no demonstrated binding to the retained v0.25.0 binary, and is not a matched sem-versus-difftastic test.",
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash."
+    }
+  ],
+  "record_type": "source_review_excerpts_not_native_receipts",
+  "capture_boundary": "Pinned public source excerpts and API projections support source review; full original HTTP response bytes were not retained in this artifact and are not presented as native receipts."
+}

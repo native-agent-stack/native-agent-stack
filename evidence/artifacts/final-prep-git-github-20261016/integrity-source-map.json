@@ -1,0 +1,723 @@
+{
+  "record_type": "derived_source_locator_index_not_a_native_receipt",
+  "native_commands": {
+    "worktrunk-download": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 16,
+      "exit_code_line": 21,
+      "stdout_line": 23
+    },
+    "worktrunk-checksum": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 30,
+      "exit_code_line": 35,
+      "stdout_line": 37
+    },
+    "worktrunk-extract": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 44,
+      "exit_code_line": 49,
+      "stdout_line": 51
+    },
+    "gh-download": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 58,
+      "exit_code_line": 63,
+      "stdout_line": 65
+    },
+    "gh-checksum": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 72,
+      "exit_code_line": 77,
+      "stdout_line": 79
+    },
+    "gh-extract": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 86,
+      "exit_code_line": 91,
+      "stdout_line": 93
+    },
+    "difftastic-download": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 100,
+      "exit_code_line": 105,
+      "stdout_line": 107
+    },
+    "difftastic-checksum": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 114,
+      "exit_code_line": 119,
+      "stdout_line": 121
+    },
+    "difftastic-extract": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 128,
+      "exit_code_line": 133,
+      "stdout_line": 135
+    },
+    "worktrunk-version": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 142,
+      "exit_code_line": 147,
+      "stdout_line": 149
+    },
+    "gh-version": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 156,
+      "exit_code_line": 161,
+      "stdout_line": 163
+    },
+    "difftastic-version": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 170,
+      "exit_code_line": 175,
+      "stdout_line": 177
+    },
+    "git-init": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 184,
+      "exit_code_line": 189,
+      "stdout_line": 191
+    },
+    "git-empty-commit": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 198,
+      "exit_code_line": 203,
+      "stdout_line": 205
+    },
+    "worktrunk-list-initial": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 212,
+      "exit_code_line": 217,
+      "stdout_line": 219
+    },
+    "worktrunk-create": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 226,
+      "exit_code_line": 231,
+      "stdout_line": 233
+    },
+    "worktrunk-list-created": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 240,
+      "exit_code_line": 245,
+      "stdout_line": 247
+    },
+    "worktrunk-dirty-refusal": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 254,
+      "exit_code_line": 259,
+      "stdout_line": 261
+    },
+    "worktrunk-remove-clean": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 268,
+      "exit_code_line": 273,
+      "stdout_line": 275
+    },
+    "worktrunk-list-final": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 282,
+      "exit_code_line": 287,
+      "stdout_line": 289
+    },
+    "gh-pr-review-help": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 296,
+      "exit_code_line": 301,
+      "stdout_line": 303
+    },
+    "gh-bash-completion": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 310,
+      "exit_code_line": 315,
+      "stdout_line": 317
+    },
+    "gh-bash-completion-parse": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 324,
+      "exit_code_line": 329,
+      "stdout_line": 331
+    },
+    "difftastic-fetch-simple_1.js": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 338,
+      "exit_code_line": 343,
+      "stdout_line": 345
+    },
+    "difftastic-fetch-simple_2.js": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 352,
+      "exit_code_line": 357,
+      "stdout_line": 359
+    },
+    "difftastic-upstream-example": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 366,
+      "exit_code_line": 371,
+      "stdout_line": 373
+    },
+    "difftastic-same-file": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 380,
+      "exit_code_line": 385,
+      "stdout_line": 387
+    },
+    "difftastic-different-files": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 394,
+      "exit_code_line": 399,
+      "stdout_line": 401
+    },
+    "difftastic-json-gate": {
+      "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "line": 408,
+      "exit_code_line": 413,
+      "stdout_line": 415
+    }
+  },
+  "angle_cells": [
+    {
+      "candidate": "worktrunk",
+      "angle": "A1",
+      "value": "+",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 56,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [
+        {
+          "kind": "receipt",
+          "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json"
+        }
+      ],
+      "note": "Capability at the resolved pin reproduced only within the receipt's documented local smoke scope; full layer requirements remain bounded by its named gaps. Native masked source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:226; the per-component .e2e.json file is a derived navigation index."
+    },
+    {
+      "candidate": "worktrunk",
+      "angle": "A2",
+      "value": "+",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 67,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [
+        {
+          "kind": "repo",
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "path": ".github/workflows/ci.yaml",
+          "line": 107
+        }
+      ],
+      "note": "Source-review judgment only: the pinned CI source documents a nextest suite (worktrunk) or an explicit native test command (gh/difftastic). No native CI result or fresh full-suite execution is inferred."
+    },
+    {
+      "candidate": "worktrunk",
+      "angle": "A3",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 81,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "No retained pin-specific independent community convergence measurement in this delta."
+    },
+    {
+      "candidate": "worktrunk",
+      "angle": "A4",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 87,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "Release download counts and task-triggered smoke invocations do not measure net production usage."
+    },
+    {
+      "candidate": "worktrunk",
+      "angle": "A5",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 93,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "No pin-bound published evaluation retained for this winner. The carried sem vendor self-report is scored separately; A5 weight stays at its stated value."
+    },
+    {
+      "candidate": "worktrunk",
+      "angle": "A6",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 99,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "No matched comparative run at these proposed pins; local smokes are A1, not A6."
+    },
+    {
+      "candidate": "gh",
+      "angle": "A1",
+      "value": "+",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 123,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [
+        {
+          "kind": "receipt",
+          "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json"
+        }
+      ],
+      "note": "Capability at the resolved pin reproduced only within the receipt's documented local smoke scope; full layer requirements remain bounded by its named gaps. Native masked source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:310; the per-component .e2e.json file is a derived navigation index."
+    },
+    {
+      "candidate": "gh",
+      "angle": "A2",
+      "value": "+",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 134,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [
+        {
+          "kind": "repo",
+          "repository": "https://github.com/cli/cli",
+          "pin": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+          "path": ".github/workflows/go.yml",
+          "line": 32
+        }
+      ],
+      "note": "Source-review judgment only: the pinned CI source documents a nextest suite (worktrunk) or an explicit native test command (gh/difftastic). No native CI result or fresh full-suite execution is inferred."
+    },
+    {
+      "candidate": "gh",
+      "angle": "A3",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 148,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "No retained pin-specific independent community convergence measurement in this delta."
+    },
+    {
+      "candidate": "gh",
+      "angle": "A4",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 154,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "Release download counts and task-triggered smoke invocations do not measure net production usage."
+    },
+    {
+      "candidate": "gh",
+      "angle": "A5",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 160,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "No pin-bound published evaluation retained for this winner. The carried sem vendor self-report is scored separately; A5 weight stays at its stated value."
+    },
+    {
+      "candidate": "gh",
+      "angle": "A6",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 166,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "No matched comparative run at these proposed pins; local smokes are A1, not A6."
+    },
+    {
+      "candidate": "difftastic",
+      "angle": "A1",
+      "value": "+",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 190,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [
+        {
+          "kind": "receipt",
+          "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json"
+        }
+      ],
+      "note": "Capability at the resolved pin reproduced only within the receipt's documented local smoke scope; full layer requirements remain bounded by its named gaps. Native masked source: evidence/artifacts/final-prep-git-github-20261016/native-commands.json:366; the per-component .e2e.json file is a derived navigation index."
+    },
+    {
+      "candidate": "difftastic",
+      "angle": "A2",
+      "value": "+",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 201,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [
+        {
+          "kind": "repo",
+          "repository": "https://github.com/Wilfred/difftastic",
+          "pin": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+          "path": ".github/workflows/test.yml",
+          "line": 61
+        }
+      ],
+      "note": "Source-review judgment only: the pinned CI source documents a nextest suite (worktrunk) or an explicit native test command (gh/difftastic). No native CI result or fresh full-suite execution is inferred."
+    },
+    {
+      "candidate": "difftastic",
+      "angle": "A3",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 215,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "No retained pin-specific independent community convergence measurement in this delta."
+    },
+    {
+      "candidate": "difftastic",
+      "angle": "A4",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 221,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "Release download counts and task-triggered smoke invocations do not measure net production usage."
+    },
+    {
+      "candidate": "difftastic",
+      "angle": "A5",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 227,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "No pin-bound published evaluation retained for this winner. The carried sem vendor self-report is scored separately; A5 weight stays at its stated value."
+    },
+    {
+      "candidate": "difftastic",
+      "angle": "A6",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 233,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "No matched comparative run at these proposed pins; local smokes are A1, not A6."
+    },
+    {
+      "candidate": "claude-code-action",
+      "angle": "A1",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 257,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [
+        {
+          "kind": "repo",
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "pin": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+          "path": "README.md",
+          "line": 10
+        }
+      ],
+      "note": "Retained survivor source re-read at its resolved sweep tag; capability screen and comparative measurement remain unresolved."
+    },
+    {
+      "candidate": "claude-code-action",
+      "angle": "A2",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 271,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "Unverified for this carried survivor in the bounded delta."
+    },
+    {
+      "candidate": "claude-code-action",
+      "angle": "A3",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 277,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "Unverified for this carried survivor in the bounded delta."
+    },
+    {
+      "candidate": "claude-code-action",
+      "angle": "A4",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 283,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "Unverified for this carried survivor in the bounded delta."
+    },
+    {
+      "candidate": "claude-code-action",
+      "angle": "A5",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 289,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "Unverified for this carried survivor in the bounded delta."
+    },
+    {
+      "candidate": "claude-code-action",
+      "angle": "A6",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 295,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "Unverified for this carried survivor in the bounded delta."
+    },
+    {
+      "candidate": "sem",
+      "angle": "A1",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 319,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [
+        {
+          "kind": "repo",
+          "repository": "https://github.com/ataraxy-labs/sem",
+          "pin": "4cfe1374f79631b01aca5746441d826738a15448",
+          "path": "README.md",
+          "line": 157
+        }
+      ],
+      "note": "Retained survivor source re-read at its resolved sweep tag; capability screen and comparative measurement remain unresolved."
+    },
+    {
+      "candidate": "sem",
+      "angle": "A2",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 333,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "Unverified for this carried survivor in the bounded delta."
+    },
+    {
+      "candidate": "sem",
+      "angle": "A3",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 339,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "Unverified for this carried survivor in the bounded delta."
+    },
+    {
+      "candidate": "sem",
+      "angle": "A4",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 345,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "Unverified for this carried survivor in the bounded delta."
+    },
+    {
+      "candidate": "sem",
+      "angle": "A5",
+      "value": "0",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 351,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [
+        {
+          "kind": "url",
+          "url": "https://ataraxy-labs.github.io/sem/agents.html",
+          "read_at": "2026-10-16T05:23:42.990875Z"
+        }
+      ],
+      "note": "Known vendor self-evaluation over 3 commits, 4 questions and 24 API calls using Claude Sonnet 4.5 versus raw git diff. It is not independent, not a difftastic comparison, and has no demonstrated binding to retained sem v0.25.0. Neutral evidence only; not run here."
+    },
+    {
+      "candidate": "sem",
+      "angle": "A6",
+      "value": "U",
+      "path": "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json",
+      "line": 363,
+      "classification": "source-review judgment or named unverified gap; not a measured numeric result",
+      "support": [],
+      "note": "Unverified for this carried survivor in the bounded delta."
+    }
+  ],
+  "native_count_derivation": {
+    "all_observations": 29,
+    "zero_exits": 26,
+    "source_refs": [
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 16,
+        "exit_code_line": 21,
+        "stdout_line": 23
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 30,
+        "exit_code_line": 35,
+        "stdout_line": 37
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 44,
+        "exit_code_line": 49,
+        "stdout_line": 51
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 58,
+        "exit_code_line": 63,
+        "stdout_line": 65
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 72,
+        "exit_code_line": 77,
+        "stdout_line": 79
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 86,
+        "exit_code_line": 91,
+        "stdout_line": 93
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 100,
+        "exit_code_line": 105,
+        "stdout_line": 107
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 114,
+        "exit_code_line": 119,
+        "stdout_line": 121
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 128,
+        "exit_code_line": 133,
+        "stdout_line": 135
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 142,
+        "exit_code_line": 147,
+        "stdout_line": 149
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 156,
+        "exit_code_line": 161,
+        "stdout_line": 163
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 170,
+        "exit_code_line": 175,
+        "stdout_line": 177
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 184,
+        "exit_code_line": 189,
+        "stdout_line": 191
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 198,
+        "exit_code_line": 203,
+        "stdout_line": 205
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 212,
+        "exit_code_line": 217,
+        "stdout_line": 219
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 226,
+        "exit_code_line": 231,
+        "stdout_line": 233
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 240,
+        "exit_code_line": 245,
+        "stdout_line": 247
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 254,
+        "exit_code_line": 259,
+        "stdout_line": 261
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 268,
+        "exit_code_line": 273,
+        "stdout_line": 275
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 282,
+        "exit_code_line": 287,
+        "stdout_line": 289
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 296,
+        "exit_code_line": 301,
+        "stdout_line": 303
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 310,
+        "exit_code_line": 315,
+        "stdout_line": 317
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 324,
+        "exit_code_line": 329,
+        "stdout_line": 331
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 338,
+        "exit_code_line": 343,
+        "stdout_line": 345
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 352,
+        "exit_code_line": 357,
+        "stdout_line": 359
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 366,
+        "exit_code_line": 371,
+        "stdout_line": 373
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 380,
+        "exit_code_line": 385,
+        "stdout_line": 387
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 394,
+        "exit_code_line": 399,
+        "stdout_line": 401
+      },
+      {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 408,
+        "exit_code_line": 413,
+        "stdout_line": 415
+      }
+    ]
+  },
+  "masked_reproduction": "The co-op independently checks the name-only private capture with the published rule; no private digest belongs in this map."
+}

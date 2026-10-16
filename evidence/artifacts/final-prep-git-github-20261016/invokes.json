@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "scope": "Task-triggered native invocations of isolated qualification binaries in the retained measured window; neither organic-session use nor an adoption-wide invocation census.",
+  "output_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+  "hash_scope": "Hashes of PUBLISHED masked native stream fields; this index is derived navigation metadata, not native output.",
+  "components": [
+    {
+      "component": "worktrunk",
+      "pin": "0.80.0",
+      "commands": [
+        {
+          "id": "worktrunk-list-initial",
+          "command": "<SCRATCH>/prefix/worktrunk/worktrunk-x86_64-unknown-linux-musl/wt --config <SCRATCH>/config/worktrunk.toml list --format=json",
+          "started_at": "2026-10-16T05:15:44.173293+00:00",
+          "completed_at": "2026-10-16T05:15:44.250894+00:00",
+          "exit_code": 0,
+          "stdout_sha256": "bade432c1f853e9bcfcf72fc7489603df5dacedb40e49918cd3a483e31eda885",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "native_source": {
+            "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+            "line": 212,
+            "exit_code_line": 217,
+            "stdout_line": 219
+          }
+        },
+        {
+          "id": "worktrunk-create",
+          "command": "<SCRATCH>/prefix/worktrunk/worktrunk-x86_64-unknown-linux-musl/wt --config <SCRATCH>/config/worktrunk.toml switch --create smoke-feature --base main --no-cd --no-hooks --format=json",
+          "started_at": "2026-10-16T05:15:44.251259+00:00",
+          "completed_at": "2026-10-16T05:15:44.319146+00:00",
+          "exit_code": 0,
+          "stdout_sha256": "c0c50460cc7b058481d4ab4a71a9154ede5b190a74c70fbf7f391559a71ac92f",
+          "stderr_sha256": "7cd405da26c16e5d13e3d457c1df17abf18e39c62bb7b5c565ce42078185f4f3",
+          "native_source": {
+            "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+            "line": 226,
+            "exit_code_line": 231,
+            "stdout_line": 233
+          }
+        },
+        {
+          "id": "worktrunk-list-created",
+          "command": "<SCRATCH>/prefix/worktrunk/worktrunk-x86_64-unknown-linux-musl/wt --config <SCRATCH>/config/worktrunk.toml list --format=json",
+          "started_at": "2026-10-16T05:15:44.319654+00:00",
+          "completed_at": "2026-10-16T05:15:44.377235+00:00",
+          "exit_code": 0,
+          "stdout_sha256": "a54a1c5c32ddc497eefbbd90473112c9d5615602624962b544efa72fb0588a86",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "native_source": {
+            "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+            "line": 240,
+            "exit_code_line": 245,
+            "stdout_line": 247
+          }
+        },
+        {
+          "id": "worktrunk-dirty-refusal",
+          "command": "<SCRATCH>/prefix/worktrunk/worktrunk-x86_64-unknown-linux-musl/wt --config <SCRATCH>/config/worktrunk.toml remove smoke-feature --foreground --no-hooks",
+          "started_at": "2026-10-16T05:16:49.354814+00:00",
+          "completed_at": "2026-10-16T05:16:49.404465+00:00",
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "149fcdd0383e2fab33002f94cb06c3eb9f81c62dba47af32e0c86cd1bc86cfc0",
+          "native_source": {
+            "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+            "line": 254,
+            "exit_code_line": 259,
+            "stdout_line": 261
+          }
+        },
+        {
+          "id": "worktrunk-remove-clean",
+          "command": "<SCRATCH>/prefix/worktrunk/worktrunk-x86_64-unknown-linux-musl/wt --config <SCRATCH>/config/worktrunk.toml remove smoke-feature --foreground --no-hooks",
+          "started_at": "2026-10-16T05:16:49.405123+00:00",
+          "completed_at": "2026-10-16T05:16:49.604266+00:00",
+          "exit_code": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "c139df59762c53f98e282f3a239d5be4ffa83a3050f8ca029da5bdc910133681",
+          "native_source": {
+            "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+            "line": 268,
+            "exit_code_line": 273,
+            "stdout_line": 275
+          }
+        },
+        {
+          "id": "worktrunk-list-final",
+          "command": "<SCRATCH>/prefix/worktrunk/worktrunk-x86_64-unknown-linux-musl/wt --config <SCRATCH>/config/worktrunk.toml list --format=json",
+          "started_at": "2026-10-16T05:16:49.604829+00:00",
+          "completed_at": "2026-10-16T05:16:49.679122+00:00",
+          "exit_code": 0,
+          "stdout_sha256": "bf543b8f332f064d428fd3bd0ff4de7cb877415f03b0d8ee5744d9addfc9f576",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "native_source": {
+            "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+            "line": 282,
+            "exit_code_line": 287,
+            "stdout_line": 289
+          }
+        }
+      ],
+      "derived_invoke_count": 6
+    },
+    {
+      "component": "gh",
+      "pin": "2.102.0",
+      "commands": [
+        {
+          "id": "gh-pr-review-help",
+          "command": "<SCRATCH>/prefix/gh/gh_2.102.0_linux_amd64/bin/gh pr review --help",
+          "started_at": "2026-10-16T05:16:49.680743+00:00",
+          "completed_at": "2026-10-16T05:16:49.859954+00:00",
+          "exit_code": 0,
+          "stdout_sha256": "2206514450875b7d549831ab08162ae0e54baaa3c3c8a02f94902a29d9774bcf",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "native_source": {
+            "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+            "line": 296,
+            "exit_code_line": 301,
+            "stdout_line": 303
+          }
+        },
+        {
+          "id": "gh-bash-completion",
+          "command": "<SCRATCH>/prefix/gh/gh_2.102.0_linux_amd64/bin/gh completion --shell bash",
+          "started_at": "2026-10-16T05:16:49.860765+00:00",
+          "completed_at": "2026-10-16T05:16:49.996740+00:00",
+          "exit_code": 0,
+          "stdout_sha256": "bedb7a78703840afe96a17e60b4c717ffc638aa5cf5760dc262ea337f580ecf5",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "native_source": {
+            "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+            "line": 310,
+            "exit_code_line": 315,
+            "stdout_line": 317
+          }
+        }
+      ],
+      "derived_invoke_count": 2
+    },
+    {
+      "component": "difftastic",
+      "pin": "0.71.0",
+      "commands": [
+        {
+          "id": "difftastic-upstream-example",
+          "command": "<SCRATCH>/prefix/difftastic/difft sample_files/simple_1.js sample_files/simple_2.js",
+          "started_at": "2026-10-16T05:16:50.328936+00:00",
+          "completed_at": "2026-10-16T05:16:50.396861+00:00",
+          "exit_code": 0,
+          "stdout_sha256": "6ec362eaafe7a3b50b72243a5e62d6b3318215f31b0d85d9a69e2b103eb0f763",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "native_source": {
+            "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+            "line": 366,
+            "exit_code_line": 371,
+            "stdout_line": 373
+          }
+        },
+        {
+          "id": "difftastic-same-file",
+          "command": "<SCRATCH>/prefix/difftastic/difft --check-only --exit-code sample_files/simple_1.js sample_files/simple_1.js",
+          "started_at": "2026-10-16T05:16:50.397616+00:00",
+          "completed_at": "2026-10-16T05:16:50.419353+00:00",
+          "exit_code": 0,
+          "stdout_sha256": "748c42073d7e991b5a3b2447bb708abce745179dfeae029e0a89af296c0891a3",
+          "stderr_sha256": "cbe028556c24e795118d2e3146d714294ee0da74996d59671ad640fd30387742",
+          "native_source": {
+            "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+            "line": 380,
+            "exit_code_line": 385,
+            "stdout_line": 387
+          }
+        },
+        {
+          "id": "difftastic-different-files",
+          "command": "<SCRATCH>/prefix/difftastic/difft --check-only --exit-code sample_files/simple_1.js sample_files/simple_2.js",
+          "started_at": "2026-10-16T05:16:50.420251+00:00",
+          "completed_at": "2026-10-16T05:16:50.441053+00:00",
+          "exit_code": 1,
+          "stdout_sha256": "64b692f92282ffc245c5ec813e0189e60be2d4d1f867bdbd193105b8ab0539ff",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "native_source": {
+            "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+            "line": 394,
+            "exit_code_line": 399,
+            "stdout_line": 401
+          }
+        },
+        {
+          "id": "difftastic-json-gate",
+          "command": "<SCRATCH>/prefix/difftastic/difft --display json sample_files/simple_1.js sample_files/simple_2.js",
+          "started_at": "2026-10-16T05:23:42.898695+00:00",
+          "completed_at": "2026-10-16T05:23:42.907715+00:00",
+          "exit_code": 2,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "3d141cf491d04cf758f68d52160a97dd7da9ef10b5680a0e7cd73d431e459add",
+          "native_source": {
+            "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+            "line": 408,
+            "exit_code_line": 413,
+            "stdout_line": 415
+          }
+        }
+      ],
+      "derived_invoke_count": 4
+    }
+  ],
+  "gaps": [
+    "Authenticated GitHub lifecycle excluded.",
+    "Organic fresh-session adoption and cross-host invoke evidence not measured."
+  ],
+  "kind": "native_evidence_index",
+  "record_type": "derived_index_not_a_native_receipt",
+  "native_capture_ref": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+  "raw_capture_name": "git-github-native-command-capture-20261016",
+  "masking_rule": "evidence/artifacts/final-prep-git-github-20261016/mask_receipts.py",
+  "masking_test": "evidence/artifacts/final-prep-git-github-20261016/test_mask_receipts.py"
+}
