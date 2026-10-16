@@ -2,6 +2,37 @@
   "evidence_class": "synthetic",
   "base": "e1b5288051292cfdb19e2ca64349e4da35ba0970",
   "admission_enabled": false,
+  "round3_parent": "f33b1cb40d1479baeaa4edc6c8973ddfa3e303e9",
+  "round3_fail_first": {
+    "methods": 6,
+    "assertion_failures": 10,
+    "errors": 1,
+    "exit": 1,
+    "boundary": "Exact f33b1cb4 qualification source, with the native-builder wave fixture and current regression methods. The sole error is the reproduced TypeError from native-valid null V2 baseline reopening metadata; no setup errors are counted.",
+    "controls": [
+      "test_qualification_rejects_duplicate_current_rows_before_following_the_pointer",
+      "test_qualification_uses_current_verdict_metadata_instead_of_packet_fields",
+      "test_hash_correct_registered_wave_must_contain_this_layer_and_winner",
+      "test_v2_null_anchor_reopen_refuses_with_a_domain_error",
+      "test_missing_file_shaped_reopening_reference_is_not_symbolic",
+      "test_whitespace_anchor_reopening_reference_refuses_even_if_file_exists"
+    ]
+  },
+  "round3_focused_run": {
+    "command": "python3 -m unittest tests.test_final_admission_checks.NativeHistoryQualificationTests tests.test_final_history_ordering tests.test_final_stack_dependencies",
+    "tests": 35,
+    "exit": 0,
+    "seconds": 10.847,
+    "limits": "Synthetic native qualification only. The complete-wave path/hash tuple control strengthens boundary diagnostics; incomplete tuples already refused later before this correction."
+  },
+  "round3_affected_run": {
+    "command": "python3 -m unittest tests.test_final_admission_checks tests.test_final_stack_dependencies tests.test_final_history_ordering tests.test_final_ordering tests.test_final_admission tests.test_angle_records tests.test_angle_records_fix1 tests.test_angle_records_fix3 tests.test_final_stack tests.test_component_matrix tests.test_landscape tests.test_saturation_ledger tests.test_record_verdicts tests.test_layer_verdicts tests.test_registration_rules tests.test_verdict_review_gate tests.test_local_pages_architecture_manifest tests.test_local_pages_architecture_cache tests.test_resolution_protocol_docs tests.test_evidence_manifest tests.test_osv_lockfile_coverage",
+    "tests": 907,
+    "exit": 0,
+    "seconds": 572.658,
+    "idle_class": true,
+    "limits": "Complete bounded affected-module run, not a repository-wide suite; no skipped cases. Admission remains disabled."
+  },
   "fold_parent": "425c4367a4db640b0bc4074f48e3990663416bee",
   "fold_fail_first": {
     "methods": 9,

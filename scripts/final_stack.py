@@ -53,7 +53,7 @@ TOOL_DIR = ROOT / "tools" / "sota-convergence"
 if str(TOOL_DIR) not in sys.path:
     sys.path.insert(0, str(TOOL_DIR))
 # The verdict tools own the wave rule (a row's lanes.sealed_base, else the 2026-09-22 wave) and the registry path.
-from build_verdicts import WAVE_REGISTRY, row_run_id  # noqa: E402
+from build_verdicts import WAVE_REGISTRY, check_frozen_rows, row_run_id  # noqa: E402
 
 
 # The date the scope and qualification contract were last checked (2026-10-15). It is never a build
@@ -750,13 +750,10 @@ def qualify_final_history(sources: Sources, key: tuple[str, str], consumed_manif
             for name, child in value.items():
                 if isinstance(child, str) and (name.endswith("_ref") or name in ("ref", "source_review")):
                     if name == "ref" and value.get("trigger") in saturation_ledger.REOPEN_TRIGGERS:
-                        # Native reopen refs can be symbolic event identifiers
-                        # (saturation_ledger.external_triggers), not file paths.
-                        try:
-                            path = sources.path(child.partition("#")[0])
-                        except FinalStackError:
-                            continue
-                        if not path.is_file():
+                        # Only the native producer's opaque namespaces are
+                        # symbolic. A file-shaped reference must still exist
+                        # and satisfy the ordinary confinement contract.
+                        if child.startswith(("receipt_staleness:", "catalog-freshness:")):
                             continue
                     sources.read_bytes(child.partition("#")[0])
                 retain(child)
@@ -779,8 +776,13 @@ def qualify_final_history(sources: Sources, key: tuple[str, str], consumed_manif
     later = [sweep for sweep in covering if sweep["ledger_index"] > baseline["ledger_index"]]
     if final_reopened_by(sources, key, later, baseline):
         raise FinalStackError("FINAL history contains an incomplete, changed or pending covering sweep")
-    if not later and any(marker.get("trigger") == "retained_failure"
-                         for marker in baseline_rows[0].get("reopen", [])):
+    baseline_reopen = baseline_rows[0].get("reopen")
+    if (not isinstance(baseline_reopen, list)
+        or any(not isinstance(marker, dict) or marker.get("trigger") not in saturation_ledger.REOPEN_TRIGGERS
+               or not isinstance(marker.get("ref"), str) or not marker["ref"].strip()
+               for marker in baseline_reopen)):
+        raise FinalStackError("FINAL baseline requires retained reopening evidence")
+    if not later and any(marker.get("trigger") == "retained_failure" for marker in baseline_reopen):
         raise FinalStackError("FINAL baseline has unresolved retained discovery failures")
     survivors = final_unresolved_survivors(sources, {**row, "catalog": key[0]}, covering)
     if survivors:
@@ -1003,6 +1005,13 @@ def check_condition_3(sources: Sources, evidence: dict, repository: str | None, 
     validator = angle_records.Draft202012Validator(contract)
     if next(validator.iter_errors(e2e), None) is not None:
         raise FinalStackError("condition 3 receipt has invalid commands or citations")
+    for citation in e2e["upstream_sources"]:
+        for field in ("url", "repository"):
+            if field in citation:
+                try:
+                    angle_records.validate_https_url(citation[field])
+                except angle_records.AngleRecordError:
+                    raise FinalStackError("condition 3 receipt has invalid source URI")
     phases = {c.get("phase") for c in _dicts(e2e.get("commands"))
               if c.get("command") and type(c.get("exit_code")) is int and c["exit_code"] == 0}
     cited = e2e.get("upstream_sources") or []
@@ -1060,6 +1069,7 @@ def qualify_final_requirements(sources: Sources, layers: list[dict], runs: list[
         raise FinalStackError("FINAL requires current angle evidence, not a retained qualification packet")
     if build_runs(run_records(sources)) != runs:
         raise FinalStackError("FINAL requires current run pins, not a retained qualification packet")
+    current_rows = landscape_rows(sources)
     by_run = {run["id"]: run for run in runs}
     by_repository = {run["repository"]: run for run in runs if run["repository"]}
     qualified = []
@@ -1077,21 +1087,17 @@ def qualify_final_requirements(sources: Sources, layers: list[dict], runs: list[
         verdict = layer["verdict"] or {}
         wave = verdict.get("wave_doc") or {}
         registered = wave_registry(sources).get(verdict.get("wave")) or {}
-        if (wave.get("path"), wave.get("sha256")) != (registered.get("path"), registered.get("sha256")):
+        if (not isinstance(registered.get("path"), str) or not registered["path"]
+            or not isinstance(registered.get("sha256"), str)
+            or not saturation_ledger.HEX64.fullmatch(registered["sha256"])
+            or (wave.get("path"), wave.get("sha256")) != (registered.get("path"), registered.get("sha256"))):
             fail("condition 1 requires the current registered verdict wave")
-        path, _, pointer = layer["source"].partition("#")
-        if sources.json(LANDSCAPE_MANIFEST)["catalogs"].get(key[0]) != path:
-            fail("requires the current catalog source for this layer")
-        catalog = sources.json(path)
-        if pointer:
-            target = saturation_ledger.resolve_pointer(catalog, pointer)
-            rows = [target] if isinstance(target, dict) and target.get("layer_id") == key[1] else []
-        else:
-            rows = [row for row in _dicts(catalog.get("layers") if isinstance(catalog, dict) else [])
-                    if row.get("layer_id") == key[1]]
-        if len(rows) != 1:
+        current_row = current_rows.get(key)
+        if current_row is None:
             fail("requires one current recorded layer")
-        raw_row = rows[0]
+        if layer.get("source") != current_row["source"]:
+            fail("requires the current catalog source for this layer")
+        raw_row = current_row["row"]
         actual = [(winner.get("component_id"), winner.get("repository"), winner.get("pin"))
                   for winner in _dicts(raw_row.get("winners"))]
         projected = [(winner.get("component_id"), winner.get("repository"), winner.get("verdict_pin"))
@@ -1102,6 +1108,8 @@ def qualify_final_requirements(sources: Sources, layers: list[dict], runs: list[
                 and raw_row["current_adoption_status"].startswith("held"))
         for raw_winner, winner in zip(_dicts(raw_row.get("winners")), layer["winners"]):
             current = build_winner(raw_winner, {}, by_repository, by_run, held)
+            if not current.get("evidence_class") or winner.get("evidence_class") != current["evidence_class"]:
+                fail("condition 1 requires current winner metadata")
             if (winner.get("run"), winner.get("pin_drift")) != (current["run"], current["pin_drift"]):
                 fail("condition 2 requires the current winner-to-run association")
         if any(value not in (None, "FINAL") for value in
@@ -1117,8 +1125,11 @@ def qualify_final_requirements(sources: Sources, layers: list[dict], runs: list[
             fail("condition 1 requires the current recorded wave identity")
         if expected_wave != verdict.get("wave"):
             fail("condition 1 requires the current recorded wave identity")
-        history = qualify_final_history(sources, key, registered.get("manifest"), rows[0])
-        if not all(verdict.get(k) for k in ("date", "wave", "next_review")) or not wave.get("path"):
+        current_verdict = build_verdict(identity_row, {}, wave_registry(sources), [], root=sources.root)
+        if any(verdict.get(field) != current_verdict.get(field) for field in ("date", "wave", "next_review")):
+            fail("condition 1 requires current recorded verdict metadata")
+        history = qualify_final_history(sources, key, registered.get("manifest"), raw_row)
+        if not all(current_verdict.get(k) for k in ("date", "wave", "next_review")) or not wave.get("path"):
             fail("condition 1 requires a recorded verdict, wave and next_review")
         try:
             raw = sources.read_bytes(wave["path"])
@@ -1126,6 +1137,13 @@ def qualify_final_requirements(sources: Sources, layers: list[dict], runs: list[
             fail("condition 1 verdict wave is not retained")
         if hashlib.sha256(raw).hexdigest() != wave.get("sha256"):
             fail("condition 1 verdict wave hash does not match")
+        try:
+            wave_problems = check_frozen_rows(sources.root, expected_wave, registered,
+                                              [(key[0], identity_row)], raw.decode("utf-8"))
+        except (OSError, TypeError, ValueError, SystemExit):
+            fail("condition 1 requires a registered frozen wave binding this current row")
+        if wave_problems:
+            fail("condition 1 requires a registered frozen wave binding this current row")
         record = entry["record"]
         bound = {e["candidate_id"]: e for e in record["final_evidence"]}
         for winner in layer["winners"]:

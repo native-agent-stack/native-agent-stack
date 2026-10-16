@@ -67,6 +67,38 @@ record, and provides no current admission result.
 
 ## Receipt and source boundaries
 
+The next qualification correction uses the existing native current-row and
+frozen-wave contracts at `f33b1cb40d1479baeaa4edc6c8973ddfa3e303e9`.
+[`landscape_rows`:249-269](https://github.com/native-agent-stack/native-agent-stack/blob/f33b1cb40d1479baeaa4edc6c8973ddfa3e303e9/scripts/final_stack.py#L249-L269)
+enumerates the canonical catalogs and rejects duplicate layer keys before a
+packet's source pointer can select one. Winner evidence class comes from that
+current row; verdict date, wave and next review are recomputed through native
+[`build_verdict`:545-561](https://github.com/native-agent-stack/native-agent-stack/blob/f33b1cb40d1479baeaa4edc6c8973ddfa3e303e9/scripts/final_stack.py#L545-L561).
+`test_qualification_rejects_duplicate_current_rows_before_following_the_pointer`
+and `test_qualification_uses_current_verdict_metadata_instead_of_packet_fields`
+fail before these bindings. A matching registered path/hash is also required
+to identify a complete tuple. After checking the retained bytes, the existing
+[`check_frozen_rows`:476-495](https://github.com/native-agent-stack/native-agent-stack/blob/f33b1cb40d1479baeaa4edc6c8973ddfa3e303e9/tools/sota-convergence/build_verdicts.py#L476-L495)
+reconciles the wave with this current layer and winner.
+`test_hash_correct_registered_wave_must_contain_this_layer_and_winner` rehashes
+both registry and packet before testing unrelated, missing and changed rows.
+The positive fixture now builds the wave through the supported native builder.
+
+Consumed reopening metadata must also be an explicit list of valid native
+markers with nonempty stripped references. This follows the native
+[`check_layer` contract at :1091-1094](https://github.com/native-agent-stack/native-agent-stack/blob/f33b1cb40d1479baeaa4edc6c8973ddfa3e303e9/scripts/saturation_ledger.py#L1091-L1094),
+even where the V2 checker at that pin permits null or whitespace metadata.
+`test_v2_null_anchor_reopen_refuses_with_a_domain_error` and
+`test_whitespace_anchor_reopening_reference_refuses_even_if_file_exists`
+reach this boundary after native integrity succeeds. The latter retains a
+file named with spaces, so a missing-file error cannot hide the metadata gap.
+The qualifier also restricts symbolic references to the two namespaces emitted
+by native [`external_triggers`:1463-1493](https://github.com/native-agent-stack/native-agent-stack/blob/f33b1cb40d1479baeaa4edc6c8973ddfa3e303e9/scripts/saturation_ledger.py#L1463-L1493):
+`receipt_staleness:` and `catalog-freshness:`. All other references use the
+confined file reader; `test_missing_file_shaped_reopening_reference_is_not_symbolic`
+fails before that distinction. General V2 checker parity remains a follow-up;
+this bounded change only strengthens evidence qualification.
+
 The qualification fold corrects three defects in the implementation at
 `425c4367a4db640b0bc4074f48e3990663416bee`. Native reopening identifiers are
 not uniformly file references: the native

@@ -62,7 +62,35 @@ class NativeHistoryQualificationTests(FixtureTestCase):
     prepare = FinalAdmissionTests.prepare
     measured = FinalAdmissionTests.measured
     matrix = FinalAdmissionTests.matrix
-    native_fixture = FinalAdmissionTests.native_cutoff_fixture
+    _native_fixture = FinalAdmissionTests.native_cutoff_fixture
+    def native_fixture(self, field, status, *, refutation=False):
+        root = self._native_fixture(field, status, refutation=refutation)
+        # The qualification packet needs an actual native frozen-wave
+        # projection, rather than the earlier minimal hash-only stand-in.
+        manifest = json.loads((root / fs.LANDSCAPE_MANIFEST).read_bytes())
+        paths = [root / path for path in manifest["catalogs"].values()]
+        original = {path: path.read_bytes() for path in paths}
+        try:
+            for path in paths:
+                catalog = json.loads(original[path])
+                for row in catalog["layers"]:
+                    row.pop("terminal_state", None)
+                    if row.get("verdict_status") == "FINAL":
+                        row["verdict_status"] = "recorded"
+                path.write_text(json.dumps(catalog) + "\n")
+            registry_path = root / fs.WAVE_REGISTRY
+            registry = json.loads(registry_path.read_bytes())
+            for wave in registry["waves"]:
+                document = wave_helpers.build_verdicts.build_document(
+                    root, "2026-09-22", run_id=wave["run_id"], manifest=wave["manifest"])
+                path = root / wave["path"]
+                path.write_text(json.dumps(document, sort_keys=True, indent=2) + "\n")
+                wave["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+            registry_path.write_text(json.dumps(registry) + "\n")
+        finally:
+            for path, raw in original.items():
+                path.write_bytes(raw)
+        return root
 
     def qualification(self, root):
         source = fs.Sources(root)
@@ -112,6 +140,72 @@ class NativeHistoryQualificationTests(FixtureTestCase):
         path.write_text(json.dumps(catalog) + "\n")
         with self.assertRaisesRegex(fs.FinalStackError, "current recorded winners"):
             fs.qualify_final_requirements(fs.Sources(root), document["layers"], document["runs"], angles)
+
+    def test_qualification_rejects_duplicate_current_rows_before_following_the_pointer(self):
+        root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+        _, document, angles = self.qualification_packet(root)
+        path = root / "catalogs/landscape/foundation.json"
+        catalog = json.loads(path.read_bytes())
+        catalog["layers"].append(json.loads(json.dumps(catalog["layers"][0])))
+        path.write_text(json.dumps(catalog) + "\n")
+        with self.assertRaisesRegex(fs.FinalStackError, "more than one landscape row|exactly one"):
+            fs.qualify_final_requirements(fs.Sources(root), document["layers"], document["runs"], angles)
+
+    def test_hash_correct_registered_wave_must_contain_this_layer_and_winner(self):
+        for changed in ("layer", "winner", "missing"):
+            with self.subTest(changed=changed):
+                root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+                _, document, angles = self.qualification_packet(root)
+                registry_path = root / fs.WAVE_REGISTRY
+                registry = json.loads(registry_path.read_bytes())
+                wave = registry["waves"][0]
+                wave_path = root / wave["path"]
+                recorded = json.loads(wave_path.read_bytes())
+                row = recorded["catalogs"]["foundation"][0]
+                if changed == "layer":
+                    row["layer_id"] = "unrelated-layer"
+                elif changed == "winner":
+                    row["winners"][0]["pin"] = "b" * 40
+                else:
+                    recorded["catalogs"]["foundation"] = []
+                wave_path.write_text(json.dumps(recorded) + "\n")
+                wave["sha256"] = hashlib.sha256(wave_path.read_bytes()).hexdigest()
+                registry_path.write_text(json.dumps(registry) + "\n")
+                self.layer(document, "alpha")["verdict"]["wave_doc"]["sha256"] = wave["sha256"]
+                with self.assertRaisesRegex(fs.FinalStackError, "registered.*wave|frozen.*wave"):
+                    fs.qualify_final_requirements(fs.Sources(root), document["layers"], document["runs"], angles)
+
+    def test_missing_fields_cannot_bind_matching_registered_wave_tuples(self):
+        for missing in ("sha256", "path"):
+            with self.subTest(missing=missing):
+                root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+                _, document, angles = self.qualification_packet(root)
+                path = root / fs.WAVE_REGISTRY
+                registry = json.loads(path.read_bytes())
+                registry["waves"][0].pop(missing)
+                path.write_text(json.dumps(registry) + "\n")
+                self.layer(document, "alpha")["verdict"]["wave_doc"].pop(missing)
+                with self.assertRaisesRegex(fs.FinalStackError, "current registered verdict wave"):
+                    fs.qualify_final_requirements(fs.Sources(root), document["layers"], document["runs"], angles)
+
+    def test_qualification_uses_current_verdict_metadata_instead_of_packet_fields(self):
+        for changed in ("evidence_class", "checked_at", "packet_date", "packet_next_review"):
+            with self.subTest(changed=changed):
+                root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+                _, document, angles = self.qualification_packet(root)
+                if changed.startswith("packet_"):
+                    key = "date" if changed == "packet_date" else "next_review"
+                    self.layer(document, "alpha")["verdict"][key] = "not-a-date"
+                else:
+                    path = root / "catalogs/landscape/foundation.json"
+                    catalog = json.loads(path.read_bytes())
+                    if changed == "evidence_class":
+                        catalog["layers"][0]["winners"][0].pop("evidence_class")
+                    else:
+                        catalog["layers"][0].pop("checked_at")
+                    path.write_text(json.dumps(catalog) + "\n")
+                with self.assertRaisesRegex(fs.FinalStackError, "current.*metadata|current.*verdict"):
+                    fs.qualify_final_requirements(fs.Sources(root), document["layers"], document["runs"], angles)
 
     def test_qualification_requires_fresh_run_and_angle_inputs(self):
         for changed in ("run", "angle"):
@@ -294,6 +388,47 @@ class NativeHistoryQualificationTests(FixtureTestCase):
         self.assertEqual(sl.check_ledger(root, ledger), [])
         with self.assertRaisesRegex(fs.FinalStackError, "incomplete, changed or pending"):
             self.qualification(root)
+
+    def test_v2_null_anchor_reopen_refuses_with_a_domain_error(self):
+        root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+        ledger = json.loads((root / fs.LEDGER).read_bytes())
+        ledger["sweeps"][-1]["layers"][0]["reopen"] = None
+        ledger = sl_rechain(ledger)
+        ledger_helpers.write(root, fs.LEDGER, ledger)
+        self.assertEqual(sl.check_ledger(root, ledger), [])
+        row = json.loads((root / "catalogs/landscape/foundation.json").read_bytes())["layers"][0]
+        with self.assertRaisesRegex(fs.FinalStackError, "baseline.*reopening"):
+            fs.qualify_final_history(fs.Sources(root), ("foundation", "alpha"),
+                                      ledger["sweeps"][-1]["manifest_ref"], row)
+
+    def test_missing_file_shaped_reopening_reference_is_not_symbolic(self):
+        root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+        ledger = json.loads((root / fs.LEDGER).read_bytes())
+        ledger["sweeps"][0]["layers"][0]["reopen"].append({
+            "trigger": "stale_receipt", "ref": "evidence/artifacts/fixture/missing-reopen.json",
+        })
+        ledger = sl_rechain(ledger)
+        ledger_helpers.write(root, fs.LEDGER, ledger)
+        self.assertEqual(sl.check_ledger(root, ledger), [])
+        with self.assertRaisesRegex(fs.FinalStackError, "missing"):
+            self.qualification(root)
+
+    def test_whitespace_anchor_reopening_reference_refuses_even_if_file_exists(self):
+        root = self.native_fixture("requirement_sha256", "completed", refutation=True)
+        # Avoid an incidental missing-file refusal: the consumed V2 marker
+        # itself must satisfy the native V1 nonempty-reference contract.
+        (root / "   ").write_text("Retained synthetic reference.\n")
+        ledger = json.loads((root / fs.LEDGER).read_bytes())
+        ledger["sweeps"][-1]["layers"][0]["reopen"].append({
+            "trigger": "stale_receipt", "ref": "   ",
+        })
+        ledger = sl_rechain(ledger)
+        ledger_helpers.write(root, fs.LEDGER, ledger)
+        self.assertEqual(sl.check_ledger(root, ledger), [])
+        row = json.loads((root / "catalogs/landscape/foundation.json").read_bytes())["layers"][0]
+        with self.assertRaisesRegex(fs.FinalStackError, "baseline.*reopening"):
+            fs.qualify_final_history(fs.Sources(root), ("foundation", "alpha"),
+                                      ledger["sweeps"][-1]["manifest_ref"], row)
 
     def test_missing_native_v2_projection_is_refused_before_replay(self):
         for field in ("eligible_field", "pending", "proposed", "manifest_ref"):

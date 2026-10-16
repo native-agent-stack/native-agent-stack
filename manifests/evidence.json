@@ -19328,8 +19328,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-final-evidence-qualification.md",
-      "sha256": "e83166d9027f003c365e3707b388cb8b8bde4d071446ca3c0b23d34ba0c2e135",
-      "bytes": 11642
+      "sha256": "ba6d1b958124c6d4f2b575a2e165f69caa3d8e7ee1b49827f6cb264bd3bbd95a",
+      "bytes": 14395
     },
     {
       "path": "docs/decisions/2026-10-15-jev-scored-contract-corrections.md",
@@ -23093,8 +23093,8 @@
     },
     {
       "path": "evidence/artifacts/final-evidence-qualification-20261015/checks.json",
-      "sha256": "260bd290a101e970be0846d7fdb24b83e8d1c2297fbcbf3a9a98c44ed265ba45",
-      "bytes": 6908
+      "sha256": "cbd08fe80940bd12dcabce6127fb2829240db645c0e2905f5220bf9c046c70b7",
+      "bytes": 9194
     },
     {
       "path": "evidence/artifacts/final-evidence-qualification-20261015/source-reads.json",
@@ -63038,8 +63038,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "bbaa4f40241b95e37c2c2d0b496a249e557eb296e58658400bbbafe959f0f764",
-      "bytes": 94458
+      "sha256": "334f39c3cec0249703b93a9827afb22c412e01d869339b56e7e6b680ec780c41",
+      "bytes": 95928
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -64123,8 +64123,8 @@
     },
     {
       "path": "tests/test_final_admission_checks.py",
-      "sha256": "9ed7e373079291d40d51c86f42c0a086542f61168e99e802e78666d09be88e88",
-      "bytes": 30405
+      "sha256": "b271ca4fb1b9c3e54e5daff0dc55be9ef84951c5a1bc6ef01a063881e95415b5",
+      "bytes": 38763
     },
     {
       "path": "tests/test_final_disabled.py",
