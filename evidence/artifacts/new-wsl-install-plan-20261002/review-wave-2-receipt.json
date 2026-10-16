@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-15",
+  "before_head": "596ab33a67364c755c30ae2f314d0e49f219c2e0",
+  "evidence_class": "synthetic",
+  "review": "GPT-VERDICT-596ab33a6.md",
+  "scope": [
+    "Complete host allocation and success-only publication",
+    "Explicit host selection before staging and dispatch",
+    "Disabled/explicitly-enabled Grafana gRPC and code-graph UI ownership",
+    "Memory allocation parity in both clients",
+    "Allocated Inspector/alert controls and Ollama readiness",
+    "Codex host-file distro identity; refuse missing input"
+  ],
+  "execution_prefix": "systemd-run --user --scope -p CPUWeight=idle --quiet --",
+  "retained_probe": {
+    "filename": "review-port-probes.py",
+    "modified": false,
+    "command_template": "python3 -B review-port-probes.py <current-checkout> -v",
+    "tests": 3,
+    "passed": 2,
+    "failures": 1,
+    "exit_code": 1,
+    "cases": {
+      "test_client_accepts_the_same_memory_allocation_as_the_plan": "PASS",
+      "test_optional_grafana_grpc_is_not_a_required_listener": "PASS",
+      "test_explicit_install_host_controls_staging_and_commands": "FAIL at staging API: unrecognized arguments: --persist-ports"
+    },
+    "disposition": "The unchanged staging case expects partial host values and immediate active publication. Both conflict with the later complete-host and transactional-publication requirements. Co-op approved a separate adapter retaining all behavioral assertions."
+  },
+  "adapted_probe": {
+    "path": "tests/pr1180_port_review_probes.py",
+    "sha256": "a6c8d3ac258ca1b03ac4b1df0580101d89008c98271be1df9b69a77d16e088c0",
+    "command_template": "python3 -B tests/pr1180_port_review_probes.py <checkout> --grafana-source <grafana-v13.2.3-checkout> -v",
+    "grafana_pin": "6193dc03311b631b9727b560d24369e683dc396e",
+    "preserves": [
+      "Grafana's disabled gRPC is not a required listener",
+      "Explicit host selection controls staged endpoint, published snapshot and dispatch",
+      "Both clients accept memory39374 with gateway29374"
+    ],
+    "additional_cc_assertions": [
+      "WSL_DISTRO_NAME renders the explicit host identity",
+      "Missing WSL_DISTRO_NAME is refused"
+    ],
+    "before": {
+      "checkout": "596ab33a67364c755c30ae2f314d0e49f219c2e0",
+      "tests": 5,
+      "failures": 4,
+      "errors": 1,
+      "exit_code": 1,
+      "observed": [
+        "Dispatch used ambient31128 while staged/published values used explicit41128",
+        "Disabled Grafana gRPC was required on21302",
+        "Client discarded AI_MEMORY_URL and reported memory/gateway collision on29374",
+        "Codex shell identity remained NativeStack2604 for a different host",
+        "Missing distro identity was accepted"
+      ]
+    },
+    "after": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0
+    },
+    "boundary": "Disposable detached baseline checkout; current probe imports that checkout's production code. Extracted helpers, printf and temporary configs only; no installer, service or live socket census."
+  },
+  "additional_before": {
+    "checkout": "596ab33a67364c755c30ae2f314d0e49f219c2e0",
+    "harness": "Import current tests.test_install_plan_no_start_ports, point ROOT/PLAN at the unchanged baseline checkout, run the named ReviewWave2Tests cases with unittest.TextTestRunner.",
+    "cases": [
+      "test_failed_install_keeps_the_published_allocation",
+      "test_ollama_readiness_uses_the_allocated_endpoint",
+      "test_isolated_host_modes_refuse_missing_port_keys",
+      "test_agentsview_conflicting_archive_port_blocks_publication",
+      "test_inspector_probe_port_is_host_selected"
+    ],
+    "tests": 5,
+    "failures": 4,
+    "errors": 1,
+    "exit_code": 1,
+    "observations": [
+      "Failed install had already published candidate41128 over prior31128",
+      "Ollama readiness still called21434 despite31434 allocation",
+      "Partial host allocation did not raise",
+      "Agentsview retained21808 against31808 render and returned success",
+      "NS_PORT_INSPECTOR_PROBE was unknown"
+    ],
+    "stronger_transaction_control": {
+      "tests": 1,
+      "failures": 1,
+      "exit_code": 1,
+      "observed": "Parsed active NS_PORT_GATEWAY was41128, expected31128; failure is semantic, not JSON formatting"
+    }
+  },
+  "after": {
+    "command": "python3 -B -m unittest tests.test_install_plan_no_start_ports tests.test_research_entry tests.test_runtime_profiles tests.test_task_model_routing tests.test_harbor_currency_contracts tests.test_hcom_status tests.test_ns2604_dashboards tests.test_new_wsl_definitive_defaults.PromptfooGatewayTopologyConfiguration tests.test_new_wsl_definitive_defaults.FixwaveAcceptanceRepairs.test_ollama_unit_placement_preserves_unrelated_warmup_and_foreign_units tests.test_wsl_new_distro_recipe.HostTemplateTests tests.test_new_wsl_client_config.RenderTests tests.test_new_wsl_client_config.MapTests tests.test_new_wsl_client_config.McpEndpointRepairTests tests.test_new_wsl_definitive_defaults.FixwaveAcceptanceRepairs.test_research_native_transport_data_preserves_claude_prompt_and_commands tests.test_new_wsl_definitive_defaults.FixwaveAcceptanceRepairs.test_research_completion_includes_final_recipe_assertions",
+    "tests": 229,
+    "failures": 0,
+    "exit_code": 0,
+    "strengthened_transaction_regression_rerun": {
+      "command": "python3 -B -m unittest tests.test_install_plan_no_start_ports",
+      "tests": 55,
+      "failures": 0,
+      "exit_code": 0
+    },
+    "check_plan": {
+      "command": "python3 -B evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "rows": 84,
+      "commands": 197,
+      "acceptance_entries": 113,
+      "exit_code": 0
+    }
+  },
+  "default_compatibility": {
+    "assets": 30,
+    "dashboards": 6,
+    "fixture": "tests/fixtures/install_plan_default_ports.json",
+    "meaning": "The pure default renderer retains8053f14e7 config bytes; explicit/no-start host mode requires a completed allocation instead of treating the frozen incomplete host template as installable."
+  },
+  "classifications": [
+    {
+      "change": "Foreground observability user-unit form",
+      "status": "PROPOSAL",
+      "evidence_class": "source_review",
+      "limit": "Fake registration tested; native service lifecycle unmeasured"
+    },
+    {
+      "change": "needs_owner for differing port configuration",
+      "status": "Follow-ups",
+      "evidence_class": "synthetic"
+    },
+    {
+      "change": "Static check_plan inspection of --list",
+      "status": "Follow-ups",
+      "evidence_class": "source_review"
+    },
+    {
+      "change": "Frozen WSL host-template extension",
+      "status": "DEFERRED",
+      "evidence_class": "source_review"
+    }
+  ],
+  "frozen_inputs": {
+    "template": "adoption/templates/wsl/host.new-distro.json.template",
+    "template_sha256": "4395aec846f1d418a55a862cb4db03906d2513d00fa596c190b56641f760f6b0",
+    "critic": "evidence/artifacts/row70-defect-a-20261008/expanded-source-critic.md",
+    "critic_sha256": "92b7170350d3d923006638c028566db42b33acfe1aa40df6210c7f6b3a379c95",
+    "live_locator_audit": "no-start-citation-audit.json"
+  },
+  "manifest_scope_proof": {
+    "base": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+    "changed_existing_entries": 46,
+    "added_entries": 14,
+    "all_changed_paths_in_authorized_diff": true,
+    "existing_fields_changed_only_sha256_and_bytes": true,
+    "extra_fields_and_top_level_preserved": true,
+    "new_entries_only_owned_artifacts": true,
+    "frozen_bytes_preserved": {
+      "adoption/templates/wsl/host.new-distro.json.template": "4395aec846f1d418a55a862cb4db03906d2513d00fa596c190b56641f760f6b0",
+      "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json": "ffbbd654c88cb8c78ddff1174dd2e15f4478cee78fa4d126a7fd16a3661f7c31",
+      "evidence/artifacts/row70-defect-a-20261008/expanded-source-critic.md": "92b7170350d3d923006638c028566db42b33acfe1aa40df6210c7f6b3a379c95"
+    },
+    "runtime_profiles_GPT_MODEL_line": 43,
+    "added_paths": [
+      "evidence/artifacts/new-wsl-install-plan-20261002/NO_START_PORTS.md",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/codebase-memory-ui.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/dagu-coordinator.conf",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/dagu.service",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/docker.service",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-alertmanager.service.example",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-grafana.service.example",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-loki.service.example",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-otel-collector.service.example",
+      "evidence/artifacts/new-wsl-install-plan-20261002/dashboard-default-port-hashes.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/no-start-citation-audit.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/no-start-test-receipt.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/review-wave-1-receipt.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/review-wave-2-receipt.json"
+    ]
+  },
+  "source_record": "NO_START_PORTS.md",
+  "limitations": {
+    "native_target_acceptance": "UNRUN by this lane; NativeHorizonNY operator owns memory-owner no-start/listener/disabled-unit acceptance",
+    "this_wave": "No install.sh, accept.sh, installer, native service, collector or live listener check executed",
+    "earlier_boundary_correction": "See no-start-test-receipt.json and review-wave-1-receipt.json: the early broad legacy run exceeded the local fixture boundary; subsequent runs exclude those harnesses."
+  },
+  "unpublished_originals": [
+    {
+      "name": "review-port-probes.py",
+      "what": "The GPT reader probe used for the retained three-case review check; the public adapter is published separately.",
+      "custody": "Kept privately in the reader work directory. No digest is published."
+    }
+  ]
+}

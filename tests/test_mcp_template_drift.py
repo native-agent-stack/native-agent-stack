@@ -32,6 +32,32 @@ SENTINEL = "SENTINEL-must-never-be-printed"
 SOURCE = "adoption/new-wsl/client-config-map.json"   # any file of this repository: an acknowledgement's source must exist
 
 
+class ExplicitHostTests(unittest.TestCase):
+    def test_cli_refuses_a_missing_host_file_before_account_comparison(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            result = subprocess.run([sys.executable, str(SCRIPT), "--home", str(root),
+                "--claude-json", str(root / "fixture-claude.json"),
+                "--codex-config", str(root / "fixture-codex.toml")], text=True, capture_output=True)
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("--host-file", result.stderr)
+            self.assertNotIn("WSL_DISTRO_NAME", result.stderr)
+
+    def test_host_values_are_complete_and_string_typed_without_value_disclosure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            host = root / "host.json"
+            good = json.loads((ROOT / "adoption/hosts/example.json").read_text())
+            cases = ([SENTINEL], {**good, "WSL_DISTRO_NAME": [SENTINEL]},
+                     {key: value for key, value in good.items() if key != "NS_PORT_GATEWAY"})
+            for values in cases:
+                with self.subTest(shape=type(values).__name__):
+                    host.write_text(json.dumps(values))
+                    with self.assertRaises(drift.DriftError) as caught:
+                        drift.render_files(root, host_file=host)
+                    self.assertNotIn(SENTINEL, str(caught.exception))
+
+
 class DriftTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -39,7 +65,11 @@ class DriftTests(unittest.TestCase):
         cls.home = Path(cls.tmp.name) / "home"
         cls.home.mkdir()
         cls.eco = cls.home / ".local" / "share" / "codex-ecosystem"
-        cls.files = drift.render_files(cls.home)
+        cls.host_file = Path(cls.tmp.name) / "host.json"
+        values = json.loads((ROOT / "adoption/hosts/example.json").read_text())
+        values["WSL_DISTRO_NAME"] = "FixtureDistro"
+        cls.host_file.write_text(json.dumps(values))
+        cls.files = drift.render_files(cls.home, host_file=cls.host_file)
         cls.claude = drift.icp.render_servers(json.loads(cls.files["mcp-servers.json"]), cls.home, cls.eco)
         cls.codex_text = cls.files["codex.config.toml"]
 
@@ -58,7 +88,7 @@ class DriftTests(unittest.TestCase):
 
     def run_tool(self, claude_path, codex_path, *extra):
         out, err = io.StringIO(), io.StringIO()
-        argv = ["--home", str(self.home), "--eco-root", str(self.eco), "--claude-json", str(claude_path), "--codex-config", str(codex_path), *extra]
+        argv = ["--host-file", str(self.host_file), "--home", str(self.home), "--eco-root", str(self.eco), "--claude-json", str(claude_path), "--codex-config", str(codex_path), *extra]
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
             code = drift.main(argv)
         return code, out.getvalue(), err.getvalue()
@@ -89,7 +119,7 @@ class DriftTests(unittest.TestCase):
         self.assertIn(str(self.eco), json.dumps(self.claude), "the Claude commands carry the rendered ecosystem prefix")
         other = Path(self.tmp.name) / "elsewhere"
         other.mkdir()
-        moved = drift.render_files(other)["codex.config.toml"]
+        moved = drift.render_files(other, host_file=self.host_file)["codex.config.toml"]
         self.assertIn(str(other), moved)
         self.assertNotIn(str(self.home), moved)
 
@@ -109,7 +139,7 @@ class DriftTests(unittest.TestCase):
 
     def test_the_authorization_option_adds_the_tool_approval_modes(self):
         plain = tomllib.loads(self.codex_text)["mcp_servers"]
-        approving = tomllib.loads(drift.render_files(self.home, authorization=True)["codex.config.toml"])["mcp_servers"]
+        approving = tomllib.loads(drift.render_files(self.home, authorization=True, host_file=self.host_file)["codex.config.toml"])["mcp_servers"]
         self.assertFalse([n for n, s in plain.items() if "default_tools_approval_mode" in s])
         self.assertTrue([n for n, s in approving.items() if "default_tools_approval_mode" in s])
 
@@ -117,9 +147,9 @@ class DriftTests(unittest.TestCase):
         original = render_config.load_host_values
         with mock.patch.object(drift.new_wsl, "analyse", side_effect=drift.new_wsl.ConfigError("planned failure")):
             with self.assertRaises(drift.DriftError):
-                drift.render_files(self.home)
+                drift.render_files(self.home, host_file=self.host_file)
         self.assertIs(render_config.load_host_values, original)
-        drift.render_files(self.home)
+        drift.render_files(self.home, host_file=self.host_file)
         self.assertIs(render_config.load_host_values, original, "a render that succeeds restores it too")
 
     # ------------------------------------------------------------------ the comparison
@@ -188,7 +218,7 @@ class DriftTests(unittest.TestCase):
         self.assertEqual((code, rows[("codex", "semble")]["fields"]), (1, ["env_vars"]))
 
     def test_the_authorization_option_changes_what_counts_as_the_template(self):
-        approving_text = drift.render_files(self.home, authorization=True)["codex.config.toml"]
+        approving_text = drift.render_files(self.home, authorization=True, host_file=self.host_file)["codex.config.toml"]
         claude_path, codex_path = self.live(codex_text=approving_text)
         code, rows, _ = self.rows(claude_path, codex_path)
         self.assertEqual(code, 1)
@@ -347,7 +377,7 @@ class DriftTests(unittest.TestCase):
             claude_path, codex_path = self.live(codex_text=self.codex_with(lambda servers, field=field: servers["semble"].update({field: secret})))
             for extra in ((), ("--json",)):
                 with self.subTest(field=field, json=bool(extra)):
-                    done = subprocess.run([sys.executable, "-I", str(SCRIPT), "--home", str(self.home), "--eco-root", str(self.eco), "--claude-json", str(claude_path), "--codex-config", str(codex_path), *extra],
+                    done = subprocess.run([sys.executable, "-I", str(SCRIPT), "--host-file", str(self.host_file), "--home", str(self.home), "--eco-root", str(self.eco), "--claude-json", str(claude_path), "--codex-config", str(codex_path), *extra],
                                           capture_output=True, text=True, timeout=180, env={"PATH": os.environ["PATH"], "HOME": str(self.home)})
                     self.assertEqual(done.returncode, 2, done.stderr)
                     for needle in (secret, "S3cret", "x9"):
@@ -392,7 +422,7 @@ class DriftTests(unittest.TestCase):
         self.addCleanup((home / ".codex").chmod, 0o700)
         out, err = io.StringIO(), io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-            code = drift.main(["--home", str(home), "--eco-root", str(self.eco)])
+            code = drift.main(["--host-file", str(self.host_file), "--home", str(home), "--eco-root", str(self.eco)])
         self.assertEqual((code, out.getvalue()), (2, ""))
         self.assertIn("cannot read ~/.codex/config.toml: PermissionError", err.getvalue())
         self.assertNotIn("Traceback", err.getvalue())
@@ -407,7 +437,7 @@ class DriftTests(unittest.TestCase):
                     drift.load_acknowledged(path)
                 err = io.StringIO()
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
-                    code = drift.main(["--home", str(self.home), "--eco-root", str(self.eco), "--acknowledged", str(path)])
+                    code = drift.main(["--host-file", str(self.host_file), "--home", str(self.home), "--eco-root", str(self.eco), "--acknowledged", str(path)])
                 self.assertEqual(code, 2)
                 self.assertNotIn("Traceback", err.getvalue())
         good = self.acknowledgements(self.entry("claude", "semble", "DIFFERS", fields=["args", "env"]))
@@ -472,14 +502,14 @@ class DriftTests(unittest.TestCase):
         shutil.copy(codex_path, self.home / ".codex" / "config.toml")
         out, err = io.StringIO(), io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-            code = drift.main(["--home", str(self.home), "--eco-root", str(self.eco)])
+            code = drift.main(["--host-file", str(self.host_file), "--home", str(self.home), "--eco-root", str(self.eco)])
         self.assertEqual(code, 0, out.getvalue())
         self.assertIn("(~/.claude.json)", out.getvalue())
         self.assertIn("(~/.codex/config.toml)", out.getvalue())
         self.assertNotIn(str(self.home), out.getvalue() + err.getvalue())
         (self.home / ".claude.json").write_text("{", encoding="utf-8")
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
-            self.assertEqual(drift.main(["--home", str(self.home), "--eco-root", str(self.eco)]), 2)
+            self.assertEqual(drift.main(["--host-file", str(self.host_file), "--home", str(self.home), "--eco-root", str(self.eco)]), 2)
         self.assertIn("cannot read ~/.claude.json: JSONDecodeError", err.getvalue())
         self.assertNotIn(str(self.home), err.getvalue())
         outside = self.live()
@@ -546,7 +576,7 @@ class DriftTests(unittest.TestCase):
         ack = self.acknowledgements(self.entry("codex", "hindsight", "LIVE-ONLY"))
         out, err = io.StringIO(), io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-            code = drift.main(["--home", str(self.home), "--eco-root", str(self.eco), "--claude-json", str(claude_path), "--acknowledged", str(ack)])
+            code = drift.main(["--host-file", str(self.host_file), "--home", str(self.home), "--eco-root", str(self.eco), "--claude-json", str(claude_path), "--acknowledged", str(ack)])
         self.assertEqual(code, 0, out.getvalue())
         self.assertIn("codex: no ", out.getvalue())
         self.assertNotIn("STALE-ACK", out.getvalue())
@@ -613,7 +643,7 @@ class DriftTests(unittest.TestCase):
             for extra in ((), ("--json",)):
                 with self.subTest(source=label, json=bool(extra)):
                     path = self.acknowledgements({**self.entry("claude", "x", "LIVE-ONLY"), "source": source})
-                    done = subprocess.run([sys.executable, "-I", str(SCRIPT), "--home", str(self.home), "--eco-root", str(self.eco), "--claude-json", str(claude_path), "--codex-config", str(codex_path),
+                    done = subprocess.run([sys.executable, "-I", str(SCRIPT), "--host-file", str(self.host_file), "--home", str(self.home), "--eco-root", str(self.eco), "--claude-json", str(claude_path), "--codex-config", str(codex_path),
                                            "--acknowledged", str(path), *extra], capture_output=True, text=True, timeout=180, env={"PATH": os.environ["PATH"], "HOME": str(self.home)})
                     self.assertEqual(done.returncode, 2, done.stderr)
                     self.assertEqual(done.stdout, "")
@@ -626,7 +656,7 @@ class DriftTests(unittest.TestCase):
         """The real command as a subprocess with one acknowledgement entry; returns (code, stdout, stderr)."""
         claude_path, codex_path = self.live()
         path = self.acknowledgements(entry)
-        done = subprocess.run([sys.executable, "-I", str(SCRIPT), "--home", str(self.home), "--eco-root", str(self.eco), "--claude-json", str(claude_path), "--codex-config", str(codex_path),
+        done = subprocess.run([sys.executable, "-I", str(SCRIPT), "--host-file", str(self.host_file), "--home", str(self.home), "--eco-root", str(self.eco), "--claude-json", str(claude_path), "--codex-config", str(codex_path),
                                "--acknowledged", str(path), *extra], capture_output=True, text=True, timeout=180, env={"PATH": os.environ["PATH"], "HOME": str(self.home)})
         return done.returncode, done.stdout, done.stderr
 
@@ -757,8 +787,8 @@ class DriftTests(unittest.TestCase):
     def test_the_ecosystem_root_reaches_both_templates(self):
         """Review of 2026-10-12 (Astra, #1034 at 6a7a7ce7): the prefix went to the Claude renderer only, so Codex kept <home>/.local/share/codex-ecosystem (six false DIFFERS rows under another prefix)."""
         custom = Path(self.tmp.name) / "another-prefix" / "ecosystem"
-        default_claude, default_codex = drift.render_templates(self.home, self.eco)
-        claude, codex = drift.render_templates(self.home, custom)
+        default_claude, default_codex = drift.render_templates(self.home, self.eco, host_file=self.host_file)
+        claude, codex = drift.render_templates(self.home, custom, host_file=self.host_file)
 
         def moved(servers):
             return json.loads(json.dumps(servers).replace(str(self.eco), str(custom)))
@@ -778,7 +808,7 @@ class DriftTests(unittest.TestCase):
                 os.environ.update(environment)
                 out, err = io.StringIO(), io.StringIO()
                 with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-                    code = drift.main(["--home", str(self.home), *option, "--claude-json", str(claude_path), "--codex-config", str(codex_path), "--json"])
+                    code = drift.main(["--host-file", str(self.host_file), "--home", str(self.home), *option, "--claude-json", str(claude_path), "--codex-config", str(codex_path), "--json"])
                 data = json.loads(out.getvalue())
                 self.assertEqual([(r["client"], r["name"], r["fields"]) for r in data["rows"] if r["row"] != "SAME"], [], err.getvalue())
                 self.assertEqual(code, 0)
@@ -800,7 +830,7 @@ class DriftTests(unittest.TestCase):
         empty_home = Path(tempfile.mkdtemp(dir=self.tmp.name))
         out, err = io.StringIO(), io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-            code = drift.main(["--home", str(empty_home), "--eco-root", str(self.eco)])
+            code = drift.main(["--host-file", str(self.host_file), "--home", str(empty_home), "--eco-root", str(self.eco)])
         self.assertEqual(code, 0)
         self.assertIn("claude: no ", out.getvalue())
         self.assertIn("codex: no ", out.getvalue())

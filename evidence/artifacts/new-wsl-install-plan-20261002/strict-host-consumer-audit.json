@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-16",
+  "review_request": "186005",
+  "baseline": "58ee5cd49d6d9b19701892b072e22b47ca5889bf",
+  "root_cause": "Consumers continued synthesizing the old nine-field frozen host template after the client renderer began requiring complete service allocations and explicit WSL_DISTRO_NAME.",
+  "search_method": {
+    "graph": "list_projects and check_index_coverage both returned Transport closed. No clean graph-coverage or graph-completeness claim is made.",
+    "fallback": "Repository-root git grep across tracked Python, shell, JSON, TOML and YAML; source/AST inspection of import aliases and calls. New owned regression files were also inspected.",
+    "exact_control": "git grep -nF 'template = (ROOT / new_wsl.HOST_TEMPLATE_REL)' 58ee5cd49 -- tools/adoption/mcp_template_drift.py",
+    "exact_control_hits": 1,
+    "expansion_patterns": [
+      {
+        "pattern": "new_wsl_client_config|\\.host_values\\(|load_host_values\\(",
+        "observed_hits": 227,
+        "paths": 78
+      },
+      {
+        "pattern": "observability_config\\.py|service_ports\\(|load_service_ports\\(|gateway_url\\(",
+        "observed_hits": 194,
+        "paths": 27
+      },
+      {
+        "pattern": "HOST_TEMPLATE_REL|host\\.new-distro\\.json\\.template",
+        "observed_hits": 18,
+        "paths": 13
+      }
+    ],
+    "count_boundary": "Tracked working-tree matches after the prepared consumer repairs and before adding this audit record; counts include non-executable references.",
+    "limits": "Static repository callers only; externally generated programs and operator-owned host files are not audited."
+  },
+  "production_consumers": [
+    {
+      "path": "tools/adoption/new_wsl_client_config.py",
+      "entry_points": [
+        "host_values",
+        "render",
+        "cmd_render",
+        "CLI --apply path",
+        "rendered_name_errors",
+        "rendered_mcp_endpoint_errors"
+      ],
+      "disposition": "Strict contract owner: complete string-map host input; explicit WSL_DISTRO_NAME; full AI_MEMORY_URL allocation; self-checks use completed example host. The remaining frozen-template reader validates the historical F8 collector invariant and does not render a client from those values."
+    },
+    {
+      "path": "tools/adoption/mcp_template_drift.py",
+      "entry_points": [
+        "main",
+        "render_files",
+        "render_templates"
+      ],
+      "severity": "P2",
+      "disposition": "Fixed: required --host-file reaches strict host_values/render; no frozen-template fallback. Existing fixture suite supplies complete host values. Missing CLI argument fails before account comparison."
+    },
+    {
+      "path": "tools/adoption/runtime_profiles.py",
+      "entry_points": [
+        "render_wsl_mcp",
+        "selected_service_ports",
+        "profile_environment",
+        "pi_models",
+        "opencode_provider",
+        "render",
+        "main --wsl-render"
+      ],
+      "severity": "P2",
+      "disposition": "Fixed additional variant: WSL MCP rendering requires explicit NS2604_HOST_FILE and reuses drift's strict render_files; telemetry and both provider constructors resolve current allocated ports, replacing frozen telemetry and import-time gateway selection. GPT_MODEL and existing live citation line numbers remain unchanged."
+    },
+    {
+      "path": "tools/research/gpt_researcher.sh",
+      "entry_points": [
+        "gateway endpoint resolution before env -i"
+      ],
+      "disposition": "Existing correction already uses the plan renderer with explicit NS2604_HOST_FILE or saved allocation before the environment scrub; no incomplete host synthesis."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "entry_points": [
+        "stage_plan_sources",
+        "run_command",
+        "model_server_answers",
+        "commit_allocation"
+      ],
+      "disposition": "Complete explicit/no-start host validation; staged effective allocation preserves unselected owners, all dispatch uses that snapshot, successful completion publishes selected owners only."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "entry_points": [
+        "run_check",
+        "host-file propagation",
+        "rendered external acceptance commands"
+      ],
+      "disposition": "Explicit or saved allocation is loaded by the same renderer; incomplete input is refused. No independent fallback host values are constructed."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "entry_points": [
+        "host-port checks",
+        "snapshot checks",
+        "default source checks"
+      ],
+      "disposition": "Explicit host path uses strict load_service_ports; pure default rendering remains limited to source compatibility checks."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py",
+      "entry_points": [
+        "service_ports",
+        "load_service_ports",
+        "gateway_url",
+        "installation_ports",
+        "main"
+      ],
+      "disposition": "Allocation contract owner. Explicit/saved/no-start inputs require completeness; the pure default-overlay API remains available for source/default compatibility fixtures."
+    },
+    {
+      "path": "observability/ns2604_dashboards.py",
+      "entry_points": [
+        "plan-output port_template"
+      ],
+      "disposition": "Generates named markers from default public dashboard output; consumes no host file and supplies no host fallback."
+    },
+    {
+      "path": "tools/adoption/runtime_acceptance.py",
+      "entry_points": [
+        "profile_environment import",
+        "check direct environment",
+        "check credential-wrapped environment"
+      ],
+      "disposition": "Compatibility caller: both direct checks and credential-wrapped native checks use current strict allocation through profile_environment. Incomplete explicit/saved allocation raises before the native fake is called; retry requires a corrected complete allocation. No production change was needed.",
+      "source": "native-agent-stack@5e3d3c2a501d5adf90891337bd70bf8bbb45d270:tools/adoption/runtime_acceptance.py:22,120,136",
+      "coverage": "tests.test_runtime_profiles.StrictHostConsumerTests.test_runtime_acceptance_uses_current_host_values_for_direct_and_credential_wrapped_checks; native calls and credential routing are faked."
+    }
+  ],
+  "data_inputs": [
+    {
+      "path": "adoption/hosts/example.json",
+      "disposition": "Complete nonsecret example allocation plus explicit distro identity."
+    },
+    {
+      "path": "adoption/new-wsl/templates/codex.config.additions.toml",
+      "disposition": "Required host identity placeholder, no literal distro fallback."
+    },
+    {
+      "path": "adoption/templates/wsl/host.new-distro.json.template",
+      "disposition": "Frozen nine-field historical experiment input; unchanged. Operators must complete a host file before strict installation/rendering. Extension remains DEFERRED."
+    }
+  ],
+  "unrelated_or_nonrendering_matches": [
+    {
+      "paths": [
+        "evidence/artifacts/new-wsl-install-plan-20261002/config/hcom-client-config.py",
+        "evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-codex-env.py",
+        "tools/adoption/codex_home.py"
+      ],
+      "reason": "Import/reference shared map, TOML merge, custody or writer helpers; do not call strict host_values/render."
+    },
+    {
+      "paths": [
+        "tools/adoption/render_config.py",
+        "tools/adoption/render_launchd.py",
+        "tools/adoption/scaffold_repo.py",
+        "tools/adoption/install_claude_profile.py",
+        "tools/sota-convergence/landscape-sweep/build_args.py"
+      ],
+      "reason": "Generic host/template APIs; no strict new-WSL render call. Their other platform contracts are unchanged."
+    },
+    {
+      "paths": [
+        "tools/sota-convergence/extract_layers.py",
+        "evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-client-accept.sh"
+      ],
+      "reason": "Source/documentation references, not strict renderer callers."
+    },
+    {
+      "paths": [
+        "examples/omniroute-codex-sdk/worker.py",
+        "scripts/hooks/secret_path_guard.py",
+        "tests/fixtures/guard_685/a7888d31/secret_path_guard.py",
+        "tests/fixtures/guard_685/f77a35eb2/secret_path_guard.py"
+      ],
+      "reason": "Unrelated gateway_url identifier or command/path policy recognition, not host-allocation loader calls."
+    }
+  ],
+  "fixture_consumers": [
+    {
+      "paths": [
+        "tests/test_new_wsl_client_config.py",
+        "tests/test_install_plan_no_start_ports.py",
+        "tests/pr1180_port_review_probes.py"
+      ],
+      "disposition": "Strict host fixtures use completed example/allocation maps; deliberate missing/invalid inputs assert rejection."
+    },
+    {
+      "paths": [
+        "tests/test_mcp_template_drift.py"
+      ],
+      "disposition": "Updated every render_files/render_templates/CLI caller with an explicit complete fixture host; retains redaction and comparison assertions."
+    },
+    {
+      "paths": [
+        "tests/test_runtime_profiles.py",
+        "tests/test_task_model_routing.py"
+      ],
+      "disposition": "Added real WSL-render, telemetry and both-provider port regressions plus missing-selector refusal; runtime/routing fixtures pass."
+    },
+    {
+      "paths": [
+        "tests/test_install_plan_review_wave3.py"
+      ],
+      "disposition": "New complete-allocation selected-owner, cross-reference and merge-collision fixtures."
+    },
+    {
+      "paths": [
+        "tests/test_new_wsl_definitive_defaults.py",
+        "tests/test_new_wsl_gateway_composition.py",
+        "tests/test_ns2604_dashboards.py",
+        "tests/test_hcom_status.py",
+        "tests/test_observability_writer_identity.py",
+        "tests/test_wsl_new_distro_recipe.py"
+      ],
+      "disposition": "Default-expanded template/source fixtures, strict host checks or historical frozen-template compatibility; not partial host inputs to a strict client render."
+    },
+    {
+      "paths": [
+        "tests/test_bootstrap_full_profile.py",
+        "tests/test_catalog_freshness_runtime.py",
+        "tests/test_codex_worker_lane.py",
+        "tests/test_install_claude_profile.py",
+        "tests/test_secret_path_guard.py"
+      ],
+      "disposition": "Generic host-loader tests or source-policy references; no new strict-client caller."
+    }
+  ],
+  "regression_commands": [
+    "python3 -B -m unittest tests.test_mcp_template_drift",
+    "python3 -B -m unittest tests.test_runtime_profiles.StrictHostConsumerTests",
+    "python3 -B -m unittest tests.test_runtime_profiles tests.test_task_model_routing",
+    "python3 -B -m unittest tests.test_install_plan_no_start_ports tests.test_install_plan_review_wave3"
+  ],
+  "documentation_consumers": [
+    "adoption/platforms/linux-wsl2-new-distro.md",
+    "adoption/templates/wsl/first-boot-checklist.md",
+    "adoption/templates/wsl/stage1-receipt.example.json",
+    "scripts/build_new_wsl_handbook.py",
+    "docs/new-wsl-handbook.md",
+    "docs/new-wsl-handbook.json",
+    "docs/decisions/2026-10-16-new-wsl-host-allocation-addendum.md"
+  ],
+  "fourth_wave_expansion": "GPT fix2 identified runtime_acceptance as a missed indirect caller. It is now explicitly inventoried and covered. CC identified live recipe/checklist/handbook consumers; they use the superseding addendum without rewriting historical decisions.",
+  "review_wave_7": {
+    "request": 196445,
+    "base": "c231aebcc29d70f88aeac0ae92385e25d1b6c241",
+    "policy": "Refuse any requested change to an unselected owner before installation; all runtime consumers must match committed allocation.",
+    "consumer_paths": [
+      {
+        "path": "config/observability_config.py",
+        "calls": [
+          "load_service_ports",
+          "committed_service_ports",
+          "client_service_ports",
+          "gateway_url"
+        ],
+        "disposition": "Shared committed-allocation check; installation/candidate-validation actions explicitly remain staged-request readers."
+      },
+      {
+        "path": "accept.sh",
+        "calls": [
+          "renderer stage without plan-file",
+          "listeners"
+        ],
+        "disposition": "Refuses an explicit host/snapshot conflict before dispatch; no full acceptance script was executed in tests."
+      },
+      {
+        "path": "tools/adoption/new_wsl_client_config.py",
+        "calls": [
+          "host_values",
+          "render"
+        ],
+        "disposition": "Both public paths use client_service_ports against the target home; direct Claude and Codex outputs covered."
+      },
+      {
+        "path": "tools/adoption/mcp_template_drift.py",
+        "calls": [
+          "render_files",
+          "render_templates"
+        ],
+        "disposition": "Delegates to the checked new-WSL host/render APIs; no new production edit needed."
+      },
+      {
+        "path": "tools/adoption/runtime_profiles.py",
+        "calls": [
+          "render_wsl_mcp",
+          "selected_service_ports",
+          "pi_models",
+          "opencode_provider",
+          "profile_environment"
+        ],
+        "disposition": "WSL MCP delegates through drift; provider and telemetry paths use the shared checked loader. Existing live locators preserved."
+      },
+      {
+        "path": "tools/adoption/runtime_acceptance.py",
+        "calls": [
+          "profile_environment"
+        ],
+        "disposition": "Existing direct/credential-wrapped acceptance paths inherit the checked profile environment; fixture tests intercept all native calls."
+      },
+      {
+        "path": "tools/research/gpt_researcher.sh",
+        "calls": [
+          "gateway --consumer-config"
+        ],
+        "disposition": "Installed wrapper uses its rendered native JSON endpoint; no listener ownership snapshot is created."
+      }
+    ],
+    "candidate_only_readers": [
+      "check_plan.py host_port_contract/ss candidate check",
+      "renderer installation stage with plan-file",
+      "renderer installation actions and command parameterization"
+    ],
+    "tests": "tests/test_install_plan_review_wave7.py covers negative conflicts and aligned-success entry points using temporary homes, fake research Config and offline renderer calls.",
+    "search_boundary": "Repository source/AST/grep fallback; graph transport unavailable. No whole-workspace graph completeness claim."
+  }
+}

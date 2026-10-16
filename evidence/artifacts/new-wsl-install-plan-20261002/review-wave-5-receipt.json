@@ -1,0 +1,341 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-16",
+  "before_head": "3a74c27f0c22f96d448998a6279933b935d085bc",
+  "status": "implemented_for_released_fold",
+  "review_names": [
+    "review_output.json",
+    "MICRO-delta-3a74c27f.md",
+    "GPT-VERDICT-3a74c27f0.md"
+  ],
+  "request_event": 187930,
+  "execution_prefix": "systemd-run --user --scope -p CPUWeight=idle --quiet --",
+  "evidence_class": "synthetic",
+  "before": {
+    "portless_flow": {
+      "command": "python3 -B -m unittest tests.test_install_plan_review_wave5.PortlessInstallFlowTests.test_portless_provisioning_allows_rerun_and_later_listener_install -v",
+      "tests": 1,
+      "failures": 1,
+      "exit_code": 1,
+      "production_source": "Unchanged 3a74c27f renderer and extracted copy_config function",
+      "observation": "Docker config copied successfully; portless publication created no snapshot; the next stage refused needs_owner"
+    },
+    "mineru_flow": {
+      "command": "python3 -B -m unittest tests.test_install_plan_review_wave5.MineruInstallFlowTests.test_no_start_models_satisfy_post_install_verification_without_daemon -v",
+      "tests": 1,
+      "failures": 1,
+      "exit_code": 1,
+      "production_source": "Unchanged 3a74c27f MinerU install command and extracted post_install model verification",
+      "observation": "No-start setup returned zero but the actual post-install verification command failed because models had not been downloaded"
+    },
+    "dagu_flow": {
+      "command": "python3 -B -m unittest tests.test_install_plan_review_wave5.DaguInstallFlowTests.test_normal_install_can_rerun_over_its_native_generated_unit -v",
+      "tests": 1,
+      "failures": 1,
+      "exit_code": 1,
+      "production_source": "Unchanged 3a74c27f Dagu command sequence",
+      "observation": "First fake normal install produced the exact pinned native unit; the identical second run refused that unit before provisioning"
+    },
+    "portless_state_directory": {
+      "command": "python3 -B -m unittest tests.test_install_plan_review_wave5.PortlessInstallFlowTests.test_declared_portless_runtime_state_does_not_establish_listener_ownership -v",
+      "tests": 1,
+      "failures": 1,
+      "exit_code": 1,
+      "production_source": "Intermediate wave5 exact-copy recognizer before the opaque state-directory correction",
+      "observation": "Promptfoo's declared native state directory still blocked a subsequent stage"
+    },
+    "CC_delta": {
+      "command": "python3 -B -m unittest tests.test_install_plan_review_wave5.FailedFirstInstallTests tests.test_install_plan_review_wave5.DocumentationFlowTests -v",
+      "tests": 4,
+      "failures": 4,
+      "errors": 0,
+      "exit_code": 1,
+      "observations": [
+        "Same-host retry after the first failed listener-row install refused needs_owner",
+        "Frozen-document check errored in a source export because a PR-only Git object was unavailable",
+        "Recipe and checklist both omitted activation/listener ownership in their immediate after-sign-in instructions"
+      ],
+      "passing_control": "A changed allocation remained refused",
+      "production_source": "The affected stage/retry guard, frozen-document test and two instruction clauses were unchanged from3a74c27f; the earlier local-review corrections were already present."
+    },
+    "exact_copy_controls": {
+      "command": "python3 -B -m unittest tests.test_install_plan_review_wave5.PortlessInstallFlowTests.test_unknown_or_modified_configuration_still_requires_allocation_custody -v",
+      "tests": 1,
+      "failures": 2,
+      "exit_code": 1,
+      "production_source": "Intermediate wave5 recognizer",
+      "observations": [
+        "Newline normalization accepted a non-identical config copy",
+        "A symlinked config root was accepted"
+      ],
+      "correction": "Compare raw copied bytes and refuse a symlinked/non-directory root"
+    },
+    "handbook_privacy": {
+      "command": "python3 -B -m unittest tests.test_new_wsl_handbook_privacy -v",
+      "tests": 2,
+      "failures": 2,
+      "errors": 0,
+      "exit_code": 1,
+      "production_source": "Unchanged3a74c27f publication path plus the earlier stage-order edits",
+      "observations": [
+        "Four complete source-text carriers remained in rendered JSON",
+        "Public authority prose did not identify a paraphrase date"
+      ],
+      "diagnostics": "Counts and code locators only; no source quotation or digest was retained in test fixtures or logs"
+    }
+  },
+  "after": {
+    "focused": {
+      "command": "python3 -B -m unittest tests.test_install_plan_no_start_ports tests.test_install_plan_review_wave3 tests.test_install_plan_review_wave5 tests.test_runtime_profiles.StrictHostConsumerTests tests.test_harbor_currency_contracts",
+      "tests": 106,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0,
+      "new_wave5_tests": 14
+    },
+    "check_plan": {
+      "rows": 84,
+      "commands": 198,
+      "acceptance_entries": 113,
+      "exit_code": 0
+    },
+    "handbook_generation": {
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "exit_code": 0,
+      "outputs_unchanged": false,
+      "receipt_change_required": true,
+      "receipt_grant": 186741,
+      "prior_bindings_and_generation_history_preserved": true,
+      "published_history_preserved": true,
+      "final_bindings_appended": 1,
+      "final_generations_appended": 1,
+      "unpublished_preparation_bindings_not_published": true
+    },
+    "citation_audit": {
+      "pre_edit_matches": 78,
+      "pre_edit_files": 37,
+      "unchanged_line_counts": [
+        "accept.sh"
+      ],
+      "current_anchors_verified": 8,
+      "install_line_delta": 4,
+      "live_Harbor_doc_and_test_repinned": true
+    },
+    "privacy_custody": {
+      "command": "python3 -B -m unittest tests.test_provenance_digest_custody.ProvenanceDigestCustodyTests.test_install_plan_private_probe_has_name_only_custody",
+      "tests": 1,
+      "failures": 0,
+      "exit_code": 0
+    },
+    "validate": {
+      "command": "python3 scripts/validate.py",
+      "status": "passed",
+      "exit_code": 0,
+      "hashed_files": 12158,
+      "components": 71,
+      "profiles": 4,
+      "receipts": 240,
+      "qualification": "Released implementation and registered artifacts; repeated after final receipt recording immediately before commit."
+    },
+    "handbook_tests": {
+      "command": "python3 -B -m unittest tests.test_new_wsl_handbook",
+      "tests": 88,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0
+    },
+    "handbook_privacy": {
+      "command": "python3 -B -m unittest tests.test_new_wsl_handbook_privacy -v",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0,
+      "public_quote_fields": 0,
+      "reviewed_source_text_matches": 0,
+      "coverage": [
+        "Real generator outputs",
+        "Nested synthetic fields and nonmutation/idempotence",
+        "Dated attributed they/them paraphrases",
+        "No quotation marks in the attributed public paraphrases"
+      ]
+    },
+    "projection_contract": {
+      "before_updated_expectations": {
+        "tests": 198,
+        "failures": 3,
+        "errors": 0,
+        "cause": "Two legacy tests required raw record equality, including the expressly paraphrased fields"
+      },
+      "after_targeted_adjustment": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "exit_code": 0
+      },
+      "contract": "An independent test allowlist preserves equality of every non-publication field, including source identity, outcomes and historical fields."
+    },
+    "final_released_suite": {
+      "command": "python3 -B /tmp/install-nostart-safe-tests-velo.py tests.test_install_plan_no_start_ports tests.test_install_plan_review_wave3 tests.test_install_plan_review_wave5 tests.test_runtime_profiles.StrictHostConsumerTests tests.test_harbor_currency_contracts tests.test_new_wsl_handbook_privacy tests.test_new_wsl_handbook",
+      "modules": [
+        "tests.test_install_plan_no_start_ports",
+        "tests.test_install_plan_review_wave3",
+        "tests.test_install_plan_review_wave5",
+        "tests.test_runtime_profiles.StrictHostConsumerTests",
+        "tests.test_harbor_currency_contracts",
+        "tests.test_new_wsl_handbook_privacy",
+        "tests.test_new_wsl_handbook"
+      ],
+      "tests": 198,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 0,
+      "runner": "Native unittest suite execution with TestResult diagnostics restricted to counts, test IDs and code locators; no assertion values are emitted."
+    }
+  },
+  "sources": [
+    {
+      "repository": "https://github.com/opendatalab/MinerU",
+      "pin": "c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+      "file": "mineru/kit/commands/models.py",
+      "lines": "86-116,171-205",
+      "mechanism": "Standalone download/verification bypasses the doclib lifecycle"
+    },
+    {
+      "repository": "https://github.com/opendatalab/MinerU",
+      "pin": "c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+      "file": "mineru/kit/main.py",
+      "lines": "42-54,69-76",
+      "mechanism": "The kit registers model commands separately from service commands"
+    },
+    {
+      "repository": "https://github.com/dagucloud/dagu",
+      "pin": "v2.18.2",
+      "file": "scripts/installer.sh",
+      "lines": "657-675,1630-1637,1666-1698,2180-2184",
+      "mechanism": "User-path defaults, native unit output and service-mode branch"
+    },
+    {
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "pin": "3a74c27f0c22f96d448998a6279933b935d085bc",
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "mechanism": "Declared per-row config_paths and existing portless-row selection; recognition is new repository integration policy"
+    },
+    {
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "pin": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+      "files": [
+        "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
+        "docs/decisions/2026-10-02-new-wsl-client-configuration.md"
+      ],
+      "mechanism": "Public frozen-byte hashes replace a dependency on unreachable PR-only commits in the preservation test"
+    },
+    {
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "pin": "39b3fcaf5bcb96c8a672fb6198972dffd3d9937a",
+      "file": "tests/test_session_relaunch.py",
+      "lines": "660-693",
+      "mechanism": "PublicationSurfaces structural privacy guard without retaining private text"
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector",
+      "pin": "v0.162.0",
+      "files": [
+        "otelcol/flags.go:15,35-37",
+        "otelcol/command.go:31-48"
+      ],
+      "mechanism": "Supported config flag and foreground Collector.Run path"
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-releases",
+      "pin": "v0.162.0",
+      "file": "distributions/otelcol-contrib/manifest.yaml",
+      "lines": "1-10",
+      "mechanism": "Pinned distribution name/version and collector dependency"
+    }
+  ],
+  "preserved_boundaries": [
+    "A portless install cannot publish an initial listener-allocation snapshot",
+    "Unknown listener configuration, modified copies and symlinks still require custody",
+    "Promptfoo state contents are opaque and never decoded by allocation staging",
+    "Dagu preflight checks all units/drop-ins before writes, reloads and vendor invocation",
+    "Normal-mode native-unit recognition does not weaken the no-start unit contract",
+    "Failed MinerU model download cannot proceed into verification or daemon configuration",
+    "Default render behavior and all earlier review-wave regressions remain covered",
+    "First listener installation retains uncommitted intent for same-host retry, separate from the client-visible committed snapshot",
+    "Changed pending intent/allocation cannot publish; successful completion removes the intent record",
+    "Frozen documentation remains checked without Git history and a changed frozen byte still fails",
+    "After-sign-in acceptance waits for operator activation and listener ownership in both live instruction carriers"
+  ],
+  "local_execution_boundary": "Only renderers, extracted commands, disposable fixtures and fakes. No full install.sh/accept.sh, native installers, model download, service activation or target listener acceptance executed.",
+  "native_target_acceptance": "Still owed by native-agent-stack-51 on NativeHorizonNY; no local result claims disabled-unit or listener acceptance on that target.",
+  "prior_full_shards": "Fourth-wave full shard results and baseline controls remain in review-wave-4-receipt.json; they were not rerun for this bounded local preparation.",
+  "manifest_scope_proof": {
+    "base": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+    "changed_existing_entries": 59,
+    "added_entries": 19,
+    "removed_entries": 0,
+    "existing_metadata_changed_only_sha256_and_bytes": true,
+    "top_level_and_extra_fields_preserved": true,
+    "five_frozen_inputs_match_prior_scope_proof": true,
+    "new_additions_since_previous_fold": [
+      "evidence/artifacts/new-wsl-install-plan-20261002/review-wave-5-receipt.json"
+    ],
+    "handbook_outputs_and_append_only_receipt_unchanged": false,
+    "handbook_receipt_current_outputs_updated_and_history_appended_under_grant": 186741,
+    "protected_prefix_counts_in_changed_new_files_and_PR_body": {
+      "7": 0,
+      "8": 0,
+      "12": 0,
+      "16": 0,
+      "64": 0
+    },
+    "protected_metadata_source": "Prior published receipt at58ee5cd49, inspected in memory only; the private original was not opened or hashed."
+  },
+  "fold_gate": "Released by188939;189041 cancels source-evidence follow-up work. One normal fold commit after final required validation; no rebuild, rebase or force push.",
+  "CC_delta_event": 188148,
+  "prior_preparation_validation": {
+    "command": "python3 scripts/validate.py",
+    "status": "passed",
+    "exit_code": 0,
+    "hashed_files": 12158,
+    "components": 71,
+    "profiles": 4,
+    "receipts": 240,
+    "qualification": "Local preparation; repeat after any further findings and before the released fold commit"
+  },
+  "GPT_request_event": 188817,
+  "fold_release_event": 188939,
+  "source_followup_cancelled_event": 189041,
+  "publication_privacy": {
+    "published_main": "5bab63233ef90260bec4a8ee0cec4f5e4431776c",
+    "existing_main_carriers": [
+      {
+        "path": "docs/new-wsl-handbook.json",
+        "count": 4,
+        "lines": [
+          851,
+          933,
+          934,
+          2383
+        ]
+      },
+      {
+        "path": "docs/new-wsl-handbook.md",
+        "complete_carrier_value_matches": 0
+      }
+    ],
+    "source_evidence_and_public_history": "Retained per189041; no source-evidence cleanup PR is scheduled.",
+    "source_files_retained": [
+      "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json"
+    ],
+    "count_scope": "Two explicit quote fields plus the two reviewed embedded prose carriers; this is not a claim that public history was erased.",
+    "retained_source_files_unchanged_from_published_head": true
+  },
+  "GPT_P3_disposition": {
+    "source_pointers": "Fixed: Collector flag/foreground sources and destination() locator467-480; historical locator retained as historical. No runtime-failure claim for citation-only corrections.",
+    "verification": "Source mirrors absent from the review packet, guarded native target acceptance, merged-tree verification and required-context inventory remain separate boundaries. Existing full-shard results are historical; no native startup/installer run was added."
+  }
+}

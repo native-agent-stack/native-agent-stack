@@ -12,7 +12,7 @@ const endpoint = topology.gateway?.endpoint;
 const gpt = topology.pool_fallback?.model;
 const claude = topology.promptfoo?.claude_model;
 // Source: https://nodejs.org/api/url.html#urlhostname and #urlport.
-// This plan owns exactly the loopback gateway on port 21128.
+// This plan owns exactly the loopback gateway on port @PORT_GATEWAY@.
 let url;
 try {
   url = new URL(endpoint);
@@ -20,7 +20,7 @@ try {
   throw new Error('The plan gateway topology must declare its endpoint and distinct GPT/Claude model IDs.');
 }
 if (typeof endpoint !== 'string' || url.protocol !== 'http:' ||
-    url.hostname !== '127.0.0.1' || url.port !== '21128' ||
+    url.hostname !== '127.0.0.1' || (url.port || '80') !== '@PORT_GATEWAY@' ||
     url.pathname !== '/v1' || url.username || url.password || url.search || url.hash ||
     [gpt, claude].some(model => typeof model !== 'string' || !model.trim() ||
       ['your-gpt-model-id', 'your-claude-model-id', 'your-model-id'].includes(model) ||

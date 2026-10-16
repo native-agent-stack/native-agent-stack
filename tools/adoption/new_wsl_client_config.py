@@ -39,8 +39,9 @@ requirement needs, so the shared templates stay what render_config.py and the bo
              confirmation: Claude Code permissions.defaultMode, skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy
              and sandbox_mode, a Codex project's trust_level, and the tool approval mode of a Codex MCP server, which
              also needs its server wired) only with the option. Placeholders
-             are filled by tools/adoption/render_config.py. The telemetry endpoint, the gateway port and AI_MEMORY_BIN
-             (the ai-memory executable the plan's memory-owner row links) come from the install plan; HOST_PATH gains
+             are filled by tools/adoption/render_config.py. The telemetry endpoint and gateway port use the host's
+             NS_PORT_* values through the install plan's renderer. AI_MEMORY_BIN (the executable the memory-owner
+             row links) comes from the install plan; HOST_PATH gains
              the directories of the wired path pieces.
   --write-blocks
              writes adoption/new-wsl/claude-user-instructions.md and codex-user-instructions.md: the two instruction blocks
@@ -96,6 +97,7 @@ import fnmatch
 import json
 import os
 import re
+import runpy
 import shlex
 import shutil
 import stat
@@ -366,14 +368,16 @@ def why_not_installed(slot: str, row: dict) -> str:
 def load_plan(root: Path) -> dict:
     """{rows: {slot: row}, ports: {...}}; each port is read from two files of the plan and the two must agree."""
     base = root / PLAN_REL
+    renderer = runpy.run_path(str(base / "config/observability_config.py"))
+    ports = renderer["service_ports"]()
     rows = {row["slot"]: row for row in read_json(base / "install-plan.json")["owners"]}
-    otel = (base / "config" / "otel.yaml").read_text(encoding="utf-8")
+    otel = renderer["render_ports"]((base / "config" / "otel.yaml").read_text(encoding="utf-8"), ports)
     listening = re.search(r"protocols:\s*\n\s*grpc:\s*\n\s*endpoint:\s*127\.0\.0\.1:(\d+)\s*\n\s*http:\s*\n"
                           r"\s*endpoint:\s*127\.0\.0\.1:(\d+)", otel)
     stated = re.search(r"OTLP grpc/http endpoint=127\.0\.0\.1:(\d+)/(\d+)",
                        rows["otel-collector-contrib"]["service"]["port_setting"])
     # Plain NAME=value lines since the wave-2 gateway ruling (change 12): systemd's EnvironmentFile= drops `export` lines.
-    env = re.search(r"^(?:export )?PORT=(\d+)$", (base / "config" / "omniroute.env.example").read_text(encoding="utf-8"), re.M)
+    env = re.search(r"^(?:export )?PORT=(\d+)$", renderer["render_ports"]((base / "config" / "omniroute.env.example").read_text(encoding="utf-8"), ports), re.M)
     if not (listening and stated and env):
         raise ConfigError("the install plan's collector or gateway port could not be read")
     gateway = rows["gpt-gateway"]["service"]["port"]
@@ -383,7 +387,7 @@ def load_plan(root: Path) -> dict:
     release = re.fullmatch(r"rust-v(\d+\.\d+\.\d+)", rows["codex"]["release"])
     if release is None:
         raise ConfigError(f"the plan's Codex release {rows['codex']['release']!r} is not rust-v<semver>")
-    return {"rows": rows,
+    return {"rows": rows, "port_renderer": str(base / "config/observability_config.py"),
             "ports": {"collector_grpc_port": int(listening.group(1)), "collector_http_port": int(listening.group(2)),
                       "gateway_port": gateway},
             "codex_model": render_config.codex_model_for(release.group(1)),
@@ -1101,6 +1105,8 @@ def substitute(text: str, values: dict, suffix: str) -> str:
 
 def host_values(host: str, plan: dict, home: Path | None, wired_dirs: list) -> dict:
     values = dict(render_config.load_host_values(host))
+    if not isinstance(values.get("WSL_DISTRO_NAME"), str) or not values["WSL_DISTRO_NAME"].strip():
+        raise ConfigError("host value file must explicitly provide WSL_DISTRO_NAME; no distribution default is used")
     if home is not None:
         old, new = values["HOME"].rstrip("/"), str(home).rstrip("/")
         if not old and new:
@@ -1118,7 +1124,11 @@ def host_values(host: str, plan: dict, home: Path | None, wired_dirs: list) -> d
     # shells' set table names, for systemctl --user and rootless Docker (codex.config.additions.toml); a host value file
     # may name another.
     values.setdefault("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
-    values["OTEL_ENDPOINT"] = f"127.0.0.1:{plan['ports']['collector_http_port']}"
+    try:
+        ports = runpy.run_path(plan["port_renderer"])["client_service_ports"](values)
+    except ValueError as error:
+        raise ConfigError(str(error)) from error
+    values["OTEL_ENDPOINT"] = f"127.0.0.1:{ports['OTEL_HTTP']}"
     values["CODEX_MODEL"] = plan["codex_model"]
     if plan.get("ai_memory_bin"):
         values["AI_MEMORY_BIN"] = f"{base}/{plan['ai_memory_bin']}"
@@ -1133,12 +1143,20 @@ def wired_path_dirs(results: list) -> list:
 
 def render(root: Path, results: list, plan: dict, values: dict, manifest: dict | None = None) -> dict:
     """{file name: text} of the wired pieces."""
+    if not isinstance(values.get("WSL_DISTRO_NAME"), str) or not values["WSL_DISTRO_NAME"].strip():
+        raise ConfigError("host value file must explicitly provide WSL_DISTRO_NAME; no distribution default is used")
     wired = {v.piece.key: v for v in results if v.wired}
+    try:
+        host_ports = runpy.run_path(plan["port_renderer"])["client_service_ports"](values)
+    except ValueError as error:
+        raise ConfigError(str(error)) from error
+    ports = {"collector_http_port": host_ports["OTEL_HTTP"], "collector_grpc_port": host_ports["OTEL_GRPC"],
+             "gateway_port": host_ports["GATEWAY"]}
 
     def keep_of(group: str):
         """(the paths of the group's wired pieces, {path: replacement value} for those an entry overrides or rewrites)."""
         kept = [v for v in results if v.wired and v.piece.group == group]
-        replaced = {v.piece.path: apply_rewrites(v.piece.key, v.piece.value, v.entry, plan["ports"])
+        replaced = {v.piece.path: apply_rewrites(v.piece.key, v.piece.value, v.entry, ports)
                     for v in kept if v.entry.raw.get("rewrite")}
         replaced.update({v.piece.path: v.entry.raw["override"] for v in kept if "override" in v.entry.raw})
         return {v.piece.path for v in kept}, replaced
@@ -1431,7 +1449,7 @@ def host_template_note(root: Path, plan: dict) -> str | None:
     plan_port = plan["ports"]["collector_http_port"]
     if match and int(match.group(1)) != plan_port:
         return (f"{HOST_TEMPLATE_REL} carries OTEL_ENDPOINT 127.0.0.1:{match.group(1)}; the plan's collector listens on "
-                f"127.0.0.1:{plan_port} (OTLP/HTTP): --render and --apply use the plan's port")
+                f"127.0.0.1:{plan_port} by default (OTLP/HTTP): --render and --apply use NS_PORT_OTEL_HTTP from the host")
     return None
 
 
@@ -1509,8 +1527,15 @@ def rendered_mcp_endpoint_errors(root: Path) -> list:
         values = host_values(EXAMPLE_HOST, plan, None, wired_path_dirs(results))
         probe_values = dict(values)
         endpoint_keys = sorted(key for key in values if key.endswith(("_URL", "_ENDPOINT", "_HOST")))
-        for index, key in enumerate(endpoint_keys):
-            probe_values[key] = f"127.0.0.2:{30000 + index}"
+        allocated = set(runpy.run_path(plan["port_renderer"])["service_ports"](values, require_complete=True).values())
+        available = (port for port in range(30000, 65536) if port not in allocated)
+        for key in endpoint_keys:
+            # Keep the allocator's loopback contract while varying endpoints;
+            # synthetic probes must not invent collisions or split memory aliases.
+            port = next(available)
+            probe_values[key] = f"127.0.0.1:{port}"
+            if key == "AI_MEMORY_URL" and "NS_PORT_MEMORY" in probe_values:
+                probe_values["NS_PORT_MEMORY"] = str(port)
         before = render(root, results, plan, values, manifest)
         after = render(root, results, plan, probe_values, manifest)
 

@@ -32,13 +32,58 @@ export PATH="$HOME/.local/bin:$PATH"
 export MISE_YES=1
 only=''
 list=false
+NS2604_NO_START=0
+host_file=''
+dagu_service_mode=yes
 while (( $# )); do
   case "$1" in
     --only) (( $# >= 2 )) || { printf 'Missing --only slot.\n' >&2; exit 2; }; only="$2"; shift 2 ;;
     --list) list=true; shift ;;
-    *) printf 'Usage: %s [--only <slot>] [--list]\n' "$0" >&2; exit 2 ;;
+    --no-start) NS2604_NO_START=1; dagu_service_mode=no; shift ;;
+    --host-file) (( $# >= 2 )) || { printf 'Missing --host-file path.\n' >&2; exit 2; }; host_file="$2"; shift 2 ;;
+    *) printf 'Usage: %s [--only <slot>] [--list] [--no-start] [--host-file PATH]\n' "$0" >&2; exit 2 ;;
   esac
 done
+export NS2604_NO_START dagu_service_mode
+config_source_root="$plan_dir/config"
+export config_source_root
+activate_user_unit() {
+  # Source: https://github.com/systemd/systemd/blob/v259/man/systemctl.xml#L880
+  # enable alone schedules future activation; --no-start must do neither.
+  if [[ "${NS2604_NO_START:-0}" != 1 ]]; then systemctl --user enable --now "$@"; fi
+}
+export -f activate_user_unit
+register_service_row() {
+  local slot="$1" unit='' source=''
+  case "$slot" in
+    otel-collector-contrib) unit=ns2604-otel-collector.service ;;
+    prometheus) unit=ns2604-prometheus.service; source="$config_root/$unit" ;;
+    loki) unit=ns2604-loki.service ;;
+    grafana) unit=ns2604-grafana.service ;;
+    alerting) unit=ns2604-alertmanager.service ;;
+    *) return 0 ;;
+  esac
+  if [[ -z "$source" ]]; then
+    python3 "$plan_dir/config/observability_config.py" units --slot "$slot" --config-root "$config_root" \
+      --source-root "$config_source_root" --tools-root "$tool_root" || return "$?"
+    source="$config_root/systemd/$unit"
+  fi
+  local units="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+  install -d -m 0700 -- "$units" || return "$?"
+  if [[ -e "$units/$unit" || -L "$units/$unit" ]]; then
+    if [[ -L "$units/$unit" ]] || ! cmp -s -- "$source" "$units/$unit"; then
+      printf 'needs_owner: existing %s differs from rendered unit; retained.\n' "$unit" >&2
+      return 1
+    fi
+  fi
+  if [[ "$slot" == prometheus ]]; then
+    # Provisioning owns runtime state; the standalone unit renderer remains render-only.
+    # systemd v259 man/systemd.exec.xml:114-125,4757-4760 requires WorkingDirectory before start.
+    install -d -m 0700 -- "${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}/prometheus" || return "$?"
+  fi
+  if [[ ! -e "$units/$unit" ]]; then install -m 0600 -- "$source" "$units/$unit" || return "$?"; fi
+  systemctl --user daemon-reload
+}
 selected() { [[ -z "$only" || "$only" == "$1" ]]; }
 # Planned. Slots the merged manifest leaves split install only when named: the deciding measurement installs them on purpose.
 named() { [[ "$only" == "$1" ]]; }
@@ -82,8 +127,14 @@ fetch_verified() {
 copy_config() {
   # Refresh plan-owned helpers and reviewed rules; preserve operator configuration.
   local name="$1"
+  local config_source_root="${config_source_root:-$plan_dir/config}"
   mkdir -p -- "$(dirname -- "$config_root/$name")"
   case "$name" in
+    grafana.ini)
+      # The Grafana action owns fully rendered paths and its digest ledger.
+      # Source: native-agent-stack@58ee5cd49 config/observability_config.py:507-545,627-644.
+      # Let that writer validate custody before it publishes; raw templates differ on rerun.
+      return ;;
     gpt-gateway-topology.json|gpt-gateway-client-accept.sh|omniroute.service|omniroute-serve.sh|omniroute-lsof-shim-v2.sh|omniroute.service.d/10-show-log.conf)
       # PR #744 composition custody: unfamiliar gateway assets belong to their owner.
       # Known previous plan bytes: 44ac761 and main #713 at 1796303f957c522e78b92667e553c06840fae3a2,
@@ -99,29 +150,33 @@ copy_config() {
           printf 'needs_owner: existing gateway asset %s differs; retained.\n' "$name" >&2
           return 1
         fi
-        if ! cmp -s -- "$plan_dir/config/$name" "$config_root/$name"; then
+        if ! cmp -s -- "$config_source_root/$name" "$config_root/$name"; then
           if [[ -z "$gateway_old_sha" ]] || ! printf '%s  %s\n' "$gateway_old_sha" "$config_root/$name" | sha256sum --check --status; then
             printf 'needs_owner: existing gateway asset %s differs; retained.\n' "$name" >&2
             return 1
           fi
-          install -m 0600 -- "$plan_dir/config/$name" "$config_root/$name"
+          install -m 0600 -- "$config_source_root/$name" "$config_root/$name"
         fi
       else
-        install -m 0600 -- "$plan_dir/config/$name" "$config_root/$name"
+        install -m 0600 -- "$config_source_root/$name" "$config_root/$name"
       fi
       return ;;
   esac
   case "$name" in
     *.sh|*.py|*.rules|*.service|omniroute-canary-evidence.json|acceptance-execution-instructions.txt)
-      if ! cmp -s -- "$plan_dir/config/$name" "$config_root/$name"; then
+      if ! cmp -s -- "$config_source_root/$name" "$config_root/$name"; then
         printf 'Updating plan-owned %s.\n' "$name" >&2
-        install -m 0600 -- "$plan_dir/config/$name" "$config_root/$name"
+        install -m 0600 -- "$config_source_root/$name" "$config_root/$name"
       fi
       return ;;
   esac
   if [[ ! -e "$config_root/$name" ]]; then
-    install -m 0600 -- "$plan_dir/config/$name" "$config_root/$name"
-  elif ! cmp -s -- "$plan_dir/config/$name" "$config_root/$name"; then
+    install -m 0600 -- "$config_source_root/$name" "$config_root/$name"
+  elif ! cmp -s -- "$config_source_root/$name" "$config_root/$name"; then
+    if grep -q '@PORT_' "$plan_dir/config/$name"; then
+      printf 'needs_owner: existing %s differs from the host port render; retained.\n' "$name" >&2
+      return 1
+    fi
     printf 'Existing %s differs; retained. Review loopback settings before starting.\n' "$name" >&2
   fi
 }
@@ -175,6 +230,11 @@ docker_engine_packages() {
   # Planned. docker/docs Ubuntu specific-version recipe:176-177; rootless docs:94.
   local engine_version
   engine_version="$(apt_release_version docker-ce 29.8.2)"
+  # Source: https://github.com/systemd/systemd/blob/v259/man/systemctl.xml#L1129
+  # Docker's Debian postinst can activate the rootful daemon; prevent that too.
+  if [[ "${NS2604_NO_START:-0}" == 1 ]]; then
+    sudo systemctl mask docker.service docker.socket containerd.service
+  fi
   sudo apt-get install -y --no-install-recommends "docker-ce=$engine_version" "docker-ce-cli=$engine_version" \
     "docker-ce-rootless-extras=$engine_version" containerd.io docker-buildx-plugin
 }
@@ -186,7 +246,40 @@ docker_compose_package() {
 }
 run_command() {
   # Planned. Thin Bash dispatcher preserves pipeline/heredoc failures independently of caller context.
-  bash -euo pipefail -c "$1"
+  local program
+  program="$(printf '%s' "$1" | python3 "$plan_dir/config/observability_config.py" command --config-root "$config_root")" || return "$?"
+  program="${program//\$plan_dir\/config/\$config_source_root}"
+  bash -euo pipefail -c "$program"
+}
+stage_plan_sources() {
+  # Normalize explicit selection before any renderer or child command can read an inherited selector.
+  if [[ -n "$host_file" ]]; then
+    host_file="$(realpath -e -- "$host_file")" || return "$?"
+    export NS2604_HOST_FILE="$host_file"
+  fi
+  config_source_root="$(mktemp -d)"
+  config_source_root="$(cd -- "$config_source_root" && pwd)"
+  trap 'rm -rf -- "$config_source_root"' EXIT
+  local port_args=()
+  if [[ -n "$host_file" ]]; then port_args+=(--host-file "$host_file"); fi
+  if [[ -n "${only:-}" ]]; then port_args+=(--slot "$only"); fi
+  python3 "$plan_dir/config/observability_config.py" stage --config-root "$config_root" \
+    --source-root "$plan_dir/config" --output-root "$config_source_root" --plan-file "$plan_dir/install-plan.json" "${port_args[@]}" || return "$?"
+  # Freeze the selected allocation, overriding any inherited host-file selector.
+  export NS2604_HOST_FILE="$config_source_root/.service-ports.json"
+  # Record first-install intent before row writes; failure can retry the same allocation.
+  local begin_args=()
+  if [[ -n "${only:-}" ]]; then begin_args+=(--slot "$only"); fi
+  python3 "$plan_dir/config/observability_config.py" begin-ports --config-root "$config_root" --source-root "$plan_dir/config" --host-file "$NS2604_HOST_FILE" --plan-file "$plan_dir/install-plan.json" "${begin_args[@]}"
+}
+commit_allocation() {
+  # Publish only after every selected row (including dependencies) succeeds.
+  if $needs_execution && (( failed == 0 )); then
+    local selection_args=()
+    if [[ -n "${only:-}" ]]; then selection_args+=(--slot "$only"); fi
+    python3 "$plan_dir/config/observability_config.py" commit-ports --config-root "$config_root" \
+      --host-file "$config_source_root/.service-ports.json" --plan-file "$plan_dir/install-plan.json" "${selection_args[@]}"
+  fi
 }
 interim_acknowledged() {
   # Planned. The gate of amendment 3 of the manifest's decision rule (the wave-2 code-search ruling, change 1: until
@@ -207,18 +300,20 @@ interim_acknowledged() {
   fi
 }
 model_server_answers() {
-  # Planned. The two model rows create their models through the running model server; this plan starts no service (README.md).
-  if ! OLLAMA_HOST=127.0.0.1:21434 ollama ls >/dev/null 2>&1; then
-    printf 'The model server does not answer on 127.0.0.1:21434: start it (README.md, "The two local-model rows"), then run this row again.\n' >&2
+  # This guard probes the selected allocation and never starts the server.
+  local endpoint
+  endpoint="$(printf '%s' '127.0.0.1:21434' | python3 "$plan_dir/config/observability_config.py" command --config-root "$config_root")" || return "$?"
+  if ! OLLAMA_HOST="$endpoint" ollama ls >/dev/null 2>&1; then
+    printf 'The model server does not answer on %s: start it (README.md, "The two local-model rows"), then run this row again.\n' "$endpoint" >&2
     return 1
   fi
   # Planned. Both rows install what was measured on Ollama 0.35.0, so nothing is pulled or created unless the server that
   # answers reports that version; GET /api/version answers the running server's own version (server/routes.go:2023).
   # Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1824
   local version
-  version="$(curl -fsS http://127.0.0.1:21434/api/version | jq -r '.version')" || version=''
+  version="$(curl -fsS "http://$endpoint/api/version" | jq -r '.version')" || version=''
   if [[ "$version" != 0.35.0 ]]; then
-    printf 'The model server on 127.0.0.1:21434 reports version %s, not 0.35.0, the version both model rows were measured on: run the local-model-server row'\''s Ollama 0.35.0 there, then run this row again.\n' "${version:-unknown}" >&2
+    printf 'The model server on %s reports version %s, not 0.35.0, the version both model rows were measured on: run the local-model-server row'\''s Ollama 0.35.0 there, then run this row again.\n' "$endpoint" "${version:-unknown}" >&2
     return 1
   fi
 }
@@ -376,8 +471,8 @@ mineru() {
   run_command 'npm install --global --prefix "$tool_root/skills-1.7.0" skills@1.7.0' || return "$?"
   # Planned. Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files
   run_command 'python3 -B "$repo_root/tools/adoption/install_skills.py" --manifest "$plan_dir/config/mineru-skills-manifest.json" --skills-bin "$tool_root/skills-1.7.0/bin/skills" --json --only mineru' || return "$?"
-  # Source: https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md#L525
-  run_command 'mineru_started=false; if ! mineru server status --json | jq -e '"'"'.running == true'"'"' >/dev/null; then   mineru server start;   mineru_started=true; fi; trap '"'"'if $mineru_started; then mineru server stop; fi'"'"' EXIT; mineru telemetry disable; mineru-kit models download --tier standard; mineru-kit models verify --tier standard; mineru config set parse_server.local.managed_tier standard; mineru config set parse_server.local.mode managed' || return "$?"
+  # Source: https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/mineru/kit/commands/models.py#L86 ; download/verify are daemon-free; README.md:525 retains the managed-mode sequence.
+  run_command 'if [[ "$NS2604_NO_START" != 1 ]]; then mineru_started=false; if ! mineru server status --json | jq -e '"'"'.running == true'"'"' >/dev/null; then   mineru server start;   mineru_started=true; fi; trap '"'"'if $mineru_started; then mineru server stop; fi'"'"' EXIT; mineru telemetry disable; fi; mineru-kit models download --tier standard; mineru-kit models verify --tier standard; if [[ "$NS2604_NO_START" != 1 ]]; then mineru config set parse_server.local.managed_tier standard; mineru config set parse_server.local.mode managed; else printf "MinerU models verified; daemon/managed-mode configuration deferred under --no-start.\\n"; fi' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/opendatalab/MinerU/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/demo/pdfs/demo1.pdf
   run_command 'fetch_verified https://raw.githubusercontent.com/opendatalab/MinerU/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/demo/pdfs/demo1.pdf f3b3be345bf2df8979f2491ca9466e078e4fd1d6a216611faa8566e4c44d474b "$tool_root/mineru/demo1.pdf"' || return "$?"
 }
@@ -462,9 +557,9 @@ memory-owner() {
   # Planned. Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L254 (user-level config and data layout)
   run_command 'if [[ ! -e "$HOME/.config/ai-memory/config.toml" ]]; then mkdir -p "$HOME/.config/ai-memory" "$HOME/.local/share/ai-memory" && ai-memory --data-dir "$HOME/.local/share/ai-memory" --config "$HOME/.config/ai-memory/config.toml" init; fi' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/templates/config.default.toml#L10 (bind; embedding_provider at L99-106); port 29374 per the wave-2 synthesis X5
-  run_command 'f="$HOME/.config/ai-memory/config.toml"; if grep -qx '\''bind = "127.0.0.1:49374"'\'' "$f"; then sed -i '\''s|^bind = "127.0.0.1:49374"$|bind = "127.0.0.1:29374"\nembedding_provider = "local"|'\'' "$f"; fi; grep -qx '\''bind = "127.0.0.1:29374"'\'' "$f"; grep -qx '\''embedding_provider = "local"'\'' "$f"' || return "$?"
+  run_command 'f="$HOME/.config/ai-memory/config.toml"; if grep -qx '\''bind = "127.0.0.1:49374"'\'' "$f"; then sed -i '\''s|^bind = "127.0.0.1:49374"$|bind = "127.0.0.1:29374"|'\'' "$f"; fi; grep -qx '\''bind = "127.0.0.1:29374"'\'' "$f"; if ! grep -Eq '\''^[[:space:]]*embedding_provider[[:space:]]*='\'' "$f"; then sed -i '\''/^bind = "127.0.0.1:29374"$/a embedding_provider = "local"'\'' "$f"; fi; grep -qx '\''embedding_provider = "local"'\'' "$f"' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L277 (systemctl --user enable --now; the unit is packaging/systemd/ai-memory-user.service)
-  run_command 'mkdir -p "$HOME/.config/systemd/user" && sed '\''s|^ExecStart=/usr/bin/ai-memory |ExecStart=%h/.local/bin/ai-memory |'\'' "$HOME/.local/opt/ai-memory-2.5.2/packaging/systemd/ai-memory-user.service" > "$HOME/.config/systemd/user/ai-memory.service" && systemctl --user daemon-reload && systemctl --user enable --now ai-memory.service' || return "$?"
+  run_command 'mkdir -p "$HOME/.config/systemd/user" && sed '\''s|^ExecStart=/usr/bin/ai-memory |ExecStart=%h/.local/bin/ai-memory |'\'' "$HOME/.local/opt/ai-memory-2.5.2/packaging/systemd/ai-memory-user.service" > "$HOME/.config/systemd/user/ai-memory.service" && systemctl --user daemon-reload && activate_user_unit ai-memory.service' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L595 (install-hooks --agent codex --apply; with AI_MEMORY_SERVER_URL set it takes the bare origin, L118-121); https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/install_hooks.rs#L2071 (writes only the Codex hooks.json, with a backup)
   # Codex's seven hooks, written once by ai-memory's own installer: the exception synthesis X11 allows, since the client configuration writes no ~/.codex/hooks.json.
   run_command 'AI_MEMORY_SERVER_URL=http://127.0.0.1:29374 ai-memory install-hooks --agent codex --apply' || return "$?"
@@ -541,7 +636,8 @@ command-output() {
   # Planned. Source: https://github.com/rtk-ai/rtk/blob/v0.51.0/src/core/config.rs (Linux config path); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/recipes/README.md#L163 (the exact five exclusions); copy_config above (preserve existing files).
   run_command 'rtk_config_dir="$HOME/.config/rtk"; if [[ "${XDG_CONFIG_HOME:-}" == /* ]]; then rtk_config_dir="$XDG_CONFIG_HOME/rtk"; fi; mkdir -p -- "$rtk_config_dir"; if [[ ! -e "$rtk_config_dir/config.toml" ]]; then install -m 0600 -- "$plan_dir/config/rtk-config.toml" "$rtk_config_dir/config.toml"; elif ! cmp -s -- "$plan_dir/config/rtk-config.toml" "$rtk_config_dir/config.toml"; then printf "Existing RTK config.toml differs; retained. Review hook exclusions before client configuration.\n" >&2; fi' || return "$?"
   # Planned. Source: https://github.com/rtk-ai/rtk/blob/v0.51.0/src/main.rs#L3072-L3100 (hook check output and exit status); https://github.com/rtk-ai/rtk/blob/v0.51.0/src/discover/registry.rs#L1553-L1582 (exclude_commands). Verify before the client hook can be wired.
-  run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; for command in "git show HEAD:README.md | tail -20" "diff a b" "jq . x.json" "git branch -a"; do rc=0; decision=$(RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" hook check "$command" 2>&1) || rc=$?; [[ "$rc" -eq 1 && "$decision" == "No rewrite for: $command" ]]; done; decision=$(RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" hook check "git status" 2>&1); [[ "$decision" == "rtk git status" ]]' || return "$?"
+  # Source: https://github.com/rtk-ai/rtk/blob/v0.51.0/src/core/config.rs#L299-L307 (suppress the fresh-host missing-hook warning during exact-output checks).
+  run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; for command in "git show HEAD:README.md | tail -20" "diff a b" "jq . x.json" "git branch -a"; do rc=0; decision=$(RTK_TELEMETRY_DISABLED=1 RTK_SUPPRESS_HOOK_WARNING=1 "$e/bin/rtk" hook check "$command" 2>&1) || rc=$?; [[ "$rc" -eq 1 && "$decision" == "No rewrite for: $command" ]]; done; decision=$(RTK_TELEMETRY_DISABLED=1 RTK_SUPPRESS_HOOK_WARNING=1 "$e/bin/rtk" hook check "git status" 2>&1); [[ "$decision" == "rtk git status" ]]' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L133 (rtk init -g --codex: the Codex PreToolUse hook, RTK.md and the AGENTS.md pointer line; idempotent; --uninstall removes all three; --hook-only, --no-patch and --auto-patch are refused with --codex); the hook group is appended after the PreToolUse group of ai-memory's own installer (memory-owner runs earlier), so ai-memory's hook keys keep their group indexes.
   run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; PATH="$e/bin:$PATH" RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" init -g --codex' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/openai/codex/01fc69f4026735edfdf6789820549727a4867b11/codex-rs/tui/src/hooks_rpc.rs#L58-L91 (the /hooks review persists trust with config/batchWrite of hooks.state); codex_hook_trust.py sends that edit for the one user-layer hook whose command is rtk hook codex, at its current hash, and refuses while a codex process runs; first it reviews the user layer's execution-rule files without parsing them and refuses, before the app-server starts, unless each file is on the reviewed list by sha256 (tools/adoption/exec_rules_reviewed.json; rtk --version must match its entry) or is Codex's own allow-only format (docs/decisions/2026-10-04-codex-rtk-hook-qualified.md).
@@ -563,6 +659,9 @@ code-index() {
 }
 
 code-graph() {
+  copy_config 'codebase-memory-ui.json' || return "$?"
+  # Source: https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/ui/config.c#L124
+  run_command 'python3 "$plan_dir/config/observability_config.py" code-graph --config-root "$config_root" --source-root "$plan_dir/config"' || return "$?"
   # codebase-memory-mcp 0.11.0 | release-binary | planned
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04 (the owner's decision, amendment 4), after every recorded run of this plan.
   # Planned. Source: https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/v0.11.0/README.md#L88 (the Linux archive of the release); https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0 (the asset; recipes/README.md records its sha256)
@@ -630,10 +729,11 @@ session-analytics() {
   # Planned. Source: https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/scripts/install.sh#L142; https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/config/config.go#L2051 (owned launcher/placement glue)
   run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; mkdir -p "$e/tools/agentsview-0.44.0" "$e/bin" "$HOME/.local/bin"; for alias in "$e/bin/agentsview" "$HOME/.local/bin/agentsview"; do if [[ -e "$alias" || -L "$alias" ]]; then [[ -L "$alias" && ( "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.44.0/launcher")" || "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.44.0/agentsview")" || "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.43.0/launcher")" || "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.43.0/agentsview")" ) ]] || { printf "Existing agentsview alias belongs to another installation; retained.\n" >&2; exit 1; }; fi; done; tar -xzf "$e/downloads/agentsview-0.44.0/agentsview_0.44.0_linux_amd64.tar.gz" -C "$e/tools/agentsview-0.44.0"; [[ -x "$e/tools/agentsview-0.44.0/agentsview" ]]; install -m 0600 -- "$plan_dir/config/agentsview.sh" "$e/tools/agentsview-0.44.0/launcher"; chmod 0755 "$e/tools/agentsview-0.44.0/launcher"; ln -sfn "$e/tools/agentsview-0.44.0/launcher" "$e/bin/agentsview"; ln -sfn "$e/tools/agentsview-0.44.0/launcher" "$HOME/.local/bin/agentsview"' || return "$?"
   # Planned. Source: https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/config/config.go#L2051 (owned archive config)
-  run_command 'd="${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/agentsview"; install -d -m 0700 "$d"; if [[ ! -e "$d/config.toml" ]]; then install -m 0600 -- "$plan_dir/config/agentsview.toml" "$d/config.toml"; elif ! cmp -s "$plan_dir/config/agentsview.toml" "$d/config.toml"; then printf "Existing agentsview config retained; review local archive settings before starting.\n" >&2; fi' || return "$?"
+  run_command 'd="${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/agentsview"; install -d -m 0700 "$d"; if [[ -L "$d/config.toml" ]]; then printf "needs_owner: existing agentsview config is a symlink; retained.\n" >&2; exit 1; elif [[ ! -e "$d/config.toml" ]]; then install -m 0600 -- "$plan_dir/config/agentsview.toml" "$d/config.toml"; elif ! cmp -s "$plan_dir/config/agentsview.toml" "$d/config.toml"; then printf "needs_owner: existing agentsview config differs from the host port render; retained.\n" >&2; exit 1; fi' || return "$?"
 }
 
 otel-collector-contrib() {
+  copy_config 'ns2604-otel-collector.service.example' || return "$?"
   # OTel Collector Contrib | release-binary | planned
   # Planned. Source: https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/9f912d59a165ded5dec82d0e1a94c2aef54e5c57/content/en/docs/collector/install/binary/linux.md#L87
   run_command 'fetch_verified '\''https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.tar.gz'\'' '\''fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3'\'' "$tool_root/otel-collector-contrib/otelcol-contrib_0.162.0_linux_amd64.tar.gz"' || return "$?"
@@ -666,6 +766,7 @@ prometheus() {
 }
 
 alerting() {
+  copy_config 'ns2604-alertmanager.service.example' || return "$?"
   # Alertmanager | release-binary | planned
   # Planned. Source: https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/README.md#L14
   run_command 'fetch_verified '\''https://github.com/prometheus/alertmanager/releases/download/v0.34.1/alertmanager-0.34.1.linux-amd64.tar.gz'\'' '\''265b9d1e55ef0d5306a436018af6d2b686c2ce051f03d968f7464ecb1372a7e8'\'' "$tool_root/alertmanager/alertmanager-0.34.1.linux-amd64.tar.gz"' || return "$?"
@@ -687,6 +788,7 @@ alerting() {
 }
 
 loki() {
+  copy_config 'ns2604-loki.service.example' || return "$?"
   # Loki | release-binary | measurement-only
   # Planned. Source: https://raw.githubusercontent.com/grafana/loki/v3.7.8/tools/release-note.md#L24
   run_command 'fetch_verified '\''https://github.com/grafana/loki/releases/download/v3.7.8/loki-linux-amd64.zip'\'' '\''62aea42c9cba52cd1642b3666ab37019a0ce4c24ab50b07e85dccc8d812f7d61'\'' "$tool_root/loki/loki-linux-amd64.zip"' || return "$?"
@@ -698,6 +800,7 @@ loki() {
 }
 
 grafana() {
+  copy_config 'ns2604-grafana.service.example' || return "$?"
   # Grafana | release-binary | measurement-only
   # Planned. Source: https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux
   run_command 'fetch_verified '\''https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz'\'' '\''6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235'\'' "$tool_root/grafana/grafana_13.2.3_36482603486_linux_amd64.tar.gz"' || return "$?"
@@ -719,10 +822,10 @@ grafana() {
   copy_config 'ns2604-research-progress.service' || return "$?"
   copy_config 'ns2604-research-progress.timer' || return "$?"
   # Native configuration format. Source: https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/administration/provisioning/index.md#L324
-  run_command 'NS2604_OBSERVABILITY_DATA="${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}" python3 "$config_root/observability_config.py" grafana --config-root "$config_root" --source-root "$plan_dir/config"' || return "$?"
+  run_command 'NS2604_OBSERVABILITY_DATA="${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}" python3 "$config_root/observability_config.py" grafana --config-root "$config_root" --source-root "$plan_dir/config" --repo-root "$repo_root"' || return "$?"
   # The research dashboard's Dagu-history emitter: install the rendered user units and start the timer.
   # Source: https://www.freedesktop.org/software/systemd/man/latest/systemctl.html
-  run_command 'units="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user" && install -d -m 0700 -- "$units" && install -m 0600 -- "$config_root/systemd/ns2604-research-progress.service" "$config_root/systemd/ns2604-research-progress.timer" "$units/" && systemctl --user daemon-reload && systemctl --user enable --now ns2604-research-progress.timer' || return "$?"
+  run_command 'units="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user" && install -d -m 0700 -- "$units" && install -m 0600 -- "$config_root/systemd/ns2604-research-progress.service" "$config_root/systemd/ns2604-research-progress.timer" "$units/" && systemctl --user daemon-reload && activate_user_unit ns2604-research-progress.timer' || return "$?"
 }
 
 local-model-server() {
@@ -736,7 +839,7 @@ local-model-server() {
   # Planned. Source: https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/linux.mdx#L57 (user-unit adaptation; D-ollama).
   run_command 'ollama_unit_path="$HOME/.config/systemd/user/ollama.service"; if [[ -L "$ollama_unit_path" ]] || { [[ -e "$ollama_unit_path" ]] && ! cmp -s -- "$config_root/ollama.service" "$ollama_unit_path"; }; then   printf '\''needs_owner: retained differing Ollama unit.\n'\'' >&2;   exit 3; fi; install -d -m 0700 -- "$HOME/.config/systemd/user" && install -m 0600 -- "$config_root/ollama.service" "$ollama_unit_path"' || return "$?"
   # Planned. Source: https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/linux.mdx#L88 (native user-unit startup adaptation).
-  run_command 'systemctl --user daemon-reload && systemctl --user enable --now ollama.service' || return "$?"
+  run_command 'systemctl --user daemon-reload && activate_user_unit ollama.service' || return "$?"
 }
 
 local-generation-model() {
@@ -826,8 +929,17 @@ actionlint-kjanat() {
 
 dagu() {
   # Dagu | native-installer | planned
+  # Source: https://github.com/dagucloud/dagu/blob/v2.18.2/scripts/installer.sh#L1666 ; preflight custody before any configuration write/reload.
+  run_command 'native_dagu_unit() { printf "%s\n" "[Unit]" "Description=Dagu Workflow Engine" "After=network.target" "Wants=network-online.target" "" "[Service]" "Type=simple" "ExecStart=${DAGU_INSTALL_DIR:-$HOME/.local/bin}/dagu start-all" "WorkingDirectory=$HOME/.dagu" "EnvironmentFile=$HOME/.config/dagu/dagu.env" "EnvironmentFile=-$HOME/.config/dagu/bootstrap.env" "Restart=always" "RestartSec=10" "" "[Install]" "WantedBy=default.target"; }; unit="$HOME/.config/systemd/user/dagu.service"; if [[ -L "$unit" ]] || { [[ -e "$unit" ]] && ! cmp -s -- "$plan_dir/config/dagu.service" "$unit" && { [[ "$NS2604_NO_START" == 1 ]] || ! cmp -s -- <(native_dagu_unit) "$unit"; }; }; then printf "needs_owner: existing Dagu unit differs; retained before provisioning.\n" >&2; exit 1; fi; for drop in "$HOME/.config/systemd/user/dagu.service.d"/*.conf; do [[ -e "$drop" || -L "$drop" ]] || continue; if [[ -L "$drop" || "$drop" != "$HOME/.config/systemd/user/dagu.service.d/20-ns2604-coordinator.conf" ]] || ! cmp -s -- "$plan_dir/config/dagu-coordinator.conf" "$drop"; then printf "needs_owner: existing Dagu drop-in differs; retained before provisioning.\n" >&2; exit 1; fi; done' || return "$?"
+  copy_config 'dagu-coordinator.conf' || return "$?"
+  # Source: https://github.com/dagucloud/dagu/blob/v2.18.2/internal/cmn/config/loader.go#L2266
+  # Source: https://github.com/systemd/systemd/blob/v259/man/systemd.unit.xml#L198
+  run_command 'drop="$HOME/.config/systemd/user/dagu.service.d/20-ns2604-coordinator.conf"; if [[ -L "$drop" ]] || { [[ -e "$drop" ]] && ! cmp -s -- "$config_root/dagu-coordinator.conf" "$drop"; }; then printf "needs_owner: existing Dagu coordinator drop-in differs; retained.\n" >&2; exit 1; fi; mkdir -p "$HOME/.config/systemd/user/dagu.service.d"; install -m 0600 "$config_root/dagu-coordinator.conf" "$drop"; systemctl --user daemon-reload' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/README.md#L105
-  run_command 'curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh | bash -s -- --version v2.18.2 --no-prompt --service yes --service-scope user --host 127.0.0.1 --port 21080 --open-browser no' || return "$?"
+  run_command 'curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh | bash -s -- --version v2.18.2 --no-prompt --service "$dagu_service_mode" --service-scope user --host 127.0.0.1 --port 21080 --open-browser no' || return "$?"
+  copy_config 'dagu.service' || return "$?"
+  # Source: https://github.com/dagucloud/dagu/blob/v2.18.2/scripts/installer.sh#L1666
+  run_command 'if [[ "$NS2604_NO_START" == 1 ]]; then mkdir -p "$HOME/.config/systemd/user" "$HOME/.dagu"; unit="$HOME/.config/systemd/user/dagu.service"; if [[ -L "$unit" ]] || { [[ -e "$unit" ]] && ! cmp -s -- "$config_root/dagu.service" "$unit"; }; then printf "needs_owner: existing Dagu unit differs from the host port render; retained.\n" >&2; exit 1; fi; for drop in "$HOME/.config/systemd/user/dagu.service.d"/*.conf; do [[ -e "$drop" || -L "$drop" ]] || continue; if [[ -L "$drop" || "$drop" != "$HOME/.config/systemd/user/dagu.service.d/20-ns2604-coordinator.conf" ]] || ! cmp -s -- "$config_root/dagu-coordinator.conf" "$drop"; then printf "needs_owner: existing Dagu environment drop-in is not the rendered coordinator configuration; retained.\n" >&2; exit 1; fi; done; if [[ ! -e "$unit" ]]; then install -m 0600 "$config_root/dagu.service" "$unit"; fi; systemctl --user daemon-reload; fi' || return "$?"
 }
 
 docker-compose() {
@@ -845,11 +957,14 @@ container-engine() {
   # Planned. Source: https://raw.githubusercontent.com/docker/docs/dd2797b84208848765705a1518aeee7e47907bd7/content/manuals/engine/install/ubuntu.md#L122
   run_command 'docker_engine_packages' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/docker/docs/dd2797b84208848765705a1518aeee7e47907bd7/content/manuals/engine/install/ubuntu.md#L122
-  run_command 'sudo systemctl disable --now docker.service docker.socket' || return "$?"
+  run_command 'if [[ "$NS2604_NO_START" != 1 ]]; then sudo systemctl disable --now docker.service docker.socket; fi' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/docker/docs/dd2797b84208848765705a1518aeee7e47907bd7/content/manuals/engine/install/ubuntu.md#L122
-  run_command 'if [[ ! -f "$HOME/.config/systemd/user/docker.service" ]]; then dockerd-rootless-setuptool.sh install; fi' || return "$?"
+  run_command 'if [[ "$NS2604_NO_START" != 1 && ! -f "$HOME/.config/systemd/user/docker.service" ]]; then dockerd-rootless-setuptool.sh install; fi' || return "$?"
+  copy_config 'docker.service' || return "$?"
+  # Source: https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/contrib/dockerd-rootless-setuptool.sh#L334
+  run_command 'if [[ "$NS2604_NO_START" == 1 && ! -e "$HOME/.config/systemd/user/docker.service" ]]; then mkdir -p "$HOME/.config/systemd/user"; install -m 0600 "$config_root/docker.service" "$HOME/.config/systemd/user/docker.service"; fi; systemctl --user daemon-reload' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/docker/docs/dd2797b84208848765705a1518aeee7e47907bd7/content/manuals/engine/install/ubuntu.md#L122
-  run_command 'systemctl --user enable --now docker.service' || return "$?"
+  run_command 'activate_user_unit docker.service' || return "$?"
 }
 
 betterleaks() {
@@ -961,7 +1076,7 @@ research-gpt-researcher() {
   # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files (this PR: tools/research/gpt_researcher.sh:27)
   run_command '(cd "$tool_root/gpt-researcher" && uv pip install --python .venv/bin/python -r requirements.txt)' || return "$?"
   # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files (this PR: tools/research/gpt_researcher.sh:27)
-  run_command 'install -d -m 0700 -- "$config_root" && install -m 0700 -- "$repo_root/tools/research/gpt_researcher.sh" "$config_root/gpt-researcher.sh" && install -m 0600 -- "$repo_root/tools/research/gpt-researcher.config.json" "$config_root/gpt-researcher.config.json"' || return "$?"
+  run_command 'install -d -m 0700 -- "$config_root" && install -m 0700 -- "$repo_root/tools/research/gpt_researcher.sh" "$config_root/gpt-researcher.sh" && python3 "$plan_dir/config/observability_config.py" research --config-root "$config_root" --source-root "$repo_root/tools/research"' || return "$?"
 }
 
 research-deer-flow() {
@@ -980,6 +1095,7 @@ research-deer-flow() {
 }
 
 research-harnesses() {
+  copy_config 'observability_config.py' || return "$?"
   copy_config 'gateway-effort-accept.py' || return "$?"
   # Planned. Keep both independent owners even when one installation fails.
   local status=0
@@ -1144,6 +1260,9 @@ esac
 # Planned. Two acceptance checks change into repo_root, so the plan runs from a checkout of the repository (README.md); --list needs none.
 [[ -e "$repo_root/.git" ]] || { printf 'Run this plan from a checkout of the repository: %s is not a git checkout (see README.md).\n' "$repo_root" >&2; exit 1; }
 
+# Resolve every port before package changes, then stage only public repository templates.
+stage_plan_sources
+
 # Planned. Package prerequisites, then mise/runtimes, user CLIs, containers, services.
 needs_execution=false
 needs_runtime=false
@@ -1182,7 +1301,7 @@ if selected betterleaks; then betterleaks_test_toolchain; fi
 failed=0
 run_slot() {
   local slot="$1" rc=0
-  if "$slot"; then rc=0; else rc=$?; failed=1; fi
+  if "$slot" && register_service_row "$slot"; then rc=0; else rc=$?; failed=1; fi
   last_rc="$rc"
   printf '%s | install | %s\n' "$slot" "$rc"
 }
@@ -1273,4 +1392,5 @@ if selected 'lm-program-optimization'; then run_slot 'lm-program-optimization'; 
 if selected 'skill-vetting'; then run_slot 'skill-vetting'; fi
 if selected 'trajectory-analysis'; then run_slot 'trajectory-analysis'; fi
 if named 'mcp-protocol-conformance'; then run_slot 'mcp-protocol-conformance'; elif selected 'mcp-protocol-conformance'; then printf '%s | install | skipped\n' 'mcp-protocol-conformance'; fi
+commit_allocation || failed=1
 exit "$failed"

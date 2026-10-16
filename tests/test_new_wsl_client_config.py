@@ -247,7 +247,8 @@ class Round2RepairIntegrationTests(unittest.TestCase):
                                    "copy_config hcom-client-config.py\ncopy_config deer-flow-config.yaml"],
                                   env={"PATH": os.environ["PATH"], "config_root": str(config),
                                        "plan_dir": str(PLAN)}, capture_output=True, text=True)
-            self.assertEqual(done.returncode, 0, done.stderr)
+            self.assertEqual(done.returncode, 1, done.stderr)
+            self.assertIn("needs_owner:", done.stderr)
             self.assertEqual(helper.read_bytes(), (PLAN / "config/hcom-client-config.py").read_bytes())
             self.assertEqual(operator.read_text(), "# operator choice\n")
 
@@ -626,7 +627,9 @@ class ObservabilityMigrationRepairTests(unittest.TestCase):
                         env=env, capture_output=True, text=True, timeout=10)
                     if case == "known":
                         self.assertEqual(result.returncode, 0, result.stderr)
-                        self.assertEqual(target.read_text(), (PLAN / "config" / name).read_text())
+                        renderer = Round2RepairIntegrationTests.source_module("observability_config.py")
+                        self.assertEqual(target.read_text(), renderer.render_ports(
+                            (PLAN / "config" / name).read_text(), renderer.service_ports()))
                         self.assertEqual(json.loads(ledger_path.read_text())[name],
                                          hashlib.sha256(target.read_bytes()).hexdigest())
                     else:
@@ -1051,6 +1054,7 @@ def make_catalog(tmp: Path) -> Path:
     files = [cfg.MAP_REL, cfg.MANIFEST_REL, cfg.BOOTSTRAP_REL, cfg.HOST_TEMPLATE_REL, *cfg.TEMPLATES.values(),
              *cfg.TEMPLATE_ADDITIONS.values(), *cfg.BLOCK_TEXT_REL.values(), *cfg.GENERATED_BLOCKS.values(), f"{cfg.PLAN_REL}/install-plan.json",
              f"{cfg.PLAN_REL}/config/otel.yaml", f"{cfg.PLAN_REL}/config/omniroute.env.example",
+             f"{cfg.PLAN_REL}/config/observability_config.py",
              cfg.SKILLS_MANIFEST_REL, cfg.managed_block.RTK_AWARENESS_REL]
     # The dated records that the map's `directive` fields name: --check requires each to be a file of the checkout.
     files += sorted({entry["directive"] for entry in json.loads((ROOT / cfg.MAP_REL).read_text(encoding="utf-8"))["entries"]
@@ -1130,11 +1134,9 @@ def foundation_rows() -> dict:
 
 def plan_ports() -> dict:
     """The plan's ports as the plan's own files state them, read without the tool."""
-    otel = (PLAN / "config" / "otel.yaml").read_text()
-    http = re.search(r"http:\s*\n\s*endpoint: 127\.0\.0\.1:(\d+)", otel).group(1)
-    grpc = re.search(r"grpc:\s*\n\s*endpoint: 127\.0\.0\.1:(\d+)", otel).group(1)
-    rows = {row["slot"]: row for row in json.loads((PLAN / "install-plan.json").read_text())["owners"]}
-    return {"http": int(http), "grpc": int(grpc), "gateway": rows["gpt-gateway"]["service"]["port"]}
+    host = json.loads((ROOT / "adoption/hosts/example.json").read_text())
+    return {"http": int(host["NS_PORT_OTEL_HTTP"]), "grpc": int(host["NS_PORT_OTEL_GRPC"]),
+            "gateway": int(host["NS_PORT_GATEWAY"])}
 
 
 class MapTests(unittest.TestCase):
@@ -1818,21 +1820,20 @@ class RenderTests(unittest.TestCase):
         self.assertTrue(any(f'bind = "{host["AI_MEMORY_URL"]}"' in command for command in memory["commands"]),
                         memory["commands"])
 
-    def test_the_render_follows_the_plan_and_refuses_a_plan_that_states_a_port_twice(self):
+    def test_the_render_follows_the_host_and_refuses_a_plan_that_states_a_port_twice(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
             base = root / cfg.PLAN_REL
-            otel = base / "config" / "otel.yaml"
-            otel.write_text(otel.read_text().replace("21318", "21999"), encoding="utf-8")
-            edit_json(base / "install-plan.json", lambda d: next(r for r in d["owners"] if r["slot"] ==
-                      "otel-collector-contrib")["service"].update(port_setting=next(
-                          r for r in d["owners"] if r["slot"] == "otel-collector-contrib")["service"][
-                              "port_setting"].replace("21318", "21999")))
             results, _, plan, errors, _ = cfg.analyse(root)
             self.assertEqual(errors, [])
-            files = cfg.render(root, results, plan, cfg.host_values(EXAMPLE_HOST, plan, None, []))
+            host = render_config.load_host_values(EXAMPLE_HOST)
+            host.update(NS_PORT_OTEL_HTTP="21999", NS_PORT_GATEWAY="21998")
+            with mock.patch.object(render_config, "load_host_values", return_value=host):
+                values = cfg.host_values(EXAMPLE_HOST, plan, None, [])
+            files = cfg.render(root, results, plan, values)
             self.assertEqual(json.loads(files["settings.json"])["env"]["OTEL_EXPORTER_OTLP_ENDPOINT"],
                              "http://127.0.0.1:21999")
+            self.assertIn("127.0.0.1:21998/v1", files["codex.omniroute.config.toml"])
             # The plan's two statements of a port then differ: the tool refuses to choose.
             (base / "config" / "omniroute.env.example").write_text("export PORT=21129\n", encoding="utf-8")
             with self.assertRaises(cfg.ConfigError):

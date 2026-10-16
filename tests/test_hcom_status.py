@@ -1,6 +1,7 @@
 """Metadata bridge contract; local synthetic inputs, not upstream acceptance."""
 import importlib.util
 import json
+import runpy
 from pathlib import Path
 import subprocess
 import sys
@@ -58,7 +59,9 @@ class HcomStatusTests(unittest.TestCase):
         self.assertNotIn('description', rows[0])
 
     def test_installed_unit_template_passes_no_identity(self):
-        command = next(line for line in UNIT.read_text().splitlines() if 'hcom_status.py' in line)
+        renderer = runpy.run_path(str(UNIT.parent / 'observability_config.py'))
+        command = next(line for line in renderer['render_ports'](UNIT.read_text(), renderer['service_ports']()).splitlines()
+                       if 'hcom_status.py' in line)
         self.assertNotIn('--name', command)
         self.assertIn('--push', command)
         self.assertIn('--otlp-url http://127.0.0.1:21318/v1/metrics', command)

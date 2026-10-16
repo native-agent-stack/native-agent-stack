@@ -20,7 +20,7 @@
     {
       "type": "link",
       "title": "agentsview sessions",
-      "url": "http://127.0.0.1:21808",
+      "url": "http://127.0.0.1:@PORT_AGENTSVIEW@",
       "targetBlank": true
     },
     {
@@ -38,7 +38,7 @@
     {
       "type": "link",
       "title": "Gateway usage",
-      "url": "http://127.0.0.1:21128/dashboard/analytics",
+      "url": "http://127.0.0.1:@PORT_GATEWAY@/dashboard/analytics",
       "targetBlank": true
     }
   ],
@@ -74,7 +74,7 @@
       "title": "Command center",
       "options": {
         "mode": "markdown",
-        "content": "One view of every lane and worker from the platforms' own data: Codex lanes and Claude sessions (OTel Collector to Loki and Prometheus), hcom status records, runtime workers that export OTLP, and OmniRoute routing spans. **No data** or **\u2014** means the source sent nothing in the window, never zero use. Claude sessions without `ecosystem.lane` show as **unattributed**; peer Claude sessions and subagents that share a coordinator's writer appear only through `query_source` and `subagent_type`.\n\nSession level: [agentsview](http://127.0.0.1:21808) (`/sessions/<agent>/<session id>`) \u00b7 [Lanes](/d/cc-lanes) \u00b7 [Native agent ecosystem](/d/ecosystem-native) \u00b7 [Token layer](/d/token-layer) \u00b7 [Gateway usage](http://127.0.0.1:21128/dashboard/analytics) \u00b7 [Coverage and gaps](https://github.com/native-agent-stack/native-agent-stack/blob/main/docs/decisions/2026-10-13-command-center-god-view.md)"
+        "content": "One view of every lane and worker from the platforms' own data: Codex lanes and Claude sessions (OTel Collector to Loki and Prometheus), hcom status records, runtime workers that export OTLP, and OmniRoute routing spans. **No data** or **\u2014** means the source sent nothing in the window, never zero use. Claude sessions without `ecosystem.lane` show as **unattributed**; peer Claude sessions and subagents that share a coordinator's writer appear only through `query_source` and `subagent_type`.\n\nSession level: [agentsview](http://127.0.0.1:@PORT_AGENTSVIEW@) (`/sessions/<agent>/<session id>`) \u00b7 [Lanes](/d/cc-lanes) \u00b7 [Native agent ecosystem](/d/ecosystem-native) \u00b7 [Token layer](/d/token-layer) \u00b7 [Gateway usage](http://127.0.0.1:@PORT_GATEWAY@/dashboard/analytics) \u00b7 [Coverage and gaps](https://github.com/native-agent-stack/native-agent-stack/blob/main/docs/decisions/2026-10-13-command-center-god-view.md)"
       },
       "id": 1,
       "gridPos": {

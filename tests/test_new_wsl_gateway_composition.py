@@ -14,6 +14,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import runpy
 from pathlib import Path
 import shlex
 import shutil
@@ -41,6 +42,11 @@ def gateway_row():
     return next(row for row in data["owners"] if row["slot"] == "gpt-gateway")
 
 
+def config_text(name):
+    renderer = runpy.run_path(str(PLAN / "config/observability_config.py"))
+    return renderer["render_asset"](name, (PLAN / "config" / name).read_text(), renderer["service_ports"]())
+
+
 def checker_module():
     spec = importlib.util.spec_from_file_location("j744_check_plan", PLAN / "check_plan.py")
     module = importlib.util.module_from_spec(spec)
@@ -64,7 +70,7 @@ class GatewayCompositionSources(unittest.TestCase):
         for name, size, digest in (("omniroute-serve.sh", 1289, WRAPPER_SHA),
                                    ("omniroute-lsof-shim-v2.sh", 1369, SHIM_SHA)):
             with self.subTest(asset=name):
-                content = (PLAN / "config" / name).read_bytes()
+                content = config_text(name).encode()
                 self.assertEqual((len(content), hashlib.sha256(content).hexdigest()), (size, digest))
         self.assertEqual((PLAN / "config/omniroute-lsof-shim-v2.sh").read_bytes(),
                          (ROOT / "evidence/artifacts/omniroute-sol-max-20260930/scripts/lsof-shim-v2.sh.txt").read_bytes())
@@ -89,7 +95,7 @@ class GatewayCompositionSources(unittest.TestCase):
             self.assertNotIn("omniroute-canary-check.py", entry["command"])
 
     def test_wrapper_unit_drop_in_and_explicit_route_agree_with_the_map(self):
-        topology = json.loads((PLAN / "config/gpt-gateway-topology.json").read_text())
+        topology = json.loads(config_text("gpt-gateway-topology.json"))
         route = topology["pool_fallback"]
         self.assertEqual((route["model"], route["model_reasoning_effort"], route["base_url"]),
                          ("cx/gpt-6.1-sol-max", "max", "http://127.0.0.1:21128/v1"))
@@ -101,7 +107,7 @@ class GatewayCompositionSources(unittest.TestCase):
         self.assertEqual(overrides["codex/omniroute/web_search"], "disabled")
         self.assertFalse(overrides["codex/omniroute/features.standalone_web_search"])
         self.assertFalse(overrides["codex/omniroute/model_providers.omniroute.supports_standalone_web_search"])
-        script = (PLAN / "config/gpt-gateway-client-accept.sh").read_text()
+        script = config_text("gpt-gateway-client-accept.sh")
         invocation = script.split("OMNIROUTE_API_KEY=keyless-loopback ", 1)[1].split("--ephemeral", 1)[0]
         argv = shlex.split(invocation.replace("\\\n", " "))
         self.assertEqual(argv[argv.index("-m") + 1], route["model"])
@@ -210,7 +216,7 @@ class GatewayCompositionFilesystemControls(unittest.TestCase):
             for directory in (self.plan / "config", self.config):
                 target = directory / name
                 target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(PLAN / "config" / name, target)
+                target.write_text(config_text(name))
         for relative, content in (("package.json", '{"version":"3.8.51"}\n'),
                                   ("dist/BUILD_SHA", "5f4b3d577\n"),
                                   ("bin/omniroute.mjs", "#!/bin/sh\nexit 99\n")):
@@ -227,7 +233,7 @@ class GatewayCompositionFilesystemControls(unittest.TestCase):
                                ("omniroute.service", self.unit),
                                ("omniroute.service.d/10-show-log.conf", self.drop_in)):
             target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(PLAN / "config" / source, target)
+            target.write_text(config_text(source))
             if target.is_relative_to(self.prefix):
                 target.chmod(0o755)
         self.tarball = self.scratch / "synthetic-package.tgz"

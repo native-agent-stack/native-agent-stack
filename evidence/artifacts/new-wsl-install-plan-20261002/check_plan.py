@@ -3,10 +3,10 @@
 
 Reads install-plan.json, owners.json, install.sh, accept.sh, mise.toml, config/ and the merged definitive manifest, names every
 disagreement and exits 1; prints actual installed, measurement-only, excluded, command and acceptance counts
-and exits 0 when they agree. It runs `bash install.sh --list` (read-only) and
-installs nothing.
+and exits 0 when they agree. It inspects the literal `--list` table without
+executing either shell script and installs nothing.
 
-usage: python3 -B check_plan.py [--plan-dir DIR] [--manifest PATH]
+usage: python3 -B check_plan.py [--plan-dir DIR] [--manifest PATH] [--host-file PATH]
 """
 import argparse
 import collections
@@ -14,6 +14,7 @@ import hashlib
 import json
 import pathlib
 import re
+import runpy
 import shlex
 import subprocess
 import sys
@@ -24,8 +25,8 @@ RUNTIME_PINS = {"node", "python", "uv"}  # install.sh installs these uncondition
 ON_DEMAND = {"mcp-inspector", "base-distribution"}  # the manifest says installs; the plan installs nothing for them (README.md)
 GATE = "interim_acknowledged"  # install.sh's gate of the interim installs (amendment 3 of the manifest's decision rule)
 FUNCTION = re.compile(r"^([A-Za-z0-9_.-]+) ?\(\) ?\{(.*)$")
-PORT_IN_CONFIG = (re.compile(r"(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}:(\d{4,5})\b|\[[0-9a-f:]*\]:(\d{4,5})\b|(?<![\w.]):(\d{4,5})\b"),
-                  re.compile(r"(?i)\b\w*port\w*\s*[=:]\s*[\"']?(\d{4,5})\b"))
+PORT_IN_CONFIG = (re.compile(r"(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}:(\d{1,5})\b|\[[0-9a-f:]*\]:(\d{1,5})\b|(?<![\w.\[]):(\d{4,5})\b"),
+                  re.compile(r"(?i)\b\w*port\w*\s*[=:]\s*[\"']?(\d{1,5})\b"))
 
 
 def functions(text):
@@ -102,6 +103,107 @@ def ports_in(text):
             for match in pattern.finditer(line):
                 found.update(int(g) for g in match.groups() if g)
     return found
+
+
+def transitive_service_inventory(funcs, text):
+    """List the service lifecycle reached through named dependency roots."""
+    match = re.search(r"^for slot in (.*); do selected \"\$slot\" && needs_docker=true; done$", text, re.M)
+    roots = shlex.split(match[1]) if match else []
+    commands = run_commands("container-engine", funcs, set()) if "container-engine" in funcs else []
+    selectors = (
+        ("package_install", "docker_engine_packages", "mask rootful units before apt installation"),
+        ("rootless_setup", "dockerd-rootless-setuptool.sh install", "skip"),
+        ("unit_registration", "systemctl --user daemon-reload", "install/preserve unit, then daemon-reload"),
+        ("activation", "activate_user_unit docker.service", "skip enable and start"),
+    )
+    steps = [{"kind": kind, "command": command, "no_start": behavior}
+             for kind, marker, behavior in selectors for command in commands if marker in command]
+    return [{"selected_row": root, "dependency": "container-engine", "steps": steps} for root in roots]
+
+
+def no_start_contract(rows, funcs, text, bad):
+    """Audit every service row, including native daemon rows without user units."""
+    if '--no-start) NS2604_NO_START=1; dagu_service_mode=no;' not in text:
+        bad("no-start", "install.sh must propagate --no-start to service activation and Dagu")
+    if "export NS2604_NO_START dagu_service_mode" not in text:
+        bad("no-start", "dependency commands must inherit the no-start flag")
+    dependency = re.search(r"^if \$needs_docker \|\| selected container-engine; then\n  run_slot container-engine\n.*?(?=^if \$needs_docker \|\| selected docker-compose;)", text, re.M | re.S)
+    if (dependency is None or "NS2604_NO_START=" in dependency[0]
+            or "NS2604_NO_START=" in funcs.get("run_slot", "")):
+        bad("no-start", "Docker dependency dispatch must retain the selected root's no-start policy")
+    inventory = transitive_service_inventory(funcs, text)
+    if {entry["selected_row"] for entry in inventory} != {"docker-compose", "harbor-containerized-agent-e2e-runner"}:
+        bad("no-start", "transitive service inventory must include both Docker dependency roots")
+    for entry in inventory:
+        if {step["kind"] for step in entry["steps"]} != {"package_install", "rootless_setup", "unit_registration", "activation"}:
+            bad("no-start", f"{entry['selected_row']}: incomplete transitive container-engine lifecycle inventory")
+    activation = funcs.get("activate_user_unit", "")
+    if 'if [[ "${NS2604_NO_START:-0}" != 1 ]]; then systemctl --user enable --now "$@"; fi' not in activation:
+        bad("no-start", "user-unit activation must be guarded by NS2604_NO_START")
+    registrar = funcs.get("register_service_row", "")
+    if ('"$slot" && register_service_row "$slot"' not in funcs.get("run_slot", "")
+            or "systemctl --user daemon-reload" not in registrar
+            or re.search(r"systemctl.*\b(?:enable|start|restart|preset)\b", registrar)):
+        bad("no-start", "every registered service row must install its unit and only daemon-reload")
+    for row in rows:
+        slot = row["slot"]
+        if not row.get("service"):
+            continue
+        body = "\n".join(line for line in funcs.get(slot, "").splitlines() if not line.lstrip().startswith("#"))
+        if slot not in {"mineru", "session-analytics", "code-graph"} and not (
+                ("systemd/user" in body and "systemctl --user daemon-reload" in body)
+                or f"{slot}) unit=" in registrar
+                or (slot == "local-model-server" and "systemctl --user daemon-reload" in body)):
+            bad("no-start", f"{slot}: service unit installation and daemon-reload are required")
+        if re.search(r"systemctl\s+--user\s+(?:enable|start|restart|preset)\b", body):
+            bad("no-start", f"{slot}: direct service activation bypasses --no-start")
+        if re.search(r"(?:agentsview daemon|mineru server) start\b", body) and 'if [[ "$NS2604_NO_START" != 1 ]]; then' not in body:
+            bad("no-start", f"{slot}: native daemon start bypasses --no-start")
+        if slot == "dagu" and '--service "$dagu_service_mode"' not in body:
+            bad("no-start", "dagu: installer must use its documented SERVICE_MODE=no")
+        if slot == "container-engine" and '"$NS2604_NO_START" != 1 &&' not in body:
+            bad("no-start", "container-engine: rootless setup starts Docker and must be skipped")
+    if 'if [[ "${NS2604_NO_START:-0}" == 1 ]]; then\n    sudo systemctl mask docker.service docker.socket containerd.service' not in funcs.get("docker_engine_packages", ""):
+        bad("no-start", "container-engine: package postinst activation must be blocked")
+    graph = funcs.get("code-graph", "")
+    if ('code-graph --config-root "$config_root"' not in graph
+            or graph.find('code-graph --config-root "$config_root"') > graph.find("fetch_verified")):
+        bad("no-start", "code-graph must install explicit disabled UI config before exposing its binary")
+
+
+def host_port_contract(plan_dir, rows, host_file, bad):
+    renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
+    try:
+        ports = renderer["load_service_ports"](host_file, check_committed=False)
+    except (OSError, ValueError) as error:
+        bad("ports", str(error))
+        return
+    slots = {row["slot"] for row in rows}
+    defaults = {str(default) for slot, default in renderer["SERVICE_PORTS"].values()}
+    for row in rows:
+        port = (row.get("service") or {}).get("port")
+        if port is not None and (row["slot"], port) not in renderer["SERVICE_PORTS"].values():
+            bad("ports", f"{row['slot']}: declared listener default has no host port allocation")
+    pattern = re.compile(r"(?<![\w-])(?:" + "|".join(defaults) + r")(?![\w])")
+    nonservice_ports = {"ollama.service": {18231, 18232},
+                       "openhands-worker.py": {1}}  # closed-port negative control, never a listener
+    for name, (slot, default) in renderer["SERVICE_PORTS"].items():
+        if slot not in slots:
+            bad("ports", f"{name}: unknown owning row {slot}")
+    for path in [*(plan_dir / "config").rglob("*"), plan_dir / "inspector-client-probe.sh"]:
+        if not path.is_file() or "__pycache__" in path.parts or path.name == "observability_config.py":
+            continue
+        text = path.read_text()
+        active = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith(("#", ";")))
+        # JSONL usage fixtures contain token counts, not endpoints. The two
+        # explicit exceptions are external GPU-owner guards and a synthetic alert label.
+        literal_ports = set() if path.suffix == ".fixture" else ports_in(active) - nonservice_ports.get(path.name, set())
+        if pattern.search(active) or literal_ports:
+            bad("ports", f"{path.relative_to(plan_dir)}: literal service port; use @PORT_NAME@")
+        try:
+            renderer["render_ports"](text, ports)
+        except ValueError as error:
+            bad("ports", f"{path.name}: {error}")
 
 
 def client_additional_checks(row, funcs, bad):
@@ -323,6 +425,10 @@ def main():
     here = pathlib.Path(__file__).resolve().parent
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--plan-dir", type=pathlib.Path, default=here)
+    ap.add_argument("--host-file", type=pathlib.Path)
+    ap.add_argument("--ss-output", type=pathlib.Path,
+                    help="target/fixture sudo ss -ltnpH snapshot: reject planned ports with invisible process owners")
+    ap.add_argument("--service-inventory", action="store_true", help="emit the checked transitive service lifecycle inventory")
     ap.add_argument("--manifest", type=pathlib.Path,
                     default=here.parent / "new-wsl-definitive-defaults-20261001" / "definitive-manifest.json")
     args = ap.parse_args()
@@ -338,6 +444,44 @@ def main():
     manifest = {s["slot_id"]: s for s in json.loads(args.manifest.read_text())["slots"] if s["catalog"] == "foundation"}
     install_text, accept_text = (plan_dir / "install.sh").read_text(), (plan_dir / "accept.sh").read_text()
     install_funcs, accept_funcs = functions(install_text), functions(accept_text)
+    no_start_contract(rows, install_funcs, install_text, bad)
+    host_port_contract(plan_dir, rows, args.host_file, bad)
+    renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
+    if renderer["SERVICE_PORTS"].get("CODE_GRAPH_UI") != ("code-graph", 9749):
+        bad("ports", "9749 belongs to codebase-memory's optional code-graph UI")
+    ui = plan_dir / "config/codebase-memory-ui.json"
+    if not ui.is_file() or json.loads(ui.read_text()) != {"ui_enabled": False, "ui_port": "@PORT_CODE_GRAPH_UI@"}:
+        bad("ports", "code-graph UI must have an explicit disabled default and a host-selected port")
+    if 'export NS2604_HOST_FILE="$config_source_root/.service-ports.json"' not in install_funcs.get("stage_plan_sources", ""):
+        bad("ports", "staging must pin the explicit selected allocation for commands and nested helpers")
+    if ('if $needs_execution && (( failed == 0 )); then' not in install_funcs.get("commit_allocation", "")
+            or 'commit_allocation || failed=1\nexit "$failed"' not in install_text):
+        bad("ports", "publish the allocation only after the selected install succeeds")
+    if args.ss_output is not None:
+        renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
+        try:
+            ports = renderer["load_service_ports"](args.host_file, check_committed=False)
+            for error in renderer["listener_ownership"](plan, ports, args.ss_output.read_text()):
+                # A pre-install snapshot may have absent listeners. A foreign
+                # listener is an allocation conflict even before services start.
+                if " foreign " in error:
+                    bad("ports", error)
+        except (OSError, ValueError) as error:
+            bad("ports", str(error))
+    if 'listeners --config-root "$config_root" --plan-file "$plan_dir/install-plan.json" --slot "$slot" --check-program' not in accept_funcs.get("check", ""):
+        bad("listeners", "service/after-sign-in acceptance must verify listener ownership before executing its program")
+    if "export NS2604_HOST_FILE" not in accept_text:
+        bad("ports", "acceptance must propagate its explicit host file to external research helpers")
+    if "copy_config 'observability_config.py'" not in install_funcs.get("research-harnesses", ""):
+        bad("ports", "installed research helper requires the shared plan renderer")
+    if "NS2604_HOST_FILE=%q" not in accept_funcs.get("research-harnesses", ""):
+        bad("ports", "native research command must carry the host-file pointer through a scrubbed client shell")
+    if 'command --config-root "$config_root" < "$plan_dir/inspector-client-probe.sh" > "$session/probe.sh"' not in accept_funcs.get("mcp-inspector", ""):
+        bad("ports", "Inspector recipe must be host-rendered before its bytes are frozen for the native clients")
+    alert_program = accept_funcs.get("alerting", "")
+    if not all(token in alert_program for token in ('connect_ex(("127.0.0.1", 21997)) != 0',
+                                                    '"sport = :21997"', 'assert not listeners.stdout.strip()')):
+        bad("ports", "alerting requires its independent failed-connect and no-listener predicate")
 
     slots = [r["slot"] for r in rows]
     for slot, count in collections.Counter(slots).items():
@@ -555,12 +699,21 @@ def main():
         if r not in named_only and f'if [[ "$only" == {slot} ]]; then {slot}; elif [[ -z "$only" ]]; then skipped {slot}; fi' in accept_text:
             bad("dispatch", f"accept.sh skips row {slot} in the default run, but install.sh installs it by default")
 
-    # --list prints exactly the rows of install-plan.json
-    proc = subprocess.run(["bash", str(plan_dir / "install.sh"), "--list"], capture_output=True, text=True, cwd=plan_dir, timeout=120)
-    if proc.returncode != 0:
-        bad("list", f"bash install.sh --list exited {proc.returncode}: {proc.stderr.strip()[:200]}")
+    # Inspect the literal --list table without executing any installation script.
+    listing = re.search(r"^if \$list; then\n(.*?)^fi$", install_text, re.M | re.S)
+    lines = []
+    if listing:
+        for line in listing[1].splitlines():
+            if line.strip().startswith("printf "):
+                words = shlex.split(line)
+                if len(words) == 3 and words[1] == "%s\\n":
+                    lines.append(words[2])
+                else:
+                    bad("list", "--list must contain literal printf rows")
+    else:
+        bad("list", "missing --list table")
     printed = []
-    for line in proc.stdout.splitlines():
+    for line in lines:
         parts = line.split(" | ")
         printed.append((parts[0], " | ".join(parts[1:-2]), parts[-2], parts[-1]) if len(parts) >= 4 else (line, "", "", ""))
     expected = [(r["slot"], r["owner"], r["route"], "planned" if r["installed"] else "measurement-only" if r.get("measurement_only") else "excluded")
@@ -591,7 +744,7 @@ def main():
     ollama = by_slot.get("local-model-server", {})
     if not ollama.get("needs", {}).get("systemd_user_unit"):
         bad("local-model-server", "lasting GPU owner requires its user-unit prerequisite")
-    native_enable = "systemctl --user daemon-reload && systemctl --user enable --now ollama.service"
+    native_enable = "systemctl --user daemon-reload && activate_user_unit ollama.service"
     if native_enable not in ollama.get("commands", []):
         bad("local-model-server", "missing native daemon-reload and boot enable/start command")
     health = (ollama.get("acceptance", {}).get("service_health") or {}).get("command") or ""
@@ -611,7 +764,8 @@ def main():
     }
     for name, expected in assets.items():
         path = plan_dir / "config" / name
-        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+        renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
+        if not path.is_file() or hashlib.sha256(renderer["render_ports"](path.read_text(), renderer["service_ports"]()).encode()).hexdigest() != expected:
             bad("local-model-server", f"{name} differs from its designated owner-approved bytes")
         if f"copy_config '{name}'" not in install_funcs.get("local-model-server", ""):
             bad("local-model-server", f"install function must place {name} through copy_config")
@@ -646,7 +800,7 @@ def main():
     # Config files: service copy_config calls and direct, preserving tool-config installs both consume plan files.
     # Ports do not collide between rows. Only the install source operand counts, never an arbitrary filename mention.
     config = {p.relative_to(plan_dir / "config").as_posix()
-              for p in (plan_dir / "config").rglob("*") if p.is_file()}
+              for p in (plan_dir / "config").rglob("*") if p.is_file() and "__pycache__" not in p.parts}
     copied = set(re.findall(r"copy_config '([^']+)'", install_text))
     commands = "\n".join(command for row in rows for command in row["commands"])
     copied.update(re.findall(r'install -m 0600 -- "\$plan_dir/config/([A-Za-z0-9._@/-]+)" "[^"\n]+"', commands))
@@ -704,6 +858,12 @@ def main():
     for name in sorted(config - copied - historical_gateway_configs - operator_examples):
         bad("config", f"config/{name} is copied by no install function")
     claims = collections.defaultdict(set)
+    port_renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
+    default_ports = port_renderer["service_ports"]()
+    # Reserve every declared port, including optional and closed/probe ports.
+    # Expanding templates below retains auxiliary binding claims as well.
+    for owner, port in port_renderer["SERVICE_PORTS"].values():
+        claims[port].add(owner)
     # G4 configs wire existing listeners. Scrape/datasource/exporter targets and synthetic
     # promtool input-series labels are references, rather than additional listening sockets.
     observability_references = {
@@ -718,15 +878,25 @@ def main():
         "grafana-command-center.json": {21128, 21808},
         # Loki push plus the hcom bridge's freshness gauge to the Collector's OTLP/HTTP receiver.
         "ns2604-research-progress.service": {21300, 21318},
+        # These consume the gateway; they never bind its HTTP port.
+        "openhands-worker-skill.md": {21128},
+        "openhands-srt.json": {21128},
+        "openhands-job.json": {21128},
+        "gateway-effort-accept.py": {21128},
     }
     for r in rows:
         if (r.get("service") or {}).get("port") is not None:
             claims[r["service"]["port"]].add(r["slot"])
-        for path in r["config_paths"]:
+        paths = list(r["config_paths"])
+        paths.extend("$plan_dir/config/" + name for name in
+                     re.findall(r"copy_config '([^']+)'", install_funcs.get(r["slot"], "")))
+        paths.extend("$plan_dir/config/" + name for name in
+                     re.findall(r'\$plan_dir/config/([A-Za-z0-9._@/-]+)', "\n".join(r["commands"])))
+        for path in paths:
             name = next((asset for asset in sorted(config, key=len, reverse=True)
                          if path.endswith("/" + asset)), path.rsplit("/", 1)[-1])
             if name in config:
-                config_text = (plan_dir / "config" / name).read_text()
+                config_text = port_renderer["render_ports"]((plan_dir / "config" / name).read_text(), default_ports)
                 if r["slot"] == "research-harnesses" and name == "deer-flow-config.yaml":
                     # The embedded model consumes the gateway's base_url; it owns no listener.
                     config_text = "\n".join(line for line in config_text.splitlines()
@@ -746,6 +916,9 @@ def main():
         print("\n".join(problems))
         print(f"FAILED: {len(problems)} problem(s)")
         return 1
+    if args.service_inventory:
+        print(json.dumps(transitive_service_inventory(install_funcs, install_text), indent=2))
+        return 0
     additional_count = sum(len(entry.get("additional_checks", [])) for row in rows for entry in row["acceptance"].values())
     print(f"OK: {len(rows)} rows: {len(selected)} installed ({len(selected) - len(named_only)} by the default run, {len(named_only)} only when named), "
           f"{len(measured)} measurement-only, {len(excluded)} not installed; "

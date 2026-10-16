@@ -17,10 +17,10 @@ Environment=PATH=%h/.local/share/mise/shims:%h/.local/bin:/usr/local/bin:/usr/bi
 Environment=DATA_DIR=%h/.local/share/omniroute
 Environment=OMNIROUTE_SERVER_HOST=127.0.0.1
 Environment=API_HOST=127.0.0.1
-Environment=PORT=21128
+Environment=PORT=@PORT_GATEWAY@
 Environment=LIVE_WS_HOST=127.0.0.1
-Environment=LIVE_WS_PORT=21129
-Environment=EMBED_WS_PROXY_PORT=21131
+Environment=LIVE_WS_PORT=@PORT_GATEWAY_WS@
+Environment=EMBED_WS_PROXY_PORT=@PORT_GATEWAY_EMBED_WS@
 Environment=OMNIROUTE_MEMORY_MB=16384
 Environment=STREAM_READINESS_TIMEOUT_MS=600000
 Environment=STREAM_READINESS_MAX_TIMEOUT_MS=600000

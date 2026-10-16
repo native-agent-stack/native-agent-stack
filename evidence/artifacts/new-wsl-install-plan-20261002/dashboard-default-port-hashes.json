@@ -1,0 +1,43 @@
+{
+  "baseline": "8053f14e7",
+  "evidence_class": "synthetic",
+  "claim": "Generator API bytes and default-expanded plan templates are identical",
+  "files": [
+    {
+      "file": "grafana-token-layer.json",
+      "before_sha256": "ffe992ccd8a9caa4d56753b44b43da785cc6d80ed7415f99d8b1332f05138cdd",
+      "after_sha256": "ffe992ccd8a9caa4d56753b44b43da785cc6d80ed7415f99d8b1332f05138cdd",
+      "default_expansion_sha256": "ffe992ccd8a9caa4d56753b44b43da785cc6d80ed7415f99d8b1332f05138cdd"
+    },
+    {
+      "file": "grafana-research-grand.json",
+      "before_sha256": "bc794124335f1f4bb900157d02cdabd00803897e9416d7161c443453dd91e541",
+      "after_sha256": "bc794124335f1f4bb900157d02cdabd00803897e9416d7161c443453dd91e541",
+      "default_expansion_sha256": "bc794124335f1f4bb900157d02cdabd00803897e9416d7161c443453dd91e541"
+    },
+    {
+      "file": "grafana-ecosystem-native.json",
+      "before_sha256": "f5fc3ad28fcc2a651dbeebd42266f1f2e68fbeef671e858ca28f606342e199c7",
+      "after_sha256": "f5fc3ad28fcc2a651dbeebd42266f1f2e68fbeef671e858ca28f606342e199c7",
+      "default_expansion_sha256": "f5fc3ad28fcc2a651dbeebd42266f1f2e68fbeef671e858ca28f606342e199c7"
+    },
+    {
+      "file": "grafana-native-foundation-data.json",
+      "before_sha256": "c4f4f8fb9286c7b10a250a339dda6ccac1b556a5900e5c384029c3f34369499c",
+      "after_sha256": "c4f4f8fb9286c7b10a250a339dda6ccac1b556a5900e5c384029c3f34369499c",
+      "default_expansion_sha256": "c4f4f8fb9286c7b10a250a339dda6ccac1b556a5900e5c384029c3f34369499c"
+    },
+    {
+      "file": "grafana-lanes.json",
+      "before_sha256": "474d03439416bbc0b908c5908a1af968b014d84c501048b6104b6123e4139e6e",
+      "after_sha256": "474d03439416bbc0b908c5908a1af968b014d84c501048b6104b6123e4139e6e",
+      "default_expansion_sha256": "474d03439416bbc0b908c5908a1af968b014d84c501048b6104b6123e4139e6e"
+    },
+    {
+      "file": "grafana-command-center.json",
+      "before_sha256": "6a5eb0001526fa1af064c9715e23e3f152fc734db7b215d32b6a91f243034f96",
+      "after_sha256": "6a5eb0001526fa1af064c9715e23e3f152fc734db7b215d32b6a91f243034f96",
+      "default_expansion_sha256": "6a5eb0001526fa1af064c9715e23e3f152fc734db7b215d32b6a91f243034f96"
+    }
+  ]
+}

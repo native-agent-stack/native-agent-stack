@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-16",
+  "before_head": "58ee5cd49d6d9b19701892b072e22b47ca5889bf",
+  "status": "implemented_for_one_fold",
+  "evidence_class": "synthetic",
+  "execution_prefix": "systemd-run --user --scope -p CPUWeight=idle --quiet --",
+  "initial_before": {
+    "command": "python3 -B -m unittest tests.test_install_plan_review_wave3 -v",
+    "tests": 4,
+    "failures": 4,
+    "exit_code": 1,
+    "production_sources": "unchanged58ee5cd49",
+    "observations": [
+      "Grafana ledger-owned output rejected by raw-template copy_config comparison",
+      "Unrelated structured-data install published gateway41128 over31128",
+      "Dagu mismatched unit returned success and fake daemon-reload",
+      "Prometheus WorkingDirectory absent after successful rendering"
+    ]
+  },
+  "dagu_dropin_before": {
+    "command": "python3 -B -m unittest tests.test_install_plan_review_wave3.ReviewWave3Tests.test_dagu_no_start_retains_matching_units_but_refuses_unknown_environment_dropins",
+    "tests": 1,
+    "subcase_failures": 1,
+    "exit_code": 1,
+    "observation": "Matching unit plus operator drop-in changing DAGU_PORT incorrectly returned success"
+  },
+  "after": {
+    "install_and_dispatch": {
+      "command": "python3 -B -m unittest tests.test_install_plan_review_wave3 tests.test_install_plan_no_start_ports tests.test_new_wsl_definitive_defaults.FixwaveAcceptanceRepairs.test_scout_scoped_dispatch_does_not_reinstall_the_inspect_owner",
+      "tests": 64,
+      "failures": 0,
+      "exit_code": 0
+    },
+    "expanded_controls": {
+      "command": "python3 -B -m unittest tests.test_install_plan_review_wave3 tests.test_mcp_template_drift.ExplicitHostTests",
+      "tests": 11,
+      "failures": 0,
+      "exit_code": 0
+    },
+    "drift": {
+      "command": "python3 -B -m unittest tests.test_mcp_template_drift",
+      "tests": 46,
+      "failures": 0,
+      "exit_code": 0,
+      "note": "Before addition of the strict host-string-map control, which passes in expanded_controls."
+    },
+    "check_plan": {
+      "rows": 84,
+      "commands": 197,
+      "acceptance_entries": 113,
+      "exit_code": 0
+    },
+    "final_targeted": {
+      "command": "python3 -B -m unittest tests.test_install_plan_no_start_ports tests.test_install_plan_review_wave3 tests.test_runtime_profiles tests.test_task_model_routing tests.test_research_entry tests.test_harbor_currency_contracts tests.test_hcom_status tests.test_ns2604_dashboards tests.test_new_wsl_client_config.RenderTests tests.test_new_wsl_client_config.MapTests tests.test_new_wsl_client_config.McpEndpointRepairTests tests.test_wsl_new_distro_recipe.HostTemplateTests tests.test_provenance_digest_custody",
+      "tests": 253,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0
+    },
+    "requested_modules": {
+      "modules": [
+        "tests.test_new_wsl_definitive_defaults",
+        "tests.test_mcp_template_drift"
+      ],
+      "tests": 179,
+      "passed": 173,
+      "skipped": 6,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0,
+      "execution": "unittest.defaultTestLoader.loadTestsFromModule for both modules; patch LocalModelAcceptance.run_accept with unittest.SkipTest to preserve the no-accept.sh execution boundary",
+      "explicit_local_exclusion": "LocalModelAcceptance.test_the_server_smoke_check_waits_for_the_embedding_row",
+      "other_test_reported_skips": 5,
+      "runner_label_correction": "LOCAL_ACCEPT_SCRIPT_EXCLUSIONS printed the total skipped count6; the deliberate full-script exclusion is one test, not all six. Full CI retains the original module unchanged."
+    },
+    "adapter": {
+      "command": "python3 -B tests/pr1180_port_review_probes.py . --grafana-source <pinned Grafana checkout> -v",
+      "tests": 5,
+      "failures": 0,
+      "exit_code": 0
+    }
+  },
+  "ci_before": {
+    "head": "58ee5cd49d6d9b19701892b072e22b47ca5889bf",
+    "shard3": {
+      "url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38826242844/job/116734262323",
+      "failure": "test_scout_scoped_dispatch_does_not_reinstall_the_inspect_owner: both subcases fail because commit_allocation is absent from the extracted fixture prelude",
+      "local_reproduction": "Two failing subcases, then pass with the fixture helper fake; owner-selection assertions preserved."
+    },
+    "shard5": {
+      "url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38826242844/job/116734262531",
+      "failure": "tests.test_mcp_template_drift.DriftTests.setUpClass: caller supplies frozen incomplete host values; required WSL_DISTRO_NAME absent",
+      "local_reproduction": "Same DriftError before changing the caller."
+    }
+  },
+  "drift_cli_before": {
+    "command": "python3 -B -m unittest tests.test_mcp_template_drift.ExplicitHostTests",
+    "tests": 1,
+    "failures": 1,
+    "exit_code": 1,
+    "observation": "Without --host-file the old CLI reached the incomplete-template render instead of refusing missing explicit host input."
+  },
+  "scope_grant": {
+    "reference_event": 185938,
+    "grant_message": 185948,
+    "paths": [
+      "tools/adoption/mcp_template_drift.py",
+      "tests/test_mcp_template_drift.py"
+    ],
+    "conditions": "Required explicit --host-file and nonsecret string-map input; strict client validation remains; frozen template unchanged; same held fold commit."
+  },
+  "sources": "NO_START_PORTS.md third review wave",
+  "allocation_boundaries": [
+    "Saved allocations remain complete; unselected owners keep their recorded values before staging and publication",
+    "Merged collisions are rejected before provisioning",
+    "Default selection preserves measurement-only ports",
+    "Unrelated rows cannot create an initial service snapshot",
+    "First port-owner provisioning establishes a complete explicit reservation; does not certify installation of unselected owners"
+  ],
+  "custody_controls": [
+    "Grafana same-port rerun",
+    "Actual8053f14e7 renderer output/ledger accepted by current upgrade",
+    "Operator-modified Grafana file retained and rejected",
+    "Matching Dagu unit retained without activation",
+    "Differing Dagu unit and unknown environment drop-ins retained and rejected"
+  ],
+  "native_target_acceptance": "UNRUN by this lane",
+  "reviews": [
+    "review_output.json",
+    "GPT-VERDICT-58ee5cd49.md"
+  ],
+  "fold_release_event": 186099,
+  "additional_CC_request": 186005,
+  "host_consumer_audit": "strict-host-consumer-audit.json",
+  "runtime_consumer_before": {
+    "command": "python3 -B -m unittest tests.test_runtime_profiles.StrictHostConsumerTests -v",
+    "tests": 3,
+    "failures": 2,
+    "errors": 1,
+    "exit_code": 1,
+    "production_sources": "runtime_profiles.py unchanged from58ee5cd49",
+    "observations": [
+      "Frozen incomplete host input failed WSL_DISTRO_NAME despite an explicit complete selector",
+      "Telemetry retained21318 despite31318 allocation",
+      "Provider retained import-time21128 despite current41128 selection"
+    ]
+  },
+  "runtime_consumer_after": {
+    "command": "python3 -B -m unittest tests.test_runtime_profiles.StrictHostConsumerTests",
+    "tests": 4,
+    "failures": 0,
+    "exit_code": 0,
+    "assertions": [
+      "Explicit complete WSL MCP source",
+      "Allocated telemetry endpoints",
+      "Both Pi and OpenCode current gateway resolution",
+      "Missing explicit WSL selector refused"
+    ]
+  },
+  "private_probe_custody": {
+    "source": "#1188 hashes.json at3c7a586f82d8a9fc96a2a0a562c34f49aa8a4f53",
+    "original_name": "review-port-probes.py",
+    "representation": "unpublished_originals name/what/custody, no digest",
+    "test": "tests.test_provenance_digest_custody.ProvenanceDigestCustodyTests.test_install_plan_private_probe_has_name_only_custody",
+    "before": {
+      "receipt_revision": "58ee5cd49d6d9b19701892b072e22b47ca5889bf",
+      "tests": 1,
+      "failures": 1,
+      "exit_code": 1,
+      "output": "Private-reference digest count1, expected0; no protected value printed"
+    },
+    "after": {
+      "tests": 1,
+      "failures": 0,
+      "exit_code": 0
+    },
+    "protected_prefix_scan": {
+      "lengths": [
+        64,
+        16,
+        12,
+        8
+      ],
+      "tracked_tree_matches": 0,
+      "PR_body_matches": 0,
+      "reference": "previously published receipt only; private original was not read or hashed"
+    },
+    "history": "Forward correction; no history rewrite"
+  },
+  "followups": {
+    "failed_asset_recovery": "Documented original-selection retry, custody conflict review, paired asset/allocation rollback and post-recovery readback; allocation publication alone is not whole-install rollback.",
+    "optional_UI": "Documented native-port reconciliation and explicit CODE_GRAPH_UI enable/recheck selection after operator changes.",
+    "README_port_prose": "Source review only; no prose-specific fail-first check claimed. Existing21808 render compatibility passed before the wording change."
+  },
+  "required_before_commit": "python3 scripts/validate.py after final manifest registration",
+  "manifest_scope_proof": {
+    "base": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+    "changed_existing_entries": 50,
+    "added_entries": 16,
+    "all_changed_paths_authorized": true,
+    "existing_metadata_changed_only_sha256_and_bytes": true,
+    "extra_fields_and_top_level_preserved": true,
+    "new_entries_only_owned_artifacts": true,
+    "frozen_bytes_preserved": {
+      "adoption/templates/wsl/host.new-distro.json.template": "4395aec846f1d418a55a862cb4db03906d2513d00fa596c190b56641f760f6b0",
+      "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json": "ffbbd654c88cb8c78ddff1174dd2e15f4478cee78fa4d126a7fd16a3661f7c31",
+      "evidence/artifacts/row70-defect-a-20261008/expanded-source-critic.md": "92b7170350d3d923006638c028566db42b33acfe1aa40df6210c7f6b3a379c95"
+    },
+    "runtime_live_locators_preserved": [
+      43,
+      "1027-1034"
+    ],
+    "added_paths": [
+      "evidence/artifacts/new-wsl-install-plan-20261002/NO_START_PORTS.md",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/codebase-memory-ui.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/dagu-coordinator.conf",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/dagu.service",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/docker.service",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-alertmanager.service.example",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-grafana.service.example",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-loki.service.example",
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-otel-collector.service.example",
+      "evidence/artifacts/new-wsl-install-plan-20261002/dashboard-default-port-hashes.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/no-start-citation-audit.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/no-start-test-receipt.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/review-wave-1-receipt.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/review-wave-2-receipt.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/review-wave-3-receipt.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/strict-host-consumer-audit.json"
+    ]
+  }
+}

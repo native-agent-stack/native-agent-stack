@@ -26,7 +26,7 @@ import urllib.parse
 import urllib.request
 
 
-BASE = "http://127.0.0.1:21128/api/usage/call-logs"
+BASE = "http://127.0.0.1:@PORT_GATEWAY@/api/usage/call-logs"
 # OmniRoute@c1e30b76: registry/codex/index.ts:9-13; services/model.ts:484-490.
 # Composed upstream@0585aba5589d5a1f49243a13a8db249558e7c9e3:
 # open-sse/config/providers/registry/codex/index.ts:73;

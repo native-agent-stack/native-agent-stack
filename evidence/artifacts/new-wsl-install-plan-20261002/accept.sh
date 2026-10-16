@@ -20,14 +20,17 @@ export plan_dir repo_root tool_root config_root
 export PATH="$HOME/.local/bin:$PATH"
 only=''
 stage=post_install
-usage() { printf 'Usage: %s [--only <slot>] [--stage post_install|service_health|after_sign_in]\n' "$0" >&2; }
+port_args=()
+usage() { printf 'Usage: %s [--only <slot>] [--stage post_install|service_health|after_sign_in] [--host-file PATH]\n' "$0" >&2; }
 while (( $# )); do
   case "$1" in
     --only) (( $# >= 2 )) || { printf 'Missing --only slot.\n' >&2; exit 2; }; only="$2"; shift 2 ;;
     --stage) (( $# >= 2 )) || { printf 'Missing --stage value.\n' >&2; exit 2; }; stage="$2"; shift 2 ;;
+    --host-file) (( $# >= 2 )) || { printf 'Missing --host-file path.\n' >&2; exit 2; }; NS2604_HOST_FILE="$(realpath -- "$2")"; export NS2604_HOST_FILE; port_args=(--host-file "$NS2604_HOST_FILE"); shift 2 ;;
     *) usage; exit 2 ;;
   esac
 done
+if [[ -z "${NS2604_HOST_FILE:-}" && -f "$config_root/.service-ports.json" ]]; then export NS2604_HOST_FILE="$config_root/.service-ports.json"; fi
 case "$stage" in
   post_install|service_health|after_sign_in) ;;
   *) printf 'Unknown stage: %s\n' "$stage" >&2; usage; exit 2 ;;
@@ -38,6 +41,12 @@ case "$only" in
 esac
 # Planned. Two checks change into repo_root, so the plan runs from a checkout of the repository (README.md).
 [[ -e "$repo_root/.git" ]] || { printf 'Run this plan from a checkout of the repository: %s is not a git checkout (see README.md).\n' "$repo_root" >&2; exit 1; }
+
+config_source_root="$(mktemp -d)"
+export config_source_root
+trap 'rm -rf -- "$config_source_root"' EXIT
+python3 "$plan_dir/config/observability_config.py" stage --config-root "$config_root" \
+  --source-root "$plan_dir/config" --output-root "$config_source_root" "${port_args[@]}"
 
 failed=0
 path_ready=false
@@ -56,6 +65,13 @@ prepare_path() {
 }
 check() {
   local slot="$1" program="$3" pending_kind="${4:-needs_user}" rc=0
+  program="$(printf '%s' "$program" | python3 "$plan_dir/config/observability_config.py" command --config-root "$config_root" "${port_args[@]}")" || { failed=1; return 1; }
+  program="${program//\$plan_dir\/config/\$config_source_root}"
+  if [[ "$stage" == service_health || "$stage" == after_sign_in ]]; then
+    if ! printf '%s' "$program" | python3 "$plan_dir/config/observability_config.py" listeners --config-root "$config_root" --plan-file "$plan_dir/install-plan.json" --slot "$slot" --check-program "${port_args[@]}"; then
+      failed=1; printf '%s | %s | 1\n' "$slot" "$stage"; return 0
+    fi
+  fi
   # Kind/source remain in JSON and beside each command. Suppress stdout, which
   # diagnostics/model examples can fill with private config; retain stderr/status.
   if prepare_path && bash -euo pipefail -c "$program" >/dev/null; then rc=0; else rc=$?; fi
@@ -738,6 +754,7 @@ command-output() {
       # Kind: smoke; Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L121 (--version); https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L193 (rtk git log); https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L313 (rtk proxy, the raw passthrough); https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L551 (RTK_TELEMETRY_DISABLED)
       # Planned exact 0.51.0 version; the archive digest was verified separately; the two log lines run in this checkout.
       # Planned. Source: https://github.com/rtk-ai/rtk/blob/v0.51.0/src/main.rs#L3072-L3100 (excluded commands exit 1 with No rewrite; the positive control exits 0 with its rewrite).
+      # Source: https://github.com/rtk-ai/rtk/blob/v0.51.0/src/core/config.rs#L299-L307 (suppress the fresh-host missing-hook warning during exact-output checks).
       # Planned. Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L133 (rtk init --show --codex: the Global hook and RTK.md lines are [ok]); codex_hook_trust.py --check exits 0 only when the named hook is trusted at its current hash and every rule file of the user layer is on the reviewed list (tools/adoption/exec_rules_reviewed.json, by sha256) or is Codex's own allow-only format (exit 5: not trusted; exit 6: trusted beside another rule file, which catches a rule file added or edited after the grant).
       check command-output smoke 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"
 [[ "$("$e/bin/rtk" --version)" == "rtk 0.51.0" ]]
@@ -747,10 +764,10 @@ RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" proxy git log -n 3
 e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"
 for command in "git show HEAD:README.md | tail -20" "diff a b" "jq . x.json" "git branch -a"; do
   rc=0
-  decision=$(RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" hook check "$command" 2>&1) || rc=$?
+  decision=$(RTK_TELEMETRY_DISABLED=1 RTK_SUPPRESS_HOOK_WARNING=1 "$e/bin/rtk" hook check "$command" 2>&1) || rc=$?
   [[ "$rc" -eq 1 && "$decision" == "No rewrite for: $command" ]]
 done
-decision=$(RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" hook check "git status" 2>&1)
+decision=$(RTK_TELEMETRY_DISABLED=1 RTK_SUPPRESS_HOOK_WARNING=1 "$e/bin/rtk" hook check "git status" 2>&1)
 [[ "$decision" == "rtk git status" ]]
 codex_home="${CODEX_HOME:-$HOME/.codex}"
 shown=$(RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" init --show --codex 2>&1)
@@ -1425,7 +1442,7 @@ if (typeof topology.gateway?.endpoint !== "string" ||
   }
 const endpoint = new URL(topology.gateway?.endpoint);
 if (endpoint.protocol !== "http:" || endpoint.hostname !== "127.0.0.1" ||
-    endpoint.port !== "21128" || endpoint.pathname !== "/v1" ||
+    (endpoint.port || "80") !== "21128" || endpoint.pathname !== "/v1" ||
     endpoint.username || endpoint.password || endpoint.search || endpoint.hash) {
   throw new Error("The plan gateway endpoint must be http://127.0.0.1:21128/v1.");
   }
@@ -2155,7 +2172,7 @@ PY'
 state="${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/mcp-inspector"
 install -d -m 0700 -- "$state"
 session="$(mktemp -d "$state/clients.XXXXXXXX")"
-install -m 0600 -- "$plan_dir/inspector-client-probe.sh" "$session/probe.sh"
+python3 "$plan_dir/config/observability_config.py" command --config-root "$config_root" < "$plan_dir/inspector-client-probe.sh" > "$session/probe.sh"
 probe_sha="$(sha256sum "$session/probe.sh" | awk '"'"'{print $1}'"'"')"
 for client in claude codex; do
   mkdir -p -- "$session/$client-tmp"
@@ -2470,7 +2487,7 @@ for client in claude codex; do
   install -d -m 0700 -- "$client_state"
   gpt_marker="native-stage-complete:$client:$session:gptr"
   deer_marker="native-stage-complete:$client:$session:deerflow"
-  printf -v gpt_command '"'"'XDG_STATE_HOME=%q bash %q %q >%q 2>%q && printf "%%s\\n" %q'"'"' "$client_state" "$repo_root/tools/research/gpt_researcher.sh" "Ubuntu 26.04 WSL news this month" "$client_state/gptr.stdout" "$client_state/gptr.stderr" "$gpt_marker"
+  printf -v gpt_command '"'"'XDG_STATE_HOME=%q NS2604_HOST_FILE=%q bash %q %q >%q 2>%q && printf "%%s\\n" %q'"'"' "$client_state" "${NS2604_HOST_FILE:-}" "$repo_root/tools/research/gpt_researcher.sh" "Ubuntu 26.04 WSL news this month" "$client_state/gptr.stdout" "$client_state/gptr.stderr" "$gpt_marker"
   printf -v deer_command '"'"'XDG_STATE_HOME=%q DEER_FLOW_CONFIG_PATH=%q bash %q %q >%q 2>%q && printf "%%s\\n" %q'"'"' "$client_state" "$plan_dir/config/deer-flow-config.yaml" "$plan_dir/config/deer-flow-research.sh" "Research Ubuntu 26.04 WSL news this month; return a short answer with primary source URLs." "$client_state/deerflow.stdout" "$client_state/deerflow.stderr" "$deer_marker"
   execution="foreground shell calls with 1560000 ms timeouts, waiting for each to finish"
   if [[ "$client" == codex ]]; then

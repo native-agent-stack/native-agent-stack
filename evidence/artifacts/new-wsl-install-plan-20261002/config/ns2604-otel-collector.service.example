@@ -1,0 +1,11 @@
+# OTel Collector v0.162.0 otelcol/flags.go:15,35-37 and command.go:31-48 (foreground --config); systemd v259 systemd.service(5).
+[Unit]
+Description=Native stack OTel Collector
+
+[Service]
+Environment=NS2604_OBSERVABILITY_DATA=@DATA_ROOT@
+ExecStart=%h/.local/bin/otelcol-contrib --config @CONFIG_ROOT@/otel.yaml
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

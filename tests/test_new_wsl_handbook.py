@@ -64,6 +64,26 @@ def all_strings(value):
             yield from all_strings(child)
 
 
+def without_publication_prose(value, slot_id="", resolution=False):
+    """Compare every source fact except the expressly paraphrased publication fields.
+
+    This independent allowlist does not call the production projection; outcome,
+    source, history and inventory mutations still fail the original comparisons.
+    The privacy suite separately tests the omitted prose and added summaries.
+    """
+    if isinstance(value, list):
+        return [without_publication_prose(child, slot_id) for child in value]
+    if not isinstance(value, dict):
+        return value
+    slot_id = value.get("slot_id", slot_id)
+    omitted = {"owner_verbatim", "verbatim", "owner_paraphrase"}
+    if resolution and slot_id == "agent-messaging":
+        omitted |= {"posture", "reason"}
+    return {key: without_publication_prose(child, slot_id,
+                                         key == "resolution" and value.get("slot_id") == "agent-messaging")
+            for key, child in value.items() if key not in omitted}
+
+
 class NewWslHandbookTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -635,7 +655,8 @@ class NewWslHandbookTests(unittest.TestCase):
         projected = []
         for layer in data["layers"]:
             expected = [slot for slot in manifest["slots"] if slot["layer_id"] == layer["layer_id"]]
-            self.assertEqual([slot["record"] for slot in layer["default_slots"]], expected)
+            self.assertEqual(without_publication_prose([slot["record"] for slot in layer["default_slots"]]),
+                             without_publication_prose(expected))
             self.assertEqual(layer["default_ownership"], next(row for row in manifest["layers"]
                                                              if row["layer_id"] == layer["layer_id"]))
             for slot in layer["default_slots"]:
@@ -1295,7 +1316,7 @@ class NewWslHandbookTests(unittest.TestCase):
             with self.subTest(slot=row["slot_id"]):
                 state = row["state"] or "open"
                 self.assertEqual(layer_id, row["layer_id"])
-                self.assertEqual(slot["record"], row)
+                self.assertEqual(without_publication_prose(slot["record"]), without_publication_prose(row))
                 self.assertEqual([slot["state"], cells[1]], [state, state])
                 self.assertEqual(cells[2], row["job"])
                 self.assertIn(row["default"] or "none", cells[3])

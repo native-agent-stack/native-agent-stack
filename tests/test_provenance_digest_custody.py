@@ -144,6 +144,23 @@ class ProvenanceDigestCustodyTests(unittest.TestCase):
         self.assertNotIn(HARBOR_RECEIPT, LEGACY)
         self.assertNotIn(HARBOR_RECEIPT, self.found)
 
+    def test_install_plan_private_probe_has_name_only_custody(self):
+        path = ROOT / "evidence/artifacts/new-wsl-install-plan-20261002/review-wave-2-receipt.json"
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+        probe = receipt["retained_probe"]
+        self.assertEqual(probe["filename"], "review-port-probes.py")
+        # Report only a count; never repeat a private original's digest in test output.
+        self.assertEqual(len(DIGEST.findall(json.dumps(probe))), 0,
+                         "the private reader probe must be named without a digest")
+        self.assertEqual(len(re.findall(r"\b[0-9a-f]{8,64}\b", json.dumps(probe))), 0,
+                         "the private reader probe must not retain digest prefixes either")
+        originals = receipt.get("unpublished_originals", [])
+        private = [entry for entry in originals if entry.get("name") == "review-port-probes.py"]
+        self.assertEqual(len(private), 1, "record the private probe in unpublished_originals")
+        self.assertEqual(set(private[0]), {"name", "what", "custody"})
+        self.assertIn("No digest is published", private[0]["custody"])
+        self.assertEqual(len(DIGEST.findall(json.dumps(originals))), 0)
+
     def test_registration_record_cites_private_gpt_review_without_a_digest(self):
         text = (ROOT / REGISTRATION_RECORD).read_text(encoding="utf-8")
         citation = re.search(r"The Astra fix-one read\b.*?(?=added two P2 blockers)", text, re.DOTALL)

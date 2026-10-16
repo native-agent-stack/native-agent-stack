@@ -32,7 +32,7 @@ import uuid
 import stat
 import tempfile
 import threading
-
+import runpy
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -41,7 +41,7 @@ ROLES = ("evidence-reviewer", "security-reviewer", "stack-researcher", "source-s
          "stack-verifier", "isolated-builder")
 CLAUDE_MODEL = "claude-opus-5-5"
 GPT_MODEL = "cx/gpt-6.1-sol"
-GATEWAY = "http://127.0.0.1:21128/v1"
+GATEWAY = runpy.run_path(str(ROOT / "evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py"))["gateway_url"]()
 SUPERPOWERS = "bb92a77741419a4ab5f06e711a283343f1ada0c3"
 SUPERPOWERS_PLUGIN = "superpowers@git+https://github.com/obra/superpowers.git#" + SUPERPOWERS
 PI_OTEL = "npm:@b1tank/pi-otel@0.5.0"  # b1tank/pi-otel@3cd674533a8d24c9b8a2a6a94072eec25466e128
@@ -258,24 +258,24 @@ def canonical_servers(home: Path, eco_root: Path, templates: list[Path], *, requ
 
 
 def render_wsl_mcp(home: Path, eco_root: Path) -> dict:
-    """Use the existing WSL source, additions and wiring map without live config reads.
-
-    Same analyse/render APIs as new_wsl_client_config --render. The public WSL
-    host template supplies endpoints; only HOME/ECO_ROOT are task values.
-    """
+    """Reuse strict client rendering from the explicit nonsecret host source."""
     sys.path.insert(0, str(ROOT / "tools/adoption"))
-    import new_wsl_client_config as wiring
-    results, manifest, plan, errors, _ = wiring.analyse(ROOT, authorization=False)
-    if errors:
-        raise ProfileError("canonical WSL MCP wiring check failed")
-    host = json.loads((ROOT / "adoption/templates/wsl/host.new-distro.json.template").read_text())
-    values = {key: value.replace("${WSL_USER}", home.name) for key, value in host.items()}
-    values.update(HOME=str(home), ECO_ROOT=str(eco_root), XDG_RUNTIME_DIR=f"/run/user/{os.getuid()}",
-                  OTEL_ENDPOINT=f"127.0.0.1:{plan['ports']['collector_http_port']}",
-                  CODEX_MODEL=plan["codex_model"])
-    files = wiring.render(ROOT, results, plan, values, manifest)
+    from mcp_template_drift import render_files, DriftError
+    selected = os.environ.get("NS2604_HOST_FILE")
+    if not selected: raise ProfileError("--wsl-render requires explicit NS2604_HOST_FILE")
+    try: files = render_files(home, eco_root=eco_root, host_file=Path(selected))
+    except DriftError as error: raise ProfileError(str(error)) from error
     install = module("runtime_claude_install", ROOT / "tools/adoption/install_claude_profile.py")
     return install.render_servers(json.loads(files["mcp-servers.json"]), home, eco_root)
+
+
+def selected_service_ports() -> dict:
+    """The current explicit host or saved allocation; shared validation stays authoritative."""
+    renderer = runpy.run_path(str(ROOT / "evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py"))
+    try: return renderer["load_service_ports"](config_root=renderer["default_config_root"]())
+    except (OSError, ValueError) as error: raise ProfileError(str(error)) from error
+
+
 
 
 def opencode_mcp(servers: dict) -> dict:
@@ -306,7 +306,7 @@ def pi_models(route: str, *, role_scope=None) -> dict:
             "headers": {"x-client-request-id": "${NS_RUNTIME_REQUEST_ID}"},
             "modelOverrides": {CLAUDE_MODEL: {"maxTokens": max_tokens}}}}}
     return {"providers": {"omniroute": {
-        "baseUrl": GATEWAY, "api": "openai-responses", "apiKey": "local",
+        "baseUrl": f"http://127.0.0.1:{selected_service_ports()['GATEWAY']}/v1", "api": "openai-responses", "apiKey": "local",
         "headers": {"x-omniroute-session-id": "${NS_RUNTIME_REQUEST_ID}"},
         "models": [{"id": GPT_MODEL, "name": "OmniRoute GPT-6.1 Sol", "reasoning": True,
                     "input": ["text"], "contextWindow": 258400, "maxTokens": max_tokens,
@@ -319,7 +319,7 @@ def opencode_provider(route: str) -> dict:
         return {"anthropic": {"options": {"apiKey": "{env:ANTHROPIC_API_KEY}",
                 "headers": {"x-client-request-id": "{env:NS_RUNTIME_REQUEST_ID}"}}}}
     return {"omniroute": {"npm": "@ai-sdk/openai", "name": "OmniRoute loopback",
-            "options": {"baseURL": GATEWAY, "apiKey": "local",
+            "options": {"baseURL": f"http://127.0.0.1:{selected_service_ports()['GATEWAY']}/v1", "apiKey": "local",
                         "headers": {"x-omniroute-session-id": "{env:NS_RUNTIME_REQUEST_ID}"}},
             "models": {GPT_MODEL: {"name": "GPT-6.1 Sol", "reasoning": True,
                        "limit": {"context": 258400, "output": 8192},
@@ -331,8 +331,8 @@ def profile_environment(profile: str, state: Path, role_scope: str | None = None
     root = state / profile
     if role_scope:
         root = root / "roles" / role_scope
-    host = json.loads((ROOT / "adoption/templates/wsl/host.new-distro.json.template").read_text())
-    endpoint = "http://" + host["OTEL_ENDPOINT"]
+    ports = selected_service_ports()
+    endpoint = f"http://127.0.0.1:{ports['OTEL_HTTP']}"
     telemetry = {"OTEL_EXPORTER_OTLP_ENDPOINT": endpoint,
                  "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
                  "OTEL_RESOURCE_ATTRIBUTES": "service.name=ns-" + profile + ",deployment.environment=trial"}
@@ -1644,7 +1644,7 @@ def parser():
     prepare.add_argument("--opencode-bin", type=Path, required=True)
     prepare.add_argument("--rtk-source", type=Path, required=True)
     prepare.add_argument("--wsl-render", action="store_true",
-                         help="render canonical MCP through new_wsl_client_config's WSL map first")
+                         help="render canonical MCP through the WSL map; requires explicit NS2604_HOST_FILE")
     prepare.add_argument("--role-scoped", action=argparse.BooleanOptionalAction, default=True,
                          help="also install vendor role sets into separate native role profile roots")
     prepare.add_argument("--auxiliary-root", type=Path,

@@ -87,7 +87,7 @@ class Ns2604DashboardTests(unittest.TestCase):
         self.assertEqual(("cc-god-view", "Command center"), (board["uid"], board["title"]))
         self.assertEqual(["Lane roster", "Progress", "Invoke rates", "Errors", "Gateway", "Coverage"],
                          [p["title"].split(" · ")[0] for p in board["panels"] if p["type"] == "row"])
-        self.assertIn("http://127.0.0.1:21808", [link["url"] for link in board["links"]])
+        self.assertIn("http://127.0.0.1:@PORT_AGENTSVIEW@", [link["url"] for link in board["links"]])
         self.assertEqual(len(board["panels"]), len({p["id"] for p in board["panels"]}))
         coverage = next(p for p in board["panels"] if p["title"].startswith("Runtime coverage"))
         for runtime in ("Codex", "Claude Code", "pi", "OpenCode", "goose", "Qwen Code", "oh-my-pi", "Hermes",

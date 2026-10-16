@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "before_head": "b615e5476427d3f920ee0130c69d8c288f8ed183",
+  "date": "2026-10-15",
+  "evidence_class": "synthetic",
+  "scope": [
+    "Addendum 1: research/runtime helpers and stage-S listener ownership",
+    "Addendum 1b: all three gateway listeners",
+    "CI source-template fixture corrections; frozen host template restored",
+    "Addenda 1c/1d: both Docker dependency roots and their transitive lifecycle"
+  ],
+  "before": {
+    "command": "python3 -B -m unittest tests.test_install_plan_no_start_ports.ReviewWave1Tests",
+    "tests": 5,
+    "failures": 5,
+    "exit_code": 1,
+    "observations": [
+      "Both helpers still selected 21128 despite a host file selecting 41128",
+      "Owned, foreign and absent listener fixtures found no ownership gate"
+    ],
+    "helper_blobs_equal_between_8053f14e7_and_before_head": {
+      "tools/research/gpt_researcher.sh": "682a4ddf59b68a459b6fd0c31781d23fece41545",
+      "tools/adoption/runtime_profiles.py": "b35f7c9a69754ae50d369f261903017c910dd756"
+    }
+  },
+  "snapshot_option_before": {
+    "command": "python3 -B -m unittest tests.test_install_plan_no_start_ports.ReviewWave1Tests.test_plan_rejects_a_foreign_listener_in_a_supplied_snapshot",
+    "exit_code": 1,
+    "cause": "check_plan.py rejected the new --ss-output option with status 2 before the option was implemented"
+  },
+  "after": {
+    "command": "python3 -B -m unittest tests.test_install_plan_no_start_ports tests.test_research_entry tests.test_runtime_profiles tests.test_task_model_routing tests.test_harbor_currency_contracts tests.test_hcom_status tests.test_ns2604_dashboards tests.test_new_wsl_definitive_defaults.PromptfooGatewayTopologyConfiguration tests.test_new_wsl_definitive_defaults.FixwaveAcceptanceRepairs.test_ollama_unit_placement_preserves_unrelated_warmup_and_foreign_units tests.test_wsl_new_distro_recipe.HostTemplateTests tests.test_new_wsl_client_config.RenderTests tests.test_new_wsl_definitive_defaults.FixwaveAcceptanceRepairs.test_research_native_transport_data_preserves_claude_prompt_and_commands tests.test_new_wsl_definitive_defaults.FixwaveAcceptanceRepairs.test_research_completion_includes_final_recipe_assertions",
+    "tests": 186,
+    "failures": 0,
+    "exit_code": 0
+  },
+  "execution_prefix": "systemd-run --user --scope -p CPUWeight=idle --quiet --",
+  "ownership_boundaries": {
+    "live_ss_executed": false,
+    "installed_client_version": "ss utility, iproute2-6.19.0",
+    "default_planned_listener_count": 15,
+    "gateway_listener_names": [
+      "GATEWAY",
+      "GATEWAY_WS",
+      "GATEWAY_EMBED_WS"
+    ],
+    "fixtures": [
+      "owned",
+      "foreign without users:",
+      "absent",
+      "missing/foreign auxiliary gateway listeners",
+      "foreign listener blocks acceptance program",
+      "foreign snapshot rejects unchanged allocation; moved port passes"
+    ],
+    "target_acceptance": "UNRUN by this lane"
+  },
+  "template_resolution": {
+    "status": "extension DEFERRED",
+    "path": "adoption/templates/wsl/host.new-distro.json.template",
+    "preserved_sha256": "4395aec846f1d418a55a862cb4db03906d2513d00fa596c190b56641f760f6b0",
+    "frozen_revision": "14048b840425c2569e0df60a6596e94e601da15b",
+    "experiment_unchanged": "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
+    "host_override_fields": "Optional NS_PORT_* values live in the host JSON; example.json and renderer defaults carry their names/defaults."
+  },
+  "first_head_ci": {
+    "run": 38800835847,
+    "repairs": {
+      "validate-shard-0": "restored the frozen host template without changing the experiment",
+      "validate-shard-3": "Ollama fixture hashes the default unit expansion",
+      "validate-shard-4": "hcom emitter fixture checks the default port expansion"
+    },
+    "out_of_scope": {
+      "job": 116649118179,
+      "advisory": "GHSA-qhrr-8q5h-9q3h",
+      "package": "MessagePack",
+      "affected": "3.1.7",
+      "fixed": "3.1.9",
+      "path": "blueprints/us-equities/engine/patches/alpaca.packages.lock.json",
+      "action": "reported; no dependency changes"
+    }
+  },
+  "citation_checks": {
+    "runtime_profiles_GPT_MODEL_line": 43,
+    "gpt_researcher_existing_line": 27,
+    "install_accept": "no-start-citation-audit.json holds the updated live anchors; receipt-bound critic remains unchanged."
+  },
+  "dependency_before": {
+    "command": "env NS_TEST_INSTALL_REF=8053f14e7 python3 -B -m unittest tests.test_install_plan_no_start_ports.ReviewWave1Tests.test_no_start_covers_both_docker_dependency_selections",
+    "tests": 1,
+    "subcase_failures": 4,
+    "exit_code": 1,
+    "roots": [
+      "docker-compose",
+      "harbor-containerized-agent-e2e-runner"
+    ],
+    "unit_states": [
+      "absent",
+      "existing"
+    ],
+    "observed": [
+      "package fake requested activation before masking",
+      "rootless setup ran for absent units",
+      "enable --now ran for both unit states"
+    ],
+    "boundary": "Only extracted selection/dispatch/lifecycle functions ran, with fake package and service tools; no installer script was executed."
+  },
+  "dependency_after": {
+    "command": "python3 -B -m unittest tests.test_install_plan_no_start_ports.ReviewWave1Tests.test_no_start_covers_both_docker_dependency_selections",
+    "tests": 1,
+    "subcases": 4,
+    "failures": 0,
+    "exit_code": 0
+  },
+  "transitive_service_inventory": [
+    {
+      "selected_row": "harbor-containerized-agent-e2e-runner",
+      "dependency": "container-engine",
+      "steps": [
+        {
+          "kind": "package_install",
+          "command": "docker_engine_packages",
+          "no_start": "mask rootful units before apt installation"
+        },
+        {
+          "kind": "rootless_setup",
+          "command": "if [[ \"$NS2604_NO_START\" != 1 && ! -f \"$HOME/.config/systemd/user/docker.service\" ]]; then dockerd-rootless-setuptool.sh install; fi",
+          "no_start": "skip"
+        },
+        {
+          "kind": "unit_registration",
+          "command": "if [[ \"$NS2604_NO_START\" == 1 && ! -e \"$HOME/.config/systemd/user/docker.service\" ]]; then mkdir -p \"$HOME/.config/systemd/user\"; install -m 0600 \"$config_root/docker.service\" \"$HOME/.config/systemd/user/docker.service\"; fi; systemctl --user daemon-reload",
+          "no_start": "install/preserve unit, then daemon-reload"
+        },
+        {
+          "kind": "activation",
+          "command": "activate_user_unit docker.service",
+          "no_start": "skip enable and start"
+        }
+      ]
+    },
+    {
+      "selected_row": "docker-compose",
+      "dependency": "container-engine",
+      "steps": [
+        {
+          "kind": "package_install",
+          "command": "docker_engine_packages",
+          "no_start": "mask rootful units before apt installation"
+        },
+        {
+          "kind": "rootless_setup",
+          "command": "if [[ \"$NS2604_NO_START\" != 1 && ! -f \"$HOME/.config/systemd/user/docker.service\" ]]; then dockerd-rootless-setuptool.sh install; fi",
+          "no_start": "skip"
+        },
+        {
+          "kind": "unit_registration",
+          "command": "if [[ \"$NS2604_NO_START\" == 1 && ! -e \"$HOME/.config/systemd/user/docker.service\" ]]; then mkdir -p \"$HOME/.config/systemd/user\"; install -m 0600 \"$config_root/docker.service\" \"$HOME/.config/systemd/user/docker.service\"; fi; systemctl --user daemon-reload",
+          "no_start": "install/preserve unit, then daemon-reload"
+        },
+        {
+          "kind": "activation",
+          "command": "activate_user_unit docker.service",
+          "no_start": "skip enable and start"
+        }
+      ]
+    }
+  ],
+  "dagu_default_correction": {
+    "source": "dagucloud/dagu v2.18.2 scripts/installer.sh:2180-2183 and internal/cmn/config/loader.go:2266",
+    "before_command": "python3 -B -m unittest tests.test_install_plan_no_start_ports.ReviewWave1Tests.test_dagu_preserves_native_bootstrap_unless_no_start_is_selected",
+    "before_exit_code": 1,
+    "before_observation": "Normal installation incorrectly selected no-service mode and bypassed native bootstrap.",
+    "after_exit_code": 0,
+    "behavior": "Normal mode retains native service/bootstrap; no-start selects --service no. Coordinator drop-in precedes native installation."
+  },
+  "local_boundary_correction": {
+    "earlier_statement": "No acceptance script or collector harness ran locally.",
+    "correction": "An early broad legacy test run invoked accept.sh with a disposable HOME/stub curl and included synthetic native-collector tests. This exceeded the requested local fixture-only/no-script boundary.",
+    "subsequent_policy": "Exclude full acceptance/collector harnesses locally; execute them only on GitHub. Final targeted matrix uses extracted functions/fakes/source checks.",
+    "nativehorizonny_acceptance": "UNRUN by this lane"
+  }
+}

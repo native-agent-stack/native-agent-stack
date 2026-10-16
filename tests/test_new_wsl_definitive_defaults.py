@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 import re
+import runpy
 import shutil
 import subprocess
 import sys
@@ -2315,7 +2316,10 @@ class LocalModelAcceptance(unittest.TestCase):
         (stub / "reply.json").write_text(reply, encoding="utf-8")
         (stub / "curl").write_text('#!/bin/sh\ncat "$STUB_DIR/reply.json"\n', encoding="utf-8")
         (stub / "curl").chmod(0o755)
-        dropped = ("OLLAMA_MODELS", "BASH_ENV", "ENV", "XDG_DATA_HOME", "XDG_CONFIG_HOME", "MISE_SHIMS_DIR", "MISE_DATA_DIR")
+        (stub / "sudo").write_text('#!/bin/sh\n[ "$*" = "ss -ltnpH" ] || exit 99\nprintf \'%s\\n\' '
+                                   '\'LISTEN 0 128 127.0.0.1:21434 0.0.0.0:* users:(("fixture",pid=42,fd=3))\'\n')
+        (stub / "sudo").chmod(0o755)
+        dropped = ("OLLAMA_MODELS", "BASH_ENV", "ENV", "XDG_DATA_HOME", "XDG_CONFIG_HOME", "MISE_SHIMS_DIR", "MISE_DATA_DIR", "NS2604_HOST_FILE")
         env = {key: value for key, value in os.environ.items() if key not in dropped}
         env.update(HOME=str(scratch / "home"), STUB_DIR=str(stub), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
         return subprocess.run(["bash", str(PLAN / "accept.sh"), "--only", "local-model-server", "--stage", "after_sign_in"],
@@ -2378,8 +2382,9 @@ class ModelServerGuard(unittest.TestCase):
                                    encoding="utf-8")
         for name in ("ollama", "curl"):
             (stub / name).chmod(0o755)
-        env = {key: value for key, value in os.environ.items() if key not in ("BASH_ENV", "ENV")}
-        env.update(STUB_DIR=str(stub), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
+        env = {key: value for key, value in os.environ.items() if key not in ("BASH_ENV", "ENV", "NS2604_HOST_FILE")}
+        env.update(STUB_DIR=str(stub), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}",
+                   plan_dir=str(PLAN), config_root=str(scratch / "config"))
         program = f"model_server_answers() {{\n{self.guard}\n}}\nmodel_server_answers"
         return subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env, capture_output=True, text=True,
                               timeout=60)
@@ -2413,7 +2418,9 @@ class PromptfooGatewayTopologyConfiguration(unittest.TestCase):
     def render(self, topology, env=None):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            shutil.copyfile(PLAN / "config/promptfoo-gateway.cjs", root / "promptfoo-gateway.cjs")
+            renderer = runpy.run_path(str(PLAN / "config/observability_config.py"))
+            (root / "promptfoo-gateway.cjs").write_text(renderer["render_ports"](
+                (PLAN / "config/promptfoo-gateway.cjs").read_text(), renderer["service_ports"]()))
             (root / "gpt-gateway-topology.json").write_text(json.dumps(topology))
             return subprocess.run(
                 ["node", "-e", "process.stdout.write(JSON.stringify(require(process.argv[1])))",
@@ -2567,6 +2574,15 @@ class PromptfooGatewayTopologyConfiguration(unittest.TestCase):
             root = Path(directory)
             (root / "config").mkdir()
             # A poison config proves the preflight does not load it or run providers.
+            shutil.copyfile(PLAN / "config/observability_config.py", root / "config/observability_config.py")
+            shutil.copyfile(PLAN / "install-plan.json", root / "install-plan.json")
+            (root / "bin").mkdir()
+            sudo = root / "bin/sudo"
+            sudo.write_text('#!/bin/sh\nprintf \'%s\\n\' '
+                            '\'LISTEN 0 128 127.0.0.1:21128 0.0.0.0:* users:(("fixture",pid=42,fd=3))\' '
+                            '\'LISTEN 0 128 127.0.0.1:21129 0.0.0.0:* users:(("fixture",pid=42,fd=4))\' '
+                            '\'LISTEN 0 128 127.0.0.1:21131 0.0.0.0:* users:(("fixture",pid=42,fd=5))\'\n')
+            sudo.chmod(0o755)
             (root / "config/promptfoo-gateway.cjs").write_text('throw new Error("CONFIG_LOADED");')
             for case in ("pending", "supplied-bad-route", "missing-ownership", "wrong-port",
                          "endpoint-array", "promptfoo-array", "promptfoo-string", "promptfoo-null", "gpt-nul"):
@@ -2591,8 +2607,9 @@ class PromptfooGatewayTopologyConfiguration(unittest.TestCase):
                              dispatcher + '\n}\ncheck promptfoo smoke ' + shlex.quote(program) +
                              ' ' + pending_kind + '\nexit "$failed"')
                     result = subprocess.run(["bash", "-euo", "pipefail", "-c", stage],
-                                            env={"PATH": os.environ["PATH"], "HOME": str(root),
-                                                 "plan_dir": str(root)},
+                                            env={"PATH": str(root / "bin") + os.pathsep + os.environ["PATH"], "HOME": str(root),
+                                                 "plan_dir": str(root), "config_root": str(root / "config"),
+                                                 "config_source_root": str(root / "config")},
                                             capture_output=True, text=True, timeout=10)
                     if case == "pending":
                         self.assertEqual(result.returncode, 0, result.stderr)
@@ -2848,6 +2865,7 @@ selected() { [[ "$only" == "$1" ]]; }
 named() { selected "$1"; }
 run_slot() { printf '%s\\n' "$1"; }
 measured_slot() { if selected "$1"; then run_slot "$1"; fi; }
+commit_allocation() { :; }  # Allocation behavior is covered by the isolated renderer/transaction fixtures.
 needs_docker=false
 failed=0
 '''
@@ -3727,7 +3745,8 @@ exec(sys.stdin.read())
         command = row["commands"][1]
         self.assertFalse((PLAN / "config/ollama-warmup.sh").exists())
         self.assertNotIn("ollama-warmup.sh", json.dumps(row))
-        expected = (PLAN / "config/ollama.service").read_bytes()
+        renderer = runpy.run_path(str(PLAN / "config/observability_config.py"))
+        expected = renderer["render_ports"]((PLAN / "config/ollama.service").read_text(), renderer["service_ports"]()).encode()
         self.assertEqual(hashlib.sha256(expected).hexdigest(),
                          "5e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db")
         self.assertNotIn(b"ExecStartPost=", expected)
@@ -4371,7 +4390,11 @@ sys.exit(42 if fail else 0)
                 env.pop("MCP_AUTO_OPEN_ENABLED", None)
                 if inherited is not None:
                     env["MCP_AUTO_OPEN_ENABLED"] = inherited
-                result = subprocess.run(["bash", str(PLAN / "inspector-client-probe.sh"), str(root), "claude"],
+                renderer = runpy.run_path(str(PLAN / "config/observability_config.py"))
+                probe = root / "probe.sh"
+                probe.write_text(renderer["render_ports"]((PLAN / "inspector-client-probe.sh").read_text(),
+                                                          renderer["service_ports"]()))
+                result = subprocess.run(["bash", str(probe), str(root), "claude"],
                                         env=env, capture_output=True, text=True, timeout=20)
                 succeeds = inherited == "false" and occupied == "none"
                 self.assertEqual(result.returncode == 0, succeeds, result.stderr)

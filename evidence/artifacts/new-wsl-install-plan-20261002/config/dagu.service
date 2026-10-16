@@ -1,0 +1,21 @@
+# Dagu v2.18.2 scripts/installer.sh:1666-1697, user-scope unit.
+# Inline nonsecret environment replaces the installer's env/bootstrap files.
+[Unit]
+Description=Dagu Workflow Engine
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/dagu start-all
+WorkingDirectory=%h/.dagu
+Environment=DAGU_HOME=%h/.dagu
+Environment=DAGU_HOST=127.0.0.1
+Environment=DAGU_PORT=@PORT_DAGU@
+Environment=DAGU_COORDINATOR_PORT=@PORT_DAGU_COORDINATOR@
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

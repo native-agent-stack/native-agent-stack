@@ -1046,30 +1046,51 @@ Proof: the two commands print the same commit. Record it as the receipt's `catal
 
 ### F8. Host value file
 
-Added after `v2026.09.26.2`: `adoption/templates/wsl/host.new-distro.json.template` has the keys of
-`adoption/hosts/example.json` with ports outside the workstation's. Exclusion set: `3710`, `3800`, `8231`, `13000`,
-`13100`, `14318`, `14333`, `16333`, `18080`, `18231`, `18525`, `18888`, `18889`, `19090`, `19093`, `20128`, `20129`,
-`24318`, `26333`, `31415`, `49374` and `49474`. These are the example's four ports, the gateway and memory services, the
-2026-09-25 relocations, the observability backend's fixed ports, and `24318` and `26333`, which the workstation's own
-collector and its Qdrant hold after their 2026-09-25 relocation (observed listening 2026-10-02, when a first run of this
-step failed its proof on them). The template's collector port, `21318`, is the OTLP/HTTP port of the install plan's
-collector (`evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml`), and its Qdrant port, `21633`, is one
-the plan does not use. When the observability layer is installed here later, move its ports with `--port-overrides`
-([Listeners and ports](linux-wsl2.md#listeners-and-ports)).
+The [2026-10-16 addendum](../../docs/decisions/2026-10-16-new-wsl-host-allocation-addendum.md)
+supersedes the earlier nine-key/fixed-port instructions. The image experiment's
+`adoption/templates/wsl/host.new-distro.json.template` remains frozen; it provides
+initial path fields, not a complete executable allocation. Create the private
+host file from it, then complete it before running the validation block below.
 
 ```sh
 cd ~/code/native-agent-stack
-ss -ltnH '( sport = :21318 or sport = :29374 or sport = :21633 or sport = :28231 )'
 python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding="utf-8").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/host.new-distro.json.template "$(id -un)" > 'adoption/hosts/<host>.json'
-python3 -m json.tool 'adoption/hosts/<host>.json'
-git check-ignore 'adoption/hosts/<host>.json'
 ```
 
-Proof: `ss` prints nothing, because no distribution listens on those ports in the shared namespace; `json.tool` prints the
-nine keys; `git check-ignore` prints the path, so the host file never enters a commit. If `ss` shows a listener, choose
-another free port outside the exclusion set and edit the rendered file. The collector's `21318` is the exception: it is
-the port the install plan's collector binds and the one F9's tool renders into both clients, so a listener on it is a
-conflict to resolve before F9, not a value to edit here.
+Add every `NS_PORT_*` field listed in `adoption/hosts/example.json`, and set
+`WSL_DISTRO_NAME` to this target distribution's registered name. Preserve the
+rendered user paths. `AI_MEMORY_URL` supplies the memory port; if `NS_PORT_MEMORY`
+is also supplied it must agree. Set `OTEL_ENDPOINT` consistently with
+`NS_PORT_OTEL_HTTP`. All values remain nonsecret strings. The collector port is
+host-selected too: there is no fixed-21318 exception. Missing allocation keys or
+missing/blank distro identity fail closed in the install/client renderers.
+
+Choose distinct ports that are free across all WSL distributions. Retain the
+historical exclusion set `3710`, `3800`, `8231`, `13000`, `13100`, `14318`, `14333`,
+`16333`, `18080`, `18231`, `18525`, `18888`, `18889`, `19090`, `19093`, `20128`,
+`20129`, `24318`, `26333`, `31415`, `49374` and `49474` as context, then verify the
+current host. The workstation collector and Qdrant were observed listening
+2026-10-02 on `24318` and `26333`; dated observations alone do not prove ports
+free today. Reserve optional/metrics listeners too, including 9749, 21302, 21888
+and 21889, and the independently allocated Inspector/closed-alert fixture ports.
+Qdrant and embedding endpoint fields must also avoid all allocated service ports.
+
+```sh
+python3 -m json.tool 'adoption/hosts/<host>.json'
+git check-ignore 'adoption/hosts/<host>.json'
+ss -ltnH > /tmp/native-stack-port-preflight.txt
+python3 -B evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py --host-file 'adoption/hosts/<host>.json' --ss-output /tmp/native-stack-port-preflight.txt
+```
+
+Proof: the complete host file parses and is git-ignored; the plan check exits 0
+with no allocation collisions or foreign listener among its required owners.
+Compare every allocated port with the same snapshot, including optional and
+measurement-only listeners, fixtures and the Qdrant/embedding endpoint fields;
+the automatic listener check does not require those optional services to run.
+The snapshot is a preflight observation, not a guarantee against later binds.
+F9 uses this exact host file for provisioning and acceptance; client `--host`
+selects the same file. The workstation backend renderer's `--port-overrides` is
+not the install plan's renderer; see [Listeners and ports](linux-wsl2.md#listeners-and-ports).
 
 ### F9. Stage 2
 
@@ -1096,11 +1117,23 @@ without writing.
 
 ```sh
 cd ~/code/native-agent-stack
-bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh
-bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh
+bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --no-start --host-file 'adoption/hosts/<host>.json'
+bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --host-file 'adoption/hosts/<host>.json'
 python3 -B tools/adoption/new_wsl_client_config.py --check
 python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'
 ```
+
+Provisioning leaves units disabled and stopped. The first acceptance command is
+post-install only; service-health and after-sign-in checks wait for separate
+operator activation and a fresh listener-ownership check. Existing enabled or
+running units retain their state. On a legacy install without an allocation
+snapshot, establish the installed allocation before attempting selective migration.
+
+For MinerU, before activation rerun
+`bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only mineru --host-file 'adoption/hosts/<host>.json'`
+without `--no-start`. This disables telemetry and sets the verified Standard
+models to managed mode; the temporary server is stopped if this step started it.
+Then perform the separate persistent activation and listener/health checks.
 
 The `--apply` line is the plain one: it writes none of the authorization settings, which grant a permission or suppress
 a confirmation (Claude Code's `permissions.defaultMode` and `skipDangerousModePermissionPrompt`, Codex's
@@ -1110,7 +1143,7 @@ sets), so each client keeps its own defaults and a value a person set is never t
 (it adds a setting the file lacks and keeps a differing value, printed beside the render's), and the receipt's
 `authorization_settings` records who asked.
 
-After the `--apply` line, run `codex login`, then `claude`, by hand (leave it once it is signed in). Then run the plan's
+After the `--apply` line, run `codex login`, then `claude`, by hand (leave it once it is signed in). Complete separate operator activation and a fresh listener-ownership check before running the plan's
 after-sign-in checks one owner at a time, `bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only <slot>
 --stage after_sign_in`, for `codex`, `claude-agent-sdk`, `codex-sdk-and-codex-exec-app-server`, `agent-messaging`, `sandbox-runtime-srt`, `serena`, `tobi-qmd`, `mineru`, `ccusage`, `command-output`, `local-model-server`, `alerting`, `session-analytics`, `inspect-ai`, `promptfoo`, `worktrunk`, `difftastic`, `gpt-gateway`, `agent-runtime-worker`, `research-harnesses`, `cross-family-review`, `mcp-inspector`, `playwright-cli`, `harbor-containerized-agent-e2e-runner`, `lm-program-optimization`, `skill-vetting`, `trajectory-analysis`, `mcp-protocol-conformance` and `grafana`, the owners whose plan row has that stage. The `command-output` check runs a fresh `codex exec` and requires the `rtk` prefix on the command it executed and that command's exit status 0. This includes acceptance-only cross-family-review and named-only mcp-inspector and grafana. Run `install.sh --only mcp-inspector` first for its declared Chromium host prerequisites. No trust
 grant or hook approval of another host is carried over, so a project's own `.codex/config.toml` stays disabled until

@@ -1,6 +1,6 @@
 # New WSL install plan
 
-Current structural inventory (2026-10-05): 84 rows, 192 install commands and 113 acceptance entries (including two additional checks). The source includes 66 configuration assets. D-ollama-2 carries the updated owner-approved user unit and removes the warmup asset; #713 supplies the additional rows. These counts describe the source, not host acceptance.
+Current structural inventory (2026-10-15): 84 rows, 198 install commands and 113 acceptance entries (including two additional checks). D-ollama-2 carries the updated owner-approved user unit and removes the warmup asset; #713 supplies the additional rows. These counts describe the source, not host acceptance.
 
 **Run the plan from a checkout of the repository** (step F7, "Clone origin/main", of `adoption/platforms/linux-wsl2-new-distro.md`). `worktrunk` and the convergence validators change into `repo_root`, the checkout three levels above this folder, so `install.sh` and `accept.sh` stop with a clear message when `repo_root` is not a git checkout (`install.sh --list` needs none).
 
@@ -18,12 +18,111 @@ The target remains a clean Ubuntu 26.04.1 WSL 2 distribution with systemd, one n
 python3 -B check_plan.py
 bash install.sh --list
 bash install.sh --only <slot>
+bash install.sh --no-start --host-file /path/to/host.json --only <slot>
 bash accept.sh --only <slot>
 bash accept.sh --only <slot> --stage service_health
 bash accept.sh --only <slot> --stage after_sign_in
 ```
 
 Both scripts refuse root. Installation selects dependencies, isolates owner failures and retains existing operator configuration. No default-shell or Windows-side change is prescribed. `--list` is read-only and prints `slot | owner | route | status` for every row; the status is `planned`, `measurement-only` or `excluded`.
+
+`--no-start` installs service files and reloads systemd without enabling or starting
+units, including the Grafana research timer. Dagu uses its pinned installer's
+`--service no` mode; rootless Docker setup is deferred and the upstream unit form
+is installed directly. The rootful Docker/containerd units are masked before apt
+can activate them. MinerU downloads and verifies Standard models through its
+standalone kit; daemon-dependent telemetry/managed-mode configuration is deferred.
+Existing enabled/running units keep their state; this option does not undo earlier
+activation. Foreground observability services receive disabled user units.
+
+`--only` retains the plan's declared dependency closure. In particular,
+`--only docker-compose --no-start` and the Harbor selection also install the
+rootless Docker prerequisite unit and reload systemd, without enabling or
+starting it or running rootless setup. This keeps provisioning in one pass;
+dependency dispatch inherits the same no-start flag as the selected row.
+`python3 check_plan.py --service-inventory` lists both roots and the transitive
+package installation, rootless setup, unit registration/reload and activation
+steps, including their no-start behavior.
+
+Allocate ports in the same nonsecret host JSON used by client configuration.
+`NS_PORT_*` keys select listeners and their client/scrape targets; `AI_MEMORY_URL`
+remains the canonical memory endpoint. Explicit host files, saved allocations and
+`--no-start` require a complete allocation. Missing keys fail before installation;
+there is no fallback to NativeStack2604 ports in these modes. Use the complete
+key set in `adoption/hosts/example.json`, choosing ports unoccupied by the other
+distributions. Client configuration also requires an explicit `WSL_DISTRO_NAME`;
+it renders that identity into Codex's shell policy and refuses missing/blank input.
+The legacy F8 template and its nine fields remain frozen by the planned image
+experiment. Extending that template is DEFERRED to its owners through a
+superseding record; operators must complete their host file before using it.
+The plan's allocation supersedes F8's older fixed-collector-port restriction.
+The pure default renderer still reproduces the previous config bytes, including
+when given the frozen host template's values. This compatibility check does not
+make the incomplete template executable as an isolated host allocation.
+
+Supply `--host-file PATH` to install, acceptance, `check_plan.py`, or this plan's
+`config/observability_config.py`. The installer normalizes an explicit selection
+before staging, freezes the resolved candidate in its temporary source tree, and
+uses that candidate for all dispatched commands. Only successful completion of
+all selected rows publishes `$config_root/.service-ports.json`; a failed run
+preserves the prior allocation. With an existing snapshot, only selected owners'
+ports change: unselected owners retain their recorded allocation before staging
+and at publication, so dependent URLs still target the configured services.
+If the host file requests different ports for an unselected owner, staging
+refuses with `needs_owner` before running rows. Acceptance and client renders
+also refuse host values that disagree with the committed allocation; a request
+is never silently partly applied. Use the complete current host file for
+selective C/D/S installation and every subsequent consumer.
+The merged allocation is collision-checked again. A row without allocated ports
+cannot publish an initial service snapshot. Later runs reuse the saved allocation
+unless another host file is supplied. Differing operator port configuration returns
+`needs_owner` and prevents publication. Staged files, commands, acceptance URLs,
+client configuration and the gateway wrapper's derived digest share this source.
+Research-only installation stores its chosen gateway in the installed GPT
+Researcher JSON, matching DeerFlow. Later invocations use that consumer setting
+after the staging selector disappears, without creating a service snapshot or
+claiming ownership of a listener.
+See [NO_START_PORTS.md](NO_START_PORTS.md) for sources, fail-first fixtures and the
+separate target-host acceptance boundary.
+
+The read-only MCP drift comparator also requires the complete host source:
+`python3 tools/adoption/mcp_template_drift.py --host-file /path/to/host.json`.
+Its render uses the explicit distro identity and allocations; the frozen F8
+template is not used as an implicit fallback.
+
+The three OmniRoute listeners have separate keys: `NS_PORT_GATEWAY` (21128),
+`NS_PORT_GATEWAY_WS` (21129), and `NS_PORT_GATEWAY_EMBED_WS` (21131). Research and
+runtime profile helpers read the same saved allocation; an explicit
+`NS2604_HOST_FILE` selects a host JSON before GPT Researcher scrubs its environment.
+`accept.sh --host-file` propagates that nonsecret pointer to its helper processes.
+
+For stage S, service-health and after-sign-in checks run the listener-ownership
+gate before their programs, including cross-service targets and research's gateway.
+The gate executes `sudo ss -ltnpH` on the target distro and rejects an absent
+listener or one with no visible `users:` process entry. Run the whole planned
+listener inventory directly with:
+
+```sh
+python3 config/observability_config.py listeners --plan-file install-plan.json --host-file /path/to/host.json
+```
+
+The default inventory contains 15 listeners; explicitly selecting a measurement
+row includes its enabled listeners too. Grafana gRPC (21302) is reserved but
+required only when `[grpc_server] enabled = true` in the rendered config, or when
+explicitly selected with `--enabled-listener GRAFANA_GRPC`. Codebase-memory owns
+the optional UI port 9749: before exposing its executable, installation writes
+native `ui_enabled: false` and the allocated integer `ui_port` in its supported
+cache config. Conflicting native settings are retained and fail with `needs_owner`.
+Inspector's 16399 and the deliberately closed alert fixture's 21997 have separate
+allocations and are excluded from running-listener requirements. The Inspector
+recipe is rendered before it is frozen and hashed. Alert acceptance still requires
+both a failed connection and an empty listener census for its closed-port control.
+All reserved, optional and fixture ports remain in collision checks, including
+9749, 21302 and OTel's 21888/21889. `--ss-output /path/to/ss.txt` supplies a recorded
+or synthetic snapshot instead of executing ss. Before installation,
+`check_plan.py --host-file /path/to/host.json --ss-output /path/to/ss.txt` rejects
+foreign listeners on selected ports while allowing currently absent services.
+Neither fixture results nor a stale snapshot prove current listener ownership.
 
 A row is installed by the default run when the manifest row says it installs something, its outcome is not `not_installed` and its state is not `split`, or when it carries an interim install (amendment 3 of the manifest's decision rule, 2026-10-03): an interim installs beside a decided default that installs nothing, whatever that row's state, so code search (split), durable memory (waiting for its measurement) and context supply (a definitive no-install row) install their interims, while their decided defaults stay as the rounds recorded them. `check_plan.py` requires the plan to install every interim the manifest records, with the interim's owner and repository, and requires each interim row's install function to call `interim_acknowledged` first. Two rows the manifest marks as installing are not: MCP Inspector (run on demand with `npx`; mcporter owns MCP calls from scripts) and the base distribution (the image the plan runs on). Two installed rows are left out of the default run: the local-model creation rows. The separate local-model-server row now carries the lasting-owner boot-enabled unit described below.
 
@@ -57,7 +156,16 @@ Installed route counts: native-installer 5; none 14; npm-global 5; uv-tool 9; mi
 
 Docker requires uidmap, dbus-user-session, kernel/rootless prerequisites and its upstream user unit. Exact Engine 29.8.2/Compose 5.5.1 apt revisions come from repository metadata; missing versions fail. Harbor's CLI installed in round 1; its overall installer failed later in Docker setup. Keep this prerequisite gate for the real distribution.
 
-Upstream Docker and Dagu user setup start their services during installation. Other documented foreground/daemon starts, including Alertmanager's, are in [SOURCES.md](SOURCES.md#service-starts--separate-from-installation); the install does not run them, so those services' health checks fail until they are started (as the real-distribution run showed). Post-install checks do not require them. Dagu's user-bus setup, rootless Docker, sandbox namespaces and Git worktree access were checked on the real distribution (VALIDATION.md).
+Upstream Docker and Dagu user setup normally starts their services during installation.
+With `--no-start`, Dagu uses no-service installation and its cited unit form,
+and the plan bypasses rootless Docker setup. Normal Dagu installation retains
+the vendor's service/bootstrap flow; a coordinator-port drop-in is installed
+before that flow can start the service. No-start defers that bootstrap flow.
+Other documented foreground/daemon starts, including Alertmanager's, are in
+[SOURCES.md](SOURCES.md#service-starts--separate-from-installation); their new user
+units are registered without activation. Service-health checks run after an
+explicit start. The older Dagu/rootless Docker distribution results remain
+historical (VALIDATION.md); the new no-start path has fixture evidence only.
 
 GPT Researcher runs only through `tools/research/gpt_researcher.sh` (a keyless configuration, an `env -i` scrub, a fail-closed preflight and `research_report` only). DeerFlow's backend is installed with `uv sync --locked`; foreground research uses its shipped headless JSON CLI with the native 100-step recursion limit and the tagged keyless DDGS adapter. The scrub leaves Jina and Tavily keys empty, and callers select the current public config explicitly. The run retains original JSON events, unqualified returned AI text and an integration receipt requiring a matched substantive search result, linked final citation and terminal usage. Empty DDGS outcomes remain provider-availability evidence and fail acceptance. The measured Tavily adapter is a ready-to-apply proposal requiring a command-center ruling; it does not decide the separate provider-owner measurement or alter GPT Researcher's keyless route. No HTTP stack is started. Historical embedded-client and Compose recipes remain recorded in [SOURCES.md](SOURCES.md).
 
@@ -237,7 +345,12 @@ These changes serve code navigation and local document reading for the research 
 - **Structural search.** The same mise-installed ast-grep 0.45.3 binary runs the unchanged README's `-r '$A?.()'` preview as well as search. The check requires the replacement text and a no-match control returning exactly 1. It uses neither `-U` nor `-i`, so the preview writes no source file. The Opus adjudication rejected the proposed source-build coverage stage; this recipe adds no Rust toolchain. Existing CLI wiring through PATH stays sufficient under that adjudication.
 - **MinerU.** The base 4.0.10 package uses CPU-capable ONNX and llama.cpp, and the row now records `needs.gpu: false`. The installer disables telemetry, installs the pinned upstream `mineru` skill for Claude Code and Codex, downloads and verifies Standard models, sets the managed tier before managed mode, and fetches upstream's public `demo1.pdf` by commit and sha256. The slot's own `config/mineru-skills-manifest.json` uses the existing repository installer's supported `--manifest` route because the shared adoption skills manifest is outside this builder's ownership. `post_install` retains upstream's `mineru --help`, adds pinned skill/list/placement checks and verifies model files. Skills CLI JSON goes to a regular file before parsing. Start the upstream server explicitly, then run `service_health`: healthy local Standard support, successful parse, and a read of the returned page locator must all pass, with first-page text containing `afforestation`. `after_sign_in` repeats parse and read through the skill in fresh sessions of both clients and checks actual successful tool output.
 
-Installation temporarily starts doclib for telemetry and configuration, then stops only the server it started. Run the persistent MinerU lifecycle in this order after installation:
+Normal installation temporarily starts doclib for telemetry and configuration,
+then stops only the server it started. With `--no-start`, the standalone
+`mineru-kit` still downloads and verifies Standard models, so `post_install`
+can check them without starting doclib. Before activation, rerun the MinerU row
+without `--no-start`, using the same explicit host file, to complete telemetry
+and managed-mode configuration. Then run the persistent MinerU lifecycle:
 
 ```sh
 mineru server start
@@ -439,7 +552,7 @@ destination values are recorded here.
 
 The G5 plan repair selected agentsview 0.43.0, Inspect AI 0.3.273 and Harbor 0.23.0 on 2026-10-04. The [2026-10-09 Harbor 0.24.0 amendment receipt](../harbor-0240-currency-20261009/receipt.json) supersedes that Harbor selection and supplies the current Harbor release, commit, wheel and checksum; the current operational owner is Harbor 0.24.0. [SOURCES.md](SOURCES.md), section "G5 analytics and evaluation sources", retains the original 0.23.0 Harbor observations as dated history and supplies the other G5 source pins, upstream operations and local assertions. The original decision is [2026-10-04-2604-e2e-fix-wave-g5-analytics-eval.md](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave-g5-analytics-eval.md). These are plan changes; this builder ran no installation, service, provider evaluation or container trial on a distribution.
 
-- **Session analytics.** The verified release installs behind an owned launcher in both the ecosystem bin and `~/.local/bin`. Every invocation uses the owned archive directory, telemetry off, update checks off and upstream `archive_content=full` (2026-10-08, CC: full session content for live lane review; was `usage`; values per kenn-io/agentsview@413a87f7 internal/config/config.go:670-692). The supported `CLAUDE_PROJECTS_DIR` and `CODEX_SESSIONS_DIR` variables select the active Claude and Codex homes, including explicit `CLAUDE_CONFIG_DIR` and `CODEX_HOME` overrides. The archive configuration binds to `127.0.0.1:8080`; start it with `agentsview daemon start`, inspect it with `agentsview daemon status`, and stop it with `agentsview daemon stop`. Installation starts no daemon. The service stage runs upstream sync, session listing and daily usage reporting for both clients, requires nonempty session and token data, and retains their actual output privately. `--offline` uses fallback pricing; its costs are estimates.
+- **Session analytics.** The verified release installs behind an owned launcher in both the ecosystem bin and `~/.local/bin`. Every invocation uses the owned archive directory, telemetry off, update checks off and upstream `archive_content=full` (2026-10-08, CC: full session content for live lane review; was `usage`; values per kenn-io/agentsview@413a87f7 internal/config/config.go:670-692). The supported `CLAUDE_PROJECTS_DIR` and `CODEX_SESSIONS_DIR` variables select the active Claude and Codex homes, including explicit `CLAUDE_CONFIG_DIR` and `CODEX_HOME` overrides. The archive configuration binds to `127.0.0.1:21808` by default (`NS_PORT_AGENTSVIEW`); start it with `agentsview daemon start`, inspect it with `agentsview daemon status`, and stop it with `agentsview daemon stop`. Installation starts no daemon. The service stage runs upstream sync, session listing and daily usage reporting for both clients, requires nonempty session and token data, and retains their actual output privately. `--offline` uses fallback pricing; its costs are estimates.
 - **Harbor.** Installation also checks out the unchanged upstream `hello-user` task at the release's exact commit, since the wheel contains no examples. After rootless Docker starts, the service stage runs one oracle and one nop trial through `harbor run`, with `DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock` explicit. It requires no model credential: the fixture pulls `ubuntu:24.04`. The upstream test's exception and verifier-reward assertions require 1.0 for oracle and 0.0 for nop; the local artifact checks also read each native `verifier/reward.txt` and require the positive reward gate to reject nop. Fresh run directories retain native job/trial results, verifier output and logs.
 - **Inspect AI.** The uv tool environment explicitly includes the optional provider SDK, `openai==3.24.0`. Installation checks out the unchanged `examples/theory_of_mind.py` at Inspect's exact release commit. The stage after sign-in evaluates one sample through the existing loopback gateway and `openai-api/omniroute/cx/gpt-6.1-sol`, then repeats it with an absent model. Inspect's own `inspect log dump --header-only` reads both logs. The positive gate requires success, one completed sample and nonempty scores; the negative run must produce an error log rejected by that same gate. Preserve the native logs and both control exit codes. This checks execution and scoring; no accuracy threshold is imposed. The keyless loopback uses a non-secret placeholder. If gateway authentication was enabled by the operator, provide `OMNIROUTE_API_KEY` through the existing credential runner.
 

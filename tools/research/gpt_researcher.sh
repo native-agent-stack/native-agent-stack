@@ -28,7 +28,7 @@
 # GPTR_CONFIG_SOURCE names another configuration to copy (the tests use it); the preflight holds any copy to the same rule.
 set -euo pipefail
 here="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-gateway="http://127.0.0.1:21128/v1"
+# Resolve the gateway from this distro's nonsecret host allocation below.
 tool_root="${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/tools"
 checkout="$tool_root/gpt-researcher"
 python="$checkout/.venv/bin/python"
@@ -42,6 +42,9 @@ if [[ ! -x "$python" || ! -f "$checkout/cli.py" ]]; then
   printf 'GPT Researcher is not installed under %s (install plan row research-harnesses).\n' "$checkout" >&2
   exit 1
 fi
+port_renderer="$here/observability_config.py"
+gateway_args=(); if [[ -f "$port_renderer" ]]; then gateway_args=(--config-root "$here" --consumer-config "$config_source"); else port_renderer="$here/../../evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py"; fi
+gateway="$("$python" "$port_renderer" gateway "${gateway_args[@]}")"
 # type -P searches PATH for an executable file only (no alias, function or builtin); a relative PATH entry is anchored here.
 timer="$(type -P timeout || type -P gtimeout || true)"
 if [[ -n "$timer" && "$timer" != /* ]]; then

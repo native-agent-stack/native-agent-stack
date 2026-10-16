@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import runpy
 import shutil
 import socket
 import subprocess
@@ -23,6 +24,13 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+_PLAN_RENDERER = runpy.run_path(str(ROOT / "evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py"))
+
+
+def collector_text(path):
+    return _PLAN_RENDERER["render_ports"](path.read_text(), _PLAN_RENDERER["service_ports"]())
+
+
 COLLECTOR = ROOT / "observability/collector/collector.yaml"
 LAUNCHER = ROOT / "observability/collector/codex-identity-launcher.sh.example"
 CONFIGURE = ROOT / "observability/backends/configure.py"
@@ -125,7 +133,7 @@ class CollectorProfileTests(unittest.TestCase):
         clear = ('delete_matching_keys(attributes, '
                  '"^(ecosystem[._]task[._]id|workflow[._]run[._]id|tool_use_id|cost_usd)$")')
         for profile in profiles:
-            config = yaml.safe_load(profile.read_text())
+            config = yaml.safe_load(collector_text(profile))
             with self.subTest(profile=str(profile.relative_to(ROOT))):
                 guard = config["processors"]["transform/metric_export_privacy"]
                 self.assertEqual(guard["error_mode"], "propagate")
@@ -470,7 +478,7 @@ class NativeCollectorTests(unittest.TestCase):
         span_metrics = self._testMethodName == "test_gateway_span_metrics_keep_provider_status_and_outcome_separate"
         source = (ROOT / "evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml"
                   if span_metrics else COLLECTOR)
-        config = yaml.safe_load(source.read_text())
+        config = yaml.safe_load(collector_text(source))
         config["receivers"] = {"otlp": {"protocols": {"http": {"endpoint": f"127.0.0.1:{self.otlp}"}}}}
         config["exporters"] = {"prometheus": {**config["exporters"]["prometheus"],
                                               "endpoint": f"127.0.0.1:{self.exporter}"}}
