@@ -22877,6 +22877,71 @@
       "bytes": 319713
     },
     {
+      "path": "evidence/artifacts/finalize-f2-claude-20261015/README.md",
+      "sha256": "2806b68229b5586285ad6e1f513ef113c6367cbf291f1c8d681aac42aca28f83",
+      "bytes": 3808
+    },
+    {
+      "path": "evidence/artifacts/finalize-f2-claude-20261015/counts.json",
+      "sha256": "75198d6eb4fc6a631d8448e434321aedf199fdd28e781e4ae89d185a0a67293d",
+      "bytes": 4609
+    },
+    {
+      "path": "evidence/artifacts/finalize-f2-claude-20261015/invoke_counts.py",
+      "sha256": "672b655ead80ae5d84fd5f6d23da248360547b4f5405a282c7cf606f96c49453",
+      "bytes": 4458
+    },
+    {
+      "path": "evidence/artifacts/finalize-f2-claude-20261015/reasons/not-invoked-sandbox-runtime.json",
+      "sha256": "60fabc136feefb6018b19d603237a3fc522d5c764a9292b0f7b425ff37bf302b",
+      "bytes": 649
+    },
+    {
+      "path": "evidence/artifacts/finalize-f2-claude-20261015/receipts/invoke-affaan-m-ecc-dd6ee538.json",
+      "sha256": "0f82ba43ce042a735bd3661f30cb76de7252a5629d8132647c255ba5627f0092",
+      "bytes": 1856
+    },
+    {
+      "path": "evidence/artifacts/finalize-f2-claude-20261015/receipts/invoke-ai-memory-2.6.3.json",
+      "sha256": "a72f8ab4c87401b0bb8f592bcf0f0eb4fb936e6b808fcf6d9d6611c12e1ebb65",
+      "bytes": 1586
+    },
+    {
+      "path": "evidence/artifacts/finalize-f2-claude-20261015/receipts/invoke-claude-code-2.1.295.json",
+      "sha256": "fecc6dac0bcabe25fe157677b879642846844dab177130889c8097daafb17878",
+      "bytes": 1535
+    },
+    {
+      "path": "evidence/artifacts/finalize-f2-claude-20261015/receipts/invoke-claude-code-2.1.300.json",
+      "sha256": "f81262dea309ae6da8e794411f7a33f8d935fc9712888f5603a6242f85b8b63b",
+      "bytes": 1589
+    },
+    {
+      "path": "evidence/artifacts/finalize-f2-claude-20261015/receipts/invoke-headroom-0.40.0.json",
+      "sha256": "53b954fbe12c4110e61af74786dae5da6be461a134e299cd07e0f0e10e754941",
+      "bytes": 1473
+    },
+    {
+      "path": "evidence/artifacts/finalize-f2-claude-20261015/receipts/invoke-qmd-2.8.3.json",
+      "sha256": "8b07bd5cd208d92bc91ec1f814f8c5426c0c27ee7507ab9c97af452cdeda6c6c",
+      "bytes": 1426
+    },
+    {
+      "path": "evidence/artifacts/finalize-f2-claude-20261015/receipts/invoke-rtk-0.51.0.json",
+      "sha256": "7c3bd5e46e05bf356db7f5c98afc8ef0cf9c6868381aa488169bce1750d1a162",
+      "bytes": 1474
+    },
+    {
+      "path": "evidence/artifacts/finalize-f2-claude-20261015/receipts/invoke-serena-2.0.0.dev0.json",
+      "sha256": "7cabb146e07d34f587b67cec41d3c5ada2602c8080f6ceb6f92f482e83dcaade",
+      "bytes": 1521
+    },
+    {
+      "path": "evidence/artifacts/finalize-f2-claude-20261015/validation.json",
+      "sha256": "bfc54fce12a0b2841a5f30efaab22648af55664b2911ad552085a4c1d5cbfdc0",
+      "bytes": 2832
+    },
+    {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
       "sha256": "ff34c3db7e67e4d96e9a1d0d154a0c7e8c01f42eade511302f963ad05a1d2c4c",
       "bytes": 6271

@@ -1,0 +1,28 @@
+{
+ "kind": "invocation",
+ "component_id": "serena",
+ "repository": "https://github.com/oraios/serena",
+ "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+ "evidence_class": "native_proven",
+ "client": "claude-code",
+ "window_start": "2026-10-05T16:09:44Z",
+ "window_end": "2026-10-15T02:10:00Z",
+ "calls": 148,
+ "unit": "tool_result events with mcp_server_name serena",
+ "applies_to": "the serena run pin on main (adoption/pins-linux-x86_64.json#/tools/19)",
+ "pin_binding": "the Claude registration runs the uv tool serena-agent, whose uv-receipt.toml pins git rev c6fbd1c5 (born 2026-10-05T16:09:43Z, the window start); serena --version prints 2.0.0.dev0",
+ "measurement": {
+  "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record): Claude Code's native OpenTelemetry tool events; the Collector copies the MCP server name, the skill name and a derived shell_rtk boolean; no command text",
+  "logql": [
+   "{service_name=\"claude-code\"} | event_name=\"tool_result\" | mcp_server_name=\"serena\""
+  ],
+  "chunking": "24-hour count_over_time chunks summed",
+  "script": "invoke_counts.py",
+  "script_sha256": "672b655ead80ae5d84fd5f6d23da248360547b4f5405a282c7cf606f96c49453",
+  "counts_file": "counts.json",
+  "counts_sha256": "75198d6eb4fc6a631d8448e434321aedf199fdd28e781e4ae89d185a0a67293d",
+  "counted_utc": "2026-10-15T02:35:59Z"
+ },
+ "measured_by": "cc-native-practice, FINALIZE-ALL F2 (Claude side)",
+ "not_evidence": "installation alone; this receipt counts calls only"
+}

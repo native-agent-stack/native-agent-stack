@@ -1,0 +1,28 @@
+{
+ "kind": "invocation",
+ "component_id": "rtk",
+ "repository": "https://github.com/rtk-ai/rtk",
+ "pin": "0.51.0",
+ "evidence_class": "native_proven",
+ "client": "claude-code",
+ "window_start": "2026-10-05T19:04:27Z",
+ "window_end": "2026-10-15T02:10:00Z",
+ "calls": 8547,
+ "unit": "Bash tool_result events with shell_rtk true: commands the PreToolUse hook rtk hook claude rewrote",
+ "applies_to": "the rtk run pin on main (adoption/pins-linux-x86_64.json#/tools/6)",
+ "pin_binding": "rtk resolves to bin/rtk (link born 2026-10-05T19:04:26Z, the window start) into tools/rtk-0.51.0; rtk --version prints 0.51.0",
+ "measurement": {
+  "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record): Claude Code's native OpenTelemetry tool events; the Collector copies the MCP server name, the skill name and a derived shell_rtk boolean; no command text",
+  "logql": [
+   "{service_name=\"claude-code\"} | event_name=\"tool_result\" | tool_name=\"Bash\" | shell_rtk=\"true\""
+  ],
+  "chunking": "24-hour count_over_time chunks summed",
+  "script": "invoke_counts.py",
+  "script_sha256": "672b655ead80ae5d84fd5f6d23da248360547b4f5405a282c7cf606f96c49453",
+  "counts_file": "counts.json",
+  "counts_sha256": "75198d6eb4fc6a631d8448e434321aedf199fdd28e781e4ae89d185a0a67293d",
+  "counted_utc": "2026-10-15T02:35:59Z"
+ },
+ "measured_by": "cc-native-practice, FINALIZE-ALL F2 (Claude side)",
+ "not_evidence": "installation alone; this receipt counts calls only"
+}

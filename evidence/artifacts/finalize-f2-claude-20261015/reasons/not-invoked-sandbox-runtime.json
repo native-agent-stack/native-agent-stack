@@ -1,0 +1,10 @@
+{
+ "kind": "non_invocation_reason",
+ "component_id": "sandbox-runtime",
+ "repository": "https://github.com/anthropics/sandbox-runtime",
+ "frozen_run_pin": "0.0.79 @ d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+ "client": "claude-code",
+ "calls": 0,
+ "not_invoked_reason": "No Claude lane runs the native Bash sandbox: user settings leave sandbox unset, and the practice skill's sandbox slot is a trial that waits for M1's arms and the owner's opt-in. The review worker's srt use waits on its own enabling (#1107's live probes). This is an owner-gated trial, not a wiring defect.",
+ "recorded_by": "cc-native-practice, FINALIZE-ALL F2 (Claude side)"
+}

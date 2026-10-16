@@ -1,0 +1,133 @@
+{
+ "loki": "http://127.0.0.1:21300",
+ "read_utc": "2026-10-15T02:35:59Z",
+ "chunk_seconds": 86400,
+ "rows": [
+  {
+   "id": "claude-code@2.1.295/tool_result",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"tool_result\" | service_version=\"2.1.295\"",
+   "window_start": "2026-10-08T20:12:18Z",
+   "window_end": "2026-10-10T05:04:41Z",
+   "calls": 52006
+  },
+  {
+   "id": "claude-code@2.1.295/api_request",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"api_request\" | service_version=\"2.1.295\"",
+   "window_start": "2026-10-08T20:12:18Z",
+   "window_end": "2026-10-10T05:04:41Z",
+   "calls": 48207
+  },
+  {
+   "id": "claude-code@2.1.300/tool_result",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"tool_result\" | service_version=\"2.1.300\"",
+   "window_start": "2026-10-14T20:16:22Z",
+   "window_end": "2026-10-15T02:10:00Z",
+   "calls": 12132
+  },
+  {
+   "id": "claude-code@2.1.300/api_request",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"api_request\" | service_version=\"2.1.300\"",
+   "window_start": "2026-10-14T20:16:22Z",
+   "window_end": "2026-10-15T02:10:00Z",
+   "calls": 11755
+  },
+  {
+   "id": "serena@c6fbd1c5",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"tool_result\" | mcp_server_name=\"serena\"",
+   "window_start": "2026-10-05T16:09:44Z",
+   "window_end": "2026-10-15T02:10:00Z",
+   "calls": 148
+  },
+  {
+   "id": "qmd@2.8.3",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"tool_result\" | mcp_server_name=\"qmd\"",
+   "window_start": "2026-10-05T10:22:24Z",
+   "window_end": "2026-10-15T02:10:00Z",
+   "calls": 135
+  },
+  {
+   "id": "headroom@0.40.0",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"tool_result\" | mcp_server_name=\"headroom\"",
+   "window_start": "2026-10-08T05:05:42Z",
+   "window_end": "2026-10-15T02:10:00Z",
+   "calls": 7
+  },
+  {
+   "id": "rtk@0.51.0",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"tool_result\" | tool_name=\"Bash\" | shell_rtk=\"true\"",
+   "window_start": "2026-10-05T19:04:27Z",
+   "window_end": "2026-10-15T02:10:00Z",
+   "calls": 8547
+  },
+  {
+   "id": "promptfoo@0.123.1",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"tool_result\" | mcp_server_name=\"promptfoo\"",
+   "window_start": "2026-10-04T15:44:42Z",
+   "window_end": "2026-10-08T04:54:52Z",
+   "calls": 2
+  },
+  {
+   "id": "socraticode@1.15.0",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"tool_result\" | mcp_server_name=\"socraticode\"",
+   "window_start": "2026-10-04T15:44:42Z",
+   "window_end": "2026-10-07T02:24:47Z",
+   "calls": 4
+  },
+  {
+   "id": "ai-memory@pre-2.6.0",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"tool_result\" | mcp_server_name=\"ai-memory\"",
+   "window_start": "2026-10-04T15:44:42Z",
+   "window_end": "2026-10-08T05:18:10Z",
+   "calls": 175
+  },
+  {
+   "id": "ai-memory@2.6.3",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"tool_result\" | mcp_server_name=\"ai-memory\"",
+   "window_start": "2026-10-10T22:09:02Z",
+   "window_end": "2026-10-15T02:10:00Z",
+   "calls": 2
+  },
+  {
+   "id": "socraticode@1.16.0",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"tool_result\" | mcp_server_name=\"socraticode\"",
+   "window_start": "2026-10-07T20:34:02Z",
+   "window_end": "2026-10-15T02:10:00Z",
+   "calls": 22
+  },
+  {
+   "id": "skill:iterative-retrieval",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"skill_activated\" | skill_name=\"iterative-retrieval\"",
+   "window_start": "2026-10-04T15:44:42Z",
+   "window_end": "2026-10-15T02:10:00Z",
+   "calls": 204
+  },
+  {
+   "id": "skill:search-first",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"skill_activated\" | skill_name=\"search-first\"",
+   "window_start": "2026-10-04T15:44:42Z",
+   "window_end": "2026-10-15T02:10:00Z",
+   "calls": 213
+  },
+  {
+   "id": "skill:typesafe-ai",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"skill_activated\" | skill_name=\"typesafe-ai\"",
+   "window_start": "2026-10-04T15:44:42Z",
+   "window_end": "2026-10-15T02:10:00Z",
+   "calls": 15
+  },
+  {
+   "id": "skill:gh-fix-ci",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"skill_activated\" | skill_name=\"gh-fix-ci\"",
+   "window_start": "2026-10-04T15:44:42Z",
+   "window_end": "2026-10-15T02:10:00Z",
+   "calls": 16
+  },
+  {
+   "id": "skill:gh-address-comments",
+   "logql": "{service_name=\"claude-code\"} | event_name=\"skill_activated\" | skill_name=\"gh-address-comments\"",
+   "window_start": "2026-10-04T15:44:42Z",
+   "window_end": "2026-10-15T02:10:00Z",
+   "calls": 14
+  }
+ ]
+}
