@@ -3,7 +3,7 @@
   "kind": "final_wave_gap_disposition_draft",
   "catalog": "foundation",
   "layer_id": "durable-memory",
-  "recorded_at": "2026-10-16T05:24:49Z",
+  "recorded_at": "2026-10-16T06:34:59.834042Z",
   "proposed_disposition": "GAP",
   "adjudicated": false,
   "final_admission_requested": false,
@@ -114,5 +114,6 @@
       },
       "next_check": "Use source changes and measured migration/quality evidence to adjudicate a later run-pin supersession; deployment incumbency gives no merit preference."
     }
-  ]
+  ],
+  "recorded_at_basis": "Actual corrective review of the retained gaps after reading the supporting capture files; validation-outputs/angle-evidence-readback.txt:10. This timestamp does not backdate the original draft."
 }

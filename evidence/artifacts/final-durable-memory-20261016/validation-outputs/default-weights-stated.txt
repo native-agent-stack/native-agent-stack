@@ -1,0 +1,1 @@
+{"weights": {"A1": 0.2, "A2": 0.2, "A3": 0.15, "A4": 0.15, "A5": 0.2, "A6": 0.1}, "stated_at": "2026-10-16T06:33:46.936381Z", "source": "scripts/angle_records.py:22"}

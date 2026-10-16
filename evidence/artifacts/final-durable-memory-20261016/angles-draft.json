@@ -4,17 +4,17 @@
   "catalog": "foundation",
   "layer_id": "durable-memory",
   "weights": {
-    "A1": 0.25,
-    "A2": 0.15,
-    "A3": 0.1,
-    "A4": 0.1,
-    "A5": 0.15,
-    "A6": 0.25
+    "A1": 0.2,
+    "A2": 0.2,
+    "A3": 0.15,
+    "A4": 0.15,
+    "A5": 0.2,
+    "A6": 0.1
   },
-  "weights_stated_at": "2026-10-16T05:24:49Z",
-  "weight_reason": "Proposed before any comparative scoring: give capability and our matched lifecycle/quality measurement equal emphasis, with engineering quality and applicable evaluations next. All six angles remain required; weights cannot turn UNKNOWN into convergence or defeat a hard disqualifier.",
+  "weights_stated_at": "2026-10-16T06:33:46.936381Z",
+  "weight_reason": "Use the angle-convergence/2 defaults from scripts/angle_records.py:22 at repository base caa224140a2d04ba5f3d0ca320c487a75f9c9ea1. The default-weight statement was captured before this corrective evidence review in validation-outputs/default-weights-stated.txt:1. No non-default weighting rationale or comparative score is introduced.",
   "published_evaluations_available": true,
-  "disclosure": "Draft only, not blind and not admitted to the canonical angle directory. No comparison scoring ran. Use the existing W6 role-specific checks; these source-pin proposals need an explicit re-freeze before any comparison. All nine verdicts remain INSUFFICIENT. The co-op owns the two-family adjudication. A fresh Hindsight recovery read fills a previous source gap without changing the separate screen PR or claiming runtime success. Receipt integrity was rechecked after the first draft: measurement summaries bind the rebuilt masked native captures, while angle scores, weights and dispositions are source-derived analyst judgments, never native output.",
+  "disclosure": "Draft only, not blind and not admitted to the canonical angle directory. No comparison ran. All nine verdicts remain INSUFFICIENT and their derived provisional flags are false: the validator reserves provisional for CONVERGED results without comparative A6. Operator trial metadata is omitted because no operator permission decision is being recorded. A1 source screening does not grant permission or choose a winner. Default weights were stated before a real corrective review of retained evidence; each read_at comes from that review, after the cited native captures. Original source-acquisition times remain in screen-delta.json. The co-op owns the two-family adjudication. published_evaluations_available records availability of the vendor-linked evaluation, not a positive A5 score or proof of independent replication. The validator capture and time readback are in fold-validation.json. The source-pin proposals still need an explicit re-freeze before comparison.",
   "resolution_inputs": [
     "catalogs/landscape/foundation.json",
     "catalogs/landscape/final-stack.json",
@@ -30,7 +30,8 @@
     "evidence/artifacts/final-durable-memory-20261016/F1-run-pin.json",
     "evidence/artifacts/final-durable-memory-20261016/screen-delta.json",
     "evidence/artifacts/final-durable-memory-20261016/E2E-attempt.json",
-    "evidence/artifacts/final-durable-memory-20261016/F2-invoke.json"
+    "evidence/artifacts/final-durable-memory-20261016/F2-invoke.json",
+    "evidence/artifacts/final-durable-memory-20261016/fold-validation.json"
   ],
   "gaps": [
     "E2E-RUST: cargo t --locked exited 127: cargo is unavailable. The full Rust/nextest tier was not executed.",
@@ -60,7 +61,7 @@
       "angles": {
         "A1": {
           "score": "+",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.822810Z",
           "sources": [
             {
               "kind": "repo",
@@ -165,7 +166,7 @@
         },
         "A2": {
           "score": "+",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.826052Z",
           "sources": [
             {
               "kind": "repo",
@@ -190,25 +191,25 @@
         },
         "A3": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.826164Z",
           "sources": [],
           "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.826259Z",
           "sources": [],
           "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
         },
         "A5": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.826351Z",
           "sources": [],
           "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
         },
         "A6": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.828138Z",
           "sources": [
             {
               "kind": "receipt",
@@ -224,12 +225,10 @@
       },
       "disqualifier": null,
       "verdict": "INSUFFICIENT",
-      "provisional": true,
+      "provisional": false,
       "measure_next": "Resolve remaining A1 gaps, adjudicate the pin delta and run the preserved role-specific W6 cases with matched models and complete usage receipts.",
       "previous_verdict": "Historical adopted candidate; reopened at 2.3.2; newer source and operating pins disagree.",
       "adoption_status": "CURRENT",
-      "trial_permitted": true,
-      "final_eligible": false,
       "licence_note": {
         "spdx_id": "MIT",
         "source": {
@@ -239,7 +238,7 @@
           "path": "LICENSE",
           "line": 1
         },
-        "read_at": "2026-10-16T05:24:49Z",
+        "read_at": "2026-10-16T06:35:00.053418Z",
         "note": "Compliance note only; it does not affect the verdict."
       }
     },
@@ -259,7 +258,7 @@
       "angles": {
         "A1": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.828306Z",
           "sources": [
             {
               "kind": "repo",
@@ -287,7 +286,7 @@
         },
         "A2": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.828444Z",
           "sources": [
             {
               "kind": "receipt",
@@ -298,37 +297,35 @@
         },
         "A3": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.828520Z",
           "sources": [],
           "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.828590Z",
           "sources": [],
           "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
         },
         "A5": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.828659Z",
           "sources": [],
           "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
         },
         "A6": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.828728Z",
           "sources": [],
           "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
         }
       },
       "disqualifier": null,
       "verdict": "INSUFFICIENT",
-      "provisional": true,
+      "provisional": false,
       "measure_next": "Qualify only the preserved W6 dependency/control role on its fixed fictional cases after the source-pin amendment is adjudicated.",
       "previous_verdict": "FAIL in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
-      "adoption_status": "COMPARISON_ARM",
-      "trial_permitted": false,
-      "final_eligible": false
+      "adoption_status": "COMPARISON_ARM"
     },
     {
       "id": "langchain-ai-langmem",
@@ -346,7 +343,7 @@
       "angles": {
         "A1": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.828980Z",
           "sources": [
             {
               "kind": "repo",
@@ -381,7 +378,7 @@
         },
         "A2": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.829116Z",
           "sources": [
             {
               "kind": "receipt",
@@ -392,37 +389,35 @@
         },
         "A3": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.829250Z",
           "sources": [],
           "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.829421Z",
           "sources": [],
           "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
         },
         "A5": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.829597Z",
           "sources": [],
           "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
         },
         "A6": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.829768Z",
           "sources": [],
           "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
         }
       },
       "disqualifier": null,
       "verdict": "INSUFFICIENT",
-      "provisional": true,
+      "provisional": false,
       "measure_next": "Qualify only the preserved W6 dependency/control role on its fixed fictional cases after the source-pin amendment is adjudicated.",
       "previous_verdict": "FAIL in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
-      "adoption_status": "COMPARISON_ARM",
-      "trial_permitted": false,
-      "final_eligible": false
+      "adoption_status": "COMPARISON_ARM"
     },
     {
       "id": "rohitg00-agentmemory",
@@ -439,7 +434,7 @@
       "angles": {
         "A1": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.830001Z",
           "sources": [
             {
               "kind": "repo",
@@ -502,7 +497,7 @@
         },
         "A2": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.830210Z",
           "sources": [
             {
               "kind": "receipt",
@@ -513,37 +508,35 @@
         },
         "A3": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.830357Z",
           "sources": [],
           "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.830508Z",
           "sources": [],
           "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
         },
         "A5": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.830616Z",
           "sources": [],
           "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
         },
         "A6": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.830720Z",
           "sources": [],
           "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
         }
       },
       "disqualifier": null,
       "verdict": "INSUFFICIENT",
-      "provisional": true,
+      "provisional": false,
       "measure_next": "Resolve remaining A1 gaps, adjudicate the pin delta and run the preserved role-specific W6 cases with matched models and complete usage receipts.",
       "previous_verdict": "INCOMPLETE in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
-      "adoption_status": "COMPARISON_ARM",
-      "trial_permitted": false,
-      "final_eligible": false
+      "adoption_status": "COMPARISON_ARM"
     },
     {
       "id": "mempalace-mempalace",
@@ -560,7 +553,7 @@
       "angles": {
         "A1": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.830912Z",
           "sources": [
             {
               "kind": "repo",
@@ -609,7 +602,7 @@
         },
         "A2": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.831099Z",
           "sources": [
             {
               "kind": "receipt",
@@ -620,37 +613,35 @@
         },
         "A3": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.831187Z",
           "sources": [],
           "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.831330Z",
           "sources": [],
           "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
         },
         "A5": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.831510Z",
           "sources": [],
           "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
         },
         "A6": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.831656Z",
           "sources": [],
           "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
         }
       },
       "disqualifier": null,
       "verdict": "INSUFFICIENT",
-      "provisional": true,
+      "provisional": false,
       "measure_next": "Resolve remaining A1 gaps, adjudicate the pin delta and run the preserved role-specific W6 cases with matched models and complete usage receipts.",
       "previous_verdict": "INCOMPLETE in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
-      "adoption_status": "COMPARISON_ARM",
-      "trial_permitted": false,
-      "final_eligible": false
+      "adoption_status": "COMPARISON_ARM"
     },
     {
       "id": "vshulcz-deja-vu",
@@ -667,7 +658,7 @@
       "angles": {
         "A1": {
           "score": "+",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.831851Z",
           "sources": [
             {
               "kind": "repo",
@@ -723,7 +714,7 @@
         },
         "A2": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.832005Z",
           "sources": [
             {
               "kind": "receipt",
@@ -734,37 +725,35 @@
         },
         "A3": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.832110Z",
           "sources": [],
           "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.832188Z",
           "sources": [],
           "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
         },
         "A5": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.832258Z",
           "sources": [],
           "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
         },
         "A6": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.832345Z",
           "sources": [],
           "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
         }
       },
       "disqualifier": null,
       "verdict": "INSUFFICIENT",
-      "provisional": true,
+      "provisional": false,
       "measure_next": "Resolve remaining A1 gaps, adjudicate the pin delta and run the preserved role-specific W6 cases with matched models and complete usage receipts.",
       "previous_verdict": "PASS in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
-      "adoption_status": "COMPARISON_ARM",
-      "trial_permitted": true,
-      "final_eligible": false
+      "adoption_status": "COMPARISON_ARM"
     },
     {
       "id": "vbcherepanov-total-agent-memory",
@@ -781,7 +770,7 @@
       "angles": {
         "A1": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.832571Z",
           "sources": [
             {
               "kind": "repo",
@@ -865,7 +854,7 @@
         },
         "A2": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.832687Z",
           "sources": [
             {
               "kind": "receipt",
@@ -876,37 +865,35 @@
         },
         "A3": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.832761Z",
           "sources": [],
           "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.832834Z",
           "sources": [],
           "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
         },
         "A5": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.832902Z",
           "sources": [],
           "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
         },
         "A6": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.832970Z",
           "sources": [],
           "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
         }
       },
       "disqualifier": null,
       "verdict": "INSUFFICIENT",
-      "provisional": true,
+      "provisional": false,
       "measure_next": "Resolve remaining A1 gaps, adjudicate the pin delta and run the preserved role-specific W6 cases with matched models and complete usage receipts.",
       "previous_verdict": "INCOMPLETE in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
-      "adoption_status": "COMPARISON_ARM",
-      "trial_permitted": false,
-      "final_eligible": false
+      "adoption_status": "COMPARISON_ARM"
     },
     {
       "id": "vectorize-io-hindsight",
@@ -925,7 +912,7 @@
       "angles": {
         "A1": {
           "score": "+",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.833068Z",
           "sources": [
             {
               "kind": "repo",
@@ -1009,7 +996,7 @@
         },
         "A2": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.833155Z",
           "sources": [
             {
               "kind": "repo",
@@ -1023,19 +1010,19 @@
         },
         "A3": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.833230Z",
           "sources": [],
           "note": "The README asserts external replication, but no independent source was verified in this delta. No community-consensus score is inferred."
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.833302Z",
           "sources": [],
           "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
         },
         "A5": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.833375Z",
           "sources": [
             {
               "kind": "repo",
@@ -1056,19 +1043,17 @@
         },
         "A6": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.833453Z",
           "sources": [],
           "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
         }
       },
       "disqualifier": null,
       "verdict": "INSUFFICIENT",
-      "provisional": true,
+      "provisional": false,
       "measure_next": "Run same-pin upstream backup/restore on an isolated locked PostgreSQL backend, then compare native capture, recovery, source-grounded recall, abstention, learning quality and total usage against ai-memory under the same frozen cases/model panel.",
       "previous_verdict": "INCOMPLETE in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
-      "adoption_status": "COMPARISON_ARM",
-      "trial_permitted": true,
-      "final_eligible": false
+      "adoption_status": "COMPARISON_ARM"
     },
     {
       "id": "tigerless-labs-agent-memory",
@@ -1085,7 +1070,7 @@
       "angles": {
         "A1": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.833567Z",
           "sources": [
             {
               "kind": "repo",
@@ -1134,7 +1119,7 @@
         },
         "A2": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.833675Z",
           "sources": [
             {
               "kind": "receipt",
@@ -1145,37 +1130,35 @@
         },
         "A3": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.833747Z",
           "sources": [],
           "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.833816Z",
           "sources": [],
           "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
         },
         "A5": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.833882Z",
           "sources": [],
           "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
         },
         "A6": {
           "score": "U",
-          "read_at": "2026-10-16T05:24:49Z",
+          "read_at": "2026-10-16T06:34:59.834001Z",
           "sources": [],
           "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
         }
       },
       "disqualifier": null,
       "verdict": "INSUFFICIENT",
-      "provisional": true,
+      "provisional": false,
       "measure_next": "Resolve remaining A1 gaps, adjudicate the pin delta and run the preserved role-specific W6 cases with matched models and complete usage receipts.",
       "previous_verdict": "INCOMPLETE in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
-      "adoption_status": "COMPARISON_ARM",
-      "trial_permitted": false,
-      "final_eligible": false
+      "adoption_status": "COMPARISON_ARM"
     }
   ],
   "final_evidence": [],

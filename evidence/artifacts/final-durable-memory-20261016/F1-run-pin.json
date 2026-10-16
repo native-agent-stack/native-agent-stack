@@ -64,6 +64,16 @@
       "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/w6-layer-verdict-20261011/primary-sources.json#L702"
     },
     {
+      "path": "docs/memory-landscape-maintenance.md",
+      "line": 125,
+      "additional_lines": [
+        134
+      ],
+      "value": "Committed host-history record: ai-memory 2.6.3 since 2026-10-10T22:09Z",
+      "note": "A historical host statement at the repository base, distinct from the fresh 2.6.6 binary version probe and the W6 2.6.0 source-review pin.",
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/memory-landscape-maintenance.md#L125"
+    },
+    {
       "kind": "observed_host_version",
       "value": "ai-memory 2.6.6",
       "command": [
@@ -74,7 +84,8 @@
       "evidence": "evidence/artifacts/final-durable-memory-20261016/outputs/host-version-readonly.txt:1",
       "note": "Read-only pre-existing binary probe; it does not prove the active service, hooks or clients use this binary.",
       "capture": "masked_native_capture",
-      "receipt": "E2E-attempt.json#/commands/host-version-readonly"
+      "receipt": "E2E-attempt.json#/commands/host-version-readonly",
+      "separate_command_note": "These are distinct native commands with separately retained captures: native-version runs <SCRATCH>/prefix/ai-memory --version at 2026-10-16T05:39:08.517690+00:00; host-version-readonly runs ai-memory --version at 2026-10-16T05:40:08.839096+00:00. Both report ai-memory 2.6.6, so identical output bytes are expected. The host probe serves F1 and is not isolated-install or E2E evidence."
     }
   ],
   "proposed_run_pin": {
@@ -105,6 +116,7 @@
     "2.4.1",
     "2.5.2",
     "2.6.0",
+    "2.6.3",
     "2.6.6"
   ],
   "newer_source_boundary": {
@@ -112,7 +124,17 @@
     "commit": "dbe928e3b64414c619435df887ed344ff83887a5",
     "source_pr": 1193,
     "source_head": "75777efa265dde1154a5524dbe69cb5dbf6eb7df",
-    "runtime_qualified": false
+    "runtime_qualified": false,
+    "source": {
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "commit": "75777efa265dde1154a5524dbe69cb5dbf6eb7df",
+      "path": "evidence/artifacts/harness-screens-20261015/durable-memory.anthropic.json",
+      "lines": [
+        10,
+        11
+      ],
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/75777efa265dde1154a5524dbe69cb5dbf6eb7df/evidence/artifacts/harness-screens-20261015/durable-memory.anthropic.json#L10"
+    }
   },
   "limits": [
     "No operational pin, install plan, catalog, canonical angle record or default changes.",

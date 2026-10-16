@@ -28,7 +28,8 @@
       "command_placeholders": {
         "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
       },
-      "output_line_count": 1
+      "output_line_count": 1,
+      "comparison_note": "These are distinct native commands with separately retained captures: native-version runs <SCRATCH>/prefix/ai-memory --version at 2026-10-16T05:39:08.517690+00:00; host-version-readonly runs ai-memory --version at 2026-10-16T05:40:08.839096+00:00. Both report ai-memory 2.6.6, so identical output bytes are expected. The host probe serves F1 and is not isolated-install or E2E evidence."
     },
     {
       "label": "native-init",

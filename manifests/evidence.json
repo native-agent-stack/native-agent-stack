@@ -22888,43 +22888,48 @@
     },
     {
       "path": "evidence/artifacts/final-durable-memory-20261016/E2E-attempt.json",
-      "sha256": "5d74d7bfc4024ea95b4fc80922df7f7e245c5f930a149d7976f72188f1250fba",
-      "bytes": 23463
+      "sha256": "a38820511334b2c6a0d6eb6cd935852f9f54e0e0ea6b42e5d71c0df66f2e52f0",
+      "bytes": 24293
     },
     {
       "path": "evidence/artifacts/final-durable-memory-20261016/F1-run-pin.json",
-      "sha256": "972b1243f089b260e44843deea64314735fbd6649653ea34d05204bd9bb13e08",
-      "bytes": 6050
+      "sha256": "10d1afa5960d867d553ef5852f849a7353eda06580b9710bce6d3ec11e5fc6a0",
+      "bytes": 7523
     },
     {
       "path": "evidence/artifacts/final-durable-memory-20261016/F2-invoke.json",
-      "sha256": "0d5c65d8949bb61021329524692123de8914861778b4860e87ce40292f579a6b",
-      "bytes": 4925
+      "sha256": "b084168e3b01f2ecfc0548b47a9bc5a13a5d1297c341f06916d7103e8dfabc71",
+      "bytes": 5340
     },
     {
       "path": "evidence/artifacts/final-durable-memory-20261016/README.md",
-      "sha256": "5c3320d53360712cc3d5fc1d8bca97693f15e78944ab2060d64ec2f163a92224",
-      "bytes": 15309
+      "sha256": "c62d1abb35f5b63ae9a4d5e0d3ab4b4d84f682400002dc94e5ec7c722b7f0fac",
+      "bytes": 17271
     },
     {
       "path": "evidence/artifacts/final-durable-memory-20261016/angles-draft.json",
-      "sha256": "254442f34738381294c72d1a8cea0f21e04bc4c6cf2749077a1d68089192010e",
-      "bytes": 51366
+      "sha256": "bc614e5a4fbcf8810db77916af23eee3b28cd74b32e3cd27e04c4fe20c7ef14a",
+      "bytes": 51645
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/fold-validation.json",
+      "sha256": "3b8f4447a9eced90faeaf406a38c8c18fd4ababec22959cbcdbc3e86d366d5e2",
+      "bytes": 8671
     },
     {
       "path": "evidence/artifacts/final-durable-memory-20261016/gaps.json",
-      "sha256": "a87218c10ecd8fa7cf8eac3e434d44243fd513848644edafc445c30e19f09648",
-      "bytes": 5706
+      "sha256": "443bc6cf1cddb66e864119aa37eba0cc946410604cad1d65a79211d81c7d8d0e",
+      "bytes": 5933
     },
     {
       "path": "evidence/artifacts/final-durable-memory-20261016/integrity-audit.md",
-      "sha256": "38c0162444ab1626252511b1e7475d6bf317bd2d953ec72632cfa2351ee7fe27",
-      "bytes": 7029
+      "sha256": "a2237ed78a584d8ccae7b241d9ff7ef5695b41dbf320ed2a00d236733c2e2083",
+      "bytes": 7979
     },
     {
       "path": "evidence/artifacts/final-durable-memory-20261016/lane-packet-delta.json",
-      "sha256": "5f16a8f6d4a76112931aa1bf167cc45e71ff3b5f2d1b459eeed14a21b5c109dd",
-      "bytes": 11119
+      "sha256": "2caf718f53ade19798a891791bb38b09c818c0ac5be6dd4a0ef6a982feea1cc2",
+      "bytes": 11158
     },
     {
       "path": "evidence/artifacts/final-durable-memory-20261016/mask_capture.py",
@@ -23038,8 +23043,28 @@
     },
     {
       "path": "evidence/artifacts/final-durable-memory-20261016/source-witness.json",
-      "sha256": "a25bc3ace5c1da6107a667979c6463b7f89a930fe2e97068f371460c050cff34",
-      "bytes": 3095
+      "sha256": "0cf996c0c430340588c3fda0d503a439045923674741666dfd2d5dd97fa9da96",
+      "bytes": 3562
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/validation-outputs/angle-evidence-readback.txt",
+      "sha256": "71b7afcc70e0326c9c7e76ec981defb694602201b41917735ad0c36f495ada12",
+      "bytes": 25910
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/validation-outputs/angle-validator-after.txt",
+      "sha256": "179cbbf2a76deecd99621efc768002c5d043052b6c3f0245ee726b546905b73a",
+      "bytes": 1391
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/validation-outputs/angle-validator-before.txt",
+      "sha256": "06a5584128c3212756d4b15ac0f94aebdc1bb7648301c8a50854b5d511e7555a",
+      "bytes": 38
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/validation-outputs/default-weights-stated.txt",
+      "sha256": "5a4b3cc42145d69f54793707c66da52d176af6c3a98cce481d851fff595ff152",
+      "bytes": 167
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",

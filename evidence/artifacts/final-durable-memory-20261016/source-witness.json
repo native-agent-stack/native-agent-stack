@@ -6,13 +6,13 @@
     {
       "command": "git archive --format=tar --output=<SCRATCH>/source.tar 04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
       "cwd": "existing pinned upstream mirror; private local path omitted",
-      "exit_code": 0,
-      "classification": "Historical preparation command; no original stdout capture retained. Public source hashes were subsequently captured natively; this is not an execution receipt."
+      "exit_code": null,
+      "classification": "Historical preparation command only. No native command capture or retained return-code witness exists, so exit_code is null. The later sha256sum capture is a separate file-identity observation, not proof of the export's result."
     },
     {
       "command": "tar -xf <SCRATCH>/source.tar -C <SCRATCH>/source",
-      "exit_code": 0,
-      "classification": "Historical preparation command; no original stdout capture retained. Public source hashes were subsequently captured natively; this is not an execution receipt."
+      "exit_code": null,
+      "classification": "Historical preparation command only. No native command capture or retained return-code witness exists, so exit_code is null. The later sha256sum capture is a separate file-identity observation, not proof of the export's result."
     }
   ],
   "hash_policy": "Hashes bind publicly retrievable upstream blobs at the stated commit, not private mirror metadata, configuration or test data.",
@@ -67,5 +67,6 @@
       "export_matches": true
     }
   ],
-  "native_hash_capture": "outputs/upstream-source-hashes.txt:1"
+  "native_hash_capture": "outputs/upstream-source-hashes.txt:1",
+  "custody_limit": "outputs/upstream-source-hashes.txt captures hashes of the seven files present at the later check. Source equality is a source-review comparison; this file does not retain the original export invocation, return code, or a continuous chain proving the exact bytes present during the earlier test processes."
 }

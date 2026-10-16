@@ -14,15 +14,15 @@
       "python3 tools/sota-convergence/lane_packets.py --root . --out <SCRATCH>/lane-packets-0926 --catalog foundation --manifest catalogs/sota-convergence/manifest-20260926.json --manifest-newcomers --registered-receipts --checked-at 2026-10-16"
     ],
     "exit_codes": [
-      0,
-      0
+      null,
+      null
     ],
     "blind": false,
     "note": "Only this layer's incumbent plus the eight cumulative survivors are retained. Generated 09-29 output omits three carried inputs; they are restored from the 09-26 packet and W6 census. Other generated layers and non-delta candidates are not reviewed or published.",
     "command_placeholders": {
       "<SCRATCH>": "Private throwaway scratch root; exact commands retained in the lane's private tool transcript."
     },
-    "capture_gap": "Generator rc 0 was observed in native tool output, but no standalone raw capture was retained. The published object is a source-derived packet, not a measured receipt."
+    "capture_gap": "No standalone raw generator capture or retained return-code witness exists; both exit_codes are null. Packet content and lineage are source-derived preparation records, not measured generator success."
   },
   "resolution_inputs": [
     "catalogs/landscape/foundation.json",
