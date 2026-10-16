@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "record": "LEAN Alpaca adapter MessagePack 3.1.9 security relock, native restore and build receipt",
+  "purpose": "Clear GHSA-qhrr-8q5h-9q3h (CVE-2026-92707) from blueprints/us-equities/engine/patches/alpaca.packages.lock.json by raising the adapter's direct MessagePack reference from 3.1.7 to 3.1.9, its first patched 3.x release. The advisory was published 2026-10-15T18:35:46Z, after main's last passing osv-scanner run, and from then the required osv-scanner check failed on every run",
+  "checked_commit": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+  "observed_utc": "2026-10-15T19:39:31Z",
+  "observed_until_utc": "2026-10-15T19:43:55Z",
+  "authorization": "Command-center incident brief for one trading-lane PR (2026-10-15): set the engine patch's MessagePack reference to 3.1.9, regenerate the Alpaca lock with dotnet restore in the engine build environment, keep LEAN Alpaca restoring for engine phase 2, and use an ignore entry only if the relock cannot build",
+  "sources": [
+    "https://github.com/advisories/GHSA-qhrr-8q5h-9q3h",
+    "https://github.com/MessagePack-CSharp/MessagePack-CSharp/security/advisories/GHSA-qhrr-8q5h-9q3h",
+    "https://github.com/MessagePack-CSharp/MessagePack-CSharp/releases/tag/v3.1.9",
+    "https://github.com/MessagePack-CSharp/MessagePack-CSharp/commit/7fd78bbf3476e03beae8b0f7a521125525a8a64a",
+    "https://www.nuget.org/packages/MessagePack/3.1.9",
+    "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/QuantConnect.AlpacaBrokerage/QuantConnect.AlpacaBrokerage.csproj#L35",
+    "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/e69f39b0d8869329cf084d08dfce7a3b5985b4d0/QuantConnect.AlpacaBrokerage/QuantConnect.AlpacaBrokerage.csproj#L35",
+    "https://github.com/dotnet/docs/blob/3725139b4d18c135917b7c5d0f31f67f68115c2f/docs/core/tools/dotnet-restore.md#L110-L158",
+    "https://github.com/google/osv-scanner/releases/tag/v2.6.0",
+    "native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:.github/osv-scanner.toml:17-18",
+    "native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:blueprints/us-equities/engine/resolution.md:19-23"
+  ],
+  "lock": "blueprints/us-equities/engine/patches/alpaca.packages.lock.json",
+  "sha256_before": "f76d53b5915c799ea56cbffa8583d646de15934477e5e9ff5d70824ae43a401a",
+  "sha256": "8f0eebd87814fa272219d70dc154d0720386f05347639ee5ffd4cdc76bea6eac",
+  "patch": "blueprints/us-equities/engine/patches/alpaca-source-references.patch",
+  "patch_sha256_before": "fc1e2e31e2feaf07fa433bc6478c6769ac8b0aa31d828ada3b53dc306c5b75a6",
+  "patch_sha256": "b6296dfbf403a311da5870c70c11f4a4ce3c8854f0cd20e13360fdf779a8e55c",
+  "advisory": {
+    "evidence_class": "native_proven",
+    "read_by": "gh api /advisories/GHSA-qhrr-8q5h-9q3h, 2026-10-15",
+    "cve": "CVE-2026-92707",
+    "summary": "MessagePack: Nested arrays can blow past buffer length limits",
+    "severity": "medium",
+    "cvss": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (5.3)",
+    "cwe": "CWE-1325",
+    "published_utc": "2026-10-15T18:35:46Z",
+    "affected": [
+      {"package": "MessagePack", "ecosystem": "nuget", "range": "< 2.5.303", "fixed": "2.5.303"},
+      {"package": "MessagePack", "ecosystem": "nuget", "range": ">= 3.0.0, < 3.1.9", "fixed": "3.1.9"}
+    ],
+    "fix_commits_in_release": "Both fix commits the advisory lists (7fd78bbf3476e03beae8b0f7a521125525a8a64a and 95b63fca4f7097d3cac12d1a95286af4b4bbf02c) are ancestors of tag v3.1.9 (aa16e71ae548645050f0a6798874540f3149681b) by the GitHub compare API (status ahead, behind 0)"
+  },
+  "moved_pins": [
+    {"package": "MessagePack", "type": "Direct", "before": "3.1.7", "after": "3.1.9", "reason": "First patched 3.x release for GHSA-qhrr-8q5h-9q3h"},
+    {"package": "MessagePack.Annotations", "type": "Transitive", "before": "3.1.7", "after": "3.1.9", "reason": "Exact dependency of MessagePack 3.1.9 in its unmodified nuspec"},
+    {"package": "MessagePackAnalyzer", "type": "Transitive", "before": "3.1.7", "after": "3.1.9", "reason": "Exact dependency of MessagePack 3.1.9 in its unmodified nuspec"}
+  ],
+  "upstream_state": {
+    "evidence_class": "native_proven",
+    "pinned_adapter": "QuantConnect/Lean.Brokerages.Alpaca@1973f6165bee212acf656ed2f9cb0af86d4f2a18, csproj line 35 requests MessagePack 3.1.7",
+    "upstream_head": "e69f39b0d8869329cf084d08dfce7a3b5985b4d0 (git ls-remote HEAD, 2026-10-15), csproj line 35 still requests MessagePack 3.1.7, so there is no upstream fix to adopt",
+    "supplied_binary": "The adapter's supplied Alpaca.Markets 8.0.0-beta4 binary lists MessagePack 3.1.7 in Alpaca.Markets.deps.json; the adapter C# source has no MessagePack use, and the csproj reference supplies that binary's dependency",
+    "package_provenance": "MessagePack 3.1.9 nuspec: MIT license, repository commit aa16e71ae548645050f0a6798874540f3149681b, equal to tag v3.1.9; release published 2026-09-17T19:20:33Z"
+  },
+  "build_environment": {
+    "evidence_class": "local_integration",
+    "dotnet_sdk": "10.0.401, official Linux x64 archive, publisher SHA-512 51c8b999af9e8dd9998c9edc5944e19a90788862068acd38694e098889054ce8c23d4f0c5cccfa16bf187d044562359e5ee69a9f8ad0bbe913ba90311fbce25b verified before extraction (the #1098 archive, re-verified)",
+    "icu": "libicu78_78.2-2ubuntu1_amd64.deb sha256 c8b97930f9e365d6d00978144b468ac8397ef07d2fb2c453869f05fc3a98c4ca extracted to a task-local prefix and passed through LD_LIBRARY_PATH; host packages and SDK globalization unchanged",
+    "nuget_config": "Task-owned public-only NuGet.Config (nuget.org v3 only, cleared sources), sha256 aec93b5637ab6d62470979a008990a4a336a287ab83a3f2541849ae735674055, passed with --configfile to every restore",
+    "layout": "Fresh physical sibling clones under one task root: Lean at 985ef30ad3ac774218c5ac516b4cb0aa2655730f with the published lean-dependencies.patch and 22 lean-locks; Alpaca at 1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+    "scheduling": "Restores, builds and scans ran under systemd-run --user --scope -p CPUWeight=idle"
+  },
+  "regeneration": {
+    "evidence_class": "local_integration",
+    "commands": [
+      "dotnet add QuantConnect.AlpacaBrokerage/QuantConnect.AlpacaBrokerage.csproj package MessagePack --version 3.1.9 --no-restore",
+      "dotnet restore Lean/QuantConnect.Lean.sln --locked-mode --disable-parallel --configfile <task NuGet.Config> -p:NuGetAuditMode=all",
+      "dotnet restore Alpaca/QuantConnect.AlpacaBrokerage/QuantConnect.AlpacaBrokerage.csproj --use-lock-file --force-evaluate --disable-parallel --configfile <task NuGet.Config> -p:NuGetAuditMode=all -p:NoWarn=",
+      "git diff -U0 -- QuantConnect.AlpacaBrokerage/QuantConnect.AlpacaBrokerage.csproj > alpaca-source-references.patch"
+    ],
+    "dotnet_add_exit": 0,
+    "csproj_lines_changed_by_vendor": 1,
+    "lean_locked_restore_exit": 0,
+    "alpaca_force_evaluate_exit": 0,
+    "lean_locks_compared": 22,
+    "lean_locks_changed": 0,
+    "alpaca_lock_changed_package_blocks": ["MessagePack", "MessagePack.Annotations", "MessagePackAnalyzer"],
+    "alpaca_lock_packages": 45,
+    "other_alpaca_lock_entries_unchanged": true,
+    "hand_edits": "None: the vendor command writes the csproj line, NuGet writes the lock, native Git writes the zero-context patch"
+  },
+  "replay": {
+    "evidence_class": "local_integration",
+    "what": "A second fresh adapter clone at the pin with the published patch and lock, restored in locked mode, built and audited",
+    "patch_apply_exit": 0,
+    "locked_restore_command": "dotnet restore <adapter csproj> --locked-mode --force --disable-parallel --configfile <task NuGet.Config> -p:NuGetAuditMode=all -p:NoWarn=",
+    "locked_restore_exit": 0,
+    "lock_unchanged_after_restore": true,
+    "restore_warnings": "Two NU1510 warnings (System.Threading.Channels and System.IO.Pipelines references will not be pruned); the base control with the old patch and lock reports the same two",
+    "build_command": "dotnet build <adapter csproj> --no-restore --disable-build-servers -m:2 --verbosity minimal -c Debug -p:NoWarn=",
+    "build_exit": 0,
+    "build_errors": 0,
+    "build_warnings": 7469,
+    "build_output": "QuantConnect.Brokerages.Alpaca.dll built; bin/Debug/MessagePack.dll sha256 6dedc861263288ee726ad9c919431cede00d35764f47ce9a3fa2f93d7f08a7f7 equals the package's lib/net9.0 asset, and the output deps.json names MessagePack 3.1.9",
+    "resolved": {"MessagePack": "3.1.9", "MessagePack.Annotations": "3.1.9", "MessagePackAnalyzer": "3.1.9"}
+  },
+  "nuget_audit": {
+    "evidence_class": "local_integration",
+    "command": "dotnet list <adapter csproj> package --vulnerable --include-transitive --format json --no-restore",
+    "base_control": {"tree": "old patch and old lock, locked restore exit 0", "exit": 0, "findings": [{"package": "MessagePack", "version": "3.1.7", "severity": "Moderate", "advisory": "https://github.com/advisories/GHSA-qhrr-8q5h-9q3h"}]},
+    "after": {"tree": "published patch and lock", "exit": 0, "findings": []}
+  },
+  "osv": {
+    "evidence_class": "local_integration",
+    "version": "2.6.0",
+    "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108, equal to OSV_SCANNER_SHA256 in .github/workflows/security-scan.yml",
+    "single_lock": {
+      "command": "osv-scanner scan source --no-resolve --config .github/osv-scanner.toml --lockfile=packages.lock.json:blueprints/us-equities/engine/patches/alpaca.packages.lock.json",
+      "before_exit": 1,
+      "before_finding": "GHSA-qhrr-8q5h-9q3h, CVSS 5.3, NuGet MessagePack 3.1.7, fixed 3.1.9",
+      "after_exit": 0,
+      "after_result": "No issues found"
+    },
+    "workflow_step": {
+      "script": "The run script of the osv-scanner job's 'Scan every listed lockfile and manifest' step in .github/workflows/security-scan.yml at 8053f14e7, run with bash -e, WRITE_SARIF=false and RUNNER_TEMP holding the verified binary",
+      "ordinary_inputs": 60,
+      "metadata_guard_tests": 23,
+      "before": {"tree": "8053f14e7, clean", "exit": 1, "preflight": "23 tests OK", "ordinary_exit": 1, "finding": "GHSA-qhrr-8q5h-9q3h in alpaca.packages.lock.json"},
+      "after": {"tree": "8053f14e7 plus the new patch and lock", "exit": 0, "preflight": "23 tests OK", "ordinary_exit": 0, "result": "No issues found"}
+    }
+  },
+  "ignore_entry": "None: the relock restores and builds, so .github/osv-scanner.toml and IGNORE_ALLOWED_LOCKS are unchanged",
+  "not_covered": [
+    "No backtest, brokerage initialization, streaming session or order was run; runtime behavior of the supplied Alpaca.Markets binary against MessagePack 3.1.9 is compile-time evidence only",
+    "The full LEAN solution was restored in locked mode but not rebuilt; its locks are byte-identical to the published ones",
+    "No exploit or reachability analysis; the claim is that the scanned and audited graph no longer contains an affected version"
+  ],
+  "hosted_acceptance": "pending"
+}

@@ -1,0 +1,383 @@
+OpenHands recipe lock: mcp 1.28.1 -> 1.30.0 for GHSA-84m7-p3x7-pcfv (CVE-2026-59951), returned outputs of 2026-10-15
+Tree: native-agent-stack@5561321b43a419cfc7b2e854c345e944c88e4d37 (#1178's head) in an owned worktree; main's a93ba0b8, #1178's
+squash merge, has the same tree. Paths are sanitized as <scratch-relock> (the task's scratch directory), <worktree> (the
+checkout), <scan-root> (the scanned tree) and <site-packages> (the relocked venv's). Digest lines of scratch files are omitted;
+the digests left name tracked files or pinned artifacts. Tools: uv 0.12.22, OSV-Scanner 2.6.0 (osv-scanner_linux_amd64 sha256
+ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108, the workflow's OSV_SCANNER_SHA256, checked with the install
+step's sha256sum --check), CPython 3.13.16. The relock, the install, the scans and the unit runs ran under systemd-run --user
+--scope -p CPUWeight=idle. Each download (the SDK archive, the PyPI, OSV.dev and GitHub JSON, the upstream source and docs
+files) sat in its own scratch directory and was read with python3 -I or text tools, never imported or executed.
+
+## A. The advisory: gh api /advisories/GHSA-84m7-p3x7-pcfv, read 2026-10-15T20:55:51Z (fields extracted from the returned JSON)
+== advisory
+ghsa_id: GHSA-84m7-p3x7-pcfv
+cve_id: CVE-2026-59951
+summary: MCP Python SDK: Unbounded Session Accumulation in StreamableHTTP Transport Enables Resource Exhaustion
+severity: medium
+published_at: 2026-10-15T20:13:13Z
+updated_at: 2026-10-15T20:13:14Z
+withdrawn_at: None
+html_url: https://github.com/advisories/GHSA-84m7-p3x7-pcfv
+cvss: 7.5 CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+cvss_severities {"cvss_v3": {"vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H", "score": 7.5}, "cvss_v4": {"vector_string": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N", "score": 6.9}}
+vuln: {'ecosystem': 'pip', 'name': 'mcp'} range: >= 1.8.0, < 1.30.0 first_patched: 1.30.0 functions: []
+vuln: {'ecosystem': 'pip', 'name': 'mcp'} range: >= 2.0.0, < 2.2.0 first_patched: 2.2.0 functions: []
+references:
+   https://github.com/modelcontextprotocol/python-sdk/security/advisories/GHSA-84m7-p3x7-pcfv
+   https://nvd.nist.gov/vuln/detail/CVE-2026-59951
+   https://github.com/modelcontextprotocol/python-sdk/pull/3395
+   https://github.com/modelcontextprotocol/python-sdk/pull/3426
+   https://github.com/modelcontextprotocol/python-sdk/commit/92120b4b0f50385af096592d7cee932fc1d994e7
+   https://github.com/modelcontextprotocol/python-sdk/commit/d2290ca3434731b68ea3e2270bc06a6e6575931b
+   https://github.com/modelcontextprotocol/python-sdk/releases/tag/v1.30.0
+   https://github.com/modelcontextprotocol/python-sdk/releases/tag/v2.2.0
+   https://github.com/advisories/GHSA-84m7-p3x7-pcfv
+cwes: ['CWE-400', 'CWE-770', 'CWE-772']
+description chars: 2269
+### the repository advisory it cites: gh api repos/modelcontextprotocol/python-sdk/security-advisories/GHSA-84m7-p3x7-pcfv, read 2026-10-15T21:20:33Z
+ghsa_id: GHSA-84m7-p3x7-pcfv | state: published | published: 2026-09-30T20:53:30Z | updated: 2026-09-30T20:53:30Z | url: https://github.com/modelcontextprotocol/python-sdk/security/advisories/GHSA-84m7-p3x7-pcfv
+vuln: pip mcp range: >= 1.8.0, < 1.30.0 patched: 1.30.0
+vuln: pip mcp range: >= 2.0.0, < 2.2.0 patched: 2.2.0
+
+## B. OSV.dev and the hosted check
+$ curl -s https://api.osv.dev/v1/vulns/GHSA-84m7-p3x7-pcfv; curl -s -d '{"package":{"name":"mcp","ecosystem":"PyPI"},"version":"<v>"}' https://api.osv.dev/v1/query     # 2026-10-15T20:58:09Z
+id: GHSA-84m7-p3x7-pcfv | aliases: ['CVE-2026-59951'] | published: 2026-10-15T20:13:13Z | modified: 2026-10-15T20:30:08.565001293Z | withdrawn: None
+affected: PyPI mcp [('ECOSYSTEM', [{'introduced': '1.8.0'}, {'fixed': '1.30.0'}])]
+affected: PyPI mcp [('ECOSYSTEM', [{'introduced': '2.0.0'}, {'fixed': '2.2.0'}])]
+query PyPI mcp 1.28.1: ['GHSA-84m7-p3x7-pcfv']
+query PyPI mcp 1.30.0: no vulnerability
+$ gh api repos/native-agent-stack/native-agent-stack/actions/jobs/116652403677; gh api .../actions/runs/38801792191
+read 2026-10-15T21:19:49Z
+job 116652403677 | osv-scanner | completed/success | 2026-10-15T20:25:18Z - 2026-10-15T20:25:41Z | head 5561321b43a419cfc7b2e854c345e944c88e4d37 | run 38801792191
+run 38801792191 | Dependency and workflow security scan | pull_request | success | head 5561321b43a419cfc7b2e854c345e944c88e4d37 | created 2026-10-15T20:25:15Z
+The hosted job ended at 20:25:41Z, before OSV.dev modified its record (20:30:08Z); every local scan in section J ran after it.
+
+## C. The v1.30.0 release: gh api repos/modelcontextprotocol/python-sdk/releases/tags/v1.30.0, read 2026-10-15T21:20:32Z
+tag: v1.30.0 | tag commit: 8c2fa6eabacde869d75568e33b9d466b58c2f512 (git/ref/tags/v1.30.0, type commit) | published: 2026-09-07T14:03:59Z | target: v1.x
+body line 3: A few defaults changed in this release. If you run a server or client on 1.x, skim these first:
+body line 5: ## Behaviour changes
+body line 6:
+body line 7: **HTTP client redirects are only followed within the endpoint's origin** (#3448)
+body line 8: - `streamable_http_client` and `sse_client` follow a redirect only if it stays on the same scheme, host and port (or upgrades `http` to `https` on the same host).
+body line 9: - A redirect anywhere else now fails the request with `httpx.HTTPStatusError`. If that other URL is the server you meant, use it as the endpoint URL.
+body line 10: - The `follow_redirects` setting on an `httpx.AsyncClient` you pass in is no longer used for MCP requests, so you don't need it for the trailing-slash redirect any more.
+body line 11: - `OAuthClientProvider` applies the same rule to its own requests.
+body line 12:
+body line 13: **Idle Streamable HTTP sessions now expire** (#3426)
+body line 14: - A stateful session with nothing in flight for 30 minutes is closed. The client's next request gets a 404 and it has to initialize again.
+body line 15: - Clients that keep the GET stream open (the SDK's client does) are not affected.
+body line 16: - A server also holds at most 10 000 sessions at once; beyond that, new sessions get a 503.
+body line 17: - To turn either off: `FastMCP(..., session_idle_timeout=None, max_sessions=None)`.
+body line 18:
+body line 19: **The OAuth client checks the authorization server's `issuer`** (#3431)
+body line 20: - Authorization server metadata whose `issuer` doesn't match the server it was fetched for is now rejected with `OAuthFlowError: Authorization server metadata issuer mismatch`.
+body line 21: - Client registrations are now remembered per issuer; if the server later points at a different authorization server, the client registers again.
+body line 22: - If protected resource metadata can't be fetched because of a 5xx/429, the flow now stops instead of falling back to the legacy endpoints.
+body line 23:
+body line 24: **Two new `DeprecationWarning`s** (#3431, #3451)
+body line 25: - `ClientCredentialsOAuthProvider` / `PrivateKeyJWTOAuthProvider` without `issuer=`. Pass your authorization server's issuer URL.
+body line 26: - `AuthSettings` with `resource_server_url` set but `validate_token_resource` unset. Set it to `True` or `False`.
+body line 27: - Both keep working as before in 1.x; this mostly matters if your tests turn warnings into errors.
+body line 33: - `session_idle_timeout=` and `max_sessions=` on `FastMCP` (#3426).
+body line 38: * [v1.x] Expire idle Streamable HTTP sessions by default and cap concurrent sessions by @maxisbey in https://github.com/modelcontextprotocol/python-sdk/pull/3426
+Tag commits read the same way: v1.28.1 777b8d06710c140e3606b0d4598e2aa48546c266, v1.29.0 98b7159cb89274964055d2c016e3360a551280d0,
+v1.29.1 b22271305c59dfc7910f1493faea78cb1d396e48, v2.2.0 9972c21aa42054fb1450c5fc614761ed11847ec6. compare v1.29.1...v1.30.0: ahead_by=5,
+commits 5ebdfed406, 92120b4b0f (#3426), 3eed7ce0a6, 2106335745, 8c2fa6eaba; compare v2.1.1...v2.2.0 contains d2290ca3 (#3395).
+
+## D. Paired relock (relock-2026-10-15-mcp.relock.sh.txt); full output: relock-2026-10-15-mcp.relock.txt
+$ cmp <scratch-relock>/u3/new/requirements.lock.repro <worktree>/blueprints/runtime-workers/openhands/requirements.lock
+cmp exit: 0
+$ diff <(grep -v "^Resolved" control/lock.out) <(grep -v "^Resolved" new/lock.out)     # uv's two change lists
+8a9
+> Updated mcp v1.28.1 -> v1.30.0
+$ uv lock --help; uv export --help     # installed uv 0.12.22: the flag lines the relock uses (help file:line)
+uv lock --help:6:      --check            Check if the lockfile is up-to-date
+uv lock --help:41:  -P, --upgrade-package <UPGRADE_PACKAGE>
+uv export --help:6:      --format <FORMAT>
+uv export --help:11:      --package <PACKAGE>
+uv export --help:35:      --no-annotate
+uv export --help:37:      --no-header
+uv export --help:54:      --no-emit-workspace
+uv export --help:62:      --frozen
+### the flags at astral-sh/uv 0.12.22 (tag commit 70fe1196a546e49148a73b1c592b2f74c33af80e): the first line of each cited block
+docs/concepts/projects/sync.md:157-182: ## Upgrading locked package versions
+docs/concepts/projects/sync.md:35-50: ## Checking the lockfile
+docs/concepts/projects/export.md:43-55: ## `requirements.txt` format
+docs/concepts/resolution.md:142-173: ## Limited resolution environments
+docs/concepts/resolution.md:303-309: ## Dependency preferences
+docs/concepts/resolution.md:846-852: Values may also be specified for specific packages, e.g.,
+docs/concepts/resolution.md:891-921: ## Dependency cooldowns
+crates/uv-cli/src/lib.rs:4102-4110: /// Check if the lockfile is up-to-date.
+crates/uv-cli/src/lib.rs:4157-4158: #[command(flatten)]
+crates/uv-cli/src/lib.rs:7506-7509: /// Allow upgrades for a specific package, ignoring pinned versions in any existing output
+crates/uv-cli/src/lib.rs:4757-4764: /// The format to which `uv.lock` should be exported.
+crates/uv-cli/src/lib.rs:4776-4780: /// Export the dependencies for specific packages in the workspace.
+crates/uv-cli/src/lib.rs:4811-4813: /// Exclude comment annotations indicating the source of each package.
+crates/uv-cli/src/lib.rs:4818-4820: /// Exclude the comment header at the top of the generated output file.
+crates/uv-cli/src/lib.rs:4900-4913: /// Do not emit any workspace members, including the root project.
+crates/uv-cli/src/lib.rs:4982-4986: /// Do not update the `uv.lock` before exporting [env: UV_FROZEN=]
+
+## E. PyPI metadata (pypi.org/pypi/mcp/json and mcp/<version>/json read 2026-10-15T20:55:51Z; fastmcp/3.2.0 and browser-use/0.11.9 read 20:56:49Z)
+== mcp 1.28.1: requires_python=>=3.10 yanked=False
+    anyio>=4.5
+    httpx-sse>=0.4
+    httpx<1.0.0,>=0.27.1
+    jsonschema>=4.20.0
+    pydantic-settings>=2.5.2
+    pydantic<3.0.0,>=2.11.0; python_version < "3.14"
+    pydantic<3.0.0,>=2.12.0; python_version >= "3.14"
+    pyjwt[crypto]>=2.10.1
+    python-multipart>=0.0.9
+    pywin32>=310; sys_platform == "win32" and python_version < "3.14"
+    pywin32>=311; sys_platform == "win32" and python_version >= "3.14"
+    sse-starlette>=1.6.1
+    starlette>=0.27; python_version < "3.14"
+    starlette>=0.48.0; python_version >= "3.14"
+    typing-extensions>=4.9.0
+    typing-inspection>=0.4.1
+    uvicorn>=0.31.1; sys_platform != "emscripten"
+    python-dotenv>=1.0.0; extra == "cli"
+    typer>=0.16.0; extra == "cli"
+    rich>=13.9.4; extra == "rich"
+    websockets>=15.0.1; extra == "ws"
+   file: mcp-1.28.1-py3-none-any.whl bdist_wheel 2026-06-26T12:57:27.218095Z 2726bca5e7193f61c5dde8b12500a6de2d9acf6d1a1c0be9e8c2e706437991df 222620
+   file: mcp-1.28.1.tar.gz sdist 2026-06-26T12:57:29.093358Z d51e36a5f5644faea4f85ea649bfffa6bc6c26770d42798ad6a3de3d2ba69683 638501
+== mcp 1.30.0: requires_python=>=3.10 yanked=False
+    anyio>=4.5
+    httpx-sse>=0.4
+    httpx<1.0.0,>=0.27.1
+    jsonschema>=4.20.0
+    pydantic-settings>=2.5.2
+    pydantic<3.0.0,>=2.11.0; python_version < "3.14"
+    pydantic<3.0.0,>=2.12.0; python_version >= "3.14"
+    pyjwt[crypto]>=2.10.1
+    python-multipart>=0.0.9
+    pywin32>=310; sys_platform == "win32" and python_version < "3.14"
+    pywin32>=311; sys_platform == "win32" and python_version >= "3.14"
+    sse-starlette>=1.6.1
+    starlette>=0.27; python_version < "3.14"
+    starlette>=0.48.0; python_version >= "3.14"
+    typing-extensions>=4.9.0
+    typing-inspection>=0.4.1
+    uvicorn>=0.31.1; sys_platform != "emscripten"
+    python-dotenv>=1.0.0; extra == "cli"
+    typer>=0.16.0; extra == "cli"
+    rich>=13.9.4; extra == "rich"
+    websockets>=15.0.1; extra == "ws"
+   file: mcp-1.30.0-py3-none-any.whl bdist_wheel 2026-09-07T14:34:14.266679Z 666edb5009503e1047c9d60346a756f94b261f05cc2625f23d41c728ffc484d0 234581
+   file: mcp-1.30.0.tar.gz sdist 2026-09-07T14:34:15.845195Z 445414625fce5c295faa505bb11bacece661ab6f4028d57c935db57820b7a3e4 680511
+== latest: 2.3.0
+   1.28.0: files=2 first=2026-06-16T21:37:16.579617Z last=2026-06-16T21:37:17.996966Z yanked=[False, False]
+   1.28.1: files=2 first=2026-06-26T12:57:27.218095Z last=2026-06-26T12:57:29.093358Z yanked=[False, False]
+   1.29.0: files=2 first=2026-07-28T13:41:40.337890Z last=2026-07-28T13:41:41.939004Z yanked=[False, False]
+   1.29.1: files=2 first=2026-08-24T18:30:39.573830Z last=2026-08-24T18:30:41.161114Z yanked=[False, False]
+   1.30.0: files=2 first=2026-09-07T14:34:14.266679Z last=2026-09-07T14:34:15.845195Z yanked=[False, False]
+   2.0.0a1: files=2 first=2026-06-11T09:55:46.823537Z last=2026-06-11T09:55:48.791495Z yanked=[False, False]
+   2.0.0a2: files=2 first=2026-06-16T22:01:35.592035Z last=2026-06-16T22:01:37.533185Z yanked=[False, False]
+   2.0.0a3: files=2 first=2026-06-26T08:49:10.845013Z last=2026-06-26T08:49:13.896941Z yanked=[False, False]
+   2.0.0b1: files=2 first=2026-06-30T23:24:34.788560Z last=2026-06-30T23:24:38.363772Z yanked=[False, False]
+   2.0.0b2: files=2 first=2026-07-14T16:47:54.768521Z last=2026-07-14T16:47:57.897927Z yanked=[False, False]
+   2.0.0: files=2 first=2026-07-28T13:45:28.853348Z last=2026-07-28T13:45:32.346253Z yanked=[False, False]
+   2.0.0rc1: files=2 first=2026-07-27T13:35:13.997438Z last=2026-07-27T13:35:17.166105Z yanked=[False, False]
+   2.0.1: files=2 first=2026-08-26T10:48:35.253507Z last=2026-08-26T10:48:38.625526Z yanked=[False, False]
+   2.1.0: files=2 first=2026-08-24T19:04:29.909929Z last=2026-08-24T19:04:32.671972Z yanked=[False, False]
+   2.1.1: files=2 first=2026-08-25T16:13:59.024858Z last=2026-08-25T16:14:02.376457Z yanked=[False, False]
+   2.2.0: files=2 first=2026-09-07T16:06:19.711091Z last=2026-09-07T16:06:23.439276Z yanked=[False, False]
+   2.3.0: files=2 first=2026-10-02T22:06:52.119073Z last=2026-10-02T22:06:56.091381Z yanked=[False, False]
+fastmcp 3.2.0 requires: ['mcp<2.0,>=1.24.0']
+browser-use 0.11.9 requires: ['mcp>=1.10.1']
+
+## F. Hash check (relock-2026-10-05-fsspec.hash-check.py.txt, unchanged, argument mcp, on the new lock)
+mcp==1.30.0: 2 hash lines; source https://pypi.org/pypi/mcp/1.30.0/json
+  445414625fce5c295faa505bb11bacece661ab6f4028d57c935db57820b7a3e4 -> mcp-1.30.0.tar.gz (uploaded 2026-09-07T14:34:15.845195Z, not yanked)
+  666edb5009503e1047c9d60346a756f94b261f05cc2625f23d41c728ffc484d0 -> mcp-1.30.0-py3-none-any.whl (uploaded 2026-09-07T14:34:14.266679Z, not yanked)
+unlisted supported artifacts: none
+hash-check exit: 0
+
+## G. Isolated hashed install (relock-2026-10-15-mcp.install-check.sh.txt), 2026-10-15T21:07:03Z to 21:07:19Z
+Creating virtual environment at: <scratch-relock>/u3/venv
+Activate with: source <scratch-relock>/u3/venv/bin/activate
+venv exit: 0
+ + packaging==26.3
+ + setuptools==84.0.0
+ + wheel==0.46.3
+build-requirements install exit: 0
+ + wrapt==1.17.3
+ + yarl==1.22.0
+ + zipp==3.23.0
+runtime lock install exit: 0
+Using Python 3.13.16 environment at: <scratch-relock>/u3/venv
+Checked 178 packages in 4ms
+All installed packages are compatible
+uv pip check exit: 0
++----------------------------------------------------------------------+
+
+SDK/tools 1.49.6 imports passed; no model request
+sdk import exit: 0
++----------------------------------------------------------------------+
+
+mcp 1.30.0 session_idle_timeout default 1800 max_sessions default 10000 fastmcp 3.2.0 browser-use 0.11.9 starlette 1.3.1 sse-starlette 3.0.2 uvicorn 0.52.4
+fixed-package imports exit: 0
+fastmcp in-memory client smoke passed: tools ['add'] add(2, 3) = 5
+fastmcp client smoke exit: 0
+done, status 0
+install-check script exit: 0
+
+## H. The fix at the two tags: python-sdk src/mcp/server/streamable_http_manager.py, read by syntax tree, not imported
+v1.28.1 | __init__ at line 65 | parameters: ['self', 'app', 'event_store', 'json_response', 'stateless', 'security_settings', 'retry_interval', 'session_idle_timeout']
+   session_idle_timeout default: (73, 'None') | max_sessions default: absent | module DEFAULT_ constants: none
+v1.30.0 | __init__ at line 91 | parameters: ['self', 'app', 'event_store', 'json_response', 'stateless', 'security_settings', 'retry_interval', 'session_idle_timeout', 'max_request_body_size', 'max_sessions']
+   session_idle_timeout default: (99, 'DEFAULT_SESSION_IDLE_TIMEOUT') | max_sessions default: (101, 'DEFAULT_MAX_SESSIONS') | module DEFAULT_ constants: {'DEFAULT_SESSION_IDLE_TIMEOUT': (42, '30 * 60'), 'DEFAULT_MAX_SESSIONS': (45, '10000')}
+
+## I. mcp importers in the relocked venv (relock-2026-10-15-mcp.mcp-importers.py.txt, on <site-packages>)
+py files searched outside mcp: 10873
+top-level distributions importing mcp: {'browser_use': ['mcp', 'mcp.client.stdio', 'mcp.server', 'mcp.server.models', 'mcp.server.stdio', 'mcp.types'], 'fastmcp': ['mcp', 'mcp.client.auth', 'mcp.client.session', 'mcp.client.sse', 'mcp.client.stdio', 'mcp.client.streamable_http', 'mcp.server.auth.handlers.authorize', 'mcp.server.auth.handlers.metadata', 'mcp.server.auth.handlers.token', 'mcp.server.auth.json_response', 'mcp.server.auth.middleware.auth_context', 'mcp.server.auth.middleware.bearer_auth', 'mcp.server.auth.middleware.client_auth', 'mcp.server.auth.provider', 'mcp.server.auth.routes', 'mcp.server.auth.settings', 'mcp.server.elicitation', 'mcp.server.fastmcp', 'mcp.server.lowlevel.server', 'mcp.server.models', 'mcp.server.session', 'mcp.server.sse', 'mcp.server.stdio', 'mcp.server.streamable_http', 'mcp.server.streamable_http_manager', 'mcp.shared._httpx_utils', 'mcp.shared.auth', 'mcp.shared.context', 'mcp.shared.exceptions', 'mcp.shared.memory', 'mcp.shared.message', 'mcp.shared.session', 'mcp.shared.tool_name_validation', 'mcp.types'], 'google': ['mcp', 'mcp.types'], 'huggingface_hub': ['mcp', 'mcp.client.sse', 'mcp.client.stdio', 'mcp.client.streamable_http'], 'litellm': ['mcp', 'mcp.client.sse', 'mcp.client.stdio', 'mcp.client.streamable_http', 'mcp.server', 'mcp.server.auth.middleware.auth_context', 'mcp.server.auth.middleware.bearer_auth', 'mcp.server.lowlevel.helper_types', 'mcp.server.lowlevel.server', 'mcp.server.models', 'mcp.server.session', 'mcp.server.streamable_http_manager', 'mcp.shared.tool_name_validation', 'mcp.types'], 'openhands': ['mcp.client.auth.utils', 'mcp.shared._httpx_utils', 'mcp.types']}
+files importing mcp.client.streamable_http (client side), per top-level package: {'fastmcp': 2, 'huggingface_hub': 1, 'litellm': 1}
+server-side hits (imports of mcp's Streamable HTTP server or FastMCP 1.x, or mentions), per top-level package: {'fastmcp': 13, 'litellm': 2}
+  fastmcp/cli/run.py: from mcp.server.fastmcp import FastMCP as FastMCP1x
+  fastmcp/client/transports/__init__.py: from mcp.server.fastmcp import FastMCP as FastMCP1Server
+  fastmcp/client/transports/inference.py: from mcp.server.fastmcp import FastMCP as FastMCP1Server
+  fastmcp/client/transports/memory.py: from mcp.server.fastmcp import FastMCP as FastMCP1Server
+  fastmcp/server/event_store.py: from mcp.server.streamable_http import EventCallback, EventId, EventMessage, StreamId
+  fastmcp/server/event_store.py: from mcp.server.streamable_http import EventStore as SDKEventStore
+  fastmcp/server/http.py: from mcp.server.streamable_http import (
+  fastmcp/server/http.py: from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
+  fastmcp/server/http.py: mentions streamable_http_app or StreamableHTTPSessionManager
+  fastmcp/server/mixins/transport.py: mentions streamable_http_app or StreamableHTTPSessionManager
+  fastmcp/utilities/inspect.py: from mcp.server.fastmcp import FastMCP as FastMCP1x
+  fastmcp/utilities/mcp_server_config/v1/sources/filesystem.py: from mcp.server.fastmcp import FastMCP as FastMCP1x
+  fastmcp/utilities/mcp_server_config/v1/sources/filesystem.py: from mcp.server.fastmcp import FastMCP as FastMCP1x
+  litellm/proxy/_experimental/mcp_server/server.py: from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
+  litellm/proxy/_experimental/mcp_server/server.py: mentions streamable_http_app or StreamableHTTPSessionManager
+importers exit: 0
+### failed attempt, retained, not adopted: the script's first version
+It flagged every module path containing streamable_http, so its server-side count ({'fastmcp': 16, 'huggingface_hub': 1,
+'litellm': 3}) included client imports of mcp.client.streamable_http; the retained version above counts those separately.
+
+## J. OSV (relock-2026-10-13-oauthlib.osv-scan-step.sh.txt, unchanged): the workflow's own scan step, then its ordinary invocation
+### before: 5561321b, this worktree clean, 2026-10-15T20:58:30Z to 20:58:35Z (full report: relock-2026-10-15-mcp.osv-before.ordinary.txt)
+44547b18f6b2551fb488cfeadaf7b1acb4d0432274f0787fe092ce2a7397d937  .github/workflows/security-scan.yml
+workflow scan step exit: 1
+ordinary entries 60
+ordinary scan exit: 1
+Ran 23 tests in 0.304s
+OK
+Total 1 package affected by 1 known vulnerability (0 Critical, 1 High, 0 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
+| https://osv.dev/GHSA-84m7-p3x7-pcfv | 7.5  | PyPI      | mcp     | 1.28.1  | 1.30.0        | blueprints/runtime-workers/openhands/requirements.lock |
+OSV primary exit code: ordinary=1; frozen evidence reports separately
+Total 1 package affected by 1 known vulnerability (0 Critical, 1 High, 0 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
+| https://osv.dev/GHSA-84m7-p3x7-pcfv | 7.5  | PyPI      | mcp     | 1.28.1  | 1.30.0        | blueprints/runtime-workers/openhands/requirements.lock |
+### the step's output, before, without the 60 Scanned lines it shares with the report
+.......................
+----------------------------------------------------------------------
+Ran 23 tests in 0.304s
+
+OK
+Starting filesystem walk for root: /
+End status: 0 dirs visited, 60 inodes visited, 60 Extract calls, 153.524219ms elapsed, 153.524279ms wall time
+Filtered 175 local/unscannable package/s from the scan.
+
+Total 1 package affected by 1 known vulnerability (0 Critical, 1 High, 0 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
+1 vulnerability can be fixed.
+
++-------------------------------------+------+-----------+---------+---------+---------------+--------------------------------------------------------+
+| OSV URL                             | CVSS | ECOSYSTEM | PACKAGE | VERSION | FIXED VERSION | SOURCE                                                 |
++-------------------------------------+------+-----------+---------+---------+---------------+--------------------------------------------------------+
+| https://osv.dev/GHSA-84m7-p3x7-pcfv | 7.5  | PyPI      | mcp     | 1.28.1  | 1.30.0        | blueprints/runtime-workers/openhands/requirements.lock |
++-------------------------------------+------+-----------+---------+---------+---------------+--------------------------------------------------------+
+OSV primary exit code: ordinary=1; frozen evidence reports separately
+### before, at main: a93ba0b8 in a detached worktree under <scratch-relock>, removed after, 2026-10-15T21:23:15Z to 21:23:19Z
+44547b18f6b2551fb488cfeadaf7b1acb4d0432274f0787fe092ce2a7397d937  .github/workflows/security-scan.yml
+workflow scan step exit: 1
+ordinary entries 60
+ordinary scan exit: 1
+Ran 23 tests in 0.325s
+OK
+Total 1 package affected by 1 known vulnerability (0 Critical, 1 High, 0 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
+| https://osv.dev/GHSA-84m7-p3x7-pcfv | 7.5  | PyPI      | mcp     | 1.28.1  | 1.30.0        | blueprints/runtime-workers/openhands/requirements.lock |
+OSV primary exit code: ordinary=1; frozen evidence reports separately
+Total 1 package affected by 1 known vulnerability (0 Critical, 1 High, 0 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
+| https://osv.dev/GHSA-84m7-p3x7-pcfv | 7.5  | PyPI      | mcp     | 1.28.1  | 1.30.0        | blueprints/runtime-workers/openhands/requirements.lock |
+### after: this change's tree, 2026-10-15T21:25:47Z to 21:25:53Z (full report: relock-2026-10-15-mcp.osv-after.ordinary.txt)
+44547b18f6b2551fb488cfeadaf7b1acb4d0432274f0787fe092ce2a7397d937  .github/workflows/security-scan.yml
+workflow scan step exit: 0
+ordinary entries 60
+ordinary scan exit: 0
+Ran 23 tests in 0.336s
+OK
+No issues found
+OSV primary exit code: ordinary=0; frozen evidence reports separately
+No issues found
+### the step's output, after, without the 60 Scanned lines
+.......................
+----------------------------------------------------------------------
+Ran 23 tests in 0.336s
+
+OK
+Starting filesystem walk for root: /
+End status: 0 dirs visited, 60 inodes visited, 60 Extract calls, 166.508456ms elapsed, 166.508506ms wall time
+Filtered 175 local/unscannable package/s from the scan.
+
+No issues found
+OSV primary exit code: ordinary=0; frozen evidence reports separately
+### this lock alone, before (5561321b, from 20:58:49Z) and after (this change, right after the step run above, ended 21:25:53Z)
+$ osv-scanner scan source --config .github/osv-scanner.toml --no-resolve --lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock
+Starting filesystem walk for root: /
+Scanned <worktree>/blueprints/runtime-workers/openhands/requirements.lock file and found 334 packages
+End status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 8.47812ms elapsed, 8.47819ms wall time
+
+Total 1 package affected by 1 known vulnerability (0 Critical, 1 High, 0 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
+1 vulnerability can be fixed.
+
++-------------------------------------+------+-----------+---------+---------+---------------+--------------------------------------------------------+
+| OSV URL                             | CVSS | ECOSYSTEM | PACKAGE | VERSION | FIXED VERSION | SOURCE                                                 |
++-------------------------------------+------+-----------+---------+---------+---------------+--------------------------------------------------------+
+| https://osv.dev/GHSA-84m7-p3x7-pcfv | 7.5  | PyPI      | mcp     | 1.28.1  | 1.30.0        | blueprints/runtime-workers/openhands/requirements.lock |
++-------------------------------------+------+-----------+---------+---------+---------------+--------------------------------------------------------+
+exit: 1
+Starting filesystem walk for root: /
+Scanned <worktree>/blueprints/runtime-workers/openhands/requirements.lock file and found 334 packages
+End status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 9.065704ms elapsed, 9.065764ms wall time
+
+No issues found
+exit: 0
+
+## K. Unit tests under TZ=UTC, the same three groups twice
+### first run: this change's tree before the summary, the after report, the receipt's result fields and the research.md citation edits
+osv exit: 0 started 2026-10-15T21:16:14Z ended 2026-10-15T21:16:21Z
+recipe exit: 0 started 2026-10-15T21:16:21Z ended 2026-10-15T21:21:21Z
+pages exit: 0 started 2026-10-15T21:21:21Z ended 2026-10-15T21:22:41Z
+#### osv
+Ran 65 tests in 6.217s
+OK
+#### recipe
+Ran 950 tests in 299.551s
+OK (skipped=55)
+#### pages
+Ran 547 tests in 79.163s
+OK
+### final run: this change's final tree, except this section and the receipt's tests block, which record it
+osv exit: 0 started 2026-10-15T21:32:48Z ended 2026-10-15T21:32:55Z
+recipe exit: 0 started 2026-10-15T21:32:55Z ended 2026-10-15T21:38:08Z
+pages exit: 0 started 2026-10-15T21:38:08Z ended 2026-10-15T21:39:30Z
+#### osv
+Ran 65 tests in 7.096s
+OK
+#### recipe
+Ran 950 tests in 312.032s
+OK (skipped=55)
+#### pages
+Ran 547 tests in 81.547s
+OK
+osv: tests.test_osv_lockfile_coverage tests.test_wsl_retrieval.RetiredRunnerTests. recipe: the 16 tests/test_*.py modules that
+git grep -l -E 'runtime-workers/openhands|requirements\.lock' -- tests names outside the local-pages set, plus
+tests.test_provenance_digest_custody. pages: the 32 tests/test_local_pages*.py modules. zizmor 1.30.1 (the CI pin) was on PATH.
+$ python3 blueprints/runtime-workers/openhands/resolver.py --help; python3 blueprints/runtime-workers/openhands/resolver.py run --help
+exit: 0; exit: 0
+
+## L. Not run
+- run-e2e.sh and e2e/: a real attempt needs the installed prefix, the pinned images, the gateway and model calls; the
+  coordinator runs it (README).
+- install.sh (host.py install): it installs into the host prefix and pulls the pinned images; the isolated install in G
+  follows install-container.sh instead.
+- The hosted osv-scanner check on this change: it runs when the coordinator's pull request does.

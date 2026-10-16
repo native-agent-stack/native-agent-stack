@@ -1030,13 +1030,24 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertIn('existing="$(find_open_pr)"', body)
         self.assertIn('gh pr edit "$existing" --title "$title" --body-file "$body_file"', body)
 
-    def _run_pr_metadata(self, lanes="", existing=True, race=False):
-        """Execute the actual metadata shell with a synthetic gh; no network calls."""
+    def _run_pr_metadata(self, lanes="", existing=True, race=False, drop=False, read="stored"):
+        """Execute the actual metadata shell with a synthetic gh; no network calls. The synthetic GitHub keeps the
+        description a create or an edit sends, and returns it to `pr view --json body` as gh does (the body and a
+        newline); `drop` answers success and keeps nothing, as GitHub did for description updates over 262,144 bytes
+        (probe of 2026-10-11 on #991). `read` is what the read-back gets: the stored description, a gh failure with no
+        output ("fail"), or a different description ("other"). What the step reports (its GITHUB_OUTPUT) is left in
+        self.reported."""
         job = self._job_body("propose")
         step = job[job.index("- name: Open or update the evidence PR"):job.index("- name: Note that this PR")]
         script = step.split("        run: |\n", 1)[1]
         script = "\n".join(line[10:] for line in script.splitlines())
         stub = r'''
+store_body() {
+  while [ "$#" -gt 0 ]; do
+    if [ "$1" = --body-file ] && [ "$TEST_DROP" != 1 ]; then cat "$2" > "$TEST_STORED"; fi
+    shift
+  done
+}
 gh() {
   printf '%s\n' "$*" >> "$TEST_CALLS"
   case "$1 $2" in
@@ -1045,11 +1056,18 @@ gh() {
     "pr view")
       case "$*" in
         *"--json labels"*) printf '%s\n' "$TEST_LANES" ;;
+        *"--json body"*)
+          case "$TEST_READ" in
+            fail) return 1 ;;
+            other) printf 'An earlier description\n' ;;
+            *) if [ -f "$TEST_STORED" ]; then cat "$TEST_STORED"; fi; printf '\n' ;;
+          esac ;;
         *) printf 'https://example.invalid/pull/527\n' ;;
       esac ;;
     "pr create")
-      if [ "$TEST_RACE" = 1 ]; then : > "$TEST_CREATED"; return 1; fi ;;
-    "pr edit") ;;
+      if [ "$TEST_RACE" = 1 ]; then : > "$TEST_CREATED"; return 1; fi
+      store_body "$@" ;;
+    "pr edit") store_body "$@" ;;
     *) return 99 ;;
   esac
 }
@@ -1059,10 +1077,13 @@ gh() {
             (root / "freshness").mkdir()
             env = {**os.environ, "RUNNER_TEMP": directory, "GITHUB_OUTPUT": str(root / "output"),
                    "TEST_CALLS": str(root / "calls"), "TEST_CREATED": str(root / "created"),
-                   "TEST_LANES": lanes, "TEST_EXISTING": str(int(existing)), "TEST_RACE": str(int(race))}
+                   "TEST_STORED": str(root / "stored"), "TEST_DROP": str(int(drop)),
+                   "TEST_LANES": lanes, "TEST_EXISTING": str(int(existing)), "TEST_RACE": str(int(race)),
+                   "TEST_READ": read}
             result = subprocess.run(["bash", "-c", stub + script], env=env, capture_output=True,
                                     text=True, timeout=30, check=False)
             body_path = root / "freshness/pr-body.md"
+            self.reported = (root / "output").read_text() if (root / "output").exists() else ""
             return result, (root / "calls").read_text(), body_path.read_text() if body_path.exists() else ""
 
     def test_pr_metadata_creates_a_shared_report_with_a_valid_source_section(self):
@@ -1097,6 +1118,52 @@ gh() {
         self.assertRegex(calls, r"pr create .*--label lane:shared")
         self.assertRegex(calls, r"pr edit 527 .*--add-label lane:trading")
         self.assertIn("Lane: `lane:trading`", rendered)
+
+    def test_pr_metadata_reads_the_published_description_back_before_reporting(self):
+        """Gap ledger B2-0004 (2026-10-15): the description goes out from its file, and the step compares what GitHub
+        holds with that file before it reports the PR's URL, on the create, update and create-race paths."""
+        for existing, race in ((False, False), (True, False), (False, True)):
+            with self.subTest(existing=existing, race=race):
+                result, calls, _ = self._run_pr_metadata(existing=existing, race=race)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                lines = calls.splitlines()
+                read_back = lines.index("pr view automation/catalog-freshness --json body --jq .body")
+                sent = max(index for index, line in enumerate(lines) if line.startswith(("pr create", "pr edit")))
+                self.assertLess(sent, read_back)
+                self.assertIn("pr_url=https://example.invalid/pull/527\n", self.reported)
+
+    def test_pr_metadata_does_not_report_a_description_github_did_not_store(self):
+        """GitHub answered HTTP 200 to description updates over 262,144 bytes and kept the old description (probe of
+        2026-10-11 on #991, read back with GET), so a successful gh exit does not show that the description is stored."""
+        for existing in (False, True):
+            with self.subTest(existing=existing):
+                result, calls, _ = self._run_pr_metadata(existing=existing, drop=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("differs from", result.stderr)
+                self.assertNotIn("pr_url=", self.reported)
+                self.assertNotIn("--json url", calls)
+
+    def test_pr_metadata_does_not_report_the_pr_when_the_read_back_fails(self):
+        """The command center's FULL read of #1169 at bf06685a (P2-1): a read-back that fails with no output stops the
+        step with its own message, on the create and the update paths."""
+        for existing in (False, True):
+            with self.subTest(existing=existing):
+                result, calls, _ = self._run_pr_metadata(existing=existing, read="fail")
+                self.assertEqual(result.returncode, 1, result.stderr)
+                self.assertIn("could not be read back", result.stderr)
+                self.assertNotIn("pr_url=", self.reported)
+                self.assertNotIn("--json url", calls)
+
+    def test_pr_metadata_does_not_report_a_different_published_description(self):
+        """The command center's FULL read of #1169 at bf06685a (P2-1): GitHub holding a description other than the
+        step's file (an earlier one, or one edited since) stops the step, on the create and the update paths."""
+        for existing in (False, True):
+            with self.subTest(existing=existing):
+                result, calls, _ = self._run_pr_metadata(existing=existing, read="other")
+                self.assertEqual(result.returncode, 1, result.stderr)
+                self.assertIn("differs from", result.stderr)
+                self.assertNotIn("pr_url=", self.reported)
+                self.assertNotIn("--json url", calls)
 
     def test_unfetched_wording_says_pin_changes_are_still_drift(self):
         report = fp.render_drift_markdown(

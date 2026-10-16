@@ -31,6 +31,13 @@ POST_PIN_RECEIPT_GRANTS = {
     "evidence/receipts/osv-openhands-oauthlib-relock-20261013.json":
         "#1060, Claude read of e3933560 (names this receipt): the new registered receipt; the Architecture build refused it "
         "without this grant (tests.test_local_pages_architecture_landscape_exclusions)",
+    "evidence/receipts/osv-alpaca-messagepack-relock-20261015.json":
+        "#1178, CI run 38799026807 (validate-shard-4) at 191f6c6f: the new registered receipt; the Architecture build refused "
+        "it without this grant (tests.test_local_pages_architecture_landscape_exclusions)",
+    "evidence/receipts/osv-openhands-mcp-relock-20261015.json":
+        "CC incident brief 2026-10-15 (GHSA-84m7-p3x7-pcfv relock; names this receipt and directs its exact grant): the new "
+        "registered receipt; the Architecture build refuses it without this grant "
+        "(tests.test_local_pages_architecture_landscape_exclusions)",
 }
 spec = importlib.util.spec_from_file_location("local_policy_grant_tests", ROOT / "scripts/local_pages_policy_grants.py")
 grants = importlib.util.module_from_spec(spec)

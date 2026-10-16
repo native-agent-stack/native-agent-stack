@@ -1,0 +1,61 @@
+"""Static text search of a relocked recipe venv: which installed packages import mcp, and does any of them import the
+server-side Streamable HTTP session code that GHSA-84m7-p3x7-pcfv concerns (the stateful session manager and the apps
+built on it)?
+Adapted from native-agent-stack@5561321b:blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.oauthlib-importers.py.txt.
+
+Reads every .py file under <site-packages> outside mcp itself; records `from mcp... import ...` and `import mcp...`
+statements (single-line forms). It flags as server side any whose module path is mcp.server.streamable_http,
+mcp.server.streamable_http_manager or mcp.server.fastmcp (the 1.x server framework), or that imports
+StreamableHTTPSessionManager, StreamableHTTPServerTransport or FastMCP from mcp.server, and any file that mentions
+streamable_http_app or StreamableHTTPSessionManager; it counts imports of mcp.client.streamable_http (the client side,
+which the advisory does not concern) separately. A text search, not a runtime trace: a multi-line import, an attribute
+access through `import mcp`, or a dynamic import would be missed.
+Usage: python3 -I <this-script> <site-packages>
+"""
+import os
+import re
+import sys
+
+site = sys.argv[1]
+statement = re.compile(r"^\s*(?:from\s+(mcp(?:\.[\w.]*)?)\s+import\s+(.+)|import\s+(mcp(?:\.[\w.]*)?)\b)", re.M)
+server_module = re.compile(r"\Amcp\.server\.(?:streamable_http(?:_manager)?|fastmcp)\b")
+server_names = re.compile(r"\b(StreamableHTTPSessionManager|StreamableHTTPServerTransport|FastMCP)\b")
+importers, hits, client_files, searched = {}, [], set(), 0
+for root, _dirs, names in os.walk(site):
+    top = os.path.relpath(root, site).split(os.sep)[0]
+    if top == "mcp" or top.startswith("mcp-"):
+        continue
+    for name in names:
+        if not name.endswith(".py"):
+            continue
+        path = os.path.join(root, name)
+        searched += 1
+        try:
+            text = open(path, encoding="utf-8", errors="replace").read()
+        except OSError:
+            continue
+        if "mcp" not in text:
+            continue
+        for match in statement.finditer(text):
+            module = match.group(1) or match.group(3)
+            imported = match.group(2) or ""
+            importers.setdefault(top, set()).add(module)
+            if module.startswith("mcp.client.streamable_http"):
+                client_files.add(os.path.relpath(path, site))
+            if server_module.search(module) or (module.startswith("mcp.server") and server_names.search(imported)):
+                hits.append((os.path.relpath(path, site), match.group(0).strip()[:140]))
+        if re.search(r"streamable_http_app|StreamableHTTPSessionManager", text):
+            hits.append((os.path.relpath(path, site), "mentions streamable_http_app or StreamableHTTPSessionManager"))
+print("py files searched outside mcp:", searched)
+print("top-level distributions importing mcp:", {key: sorted(value) for key, value in sorted(importers.items())})
+print("files importing mcp.client.streamable_http (client side), per top-level package:",
+      {key: sum(1 for path in client_files if path.split(os.sep)[0] == key)
+       for key in sorted({path.split(os.sep)[0] for path in client_files})} or "none")
+by_top = {}
+for path, line in hits:
+    by_top.setdefault(path.split(os.sep)[0], []).append((path, line))
+print("server-side hits (imports of mcp's Streamable HTTP server or FastMCP 1.x, or mentions), per top-level package:",
+      {key: len(value) for key, value in sorted(by_top.items())} or "none")
+for key, value in sorted(by_top.items()):
+    for path, line in sorted(value):
+        print(f"  {path}: {line}")

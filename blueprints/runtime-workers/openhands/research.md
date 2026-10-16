@@ -739,3 +739,82 @@ oauthlib. oauthlib 4.0.0 declares dependencies only under extras, and its one de
 Overturn conditions: (a) OSV lists an advisory for oauthlib 4.0.0 that only a later release fixes; (b) an OpenHands run of
 the recipe fails with oauthlib 4.0.0 and passes with 3.3.1; (c) upstream's workspace publishes a lock with oauthlib 4.0.0 or
 later (the next relock then follows that lock).
+
+## Runtime lock mcp relock (2026-10-15)
+
+requirements.lock moved from mcp 1.28.1 to 1.30.0 and nothing else changed (the three mcp lines, 365-367), SHA256
+a3303759da2895ecb87e0a9fa7e45878bb2588208615e6a6059704a98e71e396, previously 32bc153428aa. GHSA-84m7-p3x7-pcfv (CVE-2026-59951,
+unbounded session accumulation in the MCP Python SDK's Streamable HTTP transport, CVSS 3.1 7.5, GitHub severity field medium)
+affects mcp >= 1.8.0, < 1.30.0 and >= 2.0.0, < 2.2.0 and names 1.30.0 and 2.2.0 as the fixed releases: the GitHub advisory
+(`gh api /advisories/GHSA-84m7-p3x7-pcfv`, published 2026-10-15T20:13:13Z, updated 20:13:14Z, read 2026-10-15T20:55:51Z) and
+the repository advisory it cites
+(https://github.com/modelcontextprotocol/python-sdk/security/advisories/GHSA-84m7-p3x7-pcfv, published and updated
+2026-09-30T20:53:30Z, same ranges). The 1.x fix is modelcontextprotocol/python-sdk #3426 (92120b4b, one of the five commits
+from v1.29.1 to v1.30.0), the backport of #3395 (d2290ca3, in v2.2.0). The v1.30.0 release (tag commit
+8c2fa6eabacde869d75568e33b9d466b58c2f512, published 2026-09-07T14:03:59Z; `gh api
+repos/modelcontextprotocol/python-sdk/releases/tags/v1.30.0`) names it in body lines 13-17 ("**Idle Streamable HTTP sessions
+now expire** (#3426)": 30 idle minutes, at most 10 000 sessions, a 503 beyond), 33 and 38. OSV.dev modified its record at
+2026-10-15T20:30:08Z, so the hosted osv-scanner job at 5561321b (run 38801792191, job 116652403677, 20:25:18Z to 20:25:41Z)
+ran before it and passed. At 20:58:09Z OSV's query API returned this advisory for mcp 1.28.1 and nothing for 1.30.0. The
+workflow's own scan step then exits 1 with exactly this finding in this lock, at 5561321b (from 20:58:30Z) and at main's
+a93ba0b8 (#1178's merge, the same tree, from 21:23:15Z, in a detached worktree since removed). Record:
+[osv-openhands-mcp-relock-20261015.json](../../../evidence/receipts/osv-openhands-mcp-relock-20261015.json);
+returned outputs: the relock-2026-10-15-mcp prefix beside this recipe.
+
+The method is the 2026-10-13 oauthlib one (uv 0.12.22, a fresh extraction of the pinned archive, the `environments` and
+litellm edits, without UV_NO_CONFIG) with one more version-pinned upgrade. The control, the ten upgrades of that relock,
+reproduces the committed lock byte for byte. The flags, at astral-sh/uv 0.12.22 (tag commit
+70fe1196a546e49148a73b1c592b2f74c33af80e): `uv lock --upgrade-package <package>==<version>` upgrades one package and keeps
+the other locked versions (docs/concepts/projects/sync.md:157-182; crates/uv-cli/src/lib.rs:7506-7509, flattened into
+`LockArgs` at 4157-4158), `uv lock --check` asserts the lockfile is unchanged (sync.md:35-50; lib.rs:4102-4110), and the
+export is `uv export --frozen --format requirements.txt --no-header --no-annotate --package openhands-tools
+--no-emit-workspace` (docs/concepts/projects/export.md:43-55; lib.rs:4757-4764, 4776-4780, 4811-4813, 4818-4820, 4900-4913
+and 4982-4986). The workspace settings the relock keeps are `environments` (docs/concepts/resolution.md:142-173), lockfile
+preferences (303-309), the relative `exclude-newer = "7 days"` (891-921) and the litellm `exclude-newer-package` entry
+(846-852). The installed uv 0.12.22's `uv lock --help` and `uv export --help` list the same flags. The new run:
+
+    uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 \
+      --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 \
+      --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 \
+      --upgrade-package litellm==1.93.2 \
+      --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1 \
+      --upgrade-package oauthlib==4.0.0 --upgrade-package mcp==1.30.0
+
+The new uv.lock differs from the control's in the mcp entry only, uv's change list differs by `Updated mcp v1.28.1 ->
+v1.30.0` only, and the export differs in the three mcp lines; the committed lock is that export plus the pins.json wheel
+entries (`cmp` exit 0). Its two hashes are PyPI's wheel and sdist of 1.30.0 (uploaded 2026-09-07T14:34:14Z and 14:34:15Z,
+outside the workspace's 7-day `exclude-newer` window). mcp 1.30.0 declares the same requirements as 1.28.1, which the locked
+versions already satisfy, and both of its dependents in the lock admit it: fastmcp 3.2.0 requires `mcp<2.0,>=1.24.0` and
+browser-use 0.11.9 `mcp>=1.10.1`. No other pin moved. fastmcp's `<2.0` also rules out the 2.x fix, so 1.30.0 is the lowest
+fixed release the recipe's resolution can reach.
+
+- **Checks.** The recipe's hashed install in a scratch CPython 3.13.16 venv passed (`uv pip check` checked 178 packages,
+  exit 0), and so did the SDK/tools import check and an mcp check: mcp 1.30.0 imports, and its `StreamableHTTPSessionManager`
+  defaults `session_idle_timeout` to 1800 s and `max_sessions` to 10,000, the fix's two bounds (python-sdk v1.30.0
+  `src/mcp/server/streamable_http_manager.py:42,45,99,101`; at v1.28.1, tag commit 777b8d06, lines 65-74, the timeout
+  defaults to None and `max_sessions` does not exist). fastmcp 3.2.0, the SDK's MCP client library, listed and called a tool of an in-process FastMCP server over its
+  in-memory transport (the installed wheel's `fastmcp/client/transports/memory.py:14-23`). The hash check (the fsspec script,
+  unchanged, argument mcp) exits 0. The workflow's own scan step, run by bash under UTC as on a pull request, exits 1 at
+  5561321b and at a93ba0b8 and 0 on this change; its ordinary OSV invocation alone exits 1 (the one mcp finding) and 0 ("No
+  issues found") over the 60 ordinary inputs, and a scan of this lock alone exits 1 and 0.
+- **The recipe is an MCP client.** The advisory concerns Streamable HTTP servers in stateful mode. The recipe's enabled MCP
+  servers are stdio processes (config/mcp.template.json), and the SDK's MCP code is client-side (SDK@fcc102a
+  `openhands-sdk/openhands/sdk/mcp/client.py:1-8`, fastmcp `Client`; the agent server's `/mcp` REST router,
+  `openhands-agent-server/openhands/agent_server/mcp_router.py:29-56`, calls configured servers). In the new venv, a static
+  search of the 10,873 .py files outside mcp finds the Streamable HTTP server side only in fastmcp's own HTTP server and the
+  LiteLLM proxy's experimental MCP server, and the recipe runs neither. The relock follows the scan, not a reachability
+  finding.
+- **Release notes.** v1.30.0 also changes client behaviour that the recipe's enabled servers do not exercise (body lines
+  5-27): `streamable_http_client` and `sse_client` follow a redirect only within the endpoint's origin (#3448, lines 7-11),
+  and the recipe's one HTTP entry, ai-memory, is disabled (config/mcp.template.json; host.py:361); the OAuth client checks
+  the authorization server's `issuer` (#3431, lines 19-22); and two new DeprecationWarnings (lines 24-27). v1.29.0 (tag
+  commit 98b7159c) and v1.29.1 (b2227130) add request body limits and fix tool-name validation, the FastMCP settings model
+  and recursive output schemas (their release bodies, `gh api .../releases/tags/<tag>`).
+- **Not covered.** The image's server binary (a PyInstaller build of upstream's unchanged uv.lock, SHA256 d13a41b8..., which
+  pins mcp 1.28.1) and the grader venv are not relocked, and the inventory scans neither. No OpenHands task ran with the
+  relocked venv. An installation that recorded the old lock digest must re-run install (host.py refuses to run it
+  otherwise).
+
+Overturn conditions: (a) OSV lists an advisory for mcp 1.30.0 that only a later release fixes; (b) an OpenHands run of the
+recipe fails with mcp 1.30.0 and passes with 1.28.1; (c) upstream's workspace publishes a lock with mcp 1.30.0 or later (the
+next relock then follows that lock).
