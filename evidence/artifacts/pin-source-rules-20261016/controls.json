@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "base": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "before_primary": {
+    "tests": 3,
+    "failures": 7,
+    "errors": 1,
+    "scope": "Unchanged base with added tests: well-formed wrong binding commit and six missing/contradictory/foreign proof subcases remain accepted; marked Launchpad package fails the actual catalog URL check.",
+    "error_diagnostic": "ValueError: candidate needs a canonical public repository URL",
+    "boundary": "The one runtime error is the reproduced production refusal, not an import or fixture setup error."
+  },
+  "before_historical_cleanup": {
+    "source_commit": "1a7917ff95d9f1d2908c0bd0c3cbf213320fc6d1",
+    "tests": 3,
+    "failures": 3,
+    "errors": 0,
+    "skipped": 0,
+    "scope": "Exact before bytes for the three deferred #1197 controls: consumed binding fields, missing-stack fallback, and pinned record_pin citation span."
+  },
+  "before_utility_exclusion_correction": {
+    "tests": 1,
+    "failures": 1,
+    "errors": 0,
+    "scope": "During utility extraction, an otherwise consistent report could override the separately owned Claude Code exclusion in apply mode; the new refusal control failed before applying the exclusion there too."
+  },
+  "after": {
+    "command": "python3 -m unittest tests.test_run_pin_sources tests.test_nautilus_run_pin tests.test_distribution_source_identity tests.test_final_stack.PinTests tests.test_final_stack.RunTests tests.test_landscape",
+    "tests": 140,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "execution": "Native unittest in an idle-class scope; real repository proof replay plus temporary-root source/application controls."
+  },
+  "ownership": {
+    "final_stack_changed_existing_functions": ["run_records"],
+    "final_stack_added_functions": ["lock_source_proof"],
+    "landscape_changed_existing_functions": ["validate_verdict_row", "build_landscape"],
+    "landscape_added_functions": ["catalog_identity"],
+    "comparison": "AST dumps at the base versus current source, excluding location attributes.",
+    "boundary": "The landscape changes are legacy identity call sites only. Every other existing function, including FINAL admission/refusal/current-snapshot functions, is unchanged."
+  },
+  "limits": [
+    "Retained-observation consistency is not a signed upstream provenance or artifact-to-source build-equivalence claim.",
+    "No catalog winner, run source binding, runtime version, uv.lock, frozen verdict or wave changes.",
+    "The generated final-stack input set gains the existing public Nautilus observation hash.",
+    "PIN-RULES lands before the separate qualified FINAL opening; PIN-DATA follows rules."
+  ]
+}
