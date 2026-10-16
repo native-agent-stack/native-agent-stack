@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "capture_name": "zizmor-install-source",
+  "argv": [
+    "/usr/bin/curl",
+    "--disable",
+    "--fail",
+    "--silent",
+    "--show-error",
+    "--location",
+    "https://raw.githubusercontent.com/zizmorcore/zizmor/99a054ed9283c90abdd2d5b9fb5101d27dde9783/docs/installation.md"
+  ],
+  "cwd": "<SCRATCH>",
+  "environment": {
+    "PATH": "<SCRATCH>/bin:/usr/bin:/bin",
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "XDG_CONFIG_HOME": "<SCRATCH>/config",
+    "XDG_CACHE_HOME": "<SCRATCH>/cache",
+    "XDG_DATA_HOME": "<SCRATCH>/data",
+    "TMPDIR": "<SCRATCH>/tmp",
+    "UV_TOOL_DIR": "<SCRATCH>/tools",
+    "UV_TOOL_BIN_DIR": "<SCRATCH>/bin",
+    "UV_CACHE_DIR": "<SCRATCH>/cache/uv",
+    "UV_PYTHON_INSTALL_DIR": "<SCRATCH>/python",
+    "UV_NO_CONFIG": "1",
+    "UV_NO_PROGRESS": "1",
+    "UV_LINK_MODE": "copy",
+    "UV_PYTHON_DOWNLOADS": "never",
+    "UV_KEYRING_PROVIDER": "disabled",
+    "CURL_HOME": "<SCRATCH>/curl",
+    "WGETRC": "/dev/null",
+    "DOWNLOAD_TAG_INSTALL_SCRIPT": "false",
+    "SYFT_CHECK_FOR_APP_UPDATE": "false",
+    "ZIZMOR_OFFLINE": "1",
+    "GIT_CONFIG_NOSYSTEM": "1",
+    "GIT_CONFIG_GLOBAL": "/dev/null",
+    "GIT_NO_LAZY_FETCH": "1",
+    "GIT_OPTIONAL_LOCKS": "0"
+  },
+  "started_at": "2026-10-16T06:22:46.106641+00:00",
+  "finished_at": "2026-10-16T06:22:46.252215+00:00",
+  "exit_code": 0,
+  "classification": "masked derivative of a native capture",
+  "raw_capture_name": "zizmor-install-source",
+  "masking_rule": "../../mask.py",
+  "command_placeholders": "Marked <...> values replace private path prefixes; exact argv/cwd/environment remain in private capture.",
+  "streams": {
+    "stdout": {
+      "file": "stdout.txt",
+      "published_bytes": 4977,
+      "published_sha256": "24d83d696e4d80dad9c9daaa94b35c07027c096a7b2201b4b0798ca051b30c90"
+    },
+    "stderr": {
+      "file": "stderr.txt",
+      "published_bytes": 0,
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

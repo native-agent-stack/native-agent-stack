@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "classification": "Resolution input and scope declaration; not measured output",
+  "catalog": "foundation",
+  "layer_id": "ci-supply-chain",
+  "base_commit": "30542e70560147c19049016d19aa3f264515c92f",
+  "status": "Preparation only; existing reopened state retained; FINAL gate remains closed.",
+  "requirement": "Publish reproducible changes with scoped workflow permissions, pinned dependencies, actual runtime inventory and attributable hosted checks.",
+  "inputs": [
+    {
+      "path": "AGENTS.md",
+      "line": 5,
+      "reason": "research-first and evidence rule",
+      "commit": "30542e70560147c19049016d19aa3f264515c92f"
+    },
+    {
+      "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
+      "line": 31,
+      "reason": "read verdict/sweep and dispatch only delta",
+      "commit": "30542e70560147c19049016d19aa3f264515c92f"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "line": 3086,
+      "reason": "source requirement, winners, alternatives and gaps",
+      "commit": "30542e70560147c19049016d19aa3f264515c92f"
+    },
+    {
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 5059,
+      "reason": "current reopened layer",
+      "commit": "30542e70560147c19049016d19aa3f264515c92f"
+    },
+    {
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 5135,
+      "reason": "three existing winner rows and their drifts; see pin-reconciliation.json",
+      "commit": "30542e70560147c19049016d19aa3f264515c92f"
+    },
+    {
+      "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+      "line": 130,
+      "reason": "named F1, E2E/invoke and six-survivor gap",
+      "commit": "30542e70560147c19049016d19aa3f264515c92f"
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdict-waves.json",
+      "line": 10,
+      "reason": "20260922 verdict wave; historical verdict not recast as current convergence",
+      "commit": "30542e70560147c19049016d19aa3f264515c92f"
+    },
+    {
+      "path": "catalogs/saturation/ledger.json",
+      "line": 7694,
+      "reason": "latest covering completed sweep 20260929; earlier unresolved survivors carried",
+      "commit": "30542e70560147c19049016d19aa3f264515c92f"
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260929.json",
+      "line": 14611,
+      "reason": "frozen candidate manifest",
+      "commit": "30542e70560147c19049016d19aa3f264515c92f"
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+      "line": 22464,
+      "reason": "retained latest votes; omission is not adjudication",
+      "commit": "30542e70560147c19049016d19aa3f264515c92f"
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line": 6846,
+      "reason": "prior survivor reconstruction",
+      "commit": "30542e70560147c19049016d19aa3f264515c92f"
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line": 31543,
+      "reason": "prior retained votes",
+      "commit": "30542e70560147c19049016d19aa3f264515c92f"
+    },
+    {
+      "path": "catalogs/landscape/angles/README.md",
+      "line": 36,
+      "reason": "six-angle weight definition; smoke belongs to A1",
+      "commit": "30542e70560147c19049016d19aa3f264515c92f"
+    }
+  ],
+  "packet": {
+    "generator": "tools/sota-convergence/lane_packets.py",
+    "source_commit": "30542e70560147c19049016d19aa3f264515c92f",
+    "native_capture": "captures/lane-packets/receipt.json",
+    "native_stdout": "captures/lane-packets/stdout.txt:1",
+    "exact_command": "See captured argv with marked path placeholders; exact command is privately retained.",
+    "selected_packet_name": "foundation__ci-supply-chain.json",
+    "raw_packet_disposition": "Native generated packet retained only in scratch, named here without a private hash. This record selects dispatched identities; it does not rewrite the packet.",
+    "packet_population": 13,
+    "selected_population": 9,
+    "population_basis": "Native generated candidate list inspected; 3 current winners + 6 carried survivors from the current final-stack row. Counts are scope bookkeeping, not a runtime metric.",
+    "outside_this_dispatch": [
+      "gitleaks/gitleaks",
+      "dependabot/dependabot-core",
+      "aquasecurity/trivy",
+      "anchore/grype"
+    ],
+    "outside_disposition": "Remain outside this one-layer winner/survivor delta; no retirement or refutation inferred."
+  },
+  "selected": [
+    {
+      "id": "zizmor",
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "pin": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+      "version": "1.30.1",
+      "role": "winner",
+      "disposition": "F1 proposal; scratch observation or named GAP, pending two-family read",
+      "pin_source": "pin-reconciliation.json (proposal with pinned catalog/run and native source citations)"
+    },
+    {
+      "id": "syft",
+      "repository": "https://github.com/anchore/syft",
+      "pin": "cc326e45a6213360266dda4b30cc68095946d676",
+      "version": "1.54.0",
+      "role": "winner",
+      "disposition": "F1 proposal; scratch observation or named GAP, pending two-family read",
+      "pin_source": "pin-reconciliation.json (proposal with pinned catalog/run and native source citations)"
+    },
+    {
+      "id": "actions-attest",
+      "repository": "https://github.com/actions/attest",
+      "pin": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+      "version": "4.2.2",
+      "role": "winner",
+      "disposition": "F1 proposal; scratch observation or named GAP, pending two-family read",
+      "pin_source": "pin-reconciliation.json (proposal with pinned catalog/run and native source citations)"
+    },
+    {
+      "id": "aikidosec-safe-chain",
+      "repository": "https://github.com/AikidoSec/safe-chain",
+      "pin": "dffae994572cd9e74dc7cf868ebe4f073832caa6",
+      "version": "1.5.25",
+      "role": "survivor",
+      "disposition": "RETAIN unresolved survivor; no installation, model call or adjudication",
+      "pin_source": "Proposed source-review identity carried from https://github.com/native-agent-stack/native-agent-stack/blob/6079fe9d6d215f2d441005792b70a8001e312c5c/evidence/artifacts/harness-screens-20261015/ci-supply-chain.anthropic.json; unchanged source pin, no runtime admission."
+    },
+    {
+      "id": "boostsecurityio-poutine",
+      "repository": "https://github.com/boostsecurityio/poutine",
+      "pin": "8918c66db19ecfd12b2f8379e445c3da4589e599",
+      "version": "1.1.6",
+      "role": "survivor",
+      "disposition": "RETAIN unresolved survivor; no installation, model call or adjudication",
+      "pin_source": "Proposed source-review identity carried from https://github.com/native-agent-stack/native-agent-stack/blob/6079fe9d6d215f2d441005792b70a8001e312c5c/evidence/artifacts/harness-screens-20261015/ci-supply-chain.anthropic.json; unchanged source pin, no runtime admission."
+    },
+    {
+      "id": "datadog-supply-chain-firewall",
+      "repository": "https://github.com/DataDog/supply-chain-firewall",
+      "pin": "44203cf6d3b2e03bd179f466821ec8ae215d7b78",
+      "version": "4.0.0",
+      "role": "survivor",
+      "disposition": "RETAIN unresolved survivor; no installation, model call or adjudication",
+      "pin_source": "Proposed source-review identity carried from https://github.com/native-agent-stack/native-agent-stack/blob/6079fe9d6d215f2d441005792b70a8001e312c5c/evidence/artifacts/harness-screens-20261015/ci-supply-chain.anthropic.json; unchanged source pin, no runtime admission."
+    },
+    {
+      "id": "kjanat-actionlint",
+      "repository": "https://github.com/kjanat/actionlint",
+      "pin": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+      "version": "1.17.0",
+      "role": "survivor",
+      "disposition": "RETAIN unresolved survivor; no installation, model call or adjudication",
+      "pin_source": "Proposed source-review identity carried from https://github.com/native-agent-stack/native-agent-stack/blob/6079fe9d6d215f2d441005792b70a8001e312c5c/evidence/artifacts/harness-screens-20261015/ci-supply-chain.anthropic.json; unchanged source pin, no runtime admission."
+    },
+    {
+      "id": "rhysd-actionlint",
+      "repository": "https://github.com/rhysd/actionlint",
+      "pin": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+      "version": "1.7.12",
+      "role": "survivor",
+      "disposition": "RETAIN unresolved survivor; no installation, model call or adjudication",
+      "pin_source": "Proposed source-review identity carried from https://github.com/native-agent-stack/native-agent-stack/blob/6079fe9d6d215f2d441005792b70a8001e312c5c/evidence/artifacts/harness-screens-20261015/ci-supply-chain.anthropic.json; unchanged source pin, no runtime admission."
+    },
+    {
+      "id": "socketdev-sfw-free",
+      "repository": "https://github.com/SocketDev/sfw-free",
+      "pin": "164c32dcbe3bbebcc0b091fd6a31ff93883545b2",
+      "version": "1.15.4",
+      "role": "survivor",
+      "disposition": "RETAIN unresolved survivor; no installation, model call or adjudication",
+      "pin_source": "Proposed source-review identity carried from https://github.com/native-agent-stack/native-agent-stack/blob/6079fe9d6d215f2d441005792b70a8001e312c5c/evidence/artifacts/harness-screens-20261015/ci-supply-chain.anthropic.json; unchanged source pin, no runtime admission."
+    }
+  ],
+  "gap_dispositions": [
+    {
+      "id": "actions-attest-e2e-f2",
+      "status": "GAP",
+      "prerequisite": "Separately authorized hosted GitHub OIDC/Sigstore signing/upload capture; not simulated."
+    },
+    {
+      "id": "comparative-a6",
+      "status": "GAP",
+      "prerequisite": "Frozen matched corpus, independently enumerated expectations, separately screened arms and retained native comparison outputs."
+    },
+    {
+      "id": "a3-a4-a5",
+      "status": "GAP",
+      "prerequisite": "Independent consensus, net-usage denominator and relevant published evaluations; absent observations remain U."
+    },
+    {
+      "id": "scratch-to-host",
+      "status": "GAP",
+      "prerequisite": "Opening of FINAL gate and full convergence/installation plan; scratch results never imply host install approval."
+    }
+  ],
+  "default_changes": false,
+  "model_invocations": 0,
+  "workflow_dispatches": 0
+}

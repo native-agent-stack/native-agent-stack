@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "classification": "Derived run/source binding; the referenced capture receipts and streams are the native evidence",
+  "scope": "Native Linux x86_64 scratch observations only. Upstream CLI smokes/fixtures, not complete upstream test suites, cross-platform acceptance or A6 comparison.",
+  "components": [
+    {
+      "id": "zizmor",
+      "pin": "1.30.1 @ 99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+      "install": {
+        "capture": "captures/zizmor-install/receipt.json",
+        "exit_code": 0,
+        "source": {
+          "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-install/receipt.json",
+          "line": 46
+        },
+        "upstream": "zizmorcore/zizmor@99a054ed9283c90abdd2d5b9fb5101d27dde9783:docs/installation.md:25-42"
+      },
+      "smoke": {
+        "capture": "captures/zizmor-upstream-help-smoke/receipt.json",
+        "exit_code": 0,
+        "source": {
+          "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-help-smoke/receipt.json",
+          "line": 38
+        },
+        "upstream": "zizmorcore/zizmor@99a054ed9283c90abdd2d5b9fb5101d27dde9783:docs/quickstart.md:3"
+      },
+      "upstream_fixture_reproductions": [
+        {
+          "capture": "captures/zizmor-upstream-write-all/receipt.json",
+          "exit_code": 14,
+          "findings": 1,
+          "identifier": "excessive-permissions",
+          "sources": [
+            {
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-write-all/receipt.json",
+              "line": 45
+            },
+            {
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-write-all/stdout.txt",
+              "line": 1
+            }
+          ],
+          "upstream": "zizmorcore/zizmor@99a054ed9283c90abdd2d5b9fb5101d27dde9783:crates/zizmor/tests/integration/audit/excessive_permissions.rs:115-132"
+        },
+        {
+          "capture": "captures/zizmor-upstream-empty-perms/receipt.json",
+          "exit_code": 0,
+          "findings": 0,
+          "sources": [
+            {
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-empty-perms/receipt.json",
+              "line": 45
+            },
+            {
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-empty-perms/stdout.txt",
+              "line": 1
+            }
+          ],
+          "upstream": "zizmorcore/zizmor@99a054ed9283c90abdd2d5b9fb5101d27dde9783:crates/zizmor/tests/integration/audit/excessive_permissions.rs:139-146"
+        }
+      ],
+      "invoke": {
+        "capture": "captures/zizmor-repository-invoke/receipt.json",
+        "exit_code": 0,
+        "findings": 0,
+        "sources": [
+          {
+            "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-repository-invoke/receipt.json",
+            "line": 48
+          },
+          {
+            "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-repository-invoke/stdout.txt",
+            "line": 1
+          }
+        ],
+        "output_hash_source": "captures/zizmor-repository-invoke/receipt.json#/streams/stdout/published_sha256",
+        "target": "Current base's .github/workflows and .github/dependabot.yml; exact arguments retained privately and marked in published receipt."
+      },
+      "limits": [
+        "Only offline regular-persona checks; no live GitHub audits or workflow execution.",
+        "Upstream fixture input and expected finding reproduced through the release CLI, not cargo test. No library or native scanner code changed."
+      ]
+    },
+    {
+      "id": "syft",
+      "pin": "1.54.0 @ cc326e45a6213360266dda4b30cc68095946d676",
+      "install": {
+        "capture": "captures/syft-install/receipt.json",
+        "exit_code": 0,
+        "source": {
+          "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-install/receipt.json",
+          "line": 41
+        },
+        "upstream": "anchore/syft@cc326e45a6213360266dda4b30cc68095946d676:install.sh:817-821"
+      },
+      "smoke_and_invoke": {
+        "capture": "captures/syft-filesystem-invoke/receipt.json",
+        "exit_code": 0,
+        "package_count": 1,
+        "files": 4,
+        "relationships": 4,
+        "package": {
+          "name": "zizmor",
+          "version": "1.30.1",
+          "type": "python"
+        },
+        "sources": [
+          {
+            "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-filesystem-invoke/receipt.json",
+            "line": 47
+          },
+          {
+            "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-filesystem-invoke/stdout.txt",
+            "line": 1
+          }
+        ],
+        "output_hash_source": "captures/syft-filesystem-invoke/receipt.json#/streams/stdout/published_sha256",
+        "upstream": "anchore/syft@cc326e45a6213360266dda4b30cc68095946d676:README.md:46-61",
+        "target": "Installed scratch zizmor tool environment; no image pulls or host-wide scan."
+      },
+      "limits": [
+        "Inventory of one small runtime directory does not establish recall over all runtimes, interpreters or vendored libraries.",
+        "Package IDs/checksums in the published SBOM are deterministically masked; raw is retained privately for reproduction. It is an evidence derivative, not an operational SBOM for downstream scanners.",
+        "No signature verification, complete Go suite, vulnerability verdict or A6 comparison."
+      ]
+    },
+    {
+      "id": "actions-attest",
+      "pin": "4.2.2 @ 1e69f48acb82d1966a394da916b4c1698aa569d6",
+      "install": null,
+      "invoke": null,
+      "status": "GAP",
+      "reason": "The required live service/OIDC workflow is out of scope. No mocked, synthetic or templated success substitutes for it.",
+      "upstream": "actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6:README.md:11-18,64-74"
+    }
+  ],
+  "custody": {
+    "raw_publication": "Raw captures stay private and are named only; no unpublished digest or prefix is published.",
+    "derivatives": "Each captures/<name>/receipt.json is produced by mask.py from the raw capture, preserving command/rc and native streams under marked deterministic masking.",
+    "tests": "captures/custody-tests-final/stderr.txt records 10 passing synthetic custody tests; captures/mask-uuid-regression-before/stderr.txt records the fail-before UUID control. These are not candidate E2E evidence.",
+    "retention": "Installed tools, prefixes, caches and raw captures remain exclusively in the owned scratch directory for co-op reproduction; no host-wide install, default PATH or service was changed."
+  }
+}

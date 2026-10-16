@@ -1,0 +1,10 @@
+{
+  "ref": "refs/tags/v1.54.0",
+  "node_id": "MDM6UmVmMjYyMTI2NDk3OnJlZnMvdGFncy92MS41NC4w",
+  "url": "https://api.github.com/repos/anchore/syft/git/refs/tags/v1.54.0",
+  "object": {
+    "sha": "aee4c00c0b0dbdee3d524acdd02f8f20d0c4c2bf",
+    "type": "tag",
+    "url": "https://api.github.com/repos/anchore/syft/git/tags/aee4c00c0b0dbdee3d524acdd02f8f20d0c4c2bf"
+  }
+}

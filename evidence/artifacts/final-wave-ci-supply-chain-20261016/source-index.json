@@ -1,0 +1,468 @@
+{
+  "schema_version": 1,
+  "classification": "Derived locator index, not native output or measured result",
+  "source": "Published masked native captures; field line numbers counted directly from their bytes.",
+  "captures": {
+    "metadata-socketdev-sfw-free": {
+      "receipt": "captures/metadata-socketdev-sfw-free/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/metadata-socketdev-sfw-free/stdout.txt",
+      "stdout_lines": 138,
+      "field_lines": {
+        "pushed_at": [
+          70
+        ],
+        "archived": [
+          88
+        ],
+        "spdx_id": [
+          94
+        ]
+      }
+    },
+    "zizmor-upstream-write-all": {
+      "receipt": "captures/zizmor-upstream-write-all/receipt.json",
+      "exit_code_line": 45,
+      "stdout": "captures/zizmor-upstream-write-all/stdout.txt",
+      "stdout_lines": 53,
+      "field_lines": {}
+    },
+    "zizmor-install": {
+      "receipt": "captures/zizmor-install/receipt.json",
+      "exit_code_line": 46,
+      "stdout": "captures/zizmor-install/stdout.txt",
+      "stdout_lines": 0,
+      "field_lines": {}
+    },
+    "host-platform": {
+      "receipt": "captures/host-platform/receipt.json",
+      "exit_code_line": 39,
+      "stdout": "captures/host-platform/stdout.txt",
+      "stdout_lines": 1,
+      "field_lines": {}
+    },
+    "zizmor-package-metadata": {
+      "receipt": "captures/zizmor-package-metadata/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/zizmor-package-metadata/stdout.txt",
+      "stdout_lines": 1,
+      "field_lines": {
+        "version": [
+          1
+        ]
+      }
+    },
+    "custody-tests": {
+      "receipt": "captures/custody-tests/receipt.json",
+      "exit_code_line": 45,
+      "stdout": "captures/custody-tests/stdout.txt",
+      "stdout_lines": 0,
+      "field_lines": {}
+    },
+    "metadata-zizmor": {
+      "receipt": "captures/metadata-zizmor/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/metadata-zizmor/stdout.txt",
+      "stdout_lines": 141,
+      "field_lines": {
+        "pushed_at": [
+          70
+        ],
+        "archived": [
+          88
+        ],
+        "spdx_id": [
+          94
+        ]
+      }
+    },
+    "metadata-rhysd-actionlint": {
+      "receipt": "captures/metadata-rhysd-actionlint/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/metadata-rhysd-actionlint/stdout.txt",
+      "stdout_lines": 118,
+      "field_lines": {
+        "pushed_at": [
+          70
+        ],
+        "archived": [
+          88
+        ],
+        "spdx_id": [
+          94
+        ]
+      }
+    },
+    "metadata-aikidosec-safe-chain": {
+      "receipt": "captures/metadata-aikidosec-safe-chain/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/metadata-aikidosec-safe-chain/stdout.txt",
+      "stdout_lines": 138,
+      "field_lines": {
+        "pushed_at": [
+          70
+        ],
+        "archived": [
+          88
+        ],
+        "spdx_id": [
+          94
+        ]
+      }
+    },
+    "zizmor-ci-source": {
+      "receipt": "captures/zizmor-ci-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/zizmor-ci-source/stdout.txt",
+      "stdout_lines": 140,
+      "field_lines": {}
+    },
+    "syft-installer-source": {
+      "receipt": "captures/syft-installer-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/syft-installer-source/stdout.txt",
+      "stdout_lines": 903,
+      "field_lines": {}
+    },
+    "zizmor-fixture-empty-source": {
+      "receipt": "captures/zizmor-fixture-empty-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/zizmor-fixture-empty-source/stdout.txt",
+      "stdout_lines": 24,
+      "field_lines": {}
+    },
+    "zizmor-upstream-tests-source": {
+      "receipt": "captures/zizmor-upstream-tests-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/zizmor-upstream-tests-source/stdout.txt",
+      "stdout_lines": 374,
+      "field_lines": {}
+    },
+    "syft-ci-source": {
+      "receipt": "captures/syft-ci-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/syft-ci-source/stdout.txt",
+      "stdout_lines": 18,
+      "field_lines": {}
+    },
+    "syft-filesystem-invoke": {
+      "receipt": "captures/syft-filesystem-invoke/receipt.json",
+      "exit_code_line": 47,
+      "stdout": "captures/syft-filesystem-invoke/stdout.txt",
+      "stdout_lines": 1,
+      "field_lines": {
+        "version": [
+          1
+        ]
+      }
+    },
+    "syft-tag-source": {
+      "receipt": "captures/syft-tag-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/syft-tag-source/stdout.txt",
+      "stdout_lines": 10,
+      "field_lines": {
+        "sha": [
+          6
+        ]
+      }
+    },
+    "metadata-kjanat-actionlint": {
+      "receipt": "captures/metadata-kjanat-actionlint/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/metadata-kjanat-actionlint/stdout.txt",
+      "stdout_lines": 344,
+      "field_lines": {
+        "pushed_at": [
+          70,
+          181,
+          296
+        ],
+        "archived": [
+          88,
+          199,
+          314
+        ],
+        "spdx_id": [
+          94,
+          205,
+          320
+        ]
+      }
+    },
+    "metadata-boostsecurityio-poutine": {
+      "receipt": "captures/metadata-boostsecurityio-poutine/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/metadata-boostsecurityio-poutine/stdout.txt",
+      "stdout_lines": 149,
+      "field_lines": {
+        "pushed_at": [
+          70
+        ],
+        "archived": [
+          88
+        ],
+        "spdx_id": [
+          94
+        ]
+      }
+    },
+    "syft-release": {
+      "receipt": "captures/syft-release/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/syft-release/stdout.txt",
+      "stdout_lines": 1136,
+      "field_lines": {}
+    },
+    "host-zizmor-version": {
+      "receipt": "captures/host-zizmor-version/receipt.json",
+      "exit_code_line": 38,
+      "stdout": "captures/host-zizmor-version/stdout.txt",
+      "stdout_lines": 1,
+      "field_lines": {}
+    },
+    "clock-weights": {
+      "receipt": "captures/clock-weights/receipt.json",
+      "exit_code_line": 39,
+      "stdout": "captures/clock-weights/stdout.txt",
+      "stdout_lines": 1,
+      "field_lines": {}
+    },
+    "zizmor-fixture-write-source": {
+      "receipt": "captures/zizmor-fixture-write-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/zizmor-fixture-write-source/stdout.txt",
+      "stdout_lines": 22,
+      "field_lines": {}
+    },
+    "attest-readme-source": {
+      "receipt": "captures/attest-readme-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/attest-readme-source/stdout.txt",
+      "stdout_lines": 446,
+      "field_lines": {
+        "version": [
+          213
+        ]
+      }
+    },
+    "syft-version": {
+      "receipt": "captures/syft-version/receipt.json",
+      "exit_code_line": 40,
+      "stdout": "captures/syft-version/stdout.txt",
+      "stdout_lines": 11,
+      "field_lines": {
+        "gitCommit": [
+          5
+        ],
+        "version": [
+          10
+        ]
+      }
+    },
+    "syft-readme-source": {
+      "receipt": "captures/syft-readme-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/syft-readme-source/stdout.txt",
+      "stdout_lines": 90,
+      "field_lines": {}
+    },
+    "zizmor-repository-invoke": {
+      "receipt": "captures/zizmor-repository-invoke/receipt.json",
+      "exit_code_line": 48,
+      "stdout": "captures/zizmor-repository-invoke/stdout.txt",
+      "stdout_lines": 1,
+      "field_lines": {}
+    },
+    "metadata-syft": {
+      "receipt": "captures/metadata-syft/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/metadata-syft/stdout.txt",
+      "stdout_lines": 155,
+      "field_lines": {
+        "pushed_at": [
+          70
+        ],
+        "archived": [
+          88
+        ],
+        "spdx_id": [
+          94
+        ]
+      }
+    },
+    "metadata-actions-attest": {
+      "receipt": "captures/metadata-actions-attest/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/metadata-actions-attest/stdout.txt",
+      "stdout_lines": 252,
+      "field_lines": {
+        "pushed_at": [
+          70,
+          181
+        ],
+        "archived": [
+          88,
+          199
+        ],
+        "spdx_id": [
+          94,
+          205
+        ]
+      }
+    },
+    "zizmor-tag-source": {
+      "receipt": "captures/zizmor-tag-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/zizmor-tag-source/stdout.txt",
+      "stdout_lines": 10,
+      "field_lines": {
+        "sha": [
+          6
+        ]
+      }
+    },
+    "zizmor-version": {
+      "receipt": "captures/zizmor-version/receipt.json",
+      "exit_code_line": 38,
+      "stdout": "captures/zizmor-version/stdout.txt",
+      "stdout_lines": 1,
+      "field_lines": {}
+    },
+    "host-syft-version": {
+      "receipt": "captures/host-syft-version/receipt.json",
+      "exit_code_line": 40,
+      "stdout": "captures/host-syft-version/stdout.txt",
+      "stdout_lines": 11,
+      "field_lines": {
+        "gitCommit": [
+          5
+        ],
+        "version": [
+          10
+        ]
+      }
+    },
+    "attest-tag-source": {
+      "receipt": "captures/attest-tag-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/attest-tag-source/stdout.txt",
+      "stdout_lines": 10,
+      "field_lines": {
+        "sha": [
+          6
+        ]
+      }
+    },
+    "metadata-datadog-supply-chain-firewall": {
+      "receipt": "captures/metadata-datadog-supply-chain-firewall/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/metadata-datadog-supply-chain-firewall/stdout.txt",
+      "stdout_lines": 145,
+      "field_lines": {
+        "pushed_at": [
+          70
+        ],
+        "archived": [
+          88
+        ],
+        "spdx_id": [
+          94
+        ]
+      }
+    },
+    "zizmor-install-source": {
+      "receipt": "captures/zizmor-install-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/zizmor-install-source/stdout.txt",
+      "stdout_lines": 185,
+      "field_lines": {}
+    },
+    "zizmor-quickstart-source": {
+      "receipt": "captures/zizmor-quickstart-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/zizmor-quickstart-source/stdout.txt",
+      "stdout_lines": 110,
+      "field_lines": {}
+    },
+    "syft-tag-object-source": {
+      "receipt": "captures/syft-tag-object-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/syft-tag-object-source/stdout.txt",
+      "stdout_lines": 24,
+      "field_lines": {
+        "sha": [
+          3,
+          11
+        ]
+      }
+    },
+    "syft-install": {
+      "receipt": "captures/syft-install/receipt.json",
+      "exit_code_line": 41,
+      "stdout": "captures/syft-install/stdout.txt",
+      "stdout_lines": 0,
+      "field_lines": {}
+    },
+    "attest-ci-source": {
+      "receipt": "captures/attest-ci-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/attest-ci-source/stdout.txt",
+      "stdout_lines": 109,
+      "field_lines": {
+        "version": [
+          4
+        ]
+      }
+    },
+    "lane-packets": {
+      "receipt": "captures/lane-packets/receipt.json",
+      "exit_code_line": 51,
+      "stdout": "captures/lane-packets/stdout.txt",
+      "stdout_lines": 1,
+      "field_lines": {}
+    },
+    "host-libc": {
+      "receipt": "captures/host-libc/receipt.json",
+      "exit_code_line": 38,
+      "stdout": "captures/host-libc/stdout.txt",
+      "stdout_lines": 1,
+      "field_lines": {}
+    },
+    "zizmor-upstream-empty-perms": {
+      "receipt": "captures/zizmor-upstream-empty-perms/receipt.json",
+      "exit_code_line": 45,
+      "stdout": "captures/zizmor-upstream-empty-perms/stdout.txt",
+      "stdout_lines": 1,
+      "field_lines": {}
+    },
+    "zizmor-usage-source": {
+      "receipt": "captures/zizmor-usage-source/receipt.json",
+      "exit_code_line": 43,
+      "stdout": "captures/zizmor-usage-source/stdout.txt",
+      "stdout_lines": 1138,
+      "field_lines": {}
+    },
+    "zizmor-upstream-help-smoke": {
+      "receipt": "captures/zizmor-upstream-help-smoke/receipt.json",
+      "exit_code_line": 38,
+      "stdout": "captures/zizmor-upstream-help-smoke/stdout.txt",
+      "stdout_lines": 42,
+      "field_lines": {}
+    },
+    "custody-tests-final": {
+      "receipt": "captures/custody-tests-final/receipt.json",
+      "exit_code_line": 41,
+      "stdout": "captures/custody-tests-final/stdout.txt",
+      "stdout_lines": 0,
+      "field_lines": {}
+    },
+    "mask-uuid-regression-before": {
+      "receipt": "captures/mask-uuid-regression-before/receipt.json",
+      "exit_code_line": 41,
+      "stdout": "captures/mask-uuid-regression-before/stdout.txt",
+      "stdout_lines": 0,
+      "field_lines": {}
+    }
+  }
+}

@@ -1,0 +1,814 @@
+{
+  "schema_version": 1,
+  "rule_version": "angle-convergence/2",
+  "catalog": "foundation",
+  "layer_id": "ci-supply-chain",
+  "weights": {
+    "A1": 0.2,
+    "A2": 0.2,
+    "A3": 0.15,
+    "A4": 0.15,
+    "A5": 0.2,
+    "A6": 0.1
+  },
+  "weights_stated_at": "2026-10-16T06:22:05Z",
+  "weight_reason": "Reuse the documented default weights at catalogs/landscape/angles/README.md:36-41; weights.json and captures/clock-weights/stdout.txt:1 retain the prospective declaration. This is a draft, not a default decision.",
+  "published_evaluations_available": null,
+  "disclosure": "Existing verdicts and prior screens were known before weighting. Fresh native public-source captures and isolated CLI executions follow the retained weight timestamp. No blinded comparison or new survey was performed. A1 smokes are not A6. FINAL admission remains closed; this file is deliberately outside catalogs/landscape/angles.",
+  "resolution_inputs": [
+    "catalogs/landscape/foundation.json",
+    "catalogs/landscape/final-stack.json",
+    "catalogs/saturation/ledger.json",
+    "catalogs/sota-convergence/layer-verdict-waves.json",
+    "catalogs/sota-convergence/manifest-20260929.json",
+    "evidence/artifacts/landscape-sweep-20260929/returns.json",
+    "evidence/artifacts/final-wave-ci-supply-chain-20261016/resolution-inputs.json"
+  ],
+  "gaps": [
+    "No comparative A6; all own runs are bounded install/smoke/invoke observations.",
+    "Independent A3 consensus and A4 net usage are not established by the retained evidence. Repository popularity is not used as fit evidence.",
+    "A5 availability remains unverified, not false. No weight is transferred.",
+    "Actions attestation cannot be exercised without the live service/OIDC excluded by this preparation.",
+    "Six carried survivors remain unadjudicated: no source-missing record is upgraded to a pass or abandoned verdict."
+  ],
+  "candidates": [
+    {
+      "id": "zizmor",
+      "name": "zizmorcore/zizmor",
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "pin": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+      "role": "Existing catalog winner; proposed run reconciliation",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "confounds": [
+        "Pinned source support and scratch Linux execution have limited scope; release metadata is not independent artifact signature verification.",
+        "No macOS run, online audit, complete runtime inventory, or independent model-family adjudication is supplied by this draft."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/zizmorcore/zizmor",
+              "pin": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+              "path": "docs/quickstart.md",
+              "line": 3
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/zizmorcore/zizmor",
+              "pin": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+              "path": "crates/zizmor/tests/integration/audit/excessive_permissions.rs",
+              "line": 115
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-install/receipt.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-help-smoke/receipt.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-write-all/receipt.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-upstream-empty-perms/receipt.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-repository-invoke/receipt.json"
+            }
+          ],
+          "note": "Scoped Linux scratch A1 passes: installed 1.30.1; upstream help smoke rc0; native upstream write-all input produces one excessive-permissions diagnostic/rc14, empty permissions produces []/rc0, current repository offline scan produces []/rc0. See stdout.txt:1 for the three JSON outputs and the corresponding receipt.json exit_code line indexed in source-index.json. This is not the complete upstream Rust test suite."
+        },
+        "A2": {
+          "score": "+",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/zizmorcore/zizmor",
+              "pin": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+              "path": ".github/workflows/ci.yml",
+              "line": 30
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/zizmorcore/zizmor",
+              "pin": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+              "path": ".github/workflows/ci.yml",
+              "line": 78
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/zizmor-ci-source/receipt.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-zizmor/receipt.json"
+            }
+          ],
+          "note": "Pinned upstream CI includes formatting, clippy and test jobs. Metadata archive/activity at captures/metadata-zizmor/stdout.txt:88,70 supports an active project. Source review of the engineering process, not a claim that upstream CI was executed here."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained independent consensus evidence; stars alone are not scored."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained net-usage measurement with a denominator; current metadata is not usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: published evaluation availability and relevance unverified; not an assertion that none exists."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no matched comparative native run. Install, fixture and invocation observations belong to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "DISPUTED/UNRESOLVED: this offline regular-persona invocation does not exercise online audits or prove broader detection sensitivity. Compare the same frozen hostile/clean corpus with overlapping scanners after separately screening the arms.",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "receipt",
+          "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-zizmor/receipt.json"
+        },
+        "read_at": "2026-10-16T06:22:44.368944Z",
+        "note": "Compliance-only source captures/metadata-zizmor/stdout.txt:94. No score, verdict, trial or arm change follows from licence."
+      }
+    },
+    {
+      "id": "syft",
+      "name": "anchore/syft",
+      "repository": "https://github.com/anchore/syft",
+      "pin": "cc326e45a6213360266dda4b30cc68095946d676",
+      "role": "Existing catalog winner; proposed run reconciliation",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "confounds": [
+        "Pinned source support and scratch Linux execution have limited scope; release metadata is not independent artifact signature verification.",
+        "No macOS run, online audit, complete runtime inventory, or independent model-family adjudication is supplied by this draft."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anchore/syft",
+              "pin": "cc326e45a6213360266dda4b30cc68095946d676",
+              "path": "install.sh",
+              "line": 817
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anchore/syft",
+              "pin": "cc326e45a6213360266dda4b30cc68095946d676",
+              "path": "README.md",
+              "line": 46
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-install/receipt.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-version/receipt.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-filesystem-invoke/receipt.json"
+            }
+          ],
+          "note": "Scoped Linux scratch A1 passes: vendor installer and native version rc0; version output lines5,10 binds commit/version. Native filesystem SBOM stdout.txt:1 reports one zizmor 1.30.1 Python package, 4 files and 4 relationships in the scratch tool prefix. This is one directory, not the whole host or a vulnerability verdict."
+        },
+        "A2": {
+          "score": "+",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anchore/syft",
+              "pin": "cc326e45a6213360266dda4b30cc68095946d676",
+              "path": "Makefile",
+              "line": 1
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-ci-source/receipt.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/syft-tag-object-source/receipt.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-syft/receipt.json"
+            }
+          ],
+          "note": "Pinned Makefile:1-5 exposes the supported test target; release/tag metadata binds the source. Repository activity and test entrypoints support engineering-process evidence only; the full Go suite was not run."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained independent consensus evidence; stars alone are not scored."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained net-usage measurement with a denominator; current metadata is not usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: published evaluation availability and relevance unverified; not an assertion that none exists."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no matched comparative native run. Install, fixture and invocation observations belong to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "DISPUTED/UNRESOLVED: the old 1.52.0 verdict, current 1.54.0 run record and installed 1.54.1 differ. Reconcile adoption after two-family review; compare inventory recall against independently enumerated runtime cases before any whole-runtime claim.",
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "receipt",
+          "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-syft/receipt.json"
+        },
+        "read_at": "2026-10-16T06:22:44.454561Z",
+        "note": "Compliance-only source captures/metadata-syft/stdout.txt:94. No score, verdict, trial or arm change follows from licence."
+      }
+    },
+    {
+      "id": "actions-attest",
+      "name": "actions/attest",
+      "repository": "https://github.com/actions/attest",
+      "pin": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+      "role": "Existing catalog winner; proposed run reconciliation",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "Pinned source support and scratch Linux execution have limited scope; release metadata is not independent artifact signature verification.",
+        "No macOS run, online audit, complete runtime inventory, or independent model-family adjudication is supplied by this draft."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-actions-attest/receipt.json"
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/actions/attest",
+              "pin": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+              "path": "README.md",
+              "line": 11
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/actions/attest",
+              "pin": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+              "path": "README.md",
+              "line": 64
+            }
+          ],
+          "note": "Source capability is documented; credential-free local E2E/invoke is excluded. The exact required hosted profile remains a named gap."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-actions-attest/receipt.json"
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/actions/attest",
+              "pin": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+              "path": "package.json",
+              "line": 28
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/attest-ci-source/receipt.json"
+            }
+          ],
+          "note": "Neutral: archive/activity fields at captures/metadata-actions-attest/stdout.txt:88,70 alone do not settle upstream engineering quality. No inactivity-based abandonment or default selection."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained independent consensus evidence; stars alone are not scored."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained net-usage measurement with a denominator; current metadata is not usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: published evaluation availability and relevance unverified; not an assertion that none exists."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no matched comparative native run. Install, fixture and invocation observations belong to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "DISPUTED/UNRESOLVED: source and current workflow are pinned but catalog/run registration and a credential-backed native invocation are missing. A separately authorized hosted OIDC/Sigstore run is prerequisite; no mock can close it.",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "receipt",
+          "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-actions-attest/receipt.json"
+        },
+        "read_at": "2026-10-16T06:22:44.446871Z",
+        "note": "Compliance-only source captures/metadata-actions-attest/stdout.txt:94. No score, verdict, trial or arm change follows from licence."
+      }
+    },
+    {
+      "id": "aikidosec-safe-chain",
+      "name": "AikidoSec/safe-chain",
+      "repository": "https://github.com/AikidoSec/safe-chain",
+      "pin": "dffae994572cd9e74dc7cf868ebe4f073832caa6",
+      "role": "Carried survivor; no adjudication in this preparation",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "No candidate runtime installed or measured; prior screens are context only.",
+        "No macOS run, online audit, complete runtime inventory, or independent model-family adjudication is supplied by this draft."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-aikidosec-safe-chain/receipt.json"
+            }
+          ],
+          "note": "Carried candidate stays unresolved; metadata is not a capability screen and no execution/admission is performed in this preparation."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-aikidosec-safe-chain/receipt.json"
+            }
+          ],
+          "note": "Neutral: archive/activity fields at captures/metadata-aikidosec-safe-chain/stdout.txt:88,70 alone do not settle upstream engineering quality. No inactivity-based abandonment or default selection."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained independent consensus evidence; stars alone are not scored."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained net-usage measurement with a denominator; current metadata is not usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: published evaluation availability and relevance unverified; not an assertion that none exists."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no matched comparative native run. Install, fixture and invocation observations belong to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "DISPUTED/UNRESOLVED: the reviewed 1.5.25 source references 1.5.24 installer/checksum examples; bind exact installer/platform/inverse and repository containment before any trial.",
+      "licence_note": {
+        "spdx_id": "NOASSERTION",
+        "source": {
+          "kind": "receipt",
+          "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-aikidosec-safe-chain/receipt.json"
+        },
+        "read_at": "2026-10-16T06:22:44.385724Z",
+        "note": "Compliance-only source captures/metadata-aikidosec-safe-chain/stdout.txt:94. No score, verdict, trial or arm change follows from licence."
+      }
+    },
+    {
+      "id": "boostsecurityio-poutine",
+      "name": "boostsecurityio/poutine",
+      "repository": "https://github.com/boostsecurityio/poutine",
+      "pin": "8918c66db19ecfd12b2f8379e445c3da4589e599",
+      "role": "Carried survivor; no adjudication in this preparation",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "No candidate runtime installed or measured; prior screens are context only.",
+        "No macOS run, online audit, complete runtime inventory, or independent model-family adjudication is supplied by this draft."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-boostsecurityio-poutine/receipt.json"
+            }
+          ],
+          "note": "Carried candidate stays unresolved; metadata is not a capability screen and no execution/admission is performed in this preparation."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-boostsecurityio-poutine/receipt.json"
+            }
+          ],
+          "note": "Neutral: archive/activity fields at captures/metadata-boostsecurityio-poutine/stdout.txt:88,70 alone do not settle upstream engineering quality. No inactivity-based abandonment or default selection."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained independent consensus evidence; stars alone are not scored."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained net-usage measurement with a denominator; current metadata is not usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: published evaluation availability and relevance unverified; not an assertion that none exists."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no matched comparative native run. Install, fixture and invocation observations belong to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "DISPUTED/UNRESOLVED: overlap with zizmor/actionlint is not comparative evidence; preserve current survivor until matched pipeline-corpus results establish its additional coverage.",
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "receipt",
+          "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-boostsecurityio-poutine/receipt.json"
+        },
+        "read_at": "2026-10-16T06:22:45.599569Z",
+        "note": "Compliance-only source captures/metadata-boostsecurityio-poutine/stdout.txt:94. No score, verdict, trial or arm change follows from licence."
+      }
+    },
+    {
+      "id": "datadog-supply-chain-firewall",
+      "name": "DataDog/supply-chain-firewall",
+      "repository": "https://github.com/DataDog/supply-chain-firewall",
+      "pin": "44203cf6d3b2e03bd179f466821ec8ae215d7b78",
+      "role": "Carried survivor; no adjudication in this preparation",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "No candidate runtime installed or measured; prior screens are context only.",
+        "No macOS run, online audit, complete runtime inventory, or independent model-family adjudication is supplied by this draft."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-datadog-supply-chain-firewall/receipt.json"
+            }
+          ],
+          "note": "Carried candidate stays unresolved; metadata is not a capability screen and no execution/admission is performed in this preparation."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-datadog-supply-chain-firewall/receipt.json"
+            }
+          ],
+          "note": "Neutral: archive/activity fields at captures/metadata-datadog-supply-chain-firewall/stdout.txt:88,70 alone do not settle upstream engineering quality. No inactivity-based abandonment or default selection."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained independent consensus evidence; stars alone are not scored."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained net-usage measurement with a denominator; current metadata is not usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: published evaluation availability and relevance unverified; not an assertion that none exists."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no matched comparative native run. Install, fixture and invocation observations belong to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "DISPUTED/UNRESOLVED: exact Go module version route, policy/service entitlement and repository-local configuration isolation need pinned support; no installation or keyed call is made.",
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "receipt",
+          "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-datadog-supply-chain-firewall/receipt.json"
+        },
+        "read_at": "2026-10-16T06:22:45.774644Z",
+        "note": "Compliance-only source captures/metadata-datadog-supply-chain-firewall/stdout.txt:94. No score, verdict, trial or arm change follows from licence."
+      }
+    },
+    {
+      "id": "kjanat-actionlint",
+      "name": "kjanat/actionlint",
+      "repository": "https://github.com/kjanat/actionlint",
+      "pin": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+      "role": "Carried survivor; no adjudication in this preparation",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "No candidate runtime installed or measured; prior screens are context only.",
+        "No macOS run, online audit, complete runtime inventory, or independent model-family adjudication is supplied by this draft."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-kjanat-actionlint/receipt.json"
+            }
+          ],
+          "note": "Carried candidate stays unresolved; metadata is not a capability screen and no execution/admission is performed in this preparation."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-kjanat-actionlint/receipt.json"
+            }
+          ],
+          "note": "Neutral: archive/activity fields at captures/metadata-kjanat-actionlint/stdout.txt:88,70 alone do not settle upstream engineering quality. No inactivity-based abandonment or default selection."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained independent consensus evidence; stars alone are not scored."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained net-usage measurement with a denominator; current metadata is not usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: published evaluation availability and relevance unverified; not an assertion that none exists."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no matched comparative native run. Install, fixture and invocation observations belong to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "DISPUTED/UNRESOLVED: docs/github-automation.md:185 reports a historical successor swap, while final-stack still carries this survivor. The fork's policy defaults and PATH identity require explicit adjudication against the canonical implementation at frozen pins.",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "receipt",
+          "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-kjanat-actionlint/receipt.json"
+        },
+        "read_at": "2026-10-16T06:22:45.651838Z",
+        "note": "Compliance-only source captures/metadata-kjanat-actionlint/stdout.txt:94. No score, verdict, trial or arm change follows from licence."
+      }
+    },
+    {
+      "id": "rhysd-actionlint",
+      "name": "rhysd/actionlint",
+      "repository": "https://github.com/rhysd/actionlint",
+      "pin": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+      "role": "Carried survivor; no adjudication in this preparation",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "No candidate runtime installed or measured; prior screens are context only.",
+        "No macOS run, online audit, complete runtime inventory, or independent model-family adjudication is supplied by this draft."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-rhysd-actionlint/receipt.json"
+            }
+          ],
+          "note": "Carried candidate stays unresolved; metadata is not a capability screen and no execution/admission is performed in this preparation."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-rhysd-actionlint/receipt.json"
+            }
+          ],
+          "note": "Neutral: archive/activity fields at captures/metadata-rhysd-actionlint/stdout.txt:88,70 alone do not settle upstream engineering quality. No inactivity-based abandonment or default selection."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained independent consensus evidence; stars alone are not scored."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained net-usage measurement with a denominator; current metadata is not usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: published evaluation availability and relevance unverified; not an assertion that none exists."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no matched comparative native run. Install, fixture and invocation observations belong to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "DISPUTED/UNRESOLVED: inactive default branch is not abandonment. Read a primary current support statement and compare supported workflow semantics before disposition.",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "receipt",
+          "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-rhysd-actionlint/receipt.json"
+        },
+        "read_at": "2026-10-16T06:22:45.592170Z",
+        "note": "Compliance-only source captures/metadata-rhysd-actionlint/stdout.txt:94. No score, verdict, trial or arm change follows from licence."
+      }
+    },
+    {
+      "id": "socketdev-sfw-free",
+      "name": "SocketDev/sfw-free",
+      "repository": "https://github.com/SocketDev/sfw-free",
+      "pin": "164c32dcbe3bbebcc0b091fd6a31ff93883545b2",
+      "role": "Carried survivor; no adjudication in this preparation",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "No candidate runtime installed or measured; prior screens are context only.",
+        "No macOS run, online audit, complete runtime inventory, or independent model-family adjudication is supplied by this draft."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-socketdev-sfw-free/receipt.json"
+            }
+          ],
+          "note": "Carried candidate stays unresolved; metadata is not a capability screen and no execution/admission is performed in this preparation."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-socketdev-sfw-free/receipt.json"
+            }
+          ],
+          "note": "Neutral: archive/activity fields at captures/metadata-socketdev-sfw-free/stdout.txt:88,70 alone do not settle upstream engineering quality. No inactivity-based abandonment or default selection."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained independent consensus evidence; stars alone are not scored."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no retained net-usage measurement with a denominator; current metadata is not usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: published evaluation availability and relevance unverified; not an assertion that none exists."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:28:01.999117Z",
+          "sources": [],
+          "note": "GAP: no matched comparative native run. Install, fixture and invocation observations belong to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "DISPUTED/UNRESOLVED: inactive default branch, noninteractive warning behavior, exact release-binary identity and the separate CI action need clarification; no abandonment is inferred.",
+      "licence_note": {
+        "spdx_id": "NOASSERTION",
+        "source": {
+          "kind": "receipt",
+          "path": "evidence/artifacts/final-wave-ci-supply-chain-20261016/captures/metadata-socketdev-sfw-free/receipt.json"
+        },
+        "read_at": "2026-10-16T06:22:45.639965Z",
+        "note": "Compliance-only source captures/metadata-socketdev-sfw-free/stdout.txt:94. No score, verdict, trial or arm change follows from licence."
+      }
+    }
+  ],
+  "final_evidence": [],
+  "terminal_state": "NON_TERMINAL"
+}

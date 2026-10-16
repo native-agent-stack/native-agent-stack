@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "capture_name": "metadata-zizmor",
+  "argv": [
+    "/usr/bin/curl",
+    "--disable",
+    "--fail",
+    "--silent",
+    "--show-error",
+    "--location",
+    "https://api.github.com/repos/zizmorcore/zizmor"
+  ],
+  "cwd": "<SCRATCH>",
+  "environment": {
+    "PATH": "<SCRATCH>/bin:/usr/bin:/bin",
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "XDG_CONFIG_HOME": "<SCRATCH>/config",
+    "XDG_CACHE_HOME": "<SCRATCH>/cache",
+    "XDG_DATA_HOME": "<SCRATCH>/data",
+    "TMPDIR": "<SCRATCH>/tmp",
+    "UV_TOOL_DIR": "<SCRATCH>/tools",
+    "UV_TOOL_BIN_DIR": "<SCRATCH>/bin",
+    "UV_CACHE_DIR": "<SCRATCH>/cache/uv",
+    "UV_PYTHON_INSTALL_DIR": "<SCRATCH>/python",
+    "UV_NO_CONFIG": "1",
+    "UV_NO_PROGRESS": "1",
+    "UV_LINK_MODE": "copy",
+    "UV_PYTHON_DOWNLOADS": "never",
+    "UV_KEYRING_PROVIDER": "disabled",
+    "CURL_HOME": "<SCRATCH>/curl",
+    "WGETRC": "/dev/null",
+    "DOWNLOAD_TAG_INSTALL_SCRIPT": "false",
+    "SYFT_CHECK_FOR_APP_UPDATE": "false",
+    "ZIZMOR_OFFLINE": "1",
+    "GIT_CONFIG_NOSYSTEM": "1",
+    "GIT_CONFIG_GLOBAL": "/dev/null",
+    "GIT_NO_LAZY_FETCH": "1",
+    "GIT_OPTIONAL_LOCKS": "0"
+  },
+  "started_at": "2026-10-16T06:22:44.164902+00:00",
+  "finished_at": "2026-10-16T06:22:44.368944+00:00",
+  "exit_code": 0,
+  "classification": "masked derivative of a native capture",
+  "raw_capture_name": "metadata-zizmor",
+  "masking_rule": "../../mask.py",
+  "command_placeholders": "Marked <...> values replace private path prefixes; exact argv/cwd/environment remain in private capture.",
+  "streams": {
+    "stdout": {
+      "file": "stdout.txt",
+      "published_bytes": 6895,
+      "published_sha256": "96dade3f8d3ee403925026dc4f91b89a81d40de8537e1cd3613b2a37e66f668f"
+    },
+    "stderr": {
+      "file": "stderr.txt",
+      "published_bytes": 0,
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}
