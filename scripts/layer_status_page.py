@@ -55,6 +55,7 @@ TIERS = (
         "foundation/workers",
         "foundation/isolation",
         "foundation/observation-inference",
+        "us-equities/observability-hosting",
         "foundation/git-github-automation",
         "foundation/ci-supply-chain",
         "foundation/model-routes",
@@ -66,6 +67,14 @@ TIERS = (
     )),
 )
 REST = "T3"
+# The CC's gap-routing ROW of 2026-10-16T01:08Z (sequencing only): us-equities/observability-hosting joins T1-harness as
+# god-view work (above), and a TradingView initial sweep joins T1-trading after catalysts-sentiment. That sweep has no
+# layer row yet; the protocol decides which rows its candidates enter, so the page lists it below the table.
+SWEEPS_WITHOUT_ROW = (
+    ("T1-trading", "us-equities/catalysts-sentiment",
+     "TradingView automation: its MCP servers, alerts and webhooks into the deterministic order gate, Pine strategies "
+     "and the strategy tester, and strategy templates"),
+)
 
 
 def load(path: Path) -> dict:
@@ -195,6 +204,10 @@ def render(stack: dict, records: dict | None = None) -> str:
         lines.append(f'| {i} | {r["tier"]} | `{r["layer"]}` | {r["status"]} | {r["state"]} | '
                      f'{_cell("; ".join(r["winners"]) or "none")} | {_cell("; ".join(r["missing"]) or "none")} | '
                      f'{_cell(r["next_action"])} |')
+    if SWEEPS_WITHOUT_ROW:
+        lines += ["", "**Initial sweeps with no layer row yet** (the protocol decides which rows their candidates enter):",
+                  ""]
+        lines += [f"- {tier}, after `{after}`: {what}." for tier, after, what in SWEEPS_WITHOUT_ROW]
     return "\n".join(lines) + "\n"
 
 

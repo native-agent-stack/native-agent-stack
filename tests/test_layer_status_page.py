@@ -103,7 +103,20 @@ class OrderTests(unittest.TestCase):
         named = [key for _, keys in page.TIERS for key in keys]
         self.assertEqual(len(named), len(set(named)))
         self.assertEqual(len(dict(page.TIERS)["T1-trading"]), 6)
-        self.assertEqual(len(dict(page.TIERS)["T1-harness"]), 18)
+        self.assertEqual(len(dict(page.TIERS)["T1-harness"]), 19)
+
+    def test_observability_hosting_is_harness_work_after_observation_inference(self):
+        harness = dict(page.TIERS)["T1-harness"]
+        self.assertEqual(harness.index("us-equities/observability-hosting"),
+                         harness.index("foundation/observation-inference") + 1)
+
+    def test_tradingview_is_a_t1_trading_initial_sweep_after_catalysts_sentiment(self):
+        self.assertEqual([(tier, after) for tier, after, _ in page.SWEEPS_WITHOUT_ROW],
+                         [("T1-trading", "us-equities/catalysts-sentiment")])
+        built = page.render(WAVE_STACK)
+        note = built.index("TradingView automation")
+        self.assertGreater(note, built.index("`us-equities/catalysts-sentiment`"))
+        self.assertNotIn("| `TradingView", built)
 
 
 PIN_STACK = {
