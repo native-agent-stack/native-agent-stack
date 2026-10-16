@@ -15,7 +15,6 @@
   "execution_prefix": "systemd-run --user --scope -p CPUWeight=idle --quiet --",
   "retained_probe": {
     "filename": "review-port-probes.py",
-    "sha256": "5be55e9dea5de7313746aec955c6b6eba2917dbc03905684c62bbc12027cfe5f",
     "modified": false,
     "command_template": "python3 -B review-port-probes.py <current-checkout> -v",
     "tests": 3,
@@ -184,5 +183,12 @@
     "native_target_acceptance": "UNRUN by this lane; NativeHorizonNY operator owns memory-owner no-start/listener/disabled-unit acceptance",
     "this_wave": "No install.sh, accept.sh, installer, native service, collector or live listener check executed",
     "earlier_boundary_correction": "See no-start-test-receipt.json and review-wave-1-receipt.json: the early broad legacy run exceeded the local fixture boundary; subsequent runs exclude those harnesses."
-  }
+  },
+  "unpublished_originals": [
+    {
+      "name": "review-port-probes.py",
+      "what": "The GPT reader probe used for the retained three-case review check; the public adapter is published separately.",
+      "custody": "Kept privately in the reader work directory. No digest is published."
+    }
+  ]
 }

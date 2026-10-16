@@ -30,6 +30,47 @@ import runtime_acceptance as acceptance
 WORKER = ROOT / "tools/claude-review-worker/worker.py"
 
 
+class StrictHostConsumerTests(unittest.TestCase):
+    def host(self, root):
+        path = root / "host.json"
+        values = json.loads((ROOT / "adoption/hosts/example.json").read_text())
+        values.update(WSL_DISTRO_NAME="FixtureDistro", AI_MEMORY_URL="127.0.0.1:39374",
+                      NS_PORT_OTEL_HTTP="31318", NS_PORT_GATEWAY="41128")
+        path.write_text(json.dumps(values))
+        return path
+
+    def test_wsl_mcp_uses_the_explicit_complete_host_source(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with mock.patch.dict(os.environ, {"NS2604_HOST_FILE": str(self.host(root))}):
+                servers = profiles.render_wsl_mcp(root, root / "ecosystem")
+            self.assertEqual(servers["ai-memory"]["url"], "http://127.0.0.1:39374/mcp")
+
+    def test_runtime_telemetry_uses_the_same_host_allocation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with mock.patch.dict(os.environ, {"NS2604_HOST_FILE": str(self.host(root))}):
+                values = profiles.profile_environment("pi-gpt", root)
+            self.assertEqual(values["OTEL_EXPORTER_OTLP_ENDPOINT"], "http://127.0.0.1:31318")
+            self.assertEqual(values["OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"], "http://127.0.0.1:31318/v1/logs")
+
+    def test_provider_resolves_the_current_explicit_host_selection(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with mock.patch.dict(os.environ, {"NS2604_HOST_FILE": str(self.host(root))}):
+                provider = profiles.opencode_provider("gpt")
+                pi_provider = profiles.pi_models("gpt")
+            self.assertEqual(provider["omniroute"]["options"]["baseURL"], "http://127.0.0.1:41128/v1")
+            self.assertEqual(pi_provider["providers"]["omniroute"]["baseUrl"], "http://127.0.0.1:41128/v1")
+
+    def test_wsl_mcp_refuses_missing_explicit_host_selection(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with mock.patch.dict(os.environ, {"NS2604_HOST_FILE": ""}):
+                with self.assertRaisesRegex(profiles.ProfileError, "NS2604_HOST_FILE"):
+                    profiles.render_wsl_mcp(root, root)
+
+
 def pi_events(handle, *, error=None, tokens=0, cost=0):
     """Pi --mode json events for one assistant turn: refused with `error` ("<status> <body>"), or completed."""
     message = {"role": "assistant", "content": [] if error else [{"type": "text", "text": "fixture"}],

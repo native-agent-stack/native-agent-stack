@@ -175,6 +175,27 @@ def gateway_url(host_file=None, config_root=None):
     return f"http://127.0.0.1:{ports['GATEWAY']}/v1"
 
 
+def installation_ports(ports, root, plan, slot=None):
+    """Keep unselected owners on their recorded allocation, including all references.
+
+    The plan's installed/default rows and named-only measurement rows are the
+    existing selection contract; no service-state probe is performed here.
+    Validate the combined allocation again because a moved selected port can
+    collide with an unselected owner's retained port.
+    """
+    rows = {row["slot"]: row for row in plan["owners"]}
+    if slot is not None and slot not in rows:
+        raise ValueError("unknown installation row")
+    selected = {slot} if slot is not None else {name for name, row in rows.items() if row.get("installed")}
+    active = root / ".service-ports.json"
+    if not active.exists():
+        return ports
+    previous = service_ports(json.loads(active.read_text()), require_complete=True)
+    merged = {"NS_PORT_" + name: str(ports[name] if owner in selected else previous[name])
+              for name, (owner, _) in SERVICE_PORTS.items()}
+    return service_ports(merged, require_complete=True)
+
+
 def planned_listeners(plan, ports, slot=None, program="", enabled_optional=()):
     rows = {row["slot"]: row for row in plan["owners"]}
     if slot is not None and slot not in rows:
@@ -436,6 +457,10 @@ def main():
     if args.action == "commit-ports":
         if args.host_file is None:
             raise ValueError("commit-ports requires the successful installation's candidate --host-file")
+        if args.plan_file is not None:
+            ports = installation_ports(ports, root, json.loads(args.plan_file.read_text()), args.slot)
+            if args.slot is not None and args.slot not in {owner for owner, _ in SERVICE_PORTS.values()}:
+                return 0  # An unrelated row cannot establish an initial service allocation either.
         target = root / ".service-ports.json"
         if target.is_symlink():
             raise ValueError("needs_owner: active allocation is a symlink; retained")
@@ -462,6 +487,8 @@ def main():
     if args.action == "stage":
         if args.output_root is None or args.source_root is None:
             raise ValueError("stage requires --source-root and --output-root")
+        if args.plan_file is not None:
+            ports = installation_ports(ports, root, json.loads(args.plan_file.read_text()), args.slot)
         for path in sorted(source.rglob("*")):
             if path.is_file() and "__pycache__" not in path.parts:
                 text = path.read_text()
@@ -578,6 +605,9 @@ def main():
             rendered = rendered.replace(marker, value)
         if re.search(r"@[A-Z_]+@", rendered):
             raise ValueError("unresolved Prometheus unit template marker")
+        # systemd v259 man/systemd.exec.xml:114-125,4757-4760:
+        # WorkingDirectory must exist before the service can reach its executable.
+        (data / "prometheus").mkdir(parents=True, exist_ok=True, mode=0o700)
         publish("ns2604-prometheus.service", rendered, template)
     elif args.action == "otel":
         for name in ("otelcol/queue", "collector", "sdk-receipts"):

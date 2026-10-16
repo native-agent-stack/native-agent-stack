@@ -241,3 +241,106 @@ failures plus the memory-allocation error; all five pass on this fold. See
 | Conflicting port config returns `needs_owner` | **Follow-ups** | Synthetic custody/transaction refusal tests |
 | Static inspection of the installer's `--list` table | **Follow-ups** | Source checker; avoids executing the installer for structural validation |
 | Frozen WSL template extension | **DEFERRED** | Original hash retained; superseding experiment record belongs to its owners |
+
+## Third review wave preparation
+
+The four findings in `review_output.json` reproduce on `58ee5cd49` with isolated
+renderer/extracted-function fixtures. `GPT-VERDICT-58ee5cd49.md` and the CC agree
+on the private-probe digest and dispatcher-fixture blockers. The co-op released
+one combined fold after the GPT read; a CC delta arriving before push joins it.
+
+- Grafana's own writer already records rendered-file digests and recognizes its
+  previous output. `copy_config` now defers `grafana.ini` to that writer, so path
+  expansion is not mistaken for an operator port conflict. A same-port rerun and
+  an upgrade from the actual `8053f14e7` renderer both pass; an operator-modified
+  file remains untouched and returns `needs_owner`. The mechanism is the existing
+  [plan writer at 58ee5cd49:507–545,627–644](https://github.com/native-agent-stack/native-agent-stack/blob/58ee5cd49d6d9b19701892b072e22b47ca5889bf/evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py#L507).
+- A selective install merges only the selected owners' ports into the prior
+  complete allocation. Unselected owners retain their recorded values in staged
+  assets, command expansion and the final snapshot. The merged allocation is
+  collision-checked again before provisioning. Default selection preserves
+  measurement-only owners. A row with no allocated ports cannot publish an
+  initial service snapshot. On first provisioning of a port-owning row, the
+  complete explicit host allocation establishes the initial reservation; this
+  does not certify that unselected services were installed.
+- Dagu no-start accepts an exact matching unit, refuses a differing unit or
+  unfamiliar environment drop-in, and preserves those bytes. It still performs
+  no enable/start. The supported unit and environment mechanism remains
+  [Dagu v2.18.2 installer:1666–1697](https://github.com/dagucloud/dagu/blob/v2.18.2/scripts/installer.sh#L1666),
+  with [systemd v259 drop-in semantics](https://github.com/systemd/systemd/blob/v259/man/systemd.unit.xml#L198).
+- Prometheus's renderer creates its selected data/working directory before
+  publishing the unit. [systemd v259 man/systemd.exec.xml:114–125](https://github.com/systemd/systemd/blob/v259/man/systemd.exec.xml#L114)
+  requires that directory; [4757–4760](https://github.com/systemd/systemd/blob/v259/man/systemd.exec.xml#L4757)
+  identifies failure as `200/CHDIR`. This is a source/fixture correction, with
+  native service startup still unmeasured.
+
+The actual `58ee5cd49` CI logs exposed two additional caller/fixture contracts.
+Shard 3's scout-dispatch fixture lacked a fake for the new completion helper; its
+existing owner-selection assertions are preserved. Shard 5's MCP drift tool still
+rendered the frozen incomplete host template. It now requires `--host-file` and
+passes that complete explicit string map through the same strict client renderer.
+It neither changes the frozen template nor supplies a distro/port fallback. The
+existing drift suite uses a complete nonsecret fixture host; a new CLI test
+requires refusal before account comparison when the option is missing. Narrow
+scope was granted under hcom event reference **185938** (grant message 185948).
+See [review-wave-3-receipt.json](review-wave-3-receipt.json) for before/after results
+and exact CI jobs. The tool's comparison still reads only the account paths the
+operator selects; this lane exercises disposable fixtures only.
+
+The repository-wide caller audit found one additional strict-input variant in
+`runtime_profiles.render_wsl_mcp`, plus its frozen telemetry endpoint and provider
+gateway value captured at import time. Its WSL render now requires explicit
+`NS2604_HOST_FILE`, reuses the strict drift/client rendering path, and obtains
+telemetry and both provider endpoints from the current shared allocation. The
+three reproductions failed before this correction. The expanded four-case
+regression also requires refusal when the explicit WSL selector is missing.
+`GPT_MODEL` remains at line 43 and the other existing runtime locators do not move.
+[strict-host-consumer-audit.json](strict-host-consumer-audit.json) lists every
+matched production caller, fixture group, non-rendering import and generic-loader
+exclusion. Graph transport was unavailable; the audit uses repository-root grep
+and source/AST inspection, and makes no graph-completeness claim.
+
+The private `review-port-probes.py` original is named under `unpublished_originals`
+with a custody statement and no digest, following
+[#1188 hashes.json at 3c7a586f](https://github.com/native-agent-stack/native-agent-stack/blob/3c7a586f82d8a9fc96a2a0a562c34f49aa8a4f53/evidence/artifacts/model-routes-sweep-claude-20261015-attempts/hashes.json).
+The custody regression failed on the unchanged `58ee5cd49` receipt and passes
+after removal. It reports counts, never the protected digest; no private preimage
+was read or hashed for this correction. Forward correction leaves Git history
+unchanged. The public adapter's digest still binds its published source file.
+
+### Recovery after an incomplete installation
+
+The completion guard protects the allocation snapshot, not every preceding asset
+write. A failed row can leave a rendered file or unit candidate at the requested
+port while the prior snapshot remains active. Neither that snapshot nor a health
+response alone certifies completion of the attempted installation.
+
+1. Retain the host input used for the attempt and identify every selected row that
+   may have written files. Keep startup and acceptance pending during recovery.
+2. Retry that original selection with the same complete host input and
+   `--no-start`, including the rows whose earlier writes succeeded. Resolve each
+   `needs_owner` conflict by reviewing the retained configuration; unknown bytes
+   are not overwritten automatically.
+3. If rolling back, restore the affected configuration/unit files and their prior
+   allocation together from the operator's retained backups. A restored snapshot
+   alone does not restore files or a running service's state.
+4. After the complete selection succeeds, read back the allocation and installed
+   unit/configuration endpoints together. Activation and native listener/health
+   acceptance remain separate target-operator actions.
+
+### Optional UI changes and evidence limits
+
+Automatic code-graph UI detection reads the plan copy created during provisioning.
+Later operator changes to the native cache config require an explicit recheck:
+confirm that native `ui_port` matches the complete host allocation, then run the
+target's listener check with `--slot code-graph --enabled-listener CODE_GRAPH_UI`
+and that host file. Repeat this explicit selection while the native UI remains
+enabled. This avoids treating the retained disabled plan copy as current runtime
+state. If the native port differs, reconcile it with the allocation before
+acceptance; a different local port is not accepted implicitly. This procedure is
+source/fixture guidance, not a native lifecycle result.
+
+The README's 8080-to-21808 correction is **source_review**. The pre-existing
+Agentsview render already used 21808, so its compatibility check passes before
+the prose edit. No prose-specific fail-first test is claimed; the failed-before
+Agentsview fixture covers conflicting-configuration custody instead.

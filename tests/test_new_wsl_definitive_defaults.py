@@ -2865,6 +2865,7 @@ selected() { [[ "$only" == "$1" ]]; }
 named() { selected "$1"; }
 run_slot() { printf '%s\\n' "$1"; }
 measured_slot() { if selected "$1"; then run_slot "$1"; fi; }
+commit_allocation() { :; }  # Allocation behavior is covered by the isolated renderer/transaction fixtures.
 needs_docker=false
 failed=0
 '''

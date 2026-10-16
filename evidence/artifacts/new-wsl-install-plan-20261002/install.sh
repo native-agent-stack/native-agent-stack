@@ -126,6 +126,11 @@ copy_config() {
   local config_source_root="${config_source_root:-$plan_dir/config}"
   mkdir -p -- "$(dirname -- "$config_root/$name")"
   case "$name" in
+    grafana.ini)
+      # The Grafana action owns fully rendered paths and its digest ledger.
+      # Source: native-agent-stack@58ee5cd49 config/observability_config.py:507-545,627-644.
+      # Let that writer validate custody before it publishes; raw templates differ on rerun.
+      return ;;
     gpt-gateway-topology.json|gpt-gateway-client-accept.sh|omniroute.service|omniroute-serve.sh|omniroute-lsof-shim-v2.sh|omniroute.service.d/10-show-log.conf)
       # PR #744 composition custody: unfamiliar gateway assets belong to their owner.
       # Known previous plan bytes: 44ac761 and main #713 at 1796303f957c522e78b92667e553c06840fae3a2,
@@ -253,16 +258,19 @@ stage_plan_sources() {
   trap 'rm -rf -- "$config_source_root"' EXIT
   local port_args=()
   if [[ -n "$host_file" ]]; then port_args+=(--host-file "$host_file"); fi
+  if [[ -n "${only:-}" ]]; then port_args+=(--slot "$only"); fi
   python3 "$plan_dir/config/observability_config.py" stage --config-root "$config_root" \
-    --source-root "$plan_dir/config" --output-root "$config_source_root" "${port_args[@]}" || return "$?"
+    --source-root "$plan_dir/config" --output-root "$config_source_root" --plan-file "$plan_dir/install-plan.json" "${port_args[@]}" || return "$?"
   # Freeze the selected allocation, overriding any inherited host-file selector.
   export NS2604_HOST_FILE="$config_source_root/.service-ports.json"
 }
 commit_allocation() {
   # Publish only after every selected row (including dependencies) succeeds.
   if $needs_execution && (( failed == 0 )); then
+    local selection_args=()
+    if [[ -n "${only:-}" ]]; then selection_args+=(--slot "$only"); fi
     python3 "$plan_dir/config/observability_config.py" commit-ports --config-root "$config_root" \
-      --host-file "$config_source_root/.service-ports.json"
+      --host-file "$config_source_root/.service-ports.json" --plan-file "$plan_dir/install-plan.json" "${selection_args[@]}"
   fi
 }
 interim_acknowledged() {
@@ -921,7 +929,7 @@ dagu() {
   run_command 'curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh | bash -s -- --version v2.18.2 --no-prompt --service "$dagu_service_mode" --service-scope user --host 127.0.0.1 --port 21080 --open-browser no' || return "$?"
   copy_config 'dagu.service' || return "$?"
   # Source: https://github.com/dagucloud/dagu/blob/v2.18.2/scripts/installer.sh#L1666
-  run_command 'if [[ "$NS2604_NO_START" == 1 ]]; then mkdir -p "$HOME/.config/systemd/user" "$HOME/.dagu"; if [[ ! -e "$HOME/.config/systemd/user/dagu.service" && ! -L "$HOME/.config/systemd/user/dagu.service" ]]; then install -m 0600 "$config_root/dagu.service" "$HOME/.config/systemd/user/dagu.service"; fi; systemctl --user daemon-reload; fi' || return "$?"
+  run_command 'if [[ "$NS2604_NO_START" == 1 ]]; then mkdir -p "$HOME/.config/systemd/user" "$HOME/.dagu"; unit="$HOME/.config/systemd/user/dagu.service"; if [[ -L "$unit" ]] || { [[ -e "$unit" ]] && ! cmp -s -- "$config_root/dagu.service" "$unit"; }; then printf "needs_owner: existing Dagu unit differs from the host port render; retained.\n" >&2; exit 1; fi; for drop in "$HOME/.config/systemd/user/dagu.service.d"/*.conf; do [[ -e "$drop" || -L "$drop" ]] || continue; if [[ -L "$drop" || "$drop" != "$HOME/.config/systemd/user/dagu.service.d/20-ns2604-coordinator.conf" ]] || ! cmp -s -- "$config_root/dagu-coordinator.conf" "$drop"; then printf "needs_owner: existing Dagu environment drop-in is not the rendered coordinator configuration; retained.\n" >&2; exit 1; fi; done; if [[ ! -e "$unit" ]]; then install -m 0600 "$config_root/dagu.service" "$unit"; fi; systemctl --user daemon-reload; fi' || return "$?"
 }
 
 docker-compose() {

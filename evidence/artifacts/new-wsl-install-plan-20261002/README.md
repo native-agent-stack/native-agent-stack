@@ -64,12 +64,21 @@ Supply `--host-file PATH` to install, acceptance, `check_plan.py`, or this plan'
 before staging, freezes the resolved candidate in its temporary source tree, and
 uses that candidate for all dispatched commands. Only successful completion of
 all selected rows publishes `$config_root/.service-ports.json`; a failed run
-preserves the prior allocation. Later runs reuse the saved allocation unless
-another host file is supplied. Differing operator port configuration returns
+preserves the prior allocation. With an existing snapshot, only selected owners'
+ports change: unselected owners retain their recorded allocation before staging
+and at publication, so dependent URLs still target the configured services.
+The merged allocation is collision-checked again. A row without allocated ports
+cannot publish an initial service snapshot. Later runs reuse the saved allocation
+unless another host file is supplied. Differing operator port configuration returns
 `needs_owner` and prevents publication. Staged files, commands, acceptance URLs,
 client configuration and the gateway wrapper's derived digest share this source.
 See [NO_START_PORTS.md](NO_START_PORTS.md) for sources, fail-first fixtures and the
 separate target-host acceptance boundary.
+
+The read-only MCP drift comparator also requires the complete host source:
+`python3 tools/adoption/mcp_template_drift.py --host-file /path/to/host.json`.
+Its render uses the explicit distro identity and allocations; the frozen F8
+template is not used as an implicit fallback.
 
 The three OmniRoute listeners have separate keys: `NS_PORT_GATEWAY` (21128),
 `NS_PORT_GATEWAY_WS` (21129), and `NS_PORT_GATEWAY_EMBED_WS` (21131). Research and

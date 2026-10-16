@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """Read-only drift report between the MCP servers the committed templates render for the new WSL distribution and the servers this account's clients have registered:
 
-  python3 tools/adoption/mcp_template_drift.py [--home DIR] [--eco-root DIR] [--claude-json FILE] [--codex-config FILE]
+  python3 tools/adoption/mcp_template_drift.py --host-file FILE [--home DIR] [--eco-root DIR] [--claude-json FILE] [--codex-config FILE]
                                                [--acknowledged FILE] [--with-authorization-settings] [--json]
 
-The template side is what `new_wsl_client_config.py --render` writes (mcp-servers.json for Claude Code, the mcp_servers tables of codex.config.toml for Codex), computed in process by the same functions from the host values of
-adoption/templates/wsl/host.new-distro.json.template moved to --home; the ${HOME} and ${ECO_ROOT} placeholders of the Claude file are rendered the way install_claude_profile.py renders them when it registers a server.
+The template side is what `new_wsl_client_config.py --render` writes (mcp-servers.json for Claude Code, the mcp_servers tables of codex.config.toml for Codex), computed in process by the same functions from the explicit complete nonsecret host value file moved to --home; the ${HOME} and ${ECO_ROOT} placeholders of the Claude file are rendered the way install_claude_profile.py renders them when it registers a server.
 The live side is the user scope of Claude Code (`mcpServers` in ~/.claude.json, where `claude mcp add --scope user` writes) and `[mcp_servers.*]` of ~/.codex/config.toml. Project scope (.mcp.json), local scope and servers
 that a plugin provides are not read. Nothing is written.
 
@@ -59,10 +58,16 @@ class DriftError(ValueError):
     """An input cannot be read or does not have the expected shape."""
 
 
-def render_files(home: Path, authorization: bool = False, eco_root: Path | None = None) -> dict:
-    """{file name: text} of `new_wsl_client_config.py --render` for an account whose home is `home` (the host values of the distribution's template, moved to that home, with ECO_ROOT set to `eco_root` when given)."""
-    template = (ROOT / new_wsl.HOST_TEMPLATE_REL).read_text(encoding="utf-8")
-    values = json.loads(template.replace("${WSL_USER}", "example"))
+def render_files(home: Path, authorization: bool = False, eco_root: Path | None = None, *, host_file: Path | None = None) -> dict:
+    """Render an explicit host allocation for the account; no distro or port fallback."""
+    if host_file is None:
+        raise DriftError("an explicit complete nonsecret --host-file is required")
+    try:
+        values = json.loads(host_file.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        raise DriftError(f"cannot read the host value file: {type(error).__name__}") from None
+    if not isinstance(values, dict) or any(not isinstance(k, str) or not isinstance(v, str) for k, v in values.items()):
+        raise DriftError("host values must be a JSON object of strings")
     original = render_config.load_host_values
     render_config.load_host_values = lambda host: dict(values)
     try:
@@ -81,9 +86,9 @@ def render_files(home: Path, authorization: bool = False, eco_root: Path | None 
         render_config.load_host_values = original
 
 
-def render_templates(home: Path, eco_root: Path, authorization: bool = False) -> tuple[dict, dict]:
+def render_templates(home: Path, eco_root: Path, authorization: bool = False, *, host_file: Path | None = None) -> tuple[dict, dict]:
     """(Claude servers, Codex servers) as the render writes them under the ecosystem prefix `eco_root`; the Claude file keeps ${HOME} and ${ECO_ROOT}, which `claude mcp add` receives rendered."""
-    files = render_files(home, authorization, eco_root)
+    files = render_files(home, authorization, eco_root, host_file=host_file)
     claude = icp.render_servers(json.loads(files["mcp-servers.json"]), home, eco_root)
     codex = tomllib.loads(files["codex.config.toml"]).get("mcp_servers", {})
     return claude, codex
@@ -325,6 +330,7 @@ def report(rows: list[dict], stale: list[dict], notes: list[str]) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0], formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--host-file", type=Path, required=True, help="complete nonsecret host values, including WSL_DISTRO_NAME and service ports")
     parser.add_argument("--home", type=Path, default=Path.home(), help="the account's home (default: the current user's)")
     parser.add_argument("--eco-root", type=Path, help="the ecosystem prefix (default: install_claude_profile.default_eco_root)")
     parser.add_argument("--claude-json", type=Path, help="default: <home>/.claude.json")
@@ -336,7 +342,7 @@ def main(argv: list[str] | None = None) -> int:
     home = args.home.resolve()
     eco_root = args.eco_root or icp.default_eco_root(home)
     try:
-        claude_template, codex_template = render_templates(home, eco_root, args.with_authorization_settings)
+        claude_template, codex_template = render_templates(home, eco_root, args.with_authorization_settings, host_file=args.host_file)
         entries = load_acknowledged(args.acknowledged, home) if args.acknowledged else []
         sources = {"claude": args.claude_json or home / ".claude.json", "codex": args.codex_config or home / ".codex" / "config.toml"}
         rows, notes, compared = [], [], []
