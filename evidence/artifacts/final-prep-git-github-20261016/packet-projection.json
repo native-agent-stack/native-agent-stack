@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "catalog": "foundation",
+  "layer_id": "git-github-automation",
+  "requirement": "Own Git worktrees, GitHub review/PR automation and structural diffs for changed code.",
+  "generator": "tools/sota-convergence/lane_packets.py",
+  "base_revision": "30542e70560147c19049016d19aa3f264515c92f",
+  "command_template": "python3 tools/sota-convergence/lane_packets.py --root . --out ${SCRATCH}/packets-<manifest> --catalog foundation --manifest catalogs/sota-convergence/manifest-<manifest>.json --checked-at 2026-10-16 --seed final-prep-git-github-20261016 --registered-receipts --manifest-newcomers --withhold-labels --keys-out ${SCRATCH}/packet-keys-<manifest>.json",
+  "manifests": [
+    "20260929",
+    "20260923"
+  ],
+  "projection": "Five candidate rows only. Candidate key is scoped by generator_manifest; it is not a common blind comparison arm id. No packet seal is asserted or copied. Proposed pins and fresh measurements are separate evidence files.",
+  "withheld": [
+    "current_choice",
+    "decision",
+    "rationale",
+    "candidates[].disposition",
+    "candidates[].rationale",
+    "candidates[].review_status",
+    "candidates[].decisions[].selection",
+    "candidates[].decisions[].review_status",
+    "sota_components_not_in_candidates[].review_status",
+    "sentences of requirement, limitations, existing_overturn_when and candidates' role and card_limitations that state the current choice; other candidate names there are written <candidate>",
+    "candidates[].newcomer",
+    "candidates[].note",
+    "candidates[].pin_behind_upstream",
+    "candidates[].upstream.archived",
+    "candidates[].upstream.forks",
+    "candidates[].upstream.latest",
+    "candidates[].upstream.latest_flag",
+    "candidates[].upstream.license",
+    "candidates[].upstream.prerelease",
+    "candidates[].upstream.pushed_at",
+    "candidates[].upstream.released_at",
+    "candidates[].upstream.stars",
+    "candidates[].upstream.watchers",
+    "sota_components_not_in_candidates[].newcomer",
+    "sota_components_not_in_candidates[].note",
+    "sota_components_not_in_candidates[].pin_behind_upstream",
+    "sota_components_not_in_candidates[].upstream.archived",
+    "sota_components_not_in_candidates[].upstream.forks",
+    "sota_components_not_in_candidates[].upstream.latest",
+    "sota_components_not_in_candidates[].upstream.latest_flag",
+    "sota_components_not_in_candidates[].upstream.license",
+    "sota_components_not_in_candidates[].upstream.prerelease",
+    "sota_components_not_in_candidates[].upstream.pushed_at",
+    "sota_components_not_in_candidates[].upstream.released_at",
+    "sota_components_not_in_candidates[].upstream.stars",
+    "sota_components_not_in_candidates[].upstream.watchers",
+    "candidates[].registered_receipts[].id",
+    "sota_components_not_in_candidates[].registered_receipts[].id",
+    "candidates[].registered_receipts[].matched_by",
+    "sota_components_not_in_candidates[].registered_receipts[].matched_by",
+    "registered_receipts[] whose id or path names a selection role or disposition (default, adopt, select, winner, refuted, keep_but_compare, targeted_candidate)",
+    "candidates[].evidence_kind",
+    "candidates[].evidence_refs[] and registered_receipts[] naming a file the blind export removes (membership, selection or earlier-verdict records)",
+    "candidates[].component_id",
+    "candidates[].pin",
+    "candidates[].upstream",
+    "candidates[].recipe_ref",
+    "candidates[].decisions"
+  ],
+  "candidates": [
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "name": "worktrunk",
+      "evidence_refs": [],
+      "registered_receipts": [
+        {
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/wsl-native-tools/receipt.json"
+        },
+        {
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+        },
+        {
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+        },
+        {
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        },
+        {
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/sota-convergence-20260922.json"
+        },
+        {
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/worktrunk-0800-qualification-20261003.json"
+        },
+        {
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/worktrunk-list.json"
+        }
+      ],
+      "generator_candidate_key": "c5",
+      "generator_manifest": "catalogs/sota-convergence/manifest-20260929.json"
+    },
+    {
+      "repository": "https://github.com/cli/cli",
+      "name": "GitHub CLI (gh)",
+      "evidence_refs": [
+        "docs/github-automation.md"
+      ],
+      "registered_receipts": [],
+      "generator_candidate_key": "c3",
+      "generator_manifest": "catalogs/sota-convergence/manifest-20260929.json"
+    },
+    {
+      "repository": "https://github.com/Wilfred/difftastic",
+      "name": "Difftastic",
+      "evidence_refs": [],
+      "registered_receipts": [
+        {
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+        },
+        {
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+        },
+        {
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/portable-cli-artifacts.json"
+        },
+        {
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/sota-convergence-20260922.json"
+        },
+        {
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ],
+      "generator_candidate_key": "c1",
+      "generator_manifest": "catalogs/sota-convergence/manifest-20260929.json"
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "name": "anthropics/claude-code-action",
+      "evidence_refs": [
+        "evidence/artifacts/landscape-sweep-20260923/anthropics-claude-code-action.json"
+      ],
+      "registered_receipts": [],
+      "generator_candidate_key": "c1",
+      "generator_manifest": "catalogs/sota-convergence/manifest-20260923.json"
+    },
+    {
+      "repository": "https://github.com/ataraxy-labs/sem",
+      "name": "ataraxy-labs/sem",
+      "evidence_refs": [],
+      "registered_receipts": [],
+      "generator_candidate_key": "c2",
+      "generator_manifest": "catalogs/sota-convergence/manifest-20260929.json"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "status": "TWO_FAMILY_READS_PENDING_COOP_DISPATCH",
+  "scope": "Five delta candidates, no landscape expansion",
+  "disputed_dimensions": [
+    {
+      "id": "F1-gh",
+      "question": "Reconcile canonical portable/run 2.101.0 with plan, committed upstream qualification, host and fresh smoke 2.102.0; the sealed gh winner is unpinned.",
+      "evidence": [
+        "evidence/artifacts/final-prep-git-github-20261016/pin-reconciliation.json",
+        "evidence/artifacts/final-prep-git-github-20261016/gh.e2e.json"
+      ]
+    },
+    {
+      "id": "F1-worktrunk",
+      "question": "Does the fresh 0.80.0 lifecycle/dirty-refusal evidence justify a new verdict pin replacing the historical 0.79.0 verdict?",
+      "evidence": [
+        "evidence/artifacts/final-prep-git-github-20261016/worktrunk.e2e.json"
+      ]
+    },
+    {
+      "id": "A1-sem-v-difftastic",
+      "question": "sem documents JSON output; difftastic 0.71.0 explicitly gates JSON behind DFT_UNSTABLE. The retained frozen-fixture/agent comparison must settle required coverage and token/accuracy outcomes.",
+      "evidence": [
+        "catalogs/sota-convergence/manifest-20260929.json",
+        "evidence/artifacts/landscape-sweep-20260926/returns.json",
+        "evidence/artifacts/final-prep-git-github-20261016/source-reads.json"
+      ]
+    },
+    {
+      "id": "A1-review-action",
+      "question": "The carried action supplies unattended PR review, while local gh help/completion does not exercise credentialed review automation. Resolve the per-repository runner role and retained comparison; no live action run was authorized here.",
+      "evidence": [
+        "catalogs/sota-convergence/manifest-20260923.json",
+        "evidence/artifacts/final-prep-git-github-20261016/source-reads.json"
+      ]
+    },
+    {
+      "id": "A3-A6",
+      "question": "No retained community/net-usage/evaluation/matched-measurement delta establishes the six-angle admission bar. Missing evidence remains U, without a negative capability claim or a popularity substitution.",
+      "evidence": [
+        "evidence/artifacts/final-prep-git-github-20261016/angle-record.draft.json"
+      ]
+    }
+  ],
+  "readiness": "One evidence PR, exact head and co-op two-family review dispatch; no self-dispatched read or merge",
+  "final_admission": "CLOSED; this record prepares evidence only",
+  "named_gaps": [
+    "Full upstream Rust/Go suites not rerun; host cargo is absent and host go version exited 1. Local vendor smokes are fresh; historical suites remain historical.",
+    "No live GitHub credential/PR lifecycle or action runner connection.",
+    "No sem install, setup, login, hook or telemetry trial.",
+    "No cross-host or organic-session invoke census."
+  ],
+  "collector_attempts": [
+    {
+      "command": "python3 ${SCRATCH}/collect.py",
+      "exit_code": 1,
+      "reason": "First source lookup for share/man/man1/gh-completion.1 returned HTTP 404; replaced by pinned pkg/cmd/completion/completion.go."
+    },
+    {
+      "command": "python3 ${SCRATCH}/collect.py",
+      "exit_code": 1,
+      "reason": "Native worktrunk list exited 0; collector incorrectly treated the schema-2 JSON object as an array. Resume used items[].worktree.path, matching pinned src/commands/list/json_v2.rs:1. The stopped assertion is not an upstream defect."
+    },
+    {
+      "command": "python3 tools/sota-convergence/lane_packets.py --gap-receipts --withhold-labels [other arguments as in packet-projection.json]",
+      "exit_code": 2,
+      "reason": "Supported CLI refuses combining winner-bearing gap receipts with withheld-label packets. Successful generation removed --gap-receipts."
+    }
+  ],
+  "derived_summary": {
+    "completed_at": "2026-10-16T05:23:42.992075+00:00",
+    "command_count": 29,
+    "matched_expected_results": 27,
+    "worktrunk_final_worktree_count": 1,
+    "gh_completion_bash_syntax_valid": true,
+    "difftastic_same_exit": 0,
+    "difftastic_difference_exit": 1,
+    "full_upstream_suites": "NOT RUN; vendor binaries and documented local smokes only",
+    "github_authenticated_lifecycle": "NOT RUN; credentials/live GitHub operation excluded",
+    "collector_correction": "First orchestration pass stopped after native worktrunk-list-created exit 0: it treated Worktrunk schema-2 object as an array. Native command outputs were retained; resume used items[].worktree.path. This is a collector assertion correction, not an upstream defect or a new worktrunk run.",
+    "difftastic_json_gate_exit": 2,
+    "difftastic_json_gate_observed": true,
+    "classification": "Historical 29-row component qualification summary only; fresh provenance/validator captures are separate and are not component-invoke counts. Null-expectation exits 1 and 2 are observed probes, not predeclared expected outcomes."
+  },
+  "capture_gaps": [
+    "No separate native filesystem capture for the private driver's dirty-file-preservation assertion; this past state cannot be re-captured after the driver removed the file.",
+    "Installed-version text-mode probes lack separate original-byte custody.",
+    "gh has native CLI readiness output but no PR-operation capability receipt; A1 remains unverified.",
+    "Historical source/API response projections remain historical; fresh API, download, digest and tag checks have separate native timestamps. They do not reconstruct an old unretained response."
+  ],
+  "masking_custody": {
+    "native_capture": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+    "raw_capture_name": "git-github-native-command-capture-20261016",
+    "script": "evidence/artifacts/final-prep-git-github-20261016/mask_receipts.py",
+    "test": "evidence/artifacts/final-prep-git-github-20261016/test_mask_receipts.py",
+    "independent_coop_reproduction": "PENDING_FOR_ONE_FOLD; prior PASS applied to the old derivative. New generated/source text placeholders and supplemental captures require a new private check before push."
+  },
+  "cc_fold": {
+    "source": "CC MICRO-full-f62f2e82 ruling, cited by name only",
+    "held_head": "f62f2e824bb46a813aab26751495fb0ee2e5924c",
+    "native_source_custody": "Private horizon worktree, git-github-source-custody-20261016; no private locator or digest published",
+    "changes": [
+      "Long generated completion/help and upstream source/API bodies withheld behind marked placeholders with a published deterministic rule and tests",
+      "gh A1 U and three A2 U; sem A5 cites the actual retained manifest line",
+      "Fresh native release API, new downloads, post-download actual-equals-published checks and full tag resolutions",
+      "Formal invocation slots remain explicit gaps rather than pointing to a nonconforming command array",
+      "Index counts split zero-exit commands from nonzero observations; public tests read committed derivative bytes"
+    ]
+  },
+  "publication_validation_scope": "The recorded idle-scope validator checked the registered tree before adding its own native log row. Its failed scope-start attempt is retained separately; the runtime-environment retry completed the actual validator. A final registered-tree check precedes commit."
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "record_type": "named_gap",
+  "gap_id": "HOST-VERSION-NATIVE-BYTE-CUSTODY",
+  "reason": "Earlier installed-version probes used text mode without retained original-byte custody. Those observations cannot be published as native receipts or measured stream hashes.",
+  "prerequisite": "A separately recorded byte-mode read-only version probe, with the raw retained privately and any masked derivative independently reproduced. No new probe is performed by this correction.",
+  "components": [
+    {
+      "component": "worktrunk",
+      "status": "GAP",
+      "expected_command": "wt --version",
+      "native_capture": null,
+      "previously_reported_version": "0.80.0",
+      "value_class": "unverified historical text observation; not measured native version evidence"
+    },
+    {
+      "component": "gh",
+      "status": "GAP",
+      "expected_command": "gh --version",
+      "native_capture": null,
+      "previously_reported_version": "2.102.0",
+      "value_class": "unverified historical text observation; not measured native version evidence"
+    },
+    {
+      "component": "difftastic",
+      "status": "GAP",
+      "expected_command": "difft --version",
+      "native_capture": null,
+      "previously_reported_version": "0.71.0",
+      "value_class": "unverified historical text observation; not measured native version evidence"
+    }
+  ]
+}

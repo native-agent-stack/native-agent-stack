@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "catalog": "foundation",
+  "layer_id": "git-github-automation",
+  "base_revision": "30542e70560147c19049016d19aa3f264515c92f",
+  "decision_status": "proposal for co-op two-family adjudication; no canonical pin or sealed verdict changed",
+  "evidence_selection_scope": "Latest pin-specific evidence linked or consumed for each winner on this main snapshot, not an exhaustive search of every documentary relabel or host report.",
+  "installed_probe_ref": "evidence/artifacts/final-prep-git-github-20261016/host-versions.json",
+  "pins": [
+    {
+      "component": "worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "proposed_run_pin": "0.80.0",
+      "reason": "Current run, stack, executable plan and linked qualification name 0.80.0. The local lifecycle output supports the observed binary release string; host byte custody and full release-to-source binding remain gaps. The sealed 0.79.0 verdict still requires adjudication.",
+      "sources": [
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 5799,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "0.79.0",
+          "role": "sealed winner verdict"
+        },
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 11393,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "0.80.0",
+          "role": "run"
+        },
+        {
+          "path": "manifests/stack.json",
+          "line": 1073,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "0.80.0",
+          "role": "run pin source"
+        },
+        {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 134,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "worktrunk",
+          "role": "plan layer row"
+        },
+        {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+          "line": 879,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "0.80.0",
+          "role": "plan executable pin"
+        },
+        {
+          "path": "evidence/receipts/worktrunk-0800-qualification-20261003.json",
+          "line": 19,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "0.80.0",
+          "role": "last linked pin-specific qualification",
+          "last_change": "d9eb68750311d5f888adec140723da174f9fe10c"
+        }
+      ],
+      "drifts": [
+        "Sealed winner verdict 0.79.0 differs from proposed/current run, plan and installed 0.80.0."
+      ],
+      "proposed_source_commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "tag_resolution_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "source_resolution_status": "NATIVE_CAPTURE_RECORDED; direct git tag/ref output, peeled annotated tag when present",
+      "reported_installed_version": "0.80.0",
+      "installed_version": null,
+      "installed_version_status": "GAP; no retained original-byte host version capture",
+      "resolved_commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "tag_resolution_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 594,
+        "exit_code_line": 599,
+        "stdout_line": 601
+      }
+    },
+    {
+      "component": "gh",
+      "catalog_component_id": "candidate:cli-cli",
+      "repository": "https://github.com/cli/cli",
+      "proposed_run_pin": "2.102.0",
+      "reason": "The executable plan and previously committed upstream qualification name 2.102.0, while the canonical run/portable pins remain 2.101.0. Local help/completion output is CLI readiness only; GitHub PR capability, host byte custody and release-to-source binding remain gaps.",
+      "sources": [
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 5810,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "unpinned",
+          "role": "sealed winner verdict"
+        },
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 10700,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "2.101.0",
+          "role": "run"
+        },
+        {
+          "path": "adoption/pins-linux-x86_64.json",
+          "line": 39,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "2.101.0",
+          "role": "Linux run pin source"
+        },
+        {
+          "path": "adoption/pins-macos-arm64.json",
+          "line": 43,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "2.101.0",
+          "role": "macOS run pin source"
+        },
+        {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 134,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "candidate:cli-cli",
+          "role": "plan layer row; no version in this row"
+        },
+        {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 810,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "2.102.0",
+          "role": "plan installed-client citation"
+        },
+        {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+          "line": 872,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "2.102.0",
+          "role": "plan executable pin"
+        },
+        {
+          "path": "evidence/artifacts/gh-upstream-qualification-20261002/qualification.json",
+          "line": 28,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "v2.102.0",
+          "role": "last committed pin-specific upstream qualification",
+          "last_change": "6c5f5bb73869d01c934c97591724b5728d761465"
+        }
+      ],
+      "drifts": [
+        "Sealed winner verdict has no run identity: unpinned.",
+        "final-stack runs and both portable adoption pin files retain 2.101.0; plan, prior qualification, installed client and this proposal use 2.102.0.",
+        "The plan's layer summary counts one drifted winner, while gh's unpinned winner is separately unknown; that summary does not establish gh pin consistency."
+      ],
+      "proposed_source_commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "tag_resolution_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "source_resolution_status": "NATIVE_CAPTURE_RECORDED; direct git tag/ref output, peeled annotated tag when present",
+      "reported_installed_version": "2.102.0",
+      "installed_version": null,
+      "installed_version_status": "GAP; no retained original-byte host version capture",
+      "resolved_commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "tag_resolution_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 608,
+        "exit_code_line": 613,
+        "stdout_line": 615
+      }
+    },
+    {
+      "component": "difftastic",
+      "repository": "https://github.com/Wilfred/difftastic",
+      "proposed_run_pin": "0.71.0",
+      "reason": "Sealed winner, canonical run, stack and executable plan name 0.71.0. Local output reports the same release string and a short public revision. This does not replace native full tag resolution or host-version custody.",
+      "sources": [
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 5832,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "0.71.0",
+          "role": "sealed winner verdict"
+        },
+        {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 10623,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "0.71.0",
+          "role": "run"
+        },
+        {
+          "path": "manifests/stack.json",
+          "line": 476,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "0.71.0",
+          "role": "run pin source"
+        },
+        {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 134,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "difftastic",
+          "role": "plan layer row; no version in this row"
+        },
+        {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+          "line": 892,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "0.71.0",
+          "role": "plan executable pin"
+        },
+        {
+          "path": "evidence/artifacts/claude-repository-evidence-20260921/results.json",
+          "line": 5061,
+          "revision": "30542e70560147c19049016d19aa3f264515c92f",
+          "value": "0.71.0",
+          "role": "last linked retained component execution",
+          "last_change": "34e295908af69d88b9a2e8ff68b0a66561680555"
+        }
+      ],
+      "drifts": [],
+      "proposed_source_commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "tag_resolution_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "source_resolution_status": "NATIVE_CAPTURE_RECORDED; direct git tag/ref output, peeled annotated tag when present",
+      "reported_installed_version": "0.71.0",
+      "installed_version": null,
+      "installed_version_status": "GAP; no retained original-byte host version capture",
+      "identity_gap": "Canonical version-only source pin remains unchanged; this record now retains native full tag resolution without promoting the canonical record.",
+      "resolved_commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "tag_resolution_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 622,
+        "exit_code_line": 627,
+        "stdout_line": 629
+      }
+    }
+  ],
+  "installed_probe_status": "Named GAP; previously reported host strings are not measured native evidence and carry no published stream hash.",
+  "resolution_scope": "Fresh provenance checks follow the earlier smoke; they do not re-date or upgrade the earlier command result."
+}

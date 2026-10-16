@@ -1,0 +1,2120 @@
+{
+  "schema_version": 1,
+  "record_type": "masked_source_review_locators_not_native_receipts",
+  "raw_capture_name": "git-github-source-custody-20261016",
+  "masking_script": "mask_receipts.py",
+  "masking_test": "test_mask_receipts.py",
+  "reads": [
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md",
+      "read_at": "2026-10-16T05:15:38.764706+00:00",
+      "http_status": 200,
+      "public_source_sha256": "e627eb18fd1f383a0bbdc43531675fc2c93e6c8ab2290bc54c817ae23f4ad0aa",
+      "source_is_public": true,
+      "line_count": 267,
+      "excerpts": [
+        {
+          "line": 59,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 60,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 61,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 62,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 64,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 65,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 66,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 67,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 71,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 72,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 73,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 74,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 78,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 79,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 80,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 81,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 93,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 94,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 95,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 96,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 97,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 105,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 106,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 107,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 108,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 109,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 110,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 112,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 113,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 114,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 115,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 120,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 121,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 122,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 123,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 126,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 127,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 128,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 129,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 130,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 131,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 132,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 133,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 140,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 141,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 142,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 143,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 146,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 147,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 148,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 149,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 150,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 151,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 152,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 158,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 159,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 161,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 162,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 163,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 164,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 165,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 166,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 167,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 168,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 182,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 183,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 184,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 185,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 205,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 206,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 207,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 208,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 209,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 210,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 211,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 212,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 213,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 214,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 215,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 216,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 217,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 678,
+        "exit_code_line": 683,
+        "stdout_line": 685
+      },
+      "fresh_public_source_sha256": "e627eb18fd1f383a0bbdc43531675fc2c93e6c8ab2290bc54c817ae23f4ad0aa",
+      "fresh_read_at": "2026-10-16T08:55:04.954946Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": ".github/workflows/ci.yaml",
+      "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/b49ca7eea9b03145791a5b94eccaf9c59412ed37/.github/workflows/ci.yaml",
+      "read_at": "2026-10-16T05:15:38.802835+00:00",
+      "http_status": 200,
+      "public_source_sha256": "bd187c6d655c764c37a31d999a7aa8819645e333e22b561ad63a51c04e7b9b58",
+      "source_is_public": true,
+      "line_count": 233,
+      "excerpts": [
+        {
+          "line": 106,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 107,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 108,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 109,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 134,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 135,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 136,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 137,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 141,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 142,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 143,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 144,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 145,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 146,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 147,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 692,
+        "exit_code_line": 697,
+        "stdout_line": 699
+      },
+      "fresh_public_source_sha256": "bd187c6d655c764c37a31d999a7aa8819645e333e22b561ad63a51c04e7b9b58",
+      "fresh_read_at": "2026-10-16T08:55:05.083194Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/cli/cli",
+      "pin": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "path": "docs/install_linux.md",
+      "url": "https://raw.githubusercontent.com/cli/cli/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_linux.md",
+      "read_at": "2026-10-16T05:15:38.840311+00:00",
+      "http_status": 200,
+      "public_source_sha256": "6c54aef3c43dcfc99e6ab30dbf3f5875001997d99c2a1e3f52eba1553c793c5c",
+      "source_is_public": true,
+      "line_count": 485,
+      "excerpts": [
+        {
+          "line": 181,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 182,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 183,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 184,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 185,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 186,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 706,
+        "exit_code_line": 711,
+        "stdout_line": 713
+      },
+      "fresh_public_source_sha256": "6c54aef3c43dcfc99e6ab30dbf3f5875001997d99c2a1e3f52eba1553c793c5c",
+      "fresh_read_at": "2026-10-16T08:55:05.223282Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/cli/cli",
+      "pin": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "path": ".github/workflows/go.yml",
+      "url": "https://raw.githubusercontent.com/cli/cli/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/.github/workflows/go.yml",
+      "read_at": "2026-10-16T05:15:38.877245+00:00",
+      "http_status": 200,
+      "public_source_sha256": "62af6adcecc4a334df5ec4abf19b1b673745a0d3fd1b91d5f75cb8ae5041db2c",
+      "source_is_public": true,
+      "line_count": 61,
+      "excerpts": [
+        {
+          "line": 1,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 2,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 3,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 30,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 31,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 32,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 33,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 34,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 36,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 37,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 38,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 39,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 57,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 58,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 59,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 60,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 61,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 720,
+        "exit_code_line": 725,
+        "stdout_line": 727
+      },
+      "fresh_public_source_sha256": "62af6adcecc4a334df5ec4abf19b1b673745a0d3fd1b91d5f75cb8ae5041db2c",
+      "fresh_read_at": "2026-10-16T08:55:05.387966Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/cli/cli",
+      "pin": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "path": "pkg/cmd/completion/completion.go",
+      "url": "https://raw.githubusercontent.com/cli/cli/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/pkg/cmd/completion/completion.go",
+      "read_at": "2026-10-16T05:15:38.957288+00:00",
+      "http_status": 200,
+      "public_source_sha256": "75b78fbb28c6eec21d28a463d0192dc5f7c613e4cd14bb313ecf7b7e264d1dbf",
+      "source_is_public": true,
+      "line_count": 99,
+      "excerpts": [
+        {
+          "line": 1,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 2,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 3,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 11,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 12,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 13,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 14,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 15,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 16,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 17,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 18,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 19,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 20,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 21,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 22,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 23,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 24,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 25,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 26,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 27,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 28,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 29,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 30,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 31,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 32,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 34,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 35,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 36,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 37,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 38,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 39,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 40,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 41,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 42,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 51,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 52,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 53,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 55,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 56,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 64,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 65,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 66,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 67,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 69,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 70,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 71,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 72,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 73,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 74,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 78,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 79,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 80,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 81,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 82,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 83,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 84,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 85,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 86,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 87,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 88,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 94,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 95,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 96,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 97,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 734,
+        "exit_code_line": 739,
+        "stdout_line": 741
+      },
+      "fresh_public_source_sha256": "75b78fbb28c6eec21d28a463d0192dc5f7c613e4cd14bb313ecf7b7e264d1dbf",
+      "fresh_read_at": "2026-10-16T08:55:05.528408Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/Wilfred/difftastic",
+      "pin": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "path": "manual/src/installation.md",
+      "url": "https://raw.githubusercontent.com/Wilfred/difftastic/b7d119e90ac9f972f03f69508da765dacd302c0c/manual/src/installation.md",
+      "read_at": "2026-10-16T05:15:39.076266+00:00",
+      "http_status": 200,
+      "public_source_sha256": "a05c09aa500b683746b50832cc1d6a5f395dda794fdb7d8fb9051fa5e9d91358",
+      "source_is_public": true,
+      "line_count": 89,
+      "excerpts": [
+        {
+          "line": 2,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 3,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 4,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 5,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 6,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 7,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 8,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 9,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 10,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 11,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 12,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 13,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 748,
+        "exit_code_line": 753,
+        "stdout_line": 755
+      },
+      "fresh_public_source_sha256": "a05c09aa500b683746b50832cc1d6a5f395dda794fdb7d8fb9051fa5e9d91358",
+      "fresh_read_at": "2026-10-16T08:55:05.662249Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/Wilfred/difftastic",
+      "pin": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "path": "manual/src/usage.md",
+      "url": "https://raw.githubusercontent.com/Wilfred/difftastic/b7d119e90ac9f972f03f69508da765dacd302c0c/manual/src/usage.md",
+      "read_at": "2026-10-16T05:15:39.154522+00:00",
+      "http_status": 200,
+      "public_source_sha256": "37a65981e8673e73ec33881e4f469e8207493778107c41f045d981144cee2b0e",
+      "source_is_public": true,
+      "line_count": 94,
+      "excerpts": [
+        {
+          "line": 12,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 13,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 14,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 15,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 16,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 17,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 18,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 21,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 22,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 23,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 24,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 41,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 42,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 43,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 44,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 71,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 72,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 73,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 74,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 762,
+        "exit_code_line": 767,
+        "stdout_line": 769
+      },
+      "fresh_public_source_sha256": "37a65981e8673e73ec33881e4f469e8207493778107c41f045d981144cee2b0e",
+      "fresh_read_at": "2026-10-16T08:55:05.778477Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/Wilfred/difftastic",
+      "pin": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/Wilfred/difftastic/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md",
+      "read_at": "2026-10-16T05:15:39.245242+00:00",
+      "http_status": 200,
+      "public_source_sha256": "395325cdaeef69a79d2d39befd278cf24a062f1e4a91848482dcb9613bf20c8f",
+      "source_is_public": true,
+      "line_count": 203,
+      "excerpts": [
+        {
+          "line": 163,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 164,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 165,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 166,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 776,
+        "exit_code_line": 781,
+        "stdout_line": 783
+      },
+      "fresh_public_source_sha256": "395325cdaeef69a79d2d39befd278cf24a062f1e4a91848482dcb9613bf20c8f",
+      "fresh_read_at": "2026-10-16T08:55:05.903080Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/Wilfred/difftastic",
+      "pin": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "path": ".github/workflows/test.yml",
+      "url": "https://raw.githubusercontent.com/Wilfred/difftastic/b7d119e90ac9f972f03f69508da765dacd302c0c/.github/workflows/test.yml",
+      "read_at": "2026-10-16T05:15:39.348356+00:00",
+      "http_status": 200,
+      "public_source_sha256": "a5a44da7e99bf14a317fd8ac5d0ffb0ea0cc389023c24a2a0f210a0f4425dc99",
+      "source_is_public": true,
+      "line_count": 125,
+      "excerpts": [
+        {
+          "line": 60,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 61,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 62,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 63,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 790,
+        "exit_code_line": 795,
+        "stdout_line": 797
+      },
+      "fresh_public_source_sha256": "a5a44da7e99bf14a317fd8ac5d0ffb0ea0cc389023c24a2a0f210a0f4425dc99",
+      "fresh_read_at": "2026-10-16T08:55:06.031361Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/Wilfred/difftastic",
+      "pin": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "path": "src/options.rs",
+      "url": "https://raw.githubusercontent.com/Wilfred/difftastic/b7d119e90ac9f972f03f69508da765dacd302c0c/src/options.rs",
+      "read_at": "2026-10-16T05:15:39.446207+00:00",
+      "http_status": 200,
+      "public_source_sha256": "05231041e9a54f0cdf65a8bb95deaa0bc9893d7d412eca108eaa00af3877f390",
+      "source_is_public": true,
+      "line_count": 1094,
+      "excerpts": [
+        {
+          "line": 812,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 813,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 814,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 815,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 816,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 804,
+        "exit_code_line": 809,
+        "stdout_line": 811
+      },
+      "fresh_public_source_sha256": "05231041e9a54f0cdf65a8bb95deaa0bc9893d7d412eca108eaa00af3877f390",
+      "fresh_read_at": "2026-10-16T08:55:06.153029Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "retained_tag": "v1.0.233",
+      "read_at": "2026-10-16T05:15:39.631438+00:00",
+      "role": "carried survivor; no installation or trial",
+      "proposed_source_commit": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+      "tag_resolution_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "source_resolution_status": "NATIVE_CAPTURE_RECORDED; full ref/peeled-ref output",
+      "tag_resolution_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 636,
+        "exit_code_line": 641,
+        "stdout_line": 643
+      },
+      "resolved_commit": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "pin": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/anthropics/claude-code-action/8cf3482550831fb35a4fc3fbf7ca139cf8028b4c/README.md",
+      "read_at": "2026-10-16T05:15:39.748497+00:00",
+      "http_status": 200,
+      "public_source_sha256": "a381c47399445c97480d025a406f485644fdd5f4f7ffd880be0567ac2f7b4640",
+      "source_is_public": true,
+      "line_count": 71,
+      "excerpts": [
+        {
+          "line": 10,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 11,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 12,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 13,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 14,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 15,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 38,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 39,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 40,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 41,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 42,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 43,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 44,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 45,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 46,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 47,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 48,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 818,
+        "exit_code_line": 823,
+        "stdout_line": 825
+      },
+      "fresh_public_source_sha256": "a381c47399445c97480d025a406f485644fdd5f4f7ffd880be0567ac2f7b4640",
+      "fresh_read_at": "2026-10-16T08:55:06.293746Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "pin": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+      "path": "action.yml",
+      "url": "https://raw.githubusercontent.com/anthropics/claude-code-action/8cf3482550831fb35a4fc3fbf7ca139cf8028b4c/action.yml",
+      "read_at": "2026-10-16T05:15:39.822346+00:00",
+      "http_status": 200,
+      "public_source_sha256": "87b706489e63483c9c32c12af36467dd34e309becca35f7a8ead4d1e0664c4df",
+      "source_is_public": true,
+      "line_count": 459,
+      "excerpts": [
+        {
+          "line": 66,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 67,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 68,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 69,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 70,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 71,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 72,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 73,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 334,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 335,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 336,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 337,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 338,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 438,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 439,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 440,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 441,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 832,
+        "exit_code_line": 837,
+        "stdout_line": 839
+      },
+      "fresh_public_source_sha256": "87b706489e63483c9c32c12af36467dd34e309becca35f7a8ead4d1e0664c4df",
+      "fresh_read_at": "2026-10-16T08:55:06.458807Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/ataraxy-labs/sem",
+      "retained_tag": "v0.25.0",
+      "read_at": "2026-10-16T05:15:40.060532+00:00",
+      "role": "carried survivor; no installation or trial",
+      "proposed_source_commit": "4cfe1374f79631b01aca5746441d826738a15448",
+      "tag_resolution_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "source_resolution_status": "NATIVE_CAPTURE_RECORDED; full ref/peeled-ref output",
+      "tag_resolution_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 650,
+        "exit_code_line": 655,
+        "stdout_line": 657
+      },
+      "resolved_commit": "4cfe1374f79631b01aca5746441d826738a15448",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/ataraxy-labs/sem",
+      "pin": "4cfe1374f79631b01aca5746441d826738a15448",
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/ataraxy-labs/sem/4cfe1374f79631b01aca5746441d826738a15448/README.md",
+      "read_at": "2026-10-16T05:15:40.185678+00:00",
+      "http_status": 200,
+      "public_source_sha256": "1fcf6533e3b0ed221538176396798eb8444601f0fd74fbb60a5555a31ed8c495",
+      "source_is_public": true,
+      "line_count": 599,
+      "excerpts": [
+        {
+          "line": 157,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 158,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 159,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 160,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 167,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 168,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 169,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 170,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 312,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 313,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 314,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 315,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 323,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 324,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 325,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 326,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 328,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 330,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 331,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 363,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 364,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 365,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 366,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 367,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 368,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 369,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 381,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 382,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 383,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 384,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 510,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 511,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 512,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 513,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 576,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 577,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 578,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 579,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 581,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 582,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 583,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 584,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 585,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 586,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 587,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 588,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 589,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 846,
+        "exit_code_line": 851,
+        "stdout_line": 853
+      },
+      "fresh_public_source_sha256": "1fcf6533e3b0ed221538176396798eb8444601f0fd74fbb60a5555a31ed8c495",
+      "fresh_read_at": "2026-10-16T08:55:06.625718Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "component": "worktrunk",
+      "tag": "v0.80.0",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+      "read_at": "2026-10-16T05:15:41.329724+00:00",
+      "published_at": "2026-09-27T21:18:46Z",
+      "asset": {
+        "name": "worktrunk-x86_64-unknown-linux-musl.tar.xz",
+        "browser_download_url": "https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-x86_64-unknown-linux-musl.tar.xz",
+        "digest": "sha256:532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199",
+        "size": 8173256,
+        "download_count": 25873
+      },
+      "prefix_scope": "isolated /var/tmp scratch; no host install",
+      "record_type": "release_metadata_source_review_projection",
+      "native_api_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "publisher_integrity_status": "NATIVE_FRESH_DOWNLOAD_DIGEST_MATCH; signature/attestation not verified",
+      "asset_digest_class": "Fresh native API/download/actual-versus-published check, after the prior smoke",
+      "native_api_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 426,
+        "exit_code_line": 431,
+        "stdout_line": 433
+      },
+      "digest_comparison_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 468,
+        "exit_code_line": 473,
+        "stdout_line": 475
+      },
+      "post_download_hash_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 454,
+        "exit_code_line": 459,
+        "stdout_line": 461
+      },
+      "actual_sha256": "532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199",
+      "published_sha256": "532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "component": "gh",
+      "tag": "v2.102.0",
+      "repository": "https://github.com/cli/cli",
+      "url": "https://github.com/cli/cli/releases/tag/v2.102.0",
+      "read_at": "2026-10-16T05:15:42.320560+00:00",
+      "published_at": "2026-09-30T02:40:02Z",
+      "asset": {
+        "name": "gh_2.102.0_linux_amd64.tar.gz",
+        "browser_download_url": "https://github.com/cli/cli/releases/download/v2.102.0/gh_2.102.0_linux_amd64.tar.gz",
+        "digest": "sha256:bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386",
+        "size": 15319960,
+        "download_count": 614693
+      },
+      "prefix_scope": "isolated /var/tmp scratch; no host install",
+      "record_type": "release_metadata_source_review_projection",
+      "native_api_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "publisher_integrity_status": "NATIVE_FRESH_DOWNLOAD_DIGEST_MATCH; signature/attestation not verified",
+      "asset_digest_class": "Fresh native API/download/actual-versus-published check, after the prior smoke",
+      "native_api_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 482,
+        "exit_code_line": 487,
+        "stdout_line": 489
+      },
+      "digest_comparison_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 524,
+        "exit_code_line": 529,
+        "stdout_line": 531
+      },
+      "post_download_hash_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 510,
+        "exit_code_line": 515,
+        "stdout_line": 517
+      },
+      "actual_sha256": "bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386",
+      "published_sha256": "bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "component": "difftastic",
+      "tag": "0.71.0",
+      "repository": "https://github.com/Wilfred/difftastic",
+      "url": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+      "read_at": "2026-10-16T05:15:44.030646+00:00",
+      "published_at": "2026-09-18T22:57:29Z",
+      "asset": {
+        "name": "difft-0.71.0-x86_64-unknown-linux-musl.tar.gz",
+        "browser_download_url": "https://github.com/Wilfred/difftastic/releases/download/0.71.0/difft-0.71.0-x86_64-unknown-linux-musl.tar.gz",
+        "digest": "sha256:0a65e6715df992b0adae012e606bd9cc74fa6cfe90eaf13bbae165a0a19b3086",
+        "size": 11746371,
+        "download_count": 1704
+      },
+      "prefix_scope": "isolated /var/tmp scratch; no host install",
+      "record_type": "release_metadata_source_review_projection",
+      "native_api_receipt": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+      "publisher_integrity_status": "NATIVE_FRESH_DOWNLOAD_DIGEST_MATCH; signature/attestation not verified",
+      "asset_digest_class": "Fresh native API/download/actual-versus-published check, after the prior smoke",
+      "native_api_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 538,
+        "exit_code_line": 543,
+        "stdout_line": 545
+      },
+      "digest_comparison_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 580,
+        "exit_code_line": 585,
+        "stdout_line": 587
+      },
+      "post_download_hash_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 566,
+        "exit_code_line": 571,
+        "stdout_line": 573
+      },
+      "actual_sha256": "0a65e6715df992b0adae012e606bd9cc74fa6cfe90eaf13bbae165a0a19b3086",
+      "published_sha256": "0a65e6715df992b0adae012e606bd9cc74fa6cfe90eaf13bbae165a0a19b3086",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "src/commands/list/json_v2.rs",
+      "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/b49ca7eea9b03145791a5b94eccaf9c59412ed37/src/commands/list/json_v2.rs",
+      "read_at": "2026-10-16T05:19:32.656432+00:00",
+      "http_status": 200,
+      "public_source_sha256": "4adb0263490075a289da2985a00230a1008292e611d6137aa36cb3ca57fcae3f",
+      "source_is_public": true,
+      "line_count": 1732,
+      "excerpts": [
+        {
+          "line": 1,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 2,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 3,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 99,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 100,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 101,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 102,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 161,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 162,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 163,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 164,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 229,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 230,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 231,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 232,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 529,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 530,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 531,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 532,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 860,
+        "exit_code_line": 865,
+        "stdout_line": 867
+      },
+      "fresh_public_source_sha256": "4adb0263490075a289da2985a00230a1008292e611d6137aa36cb3ca57fcae3f",
+      "fresh_read_at": "2026-10-16T08:55:06.785138Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "dist-workspace.toml",
+      "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/b49ca7eea9b03145791a5b94eccaf9c59412ed37/dist-workspace.toml",
+      "read_at": "2026-10-16T05:19:32.753929+00:00",
+      "http_status": 200,
+      "public_source_sha256": "790cac49d6ccdbb2bd191a5c46d4c8a6469b493980b8f96e9abc539c84f5428e",
+      "source_is_public": true,
+      "line_count": 33,
+      "excerpts": [
+        {
+          "line": 9,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 10,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 11,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 12,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 13,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 14,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 15,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 16,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 17,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 18,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 19,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 24,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 25,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 26,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 27,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 31,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 32,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 33,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 874,
+        "exit_code_line": 879,
+        "stdout_line": 881
+      },
+      "fresh_public_source_sha256": "790cac49d6ccdbb2bd191a5c46d4c8a6469b493980b8f96e9abc539c84f5428e",
+      "fresh_read_at": "2026-10-16T08:55:06.916128Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "docs/src/content/docs/worktrunk.md",
+      "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/b49ca7eea9b03145791a5b94eccaf9c59412ed37/docs/src/content/docs/worktrunk.md",
+      "read_at": "2026-10-16T05:19:32.852645+00:00",
+      "http_status": 200,
+      "public_source_sha256": "b7b5e46c482f79d2709682fc62b6bef768f3c76a6667c24189e3813f392116fc",
+      "source_is_public": true,
+      "line_count": 248,
+      "excerpts": [
+        {
+          "line": 120,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 121,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 122,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 123,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 125,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 126,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 127,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 128,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 133,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 134,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 135,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 136,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 139,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 140,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 141,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 142,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 143,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 144,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 145,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 146,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 153,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 154,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 155,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 156,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 159,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 160,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 161,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 162,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 163,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 164,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 165,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 235,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 236,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 237,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 238,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 888,
+        "exit_code_line": 893,
+        "stdout_line": 895
+      },
+      "fresh_public_source_sha256": "b7b5e46c482f79d2709682fc62b6bef768f3c76a6667c24189e3813f392116fc",
+      "fresh_read_at": "2026-10-16T08:55:07.054487Z",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "kind": "publication",
+      "url": "https://ataraxy-labs.github.io/sem/agents.html",
+      "read_at": "2026-10-16T05:23:42.990875+00:00",
+      "http_status": 200,
+      "excerpts": [
+        {
+          "term": "Sonnet",
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "term": "24",
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "term": "commits",
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "term": "questions",
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "term": "git diff",
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "scope": "Existing carried vendor self-evaluation; live page has no demonstrated binding to the retained v0.25.0 binary, and is not a matched sem-versus-difftastic test.",
+      "excerpt_policy": "Selected public source lines; home-path examples omitted. Full original source remains at the pinned URL; its public-source checksum is not a private-content hash.",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    },
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": "v0.80.0",
+      "url": "https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-installer.sh",
+      "read_at": "2026-10-16T08:55:04.814129Z",
+      "public_source_sha256": "53b606fa48b84169180f8881a61f5c31c770645e1d51328032aa5aeb4f2e155a",
+      "source_is_public": true,
+      "line_count": 1604,
+      "excerpts": [
+        {
+          "line": 261,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 331,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 338,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        },
+        {
+          "line": 561,
+          "text": "<UPSTREAM_SOURCE_TEXT_WITHHELD>"
+        }
+      ],
+      "fresh_native_source": {
+        "path": "evidence/artifacts/final-prep-git-github-20261016/native-commands.json",
+        "line": 664,
+        "exit_code_line": 669,
+        "stdout_line": 671
+      },
+      "role": "Vendor release installer selects the Linux archive and extracts it; quoted source bytes remain private",
+      "quotation_custody": "Full native source/API bytes or historical source projection retained privately as git-github-source-custody-20261016; no source text quoted here."
+    }
+  ]
+}
