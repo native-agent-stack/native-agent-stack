@@ -37,13 +37,14 @@ GRAFANA_FILES = (
     ("grafana-native-foundation-data.json", "ecosystem-grafana-dashboards/native-foundation-data.json"),
     ("grafana-lanes.json", "grafana-dashboards/lanes.json"),
     ("grafana-command-center.json", "ecosystem-grafana-dashboards/command-center.json"),
+    ("grafana-trading-lanes.json", "ecosystem-grafana-dashboards/trading-lanes.json"),
     ("ns2604-research-progress.service", "systemd/ns2604-research-progress.service"),
     ("ns2604-research-progress.timer", "systemd/ns2604-research-progress.timer"),
 )
 # Filename stems and provisioned UIDs are separate native Grafana identifiers.
 DASHBOARD_UIDS = {"research-grand": "research-grand", "ecosystem-native": "ecosystem-native",
                   "native-foundation-data": "native-foundation-data", "lanes": "cc-lanes",
-                  "command-center": "cc-god-view"}
+                  "command-center": "cc-god-view", "trading-lanes": "trading-lanes"}
 EMITTER_UNITS = ("ns2604-research-progress.service", "ns2604-research-progress.timer")
 UNIT_PATH_UNSAFE = re.compile(r"[\s%\"'\\$]")
 CODEX_TOKEN_METRIC = re.compile(r"\b(?:ecosystem_)?codex_turn_token_usage_sum\b")

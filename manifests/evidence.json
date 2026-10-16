@@ -19297,6 +19297,11 @@
       "bytes": 6429
     },
     {
+      "path": "docs/decisions/2026-10-13-trading-lanes-dashboard.md",
+      "sha256": "ed6ebac823c7acf3cabb5182766c2adfc8f0fa13674aa121f9e0efd77a6e9d1a",
+      "bytes": 21802
+    },
+    {
       "path": "docs/decisions/2026-10-14-muse-file-fence.md",
       "sha256": "7fa2dc5e6c77473a55407d8d8ee77d5f8e114c525af751e6f37b1edcbd8e8370",
       "bytes": 22103
@@ -44198,8 +44203,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
-      "sha256": "4fd428d643b3539253001225b7ff2f76ea0fc3abe557006612575dc741f8499b",
-      "bytes": 52135
+      "sha256": "024cab4ec0106e5e7a93d8a718880ed3e9cb64acae0a6962a4fe1231d5244842",
+      "bytes": 52656
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/acceptance-execution-instructions.txt",
@@ -44357,6 +44362,11 @@
       "bytes": 37593
     },
     {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-trading-lanes.json",
+      "sha256": "a38f27ea00b6f0524a40266c85bba4bd52a2c051433cff62e25451bd346a02c8",
+      "bytes": 113237
+    },
+    {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana.ini",
       "sha256": "d0e6e66a4ca4e11b02b119903e1e0904737facb13414be7363f8fbd03b47b08f",
       "bytes": 1142
@@ -44403,8 +44413,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-research-progress.service",
-      "sha256": "f6f8702b5b86578830e3b7febfddc280f6bc8a5e921fdd4f25ac3e5aa5421d72",
-      "bytes": 1563
+      "sha256": "7677aa4e2ebf27c1de1b4ffe5c0ece2e598cb4f3e4414aaaba8b35702f371f8a",
+      "bytes": 1689
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-research-progress.timer",
@@ -44413,8 +44423,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py",
-      "sha256": "04e745c909490b7cd1b401850342f8e8b86b4288cb83380d633ccbe7c97e9e93",
-      "bytes": 22459
+      "sha256": "3c88e67e8f396edfde4c7ecf5954dea04a273db47f73ea1d0752c3857226b13c",
+      "bytes": 22580
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ollama.env.example",
@@ -44493,8 +44503,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml",
-      "sha256": "4b103f0bcdc6a57f8be7316bd56c951d1fb40acc84a5154d8957d7b3bfd8d5fb",
-      "bytes": 53465
+      "sha256": "caa518b39ffa7bf0ec24cac7b278d1a6488b5d68cc70c3f17dcfa1d0d3bbf282",
+      "bytes": 54916
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus-alerts.test.yaml",
@@ -62338,8 +62348,8 @@
     },
     {
       "path": "observability/ns2604_dashboards.py",
-      "sha256": "3aa7722922e4ce2b3993310fad0ca1b436c7942c0d3198a8b1b5e9d1da1a7edd",
-      "bytes": 7930
+      "sha256": "cfb4cdc222042fb6c73f05676ffacc2f8a18f519fa76a57b640e7742bec684bd",
+      "bytes": 8044
     },
     {
       "path": "observability/receipt.json",
@@ -62355,6 +62365,31 @@
       "path": "observability/session-e2e.md",
       "sha256": "843e8f4dff03e7f81d260b060ed3f140c2f6574555680beb84f3f7c0b2888712",
       "bytes": 7704
+    },
+    {
+      "path": "observability/trading-collector.yaml",
+      "sha256": "3a09623ab05df9d3a7aa8eeda44e60320e51bf3e399e848586d0aff13a1fcb70",
+      "bytes": 1490
+    },
+    {
+      "path": "observability/trading-lanes-collector.conf.example",
+      "sha256": "d83d556579a31c3960c69350ffe58eabd7dc96bb2ce60d5efcdfa1c6650718fb",
+      "bytes": 210
+    },
+    {
+      "path": "observability/trading-lanes-observer.conf.example",
+      "sha256": "619692afccc6e4ec04d00bef2a61f9930627d46403c21ab051d5c2598b3ccbe2",
+      "bytes": 281
+    },
+    {
+      "path": "observability/trading_dashboard.py",
+      "sha256": "7a919f5ff03042173485bf1f2648d62e1344deb71289e580e83bc4a4592c73fe",
+      "bytes": 7633
+    },
+    {
+      "path": "observability/trading_receipts.py",
+      "sha256": "ce82730eaa1e248516c975ffa04968791483e545514bf3653f7d5dcef02d3851",
+      "bytes": 15452
     },
     {
       "path": "recipes/README.md",
@@ -64083,8 +64118,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "4dde6cfcb82636cad926dc412b9e0a587e53f98454b80b01b821b76bf579f6b6",
-      "bytes": 345950
+      "sha256": "731092cd4b714c3dfa1301ac67e2a63ecd91824cbee4a0388746a19032b0aeba",
+      "bytes": 348402
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -64103,8 +64138,8 @@
     },
     {
       "path": "tests/test_ns2604_dashboards.py",
-      "sha256": "532511cde87dda19d719bf2ad5c162f1daa2e7e3fbdf3c5a55d373e307a5b77a",
-      "bytes": 23961
+      "sha256": "2f481bd13edd2331b0bc0151a24f4d12be03c8c3ad1b2236188cf5842698dfc9",
+      "bytes": 29950
     },
     {
       "path": "tests/test_ns_movers_decision_display.py",
@@ -64645,6 +64680,11 @@
       "path": "tests/test_trading_handbook_sizing.py",
       "sha256": "4e8589283b4515616c7d458e775912e22ddf5272b1546d0a05d1849a72afbc03",
       "bytes": 2930
+    },
+    {
+      "path": "tests/test_trading_receipts.py",
+      "sha256": "fb643cccc27aa0fc9fc3278265ef1c42cc98bb65b2a356414a487a0b6bcc07c9",
+      "bytes": 18724
     },
     {
       "path": "tests/test_tvly_keyring.py",

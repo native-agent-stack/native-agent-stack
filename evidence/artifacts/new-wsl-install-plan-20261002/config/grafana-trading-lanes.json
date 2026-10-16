@@ -1,0 +1,4332 @@
+{
+  "uid": "trading-lanes",
+  "title": "Trading lanes",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-10m",
+    "to": "now"
+  },
+  "tags": [
+    "paper",
+    "trading",
+    "receipts"
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "Receipt observations \u00b7 paper only",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Read-only projections of each lane's own receipts. Refreshed by the existing observer. Rates for A/B and IBKR are receipt stage averages; C and POST arms use the trailing minute of recorded events. Submissions are not fills. **Unavailable** means the source does not record the metric. Receipt time and status expose stale/ended runs; a fresh observation does not make a prior session live. Event freshness follows each lane's own cadence: C12min, lanea20min, laneb13min; I-llm cadence unrecorded. IBKR's Status field distinguishes Active from No session; timestamps show the latest source event. I-llm stays not live until wired."
+      }
+    },
+    {
+      "id": 2,
+      "type": "row",
+      "title": "A",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "A \u00b7 Orders/min (last stage)",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:orders/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", orders_per_min=\"orders_per_min\" | lane=\"A\" | keep lane, orders_per_min | unwrap orders_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "A \u00b7 Fills/min (last stage)",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 3,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:fills/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", fills_per_min=\"fills_per_min\" | lane=\"A\" | keep lane, fills_per_min | unwrap fills_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "A \u00b7 Cancels/min (last stage)",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:cancels/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cancels_per_min=\"cancels_per_min\" | lane=\"A\" | keep lane, cancels_per_min | unwrap cancels_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "A \u00b7 Cash use / equity",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cash_use_ratio=\"cash_use_ratio\" | lane=\"A\" | keep lane, cash_use_ratio | unwrap cash_use_ratio | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "A \u00b7 Open positions",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", open_positions=\"open_positions\" | lane=\"A\" | keep lane, open_positions | unwrap open_positions | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "A \u00b7 Realized P&L",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-9007199254740991": {
+                  "text": "Not recorded"
+                },
+                "-1e+100": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", realized_pnl_usd=\"realized_pnl_usd\" | lane=\"A\" | keep lane, realized_pnl_usd | unwrap realized_pnl_usd | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "A \u00b7 Status",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
+                "0": {
+                  "text": "Missing receipt"
+                },
+                "1": {
+                  "text": "Active"
+                },
+                "2": {
+                  "text": "Ended"
+                },
+                "3": {
+                  "text": "Blocked"
+                },
+                "4": {
+                  "text": "No session"
+                },
+                "5": {
+                  "text": "Not live"
+                },
+                "6": {
+                  "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
+                },
+                "99": {
+                  "text": "Other status"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", status_code=\"status_code\" | lane=\"A\" | keep lane, status_code | unwrap status_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "stat",
+      "title": "A \u00b7 Ended by",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Not recorded"
+                },
+                "1": {
+                  "text": "Duration"
+                },
+                "2": {
+                  "text": "Session end"
+                },
+                "3": {
+                  "text": "Stopped"
+                },
+                "4": {
+                  "text": "Risk limit"
+                },
+                "5": {
+                  "text": "Error"
+                },
+                "6": {
+                  "text": "No session"
+                },
+                "99": {
+                  "text": "Other / unknown"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", ended_by_code=\"ended_by_code\" | lane=\"A\" | keep lane, ended_by_code | unwrap ended_by_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "stat",
+      "title": "A \u00b7 Last receipt time",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 24,
+        "h": 2
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeAsIso",
+          "noValue": "Not recorded",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1000": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", source_unix=\"source_unix\" | lane=\"A\" | keep lane, source_unix | unwrap source_unix | __error__=\"\" [10m]) * 1000",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "row",
+      "title": "B",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 13,
+      "type": "stat",
+      "title": "B \u00b7 Orders/min (last stage)",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 11,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:orders/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", orders_per_min=\"orders_per_min\" | lane=\"B\" | keep lane, orders_per_min | unwrap orders_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "type": "stat",
+      "title": "B \u00b7 Fills/min (last stage)",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 3,
+        "y": 11,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:fills/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", fills_per_min=\"fills_per_min\" | lane=\"B\" | keep lane, fills_per_min | unwrap fills_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "type": "stat",
+      "title": "B \u00b7 Cancels/min (last stage)",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 11,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:cancels/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cancels_per_min=\"cancels_per_min\" | lane=\"B\" | keep lane, cancels_per_min | unwrap cancels_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "type": "stat",
+      "title": "B \u00b7 Cash use / equity",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 11,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cash_use_ratio=\"cash_use_ratio\" | lane=\"B\" | keep lane, cash_use_ratio | unwrap cash_use_ratio | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "type": "stat",
+      "title": "B \u00b7 Open positions",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 11,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", open_positions=\"open_positions\" | lane=\"B\" | keep lane, open_positions | unwrap open_positions | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "type": "stat",
+      "title": "B \u00b7 Realized P&L",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 11,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-9007199254740991": {
+                  "text": "Not recorded"
+                },
+                "-1e+100": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", realized_pnl_usd=\"realized_pnl_usd\" | lane=\"B\" | keep lane, realized_pnl_usd | unwrap realized_pnl_usd | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "type": "stat",
+      "title": "B \u00b7 Status",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 11,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
+                "0": {
+                  "text": "Missing receipt"
+                },
+                "1": {
+                  "text": "Active"
+                },
+                "2": {
+                  "text": "Ended"
+                },
+                "3": {
+                  "text": "Blocked"
+                },
+                "4": {
+                  "text": "No session"
+                },
+                "5": {
+                  "text": "Not live"
+                },
+                "6": {
+                  "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
+                },
+                "99": {
+                  "text": "Other status"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", status_code=\"status_code\" | lane=\"B\" | keep lane, status_code | unwrap status_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "type": "stat",
+      "title": "B \u00b7 Ended by",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 11,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Not recorded"
+                },
+                "1": {
+                  "text": "Duration"
+                },
+                "2": {
+                  "text": "Session end"
+                },
+                "3": {
+                  "text": "Stopped"
+                },
+                "4": {
+                  "text": "Risk limit"
+                },
+                "5": {
+                  "text": "Error"
+                },
+                "6": {
+                  "text": "No session"
+                },
+                "99": {
+                  "text": "Other / unknown"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", ended_by_code=\"ended_by_code\" | lane=\"B\" | keep lane, ended_by_code | unwrap ended_by_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "type": "stat",
+      "title": "B \u00b7 Last receipt time",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 15,
+        "w": 24,
+        "h": 2
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeAsIso",
+          "noValue": "Not recorded",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1000": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", source_unix=\"source_unix\" | lane=\"B\" | keep lane, source_unix | unwrap source_unix | __error__=\"\" [10m]) * 1000",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "type": "row",
+      "title": "C",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 17,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 23,
+      "type": "stat",
+      "title": "C \u00b7 Orders/min (last minute)",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 18,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:orders/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", orders_per_min=\"orders_per_min\" | lane=\"C\" | keep lane, orders_per_min | unwrap orders_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "type": "stat",
+      "title": "C \u00b7 Fills/min (last minute)",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 3,
+        "y": 18,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:fills/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", fills_per_min=\"fills_per_min\" | lane=\"C\" | keep lane, fills_per_min | unwrap fills_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "type": "stat",
+      "title": "C \u00b7 Cancels/min (last minute)",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 18,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:cancels/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cancels_per_min=\"cancels_per_min\" | lane=\"C\" | keep lane, cancels_per_min | unwrap cancels_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "type": "stat",
+      "title": "C \u00b7 Cash use / equity",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 18,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cash_use_ratio=\"cash_use_ratio\" | lane=\"C\" | keep lane, cash_use_ratio | unwrap cash_use_ratio | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "type": "stat",
+      "title": "C \u00b7 Open positions",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 18,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", open_positions=\"open_positions\" | lane=\"C\" | keep lane, open_positions | unwrap open_positions | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "type": "stat",
+      "title": "C \u00b7 Realized P&L",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 18,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-9007199254740991": {
+                  "text": "Not recorded"
+                },
+                "-1e+100": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", realized_pnl_usd=\"realized_pnl_usd\" | lane=\"C\" | keep lane, realized_pnl_usd | unwrap realized_pnl_usd | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "type": "stat",
+      "title": "C \u00b7 Status",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 18,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
+                "0": {
+                  "text": "Missing receipt"
+                },
+                "1": {
+                  "text": "Active"
+                },
+                "2": {
+                  "text": "Ended"
+                },
+                "3": {
+                  "text": "Blocked"
+                },
+                "4": {
+                  "text": "No session"
+                },
+                "5": {
+                  "text": "Not live"
+                },
+                "6": {
+                  "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
+                },
+                "99": {
+                  "text": "Other status"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", status_code=\"status_code\" | lane=\"C\" | keep lane, status_code | unwrap status_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "type": "stat",
+      "title": "C \u00b7 Ended by",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 18,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Not recorded"
+                },
+                "1": {
+                  "text": "Duration"
+                },
+                "2": {
+                  "text": "Session end"
+                },
+                "3": {
+                  "text": "Stopped"
+                },
+                "4": {
+                  "text": "Risk limit"
+                },
+                "5": {
+                  "text": "Error"
+                },
+                "6": {
+                  "text": "No session"
+                },
+                "99": {
+                  "text": "Other / unknown"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", ended_by_code=\"ended_by_code\" | lane=\"C\" | keep lane, ended_by_code | unwrap ended_by_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "type": "stat",
+      "title": "C \u00b7 Last receipt time",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 22,
+        "w": 24,
+        "h": 2
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeAsIso",
+          "noValue": "Not recorded",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1000": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", source_unix=\"source_unix\" | lane=\"C\" | keep lane, source_unix | unwrap source_unix | __error__=\"\" [10m]) * 1000",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "type": "row",
+      "title": "lanea",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 33,
+      "type": "stat",
+      "title": "lanea \u00b7 Orders/min (last minute)",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 25,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:orders/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", orders_per_min=\"orders_per_min\" | lane=\"lanea\" | keep lane, orders_per_min | unwrap orders_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "type": "stat",
+      "title": "lanea \u00b7 Fills/min (last minute)",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 3,
+        "y": 25,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:fills/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", fills_per_min=\"fills_per_min\" | lane=\"lanea\" | keep lane, fills_per_min | unwrap fills_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "type": "stat",
+      "title": "lanea \u00b7 Cancels/min (last minute)",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 25,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:cancels/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cancels_per_min=\"cancels_per_min\" | lane=\"lanea\" | keep lane, cancels_per_min | unwrap cancels_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "type": "stat",
+      "title": "lanea \u00b7 Cash use / equity",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 25,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cash_use_ratio=\"cash_use_ratio\" | lane=\"lanea\" | keep lane, cash_use_ratio | unwrap cash_use_ratio | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "type": "stat",
+      "title": "lanea \u00b7 Open positions",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 25,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", open_positions=\"open_positions\" | lane=\"lanea\" | keep lane, open_positions | unwrap open_positions | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "type": "stat",
+      "title": "lanea \u00b7 Realized P&L",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 25,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-9007199254740991": {
+                  "text": "Not recorded"
+                },
+                "-1e+100": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", realized_pnl_usd=\"realized_pnl_usd\" | lane=\"lanea\" | keep lane, realized_pnl_usd | unwrap realized_pnl_usd | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "type": "stat",
+      "title": "lanea \u00b7 Status",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 25,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
+                "0": {
+                  "text": "Missing receipt"
+                },
+                "1": {
+                  "text": "Active"
+                },
+                "2": {
+                  "text": "Ended"
+                },
+                "3": {
+                  "text": "Blocked"
+                },
+                "4": {
+                  "text": "No session"
+                },
+                "5": {
+                  "text": "Not live"
+                },
+                "6": {
+                  "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
+                },
+                "99": {
+                  "text": "Other status"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", status_code=\"status_code\" | lane=\"lanea\" | keep lane, status_code | unwrap status_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "type": "stat",
+      "title": "lanea \u00b7 Ended by",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 25,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Not recorded"
+                },
+                "1": {
+                  "text": "Duration"
+                },
+                "2": {
+                  "text": "Session end"
+                },
+                "3": {
+                  "text": "Stopped"
+                },
+                "4": {
+                  "text": "Risk limit"
+                },
+                "5": {
+                  "text": "Error"
+                },
+                "6": {
+                  "text": "No session"
+                },
+                "99": {
+                  "text": "Other / unknown"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", ended_by_code=\"ended_by_code\" | lane=\"lanea\" | keep lane, ended_by_code | unwrap ended_by_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "type": "stat",
+      "title": "lanea \u00b7 Last receipt time",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 29,
+        "w": 24,
+        "h": 2
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeAsIso",
+          "noValue": "Not recorded",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1000": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", source_unix=\"source_unix\" | lane=\"lanea\" | keep lane, source_unix | unwrap source_unix | __error__=\"\" [10m]) * 1000",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "type": "row",
+      "title": "laneb",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 31,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 43,
+      "type": "stat",
+      "title": "laneb \u00b7 Orders/min (last minute)",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:orders/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", orders_per_min=\"orders_per_min\" | lane=\"laneb\" | keep lane, orders_per_min | unwrap orders_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "type": "stat",
+      "title": "laneb \u00b7 Fills/min (last minute)",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 3,
+        "y": 32,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:fills/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", fills_per_min=\"fills_per_min\" | lane=\"laneb\" | keep lane, fills_per_min | unwrap fills_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "type": "stat",
+      "title": "laneb \u00b7 Cancels/min (last minute)",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 32,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:cancels/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cancels_per_min=\"cancels_per_min\" | lane=\"laneb\" | keep lane, cancels_per_min | unwrap cancels_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "type": "stat",
+      "title": "laneb \u00b7 Cash use / equity",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 32,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cash_use_ratio=\"cash_use_ratio\" | lane=\"laneb\" | keep lane, cash_use_ratio | unwrap cash_use_ratio | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "type": "stat",
+      "title": "laneb \u00b7 Open positions",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 32,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", open_positions=\"open_positions\" | lane=\"laneb\" | keep lane, open_positions | unwrap open_positions | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "type": "stat",
+      "title": "laneb \u00b7 Realized P&L",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 32,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-9007199254740991": {
+                  "text": "Not recorded"
+                },
+                "-1e+100": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", realized_pnl_usd=\"realized_pnl_usd\" | lane=\"laneb\" | keep lane, realized_pnl_usd | unwrap realized_pnl_usd | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "type": "stat",
+      "title": "laneb \u00b7 Status",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 32,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
+                "0": {
+                  "text": "Missing receipt"
+                },
+                "1": {
+                  "text": "Active"
+                },
+                "2": {
+                  "text": "Ended"
+                },
+                "3": {
+                  "text": "Blocked"
+                },
+                "4": {
+                  "text": "No session"
+                },
+                "5": {
+                  "text": "Not live"
+                },
+                "6": {
+                  "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
+                },
+                "99": {
+                  "text": "Other status"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", status_code=\"status_code\" | lane=\"laneb\" | keep lane, status_code | unwrap status_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "type": "stat",
+      "title": "laneb \u00b7 Ended by",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 32,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Not recorded"
+                },
+                "1": {
+                  "text": "Duration"
+                },
+                "2": {
+                  "text": "Session end"
+                },
+                "3": {
+                  "text": "Stopped"
+                },
+                "4": {
+                  "text": "Risk limit"
+                },
+                "5": {
+                  "text": "Error"
+                },
+                "6": {
+                  "text": "No session"
+                },
+                "99": {
+                  "text": "Other / unknown"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", ended_by_code=\"ended_by_code\" | lane=\"laneb\" | keep lane, ended_by_code | unwrap ended_by_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "type": "stat",
+      "title": "laneb \u00b7 Last receipt time",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 36,
+        "w": 24,
+        "h": 2
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeAsIso",
+          "noValue": "Not recorded",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1000": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", source_unix=\"source_unix\" | lane=\"laneb\" | keep lane, source_unix | unwrap source_unix | __error__=\"\" [10m]) * 1000",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "type": "row",
+      "title": "IBKR",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 38,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 53,
+      "type": "stat",
+      "title": "IBKR \u00b7 Orders/min (last session)",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 39,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:orders/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", orders_per_min=\"orders_per_min\" | lane=\"IBKR\" | keep lane, orders_per_min | unwrap orders_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "type": "stat",
+      "title": "IBKR \u00b7 Fills/min (last session)",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 3,
+        "y": 39,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:fills/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", fills_per_min=\"fills_per_min\" | lane=\"IBKR\" | keep lane, fills_per_min | unwrap fills_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "type": "stat",
+      "title": "IBKR \u00b7 Cancels/min (last session)",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 39,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:cancels/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cancels_per_min=\"cancels_per_min\" | lane=\"IBKR\" | keep lane, cancels_per_min | unwrap cancels_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "type": "stat",
+      "title": "IBKR \u00b7 Cash use / equity",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 39,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cash_use_ratio=\"cash_use_ratio\" | lane=\"IBKR\" | keep lane, cash_use_ratio | unwrap cash_use_ratio | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "type": "stat",
+      "title": "IBKR \u00b7 Open positions",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 39,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", open_positions=\"open_positions\" | lane=\"IBKR\" | keep lane, open_positions | unwrap open_positions | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "type": "stat",
+      "title": "IBKR \u00b7 Realized P&L",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 39,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-9007199254740991": {
+                  "text": "Not recorded"
+                },
+                "-1e+100": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", realized_pnl_usd=\"realized_pnl_usd\" | lane=\"IBKR\" | keep lane, realized_pnl_usd | unwrap realized_pnl_usd | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "type": "stat",
+      "title": "IBKR \u00b7 Status",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 39,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
+                "0": {
+                  "text": "Missing receipt"
+                },
+                "1": {
+                  "text": "Active"
+                },
+                "2": {
+                  "text": "Ended"
+                },
+                "3": {
+                  "text": "Blocked"
+                },
+                "4": {
+                  "text": "No session"
+                },
+                "5": {
+                  "text": "Not live"
+                },
+                "6": {
+                  "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
+                },
+                "99": {
+                  "text": "Other status"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", status_code=\"status_code\" | lane=\"IBKR\" | keep lane, status_code | unwrap status_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "type": "stat",
+      "title": "IBKR \u00b7 Ended by",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 39,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Not recorded"
+                },
+                "1": {
+                  "text": "Duration"
+                },
+                "2": {
+                  "text": "Session end"
+                },
+                "3": {
+                  "text": "Stopped"
+                },
+                "4": {
+                  "text": "Risk limit"
+                },
+                "5": {
+                  "text": "Error"
+                },
+                "6": {
+                  "text": "No session"
+                },
+                "99": {
+                  "text": "Other / unknown"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", ended_by_code=\"ended_by_code\" | lane=\"IBKR\" | keep lane, ended_by_code | unwrap ended_by_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "type": "stat",
+      "title": "IBKR \u00b7 Last receipt time",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 43,
+        "w": 24,
+        "h": 2
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeAsIso",
+          "noValue": "Not recorded",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1000": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", source_unix=\"source_unix\" | lane=\"IBKR\" | keep lane, source_unix | unwrap source_unix | __error__=\"\" [10m]) * 1000",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "type": "timeseries",
+      "title": "IBKR wire messages/s",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "description": "Own selected-session wire mean/peak from receipts; consult Status for Active or No session. 45/s governor, 50/s broker cap are constants.",
+      "gridPos": {
+        "x": 0,
+        "y": 45,
+        "w": 24,
+        "h": 5
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 45
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          },
+          "custom": {
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", wire_mean_per_s=\"wire_mean_per_s\" | lane=\"IBKR\" | keep lane, wire_mean_per_s | unwrap wire_mean_per_s | __error__=\"\" [10m])",
+          "legendFormat": "Session mean",
+          "queryType": "range"
+        },
+        {
+          "refId": "B",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", wire_peak_per_s=\"wire_peak_per_s\" | lane=\"IBKR\" | keep lane, wire_peak_per_s | unwrap wire_peak_per_s | __error__=\"\" [10m])",
+          "legendFormat": "Session peak",
+          "queryType": "range"
+        }
+      ],
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 63,
+      "type": "row",
+      "title": "I-llm",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 50,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 64,
+      "type": "stat",
+      "title": "I-llm \u00b7 Orders/min (last minute)",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 51,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:orders/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", orders_per_min=\"orders_per_min\" | lane=\"I-llm\" | keep lane, orders_per_min | unwrap orders_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "type": "stat",
+      "title": "I-llm \u00b7 Fills/min (last minute)",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 3,
+        "y": 51,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:fills/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", fills_per_min=\"fills_per_min\" | lane=\"I-llm\" | keep lane, fills_per_min | unwrap fills_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "type": "stat",
+      "title": "I-llm \u00b7 Cancels/min (last minute)",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 51,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:cancels/min",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cancels_per_min=\"cancels_per_min\" | lane=\"I-llm\" | keep lane, cancels_per_min | unwrap cancels_per_min | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "type": "stat",
+      "title": "I-llm \u00b7 Cash use / equity",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 51,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", cash_use_ratio=\"cash_use_ratio\" | lane=\"I-llm\" | keep lane, cash_use_ratio | unwrap cash_use_ratio | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "type": "stat",
+      "title": "I-llm \u00b7 Open positions",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 51,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", open_positions=\"open_positions\" | lane=\"I-llm\" | keep lane, open_positions | unwrap open_positions | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "type": "stat",
+      "title": "I-llm \u00b7 Realized P&L",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 51,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-9007199254740991": {
+                  "text": "Not recorded"
+                },
+                "-1e+100": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", realized_pnl_usd=\"realized_pnl_usd\" | lane=\"I-llm\" | keep lane, realized_pnl_usd | unwrap realized_pnl_usd | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "type": "stat",
+      "title": "I-llm \u00b7 Status",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 51,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
+                "0": {
+                  "text": "Missing receipt"
+                },
+                "1": {
+                  "text": "Active"
+                },
+                "2": {
+                  "text": "Ended"
+                },
+                "3": {
+                  "text": "Blocked"
+                },
+                "4": {
+                  "text": "No session"
+                },
+                "5": {
+                  "text": "Not live"
+                },
+                "6": {
+                  "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
+                },
+                "99": {
+                  "text": "Other status"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", status_code=\"status_code\" | lane=\"I-llm\" | keep lane, status_code | unwrap status_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "type": "stat",
+      "title": "I-llm \u00b7 Ended by",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 51,
+        "w": 3,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Not recorded"
+                },
+                "1": {
+                  "text": "Duration"
+                },
+                "2": {
+                  "text": "Session end"
+                },
+                "3": {
+                  "text": "Stopped"
+                },
+                "4": {
+                  "text": "Risk limit"
+                },
+                "5": {
+                  "text": "Error"
+                },
+                "6": {
+                  "text": "No session"
+                },
+                "99": {
+                  "text": "Other / unknown"
+                }
+              }
+            }
+          ],
+          "noValue": "Not recorded",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", ended_by_code=\"ended_by_code\" | lane=\"I-llm\" | keep lane, ended_by_code | unwrap ended_by_code | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "type": "stat",
+      "title": "I-llm \u00b7 Last receipt time",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 55,
+        "w": 24,
+        "h": 2
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "noValue": "Not recorded",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Not recorded"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", source_unix=\"source_unix\" | lane=\"I-llm\" | keep lane, source_unix | unwrap source_unix | __error__=\"\" [10m])",
+          "queryType": "instant"
+        }
+      ]
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "links": []
+}

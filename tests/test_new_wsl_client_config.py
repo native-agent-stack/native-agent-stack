@@ -5166,6 +5166,43 @@ class PlanConfigurationTests(unittest.TestCase):
                 if override:
                     self.assertFalse((home / ".chub/config.yaml").exists())
 
+    def test_trading_dashboard_consumption_requires_its_source_destination_and_transport(self):
+        binding = '("grafana-trading-lanes.json", "ecosystem-grafana-dashboards/trading-lanes.json"),'
+        for mutation in (None, "missing", "source", "destination", "transport", "missing-file"):
+            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as tmp:
+                plan_dir = Path(tmp) / "plan"
+                shutil.copytree(ROOT / cfg.PLAN_REL, plan_dir)
+                renderer = plan_dir / "config/observability_config.py"
+                if mutation == "missing-file":
+                    (plan_dir / "config/grafana-trading-lanes.json").unlink()
+                if mutation in ("missing", "source", "destination"):
+                    replacement = {
+                        "missing": "",
+                        "source": binding.replace("grafana-trading-lanes.json", "unbound-trading.json"),
+                        "destination": binding.replace("ecosystem-grafana-dashboards/trading-lanes.json",
+                                                       "grafana-dashboards/wrong-trading.json"),
+                    }[mutation]
+                    self.assertIn(binding, renderer.read_text())
+                    renderer.write_text(renderer.read_text().replace(binding, replacement))
+                if mutation == "transport":
+                    for name in ("install-plan.json", "owners.json"):
+                        path = plan_dir / name
+                        data = json.loads(path.read_text())
+                        row = next(r for r in data["owners"] if r["slot"] == "grafana")
+                        if "commands" in row:
+                            row["commands"] = [c for c in row["commands"] if "observability_config.py" not in c]
+                        path.write_text(json.dumps(data))
+                result = subprocess.run(
+                    [sys.executable, "-B", str(ROOT / cfg.PLAN_REL / "check_plan.py"),
+                     "--plan-dir", str(plan_dir), "--manifest", str(ROOT / cfg.MANIFEST_REL)],
+                    cwd=tmp, capture_output=True, text=True)
+                out = result.stdout + result.stderr
+                if mutation is None:
+                    self.assertEqual(0, result.returncode, out)
+                else:
+                    self.assertNotEqual(0, result.returncode, out)
+                    self.assertIn("grafana-trading-lanes.json", out)
+
     def test_plan_checker_counts_direct_config_installs_and_refuses_an_uncopied_file(self):
         with tempfile.TemporaryDirectory() as tmp:
             plan_dir = Path(tmp) / "plan"

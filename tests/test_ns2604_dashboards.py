@@ -23,10 +23,93 @@ def exprs(board):
 
 
 class Ns2604DashboardTests(unittest.TestCase):
+    def test_fresh_install_renderer_carries_trading_collector_route_with_dashboard(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            config, data = root / "config", root / "data"
+            config.mkdir()
+            env = dict(os.environ, NS2604_OBSERVABILITY_DATA=str(data))
+            renderer = PLAN / "config/observability_config.py"
+            for action in ("otel", "grafana"):
+                result = subprocess.run([sys.executable, str(renderer), action, "--config-root", str(config),
+                                         "--source-root", str(PLAN / "config"), "--repo-root", str(ROOT)],
+                                        env=env, capture_output=True, text=True)
+                self.assertEqual(0, result.returncode, result.stderr)
+            self.assertTrue((config / "ecosystem-grafana-dashboards/trading-lanes.json").is_file())
+            rendered = (config / "otel.yaml").read_text()
+            for marker in ("file_log/trading_lanes:", "transform/trading_projection:", "logs/trading_lanes:",
+                           "trading-lanes/observations.jsonl", "receivers: [file_log/trading_lanes]",
+                           "processors: [memory_limiter, transform/trading_projection, batch]"):
+                self.assertIn(marker, rendered)
+            if shutil.which("otelcol-contrib"):
+                result = subprocess.run(["otelcol-contrib", "validate", "--config=" + str(config / "otel.yaml")],
+                                        env=env, capture_output=True, text=True)
+                self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_ibkr_copy_uses_status_for_no_session_and_neutral_source_time(self):
+        board = G.dashboards()["grafana-trading-lanes.json"]
+        status = next(p for p in board["panels"] if p.get("title") == "IBKR · Status")
+        mappings = status["fieldConfig"]["defaults"]["mappings"][0]["options"]
+        self.assertEqual("Active", mappings["1"]["text"])
+        self.assertEqual("No session", mappings["4"]["text"])
+        self.assertNotRegex(json.dumps(board), r"(?i)no session tonight|no session since|no session exists")
+        self.assertTrue(any(p.get("title") == "IBKR · Last receipt time" for p in board["panels"]))
+
+    def test_block_status_correction_names_a_version_bound_producer_reference(self):
+        text = (ROOT / "docs/decisions/2026-10-13-trading-lanes-dashboard.md").read_text()
+        source_rows = [line for line in text.splitlines() if line.startswith("| ibkr_pre_series.py |")]
+        self.assertEqual(1, len(source_rows))
+        self.assertIn("source-ref:ns2604-pr1106-status-producer-refs-20261014/block-writer", source_rows[0])
+        self.assertIn("41-45, 287", source_rows[0])
+
+    def test_trading_lanes_board_has_each_receipt_lane_and_broker_wire_thresholds(self):
+        board = G.dashboards().get("grafana-trading-lanes.json")
+        self.assertIsNotNone(board, "The provisioned dashboard set must contain Trading lanes")
+        self.assertEqual(("trading-lanes", "Trading lanes"), (board["uid"], board["title"]))
+        self.assertFalse(board["editable"])
+        rows = [p["title"] for p in board["panels"] if p["type"] == "row"]
+        self.assertEqual(["A", "B", "C", "lanea", "laneb", "IBKR", "I-llm"], rows)
+        expressions = exprs(board)
+        for lane in rows:
+            for metric in ("orders_per_min", "fills_per_min", "cancels_per_min", "cash_use_ratio",
+                           "open_positions", "realized_pnl_usd", "status_code", "ended_by_code"):
+                self.assertTrue(any(f'lane="{lane}"' in expression and f"unwrap {metric} " in expression
+                                    for expression in expressions), (lane, metric))
+        self.assertTrue(all("[10m]" in expression for expression in expressions))
+        wire = next(p for p in board["panels"] if p["title"] == "IBKR wire messages/s")
+        self.assertEqual([45, 50], [x["value"] for x in wire["fieldConfig"]["defaults"]["thresholds"]["steps"]
+                                    if x["value"] is not None])
+        self.assertNotRegex(json.dumps(board), r"/home/|account_id|client_order_id|events\\.jsonl")
+
     def test_committed_plan_dashboards_match_a_fresh_render(self):
         result = subprocess.run([sys.executable, str(ROOT / "observability/ns2604_dashboards.py"), "--check"],
                                 capture_output=True, text=True)
         self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_trading_rates_name_their_minute_basis_and_missing_pnl_has_a_bounded_mapping(self):
+        board = G.dashboards()["grafana-trading-lanes.json"]
+        rates = [p for p in board["panels"] if p.get("type") == "stat" and "/min" in p["title"]]
+        self.assertEqual(21, len(rates))
+        with self.subTest(note="minute units"):
+            self.assertTrue(all(p["fieldConfig"]["defaults"]["unit"].startswith("suffix:") for p in rates))
+        with self.subTest(note="historical stage basis"):
+            self.assertTrue(all("(last stage)" in p["title"] for p in rates if p["title"].startswith(("A ·", "B ·"))))
+        pnl = next(p for p in board["panels"] if p["title"] == "I-llm · Realized P&L")
+        defaults = pnl["fieldConfig"]["defaults"]
+        key, value = next(iter(defaults["mappings"][0]["options"].items()))
+        with self.subTest(note="empty value fallback"):
+            self.assertEqual("Not recorded", defaults.get("noValue"))
+        with self.subTest(note="missing mapping transport"):
+            self.assertNotIn("e", key.lower(), "Missing-value mapping must survive native decimal LogQL output")
+            self.assertEqual("Not recorded", value["text"])
+
+    def test_unstarted_lane_last_receipt_stat_has_explicit_not_recorded_fallback(self):
+        board = G.dashboards()["grafana-trading-lanes.json"]
+        panel = next(p for p in board["panels"] if p["title"] == "I-llm · Last receipt time")
+        defaults = panel["fieldConfig"]["defaults"]
+        self.assertEqual("Not recorded", defaults.get("noValue"))
+        self.assertEqual("none", defaults["unit"], "Unstarted lane must not feed a negative epoch to the date formatter")
+        self.assertEqual("Not recorded", defaults["mappings"][0]["options"]["-1"]["text"])
 
     def test_retarget_changes_only_datasources_and_prometheus_metric_names(self):
         board = {"panels": [

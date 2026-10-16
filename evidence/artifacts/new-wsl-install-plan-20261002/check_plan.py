@@ -692,6 +692,12 @@ def main():
         # The command center's god view (cc-god-view) is rendered the same way, into the Ecosystem provider.
         if ("grafana-command-center.json", "ecosystem-grafana-dashboards/command-center.json") in rendered_assets:
             copied.add("grafana-command-center.json")
+        # Trading lanes uses the existing Ecosystem file provider. Count the
+        # source only when its exact destination and actual asset are present.
+        if ("grafana-trading-lanes.json", "ecosystem-grafana-dashboards/trading-lanes.json") in rendered_assets and "grafana-trading-lanes.json" in config:
+            copied.add("grafana-trading-lanes.json")
+        else:
+            bad("observability", "grafana: config/grafana-trading-lanes.json must render to ecosystem-grafana-dashboards/trading-lanes.json")
     # Empty public roster is an operator-populated example, never an install operand.
     operator_examples = set()
     if "lanes-registry.json" in config:

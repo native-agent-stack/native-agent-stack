@@ -16,3 +16,4 @@ NoNewPrivileges=true
 TimeoutStartSec=60
 ExecStart=/usr/bin/python3 @REPO_ROOT@/observability/grand-dashboard/progress.py --repo @REPO_ROOT@ --cache @DATA_ROOT@/grand-dashboard/progress-cache.json --loki-url http://127.0.0.1:21300/loki/api/v1/push --dagu-bin %h/.local/bin/dagu --dagu-home %h/.dagu --dagu-dag restic-backup --dagu-dag restic-restore-check --dagu-dag tz-currency-check
 ExecStart=/usr/bin/python3 @REPO_ROOT@/observability/grand-dashboard/hcom_status.py --hcom-bin %h/.local/bin/hcom --registry @DATA_ROOT@/grand-dashboard/lanes-registry.json --loki-url http://127.0.0.1:21300/loki/api/v1/push --otlp-url http://127.0.0.1:21318/v1/metrics --push
+ExecStart=/usr/bin/python3 @REPO_ROOT@/observability/trading_receipts.py --spool @DATA_ROOT@/trading-lanes/observations.jsonl
