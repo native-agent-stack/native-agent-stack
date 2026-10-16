@@ -62,8 +62,15 @@ coverage gap in the daily collector. It carries forward the last readable
 inventory's count and findings, marked as retained, alongside any new known
 counts. The session notice shows the gap beside the counts; it does not claim
 that retained findings were freshly verified. If the previous due file cannot
-be read safely, its bytes stay unchanged. The timer's existing model-currency proposal step
+be read safely, the report marks its prior findings unavailable and still writes
+current known counts. With no known counts and incomplete coverage, the existing
+file stays in place. The timer's existing model-currency proposal step
 continues to produce refresh requests before the collector writes the notice.
+
+Text output identifies each retained finding's origin. The session notice tries
+full coverage phrases, then compact labels, before omitting an inline details
+command that cannot fit its 160-character budget. The full command and coverage
+remain in the report; notice length never stops collection.
 
 A `package_bound` model joins `package.id` and `package.version` to a package
 row's `id` and `latest_version`. The shipping package's release date supplies

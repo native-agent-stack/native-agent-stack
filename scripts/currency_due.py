@@ -71,10 +71,10 @@ absolute command would leave the counts no room in the line, the line ends with 
 command that prints this document, whose details_command field carries the full command and whose root field names
 the checkout; when the resolved path is too long for that and the state directory came from XDG_STATE_HOME, the
 symbolic `cat "$XDG_STATE_HOME"/native-agent-stack/currency-due.json` is used (the hook that prints the line resolves
-the same variable). When something is due and no runnable form fits (a long checkout path with a long explicit
---state-dir), the run fails with exit 2 and writes nothing; a run with nothing due still removes an obsolete
-due-file. Every emitted line ends with a runnable command, never a cwd-relative one, and never exceeds 160
-characters. A SessionStart hook, a separate change, prints summary_line in whatever project the session
+the same variable). Coverage phrases compact before exhausting the notice budget. If no actual command or pointer
+fits (a long checkout path with a long explicit --state-dir), the line omits its command and the report retains
+details_command; current counts are still written. A run with nothing due and complete coverage removes an obsolete
+due-file. Every notice stays within 160 characters. A SessionStart hook, a separate change, prints summary_line in whatever project the session
 starts in when the file exists and nothing when it does not (docs/decisions/2026-09-30-session-currency-notice.md).
 
   python3 scripts/currency_due.py                    # write or remove the due-file; one line for the journal
@@ -417,38 +417,44 @@ def details_command(root: Path, network: bool, cadence_days: int) -> str:
 
 def summary_line(due: dict, command: str = DETAILS_COMMAND, complete: bool = True,
                  pointers: list[str] = (), gaps: tuple[str, ...] = ()) -> str:
-    """The nonzero counts and the command that prints the details, in at most SUMMARY_LIMIT characters. With no
-    count and a check that could not answer, the line says so rather than "nothing due": an incomplete skill check
-    (``complete`` False) as "skill check incomplete", a surface report that exists but could not answer (``gaps``,
-    SURFACE_GAPS phrases) by its phrase, followed by ``command`` when it fits (never a pointer: such a run writes no
-    due-file of its own). When ``command`` leaves the counts less than MIN_COUNTS_ROOM characters, the first of
-    ``pointers`` (``cat <due-file>``, then the symbolic XDG form; the document carries the command in its
-    details_command field) that leaves them that room takes its place; when none does, the run fails (CheckError)
-    rather than emit a line without a runnable command or over SUMMARY_LIMIT."""
+    """Fit counts, coverage gaps and a usable details command into SUMMARY_LIMIT without failing collection.
+
+    Try full gap phrases and then compact labels with the supplied command/pointers. If even compact coverage
+    and a real pointer cannot fit, omit only the inline command; the report retains details_command and every
+    coverage field. A coverage-only notice never links to a file it might not have written.
+    """
     parts = [f"{due[key]} {LABELS[key][0] if due[key] == 1 else LABELS[key][1]}" for key in COUNT_KEYS if due.get(key)]
+    compact = {"surface watch stale": "surface stale", "surface watch unreadable": "surface unreadable",
+               "surface watch incomplete": "surface incomplete", "model check incomplete": "models unknown",
+               "model inventory unreadable": "inventory unknown", "skill check incomplete": "skills unknown"}
+    gap_phrases = list(dict.fromkeys((", ".join(gaps), ", ".join(compact.get(gap, gap) for gap in gaps),
+                                    f"{len(gaps)} coverage gaps" if gaps else "")))
     if not parts:
         if not gaps:
             return ("stack currency: nothing due" if complete else
                     "stack currency: nothing known due, skill check incomplete")
-        text = "stack currency: nothing known due, " + ", ".join(
-            [*([] if complete else ["skill check incomplete"]), *gaps])
-        suffix = f"; details: {command}"
-        return text + suffix if len(text) + len(suffix) <= SUMMARY_LIMIT else text[:SUMMARY_LIMIT]
+        prefix = "stack currency: nothing known due, " + ("" if complete else "skill check incomplete, ")
+        for phrase in gap_phrases:
+            text = prefix + phrase
+            if len(text) <= SUMMARY_LIMIT:
+                suffix = f"; details: {command}"
+                return text + suffix if len(text) + len(suffix) <= SUMMARY_LIMIT else text
     prefix = "stack currency: "
-    gap_text = ", " + ", ".join(gaps) if gaps else ""
-    for candidate in (command, *pointers):
-        suffix = f"; details: {candidate}"
-        room = SUMMARY_LIMIT - len(prefix) - len(suffix) - len(gap_text)
-        if room >= MIN_COUNTS_ROOM:
-            break
-    else:
-        raise CheckError(f"no runnable details command fits the {SUMMARY_LIMIT}-character notice line "
-                         f"(the checkout path and the state directory are both too long); use XDG_STATE_HOME "
-                         f"or a shorter --state-dir")
     counts = ", ".join(parts)
-    if len(counts) > room:
-        counts = counts[:room - 3] + "..."
-    return prefix + counts + gap_text + suffix
+    gap_texts = [", " + phrase if phrase else "" for phrase in gap_phrases]
+    for gap_text in gap_texts:
+        for candidate in (command, *pointers):
+            suffix = f"; details: {candidate}"
+            room = SUMMARY_LIMIT - len(prefix) - len(suffix) - len(gap_text)
+            if room >= MIN_COUNTS_ROOM:
+                shown = counts if len(counts) <= room else counts[:room - 3] + "..."
+                return prefix + shown + gap_text + suffix
+    # A long explicit state path has no honest short pointer. Reporting still proceeds.
+    for gap_text in gap_texts:
+        room = SUMMARY_LIMIT - len(prefix) - len(gap_text)
+        if room >= MIN_COUNTS_ROOM:
+            shown = counts if len(counts) <= room else counts[:room - 3] + "..."
+            return prefix + shown + gap_text
 
 
 def due_file_pointers(due_file: Path | None, from_xdg: bool) -> list[str]:
@@ -813,7 +819,8 @@ def render_text(document: dict) -> str:
         if kind == "stale_model":
             lines.append(f"  model: {item.get('path')}:{item.get('line')} {item.get('model')} -> {item.get('expected')}")
         elif kind == "model_past_window":
-            lines.append(f"  model inventory: {item['finding']}")
+            origin = f" [retained from {item.get('retained_from') or 'earlier inventory'}]" if "retained_from" in item else ""
+            lines.append(f"  model inventory: {item['finding']}{origin}")
         elif kind == "pin_mismatch":
             lines.append(f"  pin: {item['component_id']} did not report its pin {item['pinned_version']} "
                          f"({', '.join(str(profile) for profile in item['profiles'])})")
@@ -913,19 +920,21 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def retain_inventory_findings(document: dict, due_file: Path, from_xdg: bool) -> bool:
-    """Keep last known inventory findings while reporting the current gap. False protects an unreadable prior file."""
+def retain_inventory_findings(document: dict, due_file: Path, from_xdg: bool) -> None:
+    """Keep recoverable prior findings; unavailable history must not prevent writing current known counts."""
     coverage = document["details"][-1]
     if coverage.get("model_inventory") != "unknown" or not due_file.exists():
-        return True
+        return
     previous = read_record(due_file)
     if "error" in previous or not isinstance(previous.get("due"), dict) or not isinstance(previous.get("details"), list):
-        return False
+        coverage["model_inventory_findings"] = "prior findings unavailable"
+        return
     count = previous["due"].get(INVENTORY_KEY, 0)
     rows = [item for item in previous["details"] if isinstance(item, dict) and item.get("kind") == "model_past_window"]
     if not isinstance(count, int) or isinstance(count, bool) or count < 0 or count != len(rows) \
             or any(not isinstance(item.get("finding"), str) for item in rows):
-        return False
+        coverage["model_inventory_findings"] = "prior findings unavailable"
+        return
     if count:
         document["due"][INVENTORY_KEY] = count
         document["details"][-1:-1] = [{"kind": "model_past_window", "finding": item["finding"],
@@ -935,7 +944,6 @@ def retain_inventory_findings(document: dict, due_file: Path, from_xdg: bool) ->
         gaps = tuple(gap for gap in gaps_of(document) if gap != "the skill check was incomplete")
         document["summary_line"] = summary_line(document["due"], document["details_command"],
             coverage.get("skills_complete") is not False, due_file_pointers(due_file, from_xdg), gaps)
-    return True
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -961,12 +969,10 @@ def main(argv: list[str] | None = None) -> int:
     try:
         document = aggregate(collect(root, now_text, args.network, state), now, now_text, args.sweep_cadence_days,
                              root, state / DUE_FILE, from_xdg)
-        writable = retain_inventory_findings(document, state / DUE_FILE, from_xdg)
+        retain_inventory_findings(document, state / DUE_FILE, from_xdg)
         action = "dry run"
         if not args.dry_run:
-            if not writable:
-                action = f"kept {state / DUE_FILE}; prior inventory findings unreadable"
-            elif any(document["due"].values()):
+            if any(document["due"].values()):
                 action = f"wrote {write_due_file(state, document)}" + "".join(
                     f"; {gap}" for gap in gaps_of(document))
             elif incomplete(document):

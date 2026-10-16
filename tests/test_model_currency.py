@@ -747,6 +747,37 @@ class ModelRouteCurrencyTests(unittest.TestCase):
                 self.assertIn("unknown package-currency row", result.stdout)
                 self.assertNotIn("Traceback", result.stderr)
 
+    def test_route_kind_and_repository_identity_shape_are_required(self):
+        for change in ({"kind": "component"}, {"kind": None}, {"repositories": None},
+                       {"repositories": []}, {"repositories": [""]}, {"repositories": [None]},
+                       {"repositories": "https://example.org/model#route"}):
+            with self.subTest(change=change):
+                self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader", **change}])
+                result = self.run_validator()
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("route kind and repository identities are required", result.stdout)
+                self.assertNotIn("Traceback", result.stderr)
+
+    def test_c2_pypi_identity_mismatches_fail_after_name_normalization(self):
+        self.bind_routes([{"route_id": "test-route", "model_currency_id": "reader"}])
+        data = inventory()
+        data["packages"] = [{"id": "speech", "latest_version": "1.0", "release_date": "2026-10-01",
+            "release_source": "https://pypi.org/project/SpeechRecognition", "checked_at": "2026-10-07",
+            "release_line": {"kind": "pypi", "package": "SpeechRecognition"}}]
+        self.write_registered("catalogs/foundation/model-currency.json", data)
+        for repository in ("https://pypi.org/project/unrelated", "https://example.org/project/speechrecognition",
+                           "http://pypi.org/project/speechrecognition", "https://pypi.org/project/speechrecognition/1.0",
+                           "https://pypi.org/project/speechrecognition?query=1", "https://pypi.org/project/speechrecognition#route",
+                           "https://[invalid/project/speechrecognition"):
+            with self.subTest(repository=repository):
+                self.write_c2([repository], [])
+                self.write_registered("evidence/artifacts/model-routes-sweep-merge-20261015/route-currency.json", {
+                    "schema_version": 1, "components": [{"repository": repository, "package_currency_id": "speech"}]})
+                result = self.run_validator()
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("component identity does not match", result.stdout)
+                self.assertNotIn("Traceback", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

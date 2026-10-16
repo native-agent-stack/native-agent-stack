@@ -2,9 +2,17 @@
   "schema_version": 1,
   "evidence_class": "local_integration",
   "date": "2026-10-16",
-  "tests_command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 -B -m unittest tests.test_model_currency tests.test_currency_due tests.test_validate tests.test_provenance_digest_custody -q",
-  "observed_test_count": 261,
+  "tests_command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 -B -m unittest tests.test_currency_due tests.test_model_currency -q",
+  "observed_test_count": 153,
   "result": "passed",
+  "notice_budget_followup": {
+    "base": "1b62f8e7d501846abb974622c89111f6f794ae9b",
+    "review": "MICRO-delta-1b62f8e7.md; matching local review_output.json (names only)",
+    "fail_first": "Six-test run: the three-gap unit case raised CheckError; long-path CLI, two unreadable/invalid-prior cases and retained-origin rendering produced four assertion failures. The route-binding and PyPI negative controls passed baseline.",
+    "after": "All 153 currency/route tests passed. Summary budgeting compacts coverage before omitting an inline command and never prevents writing. Unavailable prior history does not block current known counts; retained origins appear in text.",
+    "existing_guard_coverage": "Seven invalid binding kind/identity shapes and seven PyPI mismatch/URL-shape cases fail closed without traceback. No baseline defect is claimed for these guards.",
+    "scope": "One normal commit, no rebase; no host run, model call or timer change."
+  },
   "round_3": {
     "base": "94b4ba5515da5159c3b50d8b7edef40b7c4bbbc2",
     "commit_policy": "one normal commit; no rebase",

@@ -497,6 +497,7 @@ class CountTests(unittest.TestCase):
                          [row["finding"] for row in old["details"] if row["kind"] == "model_past_window"])
         self.assertEqual(saved["details"][-1]["model_inventory"], "unknown")
         self.assertIn("model inventory unreadable", saved["summary_line"])
+        self.assertIn("retained from " + old["generated_at"], cd.render_text(saved))
 
     def test_nonzero_counts_show_inventory_gap_in_session_notice(self):
         due = dict.fromkeys(cd.DUE_KEYS, 0)
@@ -506,6 +507,58 @@ class CountTests(unittest.TestCase):
         self.assertIn("model inventory unreadable", line)
         self.assertIn("; details:", line)
         self.assertLessEqual(len(line), cd.SUMMARY_LIMIT)
+
+    def test_three_gaps_compact_before_the_xdg_pointer_budget_is_exhausted(self):
+        due = dict.fromkeys(cd.DUE_KEYS, 0)
+        due["stale_receipts"] = 1
+        line = cd.summary_line(due, "python3 " + "x" * 150,
+                               pointers=["cat " + "y" * 150, cd.XDG_POINTER],
+                               gaps=("surface watch unreadable", "model check incomplete", "model inventory unreadable"))
+        self.assertIn("surface", line)
+        self.assertIn("models", line)
+        self.assertIn("inventory", line)
+        self.assertTrue(line.endswith("; details: " + cd.XDG_POINTER))
+        self.assertLessEqual(len(line), cd.SUMMARY_LIMIT)
+
+    def test_three_gaps_do_not_block_writing_known_counts_with_long_paths(self):
+        checkout = Checkout(self, "c" * 110)
+        checkout.state = checkout.state.parent / ("s" * 140)
+        surface = checkout.state / cd.SURFACE_DIR / cd.SURFACE_FILE
+        surface.parent.mkdir(parents=True)
+        surface.write_text("{")
+        path = checkout.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        path.write_text("{")
+        checkout.set(cd.ACTIVE_MODELS[0], {"schema_version": 1, "status": "unknown", "stale_count": 0,
+                                          "findings": [], "errors": ["synthetic unavailable check"]})
+        checkout.set(STALENESS, staleness_report(("codex", ["stale"])))
+        code, stdout, stderr = checkout.run("--json")
+        self.assertEqual(code, 0, stderr)
+        saved = json.loads(checkout.due_file.read_text())
+        self.assertEqual(saved["due"]["stale_receipts"], 1)
+        self.assertEqual(saved["details"][-1]["model_inventory"], "unknown")
+        self.assertEqual(saved["details"][-1]["active_models"], "unknown")
+        self.assertIn("surface watch unreadable", cd.gaps_of(saved))
+        self.assertLessEqual(len(saved["summary_line"]), cd.SUMMARY_LIMIT)
+
+    def test_unreadable_prior_inventory_file_does_not_block_current_known_counts(self):
+        checkout = Checkout(self)
+        path = checkout.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        path.write_text("{")
+        checkout.state.mkdir()
+        checkout.set(STALENESS, staleness_report(("codex", ["stale"])))
+        for previous in ("{", json.dumps({"due": {"models_past_window": 1}, "details": []})):
+            with self.subTest(previous_kind="json" if previous.endswith("}") else "malformed"):
+                checkout.due_file.write_text(previous)
+                code, stdout, stderr = checkout.run("--json")
+                self.assertEqual(code, 0, stderr)
+                self.assertNotEqual(checkout.due_file.read_text(), previous,
+                                    "known current counts must be persisted even when prior findings cannot be recovered")
+                saved = json.loads(checkout.due_file.read_text())
+                self.assertEqual(saved["due"]["stale_receipts"], 1)
+                self.assertEqual(saved["details"][-1]["model_inventory_findings"], "prior findings unavailable")
+                self.assertNotIn("models_past_window", saved["due"])
 
     def test_gap_remains_visible_when_counts_need_truncation(self):
         line = cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 10 ** 20),
@@ -940,9 +993,8 @@ class DetailsCommandTests(unittest.TestCase):
         self.assertTrue(line.endswith(f"; details: {cd.XDG_POINTER}"), line)
         self.assertLessEqual(len(line), 160)
         self.assertEqual(cd.XDG_POINTER, 'cat "$XDG_STATE_HOME"/native-agent-stack/currency-due.json')
-        # With nothing runnable that fits, the run fails rather than emit a non-runnable or over-long line.
-        with self.assertRaises(cd.CheckError):
-            cd.summary_line(due, too_long, pointers=[long_pointer])
+        # Without a real short pointer the notice omits the command; collection must still proceed.
+        self.assertEqual(cd.summary_line(due, too_long, pointers=[long_pointer]), "stack currency: 1 pin behind")
         # Nothing due never needs a command.
         self.assertEqual(cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 0), too_long, pointers=[long_pointer]),
                          "stack currency: nothing due")
@@ -984,10 +1036,8 @@ class DetailsCommandTests(unittest.TestCase):
                         document["summary_line"])
         self.assertEqual(self.reproduced(checkout, document)["due"], document["due"])
 
-    def test_no_runnable_command_at_all_fails_the_due_run_and_still_clears_a_stale_notice(self):
-        # A long checkout path with a long explicit state directory: nothing runnable fits the line, so a run with
-        # something due fails (exit 2, nothing written) instead of emitting a non-runnable line, while a run with
-        # nothing due still removes an obsolete due-file.
+    def test_no_short_command_still_writes_due_counts_and_clears_a_stale_notice(self):
+        # Long explicit paths may omit the inline command; the saved report retains its full runnable command.
         checkout = Checkout(self, "c" * 110)
         base = checkout.state.parent / ("s" * 140)
         base.mkdir(mode=0o700)
@@ -997,9 +1047,11 @@ class DetailsCommandTests(unittest.TestCase):
         self.assertFalse((base / "currency-due.json").exists())
         checkout.something_due()
         code, _, stderr = checkout.run("--state-dir", str(base))
-        self.assertEqual(code, 2, stderr)
-        self.assertIn("no runnable details command fits", stderr)
-        self.assertFalse((base / "currency-due.json").exists())
+        self.assertEqual(code, 0, stderr)
+        saved = json.loads((base / "currency-due.json").read_text())
+        self.assertEqual(saved["due"]["stale_receipts"], 2)
+        self.assertTrue(saved["details_command"])
+        self.assertLessEqual(len(saved["summary_line"]), cd.SUMMARY_LIMIT)
 
     def test_the_next_step_points_at_what_is_due(self):
         # A skill pin that drifted is not something scripts/adoption_status.py --pinned-versions can report.

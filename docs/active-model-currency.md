@@ -176,16 +176,20 @@ this source change makes no new native execution claim.
 
 Every `scripts/currency_due.py` collection invokes the offline check. A stale
 selector contributes a due notice and returns 1. An incomplete model report
-is a coverage gap, preserving other known counts
-and any existing due notice. The collector writes known nonzero counts and
-otherwise retains the prior due-file when a requested check cannot answer.
+is a coverage gap alongside the current known counts. The collector writes
+known nonzero counts and otherwise retains the prior due file when a requested
+check cannot answer. It does not carry old selector findings forward as current
+observations. Inventory-age findings have a separate retention rule: recoverable
+prior findings are carried forward with their origin during an inventory gap.
+Unreadable prior history is marked unavailable and does not block current counts.
 It exits 0 for a coverage-only gap and 1 when known stale model selectors exist;
 the model CLI itself still returns 2 for an incomplete comparison. The
 collector has eight possible counts: its five base counts, the conditional
 `surface_unreviewed` count, `stale_models`, and inventory-age `models_past_window`.
-An unknown model comparison
-adds the coverage message `model check incomplete`, preserving known counts
-and any earlier due-file.
+An unknown model comparison adds the coverage message `model check incomplete`.
+The 160-character session notice compacts gap phrases when needed and can omit
+an overlong inline command; its full command and coverage fields remain in the
+report. Notice length never prevents collection or persistence.
 
 The daily systemd units are repository templates, not evidence of installation.
 On this host the native systemd 259.5 readback returned `not-found` for

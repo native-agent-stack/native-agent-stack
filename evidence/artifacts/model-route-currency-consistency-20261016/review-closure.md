@@ -7,6 +7,15 @@ This table reports the implemented correction, not a new independent approval.
 Round 3 also addresses `MICRO-delta-94b4ba55.md`,
 `GPT-VERDICT-94b4ba551.md` and the newer `review_output.json`, named only.
 
+The small follow-up to `MICRO-delta-1b62f8e7.md` and its matching local review
+closes the notice-budget regression: three gaps compact before the budget is
+exhausted, and no fitting command means omitting the inline command rather than
+failing collection. Unreadable prior history no longer blocks writing current
+known counts, retained origins appear in text, and the preservation wording is
+aligned. Route-binding shape and PyPI mismatch guards now have explicit negative
+controls. The three-gap, prior-history and rendering failures were reproduced
+at `1b62f8e7d501846abb974622c89111f6f794ae9b` before the correction.
+
 | Round-3 finding | Disposition | Evidence or boundary |
 | --- | --- | --- |
 | Gateway proposal could borrow a valid route ID | Fixed | Registry entries declare route kind and exact retained identities; the C2 repository must agree. The gateway relabel fixture returned success before the fix and now fails. |
@@ -26,7 +35,7 @@ Round 3 also addresses `MICRO-delta-94b4ba55.md`,
 | C2 inline rows could bypass the shared route registry | Fixed | Every route ID resolves through the registry, and its inline inventory ID must agree. The unregistered-route fixture failed first; mismatch controls also fail closed. |
 | Duplicate, malformed and layer-count guards lacked tests | Covered | Existing code already rejected them. Six isolated guard-removal controls produced the expected assertion failures: duplicate binding 1, duplicate source 1, duplicate repository 1, GPT layer count 2, malformed binding 3, malformed source 3. No unexpected test errors; these are mutation controls, not baseline failures. |
 | Routing prefixes needed a primary citation | Fixed | OmniRoute v3.8.51 registry files at the full public pin declare `codex`/`cx` and `muse-code`/`mc`; cited in the code and decision. Prefix comparison does not establish route availability. |
-| Model inventory age findings stopped at publication output | Fixed, with round-3 persistence correction | Publication and the daily collector share `model_currency_due`; `models_past_window` persists detail and the session notice with exit 0. On an unreadable/invalid inventory, the last readable model findings are explicitly retained alongside new known counts and the visible gap. An unreadable previous due file is kept unchanged. The exact malformed-inventory plus stale-receipt case failed before this correction. |
+| Model inventory age findings stopped at publication output | Fixed, with persistence and notice-budget corrections | Publication and the daily collector share `model_currency_due`; `models_past_window` persists detail and the session notice with exit 0. Recoverable prior model findings are explicitly retained alongside new known counts and the gap. Unreadable prior history is marked unavailable and does not block current counts; an incomplete run with no known counts retains the prior file. The malformed-inventory/stale-receipt and three-gap cases failed before their corrections. |
 | Current guide still described age-based publication failure and the old background row | Fixed | The guide describes maintenance reporting and the held Haiku 5.5 proposal. Its regression failed before the correction. |
 | Edited October 7 record retained private source hashes/prefix | Fixed within the touched records | Two paragraphs cite the actual packet name only. The touched `fill-source-review.json` and `j826-checks.json` replace private packet/proposal hashes with names; command-output hashes were removed from `j826-checks.json`. The untouched `handbook-projection.json:40,47` and `fill-checks.json:59` retain pre-existing residue as history under addendum-22. No claim is made that all linked records are clean. Two tests first produced three failures, then passed; output contains counts/locators only. |
 | Provider claims lacked independent primary captures in the review package | Supplied for review | `UPSTREAM-PINS-20261016.json` indexes dated vendor excerpts separately from findings. Four `UPSTREAM-SRC-*.md` files and a reproducible public base-validator copy were supplied through the co-op. The Full capture is limited to the pinned public native receipt. |
