@@ -104,6 +104,9 @@ class DatabaseEnvironmentPolicyTests(unittest.TestCase):
                                        ledger=state/'ledger.jsonl')
                 observed=[]
                 def run(command,**kwargs):
+                    if command[:2]==['git','-C']:
+                        # The worktree status ns-run reads around an OpenCode attempt on the Claude route.
+                        return subprocess.CompletedProcess(command,0,stdout=b'',stderr=b'')
                     if profile.endswith('-claude'):
                         index=command.index('env')
                         child={item.split('=',1)[0]:item.split('=',1)[1] for item in command[index+1:]
