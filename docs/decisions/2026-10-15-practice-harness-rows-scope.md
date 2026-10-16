@@ -43,6 +43,17 @@ routed two memory rows here as PROPOSALs into the durable-memory and semantic-ra
 **Readiness:** both wait for model-routes, which decides the model behind each role: #1177 (the GPT half) and #1188 (the
 Claude half) merged. The wiring row also takes the durable-memory screen rows of #1193.
 
+At 21:13 ET the owner added that memory and local retrieval are a means of token efficiency. The command center's addendum 11
+to its 19:46Z direction (2026-10-16, a coordination record cited by name and date) routed two more items here:
+
+- **Token savings per role as a FINAL-wave criterion** (PROPOSAL, with the two memory rows): the durable-memory, semantic-rag
+  and token-efficiency rows measure, per role, the start-up and per-task token cost with and without the layer, so a memory or
+  retrieval winner shows its saving on our runs, not only its capability.
+- **The research-campaign row:** how a multi-runtime, multi-model campaign (the landscape-sweep workflow's Claude and GPT
+  halves, Muse as a TRIAL, DeerFlow, GPT Researcher, the merge, critics and blind judges) is launched, paced and sealed on the
+  new host, each mechanism cited at a pin or labelled PROPOSAL. Its mechanisms are this repository's own tools, so the row is
+  written from their sources at a pin; the new host's install of them is the install stage's (#1174).
+
 ## Step 1: layer verdicts read
 
 At `origin/main` 8053f14e7 (`catalogs/landscape/foundation.json`, every row `recorded`, wave 20260922 in

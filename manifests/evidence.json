@@ -19333,8 +19333,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-practice-harness-rows-scope.md",
-      "sha256": "f465c697c112a629e3e6182c5640d9943fb2b5813648bca51bf4c16e19ba03cf",
-      "bytes": 10515
+      "sha256": "81fac624ebc044e13d0bdbee4638af0ba3b71578c6b0aa4aee7dee06db259293",
+      "bytes": 11558
     },
     {
       "path": "docs/decisions/2026-10-15-unrun-registration-rules.md",
