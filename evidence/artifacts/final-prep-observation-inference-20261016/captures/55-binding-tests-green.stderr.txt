@@ -1,0 +1,13 @@
+test_all_five_fixture_files_match_sources_and_bracketed_smokes (test_archive_bindings.ArchiveBindingTests.test_all_five_fixture_files_match_sources_and_bracketed_smokes) ... ok
+test_claimed_verification_matches_all_three_release_digests_after_downloads (test_archive_bindings.ArchiveBindingTests.test_claimed_verification_matches_all_three_release_digests_after_downloads)
+Fails at 5e5d94bb's actual C10 claim; passes only after a new capture. ... ok
+test_each_archive_mismatch_is_rejected_even_with_valid_capture_hashes (test_archive_bindings.ArchiveBindingTests.test_each_archive_mismatch_is_rejected_even_with_valid_capture_hashes)
+Synthetic mutations of each public checksum; none is a native run. ... ok
+test_matching_digest_before_download_completion_is_rejected (test_archive_bindings.ArchiveBindingTests.test_matching_digest_before_download_completion_is_rejected)
+Synthetic ordering mutation independent of the digest comparison. ... ok
+test_retained_partial_download_capture_is_rejected (test_archive_bindings.ArchiveBindingTests.test_retained_partial_download_capture_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.296s
+
+OK

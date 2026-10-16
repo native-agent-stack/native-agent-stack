@@ -6,89 +6,109 @@
   "capture_class": "deterministically_masked_native_capture",
   "calls": [
     {
-      "id": "26-collector-upstream-config",
+      "id": "44-collector-upstream-config-bound",
       "claim": "native offline smoke",
       "command_rc": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/26-collector-upstream-config.json",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/44-collector-upstream-config-bound.json",
         "line": 14
       },
       "native_stdout": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/26-collector-upstream-config.stdout.txt",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/44-collector-upstream-config-bound.stdout.txt",
         "line": 1
       },
       "native_stderr": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/26-collector-upstream-config.stderr.txt",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/44-collector-upstream-config-bound.stderr.txt",
         "line": 1
       },
-      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior.",
+      "fixture_binding": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json",
+        "scope": "Before-file capture and post-smoke cmp bind actual inputs; original run has a historical binding GAP."
+      }
     },
     {
-      "id": "27-collector-repository-config",
+      "id": "45-collector-repository-config-bound",
       "claim": "native offline smoke",
       "command_rc": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/27-collector-repository-config.json",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/45-collector-repository-config-bound.json",
         "line": 15
       },
       "native_stdout": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/27-collector-repository-config.stdout.txt",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/45-collector-repository-config-bound.stdout.txt",
         "line": 1
       },
       "native_stderr": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/27-collector-repository-config.stderr.txt",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/45-collector-repository-config-bound.stderr.txt",
         "line": 1
       },
-      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior.",
+      "fixture_binding": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json",
+        "scope": "Before-file capture and post-smoke cmp bind actual inputs; original run has a historical binding GAP."
+      }
     },
     {
-      "id": "28-prometheus-upstream-config",
+      "id": "46-prometheus-upstream-config-bound",
       "claim": "native offline smoke",
       "command_rc": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/28-prometheus-upstream-config.json",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/46-prometheus-upstream-config-bound.json",
         "line": 15
       },
       "native_stdout": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/28-prometheus-upstream-config.stdout.txt",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/46-prometheus-upstream-config-bound.stdout.txt",
         "line": 1
       },
       "native_stderr": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/28-prometheus-upstream-config.stderr.txt",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/46-prometheus-upstream-config-bound.stderr.txt",
         "line": 1
       },
-      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior.",
+      "fixture_binding": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json",
+        "scope": "Shipped archive configuration; current content capture remains outside the five disputed fixture-file bindings."
+      }
     },
     {
-      "id": "29-prometheus-upstream-rule-test",
+      "id": "47-prometheus-rule-test-bound",
       "claim": "native upstream synthetic rule test",
       "command_rc": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/29-prometheus-upstream-rule-test.json",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/47-prometheus-rule-test-bound.json",
         "line": 15
       },
       "native_stdout": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/29-prometheus-upstream-rule-test.stdout.txt",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/47-prometheus-rule-test-bound.stdout.txt",
         "line": 1
       },
       "native_stderr": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/29-prometheus-upstream-rule-test.stderr.txt",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/47-prometheus-rule-test-bound.stderr.txt",
         "line": 1
       },
-      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior.",
+      "fixture_binding": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json",
+        "scope": "Before-file capture and post-smoke cmp bind actual inputs; original run has a historical binding GAP."
+      }
     },
     {
-      "id": "30-loki-upstream-config",
+      "id": "48-loki-config-bound",
       "claim": "native offline smoke",
       "command_rc": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/30-loki-upstream-config.json",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/48-loki-config-bound.json",
         "line": 14
       },
       "native_stdout": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/30-loki-upstream-config.stdout.txt",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/48-loki-config-bound.stdout.txt",
         "line": 1
       },
       "native_stderr": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/30-loki-upstream-config.stderr.txt",
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/48-loki-config-bound.stderr.txt",
         "line": 1
       },
-      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior.",
+      "fixture_binding": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json",
+        "scope": "Before-file capture and post-smoke cmp bind actual inputs; original run has a historical binding GAP."
+      }
     },
     {
       "id": "31-collector-version",
@@ -153,5 +173,29 @@
   "not_invoked_reason": "No live service or native runtime task was authorized by the common brief. Native CLI smoke is not production usage/counter reconciliation.",
   "final_evidence_eligible": false,
   "masking": "Unfiltered native stdout/stderr are retained privately and deterministically masked; no sed/first-line projections. Public hashes appear only in the capture envelopes and bind published derivative bytes.",
-  "raw_custody": "Private capture names are listed in capture-index.json; raw digests never published."
+  "raw_custody": "Private capture names are listed in capture-index.json; raw digests never published.",
+  "historical_calls": {
+    "ids": [
+      "26-collector-upstream-config",
+      "27-collector-repository-config",
+      "28-prometheus-upstream-config",
+      "29-prometheus-upstream-rule-test",
+      "30-loki-upstream-config"
+    ],
+    "scope": "Retained unchanged in captures/. Original input paths C26/C27/C29/C30 were not captured at their invocation time; historical input binding is GAP. They are superseded for current input-bound smoke support by C44/C45/C47/C48; no retroactive inference."
+  },
+  "fixture_bindings": {
+    "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json"
+  },
+  "archive_identity": {
+    "source": {
+      "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38-archive-checksums-sequential.stdout.txt",
+      "line": 1
+    },
+    "check": {
+      "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38b-archive-binding-green.stdout.txt",
+      "line": 1
+    },
+    "limitation": "C10 collector mismatch retained; only the later sequential capture supports equality."
+  }
 }

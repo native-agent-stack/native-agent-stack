@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "record_class": "derived_native_fixture_binding_index",
+  "hash_scope": "Every file hash is of the published masked stdout containing the complete actual file. Raw hashes remain private in native command envelopes. The private co-op reproduction compares native raw file reads too.",
+  "historical_gap": "Original C26/C27/C29/C30 did not capture input file bytes at their run time. Current snapshots cannot retroactively prove their historical inputs. Those runs are retained with this named GAP; new C44/C45/C47/C48 have before-read and after-cmp evidence.",
+  "bindings": [
+    {
+      "fixture_path": "<SCRATCH>/fixtures/otel-upstream.yaml",
+      "source_capture": "21-fixture-collector",
+      "read_capture": "39-fixture-collector-read",
+      "smoke_capture": "44-collector-upstream-config-bound",
+      "after_cmp_capture": "49-fixture-collector-unchanged",
+      "historical_capture_with_gap": "26-collector-upstream-config",
+      "published_file_sha256": "9a92a49383cf72c86419dc5da3ee7188859879bdad5265c1256aabd080d75585",
+      "published_file_bytes": 1758,
+      "hash_source": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/39-fixture-collector-read.json",
+        "line": 35
+      },
+      "source_bytes": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/21-fixture-collector.stdout.txt"
+      },
+      "actual_file_bytes": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/39-fixture-collector-read.stdout.txt"
+      },
+      "method": "Native cat captures the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. Published source and file bytes compare equal; verify_bindings.py checks timing/order and command return codes."
+    },
+    {
+      "fixture_path": "<SCRATCH>/fixtures/repository-collector.yaml",
+      "source_capture": "25-fixture-repository-collector",
+      "read_capture": "40-fixture-repository-collector-read",
+      "smoke_capture": "45-collector-repository-config-bound",
+      "after_cmp_capture": "50-fixture-repository-unchanged",
+      "historical_capture_with_gap": "27-collector-repository-config",
+      "published_file_sha256": "cdc11e88efb22a3cb883c14ffada133f044cab1a6a2d6efa95a1210c76daac7e",
+      "published_file_bytes": 52872,
+      "hash_source": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/40-fixture-repository-collector-read.json",
+        "line": 35
+      },
+      "source_bytes": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/25-fixture-repository-collector.stdout.txt"
+      },
+      "actual_file_bytes": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/40-fixture-repository-collector-read.stdout.txt"
+      },
+      "method": "Native cat captures the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. Published source and file bytes compare equal; verify_bindings.py checks timing/order and command return codes."
+    },
+    {
+      "fixture_path": "<SCRATCH>/fixtures/unittest.yml",
+      "source_capture": "22-fixture-prometheus-tests",
+      "read_capture": "41-fixture-rule-tests-read",
+      "smoke_capture": "47-prometheus-rule-test-bound",
+      "after_cmp_capture": "51-fixture-rule-tests-unchanged",
+      "historical_capture_with_gap": "29-prometheus-upstream-rule-test",
+      "published_file_sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7",
+      "published_file_bytes": 5626,
+      "hash_source": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/41-fixture-rule-tests-read.json",
+        "line": 35
+      },
+      "source_bytes": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt"
+      },
+      "actual_file_bytes": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/41-fixture-rule-tests-read.stdout.txt"
+      },
+      "method": "Native cat captures the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. Published source and file bytes compare equal; verify_bindings.py checks timing/order and command return codes."
+    },
+    {
+      "fixture_path": "<SCRATCH>/fixtures/rules.yml",
+      "source_capture": "23-fixture-prometheus-rules",
+      "read_capture": "42-fixture-rules-read",
+      "smoke_capture": "47-prometheus-rule-test-bound",
+      "after_cmp_capture": "52-fixture-rules-unchanged",
+      "historical_capture_with_gap": "29-prometheus-upstream-rule-test",
+      "published_file_sha256": "b64f5889a6bf3ab9648ea0f77e6d0767db872257b58fe344cfc80ee9ff3c1c07",
+      "published_file_bytes": 771,
+      "hash_source": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/42-fixture-rules-read.json",
+        "line": 35
+      },
+      "source_bytes": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/23-fixture-prometheus-rules.stdout.txt"
+      },
+      "actual_file_bytes": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/42-fixture-rules-read.stdout.txt"
+      },
+      "method": "Native cat captures the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. Published source and file bytes compare equal; verify_bindings.py checks timing/order and command return codes."
+    },
+    {
+      "fixture_path": "<SCRATCH>/fixtures/loki-upstream.yaml",
+      "source_capture": "24-fixture-loki",
+      "read_capture": "43-fixture-loki-read",
+      "smoke_capture": "48-loki-config-bound",
+      "after_cmp_capture": "53-fixture-loki-unchanged",
+      "historical_capture_with_gap": "30-loki-upstream-config",
+      "published_file_sha256": "b0512247b74062a2df69acdd26f1292fb7750d41330b3ee34d36d7511456ef90",
+      "published_file_bytes": 1558,
+      "hash_source": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/43-fixture-loki-read.json",
+        "line": 35
+      },
+      "source_bytes": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/24-fixture-loki.stdout.txt"
+      },
+      "actual_file_bytes": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/43-fixture-loki-read.stdout.txt"
+      },
+      "method": "Native cat captures the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. Published source and file bytes compare equal; verify_bindings.py checks timing/order and command return codes."
+    }
+  ]
+}

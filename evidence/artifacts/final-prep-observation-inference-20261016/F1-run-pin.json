@@ -152,10 +152,54 @@
         "Verdict 0.161.0 versus selected run/PATH/scratch qualification 0.162.0.",
         "Current run/stack source_commit is null; the existing 0.162.0 qualification and newly read tag identify ae8c507510f48f433ab47dd1c6b01a59d6c388b5.",
         "Distribution f6159a775dad1e21433c49bd8450673dd13ed4d3 and core 62cdad2ea133239380b44d20d84eb26e114779b6 are distinct repositories/identities, not substitutes for the contrib source commit.",
-        "Prior source screen #1192 considered newer 0.163.0 with an unbound distribution. That is not the current selected run or a reason to substitute a pin.",
-        "README deployed-version language and the existing release-tag CI hold do not establish actual service state; no service/unit was inspected."
+        "Prior screen at d4efff9d: observation-inference.anthropic.json:3469-3470 records v0.163.0/df849b54; :3735-3736 records the unbound distribution. Those candidate facts do not supersede the canonical 0.162.0 run.",
+        "README deployment wording (observability/README.md:30-31 at the base) and the release hold (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117 at the base) are historical text, not service-state observations. This lane inspected no service/unit."
       ],
-      "admission": "No new default, pin mutation or FINAL admission; proposal pending two-family review."
+      "admission": "No new default, pin mutation or FINAL admission; proposal pending two-family review.",
+      "drift_sources": [
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 3469
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 3470
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 3735
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 3736
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "observability/README.md",
+          "line": 30
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "observability/README.md",
+          "line": 31
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
+          "line": 117
+        }
+      ]
     },
     {
       "component_id": "prometheus",
@@ -485,5 +529,187 @@
       }
     }
   ],
-  "custody": "All native measurements point to labelled masked captures reproducible from private raw files with mask_capture.py. Earlier unretained summaries/projections are not used. Historical record facts remain source review."
+  "custody": "All native measurements point to labelled masked captures reproducible from private raw files with mask_capture.py. Earlier unretained summaries/projections are not used. Historical record facts remain source review.",
+  "survivor_pin_drift": [
+    {
+      "candidate_id": "mlx-lm",
+      "repository": "ml-explore/mlx-lm",
+      "canonical_carried_record": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7108
+        },
+        "line_end": 7110,
+        "fields_present": [
+          "date",
+          "repository",
+          "sweep_id"
+        ],
+        "run_pin": "ABSENT in this carried row; not a selected run"
+      },
+      "draft_candidate_pin": {
+        "value": "a9bd8af5c02118882af735cef60705d2efce9fd0",
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 2252
+        }
+      },
+      "drift": "Pin exists only in the public but unmerged #1192 candidate screen at d4efff9d. Current-base carried record provides no version/commit. This is an unresolved identity drift; no trial, selected run or canonical adoption is inferred.",
+      "status": "GAP pending two-family carry/pin adjudication"
+    },
+    {
+      "candidate_id": "llama-swap",
+      "repository": "mostlygeek/llama-swap",
+      "canonical_carried_record": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7113
+        },
+        "line_end": 7115,
+        "fields_present": [
+          "date",
+          "repository",
+          "sweep_id"
+        ],
+        "run_pin": "ABSENT in this carried row; not a selected run"
+      },
+      "draft_candidate_pin": {
+        "value": "d1e743fea64324c990e16e951ac2ea1678f02228",
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 2565
+        }
+      },
+      "drift": "Pin exists only in the public but unmerged #1192 candidate screen at d4efff9d. Current-base carried record provides no version/commit. This is an unresolved identity drift; no trial, selected run or canonical adoption is inferred.",
+      "status": "GAP pending two-family carry/pin adjudication"
+    },
+    {
+      "candidate_id": "dcgm-exporter",
+      "repository": "nvidia/dcgm-exporter",
+      "canonical_carried_record": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7118
+        },
+        "line_end": 7120,
+        "fields_present": [
+          "date",
+          "repository",
+          "sweep_id"
+        ],
+        "run_pin": "ABSENT in this carried row; not a selected run"
+      },
+      "draft_candidate_pin": {
+        "value": "fafd151148052628061a80450b4ee037a5fa0c3c",
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 2889
+        }
+      },
+      "drift": "Pin exists only in the public but unmerged #1192 candidate screen at d4efff9d. Current-base carried record provides no version/commit. This is an unresolved identity drift; no trial, selected run or canonical adoption is inferred.",
+      "status": "GAP pending two-family carry/pin adjudication"
+    },
+    {
+      "candidate_id": "ollama",
+      "repository": "ollama/ollama",
+      "canonical_carried_record": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7123
+        },
+        "line_end": 7125,
+        "fields_present": [
+          "date",
+          "repository",
+          "sweep_id"
+        ],
+        "run_pin": "ABSENT in this carried row; not a selected run"
+      },
+      "draft_candidate_pin": {
+        "value": "d919272e53593d1d55d40e1180eaa06dfbede3ac",
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 3185
+        }
+      },
+      "drift": "Pin exists only in the public but unmerged #1192 candidate screen at d4efff9d. Current-base carried record provides no version/commit. This is an unresolved identity drift; no trial, selected run or canonical adoption is inferred.",
+      "status": "GAP pending two-family carry/pin adjudication"
+    },
+    {
+      "candidate_id": "openllmetry",
+      "repository": "traceloop/openllmetry",
+      "canonical_carried_record": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7128
+        },
+        "line_end": 7130,
+        "fields_present": [
+          "date",
+          "repository",
+          "sweep_id"
+        ],
+        "run_pin": "ABSENT in this carried row; not a selected run"
+      },
+      "draft_candidate_pin": {
+        "value": "be498301c40c55155e6d0678b63943093cda14d1",
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 5045
+        }
+      },
+      "drift": "Pin exists only in the public but unmerged #1192 candidate screen at d4efff9d. Current-base carried record provides no version/commit. This is an unresolved identity drift; no trial, selected run or canonical adoption is inferred.",
+      "status": "GAP pending two-family carry/pin adjudication"
+    },
+    {
+      "candidate_id": "nvidia-gpu-exporter",
+      "repository": "utkuozdemir/nvidia_gpu_exporter",
+      "canonical_carried_record": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7133
+        },
+        "line_end": 7135,
+        "fields_present": [
+          "date",
+          "repository",
+          "sweep_id"
+        ],
+        "run_pin": "ABSENT in this carried row; not a selected run"
+      },
+      "draft_candidate_pin": {
+        "value": "87afc069c5ce6a37b13db58989ec0f30d9b87217",
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 5351
+        }
+      },
+      "drift": "Pin exists only in the public but unmerged #1192 candidate screen at d4efff9d. Current-base carried record provides no version/commit. This is an unresolved identity drift; no trial, selected run or canonical adoption is inferred.",
+      "status": "GAP pending two-family carry/pin adjudication"
+    }
+  ]
 }
