@@ -1,0 +1,6 @@
+
+> socraticode@1.16.0 build
+> tsc && node scripts/copy-assets.mjs
+
+copy-assets: /work/socraticode/src/assets → /work/socraticode/dist/assets
+copy-assets: /work/socraticode/src/services/gdscript-preflight.cjs → /work/socraticode/dist/services/gdscript-preflight.cjs

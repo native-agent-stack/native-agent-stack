@@ -1,0 +1,117 @@
+{"timestamp":"2026-10-16T05:40:50.841Z","level":"info","data":"Registered dynamic ast-grep languages","languages":["bash","c","cpp","csharp","dart","elixir","gdscript","go","java","kotlin","lua","php","python","ruby","rust","scala","swift"]}
+{"timestamp":"2026-10-16T05:40:51.355Z","level":"info","data":"Created metadata collection"}
+{"timestamp":"2026-10-16T05:40:51.418Z","level":"info","data":"Embedding config loaded","embeddingProvider":"ollama","ollamaMode":"auto","ollamaUrl":"http://localhost:11434","ollamaMaxConnections":4,"embeddingModel":"nomic-embed-text","embeddingDimensions":3,"embeddingContextLength":2048,"queryPrefix":"search_query: ","documentPrefix":"search_document: ","documentIncludesPath":true,"hasApiKey":false}
+{"timestamp":"2026-10-16T05:40:52.288Z","level":"info","data":"Collection did not exist, created fresh","collection":"codebase_ce004b2147b4"}
+{"timestamp":"2026-10-16T05:40:54.454Z","level":"info","data":"Saved project metadata","collName":"codebase_ce004b2147b4","projectPath":"/tmp/socraticode-interrupted-WyN1sQ/repo-updateProjectIndex","filesTotal":0,"filesIndexed":0,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:40:55.319Z","level":"info","data":"Saved project metadata","collName":"codebase_ce004b2147b4","projectPath":"/tmp/socraticode-interrupted-WyN1sQ/repo-updateProjectIndex","filesTotal":2,"filesIndexed":2,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:40:55.340Z","level":"info","data":"Saved project metadata","collName":"codebase_ce004b2147b4","projectPath":"/tmp/socraticode-interrupted-WyN1sQ/repo-updateProjectIndex","filesTotal":2,"filesIndexed":2,"indexingStatus":"completed"}
+{"timestamp":"2026-10-16T05:40:55.350Z","level":"info","data":"Building code graph","projectPath":"/tmp/socraticode-interrupted-WyN1sQ/repo-updateProjectIndex","fileCount":2}
+{"timestamp":"2026-10-16T05:40:55.363Z","level":"info","data":"Code graph built","nodes":2,"edges":0,"filesSkipped":0}
+{"timestamp":"2026-10-16T05:40:55.406Z","level":"info","data":"Saved code graph","graphCollName":"codegraph_ce004b2147b4","projectPath":"/tmp/socraticode-interrupted-WyN1sQ/repo-updateProjectIndex","nodes":2,"edges":0}
+{"timestamp":"2026-10-16T05:40:55.968Z","level":"info","data":"Created symbol-graph collection","name":"ce004b2147b4_symgraph_meta"}
+{"timestamp":"2026-10-16T05:40:56.761Z","level":"info","data":"Created symbol-graph collection","name":"ce004b2147b4_symgraph_index"}
+{"timestamp":"2026-10-16T05:40:57.566Z","level":"info","data":"Created symbol-graph collection","name":"ce004b2147b4_symgraph_file"}
+{"timestamp":"2026-10-16T05:40:57.640Z","level":"info","data":"Symbol graph persisted","projectId":"ce004b2147b4","files":2,"symbols":2,"edges":0,"unresolvedPct":"0.0"}
+{"timestamp":"2026-10-16T05:40:57.702Z","level":"info","data":"Deleting file chunks","collection":"codebase_ce004b2147b4","relativePath":"lost.ts"}
+{"timestamp":"2026-10-16T05:40:57.740Z","level":"info","data":"Saved project metadata","collName":"codebase_ce004b2147b4","projectPath":"/tmp/socraticode-interrupted-WyN1sQ/repo-updateProjectIndex","filesTotal":2,"filesIndexed":2,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:40:57.802Z","level":"info","data":"Reconciled hashes against stored points; files with no chunks will be re-indexed","projectId":"ce004b2147b4","collection":"codebase_ce004b2147b4","filesRestored":1,"hashesRemaining":1}
+{"timestamp":"2026-10-16T05:40:57.819Z","level":"info","data":"Saved project metadata","collName":"codebase_ce004b2147b4","projectPath":"/tmp/socraticode-interrupted-WyN1sQ/repo-updateProjectIndex","filesTotal":0,"filesIndexed":1,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:40:57.852Z","level":"info","data":"Saved project metadata","collName":"codebase_ce004b2147b4","projectPath":"/tmp/socraticode-interrupted-WyN1sQ/repo-updateProjectIndex","filesTotal":2,"filesIndexed":2,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:40:57.860Z","level":"info","data":"Saved project metadata","collName":"codebase_ce004b2147b4","projectPath":"/tmp/socraticode-interrupted-WyN1sQ/repo-updateProjectIndex","filesTotal":2,"filesIndexed":2,"indexingStatus":"completed"}
+{"timestamp":"2026-10-16T05:40:57.865Z","level":"info","data":"Rebuilding code graph","projectPath":"/tmp/socraticode-interrupted-WyN1sQ/repo-updateProjectIndex","reason":"files were added"}
+{"timestamp":"2026-10-16T05:40:57.868Z","level":"info","data":"Building code graph","projectPath":"/tmp/socraticode-interrupted-WyN1sQ/repo-updateProjectIndex","fileCount":2}
+{"timestamp":"2026-10-16T05:40:57.872Z","level":"info","data":"Code graph built","nodes":2,"edges":0,"filesSkipped":0}
+{"timestamp":"2026-10-16T05:40:57.895Z","level":"info","data":"Saved code graph","graphCollName":"codegraph_ce004b2147b4","projectPath":"/tmp/socraticode-interrupted-WyN1sQ/repo-updateProjectIndex","nodes":2,"edges":0}
+{"timestamp":"2026-10-16T05:40:58.000Z","level":"info","data":"Symbol graph persisted","projectId":"ce004b2147b4","files":2,"symbols":2,"edges":0,"unresolvedPct":"0.0"}
+{"timestamp":"2026-10-16T05:40:58.096Z","level":"warn","data":"Deleting project metadata","collName":"codebase_ce004b2147b4"}
+{"timestamp":"2026-10-16T05:40:58.100Z","level":"warn","data":"Deleting context metadata","contextCollName":"codebase_ce004b2147b4"}
+{"timestamp":"2026-10-16T05:40:58.104Z","level":"warn","data":"Deleting project metadata","collName":"codegraph_ce004b2147b4"}
+{"timestamp":"2026-10-16T05:40:58.109Z","level":"warn","data":"Deleting context metadata","contextCollName":"codegraph_ce004b2147b4"}
+{"timestamp":"2026-10-16T05:40:58.113Z","level":"warn","data":"Deleting project metadata","collName":"context_ce004b2147b4"}
+{"timestamp":"2026-10-16T05:40:58.118Z","level":"warn","data":"Deleting context metadata","contextCollName":"context_ce004b2147b4"}
+{"timestamp":"2026-10-16T05:40:59.006Z","level":"info","data":"Collection did not exist, created fresh","collection":"codebase_eaef2bf5de1d"}
+{"timestamp":"2026-10-16T05:40:59.024Z","level":"info","data":"Saved project metadata","collName":"codebase_eaef2bf5de1d","projectPath":"/tmp/socraticode-interrupted-Xnfrbd/repo-indexProject","filesTotal":0,"filesIndexed":0,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:41:02.094Z","level":"info","data":"Saved project metadata","collName":"codebase_eaef2bf5de1d","projectPath":"/tmp/socraticode-interrupted-Xnfrbd/repo-indexProject","filesTotal":2,"filesIndexed":2,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:41:02.112Z","level":"info","data":"Saved project metadata","collName":"codebase_eaef2bf5de1d","projectPath":"/tmp/socraticode-interrupted-Xnfrbd/repo-indexProject","filesTotal":2,"filesIndexed":2,"indexingStatus":"completed"}
+{"timestamp":"2026-10-16T05:41:02.115Z","level":"info","data":"Building code graph","projectPath":"/tmp/socraticode-interrupted-Xnfrbd/repo-indexProject","fileCount":2}
+{"timestamp":"2026-10-16T05:41:02.119Z","level":"info","data":"Code graph built","nodes":2,"edges":0,"filesSkipped":0}
+{"timestamp":"2026-10-16T05:41:02.148Z","level":"info","data":"Saved code graph","graphCollName":"codegraph_eaef2bf5de1d","projectPath":"/tmp/socraticode-interrupted-Xnfrbd/repo-indexProject","nodes":2,"edges":0}
+{"timestamp":"2026-10-16T05:41:02.943Z","level":"info","data":"Created symbol-graph collection","name":"eaef2bf5de1d_symgraph_file"}
+{"timestamp":"2026-10-16T05:41:03.776Z","level":"info","data":"Created symbol-graph collection","name":"eaef2bf5de1d_symgraph_meta"}
+{"timestamp":"2026-10-16T05:41:04.514Z","level":"info","data":"Created symbol-graph collection","name":"eaef2bf5de1d_symgraph_index"}
+{"timestamp":"2026-10-16T05:41:04.599Z","level":"info","data":"Symbol graph persisted","projectId":"eaef2bf5de1d","files":2,"symbols":2,"edges":0,"unresolvedPct":"0.0"}
+{"timestamp":"2026-10-16T05:41:04.650Z","level":"info","data":"Deleting file chunks","collection":"codebase_eaef2bf5de1d","relativePath":"lost.ts"}
+{"timestamp":"2026-10-16T05:41:04.673Z","level":"info","data":"Saved project metadata","collName":"codebase_eaef2bf5de1d","projectPath":"/tmp/socraticode-interrupted-Xnfrbd/repo-indexProject","filesTotal":2,"filesIndexed":2,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:41:04.737Z","level":"info","data":"Reconciled hashes against stored points; files with no chunks will be re-indexed","projectId":"eaef2bf5de1d","collection":"codebase_eaef2bf5de1d","filesRestored":1,"hashesRemaining":1}
+{"timestamp":"2026-10-16T05:41:05.007Z","level":"info","data":"Saved project metadata","collName":"codebase_eaef2bf5de1d","projectPath":"/tmp/socraticode-interrupted-Xnfrbd/repo-indexProject","filesTotal":0,"filesIndexed":1,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:41:05.034Z","level":"info","data":"Saved project metadata","collName":"codebase_eaef2bf5de1d","projectPath":"/tmp/socraticode-interrupted-Xnfrbd/repo-indexProject","filesTotal":2,"filesIndexed":2,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:41:05.057Z","level":"info","data":"Saved project metadata","collName":"codebase_eaef2bf5de1d","projectPath":"/tmp/socraticode-interrupted-Xnfrbd/repo-indexProject","filesTotal":2,"filesIndexed":2,"indexingStatus":"completed"}
+{"timestamp":"2026-10-16T05:41:05.060Z","level":"info","data":"Building code graph","projectPath":"/tmp/socraticode-interrupted-Xnfrbd/repo-indexProject","fileCount":2}
+{"timestamp":"2026-10-16T05:41:05.064Z","level":"info","data":"Code graph built","nodes":2,"edges":0,"filesSkipped":0}
+{"timestamp":"2026-10-16T05:41:05.074Z","level":"info","data":"Saved code graph","graphCollName":"codegraph_eaef2bf5de1d","projectPath":"/tmp/socraticode-interrupted-Xnfrbd/repo-indexProject","nodes":2,"edges":0}
+{"timestamp":"2026-10-16T05:41:05.169Z","level":"info","data":"Symbol graph persisted","projectId":"eaef2bf5de1d","files":2,"symbols":2,"edges":0,"unresolvedPct":"0.0"}
+{"timestamp":"2026-10-16T05:41:05.257Z","level":"warn","data":"Deleting project metadata","collName":"codebase_eaef2bf5de1d"}
+{"timestamp":"2026-10-16T05:41:05.262Z","level":"warn","data":"Deleting context metadata","contextCollName":"codebase_eaef2bf5de1d"}
+{"timestamp":"2026-10-16T05:41:05.266Z","level":"warn","data":"Deleting project metadata","collName":"codegraph_eaef2bf5de1d"}
+{"timestamp":"2026-10-16T05:41:05.270Z","level":"warn","data":"Deleting context metadata","contextCollName":"codegraph_eaef2bf5de1d"}
+{"timestamp":"2026-10-16T05:41:05.274Z","level":"warn","data":"Deleting project metadata","collName":"context_eaef2bf5de1d"}
+{"timestamp":"2026-10-16T05:41:05.281Z","level":"warn","data":"Deleting context metadata","contextCollName":"context_eaef2bf5de1d"}
+Preparing worktree (new branch 'feature')
+{"timestamp":"2026-10-16T05:41:06.400Z","level":"info","data":"Collection did not exist, created fresh","collection":"codebase_shared_worktree_recovery"}
+{"timestamp":"2026-10-16T05:41:06.412Z","level":"info","data":"Saved project metadata","collName":"codebase_shared_worktree_recovery","projectPath":"/tmp/socraticode-interrupted-yzvnsj/shared","filesTotal":0,"filesIndexed":0,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:41:08.679Z","level":"info","data":"Saved project metadata","collName":"codebase_shared_worktree_recovery","projectPath":"/tmp/socraticode-interrupted-yzvnsj/shared","filesTotal":2,"filesIndexed":2,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:41:08.695Z","level":"info","data":"Saved project metadata","collName":"codebase_shared_worktree_recovery","projectPath":"/tmp/socraticode-interrupted-yzvnsj/shared","filesTotal":2,"filesIndexed":2,"indexingStatus":"completed"}
+{"timestamp":"2026-10-16T05:41:08.699Z","level":"info","data":"Building code graph","projectPath":"/tmp/socraticode-interrupted-yzvnsj/shared","fileCount":2}
+{"timestamp":"2026-10-16T05:41:08.705Z","level":"info","data":"Code graph built","nodes":2,"edges":0,"filesSkipped":0}
+{"timestamp":"2026-10-16T05:41:08.720Z","level":"info","data":"Saved code graph","graphCollName":"codegraph_shared_worktree_recovery","projectPath":"/tmp/socraticode-interrupted-yzvnsj/shared","nodes":2,"edges":0}
+{"timestamp":"2026-10-16T05:41:09.245Z","level":"info","data":"Created symbol-graph collection","name":"shared_worktree_recovery_symgraph_meta"}
+{"timestamp":"2026-10-16T05:41:09.791Z","level":"info","data":"Created symbol-graph collection","name":"shared_worktree_recovery_symgraph_file"}
+{"timestamp":"2026-10-16T05:41:10.254Z","level":"info","data":"Created symbol-graph collection","name":"shared_worktree_recovery_symgraph_index"}
+{"timestamp":"2026-10-16T05:41:10.316Z","level":"info","data":"Symbol graph persisted","projectId":"shared_worktree_recovery","files":2,"symbols":2,"edges":0,"unresolvedPct":"0.0"}
+{"timestamp":"2026-10-16T05:41:10.370Z","level":"info","data":"Deleting file chunks","collection":"codebase_shared_worktree_recovery","relativePath":"only-in-main.ts"}
+{"timestamp":"2026-10-16T05:41:10.389Z","level":"info","data":"Saved project metadata","collName":"codebase_shared_worktree_recovery","projectPath":"/tmp/socraticode-interrupted-yzvnsj/shared-worktree","filesTotal":2,"filesIndexed":2,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:41:10.453Z","level":"info","data":"Reconciled hashes against stored points; files with no chunks will be re-indexed","projectId":"shared_worktree_recovery","collection":"codebase_shared_worktree_recovery","filesRestored":1,"hashesRemaining":1}
+{"timestamp":"2026-10-16T05:41:10.624Z","level":"info","data":"Saved project metadata","collName":"codebase_shared_worktree_recovery","projectPath":"/tmp/socraticode-interrupted-yzvnsj/shared","filesTotal":0,"filesIndexed":1,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:41:10.664Z","level":"info","data":"Saved project metadata","collName":"codebase_shared_worktree_recovery","projectPath":"/tmp/socraticode-interrupted-yzvnsj/shared","filesTotal":2,"filesIndexed":2,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:41:10.675Z","level":"info","data":"Saved project metadata","collName":"codebase_shared_worktree_recovery","projectPath":"/tmp/socraticode-interrupted-yzvnsj/shared","filesTotal":2,"filesIndexed":2,"indexingStatus":"completed"}
+{"timestamp":"2026-10-16T05:41:10.678Z","level":"info","data":"Building code graph","projectPath":"/tmp/socraticode-interrupted-yzvnsj/shared","fileCount":2}
+{"timestamp":"2026-10-16T05:41:10.681Z","level":"info","data":"Code graph built","nodes":2,"edges":0,"filesSkipped":0}
+{"timestamp":"2026-10-16T05:41:10.690Z","level":"info","data":"Saved code graph","graphCollName":"codegraph_shared_worktree_recovery","projectPath":"/tmp/socraticode-interrupted-yzvnsj/shared","nodes":2,"edges":0}
+{"timestamp":"2026-10-16T05:41:10.765Z","level":"info","data":"Symbol graph persisted","projectId":"shared_worktree_recovery","files":2,"symbols":2,"edges":0,"unresolvedPct":"0.0"}
+{"timestamp":"2026-10-16T05:41:10.851Z","level":"warn","data":"Deleting project metadata","collName":"codebase_shared_worktree_recovery"}
+{"timestamp":"2026-10-16T05:41:10.862Z","level":"warn","data":"Deleting context metadata","contextCollName":"codebase_shared_worktree_recovery"}
+{"timestamp":"2026-10-16T05:41:10.866Z","level":"warn","data":"Deleting project metadata","collName":"codegraph_shared_worktree_recovery"}
+{"timestamp":"2026-10-16T05:41:10.870Z","level":"warn","data":"Deleting context metadata","contextCollName":"codegraph_shared_worktree_recovery"}
+{"timestamp":"2026-10-16T05:41:10.874Z","level":"warn","data":"Deleting project metadata","collName":"context_shared_worktree_recovery"}
+{"timestamp":"2026-10-16T05:41:10.878Z","level":"warn","data":"Deleting context metadata","contextCollName":"context_shared_worktree_recovery"}
+{"timestamp":"2026-10-16T05:41:11.755Z","level":"info","data":"Collection did not exist, created fresh","collection":"codebase_6d47a0de92dc"}
+{"timestamp":"2026-10-16T05:41:11.822Z","level":"info","data":"Saved project metadata","collName":"codebase_6d47a0de92dc","projectPath":"/tmp/socraticode-interrupted-KG8QL8/healthy","filesTotal":0,"filesIndexed":0,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:41:13.731Z","level":"info","data":"Saved project metadata","collName":"codebase_6d47a0de92dc","projectPath":"/tmp/socraticode-interrupted-KG8QL8/healthy","filesTotal":1,"filesIndexed":1,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:41:13.741Z","level":"info","data":"Saved project metadata","collName":"codebase_6d47a0de92dc","projectPath":"/tmp/socraticode-interrupted-KG8QL8/healthy","filesTotal":1,"filesIndexed":1,"indexingStatus":"completed"}
+{"timestamp":"2026-10-16T05:41:13.744Z","level":"info","data":"Building code graph","projectPath":"/tmp/socraticode-interrupted-KG8QL8/healthy","fileCount":1}
+{"timestamp":"2026-10-16T05:41:13.746Z","level":"info","data":"Code graph built","nodes":1,"edges":0,"filesSkipped":0}
+{"timestamp":"2026-10-16T05:41:13.758Z","level":"info","data":"Saved code graph","graphCollName":"codegraph_6d47a0de92dc","projectPath":"/tmp/socraticode-interrupted-KG8QL8/healthy","nodes":1,"edges":0}
+{"timestamp":"2026-10-16T05:41:14.469Z","level":"info","data":"Created symbol-graph collection","name":"6d47a0de92dc_symgraph_index"}
+{"timestamp":"2026-10-16T05:41:15.007Z","level":"info","data":"Created symbol-graph collection","name":"6d47a0de92dc_symgraph_file"}
+{"timestamp":"2026-10-16T05:41:15.531Z","level":"info","data":"Created symbol-graph collection","name":"6d47a0de92dc_symgraph_meta"}
+{"timestamp":"2026-10-16T05:41:15.581Z","level":"info","data":"Symbol graph persisted","projectId":"6d47a0de92dc","files":1,"symbols":1,"edges":0,"unresolvedPct":"0.0"}
+{"timestamp":"2026-10-16T05:41:15.654Z","level":"info","data":"Saved project metadata","collName":"codebase_6d47a0de92dc","projectPath":"/tmp/socraticode-interrupted-KG8QL8/healthy","filesTotal":0,"filesIndexed":1,"indexingStatus":"in-progress"}
+{"timestamp":"2026-10-16T05:41:15.674Z","level":"info","data":"Saved project metadata","collName":"codebase_6d47a0de92dc","projectPath":"/tmp/socraticode-interrupted-KG8QL8/healthy","filesTotal":1,"filesIndexed":1,"indexingStatus":"completed"}
+{"timestamp":"2026-10-16T05:41:15.715Z","level":"warn","data":"Deleting project metadata","collName":"codebase_6d47a0de92dc"}
+{"timestamp":"2026-10-16T05:41:15.718Z","level":"warn","data":"Deleting context metadata","contextCollName":"codebase_6d47a0de92dc"}
+{"timestamp":"2026-10-16T05:41:15.721Z","level":"warn","data":"Deleting project metadata","collName":"codegraph_6d47a0de92dc"}
+{"timestamp":"2026-10-16T05:41:15.725Z","level":"warn","data":"Deleting context metadata","contextCollName":"codegraph_6d47a0de92dc"}
+{"timestamp":"2026-10-16T05:41:15.729Z","level":"warn","data":"Deleting project metadata","collName":"context_6d47a0de92dc"}
+{"timestamp":"2026-10-16T05:41:15.734Z","level":"warn","data":"Deleting context metadata","contextCollName":"context_6d47a0de92dc"}
+{"timestamp":"2026-10-16T05:41:16.513Z","level":"info","data":"Embedding config loaded","embeddingProvider":"ollama","ollamaMode":"auto","ollamaUrl":"http://localhost:11434","ollamaMaxConnections":4,"embeddingModel":"nomic-embed-text","embeddingDimensions":768,"embeddingContextLength":2048,"queryPrefix":"search_query: ","documentPrefix":"search_document: ","documentIncludesPath":true,"hasApiKey":false}
+{"timestamp":"2026-10-16T05:41:17.438Z","level":"warn","data":"Qdrant upsert batch 1 failed (attempt 1/3), retrying in 500ms","error":"Bad Request"}
+{"timestamp":"2026-10-16T05:41:17.945Z","level":"warn","data":"Qdrant upsert batch 1 failed (attempt 2/3), retrying in 1000ms","error":"Bad Request"}
+{"timestamp":"2026-10-16T05:41:18.955Z","level":"warn","data":"Qdrant upsert batch 1 failed, falling back to per-point upsert to isolate failures","error":"Bad Request","pointCount":2}
+{"timestamp":"2026-10-16T05:41:19.026Z","level":"warn","data":"Skipping point that failed upsert","pointId":"<UUID>","filePath":"src/lost.ts","error":"Bad Request"}
+{"timestamp":"2026-10-16T05:41:19.027Z","level":"warn","data":"Qdrant upsert batch 1: 1/2 points skipped due to errors"}
+{"timestamp":"2026-10-16T05:41:19.153Z","level":"info","data":"Saved project metadata","collName":"codebase_e3d27bbbe4ec","projectPath":"/tmp/socraticode-partial-upsert-integration","filesTotal":1,"filesIndexed":1,"indexingStatus":"completed"}
+{"timestamp":"2026-10-16T05:41:19.157Z","level":"warn","data":"Qdrant upsert batch 1 failed (attempt 1/3), retrying in 500ms","error":"Bad Request"}
+{"timestamp":"2026-10-16T05:41:19.662Z","level":"warn","data":"Qdrant upsert batch 1 failed (attempt 2/3), retrying in 1000ms","error":"Bad Request"}
+{"timestamp":"2026-10-16T05:41:20.670Z","level":"warn","data":"Qdrant upsert batch 1 failed, falling back to per-point upsert to isolate failures","error":"Bad Request","pointCount":2}
+{"timestamp":"2026-10-16T05:41:20.703Z","level":"warn","data":"Skipping point that failed upsert","pointId":"<UUID>","filePath":"src/lost.ts","error":"Bad Request"}
+{"timestamp":"2026-10-16T05:41:20.703Z","level":"warn","data":"Qdrant upsert batch 1: 1/2 points skipped due to errors"}

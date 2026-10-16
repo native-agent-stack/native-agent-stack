@@ -1,0 +1,404 @@
+           _                 _    
+  __ _  __| |_ __ __ _ _ __ | |_  
+ / _` |/ _` | '__/ _` | '_ \| __| 
+| (_| | (_| | | | (_| | | | | |_  
+ \__, |\__,_|_|  \__,_|_| |_|\__| 
+    |_|                           
+
+Version: 1.19.1, build: 6ab21cac
+Access web UI at http://localhost:6333/dashboard
+Agentic Skills: https://skills.qdrant.tech/
+
+2026-10-16T05:40:47.838783Z  WARN qdrant::settings: Config file not found: config/config
+2026-10-16T05:40:47.838837Z  WARN qdrant::settings: Config file not found: config/development
+2026-10-16T05:40:47.838989Z  INFO storage::content_manager::consensus::persistent: Loading raft state from /work/qdrant-offline/storage/raft_state.json
+2026-10-16T05:40:47.862625Z  INFO qdrant: Distributed mode disabled
+2026-10-16T05:40:47.862668Z  INFO qdrant: Telemetry reporting disabled
+2026-10-16T05:40:47.873578Z  WARN qdrant::actix::web_ui: Static content folder for Web UI './static' does not exist
+2026-10-16T05:40:47.873678Z  INFO qdrant::actix: REST transport settings: keep_alive=5s, client_request_timeout=5s, client_disconnect_timeout=5s
+2026-10-16T05:40:47.873688Z  INFO qdrant::actix: TLS disabled for REST API
+2026-10-16T05:40:47.885685Z  INFO qdrant::tonic: Qdrant gRPC listening on 6334
+2026-10-16T05:40:47.885728Z  INFO qdrant::tonic: TLS disabled for gRPC API
+2026-10-16T05:40:47.897226Z  INFO qdrant::actix: Qdrant HTTP listening on 6333
+2026-10-16T05:40:47.897263Z  INFO actix_server::builder: starting 63 workers
+2026-10-16T05:40:47.897285Z  INFO actix_server::server: Actix runtime found; starting in Actix runtime
+2026-10-16T05:40:47.897290Z  INFO actix_server::server: starting service: "actix-web-service-0.0.0.0:6333", workers: 63, listening on: 0.0.0.0:6333
+2026-10-16T05:40:50.768857Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 81 "-" "qdrant-js/1.18.0" 0.000348
+2026-10-16T05:40:50.853776Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 81 "-" "qdrant-js/1.18.0" 0.000216
+2026-10-16T05:40:50.860321Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection socraticode_metadata
+2026-10-16T05:40:51.352692Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.492703
+2026-10-16T05:40:51.401287Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.044451
+2026-10-16T05:40:51.410911Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.002317
+2026-10-16T05:40:51.414315Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_ce004b2147b4 HTTP/1.1" 404 114 "-" "qdrant-js/1.18.0" 0.000284
+2026-10-16T05:40:51.420761Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 98 "-" "qdrant-js/1.18.0" 0.000193
+2026-10-16T05:40:51.424544Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection codebase_ce004b2147b4
+2026-10-16T05:40:52.061763Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_ce004b2147b4 HTTP/1.1" 200 70 "-" "qdrant-js/1.18.0" 0.637437
+2026-10-16T05:40:52.116389Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_ce004b2147b4/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.048754
+2026-10-16T05:40:52.185716Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_ce004b2147b4/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.117477
+2026-10-16T05:40:52.233577Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_ce004b2147b4/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.165032
+2026-10-16T05:40:52.287384Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_ce004b2147b4/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.218443
+2026-10-16T05:40:54.450033Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 2.159291
+2026-10-16T05:40:55.298945Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_ce004b2147b4/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.816692
+2026-10-16T05:40:55.315880Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.008747
+2026-10-16T05:40:55.333287Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.005917
+2026-10-16T05:40:55.404696Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.007629
+2026-10-16T05:40:55.412715Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 122 "-" "qdrant-js/1.18.0" 0.000263
+2026-10-16T05:40:55.413027Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 122 "-" "qdrant-js/1.18.0" 0.000406
+2026-10-16T05:40:55.413085Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 122 "-" "qdrant-js/1.18.0" 0.000488
+2026-10-16T05:40:55.421236Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection ce004b2147b4_symgraph_meta
+2026-10-16T05:40:55.421564Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection ce004b2147b4_symgraph_index
+2026-10-16T05:40:55.421796Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection ce004b2147b4_symgraph_file
+2026-10-16T05:40:55.966848Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/ce004b2147b4_symgraph_meta HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.545783
+2026-10-16T05:40:56.756956Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/ce004b2147b4_symgraph_index HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 1.335516
+2026-10-16T05:40:57.564033Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/ce004b2147b4_symgraph_file HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 2.142381
+2026-10-16T05:40:57.576284Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/ce004b2147b4_symgraph_file/points?wait=true HTTP/1.1" 200 90 "-" "qdrant-js/1.18.0" 0.005736
+2026-10-16T05:40:57.581892Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ce004b2147b4_symgraph_index/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.000970
+2026-10-16T05:40:57.597982Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/ce004b2147b4_symgraph_index/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.009981
+2026-10-16T05:40:57.605803Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ce004b2147b4_symgraph_index/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.000723
+2026-10-16T05:40:57.615378Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/ce004b2147b4_symgraph_index/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.006229
+2026-10-16T05:40:57.624860Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/ce004b2147b4_symgraph_meta/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.004945
+2026-10-16T05:40:57.633233Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ce004b2147b4_symgraph_file/points/scroll HTTP/1.1" 200 204 "-" "qdrant-js/1.18.0" 0.002342
+2026-10-16T05:40:57.638350Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ce004b2147b4_symgraph_index/points/scroll HTTP/1.1" 200 204 "-" "qdrant-js/1.18.0" 0.000978
+2026-10-16T05:40:57.644568Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_ce004b2147b4 HTTP/1.1" 200 547 "-" "qdrant-js/1.18.0" 0.000772
+2026-10-16T05:40:57.696720Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_ce004b2147b4/points/scroll HTTP/1.1" 200 190 "-" "qdrant-js/1.18.0" 0.001087
+2026-10-16T05:40:57.706366Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_ce004b2147b4/points/delete HTTP/1.1" 200 93 "-" "qdrant-js/1.18.0" 0.001520
+2026-10-16T05:40:57.712461Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 567 "-" "qdrant-js/1.18.0" 0.000883
+2026-10-16T05:40:57.717456Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 567 "-" "qdrant-js/1.18.0" 0.001180
+2026-10-16T05:40:57.736689Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.014936
+2026-10-16T05:40:57.742525Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_ce004b2147b4/points/scroll HTTP/1.1" 200 155 "-" "qdrant-js/1.18.0" 0.000931
+2026-10-16T05:40:57.749298Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_ce004b2147b4 HTTP/1.1" 200 546 "-" "qdrant-js/1.18.0" 0.000750
+2026-10-16T05:40:57.796167Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 567 "-" "qdrant-js/1.18.0" 0.000784
+2026-10-16T05:40:57.800630Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_ce004b2147b4/points/scroll HTTP/1.1" 200 155 "-" "qdrant-js/1.18.0" 0.000595
+2026-10-16T05:40:57.805701Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 569 "-" "qdrant-js/1.18.0" 0.000727
+2026-10-16T05:40:57.817521Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.007941
+2026-10-16T05:40:57.835983Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_ce004b2147b4/points?wait=true HTTP/1.1" 200 93 "-" "qdrant-js/1.18.0" 0.009087
+2026-10-16T05:40:57.849266Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 90 "-" "qdrant-js/1.18.0" 0.009307
+2026-10-16T05:40:57.858416Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.004712
+2026-10-16T05:40:57.863388Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 337 "-" "qdrant-js/1.18.0" 0.000904
+2026-10-16T05:40:57.893163Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.018778
+2026-10-16T05:40:57.906619Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/ce004b2147b4_symgraph_file/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.007718
+2026-10-16T05:40:57.911683Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ce004b2147b4_symgraph_index/points HTTP/1.1" 200 67 "-" "qdrant-js/1.18.0" 0.001256
+2026-10-16T05:40:57.921456Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/ce004b2147b4_symgraph_index/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.005761
+2026-10-16T05:40:57.926554Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ce004b2147b4_symgraph_index/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.000625
+2026-10-16T05:40:57.942575Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/ce004b2147b4_symgraph_index/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.005040
+2026-10-16T05:40:57.951568Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/ce004b2147b4_symgraph_meta/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.004344
+2026-10-16T05:40:57.957679Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ce004b2147b4_symgraph_file/points/scroll HTTP/1.1" 200 283 "-" "qdrant-js/1.18.0" 0.000881
+2026-10-16T05:40:57.969857Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ce004b2147b4_symgraph_index/points/scroll HTTP/1.1" 200 281 "-" "qdrant-js/1.18.0" 0.001558
+2026-10-16T05:40:57.982651Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ce004b2147b4_symgraph_file/points/delete?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.004735
+2026-10-16T05:40:57.996713Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ce004b2147b4_symgraph_index/points/delete?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.006952
+2026-10-16T05:40:58.004206Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_ce004b2147b4/points/scroll HTTP/1.1" 200 190 "-" "qdrant-js/1.18.0" 0.000932
+2026-10-16T05:40:58.006556Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_ce004b2147b4 HTTP/1.1" 200 550 "-" "qdrant-js/1.18.0" 0.000669
+2026-10-16T05:40:58.055227Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection codebase_ce004b2147b4
+2026-10-16T05:40:58.087926Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/codebase_ce004b2147b4 HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.032857
+2026-10-16T05:40:58.091312Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection codegraph_ce004b2147b4
+2026-10-16T05:40:58.091652Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/codegraph_ce004b2147b4 HTTP/1.1" 200 72 "-" "qdrant-js/1.18.0" 0.000434
+2026-10-16T05:40:58.093831Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection context_ce004b2147b4
+2026-10-16T05:40:58.093986Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/context_ce004b2147b4 HTTP/1.1" 200 72 "-" "qdrant-js/1.18.0" 0.000233
+2026-10-16T05:40:58.098856Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.000905
+2026-10-16T05:40:58.102962Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.000737
+2026-10-16T05:40:58.107657Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.000955
+2026-10-16T05:40:58.112103Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.000934
+2026-10-16T05:40:58.115812Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.000873
+2026-10-16T05:40:58.121332Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.000900
+2026-10-16T05:40:58.136647Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 137 "-" "qdrant-js/1.18.0" 0.000213
+2026-10-16T05:40:58.178700Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.039439
+2026-10-16T05:40:58.186406Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.000925
+2026-10-16T05:40:58.190165Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_eaef2bf5de1d HTTP/1.1" 404 114 "-" "qdrant-js/1.18.0" 0.000319
+2026-10-16T05:40:58.193089Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 138 "-" "qdrant-js/1.18.0" 0.000201
+2026-10-16T05:40:58.195604Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection codebase_eaef2bf5de1d
+2026-10-16T05:40:58.800613Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_eaef2bf5de1d HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.605235
+2026-10-16T05:40:58.843608Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_eaef2bf5de1d/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.038258
+2026-10-16T05:40:58.890055Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_eaef2bf5de1d/index HTTP/1.1" 200 93 "-" "qdrant-js/1.18.0" 0.084430
+2026-10-16T05:40:58.937257Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_eaef2bf5de1d/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.131339
+2026-10-16T05:40:59.004026Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_eaef2bf5de1d/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.197530
+2026-10-16T05:40:59.023075Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.015488
+2026-10-16T05:41:02.076342Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_eaef2bf5de1d/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 3.045136
+2026-10-16T05:41:02.092849Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.012742
+2026-10-16T05:41:02.110249Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.013700
+2026-10-16T05:41:02.146692Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.025379
+2026-10-16T05:41:02.150401Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 155 "-" "qdrant-js/1.18.0" 0.000246
+2026-10-16T05:41:02.150534Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 154 "-" "qdrant-js/1.18.0" 0.000160
+2026-10-16T05:41:02.150578Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 154 "-" "qdrant-js/1.18.0" 0.000184
+2026-10-16T05:41:02.153952Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection eaef2bf5de1d_symgraph_file
+2026-10-16T05:41:02.154191Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection eaef2bf5de1d_symgraph_meta
+2026-10-16T05:41:02.154476Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection eaef2bf5de1d_symgraph_index
+2026-10-16T05:41:02.942253Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/eaef2bf5de1d_symgraph_file HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.788476
+2026-10-16T05:41:03.773709Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/eaef2bf5de1d_symgraph_meta HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 1.619671
+2026-10-16T05:41:04.512917Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/eaef2bf5de1d_symgraph_index HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 2.358527
+2026-10-16T05:41:04.529618Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/eaef2bf5de1d_symgraph_file/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.010373
+2026-10-16T05:41:04.540329Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/eaef2bf5de1d_symgraph_index/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.001019
+2026-10-16T05:41:04.553220Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/eaef2bf5de1d_symgraph_index/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.009921
+2026-10-16T05:41:04.558592Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/eaef2bf5de1d_symgraph_index/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.000907
+2026-10-16T05:41:04.571326Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/eaef2bf5de1d_symgraph_index/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.008123
+2026-10-16T05:41:04.585243Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/eaef2bf5de1d_symgraph_meta/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.007227
+2026-10-16T05:41:04.589978Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/eaef2bf5de1d_symgraph_file/points/scroll HTTP/1.1" 200 204 "-" "qdrant-js/1.18.0" 0.001162
+2026-10-16T05:41:04.596947Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/eaef2bf5de1d_symgraph_index/points/scroll HTTP/1.1" 200 204 "-" "qdrant-js/1.18.0" 0.002351
+2026-10-16T05:41:04.603095Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_eaef2bf5de1d HTTP/1.1" 200 549 "-" "qdrant-js/1.18.0" 0.000877
+2026-10-16T05:41:04.647886Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_eaef2bf5de1d/points/scroll HTTP/1.1" 200 190 "-" "qdrant-js/1.18.0" 0.000880
+2026-10-16T05:41:04.653670Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_eaef2bf5de1d/points/delete HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.001348
+2026-10-16T05:41:04.657952Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 563 "-" "qdrant-js/1.18.0" 0.000804
+2026-10-16T05:41:04.661658Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 563 "-" "qdrant-js/1.18.0" 0.000926
+2026-10-16T05:41:04.671583Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.006400
+2026-10-16T05:41:04.676251Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_eaef2bf5de1d/points/scroll HTTP/1.1" 200 155 "-" "qdrant-js/1.18.0" 0.001099
+2026-10-16T05:41:04.679937Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_eaef2bf5de1d HTTP/1.1" 200 549 "-" "qdrant-js/1.18.0" 0.000824
+2026-10-16T05:41:04.731377Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 565 "-" "qdrant-js/1.18.0" 0.000753
+2026-10-16T05:41:04.735457Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_eaef2bf5de1d/points/scroll HTTP/1.1" 200 155 "-" "qdrant-js/1.18.0" 0.000817
+2026-10-16T05:41:04.739877Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 565 "-" "qdrant-js/1.18.0" 0.000685
+2026-10-16T05:41:04.742365Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 170 "-" "qdrant-js/1.18.0" 0.000218
+2026-10-16T05:41:04.811572Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_eaef2bf5de1d/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.064929
+2026-10-16T05:41:04.856899Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_eaef2bf5de1d/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.110279
+2026-10-16T05:41:04.930219Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_eaef2bf5de1d/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.183443
+2026-10-16T05:41:04.990555Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_eaef2bf5de1d/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.243180
+2026-10-16T05:41:05.005285Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.011365
+2026-10-16T05:41:05.019189Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_eaef2bf5de1d/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.006364
+2026-10-16T05:41:05.032419Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.009639
+2026-10-16T05:41:05.055724Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.019196
+2026-10-16T05:41:05.072545Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.006334
+2026-10-16T05:41:05.087204Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/eaef2bf5de1d_symgraph_file/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.008344
+2026-10-16T05:41:05.091181Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/eaef2bf5de1d_symgraph_index/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.000792
+2026-10-16T05:41:05.101371Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/eaef2bf5de1d_symgraph_index/points?wait=true HTTP/1.1" 200 90 "-" "qdrant-js/1.18.0" 0.008089
+2026-10-16T05:41:05.107009Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/eaef2bf5de1d_symgraph_index/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.001046
+2026-10-16T05:41:05.125528Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/eaef2bf5de1d_symgraph_index/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.012613
+2026-10-16T05:41:05.135039Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/eaef2bf5de1d_symgraph_meta/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.005714
+2026-10-16T05:41:05.139693Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/eaef2bf5de1d_symgraph_file/points/scroll HTTP/1.1" 200 282 "-" "qdrant-js/1.18.0" 0.001232
+2026-10-16T05:41:05.143995Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/eaef2bf5de1d_symgraph_index/points/scroll HTTP/1.1" 200 281 "-" "qdrant-js/1.18.0" 0.001244
+2026-10-16T05:41:05.155387Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/eaef2bf5de1d_symgraph_file/points/delete?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.007724
+2026-10-16T05:41:05.167076Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/eaef2bf5de1d_symgraph_index/points/delete?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.008874
+2026-10-16T05:41:05.173086Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_eaef2bf5de1d/points/scroll HTTP/1.1" 200 190 "-" "qdrant-js/1.18.0" 0.000777
+2026-10-16T05:41:05.177165Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_eaef2bf5de1d HTTP/1.1" 200 547 "-" "qdrant-js/1.18.0" 0.000987
+2026-10-16T05:41:05.228003Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection codebase_eaef2bf5de1d
+2026-10-16T05:41:05.245962Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/codebase_eaef2bf5de1d HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.018163
+2026-10-16T05:41:05.249819Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection codegraph_eaef2bf5de1d
+2026-10-16T05:41:05.250031Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/codegraph_eaef2bf5de1d HTTP/1.1" 200 72 "-" "qdrant-js/1.18.0" 0.000340
+2026-10-16T05:41:05.255700Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection context_eaef2bf5de1d
+2026-10-16T05:41:05.255971Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/context_eaef2bf5de1d HTTP/1.1" 200 72 "-" "qdrant-js/1.18.0" 0.000406
+2026-10-16T05:41:05.260548Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.000745
+2026-10-16T05:41:05.264579Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.001209
+2026-10-16T05:41:05.268257Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.000859
+2026-10-16T05:41:05.272882Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.000657
+2026-10-16T05:41:05.279956Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.004097
+2026-10-16T05:41:05.284775Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.001365
+2026-10-16T05:41:05.414295Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 161 "-" "qdrant-js/1.18.0" 0.000285
+2026-10-16T05:41:05.464025Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.045703
+2026-10-16T05:41:05.468156Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.000955
+2026-10-16T05:41:05.471367Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_shared_worktree_recovery HTTP/1.1" 404 121 "-" "qdrant-js/1.18.0" 0.000252
+2026-10-16T05:41:05.474591Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 161 "-" "qdrant-js/1.18.0" 0.000194
+2026-10-16T05:41:05.477625Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection codebase_shared_worktree_recovery
+2026-10-16T05:41:06.155656Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_shared_worktree_recovery HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.678262
+2026-10-16T05:41:06.232852Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_shared_worktree_recovery/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.065276
+2026-10-16T05:41:06.289910Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_shared_worktree_recovery/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.121820
+2026-10-16T05:41:06.344784Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_shared_worktree_recovery/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.175223
+2026-10-16T05:41:06.396527Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_shared_worktree_recovery/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.225182
+2026-10-16T05:41:06.410328Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.008617
+2026-10-16T05:41:08.664458Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_shared_worktree_recovery/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 2.241579
+2026-10-16T05:41:08.677898Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 93 "-" "qdrant-js/1.18.0" 0.007894
+2026-10-16T05:41:08.691759Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.010464
+2026-10-16T05:41:08.714479Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.006634
+2026-10-16T05:41:08.723938Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 182 "-" "qdrant-js/1.18.0" 0.000298
+2026-10-16T05:41:08.724375Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 183 "-" "qdrant-js/1.18.0" 0.000443
+2026-10-16T05:41:08.724384Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 183 "-" "qdrant-js/1.18.0" 0.000408
+2026-10-16T05:41:08.730941Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection shared_worktree_recovery_symgraph_meta
+2026-10-16T05:41:08.733041Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection shared_worktree_recovery_symgraph_file
+2026-10-16T05:41:08.733269Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection shared_worktree_recovery_symgraph_index
+2026-10-16T05:41:09.241569Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/shared_worktree_recovery_symgraph_meta HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.510778
+2026-10-16T05:41:09.786361Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/shared_worktree_recovery_symgraph_file HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 1.053479
+2026-10-16T05:41:10.251905Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/shared_worktree_recovery_symgraph_index HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 1.518743
+2026-10-16T05:41:10.267341Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/shared_worktree_recovery_symgraph_file/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.007134
+2026-10-16T05:41:10.270964Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/shared_worktree_recovery_symgraph_index/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.000900
+2026-10-16T05:41:10.279933Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/shared_worktree_recovery_symgraph_index/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.006123
+2026-10-16T05:41:10.284482Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/shared_worktree_recovery_symgraph_index/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.000714
+2026-10-16T05:41:10.296899Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/shared_worktree_recovery_symgraph_index/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.008973
+2026-10-16T05:41:10.306514Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/shared_worktree_recovery_symgraph_meta/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.005545
+2026-10-16T05:41:10.311052Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/shared_worktree_recovery_symgraph_file/points/scroll HTTP/1.1" 200 204 "-" "qdrant-js/1.18.0" 0.000644
+2026-10-16T05:41:10.314479Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/shared_worktree_recovery_symgraph_index/points/scroll HTTP/1.1" 200 205 "-" "qdrant-js/1.18.0" 0.001075
+2026-10-16T05:41:10.318770Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_shared_worktree_recovery HTTP/1.1" 200 545 "-" "qdrant-js/1.18.0" 0.000882
+2026-10-16T05:41:10.368068Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_shared_worktree_recovery/points/scroll HTTP/1.1" 200 200 "-" "qdrant-js/1.18.0" 0.000924
+2026-10-16T05:41:10.373245Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_shared_worktree_recovery/points/delete HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.000992
+2026-10-16T05:41:10.376165Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 573 "-" "qdrant-js/1.18.0" 0.000728
+2026-10-16T05:41:10.380247Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 573 "-" "qdrant-js/1.18.0" 0.000880
+2026-10-16T05:41:10.387774Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.004810
+2026-10-16T05:41:10.391885Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_shared_worktree_recovery/points/scroll HTTP/1.1" 200 157 "-" "qdrant-js/1.18.0" 0.000897
+2026-10-16T05:41:10.396197Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_shared_worktree_recovery HTTP/1.1" 200 548 "-" "qdrant-js/1.18.0" 0.001079
+2026-10-16T05:41:10.446782Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 578 "-" "qdrant-js/1.18.0" 0.000754
+2026-10-16T05:41:10.451134Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_shared_worktree_recovery/points/scroll HTTP/1.1" 200 157 "-" "qdrant-js/1.18.0" 0.001045
+2026-10-16T05:41:10.455010Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 578 "-" "qdrant-js/1.18.0" 0.000874
+2026-10-16T05:41:10.457338Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 196 "-" "qdrant-js/1.18.0" 0.000270
+2026-10-16T05:41:10.493725Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_shared_worktree_recovery/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.032885
+2026-10-16T05:41:10.526699Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_shared_worktree_recovery/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.065630
+2026-10-16T05:41:10.571216Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_shared_worktree_recovery/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.109937
+2026-10-16T05:41:10.612924Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_shared_worktree_recovery/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.151419
+2026-10-16T05:41:10.622753Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.007377
+2026-10-16T05:41:10.635587Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_shared_worktree_recovery/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.005193
+2026-10-16T05:41:10.662462Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.022870
+2026-10-16T05:41:10.673780Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.007932
+2026-10-16T05:41:10.688626Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.004846
+2026-10-16T05:41:10.701421Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/shared_worktree_recovery_symgraph_file/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.008346
+2026-10-16T05:41:10.704975Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/shared_worktree_recovery_symgraph_index/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.000665
+2026-10-16T05:41:10.712989Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/shared_worktree_recovery_symgraph_index/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.005800
+2026-10-16T05:41:10.718367Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/shared_worktree_recovery_symgraph_index/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.000521
+2026-10-16T05:41:10.726201Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/shared_worktree_recovery_symgraph_index/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.005349
+2026-10-16T05:41:10.737550Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/shared_worktree_recovery_symgraph_meta/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.007931
+2026-10-16T05:41:10.741099Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/shared_worktree_recovery_symgraph_file/points/scroll HTTP/1.1" 200 282 "-" "qdrant-js/1.18.0" 0.000925
+2026-10-16T05:41:10.744384Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/shared_worktree_recovery_symgraph_index/points/scroll HTTP/1.1" 200 282 "-" "qdrant-js/1.18.0" 0.000790
+2026-10-16T05:41:10.751038Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/shared_worktree_recovery_symgraph_file/points/delete?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.004526
+2026-10-16T05:41:10.762784Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/shared_worktree_recovery_symgraph_index/points/delete?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.008766
+2026-10-16T05:41:10.768894Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/codebase_shared_worktree_recovery/points/scroll HTTP/1.1" 200 200 "-" "qdrant-js/1.18.0" 0.001226
+2026-10-16T05:41:10.772672Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_shared_worktree_recovery HTTP/1.1" 200 547 "-" "qdrant-js/1.18.0" 0.000795
+2026-10-16T05:41:10.818174Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection codebase_shared_worktree_recovery
+2026-10-16T05:41:10.844859Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/codebase_shared_worktree_recovery HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.026819
+2026-10-16T05:41:10.847611Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection codegraph_shared_worktree_recovery
+2026-10-16T05:41:10.847834Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/codegraph_shared_worktree_recovery HTTP/1.1" 200 72 "-" "qdrant-js/1.18.0" 0.000407
+2026-10-16T05:41:10.849843Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection context_shared_worktree_recovery
+2026-10-16T05:41:10.849991Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/context_shared_worktree_recovery HTTP/1.1" 200 72 "-" "qdrant-js/1.18.0" 0.000249
+2026-10-16T05:41:10.857965Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.000676
+2026-10-16T05:41:10.865046Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.001002
+2026-10-16T05:41:10.868979Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.000899
+2026-10-16T05:41:10.872266Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.000825
+2026-10-16T05:41:10.876583Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.000952
+2026-10-16T05:41:10.880163Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.000941
+2026-10-16T05:41:10.892285Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 187 "-" "qdrant-js/1.18.0" 0.000357
+2026-10-16T05:41:10.934307Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.039258
+2026-10-16T05:41:10.937331Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 68 "-" "qdrant-js/1.18.0" 0.000578
+2026-10-16T05:41:10.940601Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_6d47a0de92dc HTTP/1.1" 404 113 "-" "qdrant-js/1.18.0" 0.000195
+2026-10-16T05:41:10.943322Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 185 "-" "qdrant-js/1.18.0" 0.000152
+2026-10-16T05:41:10.947759Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection codebase_6d47a0de92dc
+2026-10-16T05:41:11.542620Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_6d47a0de92dc HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.595036
+2026-10-16T05:41:11.574834Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_6d47a0de92dc/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.027625
+2026-10-16T05:41:11.609947Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_6d47a0de92dc/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.062503
+2026-10-16T05:41:11.687691Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_6d47a0de92dc/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.139865
+2026-10-16T05:41:11.753893Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_6d47a0de92dc/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.205898
+2026-10-16T05:41:11.820496Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.063642
+2026-10-16T05:41:13.718810Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_6d47a0de92dc/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 1.891475
+2026-10-16T05:41:13.728221Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.005841
+2026-10-16T05:41:13.738147Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.005047
+2026-10-16T05:41:13.755212Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.006667
+2026-10-16T05:41:13.761800Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 202 "-" "qdrant-js/1.18.0" 0.000290
+2026-10-16T05:41:13.761962Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 202 "-" "qdrant-js/1.18.0" 0.000243
+2026-10-16T05:41:13.761984Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 203 "-" "qdrant-js/1.18.0" 0.000318
+2026-10-16T05:41:13.767076Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection 6d47a0de92dc_symgraph_index
+2026-10-16T05:41:13.767230Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection 6d47a0de92dc_symgraph_file
+2026-10-16T05:41:13.767982Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection 6d47a0de92dc_symgraph_meta
+2026-10-16T05:41:14.468016Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/6d47a0de92dc_symgraph_index HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.701169
+2026-10-16T05:41:15.004484Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/6d47a0de92dc_symgraph_file HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 1.237447
+2026-10-16T05:41:15.529645Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/6d47a0de92dc_symgraph_meta HTTP/1.1" 200 78 "-" "qdrant-js/1.18.0" 1.761817
+2026-10-16T05:41:15.541309Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/6d47a0de92dc_symgraph_file/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.006874
+2026-10-16T05:41:15.547437Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/6d47a0de92dc_symgraph_index/points HTTP/1.1" 200 69 "-" "qdrant-js/1.18.0" 0.001072
+2026-10-16T05:41:15.555333Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/6d47a0de92dc_symgraph_index/points?wait=true HTTP/1.1" 200 90 "-" "qdrant-js/1.18.0" 0.005810
+2026-10-16T05:41:15.568654Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/6d47a0de92dc_symgraph_meta/points?wait=true HTTP/1.1" 200 90 "-" "qdrant-js/1.18.0" 0.009534
+2026-10-16T05:41:15.574160Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/6d47a0de92dc_symgraph_file/points/scroll HTTP/1.1" 200 171 "-" "qdrant-js/1.18.0" 0.001295
+2026-10-16T05:41:15.578679Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/6d47a0de92dc_symgraph_index/points/scroll HTTP/1.1" 200 172 "-" "qdrant-js/1.18.0" 0.001057
+2026-10-16T05:41:15.588632Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 541 "-" "qdrant-js/1.18.0" 0.000917
+2026-10-16T05:41:15.593205Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_6d47a0de92dc HTTP/1.1" 200 547 "-" "qdrant-js/1.18.0" 0.000647
+2026-10-16T05:41:15.639846Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 541 "-" "qdrant-js/1.18.0" 0.000933
+2026-10-16T05:41:15.643860Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 541 "-" "qdrant-js/1.18.0" 0.001308
+2026-10-16T05:41:15.653465Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.006781
+2026-10-16T05:41:15.672041Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.009628
+2026-10-16T05:41:15.677906Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 320 "-" "qdrant-js/1.18.0" 0.000639
+2026-10-16T05:41:15.687022Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 541 "-" "qdrant-js/1.18.0" 0.000926
+2026-10-16T05:41:15.690411Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection codebase_6d47a0de92dc
+2026-10-16T05:41:15.707304Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/codebase_6d47a0de92dc HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.017011
+2026-10-16T05:41:15.710598Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection codegraph_6d47a0de92dc
+2026-10-16T05:41:15.710790Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/codegraph_6d47a0de92dc HTTP/1.1" 200 72 "-" "qdrant-js/1.18.0" 0.000288
+2026-10-16T05:41:15.713644Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection context_6d47a0de92dc
+2026-10-16T05:41:15.713922Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/context_6d47a0de92dc HTTP/1.1" 200 72 "-" "qdrant-js/1.18.0" 0.000377
+2026-10-16T05:41:15.717371Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.000747
+2026-10-16T05:41:15.720409Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.000649
+2026-10-16T05:41:15.723267Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.000495
+2026-10-16T05:41:15.726938Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.000748
+2026-10-16T05:41:15.731976Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 93 "-" "qdrant-js/1.18.0" 0.001227
+2026-10-16T05:41:15.736219Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points/delete HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.001042
+2026-10-16T05:41:16.479521Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 206 "-" "qdrant-js/1.18.0" 0.000686
+2026-10-16T05:41:16.503392Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection codebase_e3d27bbbe4ec
+2026-10-16T05:41:16.503771Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/codebase_e3d27bbbe4ec HTTP/1.1" 200 72 "-" "qdrant-js/1.18.0" 0.000547
+2026-10-16T05:41:16.508869Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 205 "-" "qdrant-js/1.18.0" 0.000173
+2026-10-16T05:41:16.523461Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection codebase_e3d27bbbe4ec
+2026-10-16T05:41:17.177017Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.653739
+2026-10-16T05:41:17.242565Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/index HTTP/1.1" 200 94 "-" "qdrant-js/1.18.0" 0.056664
+2026-10-16T05:41:17.322262Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.135467
+2026-10-16T05:41:17.371874Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.184532
+2026-10-16T05:41:17.418620Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.230661
+2026-10-16T05:41:17.423706Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_e3d27bbbe4ec HTTP/1.1" 200 491 "-" "qdrant-js/1.18.0" 0.000672
+2026-10-16T05:41:17.435390Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/points?wait=true HTTP/1.1" 400 126 "-" "qdrant-js/1.18.0" 0.000967
+2026-10-16T05:41:17.943092Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/points?wait=true HTTP/1.1" 400 127 "-" "qdrant-js/1.18.0" 0.000807
+2026-10-16T05:41:18.949857Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/points?wait=true HTTP/1.1" 400 127 "-" "qdrant-js/1.18.0" 0.000853
+2026-10-16T05:41:19.016926Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.059737
+2026-10-16T05:41:19.024716Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/points?wait=true HTTP/1.1" 400 127 "-" "qdrant-js/1.18.0" 0.001389
+2026-10-16T05:41:19.031265Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_e3d27bbbe4ec HTTP/1.1" 200 552 "-" "qdrant-js/1.18.0" 0.001096
+2026-10-16T05:41:19.077297Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 222 "-" "qdrant-js/1.18.0" 0.000252
+2026-10-16T05:41:19.129980Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/index HTTP/1.1" 200 95 "-" "qdrant-js/1.18.0" 0.047929
+2026-10-16T05:41:19.150550Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/socraticode_metadata/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.006795
+2026-10-16T05:41:19.155736Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/points?wait=true HTTP/1.1" 400 126 "-" "qdrant-js/1.18.0" 0.000623
+2026-10-16T05:41:19.660397Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/points?wait=true HTTP/1.1" 400 126 "-" "qdrant-js/1.18.0" 0.000729
+2026-10-16T05:41:20.667607Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/points?wait=true HTTP/1.1" 400 127 "-" "qdrant-js/1.18.0" 0.000801
+2026-10-16T05:41:20.696183Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/points?wait=true HTTP/1.1" 200 92 "-" "qdrant-js/1.18.0" 0.022726
+2026-10-16T05:41:20.701174Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/points?wait=true HTTP/1.1" 400 127 "-" "qdrant-js/1.18.0" 0.000612
+2026-10-16T05:41:20.707124Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/socraticode_metadata/points HTTP/1.1" 200 547 "-" "qdrant-js/1.18.0" 0.001817
+2026-10-16T05:41:20.733945Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/codebase_e3d27bbbe4ec/points?wait=true HTTP/1.1" 200 91 "-" "qdrant-js/1.18.0" 0.019627
+2026-10-16T05:41:20.739459Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/codebase_e3d27bbbe4ec HTTP/1.1" 200 552 "-" "qdrant-js/1.18.0" 0.001546
+2026-10-16T05:41:20.785117Z  INFO storage::content_manager::toc::collection_meta_ops: Deleting collection codebase_e3d27bbbe4ec
+2026-10-16T05:41:20.814998Z  INFO actix_web::middleware::logger: 127.0.0.1 "DELETE /collections/codebase_e3d27bbbe4ec HTTP/1.1" 200 71 "-" "qdrant-js/1.18.0" 0.030035
+2026-10-16T05:41:20.983890Z  INFO actix_server::server: SIGTERM received; starting graceful shutdown
+2026-10-16T05:41:20.984007Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.984011Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985020Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985057Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985083Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985119Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985083Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985137Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985154Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985195Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985266Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985237Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985306Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985292Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985335Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985400Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985434Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985487Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985527Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985583Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985661Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985753Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985800Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.985965Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.986208Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.986916Z  INFO actix_server::accept: accept thread stopped
+2026-10-16T05:41:20.987076Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.987116Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.987537Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.988129Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.988973Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.989588Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.990182Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.991049Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.991134Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.991514Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.991972Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.992316Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.992972Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.993676Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.993873Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.994590Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.995255Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.995514Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.995766Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.995993Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.996061Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.996061Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.996227Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.996225Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.996268Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.996280Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.996242Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.996526Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.996526Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.996541Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.997614Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.997641Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.997652Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.997762Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.997760Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.997812Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.997781Z  INFO actix_server::worker: shutting down idle worker
+2026-10-16T05:41:20.997862Z  INFO actix_server::worker: shutting down idle worker

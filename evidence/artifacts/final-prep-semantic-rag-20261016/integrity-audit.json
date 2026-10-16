@@ -1,0 +1,380 @@
+{
+  "kind": "derived_integrity_audit_not_candidate_measurement",
+  "recorded_at": "2026-10-16T08:46:58.333408+00:00",
+  "commands": 24,
+  "stream_count": 52,
+  "reproduction_failures": [],
+  "changed_streams": 2,
+  "streams": [
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-help.stdout",
+      "raw_name": "qdrant-help.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-help.stderr",
+      "raw_name": "qdrant-help.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-version.stdout",
+      "raw_name": "qdrant-version.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-version.stderr",
+      "raw_name": "qdrant-version.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-build.stdout",
+      "raw_name": "socraticode-build.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-build.stderr",
+      "raw_name": "socraticode-build.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-install.stdout",
+      "raw_name": "socraticode-install.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-install.stderr",
+      "raw_name": "socraticode-install.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration-first.stdout",
+      "raw_name": "socraticode-offline-integration-first.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration-first.stderr",
+      "raw_name": "socraticode-offline-integration-first.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stdout",
+      "raw_name": "socraticode-offline-integration.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stderr",
+      "raw_name": "socraticode-offline-integration.stderr",
+      "reproduces": true,
+      "changed_by_mask": true
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-release-versions.stdout",
+      "raw_name": "socraticode-release-versions.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-release-versions.stderr",
+      "raw_name": "socraticode-release-versions.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stdout",
+      "raw_name": "socraticode-unit.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stderr",
+      "raw_name": "socraticode-unit.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-metadata.stdout",
+      "raw_name": "vllm-metadata.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-metadata.stderr",
+      "raw_name": "vllm-metadata.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-resolution.stdout",
+      "raw_name": "vllm-resolution.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-resolution.stderr",
+      "raw_name": "vllm-resolution.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-version.stdout",
+      "raw_name": "vllm-version.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-version.stderr",
+      "raw_name": "vllm-version.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/node-version.stdout",
+      "raw_name": "node-version.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/node-version.stderr",
+      "raw_name": "node-version.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/npm-version.stdout",
+      "raw_name": "npm-version.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/npm-version.stderr",
+      "raw_name": "npm-version.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-pin.stdout",
+      "raw_name": "socraticode-source-pin.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-pin.stderr",
+      "raw_name": "socraticode-source-pin.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-clean.stdout",
+      "raw_name": "socraticode-source-clean.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-clean.stderr",
+      "raw_name": "socraticode-source-clean.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-lock-unchanged.stdout",
+      "raw_name": "socraticode-lock-unchanged.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-lock-unchanged.stderr",
+      "raw_name": "socraticode-lock-unchanged.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/public-artifact-hashes.stdout",
+      "raw_name": "public-artifact-hashes.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/public-artifact-hashes.stderr",
+      "raw_name": "public-artifact-hashes.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/lane-packets.stdout",
+      "raw_name": "lane-packets.stdout",
+      "reproduces": true,
+      "changed_by_mask": true
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/lane-packets.stderr",
+      "raw_name": "lane-packets.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/uv-version.stdout",
+      "raw_name": "uv-version.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/uv-version.stderr",
+      "raw_name": "uv-version.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-release-metadata.stdout",
+      "raw_name": "fold-qdrant-release-metadata.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-release-metadata.stderr",
+      "raw_name": "fold-qdrant-release-metadata.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-download.stdout",
+      "raw_name": "fold-qdrant-download.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-download.stderr",
+      "raw_name": "fold-qdrant-download.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-sha256.stdout",
+      "raw_name": "fold-qdrant-sha256.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-sha256.stderr",
+      "raw_name": "fold-qdrant-sha256.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-socraticode-lock-download.stdout",
+      "raw_name": "fold-socraticode-lock-download.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-socraticode-lock-download.stderr",
+      "raw_name": "fold-socraticode-lock-download.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-socraticode-lock-sha256.stdout",
+      "raw_name": "fold-socraticode-lock-sha256.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-socraticode-lock-sha256.stderr",
+      "raw_name": "fold-socraticode-lock-sha256.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline.stdout",
+      "raw_name": "qdrant-offline.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline.stderr",
+      "raw_name": "qdrant-offline.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline-first.stdout",
+      "raw_name": "qdrant-offline-first.stdout",
+      "reproduces": true,
+      "changed_by_mask": false
+    },
+    {
+      "published": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline-first.stderr",
+      "raw_name": "qdrant-offline-first.stderr",
+      "reproduces": true,
+      "changed_by_mask": false
+    }
+  ],
+  "claims": [
+    {
+      "claim": "SocratiCode unit counts",
+      "source": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stdout:154-155",
+      "status": "native counts retained"
+    },
+    {
+      "claim": "SocratiCode offline integration counts",
+      "source": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stdout:13-14",
+      "status": "native counts, synthetic/stub vectors explicitly labelled"
+    },
+    {
+      "claim": "Qdrant binary version",
+      "source": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-version.stdout:1",
+      "status": "native"
+    },
+    {
+      "claim": "vLLM package version",
+      "source": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-metadata.stdout:1",
+      "status": "distribution metadata only"
+    },
+    {
+      "claim": "vLLM CLI no-GPU failure",
+      "source": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-version.stderr:31",
+      "status": "native failed invocation, not live-server failure"
+    },
+    {
+      "claim": "199-package lock resolution",
+      "source": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-resolution.stderr:2",
+      "status": "native resolver result, not installation"
+    },
+    {
+      "claim": "36 transitive-package drift",
+      "source": "MEMRAG-INSTALL-STATUS-20261016.md",
+      "status": "reported limitation only; not remeasured; private name only"
+    },
+    {
+      "claim": "earlier setup and generic-platform attempt",
+      "status": "missing original raw capture; named gap, not measured evidence"
+    },
+    {
+      "claim": "seven angle values",
+      "source": "evidence/artifacts/final-prep-semantic-rag-20261016/angle-record-draft.json",
+      "status": "derived INSUFFICIENT, no default or FINAL"
+    }
+  ],
+  "mask_tests": 12,
+  "uuid_regression": "The new UUID token test failed on the previous rule, then passed after adding deterministic token substitution; native failure text and counts are preserved.",
+  "scratch_root_regression": "The explicit scratch-root masking test failed before the parameter existed, then passed after deterministic exact-byte substitution. The native status, packet count, descendant path and line breaks remain intact.",
+  "co_op_reproduction": {
+    "previous_check": "42/42 derivatives reproduced; one unmarked scratch-root publication finding required this local amendment.",
+    "current_check": "Co-op private reproduction PASS: original 42/42 derivatives at published commit 564f6999dbe5ac072b9056682d103f7dacce93fa on 2026-10-16; no private digest.",
+    "previous_state": "Unpublished local preparation state amended before the first push; identifier deliberately omitted.",
+    "fold_check": "PASS: co-op FOLD PRIVATE CHECK on 2026-10-16 independently reproduced all 52 derivatives (42 prior plus ten new), checked staged-blob equality and download/hash ordering, and found no home/user/scratch-root tokens. Private check cited by name only; no private digest."
+  },
+  "command_stream_count": 48,
+  "supporting_stream_count": 4,
+  "scope": "Derived audit, not native measurement output. All 52 streams passed the co-op FOLD PRIVATE CHECK; the original 42 derivatives are unchanged."
+}

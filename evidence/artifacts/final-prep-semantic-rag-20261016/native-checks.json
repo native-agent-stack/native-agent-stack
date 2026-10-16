@@ -1,0 +1,1398 @@
+{
+  "schema_version": 2,
+  "kind": "masked_native_capture_record",
+  "catalog": "foundation",
+  "layer_id": "semantic-rag",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "recorded_at": "2026-10-16T08:42:47.771872+00:00",
+  "capture_contract": {
+    "classification": "deterministic masked derivative of native stdout/stderr",
+    "masking_script": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py",
+    "masking_tests": "tests/test_semantic_rag_capture_mask.py",
+    "rule": "Replace the exact privately supplied scratch root with <PRIVATE_SCRATCH_ROOT>, then Unix/macOS private home-path and UUID tokens; preserve every other byte, including failures, ANSI, timestamps and line breaks. No summaries or synthetic output substitute for a native capture.",
+    "raw_custody": "Private captures are referenced by basename only; co-op privately replays the published mask. Only published derivative hashes appear here.",
+    "command_paths": "/work and /runtime are real paths inside the isolated namespaces. Host mount-source paths are marked <PRIVATE_SCRATCH_ROOT>, <PRIVATE_NODE_RUNTIME>, <PRIVATE_VLLM_PREFIX>, <PRIVATE_PYTHON_RUNTIME> in reproduction notes; exact wrapper is held privately as capture-native.py."
+  },
+  "commands": [
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "qdrant-help",
+      "command": [
+        "/work/qdrant/qdrant",
+        "--help"
+      ],
+      "cwd": "/work/qdrant",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:36:27.240229+00:00",
+      "finished_at": "2026-10-16T05:36:27.304995+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-help.stdout",
+          "bytes": 2825,
+          "sha256": "352e3f395f741298fd090cc76cc9fc66a4a423e2ff43fe65cff783effbb45b66",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "qdrant-help.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-help.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "qdrant-help.stderr",
+          "raw_digest_published": false
+        }
+      },
+      "private_recorder_metadata_name": "qdrant-help.json",
+      "command_boundary": "Command is exact inside the isolated namespace. /work and /runtime are literal namespace paths; host mount-source locations are private and are cited by name only."
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "qdrant-version",
+      "command": [
+        "/work/qdrant/qdrant",
+        "--version"
+      ],
+      "cwd": "/work/qdrant",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:36:27.106179+00:00",
+      "finished_at": "2026-10-16T05:36:27.223688+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-version.stdout",
+          "bytes": 14,
+          "sha256": "214295b22d2d525fae20e55f19eb6c016fe20ec4863a531f204e6e849124071e",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "qdrant-version.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-version.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "qdrant-version.stderr",
+          "raw_digest_published": false
+        }
+      },
+      "private_recorder_metadata_name": "qdrant-version.json",
+      "command_boundary": "Command is exact inside the isolated namespace. /work and /runtime are literal namespace paths; host mount-source locations are private and are cited by name only."
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "socraticode-build",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "/work/socraticode",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:38:57.285397+00:00",
+      "finished_at": "2026-10-16T05:39:03.522030+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-build.stdout",
+          "bytes": 269,
+          "sha256": "3f43d84f379bb4173f796dafdddfd33d66721bc068b4754615b9d028f89a7429",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-build.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-build.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-build.stderr",
+          "raw_digest_published": false
+        }
+      },
+      "private_recorder_metadata_name": "socraticode-build.json",
+      "command_boundary": "Command is exact inside the isolated namespace. /work and /runtime are literal namespace paths; host mount-source locations are private and are cited by name only."
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "socraticode-install",
+      "command": [
+        "npm",
+        "ci",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "cwd": "/work/socraticode",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:36:24.784814+00:00",
+      "finished_at": "2026-10-16T05:36:36.389866+00:00",
+      "network": "public registry access for install only",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-install.stdout",
+          "bytes": 27,
+          "sha256": "5ce742b53d25d17f9f702e14252ebb84cc883a59afffaffe466d6a224ae7c778",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-install.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-install.stderr",
+          "bytes": 2164,
+          "sha256": "071e031d7fef181af9e270f8e696166ee0bd6f622c808f3393aa86627d5b3f68",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-install.stderr",
+          "raw_digest_published": false
+        }
+      },
+      "private_recorder_metadata_name": "socraticode-install.json",
+      "command_boundary": "Command is exact inside the isolated namespace. /work and /runtime are literal namespace paths; host mount-source locations are private and are cited by name only."
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "socraticode-offline-integration-first",
+      "command": [
+        "/bin/bash",
+        "/work/run-offline-integration.sh"
+      ],
+      "cwd": "/work/socraticode",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 1,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:39:03.522833+00:00",
+      "finished_at": "2026-10-16T05:39:13.832346+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration-first.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-offline-integration-first.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration-first.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-offline-integration-first.stderr",
+          "raw_digest_published": false
+        }
+      },
+      "private_recorder_metadata_name": "socraticode-offline-integration-first.json",
+      "command_boundary": "Command is exact inside the isolated namespace. /work and /runtime are literal namespace paths; host mount-source locations are private and are cited by name only."
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "socraticode-offline-integration",
+      "command": [
+        "/bin/bash",
+        "/work/run-offline-integration.sh"
+      ],
+      "cwd": "/work/socraticode",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:40:47.799537+00:00",
+      "finished_at": "2026-10-16T05:41:21.501682+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stdout",
+          "bytes": 875,
+          "sha256": "54f1939e8b091761ae14fcc8669f1fe0225c29fe10f33ebac743ace88450b3dc",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-offline-integration.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stderr",
+          "bytes": 21136,
+          "sha256": "5aa937dc43d1e4a68b5795ef3b9170532ee0fe3a4c7d829f1d1b6cfc1c8bc114",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-offline-integration.stderr",
+          "raw_digest_published": false
+        }
+      },
+      "private_recorder_metadata_name": "socraticode-offline-integration.json",
+      "command_boundary": "Command is exact inside the isolated namespace. /work and /runtime are literal namespace paths; host mount-source locations are private and are cited by name only."
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "socraticode-release-versions",
+      "command": [
+        "npm",
+        "run",
+        "check:release-versions"
+      ],
+      "cwd": "/work/socraticode",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:38:13.852347+00:00",
+      "finished_at": "2026-10-16T05:38:14.171023+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-release-versions.stdout",
+          "bytes": 119,
+          "sha256": "f4bd6abd0f700e18f30bc3b4a9314b557c5ed243711807ed2f30a1b514adcca8",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-release-versions.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-release-versions.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-release-versions.stderr",
+          "raw_digest_published": false
+        }
+      },
+      "private_recorder_metadata_name": "socraticode-release-versions.json",
+      "command_boundary": "Command is exact inside the isolated namespace. /work and /runtime are literal namespace paths; host mount-source locations are private and are cited by name only."
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "socraticode-unit",
+      "command": [
+        "npm",
+        "run",
+        "test:unit"
+      ],
+      "cwd": "/work/socraticode",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:36:36.390635+00:00",
+      "finished_at": "2026-10-16T05:38:13.850269+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stdout",
+          "bytes": 9994,
+          "sha256": "8aa11223bf7c426be7c5f0303b71bf69a3af117bd88c8ee75c754fa31d58075b",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-unit.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stderr",
+          "bytes": 134956,
+          "sha256": "4a4fc8c25f5fd4b625335d52e15eff9cb84e7e905073db448bdbf37aafa51252",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-unit.stderr",
+          "raw_digest_published": false
+        }
+      },
+      "private_recorder_metadata_name": "socraticode-unit.json",
+      "command_boundary": "Command is exact inside the isolated namespace. /work and /runtime are literal namespace paths; host mount-source locations are private and are cited by name only."
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "vllm-metadata",
+      "command": [
+        "/runtime/vllm/bin/python",
+        "-c",
+        "import importlib.metadata; print(importlib.metadata.version(\"vllm\"))"
+      ],
+      "cwd": "/tmp",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1",
+        "VLLM_NO_USAGE_STATS": "1",
+        "HF_HUB_OFFLINE": "1",
+        "CUDA_VISIBLE_DEVICES": ""
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:36:50.121861+00:00",
+      "finished_at": "2026-10-16T05:36:50.288486+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-metadata.stdout",
+          "bytes": 7,
+          "sha256": "8c4f709e958791f38fd4d06c953c9182f61a05abbc45508e281b907f08b52210",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "vllm-metadata.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-metadata.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "vllm-metadata.stderr",
+          "raw_digest_published": false
+        }
+      },
+      "private_recorder_metadata_name": "vllm-metadata.json",
+      "command_boundary": "Command is exact inside the isolated namespace. /work and /runtime are literal namespace paths; host mount-source locations are private and are cited by name only."
+    },
+    {
+      "name": "vllm-resolution",
+      "command": [
+        "/runtime/uv",
+        "pip",
+        "compile",
+        "/work/vllm.in",
+        "--python-version",
+        "3.13",
+        "--default-index",
+        "https://pypi.org/simple",
+        "--exclude-newer",
+        "2026-10-16T05:15:55Z",
+        "--generate-hashes",
+        "--no-header",
+        "--no-annotate",
+        "--no-build",
+        "--output-file",
+        "/work/vllm-0.31.0.requirements.lock"
+      ],
+      "cwd": "/work",
+      "return_code": 0,
+      "started_at": "2026-10-16T05:41:15.459042+00:00",
+      "finished_at": "2026-10-16T05:41:16.377041+00:00",
+      "recorder": "subprocess.run with direct binary stdout/stderr file handles; no filtering",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-resolution.stdout",
+          "bytes": 396581,
+          "sha256": "cc7d568fd9368d0ba1090c4ff729daa7d3c96d23970c0d5b7c3a74faf074c05f",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "vllm-resolution.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-resolution.stderr",
+          "bytes": 143,
+          "sha256": "10b6fa5a239d5b1900bd6eea22652e7214780abff69055a9fa7c94a72a1b351e",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "vllm-resolution.stderr",
+          "raw_digest_published": false
+        }
+      },
+      "private_recorder_metadata_name": "vllm-resolution.json",
+      "command_boundary": "Command is exact inside the isolated namespace. /work and /runtime are literal namespace paths; host mount-source locations are private and are cited by name only.",
+      "output_behavior": {
+        "note": "uv pip compile echoes compiled requirements to stdout while writing --output-file when --quiet is absent. The recorded argv lacks -q/--quiet; byte-identical native stdout and lock are expected.",
+        "source": {
+          "repository": "https://github.com/astral-sh/uv",
+          "pin": "70fe1196a546e49148a73b1c592b2f74c33af80e",
+          "path": "crates/uv/src/commands/pip/compile.rs",
+          "line": 618
+        },
+        "stdout_is_separate_native_capture": true
+      }
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "vllm-version",
+      "command": [
+        "/runtime/vllm/bin/python",
+        "/runtime/vllm/bin/vllm",
+        "--version"
+      ],
+      "cwd": "/tmp",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1",
+        "VLLM_NO_USAGE_STATS": "1",
+        "HF_HUB_OFFLINE": "1",
+        "CUDA_VISIBLE_DEVICES": ""
+      },
+      "return_code": 1,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:36:27.673147+00:00",
+      "finished_at": "2026-10-16T05:36:50.116519+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-version.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "vllm-version.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-version.stderr",
+          "bytes": 2166,
+          "sha256": "a6cc14befe72f26f1e9206a81a8e8a4ecd36ef6378dbeb4c68a7752efe4e12a7",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "vllm-version.stderr",
+          "raw_digest_published": false
+        }
+      },
+      "private_recorder_metadata_name": "vllm-version.json",
+      "command_boundary": "Command is exact inside the isolated namespace. /work and /runtime are literal namespace paths; host mount-source locations are private and are cited by name only."
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "node-version",
+      "command": [
+        "node",
+        "--version"
+      ],
+      "cwd": "/work/socraticode",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:43:21.194149+00:00",
+      "finished_at": "2026-10-16T05:43:21.227940+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/node-version.stdout",
+          "bytes": 9,
+          "sha256": "f2ec568164f99546161909b0189b57bb5be3e80f8e2ccd8a51a4aed8c4055a04",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "node-version.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/node-version.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "node-version.stderr",
+          "raw_digest_published": false
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "npm-version",
+      "command": [
+        "npm",
+        "--version"
+      ],
+      "cwd": "/work/socraticode",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:43:21.228575+00:00",
+      "finished_at": "2026-10-16T05:43:21.394083+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/npm-version.stdout",
+          "bytes": 8,
+          "sha256": "005206ab803f8881d8227540b7980b37e723b69a8849edb31734a90b7e7964e2",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "npm-version.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/npm-version.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "npm-version.stderr",
+          "raw_digest_published": false
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "socraticode-source-pin",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/work/socraticode",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:47:00.772512+00:00",
+      "finished_at": "2026-10-16T05:47:00.809629+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-pin.stdout",
+          "bytes": 41,
+          "sha256": "7180be4b6eb2526f6f43cc9747c54f704949b1b4ecbcfaf272773b324e27b93a",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-source-pin.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-pin.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-source-pin.stderr",
+          "raw_digest_published": false
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "socraticode-source-clean",
+      "command": [
+        "git",
+        "status",
+        "--porcelain"
+      ],
+      "cwd": "/work/socraticode",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:47:00.810236+00:00",
+      "finished_at": "2026-10-16T05:47:00.875076+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-clean.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-source-clean.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-source-clean.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-source-clean.stderr",
+          "raw_digest_published": false
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "socraticode-lock-unchanged",
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "--",
+        "package-lock.json"
+      ],
+      "cwd": "/work/socraticode",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:47:00.876021+00:00",
+      "finished_at": "2026-10-16T05:47:00.911670+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-lock-unchanged.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-lock-unchanged.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-lock-unchanged.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "socraticode-lock-unchanged.stderr",
+          "raw_digest_published": false
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "public-artifact-hashes",
+      "command": [
+        "sha256sum",
+        "/work/qdrant-1.19.1.tar.gz",
+        "/work/socraticode/package-lock.json",
+        "/work/vllm-0.31.0.requirements.lock"
+      ],
+      "cwd": "/work/socraticode",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T05:47:00.912191+00:00",
+      "finished_at": "2026-10-16T05:47:01.027047+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/public-artifact-hashes.stdout",
+          "bytes": 297,
+          "sha256": "6e7e6c881ab529474b1aaaf7b737434a91ca4e5bf3ff93ee9c8809486031a987",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "public-artifact-hashes.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/public-artifact-hashes.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "public-artifact-hashes.stderr",
+          "raw_digest_published": false
+        }
+      }
+    },
+    {
+      "name": "lane-packets",
+      "command": [
+        "python3",
+        "tools/sota-convergence/lane_packets.py",
+        "--root",
+        "<PRIVATE_WORKTREE>",
+        "--out",
+        "<PRIVATE_SCRATCH_ROOT>/lane-packets-recapture",
+        "--catalog",
+        "foundation",
+        "--checked-at",
+        "2026-10-16",
+        "--manifest",
+        "catalogs/sota-convergence/manifest-20261009.json",
+        "--manifest-newcomers",
+        "--registered-receipts"
+      ],
+      "cwd": "<PRIVATE_WORKTREE>",
+      "return_code": 0,
+      "started_at": "2026-10-16T05:49:00.350908+00:00",
+      "finished_at": "2026-10-16T05:49:00.716652+00:00",
+      "recorder": "subprocess.run with direct binary stdout/stderr capture; command host paths are marked placeholders",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/lane-packets.stdout",
+          "bytes": 783,
+          "sha256": "e1a75dc4646465a7f13af30e1c38b23f553ff2c72932c484f54db82c1e9616c6",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "lane-packets.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/lane-packets.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "lane-packets.stderr",
+          "raw_digest_published": false
+        }
+      }
+    },
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "cwd": "<PRIVATE_WORKTREE>",
+      "return_code": 0,
+      "started_at": "2026-10-16T05:49:00.357361+00:00",
+      "finished_at": "2026-10-16T05:49:00.373996+00:00",
+      "recorder": "subprocess.run with direct binary stdout/stderr capture; command host paths are marked placeholders",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/uv-version.stdout",
+          "bytes": 38,
+          "sha256": "dcccc14d410dab345544375b730933845d90c3222a4a8a0c08ed6c412ca336a4",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "uv-version.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/uv-version.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "uv-version.stderr",
+          "raw_digest_published": false
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "fold-qdrant-release-metadata",
+      "command": [
+        "curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--location",
+        "https://api.github.com/repos/qdrant/qdrant/releases/tags/v1.19.1"
+      ],
+      "cwd": "/work",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T08:41:27.337420+00:00",
+      "finished_at": "2026-10-16T08:41:27.655783+00:00",
+      "network": "public registry access for install only",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-release-metadata.stdout",
+          "bytes": 22429,
+          "sha256": "cf3652f2e81e4c7b453383731eacacf0acb8cdc199c94ddba1f31356f99d3505",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "fold-qdrant-release-metadata.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-release-metadata.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "fold-qdrant-release-metadata.stderr",
+          "raw_digest_published": false
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "fold-qdrant-download",
+      "command": [
+        "curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--location",
+        "--output",
+        "/work/verification/qdrant-1.19.1.tar.gz",
+        "--write-out",
+        "http_code=%{http_code}\\nsize_download=%{size_download}\\n",
+        "https://github.com/qdrant/qdrant/releases/download/v1.19.1/qdrant-x86_64-unknown-linux-musl.tar.gz"
+      ],
+      "cwd": "/work",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T08:41:27.657924+00:00",
+      "finished_at": "2026-10-16T08:41:28.137547+00:00",
+      "network": "public registry access for install only",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-download.stdout",
+          "bytes": 37,
+          "sha256": "df4889ce15f229895f7d9a80685bf7b1c0eba915fa2c9b751c798b6936574671",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "fold-qdrant-download.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-download.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "fold-qdrant-download.stderr",
+          "raw_digest_published": false
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "fold-qdrant-sha256",
+      "command": [
+        "sha256sum",
+        "/work/verification/qdrant-1.19.1.tar.gz"
+      ],
+      "cwd": "/work",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T08:41:28.138192+00:00",
+      "finished_at": "2026-10-16T08:41:28.256646+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-sha256.stdout",
+          "bytes": 106,
+          "sha256": "3b12585850455cc994cfd1b280b267c977ff5fcdb454f0e92a0a9300e4bd47cc",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "fold-qdrant-sha256.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-qdrant-sha256.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "fold-qdrant-sha256.stderr",
+          "raw_digest_published": false
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "fold-socraticode-lock-download",
+      "command": [
+        "curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--location",
+        "--output",
+        "/work/verification/socraticode-package-lock.json",
+        "--write-out",
+        "http_code=%{http_code}\\nsize_download=%{size_download}\\n",
+        "https://raw.githubusercontent.com/giancarloerra/SocratiCode/3d3a4a4d427cb0f29de4f5dd1360da52896f62df/package-lock.json"
+      ],
+      "cwd": "/work",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T08:41:28.258453+00:00",
+      "finished_at": "2026-10-16T08:41:28.475176+00:00",
+      "network": "public registry access for install only",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-socraticode-lock-download.stdout",
+          "bytes": 35,
+          "sha256": "ec0da67abb3f5e73e097e3a300d89e2dd29f4c3ca342b09c27138c634d2e4b8e",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "fold-socraticode-lock-download.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-socraticode-lock-download.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "fold-socraticode-lock-download.stderr",
+          "raw_digest_published": false
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "recorder": "Python subprocess.run with direct binary stdout/stderr file handles; no decoding, redaction, filtering or synthesis",
+      "name": "fold-socraticode-lock-sha256",
+      "command": [
+        "sha256sum",
+        "/work/verification/socraticode-package-lock.json",
+        "/work/socraticode/package-lock.json"
+      ],
+      "cwd": "/work",
+      "environment": {
+        "PATH": "/runtime/node/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "XDG_CACHE_HOME": "/work/cache",
+        "XDG_CONFIG_HOME": "/work/config",
+        "npm_config_cache": "/work/npm-cache",
+        "npm_config_userconfig": "/work/npm-user.rc",
+        "npm_config_globalconfig": "/work/npm-global.rc",
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "return_code": 0,
+      "timed_out": false,
+      "started_at": "2026-10-16T08:41:28.476116+00:00",
+      "finished_at": "2026-10-16T08:41:28.515615+00:00",
+      "network": "isolated namespace; no host/external services",
+      "source_boundary": "Only owned scratch/system/language runtimes mounted. Existing vLLM distribution, when used, is read-only at /runtime/vllm; private mount-source locator withheld.",
+      "streams": {
+        "stdout": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-socraticode-lock-sha256.stdout",
+          "bytes": 217,
+          "sha256": "f106e8586d931f6c651b99f74feb39e24d3f542bdfff5af36e33126fa3c09e05",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "fold-socraticode-lock-sha256.stdout",
+          "raw_digest_published": false
+        },
+        "stderr": {
+          "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/fold-socraticode-lock-sha256.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_class": "deterministic_masked_native_output",
+          "masking_rule": "evidence/artifacts/final-prep-semantic-rag-20261016/mask_capture.py:19",
+          "private_raw_name": "fold-socraticode-lock-sha256.stderr",
+          "raw_digest_published": false
+        }
+      }
+    }
+  ],
+  "values": [
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-install.stdout",
+      "line": 2,
+      "text": "added 425 packages in 11s"
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stdout",
+      "line": 154,
+      "text": " Test Files  107 passed (107)"
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stdout",
+      "line": 155,
+      "text": "      Tests  2517 passed (2517)"
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stdout",
+      "line": 157,
+      "text": "   Duration  96.77s (transform 3.06s, setup 0ms, import 12.44s, tests 66.99s, environment 15ms)"
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-release-versions.stdout",
+      "line": 5,
+      "text": "release manifests match 1.16.0"
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stdout",
+      "line": 13,
+      "text": " Test Files  2 passed (2)"
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stdout",
+      "line": 14,
+      "text": "      Tests  6 passed (6)"
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stdout",
+      "line": 16,
+      "text": "   Duration  31.20s (transform 752ms, setup 0ms, import 1.42s, tests 29.38s, environment 0ms)"
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-version.stdout",
+      "line": 1,
+      "text": "qdrant 1.19.1"
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-metadata.stdout",
+      "line": 1,
+      "text": "0.31.0"
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-resolution.stderr",
+      "line": 2,
+      "text": "Resolved 199 packages in 652ms"
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-version.stderr",
+      "line": 31,
+      "text": "RuntimeError: Failed to infer device type, please set the environment variable `VLLM_LOGGING_LEVEL=DEBUG` to turn on verbose logging to help debug the issue."
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline-first.stdout",
+      "line": 30,
+      "text": "2026-10-16T05:39:03.737807Z ERROR qdrant::startup: Panic occurred in file src/common/inference/service.rs at line 104: Invalid timeout value for HTTP client: reqwest::Error { kind: Builder, source: General(\"No CA certificates were loaded from the system\") }"
+    }
+  ],
+  "results": {
+    "socraticode": {
+      "pin": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+      "version": "1.16.0",
+      "unit_files": 107,
+      "unit_tests": 2517,
+      "integration_files": 2,
+      "integration_tests": 6,
+      "counts_sources": [
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stdout:154",
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stdout:155",
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stdout:13",
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stdout:14"
+      ],
+      "evidence_class": "native_proven command execution; synthetic/stubbed-vector fixture scope",
+      "simulation": true,
+      "simulation_scope": "Upstream unit mocks and the two integration tests use synthetic/pre-embedded or stub-generated vectors. Real Qdrant and upstream indexing/recovery code run; no embedding model or quality comparison runs.",
+      "upstream_sources": [
+        {
+          "repository": "https://github.com/giancarloerra/SocratiCode",
+          "pin": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+          "path": ".github/workflows/ci.yml",
+          "lines": [
+            151,
+            187
+          ]
+        },
+        {
+          "repository": "https://github.com/giancarloerra/SocratiCode",
+          "pin": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+          "path": "tests/integration/interrupted-resume-recovery.test.ts",
+          "lines": [
+            17,
+            40
+          ]
+        }
+      ],
+      "full_model_e2e": "GAP: C2 model arms not yet measured; no true embedding/model retrieval, native client request, full-service restore or macOS run.",
+      "omitted_upstream_ci_files": [
+        {
+          "path": "tests/integration/char-cap-split-retrieval.test.ts",
+          "status": "GAP_NOT_RUN",
+          "reason": "Uses a test-served embedding HTTP endpoint; this preparation excludes embedding-service calls.",
+          "source": ".github/workflows/ci.yml:186 at 3d3a4a4d427cb0f29de4f5dd1360da52896f62df"
+        },
+        {
+          "path": "tests/integration/prune-reclamation.test.ts",
+          "status": "GAP_NOT_RUN",
+          "reason": "Outside the explicitly selected two-file subset; no qualification for this regression.",
+          "source": ".github/workflows/ci.yml:187 at 3d3a4a4d427cb0f29de4f5dd1360da52896f62df"
+        }
+      ]
+    },
+    "qdrant": {
+      "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "version_source": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-version.stdout:1",
+      "native_invocation": "Version/help plus parent integration tests against owned scratch Qdrant. Its log has 270 HTTP 200, eight 400 and four 404 responses; child exit code is missing. Parent Vitest rc 0 is not a component or per-call rc.",
+      "full_storage_e2e": "GAP: Qdrant's own full recovery/cluster suite not run.",
+      "http_outcomes_ref": "evidence/artifacts/final-prep-semantic-rag-20261016/qdrant-http-outcomes.json"
+    },
+    "vllm": {
+      "pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+      "version_source": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-metadata.stdout:1",
+      "cli_failure_source": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-version.stderr:31",
+      "resolution_source": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-resolution.stderr:2",
+      "full_e2e": "GAP: No new runtime install, no GPU, model download, inference or serving connection."
+    }
+  },
+  "attempt_disclosure": {
+    "recaptured_results": "All relied-on numeric/native results above were recaptured directly after integrity addendum-01; earlier excerpt-only draft receipts were discarded.",
+    "missing_captures": "Earlier npm sandbox-home/config/localhost setup attempts and first generic-platform resolver attempt have no compliant original raw capture in this packet. They remain named preparation gaps/history, never evidence of candidate behavior.",
+    "retained_failed_integration": "The first offline integration failed before tests when Qdrant could not load CA roots. Its raw streams are retained; retry adds read-only public CA roots while keeping the network namespace isolated.",
+    "scratch_state": "The successful retry reused owned scratch storage and loaded the first attempt's raft state (captures/qdrant-offline.stdout:14). New process/network namespace, not a fresh data directory."
+  },
+  "isolation": {
+    "new_host_installs": 0,
+    "new_units": 0,
+    "host_live_service_connections": 0,
+    "external_embedding_calls": 0,
+    "model_calls": 0,
+    "owned_scratch_qdrant_instances": 1,
+    "cleanup": "offline-integration.sh trap signals/waits only for its owned PID; namespace teardown removes access to the owned process.",
+    "fence": "No GPU devices, broker/account actions or credential/config mounts."
+  },
+  "supporting_service_streams": [
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline.stdout",
+      "bytes": 60723,
+      "sha256": "135f1af041e5defd2bdc0d81b474423b0319bfe4586b344774e9c0418a1017ba",
+      "capture_class": "deterministic_masked_native_output",
+      "private_raw_name": "qdrant-offline.stdout",
+      "raw_digest_published": false,
+      "command_ref": "evidence/artifacts/final-prep-semantic-rag-20261016/offline-integration.sh:5",
+      "return_code": null,
+      "return_code_gap": "Child exit status was consumed by the cleanup trap; only the parent integration command rc is independently captured. This stream is supporting log evidence, not a standalone successful server receipt."
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_class": "deterministic_masked_native_output",
+      "private_raw_name": "qdrant-offline.stderr",
+      "raw_digest_published": false,
+      "command_ref": "evidence/artifacts/final-prep-semantic-rag-20261016/offline-integration.sh:5",
+      "return_code": null,
+      "return_code_gap": "Child exit status was consumed by the cleanup trap; only the parent integration command rc is independently captured. This stream is supporting log evidence, not a standalone successful server receipt."
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline-first.stdout",
+      "bytes": 1742,
+      "sha256": "b3ca0bd7a2ca536313c2ee789eb5af98112fbf94f7be5a43455a7eb20e9ca3c1",
+      "capture_class": "deterministic_masked_native_output",
+      "private_raw_name": "qdrant-offline-first.stdout",
+      "raw_digest_published": false,
+      "command_ref": "evidence/artifacts/final-prep-semantic-rag-20261016/offline-integration.sh:5",
+      "return_code": null,
+      "return_code_gap": "Child exit status was consumed by the cleanup trap; only the parent integration command rc is independently captured. This stream is supporting log evidence, not a standalone successful server receipt."
+    },
+    {
+      "path": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline-first.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_class": "deterministic_masked_native_output",
+      "private_raw_name": "qdrant-offline-first.stderr",
+      "raw_digest_published": false,
+      "command_ref": "evidence/artifacts/final-prep-semantic-rag-20261016/offline-integration.sh:5",
+      "return_code": null,
+      "return_code_gap": "Child exit status was consumed by the cleanup trap; only the parent integration command rc is independently captured. This stream is supporting log evidence, not a standalone successful server receipt."
+    }
+  ],
+  "artifact_verification_ref": "evidence/artifacts/final-prep-semantic-rag-20261016/artifact-verification.json"
+}

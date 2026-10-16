@@ -1,0 +1,1711 @@
+{
+  "schema_version": 1,
+  "kind": "derived_http_outcome_index_not_measurement_receipt",
+  "source": "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-offline.stdout",
+  "source_pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+  "derivation": "Parse every native actix_web logger line: quoted METHOD target HTTP/version, then response status. Preserve source order and exact line locators; the full native log is the evidence.",
+  "counts": {
+    "200": 270,
+    "400": 8,
+    "404": 4
+  },
+  "request_count": 282,
+  "unparsed_logger_lines": [],
+  "requests": [
+    {
+      "line": 26,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 27,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 29,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata",
+      "status": 200
+    },
+    {
+      "line": 30,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/index",
+      "status": 200
+    },
+    {
+      "line": 31,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 32,
+      "method": "GET",
+      "target": "/collections/codebase_ce004b2147b4",
+      "status": 404
+    },
+    {
+      "line": 33,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 35,
+      "method": "PUT",
+      "target": "/collections/codebase_ce004b2147b4",
+      "status": 200
+    },
+    {
+      "line": 36,
+      "method": "PUT",
+      "target": "/collections/codebase_ce004b2147b4/index",
+      "status": 200
+    },
+    {
+      "line": 37,
+      "method": "PUT",
+      "target": "/collections/codebase_ce004b2147b4/index",
+      "status": 200
+    },
+    {
+      "line": 38,
+      "method": "PUT",
+      "target": "/collections/codebase_ce004b2147b4/index",
+      "status": 200
+    },
+    {
+      "line": 39,
+      "method": "PUT",
+      "target": "/collections/codebase_ce004b2147b4/index",
+      "status": 200
+    },
+    {
+      "line": 40,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 41,
+      "method": "PUT",
+      "target": "/collections/codebase_ce004b2147b4/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 42,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 43,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 44,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 45,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 46,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 47,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 51,
+      "method": "PUT",
+      "target": "/collections/ce004b2147b4_symgraph_meta",
+      "status": 200
+    },
+    {
+      "line": 52,
+      "method": "PUT",
+      "target": "/collections/ce004b2147b4_symgraph_index",
+      "status": 200
+    },
+    {
+      "line": 53,
+      "method": "PUT",
+      "target": "/collections/ce004b2147b4_symgraph_file",
+      "status": 200
+    },
+    {
+      "line": 54,
+      "method": "PUT",
+      "target": "/collections/ce004b2147b4_symgraph_file/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 55,
+      "method": "POST",
+      "target": "/collections/ce004b2147b4_symgraph_index/points",
+      "status": 200
+    },
+    {
+      "line": 56,
+      "method": "PUT",
+      "target": "/collections/ce004b2147b4_symgraph_index/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 57,
+      "method": "POST",
+      "target": "/collections/ce004b2147b4_symgraph_index/points",
+      "status": 200
+    },
+    {
+      "line": 58,
+      "method": "PUT",
+      "target": "/collections/ce004b2147b4_symgraph_index/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 59,
+      "method": "PUT",
+      "target": "/collections/ce004b2147b4_symgraph_meta/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 60,
+      "method": "POST",
+      "target": "/collections/ce004b2147b4_symgraph_file/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 61,
+      "method": "POST",
+      "target": "/collections/ce004b2147b4_symgraph_index/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 62,
+      "method": "GET",
+      "target": "/collections/codebase_ce004b2147b4",
+      "status": 200
+    },
+    {
+      "line": 63,
+      "method": "POST",
+      "target": "/collections/codebase_ce004b2147b4/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 64,
+      "method": "POST",
+      "target": "/collections/codebase_ce004b2147b4/points/delete",
+      "status": 200
+    },
+    {
+      "line": 65,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 66,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 67,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 68,
+      "method": "POST",
+      "target": "/collections/codebase_ce004b2147b4/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 69,
+      "method": "GET",
+      "target": "/collections/codebase_ce004b2147b4",
+      "status": 200
+    },
+    {
+      "line": 70,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 71,
+      "method": "POST",
+      "target": "/collections/codebase_ce004b2147b4/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 72,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 73,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 74,
+      "method": "PUT",
+      "target": "/collections/codebase_ce004b2147b4/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 75,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 76,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 77,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 78,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 79,
+      "method": "PUT",
+      "target": "/collections/ce004b2147b4_symgraph_file/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 80,
+      "method": "POST",
+      "target": "/collections/ce004b2147b4_symgraph_index/points",
+      "status": 200
+    },
+    {
+      "line": 81,
+      "method": "PUT",
+      "target": "/collections/ce004b2147b4_symgraph_index/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 82,
+      "method": "POST",
+      "target": "/collections/ce004b2147b4_symgraph_index/points",
+      "status": 200
+    },
+    {
+      "line": 83,
+      "method": "PUT",
+      "target": "/collections/ce004b2147b4_symgraph_index/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 84,
+      "method": "PUT",
+      "target": "/collections/ce004b2147b4_symgraph_meta/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 85,
+      "method": "POST",
+      "target": "/collections/ce004b2147b4_symgraph_file/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 86,
+      "method": "POST",
+      "target": "/collections/ce004b2147b4_symgraph_index/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 87,
+      "method": "POST",
+      "target": "/collections/ce004b2147b4_symgraph_file/points/delete?wait=true",
+      "status": 200
+    },
+    {
+      "line": 88,
+      "method": "POST",
+      "target": "/collections/ce004b2147b4_symgraph_index/points/delete?wait=true",
+      "status": 200
+    },
+    {
+      "line": 89,
+      "method": "POST",
+      "target": "/collections/codebase_ce004b2147b4/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 90,
+      "method": "GET",
+      "target": "/collections/codebase_ce004b2147b4",
+      "status": 200
+    },
+    {
+      "line": 92,
+      "method": "DELETE",
+      "target": "/collections/codebase_ce004b2147b4",
+      "status": 200
+    },
+    {
+      "line": 94,
+      "method": "DELETE",
+      "target": "/collections/codegraph_ce004b2147b4",
+      "status": 200
+    },
+    {
+      "line": 96,
+      "method": "DELETE",
+      "target": "/collections/context_ce004b2147b4",
+      "status": 200
+    },
+    {
+      "line": 97,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 98,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 99,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 100,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 101,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 102,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 103,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 104,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/index",
+      "status": 200
+    },
+    {
+      "line": 105,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 106,
+      "method": "GET",
+      "target": "/collections/codebase_eaef2bf5de1d",
+      "status": 404
+    },
+    {
+      "line": 107,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 109,
+      "method": "PUT",
+      "target": "/collections/codebase_eaef2bf5de1d",
+      "status": 200
+    },
+    {
+      "line": 110,
+      "method": "PUT",
+      "target": "/collections/codebase_eaef2bf5de1d/index",
+      "status": 200
+    },
+    {
+      "line": 111,
+      "method": "PUT",
+      "target": "/collections/codebase_eaef2bf5de1d/index",
+      "status": 200
+    },
+    {
+      "line": 112,
+      "method": "PUT",
+      "target": "/collections/codebase_eaef2bf5de1d/index",
+      "status": 200
+    },
+    {
+      "line": 113,
+      "method": "PUT",
+      "target": "/collections/codebase_eaef2bf5de1d/index",
+      "status": 200
+    },
+    {
+      "line": 114,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 115,
+      "method": "PUT",
+      "target": "/collections/codebase_eaef2bf5de1d/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 116,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 117,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 118,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 119,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 120,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 121,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 125,
+      "method": "PUT",
+      "target": "/collections/eaef2bf5de1d_symgraph_file",
+      "status": 200
+    },
+    {
+      "line": 126,
+      "method": "PUT",
+      "target": "/collections/eaef2bf5de1d_symgraph_meta",
+      "status": 200
+    },
+    {
+      "line": 127,
+      "method": "PUT",
+      "target": "/collections/eaef2bf5de1d_symgraph_index",
+      "status": 200
+    },
+    {
+      "line": 128,
+      "method": "PUT",
+      "target": "/collections/eaef2bf5de1d_symgraph_file/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 129,
+      "method": "POST",
+      "target": "/collections/eaef2bf5de1d_symgraph_index/points",
+      "status": 200
+    },
+    {
+      "line": 130,
+      "method": "PUT",
+      "target": "/collections/eaef2bf5de1d_symgraph_index/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 131,
+      "method": "POST",
+      "target": "/collections/eaef2bf5de1d_symgraph_index/points",
+      "status": 200
+    },
+    {
+      "line": 132,
+      "method": "PUT",
+      "target": "/collections/eaef2bf5de1d_symgraph_index/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 133,
+      "method": "PUT",
+      "target": "/collections/eaef2bf5de1d_symgraph_meta/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 134,
+      "method": "POST",
+      "target": "/collections/eaef2bf5de1d_symgraph_file/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 135,
+      "method": "POST",
+      "target": "/collections/eaef2bf5de1d_symgraph_index/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 136,
+      "method": "GET",
+      "target": "/collections/codebase_eaef2bf5de1d",
+      "status": 200
+    },
+    {
+      "line": 137,
+      "method": "POST",
+      "target": "/collections/codebase_eaef2bf5de1d/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 138,
+      "method": "POST",
+      "target": "/collections/codebase_eaef2bf5de1d/points/delete",
+      "status": 200
+    },
+    {
+      "line": 139,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 140,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 141,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 142,
+      "method": "POST",
+      "target": "/collections/codebase_eaef2bf5de1d/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 143,
+      "method": "GET",
+      "target": "/collections/codebase_eaef2bf5de1d",
+      "status": 200
+    },
+    {
+      "line": 144,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 145,
+      "method": "POST",
+      "target": "/collections/codebase_eaef2bf5de1d/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 146,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 147,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 148,
+      "method": "PUT",
+      "target": "/collections/codebase_eaef2bf5de1d/index",
+      "status": 200
+    },
+    {
+      "line": 149,
+      "method": "PUT",
+      "target": "/collections/codebase_eaef2bf5de1d/index",
+      "status": 200
+    },
+    {
+      "line": 150,
+      "method": "PUT",
+      "target": "/collections/codebase_eaef2bf5de1d/index",
+      "status": 200
+    },
+    {
+      "line": 151,
+      "method": "PUT",
+      "target": "/collections/codebase_eaef2bf5de1d/index",
+      "status": 200
+    },
+    {
+      "line": 152,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 153,
+      "method": "PUT",
+      "target": "/collections/codebase_eaef2bf5de1d/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 154,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 155,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 156,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 157,
+      "method": "PUT",
+      "target": "/collections/eaef2bf5de1d_symgraph_file/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 158,
+      "method": "POST",
+      "target": "/collections/eaef2bf5de1d_symgraph_index/points",
+      "status": 200
+    },
+    {
+      "line": 159,
+      "method": "PUT",
+      "target": "/collections/eaef2bf5de1d_symgraph_index/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 160,
+      "method": "POST",
+      "target": "/collections/eaef2bf5de1d_symgraph_index/points",
+      "status": 200
+    },
+    {
+      "line": 161,
+      "method": "PUT",
+      "target": "/collections/eaef2bf5de1d_symgraph_index/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 162,
+      "method": "PUT",
+      "target": "/collections/eaef2bf5de1d_symgraph_meta/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 163,
+      "method": "POST",
+      "target": "/collections/eaef2bf5de1d_symgraph_file/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 164,
+      "method": "POST",
+      "target": "/collections/eaef2bf5de1d_symgraph_index/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 165,
+      "method": "POST",
+      "target": "/collections/eaef2bf5de1d_symgraph_file/points/delete?wait=true",
+      "status": 200
+    },
+    {
+      "line": 166,
+      "method": "POST",
+      "target": "/collections/eaef2bf5de1d_symgraph_index/points/delete?wait=true",
+      "status": 200
+    },
+    {
+      "line": 167,
+      "method": "POST",
+      "target": "/collections/codebase_eaef2bf5de1d/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 168,
+      "method": "GET",
+      "target": "/collections/codebase_eaef2bf5de1d",
+      "status": 200
+    },
+    {
+      "line": 170,
+      "method": "DELETE",
+      "target": "/collections/codebase_eaef2bf5de1d",
+      "status": 200
+    },
+    {
+      "line": 172,
+      "method": "DELETE",
+      "target": "/collections/codegraph_eaef2bf5de1d",
+      "status": 200
+    },
+    {
+      "line": 174,
+      "method": "DELETE",
+      "target": "/collections/context_eaef2bf5de1d",
+      "status": 200
+    },
+    {
+      "line": 175,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 176,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 177,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 178,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 179,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 180,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 181,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 182,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/index",
+      "status": 200
+    },
+    {
+      "line": 183,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 184,
+      "method": "GET",
+      "target": "/collections/codebase_shared_worktree_recovery",
+      "status": 404
+    },
+    {
+      "line": 185,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 187,
+      "method": "PUT",
+      "target": "/collections/codebase_shared_worktree_recovery",
+      "status": 200
+    },
+    {
+      "line": 188,
+      "method": "PUT",
+      "target": "/collections/codebase_shared_worktree_recovery/index",
+      "status": 200
+    },
+    {
+      "line": 189,
+      "method": "PUT",
+      "target": "/collections/codebase_shared_worktree_recovery/index",
+      "status": 200
+    },
+    {
+      "line": 190,
+      "method": "PUT",
+      "target": "/collections/codebase_shared_worktree_recovery/index",
+      "status": 200
+    },
+    {
+      "line": 191,
+      "method": "PUT",
+      "target": "/collections/codebase_shared_worktree_recovery/index",
+      "status": 200
+    },
+    {
+      "line": 192,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 193,
+      "method": "PUT",
+      "target": "/collections/codebase_shared_worktree_recovery/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 194,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 195,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 196,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 197,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 198,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 199,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 203,
+      "method": "PUT",
+      "target": "/collections/shared_worktree_recovery_symgraph_meta",
+      "status": 200
+    },
+    {
+      "line": 204,
+      "method": "PUT",
+      "target": "/collections/shared_worktree_recovery_symgraph_file",
+      "status": 200
+    },
+    {
+      "line": 205,
+      "method": "PUT",
+      "target": "/collections/shared_worktree_recovery_symgraph_index",
+      "status": 200
+    },
+    {
+      "line": 206,
+      "method": "PUT",
+      "target": "/collections/shared_worktree_recovery_symgraph_file/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 207,
+      "method": "POST",
+      "target": "/collections/shared_worktree_recovery_symgraph_index/points",
+      "status": 200
+    },
+    {
+      "line": 208,
+      "method": "PUT",
+      "target": "/collections/shared_worktree_recovery_symgraph_index/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 209,
+      "method": "POST",
+      "target": "/collections/shared_worktree_recovery_symgraph_index/points",
+      "status": 200
+    },
+    {
+      "line": 210,
+      "method": "PUT",
+      "target": "/collections/shared_worktree_recovery_symgraph_index/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 211,
+      "method": "PUT",
+      "target": "/collections/shared_worktree_recovery_symgraph_meta/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 212,
+      "method": "POST",
+      "target": "/collections/shared_worktree_recovery_symgraph_file/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 213,
+      "method": "POST",
+      "target": "/collections/shared_worktree_recovery_symgraph_index/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 214,
+      "method": "GET",
+      "target": "/collections/codebase_shared_worktree_recovery",
+      "status": 200
+    },
+    {
+      "line": 215,
+      "method": "POST",
+      "target": "/collections/codebase_shared_worktree_recovery/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 216,
+      "method": "POST",
+      "target": "/collections/codebase_shared_worktree_recovery/points/delete",
+      "status": 200
+    },
+    {
+      "line": 217,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 218,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 219,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 220,
+      "method": "POST",
+      "target": "/collections/codebase_shared_worktree_recovery/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 221,
+      "method": "GET",
+      "target": "/collections/codebase_shared_worktree_recovery",
+      "status": 200
+    },
+    {
+      "line": 222,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 223,
+      "method": "POST",
+      "target": "/collections/codebase_shared_worktree_recovery/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 224,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 225,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 226,
+      "method": "PUT",
+      "target": "/collections/codebase_shared_worktree_recovery/index",
+      "status": 200
+    },
+    {
+      "line": 227,
+      "method": "PUT",
+      "target": "/collections/codebase_shared_worktree_recovery/index",
+      "status": 200
+    },
+    {
+      "line": 228,
+      "method": "PUT",
+      "target": "/collections/codebase_shared_worktree_recovery/index",
+      "status": 200
+    },
+    {
+      "line": 229,
+      "method": "PUT",
+      "target": "/collections/codebase_shared_worktree_recovery/index",
+      "status": 200
+    },
+    {
+      "line": 230,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 231,
+      "method": "PUT",
+      "target": "/collections/codebase_shared_worktree_recovery/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 232,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 233,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 234,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 235,
+      "method": "PUT",
+      "target": "/collections/shared_worktree_recovery_symgraph_file/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 236,
+      "method": "POST",
+      "target": "/collections/shared_worktree_recovery_symgraph_index/points",
+      "status": 200
+    },
+    {
+      "line": 237,
+      "method": "PUT",
+      "target": "/collections/shared_worktree_recovery_symgraph_index/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 238,
+      "method": "POST",
+      "target": "/collections/shared_worktree_recovery_symgraph_index/points",
+      "status": 200
+    },
+    {
+      "line": 239,
+      "method": "PUT",
+      "target": "/collections/shared_worktree_recovery_symgraph_index/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 240,
+      "method": "PUT",
+      "target": "/collections/shared_worktree_recovery_symgraph_meta/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 241,
+      "method": "POST",
+      "target": "/collections/shared_worktree_recovery_symgraph_file/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 242,
+      "method": "POST",
+      "target": "/collections/shared_worktree_recovery_symgraph_index/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 243,
+      "method": "POST",
+      "target": "/collections/shared_worktree_recovery_symgraph_file/points/delete?wait=true",
+      "status": 200
+    },
+    {
+      "line": 244,
+      "method": "POST",
+      "target": "/collections/shared_worktree_recovery_symgraph_index/points/delete?wait=true",
+      "status": 200
+    },
+    {
+      "line": 245,
+      "method": "POST",
+      "target": "/collections/codebase_shared_worktree_recovery/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 246,
+      "method": "GET",
+      "target": "/collections/codebase_shared_worktree_recovery",
+      "status": 200
+    },
+    {
+      "line": 248,
+      "method": "DELETE",
+      "target": "/collections/codebase_shared_worktree_recovery",
+      "status": 200
+    },
+    {
+      "line": 250,
+      "method": "DELETE",
+      "target": "/collections/codegraph_shared_worktree_recovery",
+      "status": 200
+    },
+    {
+      "line": 252,
+      "method": "DELETE",
+      "target": "/collections/context_shared_worktree_recovery",
+      "status": 200
+    },
+    {
+      "line": 253,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 254,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 255,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 256,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 257,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 258,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 259,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 260,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/index",
+      "status": 200
+    },
+    {
+      "line": 261,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 262,
+      "method": "GET",
+      "target": "/collections/codebase_6d47a0de92dc",
+      "status": 404
+    },
+    {
+      "line": 263,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 265,
+      "method": "PUT",
+      "target": "/collections/codebase_6d47a0de92dc",
+      "status": 200
+    },
+    {
+      "line": 266,
+      "method": "PUT",
+      "target": "/collections/codebase_6d47a0de92dc/index",
+      "status": 200
+    },
+    {
+      "line": 267,
+      "method": "PUT",
+      "target": "/collections/codebase_6d47a0de92dc/index",
+      "status": 200
+    },
+    {
+      "line": 268,
+      "method": "PUT",
+      "target": "/collections/codebase_6d47a0de92dc/index",
+      "status": 200
+    },
+    {
+      "line": 269,
+      "method": "PUT",
+      "target": "/collections/codebase_6d47a0de92dc/index",
+      "status": 200
+    },
+    {
+      "line": 270,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 271,
+      "method": "PUT",
+      "target": "/collections/codebase_6d47a0de92dc/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 272,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 273,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 274,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 275,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 276,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 277,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 281,
+      "method": "PUT",
+      "target": "/collections/6d47a0de92dc_symgraph_index",
+      "status": 200
+    },
+    {
+      "line": 282,
+      "method": "PUT",
+      "target": "/collections/6d47a0de92dc_symgraph_file",
+      "status": 200
+    },
+    {
+      "line": 283,
+      "method": "PUT",
+      "target": "/collections/6d47a0de92dc_symgraph_meta",
+      "status": 200
+    },
+    {
+      "line": 284,
+      "method": "PUT",
+      "target": "/collections/6d47a0de92dc_symgraph_file/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 285,
+      "method": "POST",
+      "target": "/collections/6d47a0de92dc_symgraph_index/points",
+      "status": 200
+    },
+    {
+      "line": 286,
+      "method": "PUT",
+      "target": "/collections/6d47a0de92dc_symgraph_index/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 287,
+      "method": "PUT",
+      "target": "/collections/6d47a0de92dc_symgraph_meta/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 288,
+      "method": "POST",
+      "target": "/collections/6d47a0de92dc_symgraph_file/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 289,
+      "method": "POST",
+      "target": "/collections/6d47a0de92dc_symgraph_index/points/scroll",
+      "status": 200
+    },
+    {
+      "line": 290,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 291,
+      "method": "GET",
+      "target": "/collections/codebase_6d47a0de92dc",
+      "status": 200
+    },
+    {
+      "line": 292,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 293,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 294,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 295,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 296,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 297,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 299,
+      "method": "DELETE",
+      "target": "/collections/codebase_6d47a0de92dc",
+      "status": 200
+    },
+    {
+      "line": 301,
+      "method": "DELETE",
+      "target": "/collections/codegraph_6d47a0de92dc",
+      "status": 200
+    },
+    {
+      "line": 303,
+      "method": "DELETE",
+      "target": "/collections/context_6d47a0de92dc",
+      "status": 200
+    },
+    {
+      "line": 304,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 305,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 306,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 307,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 308,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 309,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points/delete",
+      "status": 200
+    },
+    {
+      "line": 310,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 312,
+      "method": "DELETE",
+      "target": "/collections/codebase_e3d27bbbe4ec",
+      "status": 200
+    },
+    {
+      "line": 313,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 315,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec",
+      "status": 200
+    },
+    {
+      "line": 316,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/index",
+      "status": 200
+    },
+    {
+      "line": 317,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/index",
+      "status": 200
+    },
+    {
+      "line": 318,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/index",
+      "status": 200
+    },
+    {
+      "line": 319,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/index",
+      "status": 200
+    },
+    {
+      "line": 320,
+      "method": "GET",
+      "target": "/collections/codebase_e3d27bbbe4ec",
+      "status": 200
+    },
+    {
+      "line": 321,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/points?wait=true",
+      "status": 400
+    },
+    {
+      "line": 322,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/points?wait=true",
+      "status": 400
+    },
+    {
+      "line": 323,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/points?wait=true",
+      "status": 400
+    },
+    {
+      "line": 324,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 325,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/points?wait=true",
+      "status": 400
+    },
+    {
+      "line": 326,
+      "method": "GET",
+      "target": "/collections/codebase_e3d27bbbe4ec",
+      "status": 200
+    },
+    {
+      "line": 327,
+      "method": "GET",
+      "target": "/collections",
+      "status": 200
+    },
+    {
+      "line": 328,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/index",
+      "status": 200
+    },
+    {
+      "line": 329,
+      "method": "PUT",
+      "target": "/collections/socraticode_metadata/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 330,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/points?wait=true",
+      "status": 400
+    },
+    {
+      "line": 331,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/points?wait=true",
+      "status": 400
+    },
+    {
+      "line": 332,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/points?wait=true",
+      "status": 400
+    },
+    {
+      "line": 333,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 334,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/points?wait=true",
+      "status": 400
+    },
+    {
+      "line": 335,
+      "method": "POST",
+      "target": "/collections/socraticode_metadata/points",
+      "status": 200
+    },
+    {
+      "line": 336,
+      "method": "PUT",
+      "target": "/collections/codebase_e3d27bbbe4ec/points?wait=true",
+      "status": 200
+    },
+    {
+      "line": 337,
+      "method": "GET",
+      "target": "/collections/codebase_e3d27bbbe4ec",
+      "status": 200
+    },
+    {
+      "line": 339,
+      "method": "DELETE",
+      "target": "/collections/codebase_e3d27bbbe4ec",
+      "status": 200
+    }
+  ],
+  "process_return_code": null,
+  "process_return_code_gap": "HTTP statuses are not process exit codes; child exit not captured.",
+  "context": "Synthetic-vector upstream fixtures; all 400/404 outcomes retained. Derived locator index, not replacement native bytes."
+}

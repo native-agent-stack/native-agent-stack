@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "kind": "native_invoke_evidence_with_role_gaps",
+  "catalog": "foundation",
+  "layer_id": "semantic-rag",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "capture_contract": "All measured values derive from deterministic masked native streams in native-checks.json; no excerpt or summary substitutes for a capture.",
+  "commands_ref": "native-checks.json",
+  "components": [
+    {
+      "id": "socraticode",
+      "pin": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+      "native_commands": [
+        "npm run test:unit",
+        "npm run check:release-versions",
+        "npx --no-install vitest run tests/integration/partial-upsert-skip.test.ts tests/integration/interrupted-resume-recovery.test.ts"
+      ],
+      "return_codes": [
+        0,
+        0,
+        0
+      ],
+      "sources": [
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stdout:154",
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-unit.stdout:155",
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-release-versions.stdout:5",
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stdout:13",
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stdout:14"
+      ],
+      "synthetic": true,
+      "synthetic_scope": "Upstream fixtures, pre-embedded/stub vectors; real isolated Qdrant/indexing/recovery paths. No embedding model or native-client MCP request.",
+      "f2_status": "GAP for full native semantic-client role"
+    },
+    {
+      "id": "qdrant",
+      "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "native_commands": [
+        "qdrant --version",
+        "qdrant --help",
+        "Owned isolated Qdrant API calls from two upstream integration files"
+      ],
+      "sources": [
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-version.stdout:1",
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/qdrant-help.stdout:3",
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/socraticode-offline-integration.stdout:14"
+      ],
+      "return_codes": [
+        0,
+        0,
+        null
+      ],
+      "synthetic": true,
+      "synthetic_scope": "Native storage/upsert/recovery operations on synthetic fixture vectors, not representative source/model quality.",
+      "f2_status": "Native CLI observed; HTTP outcomes mixed; full semantic-role E2E remains GAP.",
+      "return_code_gap": "Per-call HTTP statuses and the Qdrant child process exit code are distinct. The latter was not captured; do not substitute the parent test script's rc.",
+      "http_outcomes_ref": "evidence/artifacts/final-prep-semantic-rag-20261016/qdrant-http-outcomes.json",
+      "http_status_counts": {
+        "200": 270,
+        "400": 8,
+        "404": 4
+      },
+      "http_status_kind": "Derived index of native access-log HTTP responses, not process exit codes.",
+      "parent_test_outcome": {
+        "command_id": "socraticode-offline-integration",
+        "return_code": 0,
+        "source": "evidence/artifacts/final-prep-semantic-rag-20261016/native-checks.json",
+        "scope": "Parent test process only; not every API response or child server exit."
+      }
+    },
+    {
+      "id": "vllm",
+      "pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+      "native_commands": [
+        "python vllm --version"
+      ],
+      "return_codes": [
+        1
+      ],
+      "sources": [
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-version.stderr:31",
+        "evidence/artifacts/final-prep-semantic-rag-20261016/captures/vllm-metadata.stdout:1"
+      ],
+      "f2_status": "GAP",
+      "reason": "No GPU devices in the sandbox; CLI device setup fails before version printing. Distribution metadata 0.31.0 is not serving invocation. C2 model arms not yet measured."
+    }
+  ],
+  "readiness": [
+    "C2 model arms not yet measured",
+    "Review resolves role and source-pin discrepancies, including Ollama split and SocratiCode frozen arm",
+    "Disposable model-service runner and GPU allocation ready; no host install",
+    "Complete upstream-owned E2E and native-client invoke receipt at the same full run identity"
+  ],
+  "final_admission": false
+}
