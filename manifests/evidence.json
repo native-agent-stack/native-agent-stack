@@ -19332,9 +19332,19 @@
       "bytes": 4356
     },
     {
+      "path": "docs/decisions/2026-10-15-practice-harness-rows-scope.md",
+      "sha256": "81fac624ebc044e13d0bdbee4638af0ba3b71578c6b0aa4aee7dee06db259293",
+      "bytes": 11558
+    },
+    {
       "path": "docs/decisions/2026-10-15-unrun-registration-rules.md",
       "sha256": "10c05e99847859f1c66ba5746ad5872a79ea6f7c115bfb243911d69e86d8f1a6",
       "bytes": 9884
+    },
+    {
+      "path": "docs/decisions/2026-10-16-research-campaign-practice.md",
+      "sha256": "edd36738a8cf89a925afd9548a534d4121cdd1551cad8be2ffc830a1c6619998",
+      "bytes": 8510
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
