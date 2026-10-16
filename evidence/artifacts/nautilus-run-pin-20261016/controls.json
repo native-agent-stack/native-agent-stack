@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "base": "8dfe8b588de22451364857b4be4683fb35f57a7d",
+  "component": "nautilus-trader",
+  "before": {
+    "command": "python3 -m unittest tests.test_nautilus_run_pin",
+    "tests": 4,
+    "failures": 8,
+    "errors": 0,
+    "exit_code": 1,
+    "scope": "Unchanged main data and implementation, with only the new behavioral test module added. Includes five mismatch subtest failures."
+  },
+  "after_fixture": {
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "exit_code": 0,
+    "scope": "Exact-lock receipt binding, five identity mismatches and duplicate pointer refusal, before owning regeneration."
+  },
+  "after": {
+    "command": "python3 -m unittest tests.test_nautilus_run_pin tests.test_final_stack.PinTests tests.test_final_stack.RunTests",
+    "tests": 23,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "scope": "Four new binding tests plus 19 existing parser and precedence tests, after native final-stack regeneration."
+  },
+  "scope_preservation": {
+    "run_count_before": 81,
+    "run_count_after": 81,
+    "changed_run_ids": ["nautilus-trader"],
+    "unchanged": [
+      "scripts/landscape.py",
+      "catalogs/landscape/foundation.json",
+      "catalogs/landscape/us-equities.json",
+      "catalogs/sota-convergence/layer-verdict-waves.json",
+      "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "adoption/pins-linux-x86_64.json",
+      "adoption/pins-macos-arm64.json",
+      "manifests/stack.json",
+      "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
+    ]
+  },
+  "boundary": "No E2E, invoke receipt, broker operation, installation or FINAL admission; all fixture mutations stay in temporary roots."
+}

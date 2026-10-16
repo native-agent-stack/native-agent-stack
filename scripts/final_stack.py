@@ -102,6 +102,7 @@ MEASURED_EVIDENCE = (("evidence_class", "measured_comparison"), ("evidence_kind"
 
 # Run-pin sources, highest precedence first. A component is the normalized repository (or, without one, its id).
 LOCKFILE = "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
+LOCKFILE_SOURCES = "catalogs/landscape/lockfile-source-identities.json"
 PIN_FILES = (("linux-x86_64", "adoption/pins-linux-x86_64.json"), ("macos-arm64", "adoption/pins-macos-arm64.json"))
 STACK = component_matrix.STACK_FILE
 RUNTIME_TARGET = "catalogs/us-equities/runtime-target.json"
@@ -114,6 +115,7 @@ RUN_PIN_SOURCES_TEXT = (f"the allowlisted lockfile {LOCKFILE} (its root package'
 # package (catalogs/landscape/us-equities.json data-mlflow and data-pandera).
 LOCKFILE_REPOSITORIES = {
     "mlflow": "https://github.com/mlflow/mlflow",
+    "nautilus-trader": "https://github.com/nautechsystems/nautilus_trader",
     "pandera": "https://github.com/unionai-oss/pandera",
 }
 # Winners whose only run pin lives in the private trading repository: component_id -> the record that says so.
@@ -375,6 +377,18 @@ def run_records(sources: Sources) -> list[dict]:
     records = []
 
     lock = sources.toml(LOCKFILE)
+    bindings = {}
+    if sources.path(LOCKFILE_SOURCES).exists():
+        supplement = sources.json(LOCKFILE_SOURCES)
+        if (not isinstance(supplement, dict) or supplement.get("schema_version") != 1
+                or supplement.get("lockfile") != LOCKFILE or not isinstance(supplement.get("bindings"), list)):
+            raise FinalStackError(f"{LOCKFILE_SOURCES}: unknown schema or lockfile")
+        for binding in supplement["bindings"]:
+            if not isinstance(binding, dict) or not isinstance(binding.get("source"), str):
+                raise FinalStackError(f"{LOCKFILE_SOURCES}: binding requires a source pointer")
+            if binding["source"] in bindings:
+                raise FinalStackError(f"{LOCKFILE_SOURCES}: duplicate source identity")
+            bindings[binding["source"]] = binding
     packages = _dicts(lock.get("package"))
     # uv 0.12.17 (635500036e1705961315e86447f0fab0a8ddb309),
     # crates/uv-lock/src/lock/mod.rs:3600-3607: editable/virtual roots have the empty
@@ -393,8 +407,24 @@ def run_records(sources: Sources) -> list[dict]:
             raise FinalStackError(f"{LOCKFILE}: {len(matches)} package entries for requirement {name}")
         index, package = matches[0]
         repository = stack_repository.get(name) or host_receipts.normalize_repository(LOCKFILE_REPOSITORIES.get(name))
-        records.append({"rank": 0, "id": name, "repository": repository, "pin": package.get("version"),
-                        "parsed": record_pin(package.get("version")), "source": f"{LOCKFILE}#/package/{index}",
+        source = f"{LOCKFILE}#/package/{index}"
+        pin = package.get("version")
+        parsed = record_pin(pin)
+        if source in bindings:
+            binding = bindings[source]
+            artifacts = sorted({artifact["hash"] for artifact in
+                                [package.get("sdist", {}), *package.get("wheels", [])] if artifact.get("hash")})
+            if (binding.get("package") == name and binding.get("version") == pin
+                    and artifacts and binding.get("artifact_sha256") == artifacts
+                    and repository is not None
+                    and host_receipts.normalize_repository(binding.get("repository")) == repository
+                    and isinstance(binding.get("commit"), str) and COMMIT_PATTERN.fullmatch(binding["commit"])):
+                parsed = record_pin(pin, binding["commit"])
+                pin = f"{pin}; source {binding['commit']}"
+            else:
+                parsed = {"pin_parse": "unparsed"}
+        records.append({"rank": 0, "id": name, "repository": repository, "pin": pin,
+                        "parsed": parsed, "source": source,
                         "platform": None})
 
     for platform_order, (platform, relative) in enumerate(PIN_FILES):

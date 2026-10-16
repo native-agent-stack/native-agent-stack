@@ -17608,8 +17608,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "e482c30346bbe97fc06a8909a43e86d8d69a93983a443747f92ad7d3d8b9d46d",
-      "bytes": 338896
+      "sha256": "c0192f2e9f8c51d1a890be1d5bf7e264833b287c31dcfb7bfa54937ad272a572",
+      "bytes": 339109
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -17680,6 +17680,11 @@
       "path": "catalogs/landscape/independent-discovery.json",
       "sha256": "b3c294015ffeb4aa488353f9cd86e1e5181a2233bcac70fbc32231495b22bd31",
       "bytes": 90370
+    },
+    {
+      "path": "catalogs/landscape/lockfile-source-identities.json",
+      "sha256": "61204af26d0da94eb3cc3292caca0fd39e7c4625395ce6cf2d1ebc7e5223de80",
+      "bytes": 1008
     },
     {
       "path": "catalogs/landscape/manifest.json",
@@ -19335,6 +19340,11 @@
       "path": "docs/decisions/2026-10-15-unrun-registration-rules.md",
       "sha256": "10c05e99847859f1c66ba5746ad5872a79ea6f7c115bfb243911d69e86d8f1a6",
       "bytes": 9884
+    },
+    {
+      "path": "docs/decisions/2026-10-16-nautilus-rc5-run-source-pin.md",
+      "sha256": "796d0194b72cf824b26dbbbf4ddceefb2f51c0f575764078c60e15dbe1b40a27",
+      "bytes": 4531
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -43212,6 +43222,21 @@
       "bytes": 817
     },
     {
+      "path": "evidence/artifacts/nautilus-run-pin-20261016/controls.json",
+      "sha256": "377cfe2369d5277c98b42c96a09f56ffbba0a178b5c20875e46dd68f46b1587c",
+      "bytes": 1764
+    },
+    {
+      "path": "evidence/artifacts/nautilus-run-pin-20261016/tag-resolution.json",
+      "sha256": "9f685ec16531c682b296a51559441be110aedf12bed9e2a4f39ab1ed3f6ecb13",
+      "bytes": 805
+    },
+    {
+      "path": "evidence/artifacts/nautilus-run-pin-20261016/tags.md",
+      "sha256": "c6badb9cf3eeed7a5646670f0feea2cb012738f7db34bbd07da9d884d48c50da",
+      "bytes": 220
+    },
+    {
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/README.md",
       "sha256": "02b9dcd15080141851f8b18f0b6340279e2c43a032df8f3dd7b8f1560c3fcdb3",
       "bytes": 2323
@@ -62483,8 +62508,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "2319364f1f99b491f7d5fed2ec3a7851e1bce5117da5f0f6eebad1a0d05a66f1",
-      "bytes": 81671
+      "sha256": "df1fe84127b3bf3871f578eb73f56890d4d97379286081a8e1c12f82404f5736",
+      "bytes": 83545
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -64075,6 +64100,11 @@
       "path": "tests/test_nautilus_equity_replay.py",
       "sha256": "5e254b3f118ac09434dee27133c0665788e0b18190889334c39e4470a22fb056",
       "bytes": 5412
+    },
+    {
+      "path": "tests/test_nautilus_run_pin.py",
+      "sha256": "e192ef634053f77916a1f3f4c938bc3f8f1372576a8b0519b6eb07396d59657a",
+      "bytes": 3530
     },
     {
       "path": "tests/test_new_host_grand_list.py",
