@@ -3,6 +3,7 @@
 import copy
 import hashlib
 import json
+import re
 from datetime import date
 from pathlib import Path
 import subprocess
@@ -51,41 +52,67 @@ def package_bound_inventory():
 
 
 class ModelCurrencyTests(unittest.TestCase):
-    def test_background_haiku_records_sourced_successor_and_triggered_review(self):
-        """Guard the corrected real row, independently of date/shape validation.
+    def test_background_haiku_row_names_haiku_5_5_for_the_client_it_states(self):
+        """The background-haiku row follows the client default for the version it names.
 
-        The old no-successor judgment passes the generic schema with fresh dates;
-        it must not silently return after the October 15 primary-source review.
+        Claude Code 2.1.293 made Haiku 5.5 the default Haiku on the Anthropic API
+        (anthropics/claude-code v2.1.302, commit c017428c8c27e604840435048d5bce6a9a22c040,
+        CHANGELOG.md:642), so a row that names a client at
+        or after 2.1.293 and still pins Haiku 4.5 is stale. This replaces the
+        2026-10-15 receipt test that asserted the Haiku 4.5 pin; the correction
+        record is docs/decisions/2026-10-17-background-haiku-currency-correction.md.
         """
         path = Path(__file__).resolve().parents[1] / "catalogs/foundation/model-currency.json"
         data = json.loads(path.read_text())
         row = next(model for model in data["models"] if model["id"] == "background-haiku")
-        check = row["landscape_check"]
-        candidates = {candidate["model_id"]: candidate for candidate in check["newer_candidates"]}
-        self.assertIn("claude-haiku-5-5", candidates)
-        successor = candidates["claude-haiku-5-5"]
-        self.assertEqual(successor["revision"], "claude-haiku-5-5")
-        self.assertEqual(successor["source"],
-                         "https://platform.claude.com/docs/en/models/haiku-5-5/overview")
-        self.assertIn(successor["source"], check["sources"])
-        self.assertIn("2026-10-07", successor["reason"])
-        self.assertIn("overturn condition is met", successor["reason"])
-        self.assertIn("supersedes the October 7 no-newer-Haiku claim", check["reason"])
-        self.assertIn("Triggered", row["overturn"])
-        self.assertIn("Haiku 5.5 is available", row["overturn"])
-        self.assertIn("Migration-review owner: command center (CC)", row["overturn"])
-        self.assertIn("#haiku-background-migration-review", row["overturn"])
-        self.assertIn("Paired Haiku 4.5/5.5", row["overturn"])
-        self.assertIn("Claude Code headless", row["overturn"])
-        self.assertIn("never a bare API call from a Codex lane", row["overturn"])
-        self.assertIn("Active (legacy)", check["reason"])
-        self.assertIn("not sooner than 2026-10-15", check["reason"])
-        self.assertIn("at least 60 days' notice", check["reason"])
-        self.assertIn("review", row["overturn"])
-        self.assertIn("authorized application", row["overturn"])
-        # A detected successor is a review gate, not a silent deployed-pin change.
+        match = re.search(r"Claude Code (\d+)\.(\d+)\.(\d+)\b", row["consumer"])
+        self.assertIsNotNone(match, row["consumer"])
+        client = tuple(int(part) for part in match.groups())
+        self.assertGreaterEqual(client, (2, 1, 293), "row must state a client that defaults to Haiku 5.5")
         self.assertEqual((row["model_id"], row["revision"], row["status"]),
-                         ("claude-haiku-4-5-20251001", "claude-haiku-4-5-20251001", "in_use"))
+                         ("claude-haiku-5-5", "claude-haiku-5-5", "in_use"))
+        self.assertEqual(row["release_date"], "2026-10-07")
+        self.assertEqual(row["release_source"], "https://platform.claude.com/docs/en/models/haiku-5-5/overview")
+        self.assertEqual(row["release_line"]["url"], row["release_source"])
+        self.assertEqual(row["checked_at"], "2026-10-17")
+        # The pinned model is never recorded as a newer candidate of itself.
+        pinned = {row["model_id"], row["revision"]}
+        for candidate in row.get("landscape_check", {}).get("newer_candidates", []):
+            self.assertNotIn(candidate["model_id"], pinned)
+        self.assertIn("2.1.295", row["overturn"])
+        self.assertIn("gateway", row["overturn"])
+        self.assertIn("2026-10-17-background-haiku-currency-correction.md", row["overturn"])
+
+    def test_background_haiku_selection_records_and_correction_citations_follow_the_row(self):
+        """The hand-kept selection records agree with the row; the record cites upstream, not a host path.
+
+        Zero-tolerance policy: docs/decisions/2026-10-17-zero-tolerance-currency.md.
+        """
+        root = Path(__file__).resolve().parents[1]
+        row = next(model for model in json.loads((root / "catalogs/foundation/model-currency.json").read_text())["models"]
+                   if model["id"] == "background-haiku")
+        stack = json.loads((root / "manifests/stack.json").read_text())
+        entries = [model for model in stack["models"] if "background-haiku" in model.get("currency_rows", [])]
+        self.assertEqual([(model["id"], model["revision"], model["release_date"], model["release_source"],
+                           model["currency_status"]) for model in entries],
+                         [(row["model_id"], row["revision"], row["release_date"], row["release_source"], row["status"])])
+        self.assertEqual(entries[0]["overturn"], row["overturn"].split(" Gateway exception:")[0])
+        # The id and revision are the pinned canonical model ID; the moving alias is `haiku`, so the entry
+        # must not call itself an alias (anthropics/claude-code docs model-config: aliases move, full names pin).
+        self.assertEqual(entries[0]["distribution"], "Hosted canonical model ID; no local weights or CI calls")
+        doc = " ".join((root / "docs/model-currency.md").read_text().split())
+        self.assertNotIn("retains Haiku 4.5", doc)
+        self.assertIn("follows Haiku 5.5", doc)
+        self.assertNotIn("remains a dated claim requiring separate reconciliation",
+                         " ".join((root / "docs/active-model-currency.md").read_text().split()))
+        latest = json.loads((root / "catalogs/foundation/latest-models.json").read_text())
+        self.assertEqual(latest["latest"]["claude-haiku"], row["model_id"])
+        record = (root / "docs/decisions/2026-10-17-background-haiku-currency-correction.md").read_text()
+        for parts in (("var", "tmp"), ("home",), ("tmp",)):  # host-private path roots
+            self.assertNotIn("/" + "/".join(parts) + "/", record)
+        self.assertIn("c017428c8c27e604840435048d5bce6a9a22c040", record)
+        for cited in ("CHANGELOG.md:642", "CHANGELOG.md:594", "CHANGELOG.md:421"):
+            self.assertIn(cited, record)
 
     def assert_valid(self, document):
         self.assertEqual(model_currency_problems(document, TODAY), [])

@@ -66,9 +66,9 @@ Inventory objects reject extra keys at every defined level, so a misspelled
 exception field cannot be ignored. Primary source URLs must be HTTPS without
 credentials, whitespace or control characters, and their ports must parse.
 
-Currency follows the newest release within a model's own line. The background
-slot retains Haiku 4.5 as a dated exception for simple work; currency alone does
-not promote it to Sonnet or Opus. A published Haiku 5.x ID reopens that selection.
+Currency follows the newest release within a model's own line. The background slot follows Haiku 5.5 (`claude-haiku-5-5`), the Anthropic API default Haiku from Claude Code 2.1.293 and the model the installed 2.1.302 client runs there;
+currency alone does not promote it to Sonnet or Opus. A Claude Code release that moves the slot off Haiku 5.5,
+or a legacy or retirement notice for it, reopens that selection ([correction record](decisions/2026-10-17-background-haiku-currency-correction.md)).
 
 ## Daily review proposals
 
