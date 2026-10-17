@@ -151,7 +151,7 @@ def validate_convergence(root: Path, snapshot: dict, *, read=None) -> dict:
         require(name not in by_repo, "duplicate snapshot repository identity")
         by_repo[name] = star
     layer_doc = load_document("catalogs/foundation/manifest.json")
-    layers = {row["id"] for row in layer_doc["layers"]}
+    layers = {row["id"] for row in layer_doc["layers"]} | _us_equities_layers(root, load_document)
     skills = "catalogs/landscape/skills-lifecycle.json"
     if safe_file(root, skills).exists():
         layers.update(row["layer_id"] for row in load_document(skills)["tasks"])
@@ -279,3 +279,12 @@ def validate_convergence(root: Path, snapshot: dict, *, read=None) -> dict:
             "every seed row must be referenced by a disposition")
     _validate_finalization(root, manifest, read)
     return {"status": "valid", "count": len(rows), "pending": 0, "seed_count": len(seed_doc["seeds"]), **counts}
+
+
+def _us_equities_layers(root, load_document):
+    """The us-equities layer ids (catalogs/landscape/us-equities.json#/layers), read like the skills catalog: only
+    when the catalog exists. Its domain_rows are the historical research layers, not canonical layer ids."""
+    us_equities = "catalogs/landscape/us-equities.json"
+    if not safe_file(root, us_equities).exists():
+        return set()
+    return {row["layer_id"] for row in load_document(us_equities)["layers"]}

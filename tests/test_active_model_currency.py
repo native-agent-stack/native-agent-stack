@@ -613,6 +613,25 @@ class ActiveModelCurrencyTests(unittest.TestCase):
         self.assertEqual(result["status"], "stale")
         self.assertEqual(result["stale_count"], 1)
 
+    def test_step1_coverage_records_do_not_mask_active_copies_or_size_gaps(self):
+        # The step-1 coverage ledger and its list table each exceed MAX_BYTES and name model-serving
+        # repositories as list text; before their exemption the whole report went unknown (currency_due's
+        # ThisCheckoutTests.test_the_real_checks_run_dry_and_write_nothing caught it).
+        for name, kind in (("catalogs/landscape/coverage/coverage-ledger-20261016.json", "landscape-coverage-ledger"),
+                           ("catalogs/landscape/coverage/awesome-lists-20261016.json", "landscape-awesome-list-table")):
+            with self.subTest(name=name):
+                text = json.dumps({"schema_version": 1, "kind": kind, "seeds": [{"source_model_ids": ["gpt-6-sol"]}],
+                                   "padding": "x" * mc.MAX_BYTES})
+                path = self.write(name, text)
+                self.assertEqual(self.check()["status"], "current")
+                active = self.write("config/" + Path(name).name, text)
+                self.assertEqual(self.check()["status"], "unknown")
+                active.write_text(json.dumps({"model": "gpt-6-sol"}))
+                result = self.check()
+                self.assertEqual((result["status"], result["stale_count"]), ("stale", 1))
+                active.unlink()
+                path.unlink()
+
     def test_multiline_commands_keep_comment_boundaries_for_short_flags(self):
         self.write("config/commands.json", json.dumps({"commands": [
             'codex exec --model gpt-6.1-sol # accepted\ngit commit -m "gpt-6-sol"',

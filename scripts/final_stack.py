@@ -7,10 +7,10 @@ landscape catalogs named by ``catalogs/landscape/manifest.json#/catalogs`` and
 ``catalogs/landscape/planned-layers.json``, the committed ``catalogs/landscape/component-evidence-matrix.json``,
 the completed sweeps of ``catalogs/saturation/ledger.json`` (and its report in ``scripts/saturation_ledger.py``),
 ``catalogs/landscape/research-state.json``, ``catalogs/landscape/skills-lifecycle.json``, the verdict-wave
-registry, the newest landscape-sweep seeds file and the run-pin sources (an allowlisted lockfile, the adoption pin
-files, ``manifests/stack.json`` and ``catalogs/us-equities/runtime-target.json#/engine``) already say. The output is
-deterministic: sorted keys and no clock. ``checked_at`` is the schema date; staleness is computed only at check
-time, from ``--today``.
+registry, the newest landscape-sweep seeds file and coverage ledger, and the run-pin sources (an allowlisted lockfile,
+the adoption pin files, ``manifests/stack.json`` and ``catalogs/us-equities/runtime-target.json#/engine``) already
+say. The output is deterministic: sorted keys and no clock. ``checked_at`` is the schema date; staleness is computed
+only at check time, from ``--today``.
 
 Modes: ``--check`` (default) rebuilds the document in memory and exits 1 when the committed file differs, a
 recorded source hash changed, a landscape, research-state or matrix layer does not have exactly one row, a planned
@@ -80,8 +80,8 @@ LEDGER = saturation_ledger.LEDGER
 ADOPTION = saturation_ledger.ADOPTION
 SEEDS_DIR = "tools/sota-convergence/landscape-sweep"
 SEEDS_NAME = re.compile(r"seeds-(\d{4})(\d{2})(\d{2})\.json")
-STARS_FILE = "catalogs/convergence-practice/starred-seeds-20261010.json"
-GRAND_COUNTS_FILE = "catalogs/landscape/grand-catalog-counts.json"
+COVERAGE_LEDGER_DIR = "catalogs/landscape/coverage"  # the step-1 coverage ledger (tools/landscape/coverage_ledger.py)
+COVERAGE_LEDGER_NAME = re.compile(r"coverage-ledger-(\d{4})(\d{2})(\d{2})\.json")
 # Import the shared policy without pulling currency_due's host-oriented closure into this generator.
 REVIEW_DAYS = DEFAULT_SWEEP_CADENCE_DAYS
 
@@ -1184,13 +1184,34 @@ def build_intake(sources: Sources, layers: list[dict]) -> dict:
         seeds = {"path": relative, "date": f"{year}-{month}-{day}", "total": sum(map(len, document.values())),
                  "by_layer": dict(sorted(by_layer.items())),
                  "unmatched": sorted(layer_id for layer_id in document if len(catalogs_of.get(layer_id, [])) != 1)}
-    return {
-        "seeds": seeds,
-        "stars": {"status": "UNREPORTED", "source": STARS_FILE,
-                  "reason": "future integration path for the starred-seeds intake (#978); v1 does not read it"},
-        "grand": {"status": "UNREPORTED", "source": GRAND_COUNTS_FILE,
-                  "reason": "future integration path for the grand-catalog counts snapshot (W4 PR 3); v1 does not read it"},
-    }
+    return {"seeds": seeds, **coverage_intake(sources)}
+
+
+def coverage_intake(sources: Sources) -> dict:
+    """The stars and grand intake from the newest step-1 coverage ledger: each population's seeds by disposition,
+    read from the ledger's own counts (tools/landscape/coverage_ledger.py check keeps them equal to its rows)."""
+    directory = sources.path(COVERAGE_LEDGER_DIR)
+    dated = sorted(((match.group(1, 2, 3), path.name) for path in (directory.iterdir() if directory.is_dir() else [])
+                    if (match := COVERAGE_LEDGER_NAME.fullmatch(path.name))))
+    if not dated:
+        missing = {"status": "UNREPORTED", "source": f"{COVERAGE_LEDGER_DIR}/coverage-ledger-<date>.json",
+                   "reason": "no coverage ledger in this checkout; tools/landscape/coverage_ledger.py build writes it"}
+        return {"stars": dict(missing), "grand": dict(missing)}
+    (year, month, day), name = dated[-1]
+    relative = f"{COVERAGE_LEDGER_DIR}/{name}"
+    document = sources.json(relative)
+    counts = document.get("counts") if isinstance(document, dict) else None
+    by_population = counts.get("by_population_disposition") if isinstance(counts, dict) else None
+    intake = {}
+    for population in ("stars", "grand"):
+        dispositions = by_population.get(population) if isinstance(by_population, dict) else None
+        if not isinstance(dispositions, dict) or not all(
+                isinstance(value, int) and not isinstance(value, bool) and value >= 0 for value in dispositions.values()):
+            raise FinalStackError(f"{relative}: counts.by_population_disposition.{population} must map dispositions "
+                                  "to seed counts")
+        intake[population] = {"status": "REPORTED", "source": relative, "date": f"{year}-{month}-{day}",
+                              "seeds": sum(dispositions.values()), "by_disposition": dict(sorted(dispositions.items()))}
+    return intake
 
 
 def build_index(layers: list[dict], landscape: dict) -> dict:

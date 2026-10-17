@@ -508,17 +508,43 @@ class RunTests(FixtureTestCase):
                 self.assertEqual(run["pin_parsed"], {"version": "1.0.0", "commit": None})
                 self.assertEqual(run["conflicts"], expected)
 
-    def test_unreported_intake_names_future_paths_without_reading_them(self):
+    def test_intake_without_a_coverage_ledger_stays_unreported(self):
         document = self.build(foundation=[_layer("seeded")])
         self.assertEqual(document["intake"]["seeds"], {
             "path": "tools/sota-convergence/landscape-sweep/seeds-20260926.json", "date": "2026-09-26",
             "total": 1, "by_layer": {"foundation/seeded": 1}, "unmatched": []})
-        for name, source in (("stars", fs.STARS_FILE), ("grand", fs.GRAND_COUNTS_FILE)):
+        for name in ("stars", "grand"):
             with self.subTest(intake=name):
                 entry = document["intake"][name]
-                self.assertEqual((entry["status"], entry["source"]), ("UNREPORTED", source))
-                self.assertIn("future integration path", entry["reason"])
-                self.assertNotIn(source, document["sources"])
+                self.assertEqual((entry["status"], entry["source"]),
+                                 ("UNREPORTED", "catalogs/landscape/coverage/coverage-ledger-<date>.json"))
+                self.assertIn("no coverage ledger", entry["reason"])
+        self.assertFalse(any("coverage-ledger" in source for source in document["sources"]))
+
+    def test_intake_reports_stars_and_grand_from_the_newest_coverage_ledger(self):
+        root = self.root()
+        _fixture(root, foundation=[_layer("seeded")])
+        older = {"counts": {"by_population_disposition": {"stars": {"OUT-OF-SCOPE": 9}, "grand": {"UNMAPPED": 9}}}}
+        newer = {"counts": {"by_population_disposition": {
+            "stars": {"LAYER-CANDIDATE": 3, "OUT-OF-SCOPE": 1}, "grand": {"LAYER-CANDIDATE": 5, "RETIRED": 1},
+            "lists": {"OUT-OF-SCOPE": 7}}}}
+        _write_json(root / "catalogs/landscape/coverage/coverage-ledger-20261015.json", older)
+        _write_json(root / "catalogs/landscape/coverage/coverage-ledger-20261016.json", newer)
+        document = fs.build_document(root)
+        self.assertEqual(document["intake"]["stars"], {
+            "status": "REPORTED", "source": "catalogs/landscape/coverage/coverage-ledger-20261016.json",
+            "date": "2026-10-16", "seeds": 4, "by_disposition": {"LAYER-CANDIDATE": 3, "OUT-OF-SCOPE": 1}})
+        self.assertEqual(document["intake"]["grand"]["by_disposition"], {"LAYER-CANDIDATE": 5, "RETIRED": 1})
+        self.assertIn("catalogs/landscape/coverage/coverage-ledger-20261016.json", document["sources"])
+        self.assertNotIn("catalogs/landscape/coverage/coverage-ledger-20261015.json", document["sources"])
+
+    def test_a_coverage_ledger_without_population_counts_is_refused(self):
+        root = self.root()
+        _fixture(root, foundation=[_layer("seeded")])
+        _write_json(root / "catalogs/landscape/coverage/coverage-ledger-20261016.json",
+                    {"counts": {"by_population_disposition": {"stars": {"LAYER-CANDIDATE": "3"}}}})
+        with self.assertRaisesRegex(fs.FinalStackError, "by_population_disposition.stars"):
+            fs.build_document(root)
 
     def test_a_subpath_editable_or_virtual_package_is_not_the_lock_root(self):
         for kind in ("editable", "virtual"):

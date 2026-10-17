@@ -229,6 +229,21 @@ class StarredConvergenceTests(unittest.TestCase):
         self.sync()
         self.assertEqual(validate_convergence(self.root, self.snapshot)["status"], "valid")
 
+    def test_us_equities_layer_ids_come_from_the_landscape_catalog(self):
+        self.seeds["seeds"][0]["layer"] = "backtesting-engine"
+        self.row["layer_keys"] = ["backtesting-engine"]
+        self.row["verdict_follow_up"]["layer_keys"] = ["backtesting-engine"]
+        self.sync()
+        with self.assertRaisesRegex(ValueError, "unsupported canonical layer"):
+            validate_convergence(self.root, self.snapshot)
+        self.write("catalogs/landscape/us-equities.json", {
+            "layers": [{"layer_id": "backtesting-engine"}], "domain_rows": [{"layer_id": "engines-strategies"}]})
+        self.assertEqual(validate_convergence(self.root, self.snapshot)["status"], "valid")
+        self.seeds["seeds"][0]["layer"] = "engines-strategies"
+        self.row["layer_keys"] = ["engines-strategies"]
+        self.row["verdict_follow_up"]["layer_keys"] = ["engines-strategies"]
+        self.reject("unsupported canonical layer")
+
     def test_completed_manifest_cannot_hide_pending(self):
         self.row["scope"] = "PENDING"
         self.reject("cannot be PENDING")

@@ -180,10 +180,10 @@ def exempt(path: str) -> str | None:
         return "dated decision record"
     if path in {"manifests/evidence.json", "catalogs/foundation/model-currency.json"}:
         return "file registration or dated age-review inventory; not a runtime selector"
-    if path == "catalogs/landscape/grand-catalog-20261008.json":
-        # Published schema-1 g5-compact-landscape on main ff69fc86 contains
-        # reference rows; the full selector grammar extracts no active values.
+    if path == "catalogs/landscape/grand-catalog-20261008.json":  # schema-1 reference rows on main ff69fc86
         return "dated G5 compact landscape comparison record; model references are source metadata"
+    if path in {"catalogs/landscape/coverage/coverage-ledger-20261016.json", "catalogs/landscape/coverage/awesome-lists-20261016.json"}:
+        return "dated step-1 coverage ledger or pinned list table; list entries and headings are source metadata"
     if path.startswith(FROZEN_EXPERIMENTS):
         return "frozen completed experiment and exact replay source"
     if path == "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json":

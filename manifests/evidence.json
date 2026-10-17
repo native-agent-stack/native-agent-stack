@@ -5342,8 +5342,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "96482136147070cd68f0369d628b20f37103db882edb310724cb74efee46b551",
-      "bytes": 33456
+      "sha256": "3be04013a7a091866a28730482c880d302e1d3dbf3d461d7c90cc89f74e15960",
+      "bytes": 34434
     },
     {
       "path": ".gitleaksignore",
@@ -17702,9 +17702,34 @@
       "bytes": 315354
     },
     {
+      "path": "catalogs/landscape/coverage/awesome-lists-20261016.json",
+      "sha256": "b9686ff2ce8f00b7ded0720a5666c44677c552e38e7ff13afba2f9f8be2c7c1d",
+      "bytes": 2982237
+    },
+    {
+      "path": "catalogs/landscape/coverage/awesome-lists.schema.json",
+      "sha256": "2b76fab0b29d3e016ed1fc18ea4cddc36e636abf1d60a10d7089ead0720e9e66",
+      "bytes": 4985
+    },
+    {
+      "path": "catalogs/landscape/coverage/coverage-ledger-20261016.json",
+      "sha256": "ec0464e25ef8774175f3a2df23094fefe3934a76071ecacb6d02d8a2a6735cfe",
+      "bytes": 15662975
+    },
+    {
+      "path": "catalogs/landscape/coverage/coverage-ledger.schema.json",
+      "sha256": "fc0c0d6015c57e36e8de0d6a156a0f38da6f85add64ebec488f838905196e92a",
+      "bytes": 5649
+    },
+    {
+      "path": "catalogs/landscape/coverage/runs-index.schema.json",
+      "sha256": "38d83f0e57884d34668eb765f95f6aa77cb4ed8382b657719b7d3f82985e8e20",
+      "bytes": 4312
+    },
+    {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "0270f74ecf6ab097a1f565f5f1848395d9690e951cde4c0216930e332292e825",
-      "bytes": 339603
+      "sha256": "379abbf296fbe3c74934b4e7558cedccf01f43a4ca7c1cf67a82f2617d11db16",
+      "bytes": 339819
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -38030,6 +38055,11 @@
       "path": "evidence/artifacts/k4-timing-gc-20261003/summary.json",
       "sha256": "4569f912234abf37f455c7653b2dd468b633bb40b3a8b18e442db02f3a4fe4ff",
       "bytes": 19674
+    },
+    {
+      "path": "evidence/artifacts/landscape-coverage-ledger-20261016/runs-index.json",
+      "sha256": "19072364746b476aeffc2078ad87de4d3a1da0bf87fd6dc31942f69d15d43333",
+      "bytes": 605162
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",
@@ -63183,8 +63213,8 @@
     },
     {
       "path": "scripts/active_model_currency.py",
-      "sha256": "6f047b1b0caf54d4d4b410cbc966a7869bc4e0a4244af953a254832f101862c2",
-      "bytes": 44587
+      "sha256": "1836814a33885b830620db021ec16a4427c704274e7ebcdf61dc7bd141976e76",
+      "bytes": 44727
     },
     {
       "path": "scripts/adoption_status.py",
@@ -63253,8 +63283,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "3b29a722563df44b6485c0b039b5330c331fc1ae55a43c10ea2e82c8f515c024",
-      "bytes": 85843
+      "sha256": "d57722787c495d2ce86e1681ef2fc8843c14d17e0953ba9b9edddbef35f452db",
+      "bytes": 87448
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -63373,8 +63403,8 @@
     },
     {
       "path": "scripts/starred_convergence.py",
-      "sha256": "b231d06f113e45638395a0496e6a712a8451f063d82f04d53129dfa17baeb76d",
-      "bytes": 17830
+      "sha256": "6a01efdd573d3392174d55c48b9337b6455eaf0b31387842b870d2cbbad76363",
+      "bytes": 18349
     },
     {
       "path": "scripts/starred_protected.py",
@@ -63733,8 +63763,8 @@
     },
     {
       "path": "tests/test_active_model_currency.py",
-      "sha256": "69e5318afc4a6dd70cb85fc189680fd180ff5c322f0174530c0705a41a69583a",
-      "bytes": 58353
+      "sha256": "1381346f57b63a65c14576dac386bc29e769140f8547645dd20a39ee020ca138",
+      "bytes": 59710
     },
     {
       "path": "tests/test_active_recovery_plans.py",
@@ -64353,8 +64383,8 @@
     },
     {
       "path": "tests/test_final_stack.py",
-      "sha256": "04cb6cfbbea6cdc22d44aa46b78441a59c793212854215f7a64dbf2168993ca1",
-      "bytes": 79674
+      "sha256": "45828865943dabd3e81ed361331973f2ab8f215eb9b7cd8cc9152d0f780c99b8",
+      "bytes": 81518
     },
     {
       "path": "tests/test_financial_data.py",
@@ -64423,8 +64453,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "b668888f4ddafd075e144d9c6f483150d8588a138c2545c4d91c8249937e84f7",
-      "bytes": 91041
+      "sha256": "db4cbd300e05a80c296cb3bd50b1ef9ad486a7621f35bba68306b40a1b01c39c",
+      "bytes": 93516
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
@@ -64587,9 +64617,19 @@
       "bytes": 87945
     },
     {
+      "path": "tests/test_landscape_coverage_ledger.py",
+      "sha256": "dd697730c7007e3a8da50a21b1522ca9b85583f891c601ee66bf363beb541b41",
+      "bytes": 24325
+    },
+    {
       "path": "tests/test_landscape_postrun.py",
       "sha256": "bce973989a7f85b81b35af4c69d083d8d57a25b2dd3558a8bd0db2c8e8e07601",
       "bytes": 37533
+    },
+    {
+      "path": "tests/test_landscape_screen_generic.py",
+      "sha256": "c0b0820e926e4043ea3704cce33589970c373b6f48643c50f66419dd4ff06001",
+      "bytes": 13598
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
@@ -65343,8 +65383,8 @@
     },
     {
       "path": "tests/test_starred_convergence.py",
-      "sha256": "9f535438a0cda8c2738a2091bf09f9b7b83280cc405c2c110b7a38dbea0b3501",
-      "bytes": 17943
+      "sha256": "3771ef33c37e01e3b544b01ec199f000e6e29af816109add520c072a064d9a34",
+      "bytes": 18886
     },
     {
       "path": "tests/test_starred_maintenance.py",
@@ -65865,6 +65905,21 @@
       "path": "tools/landing/uet_land.sh",
       "sha256": "95a4e1634b6a53b14d7736d2d40a3f0058a15aec9c9178e528ca44cfb74324ce",
       "bytes": 37901
+    },
+    {
+      "path": "tools/landscape/README.md",
+      "sha256": "0cd84ef0129b1609c269a5176147cee80e2125ace5e4f8e00e1e5301878cb026",
+      "bytes": 8738
+    },
+    {
+      "path": "tools/landscape/coverage_ledger.py",
+      "sha256": "1abc36934d52baf9d55974ce83cdaf20c5a8b4bbd5859d0b43087dadb87899e5",
+      "bytes": 99713
+    },
+    {
+      "path": "tools/landscape/screen_generic.py",
+      "sha256": "4269970d26d01c2ecab621efc5314b79048143025be00c6c9e6a1b3af8585a48",
+      "bytes": 46078
     },
     {
       "path": "tools/local-pages/README.md",

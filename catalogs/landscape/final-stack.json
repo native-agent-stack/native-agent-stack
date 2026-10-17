@@ -4807,9 +4807,14 @@
   },
   "intake": {
     "grand": {
-      "reason": "future integration path for the grand-catalog counts snapshot (W4 PR 3); v1 does not read it",
-      "source": "catalogs/landscape/grand-catalog-counts.json",
-      "status": "UNREPORTED"
+      "by_disposition": {
+        "LAYER-CANDIDATE": 2982,
+        "OUT-OF-SCOPE": 46
+      },
+      "date": "2026-10-16",
+      "seeds": 3028,
+      "source": "catalogs/landscape/coverage/coverage-ledger-20261016.json",
+      "status": "REPORTED"
     },
     "seeds": {
       "by_layer": {
@@ -4834,9 +4839,14 @@
       "unmatched": []
     },
     "stars": {
-      "reason": "future integration path for the starred-seeds intake (#978); v1 does not read it",
-      "source": "catalogs/convergence-practice/starred-seeds-20261010.json",
-      "status": "UNREPORTED"
+      "by_disposition": {
+        "LAYER-CANDIDATE": 327,
+        "OUT-OF-SCOPE": 46
+      },
+      "date": "2026-10-16",
+      "seeds": 373,
+      "source": "catalogs/landscape/coverage/coverage-ledger-20261016.json",
+      "status": "REPORTED"
     }
   },
   "layers": [
@@ -11425,6 +11435,7 @@
     "catalogs/landscape/angles/foundation-workers.json": "9bf004fd463a910b6325ba28965cd8a59374e2b4c5dc3339a532d996fdcd9e0c",
     "catalogs/landscape/angles/schema.json": "e4dc3f9dd1c9c00108b33aa9cc5c378987d32da43d7b479ec2371f1e427b3055",
     "catalogs/landscape/component-evidence-matrix.json": "095f424be1ad5f1ce539d31531575b1e37e072b2aed983e566c4c2f8e50ee410",
+    "catalogs/landscape/coverage/coverage-ledger-20261016.json": "ec0464e25ef8774175f3a2df23094fefe3934a76071ecacb6d02d8a2a6735cfe",
     "catalogs/landscape/foundation.json": "55751afc9a6e3d2dd814d5ba35d811ea9424464ccc417234b8cb6d08864e48b8",
     "catalogs/landscape/lockfile-source-identities.json": "a25a267f8c87fd435297cdc5e9290e2fee5d2bcf4eb5980d52524bfa8fbc4da5",
     "catalogs/landscape/manifest.json": "8f2795612616853c92db1571de32d5ffb2019c32b3376ef0ed3b28fe9a8cc077",
