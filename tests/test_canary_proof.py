@@ -741,10 +741,14 @@ class UnitTests(unittest.TestCase):
     """Pure functions: canary grammar, forms, tags, CP03 layout, version codes and every routing row."""
 
     def test_ai_memory_data_dir_override_is_no_pointer(self):
-        """A2 finding G8-A02: AI_MEMORY_DATA_DIR names ai-memory's whole data directory, not a store file. Exported, it is not one of
-        prepare's pointer paths (pointer_paths, the list the worker's pointer_binding facts are read from and refused as
-        pointer_target_not_file when a target is a directory). The exclusions keep the ai-memory token files under it as key paths,
-        never the directory itself, and credential_run leaves it in a child's environment. Synthetic: a fake directory, never created."""
+        """A2 finding G8-A02: AI_MEMORY_DATA_DIR names ai-memory's data directory, not a store file, and this stack pins --data-dir to
+        the default, which wins over the variable (ai-memory v3.1.0 config.rs:2349-2355). Exported to a non-default directory:
+        - it is not one of prepare's pointer paths (pointer_paths, the list the worker's pointer_binding facts are read from and refused
+          as pointer_target_not_file when a target is a directory), and the moved directory is no key path;
+        - the ai-memory token files under every U8 root stay key paths: the exclusions follow no override;
+        - the status checker reports the override (store_path_overridden on each ai-memory row, and the environment summary);
+        - credential_run leaves it in a child's environment.
+        Synthetic: a temporary HOME; the moved directory is never created, and no store file exists."""
         import credential_run as runner
         with tempfile.TemporaryDirectory(prefix="g8-a02-home-") as home:
             data = Path(home) / ".local" / "share" / "ai-memory-moved"
@@ -753,9 +757,20 @@ class UnitTests(unittest.TestCase):
             exact, _glob = cp.exclusions(home, [f"{home}/.codex"], env, "confirmed", "agent", cp.pointer_paths(env))
             keys = {path for path, kind in exact if kind == "key"}
             self.assertNotIn(str(data), keys, "G8-directory-not-a-key-path")
-            for name in ("auth-token", "auth-header", "auth-tokens/default", "auth.json"):
-                self.assertIn(str(data / name), keys, f"G8-{name}-excluded")
+            roots = [path for kind, path in cp.sink_roots(home, os.getuid(), [f"{home}/.codex"], "-")["U8"]
+                     if kind == "dir" and path.endswith("/ai-memory")]
+            self.assertEqual(roots, [f"{home}/.local/share/ai-memory"], "G8-U8-ai-memory-roots")
+            for root in roots:
+                for name in ("auth-token", "auth-header", "auth-tokens/default", "auth.json"):
+                    self.assertIn(f"{root}/{name}", keys, f"G8-{name}-excluded-under-{root}")
             inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text(encoding="utf-8"))
+            rows = [entry for entry in inventory["entries"] if entry["id"].startswith("ai-memory-")]
+            self.assertEqual(len(rows), 4)
+            self.assertIn("AI_MEMORY_DATA_DIR", cp.cs.native_store_overrides(inventory["entries"], env), "G8-override-reported")
+            for row in rows:
+                report = cp.cs.inspect_entry(row, env, os.getuid(), time.time())
+                self.assertIn("store_path_overridden", report["warnings"], f"G8-{row['id']}-override-warning")
+                self.assertEqual(report["state"], "missing", f"G8-{row['id']}-default-path-inspected")
             entry = next(entry for entry in inventory["entries"] if entry["id"] == "tavily")
             self.assertEqual(runner.child_environment(inventory, entry, {}, env).get("AI_MEMORY_DATA_DIR"), str(data),
                              "G8-not-stripped-as-a-pointer")

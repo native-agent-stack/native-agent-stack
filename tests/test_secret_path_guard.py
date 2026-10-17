@@ -2186,12 +2186,13 @@ class SecretPathGuardTests(unittest.TestCase):
                 self.assertIsNone(guard.check(command))
 
     def test_g8_a02_inventory_rows(self):
-        # The protection-only rows: each store's path template is a native_store the guard refuses to read. ai-memory's data-directory
-        # override (config.rs:760) is a directory, so its rows read it as a template default (the CODEX_HOME and HF_HOME shape), never as a
-        # pointer variable, which names a store file (docs/secret-storage.md); the guard still refuses a read through it.
+        # The protection-only rows: each store's path template is a native_store the guard refuses to read. ai-memory's rows keep the
+        # default path, where this stack pins --data-dir (which wins over the variable, config.rs:2349-2355); its data-directory override
+        # (config.rs:760) is a directory, so it is a warning-only override_variables name, never a pointer variable (which names a store
+        # file, docs/secret-storage.md). The guard still refuses a read through it.
         inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text(encoding="utf-8"))
         rows = {entry["id"]: entry for entry in inventory["entries"]}
-        data = "${AI_MEMORY_DATA_DIR:-$HOME/.local/share/ai-memory}"
+        data = "$HOME/.local/share/ai-memory"
         expected = {
             "ai-memory-auth-token": f"{data}/auth-token",
             "ai-memory-auth-header": f"{data}/auth-header",
@@ -2205,6 +2206,8 @@ class SecretPathGuardTests(unittest.TestCase):
                 entry = rows[identifier]
                 self.assertEqual(entry["store"], {"kind": "native_store", "path_template": template})
                 self.assertEqual((entry["variables"], entry["optional_variables"], entry["pointer_variables"]), ([], [], []))
+                self.assertEqual(entry.get("override_variables", []),
+                                 ["AI_MEMORY_DATA_DIR"] if identifier.startswith("ai-memory-") else [])
                 self.assertIsNotNone(guard.check(f'cat "{template}"'))
         self.assertIsNotNone(guard.check(f'cat "{rows["codex-native"]["store"]["path_template"]}"'))
         self.assertNotIn("AI_MEMORY_DATA_DIR", {name for entry in inventory["entries"] for name in entry["pointer_variables"]})
@@ -2521,9 +2524,11 @@ class SecretPathGuardTests(unittest.TestCase):
 
     def test_inventory_pointer_variables_are_guarded(self):
         # A pointer variable (PAPER_ENV_FILE, or huggingface_hub's own HF_TOKEN_PATH) names a
-        # credential file, so a reader on it is blocked for every inventory entry.
+        # credential file, so a reader on it is blocked for every inventory entry; so is a reader on an override variable (a store
+        # directory, such as AI_MEMORY_DATA_DIR).
         inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text())
-        pointers = {name for entry in inventory["entries"] for name in entry["pointer_variables"]}
+        pointers = {name for entry in inventory["entries"] for name in entry["pointer_variables"] + entry.get("override_variables", [])}
+        self.assertIn("AI_MEMORY_DATA_DIR", pointers)
         self.assertIn("HF_TOKEN_PATH", pointers)
         for name in sorted(pointers):
             with self.subTest(name=name):

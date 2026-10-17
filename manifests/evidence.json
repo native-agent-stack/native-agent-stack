@@ -5392,8 +5392,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "d496594e92d0a0011f178fa271f52aac7d7e9f0dd5b4c1803da3baa4ba8769f6",
-      "bytes": 50788
+      "sha256": "856ab914f638c8d57475e55d785f4f72cb6acddd8c479a15ac67d495aeaf42a5",
+      "bytes": 51111
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -5407,7 +5407,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "773f8c7689aaaef25d32a69b14f7830df6239899f280b8ce9c60c8de4964e027",
+      "sha256": "bc72b46e1495148caef90c6a8f8729c14ba34b76570edad0f94ebeca172edda2",
       "bytes": 1229
     },
     {
@@ -63118,8 +63118,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "fc0eaad9f0738ee82d505f4a0ba32af8df5202f1008d92aa754a8d3788244bb9",
-      "bytes": 35907
+      "sha256": "20825c24f56a375b65a548f8e0219734d6dc6a47f67f217eb9b93b99068b3f9a",
+      "bytes": 36029
     },
     {
       "path": "scripts/currency_due.py",
@@ -63163,8 +63163,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "aece9dd76686e6fea1ae822cd6873aaafaef87ed8a1d5e012b3c1958f3395492",
-      "bytes": 302217
+      "sha256": "d4b8554e8c2fcfb1e9eb2f092935acc72af77c450b8159da997200248f210eaf",
+      "bytes": 302197
     },
     {
       "path": "scripts/host_name_scan.py",
@@ -63953,8 +63953,8 @@
     },
     {
       "path": "tests/test_canary_proof.py",
-      "sha256": "4171047d2d728d3dfce7733df312b3cbcc0daa1c0f3d3ed90adeb8c564dfa4e8",
-      "bytes": 218469
+      "sha256": "439bd54c56b00642ba6a3e2e39a495482e4fbc8ebf63a8cd7469dd02f38464fb",
+      "bytes": 219774
     },
     {
       "path": "tests/test_capability_gate.py",
@@ -65108,8 +65108,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "66be8de81515e4cf84c26540a27edcb03c6172b796362fdf3a055675c351687c",
-      "bytes": 406526
+      "sha256": "fcb98ed49e0f4e1926b764be6273fe7f2ed327594ff658c45ae8d467a9d83bd0",
+      "bytes": 406963
     },
     {
       "path": "tests/test_secret_scan_metrics.py",

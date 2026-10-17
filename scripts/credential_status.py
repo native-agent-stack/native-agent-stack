@@ -73,8 +73,8 @@ STATUSES = {"required", "optional", "user_only_paid", "generated_local", "native
 CLASSES = {"broker_api_key_pair", "contact_identity", "provider_api_key",
            "local_service_secret", "native_signin", "ci_secret", "test_canary",
            "github_app_private_key"}  # a GitHub App's PEM key, a private_file (set_credential.py --from-file)
-TEMPLATE_PREFIXES = ("${XDG_CONFIG_HOME:-$HOME/.config}/", "${CODEX_HOME:-$HOME/.codex}/", "${AI_MEMORY_DATA_DIR:-$HOME/.local/share/ai-memory}/",
-                     "${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/", "$HOME/")  # AI_MEMORY_DATA_DIR: a directory (G8-A02)
+TEMPLATE_PREFIXES = ("${XDG_CONFIG_HOME:-$HOME/.config}/", "${CODEX_HOME:-$HOME/.codex}/",
+                     "${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/", "$HOME/")
 NAME = re.compile(r"^[A-Z][A-Z0-9_]*$")
 # ${NAME:-default}, where the default may hold one nested ${NAME:-default}: huggingface_hub's
 # HF_HOME defaults to ${XDG_CACHE_HOME:-$HOME/.cache}/huggingface (constants.py).
@@ -155,8 +155,8 @@ def inventory_errors(inventory, root: Path | None = None) -> list[str]:
             if store["kind"] in MEMORY_KINDS and entry["status"] == "required":
                 errors.append(f"{label}: a required key cannot live only in the kernel keyring, which loses it "
                               "at every kernel restart; store it in a file")
-        for key in ("variables", "optional_variables", "pointer_variables"):
-            names = entry[key]
+        for key in ("variables", "optional_variables", "pointer_variables", "override_variables"):
+            names = entry.get(key, [])  # override_variables is optional: see native_store_overrides
             if not isinstance(names, list) or not all(isinstance(n, str) and NAME.match(n) for n in names):
                 errors.append(f"{label}: {key} must be uppercase variable names")
             elif len(set(names)) != len(names):
@@ -233,12 +233,12 @@ def git_tracks(path: Path) -> bool:
 
 
 def native_store_overrides(entries, env) -> list[str]:
-    """Names of set pointer variables of native stores (a path override such as HF_TOKEN_PATH).
+    """Names of set pointer or override variables of native stores (HF_TOKEN_PATH; AI_MEMORY_DATA_DIR, a directory).
 
-    Our own stores are found through pointer variables on purpose; a native tool reads such a
-    variable itself, so the store is no longer where its template says. Names only."""
+    A native tool reads such a variable itself, so the store may no longer be where its template says. override_variables
+    is warning-only: no reader resolves a path, root or exclusion through it (canary_proof.py, credential_run.py). Names only."""
     return sorted({name for entry in entries if entry["store"]["kind"] == "native_store"
-                   for name in entry["pointer_variables"] if name in env})
+                   for name in entry["pointer_variables"] + entry.get("override_variables", []) if name in env})
 
 
 def inspect_entry(entry: dict, env, uid: int, now: float, *, check_store_lines: bool = True) -> dict:
