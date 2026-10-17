@@ -1033,6 +1033,8 @@ def staged_inputs(config: dict) -> dict:
         extras["otel"] = dict(sorted(config["otel"].items()))
     if config.get("disable"):
         extras["disable"] = list(config["disable"])
+    if config.get("standalone_web_search"):
+        extras["standalone_web_search"] = True
     if config.get("ai_memory_token_env"):
         extras["ai_memory_token_env"] = config["ai_memory_token_env"]
     return extras
@@ -1153,7 +1155,9 @@ def start(base: Path, job: str, prompt_file: str, schema_file: str) -> int:
             matches = (matches and fallback is not None and route.get("provider") == fallback["provider"]
                        and route.get("base_url") == fallback["base_url"]
                        and route.get("gateway_model") == fallback_model(config["model"], config["request_effort"])
-                       and route.get("gateway_effort") == config["request_effort"])
+                       and route.get("gateway_effort") == config["request_effort"]
+                       and route.get("search_backend") == (FALLBACK_SEARCH_BACKEND if config["standalone_web_search"]
+                                                           else FALLBACK_NO_SEARCH_BACKEND))
         if matches and completion_error(directory) is None:
             print(f"already done: {job}")
             return 0

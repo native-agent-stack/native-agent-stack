@@ -359,7 +359,8 @@ Decision record: [docs/decisions/2026-10-17-codex-job-lane-hooks-mcp-memory.md](
 Every item is a `build_args.py` option that writes one `staged.json` `codex` key; with no option the argv, the
 environment, `inputs.json`, `result` and the lane home are byte-identical to before, except for the search default below:
 the lane `config.toml` and the failover argv now write both standalone web search switches `false`, a change from the
-earlier `true`, which `--standalone-web-search` restores. Pins: openai/codex `rust-v0.163.0`
+earlier `true`. The failover `result` and `route.json` now record `search_backend` as `none` instead of
+`omniroute:/alpha/search`. `--standalone-web-search` restores the earlier switches and backend. Pins: openai/codex `rust-v0.163.0`
 at `83086188ae0614bd882818ff1aa23f3194962012`, rtk 1.0.1, ai-memory 3.1.0. A restage rewrites `staged.json`, so repeat the options.
 
 | Option | Staged key | What the runner does | Bound in `inputs.json` |
@@ -367,7 +368,7 @@ at `83086188ae0614bd882818ff1aa23f3194962012`, rtk 1.0.1, ai-memory 3.1.0. A res
 | `--codex-hook rtk` | `hooks.rtk` | One `-c hooks.state={...}` inline table trusts the one `rtk hook codex` PreToolUse handler found in `<home>/hooks.json` (by command, never by position; the realpath of `CODEX_HOME`, else `$HOME/.codex`; for a gateway lane `<work-dir>/codex-home`, where `build_args.py` runs upstream's own `rtk init -g --codex`). Sets `RTK_TELEMETRY_DISABLED=1` and the same value for the model's shells. A missing or duplicate handler ends the job before codex starts (exit 2, failure kind `hook_trust`). `--ignore-user-config` stays on the native lane. | `hooks` |
 | `--codex-hook secret_guard` | `hooks.secret_guard` | Registers the staged, hash-checked copy of `scripts/hooks/secret_path_guard.py` as a PreToolUse hook for `Bash` only (timeout 10) with `-c hooks.PreToolUse=[...]`, trusted under the session-flags key in the same `hooks.state` table. A missing or changed copy ends the job before codex starts, and the registered command itself exits 2 with a reason if the copy or the interpreter vanishes later. | `hooks` |
 | `--codex-disable-feature apps`, `--web-search disabled` | `disable`, `web_search` | `codex exec --disable apps` (Codex validates the name). `web_search` was already a staged key; nothing couples it to `disable`. | `disable`, `web_search` |
-| `--standalone-web-search` (gateway lane or `--gpt6-fallback`) | `standalone_web_search` | Writes `supports_standalone_web_search = true` and `[features] standalone_web_search = true` in the lane `config.toml`, and the same two in the failover argv (`supports_standalone_web_search` in the `-c model_providers.omniroute={...}` table, and `-c features.standalone_web_search=`), so Codex's `web.run` POSTs `<base_url>/alpha/search`. Without it both are `false`, and a failover result's `route.search_backend` is `none`. Refused without `--gpt6-provider omniroute` or `--gpt6-fallback`. The "Web search for GPT-6 Astra" item under "GPT-6 through OmniRoute" gives the reason for the default. | no (it changes the lane config and the failover argv, not `inputs.json`) |
+| `--standalone-web-search` (gateway lane or `--gpt6-fallback`) | `standalone_web_search` | Writes `supports_standalone_web_search = true` and `[features] standalone_web_search = true` in the lane `config.toml`, and the same two in the failover argv (`supports_standalone_web_search` in the `-c model_providers.omniroute={...}` table, and `-c features.standalone_web_search=`), so Codex's `web.run` POSTs `<base_url>/alpha/search`. Without it both are `false`, and a failover result's `route.search_backend` is `none`. Refused without `--gpt6-provider omniroute` or `--gpt6-fallback`. The "Web search for GPT-6 Astra" item under "GPT-6 through OmniRoute" gives the reason for the default. | `standalone_web_search` (only when true) |
 | `--codex-otel-endpoint 127.0.0.1:PORT [--codex-otel-lane NAME]` | `otel` | `otel.exporter` and `otel.metrics_exporter` (OTLP/HTTP binary to the loopback collector), `otel.tool_result.max_bytes=0` and `otel.environment=<NAME>-<job id>`. A tag the collector would delete (longer than 128 characters or outside its id pattern) is refused before state changes. | `otel` |
 | `--rollout-usage` | `rollout_usage` | After each attempt, a field of its own, `rollout_usage {status, thread_id, rollout, usage, reason}`, from the last `token_count` of the thread's rollout under the attempt's recorded Codex home, found by thread id and never by date. `usage` and `usage_status` stay as they were, `total_tokens` is dropped, and a job that died before `thread.started` stays `unavailable`. | no (it only reads a finished attempt) |
 | `--ai-memory-bearer-env [NAME]` (gateway) | `ai_memory_token_env` | The lane's ai-memory MCP entry carries `bearer_token_env_var = "NAME"` (default `AI_MEMORY_AUTH_TOKEN`), the host's own form. The lane config filters `NAME` out of the model's shells, the runner refuses a start while it is unset or blank (exit 6, kind `no_key`), and the value is written nowhere. | `ai_memory_token_env` |
@@ -428,8 +429,10 @@ directly to the gateway has `native_attempt: null`, because it has no native att
 the route and each archived route; later retries preserve it. `convert.py` reads the original sibling receipt,
 because the Workflow wrapper copies a fixed set of result fields. It retains the route in raw metadata and GPT-6
 fit votes and adds the gateway search limitation to the lane. A successful fallback job is reused only while its
-bound inputs and requested fallback route still match; changing the endpoint or disabling fallback reruns that job
-and archives the earlier result.
+bound inputs and requested fallback route (provider, endpoint, model, effort and search backend) still match;
+changing the endpoint or standalone search mode, or disabling fallback, reruns that job and archives the earlier result.
+`standalone_web_search` is bound only when true, so default-off inputs still match older records without that key.
+A legacy `omniroute:/alpha/search` fallback route reruns with standalone search off even when its bound inputs match.
 
 The installed gateway's carried
 [search adapter](https://github.com/amsjavan/OmniRoute/blob/6c7990058c4ce9677de79452c8cefb10b4bf1b3d/src/app/api/v1/alpha/search/route.ts)
