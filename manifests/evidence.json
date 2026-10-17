@@ -5537,8 +5537,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "c395763f94d5bb335584d22ca4903dc977544d0e50fc6027f36e0fa64ee3a2af",
-      "bytes": 57789
+      "sha256": "2ade836cc0fef1aab6adc1c1acc436036bcdd59f692142d86f30ccc8373cd56c",
+      "bytes": 57780
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
