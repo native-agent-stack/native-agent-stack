@@ -57,11 +57,12 @@
     - A normal run on the workstation writes nothing to stderr, and lists 55 TCP and 5 UDP listeners (2026-10-17).
   - **ss runs without the variables that point it at files.** The census drops `TCPDIAG_FILE` and every `PROC_*`
     variable from the environment it gives ss.
-    - Four of them make ss read a file instead of the kernel's table: `TCPDIAG_FILE`, `PROC_ROOT`, `PROC_NET_TCP`
-      and `PROC_NET_UDP` (`misc/ss.c:4237`, `:4240` and `:4371`).
-    - The other `PROC_*` variables, such as `PROC_NET_TCP6` and `PROC_NET_UDP6`, only name the files ss reads in its
-      `/proc` fallback (`:482-498`, `:4265-4266`, `:4383-4384`, and `lib/utils.c:2054-2066`). The census drops them
-      too.
+    - The census's `-t -u` listing reads only the TCP and UDP tables (`misc/ss.c:5989-5997`).
+    - For those tables, `TCPDIAG_FILE`, `PROC_ROOT`, `PROC_NET_TCP` and `PROC_NET_UDP` make ss read a file instead of
+      the kernel's table (`:4237`, `:4240`, `:4371`).
+    - `PROC_NET_TCP6` and `PROC_NET_UDP6` are the only other variables that listing reads, in its `/proc` fallback
+      (`:482-485`, `:4265-4266`, `:4383-4384`, `lib/utils.c:2054-2066`).
+    - Other `PROC_*` variables serve other tables or reports, and the census removes every `PROC_*` variable anyway.
     - So a variable left in the census's environment cannot hide a table.
   - It prints one JSON line: `check`, `at`, `listeners` and `violations`, or `error` for a census error.
     - An error report also carries the `violations` found in the other lines, so a parse error never hides a breach.
@@ -97,12 +98,24 @@ NativeHorizonNY has run a shell precursor every 5 minutes since 2026-10-17 04:14
 - the script `~/.local/share/native-agent-stack/loopback-census/loopback_census.sh`.
 
 It applies the same rule, with seven differences.
-- **Five come from rows.** On 2026-10-17 the precursor ran unmodified, with a fake `ss` first on PATH, over every
-  fixture line in `tests/test_loopback_census.py`, two rows the reads raised, and the failure cases.
-  - It was compared with this census as of commit `b6edd270`, the revision that added the per-protocol floor. Every
-    listing got one loopback row of each protocol, because a listing without both is a census error there.
-  - 11 of 31 rows differ, in five ways. The same rows differed against `d4dcf73e`, before the floor, without the added
-    rows.
+- **Five come from rows.** On 2026-10-17 the precursor ran unmodified, with a fake `ss` first on PATH, over 31
+  listings:
+  - the 17 rows of the test fixtures `LOOPBACK_ONLY` and `BREACHES`;
+  - 12 more rows:
+    - port 53 on four addresses other than the tunnel;
+    - `[::1%lo]:633`;
+    - the device-bound wildcard `0.0.0.0%lo:53`;
+    - four rows that do not parse;
+    - the two rows the reads raised, `udp … 10.255.255.254%lo:53` and the short `tcp LISTEN 0 4096 [::1]:631`;
+  - two failure cases: an empty listing, and an ss that exits 3.
+- **How the comparison ran.** It was compared with this census as of commit `b6edd270`, the revision that added the
+  per-protocol floor.
+  - The 29 one-row listings each got one loopback row of each protocol, because a listing without both is a census
+    error there.
+  - The two failure cases ran with their original inputs. Their census outcome is the one the tests pin:
+    `ss listed no listener` and `ss exited 3`.
+- **The result.** 11 of the 31 listings differ, in five ways. The same rows differed against `d4dcf73e`, before the
+  floor, without the added rows.
 - **Two come from reading the precursor's unit and script.**
 
 The five row differences:

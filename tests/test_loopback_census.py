@@ -234,6 +234,25 @@ class RealInvocationTests(unittest.TestCase):
         self.assertEqual(report["error"],
                          "ss reported an error on stderr: 'fopen(TCPDIAG_FILE): Permission denied'")
 
+    def test_a_diagnostic_does_not_hide_a_breach_that_ss_still_listed(self):
+        # "Cannot open netlink socket" (lib/libnetlink.c:205 at iproute2 v6.19.0) is followed by the /proc fallback, which
+        # still lists the tables: the breach on stdout is reported and kept, with exit 2 for the diagnostic.
+        breach = "tcp LISTEN 0 4096 0.0.0.0:8080 0.0.0.0:* users:((\"python3\",pid=4242,fd=3))"
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = Path(directory) / "fixture"
+            fixture.write_text(LOOPBACK_ONLY + breach + "\n", encoding="utf-8")
+            fake_ss(directory, f'echo "Cannot open netlink socket: Permission denied" >&2\n"{CAT}" "{fixture}"\nexit 0\n')
+            state = Path(directory) / "state"
+            code, report, stderr = run_with_path(directory, "--state-dir", str(state))
+            records = records_in(state)
+            last = json.loads((state / "last.json").read_text(encoding="utf-8"))
+        self.assertEqual(code, 2)
+        self.assertEqual(report["error"], "ss reported an error on stderr: 'Cannot open netlink socket: Permission denied'")
+        self.assertEqual([v["address"] for v in report["violations"]], ["0.0.0.0:8080"])
+        self.assertEqual(len(records), 1)
+        self.assertEqual(last["record"], records[0].name)
+        self.assertIn(f"breach record {records[0]}", stderr)
+
     def test_a_dropped_table_with_exit_0_and_no_stderr_is_an_error(self):
         # iproute2 6.19.0 drops a TCP table it cannot open with no diagnostic and exits 0 (misc/ss.c:4256-4257,
         # :4276-4285 and :6276-6302 at v6.19.0), so ss prints only the UDP rows.

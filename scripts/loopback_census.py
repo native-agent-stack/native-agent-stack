@@ -63,11 +63,12 @@ SS_ARGV = ("ss", "-H", "-l", "-t", "-u", "-n", "-p")
 SS_TIMEOUT = 30.0
 ALLOWED = {("udp", "10.255.255.254", "53"), ("tcp", "10.255.255.254", "53")}
 PROTOCOLS = {"tcp", "udp"}
-# iproute2 6.19.0's ss reads a file instead of a kernel table when TCPDIAG_FILE, PROC_ROOT, PROC_NET_TCP or PROC_NET_UDP
-# is set (misc/ss.c:4237, :4240, :4371). The other PROC_* variables, such as PROC_NET_TCP6 and PROC_NET_UDP6, name the
-# files its /proc fallback reads (:482-498, :4265-4266, :4383-4384; lib/utils.c:2054-2066). A file that cannot be
-# opened drops its table with no diagnostic (ss.c:4256-4257 and :4276-4285 for TCP, :4376-4377 and :4391-4399 for
-# UDP), so the census passes none of them on.
+# The census's `-t -u` listing reads the TCP and UDP tables only (iproute2 6.19.0 misc/ss.c:5989-5997). For them, ss
+# reads a file instead of the kernel's table when TCPDIAG_FILE, PROC_ROOT, PROC_NET_TCP or PROC_NET_UDP is set
+# (:4237, :4240, :4371), and PROC_NET_TCP6 and PROC_NET_UDP6 name the files its /proc fallback reads (:482-485,
+# :4265-4266, :4383-4384; lib/utils.c:2054-2066). A file that cannot be opened drops its table with no diagnostic
+# (ss.c:4256-4257 and :4276-4285 for TCP, :4376-4377 and :4391-4399 for UDP). So the census removes TCPDIAG_FILE and
+# every PROC_* variable, including those that serve other tables.
 SS_FILE_VARIABLE = "TCPDIAG_FILE"
 SS_FILE_PREFIX = "PROC_"
 PROCESS = re.compile(r'\(\("([^"]+)",pid=(\d+)')
@@ -171,10 +172,18 @@ def run_ss(timeout):
     # example perror("fopen($TCPDIAG_FILE)") at :4160-4162, or nothing at all (see SS_FILE_VARIABLE). So a stderr line
     # is an error here, and census() also requires a TCP and a UDP listener. A normal run on the workstation writes
     # nothing to stderr.
+    # A diagnostic can sit beside a complete listing: "Cannot open netlink socket" (lib/libnetlink.c:205) is followed by
+    # the /proc fallback, which still lists the tables. So stdout is parsed first, and the error carries the violations
+    # it holds, as the malformed-line path does. No diagnostic hides a breach.
     diagnostics = [line.strip() for line in result.stderr.splitlines() if line.strip()]
     if diagnostics:
         more = f" and {len(diagnostics) - 1} more line(s)" if len(diagnostics) > 1 else ""
-        raise CensusError(f"ss reported an error on stderr: {diagnostics[0][:120]!r}{more}")
+        message = f"ss reported an error on stderr: {diagnostics[0][:120]!r}{more}"
+        try:
+            _total, violations = census(result.stdout.splitlines())
+        except CensusError as error:
+            message, violations = f"{message}; and {error}", error.violations
+        raise CensusError(message, violations)
     return result.stdout
 
 
