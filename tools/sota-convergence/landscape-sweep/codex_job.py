@@ -6,7 +6,8 @@
   codex_call.sh [--work-dir DIR] result <job-id>              one JSON line: status, exit, started, finished,
                                                               usage, usage_status, output_text, stderr_tail,
                                                               limit, limit_marker, model, effort, request_effort, web_search,
-                                                              codex_version, inputs, attempts, quota, failure, route
+                                                              codex_version, inputs, attempts, quota, failure, route,
+                                                              and rollout_usage when staged (see "Opt-in lane hardening")
 
 `start` detaches one job and returns at once. The job waits for a semaphore slot (an fcntl lock on
 <lock dir>/slot-<n>, held by the runner and by codex itself, so a killed runner never frees a slot early), then runs
@@ -114,6 +115,55 @@ inputs_changed, including invalid restaging. Every recorded nonzero terminal exi
 Initial invalid settings are refused before job state changes; refusing different inputs for a running job leaves
 its owned state alone. The recorded model, effort and search mode always describe the invocation that ran.
 
+Opt-in lane hardening (docs/decisions/2026-10-17-codex-job-lane-hooks-mcp-memory.md). Every item below is a staged
+key under staged.json codex; an absent key reproduces the earlier argv, environment, inputs.json and result bytes
+exactly, and a key adds its inputs.json field only when staged (build_args.py writes them; pins: openai/codex rust-v0.163.0
+at 83086188ae0614bd882818ff1aa23f3194962012, rtk 1.0.1, ai-memory 3.1.0):
+
+  hooks {"rtk": true, "secret_guard": true}   one `-c hooks.state={...}` inline table (a second `-c hooks.state` would
+        replace the first, and a dotted-key form is split on every "." and never matches), holding a trusted_hash per
+        hook the job registers. Keep --ignore-user-config on the native lane; --dangerously-bypass-hook-trust is never
+        passed. The inline table is parsed as TOML into the session-flags layer (codex-rs/utils/cli/src/config_override.rs:
+        49-101, config/src/loader/mod.rs:253-268); trust is read only from the user and session-flags layers
+        (hooks/src/config_rules.rs:8-29).
+        rtk: Codex's hook trust key is "<hooks.json path>:pre_tool_use:<group>:<handler>" (hooks/src/lib.rs:112-123) and its
+        value is sha256 over the sorted compact JSON of the hook's normalized identity (hooks/src/engine/discovery.rs:
+        742-794, config/src/fingerprint.rs:54-66), which hook_trust_hash reproduces. The runner finds the one
+        `rtk hook codex` handler under PreToolUse in <home>/hooks.json by command, never by position (the key embeds the
+        group index), where <home> is the realpath of CODEX_HOME when set, else $HOME/.codex (utils/home-dir/src/lib.rs:
+        13-62), and for a gateway lane the realpath of <work-dir>/codex-home, which build_args.py stages with upstream's
+        own `rtk init -g --codex`. A missing or duplicate handler ends the job before codex starts: exit 2, failure kind
+        hook_trust, because an untrusted hook is skipped without an error (hooks/src/engine/discovery.rs:715-736).
+        It also exports RTK_TELEMETRY_DISABLED=1 (hook processes inherit codex's environment, hooks/src/engine/
+        command_runner.rs:424-436) and passes -c shell_environment_policy.set.RTK_TELEMETRY_DISABLED="1" for the model's
+        shells.
+        secret_guard: the staged copy <work-dir>/secret_path_guard.py (scripts/hooks/secret_path_guard.py, byte for byte;
+        its sha256 is checked against staged.json harness.files) is registered for Bash only as `-c hooks.PreToolUse=[...]`
+        (timeout 10) and trusted under the session-flags key "/<session-flags>/config.toml:pre_tool_use:0:0"
+        (hooks/src/engine/discovery.rs:421; statusMessage, which the registered form omits, is hashed, :561-568). apply_patch is not registered: the guard returns 0 for any tool
+        but Bash. Codex has no equivalent of Claude's onFailure "block": only exit 2 with stderr text blocks, and a crash,
+        a timeout or any other exit lets the call continue (hooks/src/events/pre_tool_use.rs:213-291). The registered
+        command therefore refuses with exit 2 and a reason when the staged copy or the interpreter is missing, and the
+        runner refuses the job before codex starts in the same cases.
+  web_search / disable ["apps"]   `--disable apps` (validated against known features, codex-rs/cli/src/main.rs:951-997;
+        features.apps is stable and on by default, features/src/lib.rs:1523-1528) for reviewer jobs; bound in inputs.json.
+  otel {"endpoint": "127.0.0.1:PORT", "lane": "<prefix>"}   four overrides: otel.exporter and otel.metrics_exporter
+        (otlp-http, protocol "binary", /v1/logs and /v1/metrics on the loopback collector; `protocol` has no default,
+        config/src/types.rs:603-609), otel.tool_result.max_bytes=0 and otel.environment=<lane>-<job id>, which the
+        collector keeps when it matches ^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$ (observability/collector/collector.yaml:303):
+        a job whose tag would be longer is refused before state changes. Content is stripped by the collector.
+  rollout_usage true   a failed attempt's usage from its rollout's last token_count (rollout/src/policy.rs:41-48; the
+        format is internal and a killed run can lose items, history/src/lib.rs:364-369, rollout/src/recorder.rs:1786-
+        1790), found by thread id under <effective CODEX_HOME>/sessions/**/rollout-*-<thread id>.jsonl, never by date
+        (the folders use local time). It is a field of its own, rollout_usage {status, thread_id, rollout, usage, reason},
+        in result and in every attempts[] entry; `usage` and `usage_status` stay as they were, and total_tokens is
+        dropped. A job that died before thread.started stays unavailable. Not bound in inputs.json: it reads a finished
+        attempt and changes nothing codex runs.
+  ai_memory_token_env NAME   the lane home's ai-memory MCP entry carries bearer_token_env_var = NAME (build_args.py
+        --ai-memory-bearer-env); the runner refuses a start (exit 6, kind no_key) while the variable is unset or blank,
+        the way it refuses a missing gateway key, and the lane config filters it out of the model's shells. The value is
+        never written to a file, an argument or any output.
+
 Work dir: --work-dir, else this file's directory when build_args.py staged it there (staged.json present), else
 $SWEEP_WORK_DIR. It must lie outside every git repository: Codex would otherwise load that repository's AGENTS.md
 into the lane. Standard library only; Linux and macOS (Python 3.9+).
@@ -129,6 +179,7 @@ import math
 import os
 import random
 import re
+import shlex
 import shutil
 import signal
 import subprocess
@@ -220,7 +271,31 @@ PROFILE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
 # Everything one attempt writes; an earlier attempt's files move together to attempts/<n>/.
 ATTEMPT_FILES = ("events.jsonl", "stderr.txt", "last.json", "started", "finished", "exit", "slot", "model",
                  "codex_version", "done", "prompt.txt", "schema.json", "inputs.json", "runner.log", "quota.json",
-                 "failure.json", "route.json")
+                 "failure.json", "route.json", "codex_home", "rollout_usage.json")
+# Opt-in lane hardening (see the module docstring). Pins: openai/codex rust-v0.163.0 at
+# 83086188ae0614bd882818ff1aa23f3194962012; the paths below are codex-rs relative.
+HOOK_NAMES = ("rtk", "secret_guard")
+RTK_HOOK_COMMAND = "rtk hook codex"  # what `rtk init -g --codex` registers (rtk 1.0.1)
+GUARD_FILE = "secret_path_guard.py"  # the staged copy of scripts/hooks/secret_path_guard.py, beside this file
+GUARD_MATCHER, GUARD_TIMEOUT_S = "Bash", 10  # Bash only: the guard returns 0 for any other tool_name
+# hooks/src/engine/discovery.rs:421 (synthetic_layer_path("<session-flags>/config.toml") resolved against "/").
+SESSION_FLAGS_CONFIG = "/<session-flags>/config.toml"
+# hooks/src/lib.rs:94-109 (hook_event_key_label) and config/src/hook_config.rs:35-61 (the TOML event names).
+HOOK_EVENT_LABELS = {"PreToolUse": "pre_tool_use", "PermissionRequest": "permission_request",
+                     "PostToolUse": "post_tool_use", "PreCompact": "pre_compact", "PostCompact": "post_compact",
+                     "SessionStart": "session_start", "SessionEnd": "session_end",
+                     "UserPromptSubmit": "user_prompt_submit", "SubagentStart": "subagent_start",
+                     "SubagentStop": "subagent_stop", "Stop": "stop", "Interrupt": "interrupt"}
+HOOK_EVENTS_WITHOUT_MATCHER = ("UserPromptSubmit", "Stop", "Interrupt")  # their matcher is ignored (hooks.md)
+DISABLE_FEATURES = ("apps",)  # features Codex's --disable is staged for; Codex rejects an unknown name
+# observability/collector/collector.yaml:303: a tag outside this shape is deleted, never rewritten.
+OTEL_TAG = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}")
+OTEL_LANE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,31}")
+OTEL_ENDPOINT = re.compile(r"(?:127\.0\.0\.1|localhost):([0-9]{1,5})")
+THREAD_ID = re.compile(r"[0-9A-Za-z][0-9A-Za-z-]{0,63}")
+# The keys turn.completed carries; the rollout's total_tokens is left out because convert.py sums every counter.
+ROLLOUT_USAGE_KEYS = ("input_tokens", "cached_input_tokens", "cache_write_input_tokens", "output_tokens",
+                      "reasoning_output_tokens")
 EXIT_LIMIT, EXIT_TIMEOUT, EXIT_NO_CODEX, EXIT_REFUSED = 3, 124, 127, 2
 EXIT_NO_KEY = 6  # a gateway lane whose API key variable is unset in the runner's environment
 EXIT_IDLE = 125
@@ -229,6 +304,10 @@ EXIT_INCOMPLETE = 126  # exit 0 without a completed turn and non-empty output
 
 class UsageError(Exception):
     """A refusal before any job state changes (bad arguments, work dir inside a repository)."""
+
+
+class HookTrustError(UsageError):
+    """A staged hook cannot be registered and trusted for this launch (failure kind hook_trust, exit 2)."""
 
 
 def utc_now() -> str:
@@ -343,7 +422,84 @@ def settings(base: Path) -> dict:
         if match is None or not 1 <= int(match[1]) <= 65535:
             raise UsageError("codex.fallback.base_url must be a loopback http URL ending in /v1 with port 1-65535")
         out["fallback"] = {"provider": "omniroute", "base_url": url}
+    out["hooks"] = hook_settings(staged.get("hooks"))
+    out["otel"] = otel_settings(staged.get("otel"))
+    out["disable"] = disable_settings(staged.get("disable"))
+    rollout = staged.get("rollout_usage")
+    if rollout is not None and not isinstance(rollout, bool):
+        raise UsageError("codex.rollout_usage must be true or false (or absent)")
+    out["rollout_usage"] = bool(rollout)
+    out["ai_memory_token_env"] = ai_memory_settings(base, staged, out)
     return out
+
+
+def hook_settings(staged) -> dict | None:
+    """codex.hooks: {"rtk": true, "secret_guard": true} (either or both), else None. Anything else is refused: a
+    hook the operator did not name is never trusted."""
+    if staged is None:
+        return None
+    if not isinstance(staged, dict) or not staged:
+        raise UsageError(f"codex.hooks must be a non-empty table with only {', '.join(HOOK_NAMES)} set to true")
+    for name, value in staged.items():
+        if name not in HOOK_NAMES or value is not True:
+            raise UsageError(f"codex.hooks may hold only {', '.join(HOOK_NAMES)}, each set to true")
+    return {name: True for name in HOOK_NAMES if name in staged}
+
+
+def otel_settings(staged) -> dict | None:
+    """codex.otel: {"endpoint": "127.0.0.1:PORT", "lane": "<prefix>"?}: the loopback collector, never another host."""
+    if staged is None:
+        return None
+    if not isinstance(staged, dict) or set(staged) - {"endpoint", "lane"}:
+        raise UsageError("codex.otel must be a table holding only endpoint and lane")
+    endpoint = staged.get("endpoint")
+    match = OTEL_ENDPOINT.fullmatch(endpoint) if isinstance(endpoint, str) else None
+    if match is None or not 1 <= int(match[1]) <= 65535:
+        raise UsageError("codex.otel.endpoint must be 127.0.0.1:PORT or localhost:PORT (port 1-65535): the collector "
+                         "is loopback only")
+    out = {"endpoint": endpoint}
+    if "lane" in staged:
+        if not (isinstance(staged["lane"], str) and OTEL_LANE.fullmatch(staged["lane"])):
+            raise UsageError(f"codex.otel.lane must match {OTEL_LANE.pattern}")
+        out["lane"] = staged["lane"]
+    return out
+
+
+def disable_settings(staged) -> tuple:
+    """codex.disable: a list of feature names for `codex exec --disable` (DISABLE_FEATURES), else ()."""
+    if staged is None:
+        return ()
+    if not isinstance(staged, list) or not staged or len(set(staged)) != len(staged) or any(
+            name not in DISABLE_FEATURES for name in staged):
+        raise UsageError(f"codex.disable must be a list of distinct names from {', '.join(DISABLE_FEATURES)}")
+    return tuple(name for name in DISABLE_FEATURES if name in staged)
+
+
+def ai_memory_settings(base: Path, staged: dict, out: dict) -> str | None:
+    """codex.ai_memory_token_env: the variable the gateway lane's ai-memory MCP entry names in bearer_token_env_var.
+    The lane home's config.toml must carry exactly that entry (read with tomllib, as the provider headers are)."""
+    name = staged.get("ai_memory_token_env")
+    if name is None:
+        return None
+    if out["codex_home"] is None:
+        raise UsageError("codex.ai_memory_token_env needs a gateway provider: the native lane has no lane home")
+    if not (isinstance(name, str) and ENV_NAME.fullmatch(name)):
+        raise UsageError("codex.ai_memory_token_env must name an environment variable")
+    try:
+        import tomllib
+    except ImportError:
+        raise UsageError("comparing codex.ai_memory_token_env with the lane home config.toml needs Python 3.11+ "
+                         "(tomllib); run the harness with a newer python3") from None
+    try:
+        parsed = tomllib.loads((out["codex_home"] / "config.toml").read_text(encoding="utf-8"))
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as error:
+        raise UsageError(f"the lane home config.toml is not valid TOML ({error}); restage with build_args.py") from None
+    servers = parsed.get("mcp_servers")
+    entry = servers.get("ai-memory") if isinstance(servers, dict) else None
+    if not isinstance(entry, dict) or entry.get("bearer_token_env_var") != name:
+        raise UsageError("the lane home config.toml does not carry the staged ai-memory bearer_token_env_var; "
+                         "restage with build_args.py --ai-memory-bearer-env")
+    return name
 
 
 def lane_settings(base: Path, staged: dict) -> dict:
@@ -582,17 +738,229 @@ def capacity_error(directory: Path) -> bool:
         for line in (read(directory / "stderr.txt") or "").splitlines())
 
 
-def codex_env(lane: dict | None = None) -> dict:
+def codex_env(lane: dict | None = None, extra: dict | None = None) -> dict:
     """The caller's environment without Rust tracing settings (see the module docstring). For a gateway lane,
     CODEX_HOME points at the staged lane-local home, never at the caller's; the key variable passes through as it is
-    and is never written anywhere."""
+    and is never written anywhere. extra holds the staged launch variables (RTK_TELEMETRY_DISABLED for the rtk hook)."""
     env = {key: value for key, value in os.environ.items() if not key.startswith("RUST_LOG")}
     if lane is not None:
         if lane.get("codex_home") is not None:
             env["CODEX_HOME"] = str(lane["codex_home"])
         if not (env.get(lane["api_key_env"]) or "").strip() and lane.get("api_key_placeholder"):
             env[lane["api_key_env"]] = lane["api_key_placeholder"]  # keyless loopback gateway; a real key wins
+    env.update(extra or {})
     return env
+
+
+def effective_codex_home(lane: dict | None, env: dict) -> Path:
+    """The Codex home the launched process uses: the lane-local home, else CODEX_HOME when set and non-empty
+    (canonicalized, as Codex requires it to exist, utils/home-dir/src/lib.rs:13-62), else $HOME/.codex, not resolved."""
+    if lane is not None and lane.get("codex_home") is not None:
+        return Path(os.path.realpath(lane["codex_home"]))
+    if env.get("CODEX_HOME"):
+        return Path(os.path.realpath(env["CODEX_HOME"]))
+    return Path(env.get("HOME") or os.path.expanduser("~")) / ".codex"
+
+
+def hook_trust_hash(event: str, matcher: str | None, handler: dict) -> str:
+    """The trusted_hash Codex records for one command hook: sha256 over the compact, key-sorted JSON of the
+    normalized identity {event_name, matcher?, hooks: [handler]} (codex-rs/hooks/src/engine/discovery.rs:742-794,
+    config/src/fingerprint.rs:54-66 at rust-v0.163.0). The handler is normalized as discovery.rs:559-568 does:
+    timeout defaults to 600 s (SessionEnd and Interrupt: 1 s, clamped to 1-3 s), async to false; statusMessage joins
+    the identity only when present. Reproduced for 11 of 11 handlers of a live hooks.json and the RTK vector in the
+    tests."""
+    if event not in HOOK_EVENT_LABELS:
+        raise HookTrustError(f"unknown hook event {event!r}")
+    if handler.get("type") != "command" or not isinstance(handler.get("command"), str):
+        raise HookTrustError("only command hooks are trusted")
+    if set(handler) - {"type", "command", "timeout", "async", "statusMessage"}:
+        # commandWindows and additionalContextLimit also join the identity (config/src/hook_config.rs:163-185); the
+        # port does not model them, and a wrong hash would leave the hook untrusted without an error.
+        raise HookTrustError("a hook handler field the trust hash does not model is present")
+    timeout = handler.get("timeout")
+    if timeout is not None and (isinstance(timeout, bool) or not isinstance(timeout, int)):
+        raise HookTrustError("a hook timeout must be a whole number of seconds")
+    if event in ("SessionEnd", "Interrupt"):
+        timeout = min(3, max(1, 1 if timeout is None else timeout))
+    else:
+        timeout = max(1, 600 if timeout is None else timeout)
+    normalized = {"type": "command", "command": handler["command"], "timeout": timeout,
+                  "async": bool(handler.get("async", False))}
+    if handler.get("statusMessage") is not None:
+        normalized["statusMessage"] = handler["statusMessage"]
+    identity = {"event_name": HOOK_EVENT_LABELS[event], "hooks": [normalized]}
+    if matcher is not None and event not in HOOK_EVENTS_WITHOUT_MATCHER:
+        identity["matcher"] = matcher
+    blob = json.dumps(identity, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return "sha256:" + sha256_hex(blob.encode("utf-8"))
+
+
+def rtk_hook_entry(hooks_json: Path) -> tuple[int, int, str]:
+    """(group index, handler index, trusted_hash) of the one `rtk hook codex` command under PreToolUse in a hooks.json.
+    Found by command, never by position: the trust key embeds the group index, so a reordered file would silently
+    untrust a hook that was addressed by index. Missing, duplicate or unreadable files are refused without echoing
+    their content."""
+    try:
+        document = json.loads(hooks_json.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        raise HookTrustError("the rtk hook is staged but the Codex home holds no readable hooks.json; run "
+                             "`rtk init -g --codex` for that home") from None
+    groups = (((document or {}).get("hooks") or {}).get("PreToolUse")) if isinstance(document, dict) else None
+    found = []
+    for g, group in enumerate(groups if isinstance(groups, list) else ()):
+        handlers = group.get("hooks") if isinstance(group, dict) else None
+        for h, handler in enumerate(handlers if isinstance(handlers, list) else ()):
+            if isinstance(handler, dict) and handler.get("type") == "command" \
+                    and handler.get("command") == RTK_HOOK_COMMAND:
+                matcher = group.get("matcher")
+                found.append((g, h, hook_trust_hash("PreToolUse", matcher if isinstance(matcher, str) else None,
+                                                    handler)))
+    if len(found) != 1:
+        raise HookTrustError(f"the rtk hook is staged but hooks.json holds {len(found)} PreToolUse handlers whose "
+                             f"command is {RTK_HOOK_COMMAND!r}, not exactly one; run `rtk init -g --codex` for that home")
+    return found[0]
+
+
+def guard_command(guard: Path) -> str:
+    """The command Codex runs (as `<shell> -lc <command>`) for the secret-path guard. Codex lets a call continue when a
+    hook crashes, times out or exits with anything but 2 and a stderr reason (hooks/src/events/pre_tool_use.rs:213-291),
+    so a missing copy or interpreter exits 2 with a reason here, never 127."""
+    interpreter = shlex.quote(sys.executable)
+    return (f'f={shlex.quote(str(guard))}; if [ -f "$f" ] && [ -x {interpreter} ]; then exec {interpreter} "$f"; fi; '
+            "echo 'secret_path_guard: blocked (guard_missing). The staged secret-path guard or its interpreter is "
+            "missing; restage the lane.' >&2; exit 2")
+
+
+def staged_guard(base: Path) -> Path:
+    """The staged guard copy, which must exist and equal staged.json harness.files[GUARD_FILE] (build_args.py)."""
+    guard = base / GUARD_FILE
+    if not guard.is_file():
+        raise HookTrustError(f"codex.hooks.secret_guard is staged but {GUARD_FILE} is missing from the work directory; "
+                             "restage with build_args.py --codex-hook secret_guard")
+    staged = read_json(base / STAGED)
+    recorded = (((staged or {}).get("harness") or {}).get("files") or {}).get(GUARD_FILE) if isinstance(
+        staged, dict) else None
+    if not (isinstance(recorded, str) and recorded == sha256_hex(guard.read_bytes())):
+        raise HookTrustError(f"{GUARD_FILE} does not match the sha256 staged.json records for it; restage")
+    return guard
+
+
+def toml_string(value: str) -> str:
+    """A TOML basic string (JSON's escapes are a subset of TOML's)."""
+    return json.dumps(value, ensure_ascii=True)
+
+
+def hook_launch(base: Path, config: dict, env: dict) -> tuple[list, dict]:
+    """The argv extras and environment extras for the staged hooks. One `-c hooks.state={...}` inline table carries
+    every trust entry (a second `-c hooks.state` replaces the first, and the dotted quoted-key form is split on each
+    "." and lands under a broken key; codex-rs/config/src/overrides.rs:18-22, utils/cli/src/config_override.rs:49-101)."""
+    hooks = config.get("hooks")
+    if not hooks:
+        return [], {}
+    states, args, extra_env = {}, [], {}
+    if hooks.get("rtk"):
+        home = effective_codex_home(config if config.get("codex_home") is not None else None, env)
+        g, h, digest = rtk_hook_entry(home / "hooks.json")
+        states[f"{home / 'hooks.json'}:pre_tool_use:{g}:{h}"] = digest
+        extra_env["RTK_TELEMETRY_DISABLED"] = "1"
+        args += ["-c", 'shell_environment_policy.set.RTK_TELEMETRY_DISABLED="1"']
+    if hooks.get("secret_guard"):
+        handler = {"type": "command", "command": guard_command(staged_guard(base)), "timeout": GUARD_TIMEOUT_S}
+        states[f"{SESSION_FLAGS_CONFIG}:pre_tool_use:0:0"] = hook_trust_hash("PreToolUse", GUARD_MATCHER, handler)
+        args += ["-c", "hooks.PreToolUse=[{matcher=" + toml_string(GUARD_MATCHER) + ",hooks=[{type=\"command\",command="
+                 + toml_string(handler["command"]) + f",timeout={GUARD_TIMEOUT_S}}}]}}]"]
+    table = "{" + ",".join(f"{toml_string(key)}={{trusted_hash={toml_string(value)}}}"
+                           for key, value in sorted(states.items())) + "}"
+    return ["-c", f"hooks.state={table}", *args], extra_env
+
+
+def otel_environment(config: dict, job: str) -> str | None:
+    """The otel.environment tag: the job id, with the staged lane prefix. The collector deletes a tag outside its id
+    shape (collector.yaml:303), so a tag over 128 characters is refused rather than truncated."""
+    otel = config.get("otel")
+    if not otel:
+        return None
+    tag = f"{otel['lane']}-{job}" if otel.get("lane") else job
+    if not OTEL_TAG.fullmatch(tag):
+        raise UsageError(f"the otel.environment tag for job {job!r} ({len(tag)} characters) must match "
+                         f"{OTEL_TAG.pattern}; use a shorter job id or codex.otel.lane")
+    return tag
+
+
+def otel_launch(config: dict, job: str) -> list:
+    """The four overrides of the loopback collector export (report enhancement 3). `protocol` has no default
+    (config/src/types.rs:603-609); log_user_prompt is already false and span attributes only reach the tracer, which
+    stays off, so neither is set (core/src/config/otel.rs:13-21, otel/src/provider.rs:196-254)."""
+    tag = otel_environment(config, job)
+    if tag is None:
+        return []
+    base = f"http://{config['otel']['endpoint']}"
+    return ["-c", f'otel.exporter={{otlp-http={{endpoint="{base}/v1/logs",protocol="binary"}}}}',
+            "-c", f'otel.metrics_exporter={{otlp-http={{endpoint="{base}/v1/metrics",protocol="binary"}}}}',
+            "-c", "otel.tool_result.max_bytes=0", "-c", f"otel.environment={toml_string(tag)}"]
+
+
+def launch_extras(base: Path, config: dict, env: dict, job: str) -> tuple[list, dict]:
+    """Every staged flag that follows -c web_search in the codex argv, and the staged environment variables."""
+    args = [item for name in config.get("disable") or () for item in ("--disable", name)]
+    hook_args, extra_env = hook_launch(base, config, env)
+    return [*args, *hook_args, *otel_launch(config, job)], extra_env
+
+
+def rollout_files(home: Path, thread_id: str) -> list:
+    return sorted(home.glob(f"sessions/*/*/*/rollout-*-{thread_id}.jsonl"))
+
+
+def find_rollout_usage(directory: Path, home: Path) -> dict:
+    """A failed attempt's usage from its rollout: the last token_count's total_token_usage (best effort; the format
+    is internal, so any miss is a reason, never an error). The thread id comes from the attempt's own thread.started
+    event, and the file is found by it, not by date: the date folders use local time."""
+    parsed = events(directory)
+    if any(event.get("type") == "turn.completed" for event in parsed):
+        return {"status": "not_needed", "reason": "a turn completed; usage is the turn.completed figure"}
+    thread_id = next((event.get("thread_id") for event in parsed if event.get("type") == "thread.started"), None)
+    if not (isinstance(thread_id, str) and THREAD_ID.fullmatch(thread_id)):
+        return {"status": "unavailable", "reason": "no thread.started event: the job made no model call"}
+    record = {"status": "unavailable", "thread_id": thread_id}
+    files = rollout_files(home, thread_id)
+    if not files:
+        compressed = sorted(home.glob(f"sessions/*/*/*/rollout-*-{thread_id}.jsonl.*"))
+        record["reason"] = ("the rollout is compressed" if compressed else "no rollout file for this thread id")
+        return record
+    path, last = files[-1], None
+    try:
+        with open(path, encoding="utf-8", errors="replace") as handle:
+            for line in handle:
+                try:
+                    item = json.loads(line)
+                except ValueError:
+                    continue
+                payload = item.get("payload") if isinstance(item, dict) and item.get("type") == "event_msg" else None
+                info = payload.get("info") if isinstance(payload, dict) and payload.get("type") == "token_count" else None
+                total = info.get("total_token_usage") if isinstance(info, dict) else None
+                if isinstance(total, dict):
+                    last = total
+    except OSError:
+        record["reason"] = "the rollout could not be read"
+        return record
+    record["rollout"] = str(path.relative_to(home))
+    usage = {key: last[key] for key in ROLLOUT_USAGE_KEYS if isinstance(last.get(key), int)
+             and not isinstance(last.get(key), bool)} if last else {}
+    if not usage:
+        record["reason"] = "the rollout holds no token_count event"
+        return record
+    record.update(status="found", usage=usage)
+    return record
+
+
+def rollout_usage(directory: Path) -> dict | None:
+    """The attempt's rollout_usage record, or None when it was not staged for the attempt (no codex_home receipt).
+    Read from rollout_usage.json when the runner wrote it, else computed from the recorded home."""
+    saved = read_json(directory / "rollout_usage.json")
+    if isinstance(saved, dict):
+        return saved
+    home = (read(directory / "codex_home") or "").strip()
+    return find_rollout_usage(directory, Path(home)) if home else None
 
 
 def sha256_hex(data: bytes) -> str:
@@ -645,9 +1013,24 @@ def usage_status(directory: Path, usage: dict | None) -> str:
     return "primary_thread_only" if delegated else ("reported" if usage is not None else "unavailable")
 
 
+def staged_inputs(config: dict) -> dict:
+    """The inputs.json fields of the staged opt-in behaviours that change what codex runs: present only when the key
+    is staged, so a job finished without them still matches and a job staged with other values runs again."""
+    extras = {}
+    if config.get("hooks"):
+        extras["hooks"] = dict(sorted(config["hooks"].items()))
+    if config.get("otel"):
+        extras["otel"] = dict(sorted(config["otel"].items()))
+    if config.get("disable"):
+        extras["disable"] = list(config["disable"])
+    if config.get("ai_memory_token_env"):
+        extras["ai_memory_token_env"] = config["ai_memory_token_env"]
+    return extras
+
+
 def job_inputs(prompt: bytes, schema: bytes, model: str, provider: str = "native",
                http_headers: dict | None = None, effort: str = DEFAULT_EFFORT,
-               web_search: str = DEFAULT_WEB_SEARCH) -> dict:
+               web_search: str = DEFAULT_WEB_SEARCH, extras: dict | None = None) -> dict:
     inputs = {"prompt_sha256": sha256_hex(prompt), "schema_sha256": sha256_hex(schema), "model": model,
               "effort": effort, "request_effort": request_effort(model, effort)}
     if web_search != DEFAULT_WEB_SEARCH:  # old records used live implicitly; preserve valid same-input reuse
@@ -656,6 +1039,7 @@ def job_inputs(prompt: bytes, schema: bytes, model: str, provider: str = "native
         inputs["provider"] = provider
     if http_headers:  # other provider headers (another compression plan, say) make another run
         inputs["http_headers"] = dict(sorted(http_headers.items()))
+    inputs.update(extras or {})
     return inputs
 
 
@@ -685,7 +1069,7 @@ def archive_attempt(directory: Path, *, keep_runner_log: bool = False) -> int | 
 
 def codex_argv(codex: str, directory: Path, model: str, prompt: str, lane: dict | None = None,
                version: str | None = None, effort: str = DEFAULT_EFFORT,
-               web_search: str = DEFAULT_WEB_SEARCH) -> list[str]:
+               web_search: str = DEFAULT_WEB_SEARCH, extra: list | tuple = ()) -> list[str]:
     if lane is not None and lane.get("codex_home") is not None:
         # The lane-local CODEX_HOME is the whole configuration, so --ignore-user-config (which drops
         # $CODEX_HOME/config.toml) must not be passed; the profile layers <profile>.config.toml over it (profile-v2).
@@ -706,7 +1090,7 @@ def codex_argv(codex: str, directory: Path, model: str, prompt: str, lane: dict 
     # retried once, budget permitting (codex-rs/core/src/responses_retry.rs:71-96). Error notices are not progress.
     return [*head, "--skip-git-repo-check", "-s", "read-only",
             "-m", model, "-c", f'model_reasoning_effort="{effort}"', "-c", f'web_search="{web_search}"',
-            "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json", prompt]
+            *extra, "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json", prompt]
 
 
 def retire(directory: Path) -> None:
@@ -743,8 +1127,9 @@ def start(base: Path, job: str, prompt_file: str, schema_file: str) -> int:
             print(f"not started {job}: staged settings changed after input binding", file=sys.stderr)
             return EXIT_REFUSED
         raise
+    otel_environment(config, job)  # a tag the collector would delete is refused before any state changes
     inputs = job_inputs(prompt_bytes, schema_bytes, config["model"], config["provider"], config["http_headers"],
-                        config["effort"], config["web_search"])
+                        config["effort"], config["web_search"], staged_inputs(config))
     if (directory / "done").exists() and exit_code(directory) == 0:
         matches = same_inputs(read_json(directory / "inputs.json"), inputs)
         route = read_json(directory / "route.json") or {}
@@ -1087,7 +1472,8 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
     bound = read_json(directory / "inputs.json")
     if bound is not None and not same_inputs(bound, job_inputs(
             (directory / "prompt.txt").read_bytes(), (directory / "schema.json").read_bytes(),
-            config["model"], config["provider"], config["http_headers"], config["effort"], config["web_search"])):
+            config["model"], config["provider"], config["http_headers"], config["effort"], config["web_search"],
+            staged_inputs(config))):
         # start and the detached runner read staged.json separately; never execute under another input identity.
         write_atomic(directory / "stderr.txt", "staged settings changed after input binding; start the job again\n")
         finish(directory, EXIT_REFUSED, "inputs_changed")
@@ -1105,6 +1491,19 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
                      "the harness with the gateway key loaded from its store by pointer (docs/secret-storage.md)\n")
         finish(directory, EXIT_NO_KEY, "no_key")
         return EXIT_NO_KEY
+    token_env = config.get("ai_memory_token_env")
+    if token_env and not (os.environ.get(token_env) or "").strip():
+        write_atomic(directory / "stderr.txt", f"{token_env} is not set in the runner's environment; the lane's "
+                     "ai-memory MCP entry reads its bearer token from it, so start the harness with the variable "
+                     "loaded from its store by pointer (docs/secret-storage.md)\n")
+        finish(directory, EXIT_NO_KEY, "no_key")
+        return EXIT_NO_KEY
+    try:
+        launch_args, launch_env = launch_extras(base, config, codex_env(lane), job)
+    except UsageError as error:  # a hook that cannot be registered and trusted: an untrusted hook is skipped silently
+        write_atomic(directory / "stderr.txt", f"hook_trust: {error}\n")
+        finish(directory, EXIT_REFUSED, "hook_trust")
+        return EXIT_REFUSED
     version = codex_version(codex)
     if version:
         write_atomic(directory / "codex_version", version + "\n")
@@ -1175,11 +1574,14 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
             attempt_config["route"]["native_attempt"] = number
             native_failure = None
         with open(directory / "events.jsonl", "wb") as output, open(directory / "stderr.txt", "wb") as errors:
+            attempt_env = codex_env(lane, launch_env)
             process = subprocess.Popen(codex_argv(codex, directory, attempt_config["model"], prompt, lane, version,
-                                                 config["effort"], config["web_search"]),
+                                                 config["effort"], config["web_search"], launch_args),
                                        cwd=str(base / "empty"), stdin=subprocess.DEVNULL, stdout=output, stderr=errors,
-                                       pass_fds=(slot_fd, lock_fd), start_new_session=True, env=codex_env(lane))
+                                       pass_fds=(slot_fd, lock_fd), start_new_session=True, env=attempt_env)
             write_atomic(directory / "started", utc_now() + "\n")
+            if config["rollout_usage"]:  # this attempt's own receipt of where its rollout will be
+                write_atomic(directory / "codex_home", str(effective_codex_home(lane, attempt_env)) + "\n")
             write_atomic(directory / "slot", f"{slot}\n")
             write_atomic(directory / "model", attempt_config["model"] + "\n")
             if version:
@@ -1188,6 +1590,8 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
                 write_atomic(directory / "route.json", json.dumps(attempt_config["route"], sort_keys=True) + "\n")
                 gateway_started = True
             code, failure = wait_process(process, directory, config, deadline)
+        if config["rollout_usage"]:
+            record_rollout_usage(directory)
         kind = limit_kind(directory, attempt_config["provider"])
         incomplete = completion_error(directory) if code == 0 else None
         if kind is not None and config["fallback"] is not None and attempt_config["provider"] == "native":
@@ -1258,6 +1662,17 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
             (directory / name).write_bytes(data)
 
 
+def record_rollout_usage(directory: Path) -> None:
+    """Keep the attempt's rollout figure beside its files, so a later cleanup or compression of the rollout cannot
+    lose it. Best effort: nothing here can change the attempt's exit."""
+    try:
+        record = rollout_usage(directory)
+        if record is not None:
+            write_atomic(directory / "rollout_usage.json", json.dumps(record, sort_keys=True) + "\n")
+    except Exception:  # noqa: BLE001 - the figure is a receipt, never a reason to fail a job
+        pass
+
+
 def wait(base: Path, job: str, seconds: float) -> int:
     directory = job_dir(base, job)
     poll_s = DEFAULTS["wait_poll_s"]
@@ -1324,18 +1739,25 @@ def result(base: Path, job: str) -> dict:
     out["quota"] = quota_summary(directory)
     out["route"] = read_json(directory / "route.json")
     out["failure"] = failure
+    staged_rollout = rollout_usage(directory)
+    if staged_rollout is not None:  # only a job that staged rollout_usage carries the key
+        out["rollout_usage"] = staged_rollout
     return out
 
 
 def attempt_summary(path: Path) -> dict:
     usage = turn_usage(path)
     code, failure = attempt_outcome(path)
-    return {"attempt": int(path.name), "exit": code,
-            "started": (read(path / "started") or "").strip() or None,
-            "finished": (read(path / "finished") or "").strip() or None,
-            "usage": usage, "usage_status": usage_status(path, usage),
-            "limit": limit_error(path), "inputs": read_json(path / "inputs.json"),
-            "quota": quota_summary(path), "failure": failure, "route": read_json(path / "route.json")}
+    summary = {"attempt": int(path.name), "exit": code,
+               "started": (read(path / "started") or "").strip() or None,
+               "finished": (read(path / "finished") or "").strip() or None,
+               "usage": usage, "usage_status": usage_status(path, usage),
+               "limit": limit_error(path), "inputs": read_json(path / "inputs.json"),
+               "quota": quota_summary(path), "failure": failure, "route": read_json(path / "route.json")}
+    staged_rollout = rollout_usage(path)
+    if staged_rollout is not None:
+        summary["rollout_usage"] = staged_rollout
+    return summary
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -21760,5 +21760,19 @@
         "path": "coordination/cc-native-practice-20261009/floor-2300-20261014/changelog-2.1.296-2.1.300.md"
       }
     ]
+  },
+  "atlas": {
+    "atlas_token_rate_latest": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/skills/token-rate-latest.json"
+      }
+    ],
+    "atlas_token_rate_history": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/skills/token-rate-history.json"
+      }
+    ]
   }
 }

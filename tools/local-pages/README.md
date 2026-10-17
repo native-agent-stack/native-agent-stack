@@ -266,6 +266,44 @@ and their digests stay in the nonserved receipt
 overview and the layer pages it links into; a full refresh renders it too and
 records it under `overview`.
 
+`atlas.html`, the harness atlas, answers three questions in one pass: what each
+model family (Claude in Claude Code, GPT in Codex through `codex_call.sh`, Muse
+in Muse Code inside `tools/muse_file_fence.py`) runs at each of the seven
+harness layers, what is settled, and what measurement shows the lanes used. It has nine
+sections: the terms, the seven layers by family, the memory and retrieval,
+code-intelligence and token-efficiency stacks, the measured use per lane, model
+routing, how to watch it, the standing rules, what changed and its sources.
+Every source is declared once in `atlas_sources.json` and checked against its
+exact grant before any open through `overview_data.load_page_sources`:
+repository records reuse the existing Architecture and overview grants, and the
+two private projections (`token-rate-latest.json` and
+`token-rate-history.json`, written by `tools/skill-usage/daily_token_usage.py`)
+use the `atlas` grants only, enforced by `source_policy.AtlasReads` with 1 MiB
+and 4 MiB bounds. `atlas_map.json` holds the reviewed joins and paraphrases;
+each citation names a path, a line and an anchor phrase that a test opens.
+Layer states, winners and the FINAL count are `overview_data.architecture()`
+and `overview_data.repos()` over the same committed records, so the page never
+claims a FINAL layer the protocol does not. A missing source renders as pending
+with its trigger, never as zero; the measured section stays pending until the
+CC installs `token-rate.timer`.
+
+The atlas compounds. Each build reduces its model to a timestamp-free state
+(layer states and winners, slot statuses, declared routing, rule records, skill
+pins and the measured extent) and appends one hash-chained row to
+`atlas/atlas-ledger.json` beside the refresh receipt only when that state
+changed; every build writes `atlas/atlas-receipt.json` (`local-atlas/1`) naming
+the row it matched and the checks since it. Both are nonserved, and their
+directory is 0700, tightened to it when it already exists looser. A ledger that
+fails its digest or chain check is left untouched for inspection and nothing is
+appended. The read, append and publish hold one `flock` on
+`atlas/.atlas.lock`. `build_pages.py --atlas-only --output-dir DIR --receipt
+FILE` renders the atlas alone and builds no layer page; without `--receipt` it
+writes `atlas/atlas-receipt.json` beside the refresh receipt and refuses the
+refresh receipt itself. A full refresh renders it too and records it under
+`atlas`; if it fails, an existing page is kept and a missing one gets an
+UNREPORTED placeholder. The page shows aggregates only: counts, ratios,
+versions and loopback URLs; private records appear by name.
+
 Inventory rows use canonical winner component-ID and candidate repository
 joins, followed by the reviewed `architecture_mapping.json` for remaining
 skills, agents, workflows and runtime automation. Each remaining unmapped item
@@ -525,11 +563,21 @@ nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p t
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_tracking.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_tracking_view.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_adoption.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_overview.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p 'test_local_pages_architecture_*.py'
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_atlas_data.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_atlas_view.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_atlas_build.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_token_usage_daily.py
 ```
 
 The fixtures use the repository's real native builder and local temporary
-receipts. They need no external network, shared service, credentials or
-third-party packages; the redirect tests bind an isolated loopback socket.
+receipts. They need no external network, shared service or credentials, and
+no third-party package except that the `CascadeTests` that build a page cascade in
+`test_local_pages_atlas_view.py` import tinycss2 and cssselect2 from the
+hash-pinned `.github/requirements-ci.txt` (install it with
+`python3 -m pip install --only-binary=:all: --require-hashes -r .github/requirements-ci.txt`);
+the redirect tests bind an isolated loopback socket.
 Browser interaction and actual host reachability are separate co-op checks.
 
 Primary references: the native readiness API at the commit above; the retained

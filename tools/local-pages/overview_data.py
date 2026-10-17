@@ -45,28 +45,56 @@ def load(name: str) -> Any:
 
 
 # ---------------------------------------------------------------- source map
+def _page_label(schema: str) -> str:
+    """The page a source-map schema belongs to: local-overview-sources/1 is the overview's, local-atlas-sources/1 the atlas's."""
+    return schema.split("/", 1)[0].removeprefix("local-").removesuffix("-sources")
+
+
+def _reader(readers: dict, role: str) -> Any:
+    """The reader whose role prefix the role carries; a role with no known prefix goes to the page's own grants, listed last,
+    which refuse it (as the overview always did for a role that is not an Architecture role)."""
+    return next((reader for prefix, reader in readers.items() if role.startswith(prefix)), list(readers.values())[-1])
+
+
+def load_page_sources(root: Path, state_root: Path, *, source_map: Path, policy_path: Path, schema: str, sections: tuple,
+                      readers: dict) -> tuple[dict, dict, dict]:
+    """Parse a page's source map and bind every declaration to its exact grant before any source read.
+
+    readers maps a role prefix to its source_policy reader class, the page's own grants last; each one is built over the
+    two roots, and every declaration is checked by the reader its role prefix names. An Architecture role needs its exact
+    Architecture grant and no glob. Returns the map, the built readers by prefix and the map's own custody record.
+    """
+    policy = load("source_policy")
+    label = _page_label(schema)
+    raw = policy._read_regular(Path(source_map), 1024 * 1024)
+    document = load("build_pages").strict_json(raw)
+    if not isinstance(document, dict) or document.get("schema") != schema or not isinstance(document.get("sources"), dict):
+        raise policy.SourcePolicyError(f"{label} source map must be a {schema} object with a sources map")
+    built = {prefix: reader(root, state_root, policy_path=policy_path) for prefix, reader in readers.items()}
+    for key, entry in document["sources"].items():
+        if not isinstance(entry, dict) or entry.get("section") not in sections or entry.get("root") not in ("repo", "state"):
+            raise policy.SourcePolicyError(f"{label} source {key} needs a known section and root")
+        if not isinstance(entry.get("trigger"), str) or not entry["trigger"].strip() or not isinstance(entry.get("reads"), str):
+            raise policy.SourcePolicyError(f"{label} source {key} needs what it reads and its readiness trigger")
+        role, path, glob = entry.get("role"), entry.get("path"), entry.get("glob")
+        if not isinstance(role, str):
+            raise policy.SourcePolicyError(f"{label} source {key} needs a role")
+        if role.startswith("architecture_"):
+            architecture = built.get("architecture_")
+            if architecture is None or glob is not None or not isinstance(path, str) or (entry["root"], policy._relative(path)) not in architecture.allowed.get(role, set()):
+                raise policy.SourcePolicyError(f"{label} source has no exact Architecture grant: " + key)
+        else:
+            _reader(built, role).validate(role, entry["root"], path=path, glob=glob)
+    receipt = {"path": "tools/local-pages/" + Path(source_map).name, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
+    return document, built, receipt
+
+
 def load_source_map(root: Path, state_root: Path, *, source_map: Path = SOURCE_MAP, policy_path: Path = SOURCE_POLICY_PATH) -> tuple[dict, Any, Any, dict]:
     """Parse the map and bind every declaration to its exact grant before any source read."""
     policy = load("source_policy")
-    raw = policy._read_regular(Path(source_map), 1024 * 1024)
-    document = load("build_pages").strict_json(raw)
-    if not isinstance(document, dict) or document.get("schema") != MAP_SCHEMA or not isinstance(document.get("sources"), dict):
-        raise policy.SourcePolicyError("overview source map must be a local-overview-sources/1 object with a sources map")
-    architecture = policy.ArchitectureReads(root, state_root, policy_path=policy_path)
-    overview = policy.OverviewReads(root, state_root, policy_path=policy_path)
-    for key, entry in document["sources"].items():
-        if not isinstance(entry, dict) or entry.get("section") not in SECTIONS or entry.get("root") not in ("repo", "state"):
-            raise policy.SourcePolicyError(f"overview source {key} needs a known section and root")
-        if not isinstance(entry.get("trigger"), str) or not entry["trigger"].strip() or not isinstance(entry.get("reads"), str):
-            raise policy.SourcePolicyError(f"overview source {key} needs what it reads and its readiness trigger")
-        role, path, glob = entry.get("role"), entry.get("path"), entry.get("glob")
-        if not isinstance(role, str):
-            raise policy.SourcePolicyError(f"overview source {key} needs a role")
-        if role.startswith("architecture_"):
-            if glob is not None or not isinstance(path, str) or (entry["root"], policy._relative(path)) not in architecture.allowed.get(role, set()):
-                raise policy.SourcePolicyError("overview source has no exact Architecture grant: " + key)
-        else:
-            overview.validate(role, entry["root"], path=path, glob=glob)
+    document, readers, receipt = load_page_sources(root, state_root, source_map=source_map, policy_path=policy_path, schema=MAP_SCHEMA,
+                                                   sections=SECTIONS, readers={"architecture_": policy.ArchitectureReads, "overview_": policy.OverviewReads})
+    architecture, overview = readers["architecture_"], readers["overview_"]
     workers = document.get("workers", [])
     if not isinstance(workers, list):
         raise policy.SourcePolicyError("overview workers must be a list")
@@ -77,12 +105,16 @@ def load_source_map(root: Path, state_root: Path, *, source_map: Path = SOURCE_M
             binding = worker.get(field)
             if binding is not None and (not isinstance(binding, dict) or binding.get("source") not in document["sources"]):
                 raise policy.SourcePolicyError(f"overview worker {worker['name']} binds {field} to an undeclared source")
-    receipt = {"path": "tools/local-pages/" + Path(source_map).name, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
     return document, architecture, overview, receipt
 
 
 def read_sources(document: dict, root: Path, state_root: Path, architecture: Any, overview: Any) -> dict[str, dict]:
     """Read each declared source once; record present, pending or unreadable."""
+    return read_declared(document, root, state_root, {"architecture_": architecture, "overview_": overview})
+
+
+def read_declared(document: dict, root: Path, state_root: Path, readers: dict) -> dict[str, dict]:
+    """Read each declared source once through the reader its role prefix names; record present, pending or unreadable."""
     pages = load("build_pages")
     bases = {"repo": Path(root).absolute(), "state": Path(state_root).absolute()}
     results = {}
@@ -93,7 +125,7 @@ def read_sources(document: dict, root: Path, state_root: Path, architecture: Any
                   "name": PurePosixPath(declared).name, "trigger": entry["trigger"], "status": "pending", "entry": entry}
         path = base / entry["path"]
         if path is not None:
-            reader = architecture if role.startswith("architecture_") else overview
+            reader = _reader(readers, role)
             try:
                 raw, record = reader.read(role, path, max_bytes=MAX_BYTES)
             except FileNotFoundError:
