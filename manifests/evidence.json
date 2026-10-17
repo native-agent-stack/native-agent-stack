@@ -17608,8 +17608,8 @@
     },
     {
       "path": "catalogs/foundation/model-currency.json",
-      "sha256": "3c5a2d3665aefab02aef36770de4dd0f7f191e534b2c83535405894a62d2932a",
-      "bytes": 41958
+      "sha256": "30cdad347404a4d167fc7da5cf59b05c4342938d90c433a4311b7cfc39d182e6",
+      "bytes": 39664
     },
     {
       "path": "catalogs/foundation/model-currency.schema.json",
@@ -19460,6 +19460,11 @@
       "path": "docs/decisions/2026-10-16-new-wsl-host-allocation-addendum.md",
       "sha256": "daa915db643a84c35f2ec44b04cade50ca610e8c90a9b5ec5d5de20aa351951e",
       "bytes": 6429
+    },
+    {
+      "path": "docs/decisions/2026-10-17-background-haiku-currency-correction.md",
+      "sha256": "4e59c64c0ebe5d0a5f5b519e84ba5339ec262f3714d405cacd1c1fdfeed11a0a",
+      "bytes": 6459
     },
     {
       "path": "docs/decisions/2026-10-17-codex-job-lane-hooks-mcp-memory.md",
@@ -64718,8 +64723,8 @@
     },
     {
       "path": "tests/test_model_currency.py",
-      "sha256": "0d5b98a3894c1d5f39484e0f6be87f8cc48452be3b831501e6b42e4d43651b54",
-      "bytes": 18945
+      "sha256": "65910f1998337e5869aa72136b4b80dfdd6a6aebfc6b1acabdc1b716f553fa6e",
+      "bytes": 18662
     },
     {
       "path": "tests/test_model_currency_propose.py",
