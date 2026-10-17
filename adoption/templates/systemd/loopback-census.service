@@ -6,8 +6,8 @@
 #   0: every TCP and UDP listener binds loopback (127.0.0.0/8, ::1 or ::ffff:127.0.0.0/104), apart from WSL's DNS
 #      tunnel at 10.255.255.254:53;
 #   1: a breach;
-#   2: a census error: ss is missing, failing or hung, ss listed no listener, a line did not parse, or the state
-#      directory could not be written.
+#   2: a census error: ss is missing, failing or hung, ss wrote a diagnostic to stderr (even with exit 0), ss listed
+#      no listener, a line did not parse, the state directory could not be written, or any other exception.
 # So a broken census never reports clean.
 #
 # Either failure starts stack-alert@%n.service through OnFailure=. That handler sends the command center one named hcom
@@ -19,8 +19,8 @@
 # then names that record. StandardError=journal sends those lines to the journal, so the alert's journal pointer leads to
 # them.
 #
-# TimeoutStartSec=60 fails the unit, and so alerts, if a run hangs. Without it, Type=oneshot has no start timeout
-# (systemd.service(5)).
+# TimeoutStartSec=60 fails the unit, and so alerts, if a run hangs. Without it, Type=oneshot has no start timeout: systemd
+# 259 disables it by default for oneshot services (man/systemd.service.xml:619-627 at tag v259, commit 9ca43348).
 #
 # @REPOSITORY@ is the checkout that holds scripts/loopback_census.py. On the workstation that is the live clone,
 # %h/code/native-agent-stack-live, as for stack-currency.service. Never use the working checkout, whose revision moves,

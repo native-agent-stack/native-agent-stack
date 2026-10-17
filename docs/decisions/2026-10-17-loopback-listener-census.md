@@ -40,11 +40,21 @@
   - Exit 0 means clean. Exit 1 means a breach.
   - Exit 2 means a census error:
     - ss is missing, cannot start, exits non-zero or hangs;
+    - ss writes any diagnostic to stderr, even with exit 0;
     - ss lists no listener, or a line does not parse;
-    - or the state directory cannot be written.
+    - the state directory cannot be written;
+    - or any other exception, through a final handler. So no failure exits 1, the breach code.
     A real host always has listeners, so an empty enumeration is never a clean pass.
-  - It prints one JSON line: `check`, `at`, `listeners` and `violations`, or `error`. An error report also carries
-    the `violations` found in the other lines, so a parse error never hides a breach.
+  - **Why a diagnostic counts even with exit 0:** iproute2 6.19.0's `main()` calls each table's dump without checking
+    its result, and returns 0 (iproute2 tag `v6.19.0`, commit `dac1bc6021693902b25a961227e289791e429b91`,
+    `misc/ss.c:6276-6291` and `:6302`).
+    - A failed dump shows only as a diagnostic on stderr, for example `perror("fopen($TCPDIAG_FILE)")` at
+      `:4160-4162`, beside the other tables' valid stdout.
+    - A normal run on the workstation writes nothing to stderr.
+  - It prints one JSON line: `check`, `at`, `listeners` and `violations`, or `error` for a census error.
+    - An error report also carries the `violations` found in the other lines, so a parse error never hides a breach.
+    - When only the state directory cannot be written, the exit is 2, but stdout holds the normal report.
+    - An unexpected exception leaves whatever line was printed before it, or none.
   - With `--state-dir`:
     - It keeps a run's violations as `breaches/<UTC stamp>.json`, which no later run overwrites.
     - A run whose violations equal the previous run's names that run's record instead of writing another.
@@ -54,6 +64,7 @@
   - Process names come from ss's users field when ss can see them. argv is never read.
 - **`adoption/templates/systemd/loopback-census.service`:**
   - A timer-triggered oneshot with `TimeoutStartSec=60`, so a hung run fails the unit instead of blocking later runs.
+    systemd 259 disables the start timeout for `Type=oneshot` by default: `man/systemd.service.xml:619-627` at tag `v259`, commit `9ca433482f2281d71718718705ca8cd3bf562ad6`; the workstation runs 259.5.
   - It runs the script with `--state-dir %S/loopback-census` (`StateDirectory=`), discards stdout, and sends stderr to
     the journal.
   - Either failure starts `OnFailure=stack-alert@%n.service`. That handler sends the command center one named hcom
@@ -73,20 +84,31 @@ NativeHorizonNY has run a shell precursor every 5 minutes since 2026-10-17 04:14
 - the units `nhny-loopback-census.service` and `nhny-loopback-census.timer`;
 - the script `~/.local/share/native-agent-stack/loopback-census/loopback_census.sh`.
 
-It applies the same rule, with six differences.
+It applies the same rule, with seven differences.
+- **Five come from rows.** On 2026-10-17 the precursor ran unmodified, with a fake `ss` first on PATH, over every
+  fixture line in `tests/test_loopback_census.py`, two rows the reads raised, and the failure cases. 11 of 31 rows differ
+  from this census, in five ways.
+- **Two come from reading the precursor's unit and script.**
 
-How they were found: on 2026-10-17 the precursor ran unmodified, with a fake `ss` first on PATH, over every fixture line
-in `tests/test_loopback_census.py` plus the failure cases. 9 of 29 rows differ from this census.
+The five row differences:
 - **v4-mapped loopback:** it flags a `::ffff:127.x` listener, which this census allows.
 - **Device-bound ::1:** it flags a `::1` listener bound to a device, and this census allows it.
   - ss 6.19.0 prints that listener as `[::1]%lo:<port>`, sampled on this host.
   - The precursor's loopback patterns are only `127.*`, `[::1]:*` and `::1:*`.
-- **Lines that do not parse:** it classifies them by their text. An address without a port, such as `127.0.0.1`,
-  passes; every other shape is flagged. This census exits 2 on them.
-- **Failures:** it counts an ss failure or an empty listing as clean. ss's errors go to /dev/null, and an empty
-  violation list exits 0.
+- **The scope-stripped tunnel address:** it flags `10.255.255.254%lo:53`, because its exception is the literal
+  `10.255.255.254:53`. This census strips a device scope before the match, as for every address, and allows the row.
+  A test pins that.
+- **Rows the census cannot parse:** it reads the fifth field as the address.
+  - Such a row passes when that field matches a loopback pattern or the literal `10.255.255.254:53`, and is flagged
+    otherwise.
+  - So `tcp LISTEN 0 4096 [::1]:631`, a short row, and `127.0.0.1` without a port both pass.
+  - This census exits 2 on every row it cannot parse.
+- **Failures:** it counts an ss failure, a diagnostic on stderr or an empty listing as clean, because ss's errors go
+  to /dev/null and an empty violation list exits 0.
+
+The two from reading:
 - **Breaches:** it keeps only `last.json`, so the next clean run overwrites a breach's detail.
-- **Hangs:** its unit has no start timeout.
+- **Hangs:** its unit has no start timeout, and systemd 259 disables the start timeout for `Type=oneshot` by default: `man/systemd.service.xml:619-627` at tag `v259`, commit `9ca433482f2281d71718718705ca8cd3bf562ad6`.
 
 **Cutover:**
 1. Install and activate the templates by the service header's steps. They disable `nhny-loopback-census.timer`.

@@ -16,13 +16,19 @@ Exit codes. A systemd OnFailure= handler fires on 1 and 2, and stderr says which
 - 1: a breach, where at least one listener breaks the rule;
 - 2: a census error:
   - ss is missing, cannot start, exits non-zero or times out, or the saved listing cannot be read;
+  - ss writes any diagnostic to stderr. iproute2 6.19.0 exits 0 even when a socket-table dump fails, and reports the
+    failure only on stderr (see run_ss);
   - the listing names no listener, or a line does not parse;
-  - or --state-dir cannot be written.
+  - --state-dir cannot be written;
+  - or any other exception, through main's final handler, so no failure exits 1, the breach code.
   A real host always has listeners (WSL's DNS tunnel at least), so an empty enumeration is an error, never a clean pass.
 
 Output:
-- stdout: one JSON line {"check", "at", "listeners", "violations"}, or {"check", "at", "error"} on exit 2.
+- stdout: one JSON line {"check", "at", "listeners", "violations"}, or {"check", "at", "error"} for a census error.
   - An error report also carries "violations" when the other lines held a breach, so a parse error never hides one.
+  - When only --state-dir cannot be written, the exit is 2 but stdout holds the normal report, and stderr says why the
+    state was not kept.
+  - An unexpected exception leaves whatever line was printed before it, or none.
 - stderr: first the breach count or the error, before any state is written. Then, with --state-dir, the breach record's
   path, or why the state was not kept, followed by the report itself.
 - With --state-dir DIR:
@@ -139,6 +145,14 @@ def run_ss(timeout):
         raise CensusError(f"ss could not start: {error.strerror}") from None
     if result.returncode:
         raise CensusError(f"ss exited {result.returncode}")
+    # iproute2 6.19.0's main() calls each table's dump without checking its result, and returns 0
+    # (iproute2@v6.19.0, commit dac1bc60, misc/ss.c:6276-6291 and :6302). A failed dump shows only as a diagnostic on
+    # stderr, for example perror("fopen($TCPDIAG_FILE)") at :4160-4162, beside the other tables' valid stdout. So any
+    # stderr line makes the listing incomplete. A normal run on the workstation writes nothing there.
+    diagnostics = [line.strip() for line in result.stderr.splitlines() if line.strip()]
+    if diagnostics:
+        more = f" and {len(diagnostics) - 1} more line(s)" if len(diagnostics) > 1 else ""
+        raise CensusError(f"ss reported an error on stderr: {diagnostics[0][:120]!r}{more}")
     return result.stdout
 
 
@@ -218,6 +232,15 @@ def finish(state_dir, report, code):
 
 
 def main(argv=None):
+    """Run the census. Any exception the census does not handle exits 2, a census error, never 1, the breach code."""
+    try:
+        return census_run(argv)
+    except Exception as error:  # noqa: BLE001 (the final handler: OnFailure must see an error, not a breach)
+        print(f"loopback census error: unexpected {type(error).__name__}: {error}", file=sys.stderr)
+        return ERROR
+
+
+def census_run(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--state-dir", type=Path, help="keep last.json and breaches/ here")
     parser.add_argument("--ss-output", help="read a saved `ss -H -ltunp` output instead of running ss")

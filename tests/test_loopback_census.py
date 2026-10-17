@@ -13,7 +13,9 @@ The script:
 The unit runs it with StandardError=journal, so the alert's journal pointer leads to the record.
 """
 import configparser
+import contextlib
 import importlib.util
+import io
 import json
 import os
 import shutil
@@ -23,6 +25,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/loopback_census.py"
@@ -115,6 +118,9 @@ class RuleTests(unittest.TestCase):
             with self.subTest(line=line):
                 self.assertEqual(run(line + "\n")[0], 1)
         self.assertEqual(run("tcp LISTEN 0 1000 10.255.255.254:53 0.0.0.0:*\n")[0], 0)
+        # A device scope is stripped before the match, as for every address, so the scoped tunnel bind is allowed too. The
+        # precursor flags this row, and the decision lists the difference.
+        self.assertEqual(run("udp UNCONN 0 0 10.255.255.254%lo:53 0.0.0.0:*\n")[0], 0)
 
     def test_a_listener_listed_twice_is_reported_once(self):
         _code, report, _ = run(BREACHES.splitlines()[0] + "\n" + BREACHES.splitlines()[0] + "\n")
@@ -202,6 +208,18 @@ class RealInvocationTests(unittest.TestCase):
                 code, report, _ = run_with_path(directory, *extra)
                 self.assertEqual((code, report["error"]), (2, error))
 
+    def test_a_diagnostic_on_stderr_is_an_error_even_when_ss_exits_0(self):
+        # iproute2 6.19.0 exits 0 after a failed socket-table dump and reports it only on stderr (misc/ss.c:6276-6291,
+        # :6302 at v6.19.0), so valid stdout from the other tables must not read as a clean census.
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = Path(directory) / "fixture"
+            fixture.write_text(LOOPBACK_ONLY, encoding="utf-8")
+            fake_ss(directory, f'"{CAT}" "{fixture}"\necho "fopen(TCPDIAG_FILE): Permission denied" >&2\nexit 0\n')
+            code, report, _ = run_with_path(directory)
+        self.assertEqual(code, 2)
+        self.assertEqual(report["error"],
+                         "ss reported an error on stderr: 'fopen(TCPDIAG_FILE): Permission denied'")
+
     def test_a_non_utf8_ss_output_is_read_with_replacement_characters(self):
         with tempfile.TemporaryDirectory() as directory:
             fixture = Path(directory) / "fixture"
@@ -264,8 +282,9 @@ class StateTests(unittest.TestCase):
             blocker = Path(directory) / "file"
             blocker.write_text("", encoding="utf-8")
             state = str(blocker / "state")
-            code, _report, stderr = run(BREACHES, "--state-dir", state)
+            code, report, stderr = run(BREACHES, "--state-dir", state)
             self.assertEqual(code, 2)
+            self.assertEqual(set(report), {"check", "at", "listeners", "violations"})  # stdout keeps the normal report
             count, kept = stderr.splitlines()
             self.assertEqual(count, "loopback census: 7 non-loopback listener(s)")
             self.assertTrue(kept.startswith(f"loopback census error: state not kept in {state}: Not a directory; report "))
@@ -274,6 +293,19 @@ class StateTests(unittest.TestCase):
             self.assertEqual(code, 2)
             self.assertEqual(stderr.splitlines()[0], "loopback census error: ss listed no listener")
             self.assertIn("state not kept", stderr.splitlines()[1])
+
+
+class FinalHandlerTests(unittest.TestCase):
+    def test_an_unexpected_exception_exits_2_never_the_breach_code(self):
+        with tempfile.TemporaryDirectory() as directory:
+            listing = Path(directory) / "listing"
+            listing.write_text(BREACHES, encoding="utf-8")
+            out, err = io.StringIO(), io.StringIO()
+            with mock.patch.object(census, "keep", side_effect=RuntimeError("boom")), \
+                    contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                code = census.main(["--ss-output", str(listing), "--state-dir", str(Path(directory) / "state")])
+        self.assertEqual(code, 2)
+        self.assertIn("loopback census error: unexpected RuntimeError: boom", err.getvalue())
 
 
 def unit(path):
