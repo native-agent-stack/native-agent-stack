@@ -246,8 +246,9 @@ class RealInvocationTests(unittest.TestCase):
         self.assertEqual(stderr.splitlines(), ["loopback census error: ss listed no tcp listener"])
 
     def test_ss_runs_without_the_variables_that_point_it_at_files(self):
-        # TCPDIAG_FILE and the PROC_* variables make ss read files instead of the kernel's tables (misc/ss.c:4237, :4240,
-        # :4371, :482-498; lib/utils.c:2054-2066 at v6.19.0). The census must not pass them on; other variables pass.
+        # TCPDIAG_FILE, PROC_ROOT, PROC_NET_TCP and PROC_NET_UDP make ss read files instead of the kernel's tables, and
+        # PROC_NET_TCP6 names a file its /proc fallback reads (misc/ss.c:4237, :4240, :4371, :4265-4266 at v6.19.0). The
+        # census must not pass them on; other variables pass.
         names = ("TCPDIAG_FILE", "PROC_ROOT", "PROC_NET_TCP", "PROC_NET_UDP", "PROC_NET_TCP6", "CENSUS_TEST_MARKER")
         with tempfile.TemporaryDirectory() as directory:
             seen = Path(directory) / "seen"

@@ -57,8 +57,11 @@
     - A normal run on the workstation writes nothing to stderr, and lists 55 TCP and 5 UDP listeners (2026-10-17).
   - **ss runs without the variables that point it at files.** The census drops `TCPDIAG_FILE` and every `PROC_*`
     variable from the environment it gives ss.
-    - Each one makes ss read a file instead of the kernel's table: `misc/ss.c:4237`, `:4240` and `:4371`, the
-      `PROC_NET_*` openers at `:482-498`, and `lib/utils.c:2054-2066` for `PROC_ROOT`.
+    - Four of them make ss read a file instead of the kernel's table: `TCPDIAG_FILE`, `PROC_ROOT`, `PROC_NET_TCP`
+      and `PROC_NET_UDP` (`misc/ss.c:4237`, `:4240` and `:4371`).
+    - The other `PROC_*` variables, such as `PROC_NET_TCP6` and `PROC_NET_UDP6`, only name the files ss reads in its
+      `/proc` fallback (`:482-498`, `:4265-4266`, `:4383-4384`, and `lib/utils.c:2054-2066`). The census drops them
+      too.
     - So a variable left in the census's environment cannot hide a table.
   - It prints one JSON line: `check`, `at`, `listeners` and `violations`, or `error` for a census error.
     - An error report also carries the `violations` found in the other lines, so a parse error never hides a breach.
@@ -95,8 +98,11 @@ NativeHorizonNY has run a shell precursor every 5 minutes since 2026-10-17 04:14
 
 It applies the same rule, with seven differences.
 - **Five come from rows.** On 2026-10-17 the precursor ran unmodified, with a fake `ss` first on PATH, over every
-  fixture line in `tests/test_loopback_census.py`, two rows the reads raised, and the failure cases. 11 of 31 rows differ
-  from this census, in five ways.
+  fixture line in `tests/test_loopback_census.py`, two rows the reads raised, and the failure cases.
+  - It was compared with this census as of commit `b6edd270`, the revision that added the per-protocol floor. Every
+    listing got one loopback row of each protocol, because a listing without both is a census error there.
+  - 11 of 31 rows differ, in five ways. The same rows differed against `d4dcf73e`, before the floor, without the added
+    rows.
 - **Two come from reading the precursor's unit and script.**
 
 The five row differences:
@@ -142,12 +148,19 @@ The two from reading:
   - Records are never pruned.
   - The handler throttles only its Windows toast, to one per hour per unit.
 - **User manager.** This is a user timer, so no census runs while the user manager is down.
-- **The floor is per protocol, not per address family.**
-  - ss reads `/proc` only when its netlink dump fails. In that path, an IPv6 table that cannot be opened is skipped
-    without a trace (`misc/ss.c:4265-4271` at iproute2 `v6.19.0`), so an IPv4 row of the same protocol still meets
-    the floor.
-  - The netlink failure that leads there normally leaves a diagnostic, for example "Cannot open netlink socket"
-    (`lib/libnetlink.c:205`), and a diagnostic is a census error.
+- **The floor is per protocol, and it does not see a table cut short.** These cites are at iproute2 `v6.19.0`.
+  - **The netlink failure that leads to `/proc` can be silent.** ss reads `/proc` only when its netlink dump fails,
+    and some failures leave no diagnostic:
+    - `lib/libnetlink.c:785-788`, for ENOENT or EOPNOTSUPP on the sock-diag socket;
+    - `misc/ss.c:4025-4029`, for a failed sendmsg;
+    - `:3886-3891`, for the UDP retry.
+  - **In the `/proc` fallback, tables can be lost or cut short without a trace:**
+    - an IPv6 table that cannot be opened is skipped (`:4265-4271`, `:4383-4384`);
+    - an overlong line ends a table (`:2871-2873`);
+    - a row the parser rejects ends it too (`:2877-2878`).
+  - So an IPv4 row of the same protocol, or the rows read before a cut, still meet the floor.
+  - This residual does not depend on a diagnostic. "Cannot open netlink socket" (`lib/libnetlink.c:205`) is one
+    failure that does leave a diagnostic, and that census errors.
 - **A benign diagnostic alerts too.**
   - Any stderr line from ss is a census error. So a diagnostic after which the listing is still complete fails every
     run and alerts every 5 minutes.

@@ -63,10 +63,11 @@ SS_ARGV = ("ss", "-H", "-l", "-t", "-u", "-n", "-p")
 SS_TIMEOUT = 30.0
 ALLOWED = {("udp", "10.255.255.254", "53"), ("tcp", "10.255.255.254", "53")}
 PROTOCOLS = {"tcp", "udp"}
-# iproute2 6.19.0's ss reads a file instead of a kernel table when TCPDIAG_FILE or a PROC_* variable is set: misc/ss.c
-# :4237 and :4240 (TCP), :4371 (UDP) and :482-498 (the PROC_NET_* openers), and lib/utils.c:2054-2066 (PROC_ROOT and
-# each name). A file that cannot be opened drops its table with no diagnostic (ss.c:4256-4257 and :4276-4285 for TCP,
-# :4376-4377 and :4391-4399 for UDP), so the census never passes those variables on.
+# iproute2 6.19.0's ss reads a file instead of a kernel table when TCPDIAG_FILE, PROC_ROOT, PROC_NET_TCP or PROC_NET_UDP
+# is set (misc/ss.c:4237, :4240, :4371). The other PROC_* variables, such as PROC_NET_TCP6 and PROC_NET_UDP6, name the
+# files its /proc fallback reads (:482-498, :4265-4266, :4383-4384; lib/utils.c:2054-2066). A file that cannot be
+# opened drops its table with no diagnostic (ss.c:4256-4257 and :4276-4285 for TCP, :4376-4377 and :4391-4399 for
+# UDP), so the census passes none of them on.
 SS_FILE_VARIABLE = "TCPDIAG_FILE"
 SS_FILE_PREFIX = "PROC_"
 PROCESS = re.compile(r'\(\("([^"]+)",pid=(\d+)')
