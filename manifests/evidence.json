@@ -5392,8 +5392,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "9edb9ac1dea4b75b17883d7ba619129bd44a2a0f1c21314842cf2913d72f13a6",
-      "bytes": 45333
+      "sha256": "89fe8ffcdee0d2b7315ccf67497ee3557a2a66cc210975d2806e7fe6bfd3cab7",
+      "bytes": 49402
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -5407,7 +5407,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "dd739c014f5cb6b4ec09b1b4b53558397356ddf5858f4df96fb0203581bb7846",
+      "sha256": "e8f32f6d7a6cac02e01f62e9e08d43ead25054834e0030ef45a5f7c1e4fa1c0f",
       "bytes": 1229
     },
     {
@@ -5782,8 +5782,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "dd39aee7815e52aed292ee3c0e9c6c0e232e6be3c5aef943bb78237b6e81cb99",
-      "bytes": 13903
+      "sha256": "1ad0da8be8a8001ddceec1876fd8455d44252560738e48046ce57c59a26d48aa",
+      "bytes": 14589
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -18583,8 +18583,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "43cc2ff82481dbf509418b036aabbe868b52812c78870c587eeaadfc64c23490",
-      "bytes": 150626
+      "sha256": "c187d391a6fac63f58c9fcccdcb87a12bb64576591c43ee0c27cb0ea7adb340f",
+      "bytes": 151391
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -63163,8 +63163,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "b19e15f5b7a2928e8bb190da812a9745e0683ba7a5ed5637811a6a2fcdb42773",
-      "bytes": 298097
+      "sha256": "149858ae4c0f4085d729c403f3a5d206a850bd7bfef53a57a8619b03e231038b",
+      "bytes": 298998
     },
     {
       "path": "scripts/host_name_scan.py",
@@ -64638,8 +64638,8 @@
     },
     {
       "path": "tests/test_muse_file_fence.py",
-      "sha256": "12e498dc0c7c0d04b9553326e29c73d618d39bd82fc3a9860f69e50295e18edb",
-      "bytes": 34078
+      "sha256": "d336106851a1669d83b792bce3da68b495499c9ca38f1913e9d42e61e5ca2af0",
+      "bytes": 34985
     },
     {
       "path": "tests/test_muse_runtime_currency.py",
@@ -65108,8 +65108,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "bae76bedf85231e10cb205d65e166cb90a4924d7b86554299d2b7e3487ca661e",
-      "bytes": 394232
+      "sha256": "61262c5b6b6fe4b9dc17677afbaa7ba2de07b27bc0878aca988673db11bb8dd3",
+      "bytes": 398157
     },
     {
       "path": "tests/test_secret_scan_metrics.py",
@@ -65778,8 +65778,8 @@
     },
     {
       "path": "tools/muse_file_fence.py",
-      "sha256": "0d8ad38a46ddd595f5a3b79d9789ece1c25c3b4c0e860b638cd4ef8805df9a17",
-      "bytes": 29177
+      "sha256": "04b6ac61b2e88c21c6763517e471db54ea4aaf4633567e7cc075a8704e848392",
+      "bytes": 29193
     },
     {
       "path": "tools/omniroute/gateway_record.py",

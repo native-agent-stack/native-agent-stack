@@ -20,6 +20,7 @@ import re
 import shlex
 import subprocess
 import sys
+import tempfile
 import time
 import unittest
 from unittest import mock
@@ -1904,6 +1905,7 @@ STORE_PATH_LEADS = {
     4: ["gh/hosts.yml"], 5: ["huggingface", "HF_HOME:-", "HF_HOME"], 6: [".tavily/config.json"], 7: ["ecosystem-grafana.env"],
     8: ["nativestack/generation.key"], 9: ["/proc", "/proc/"], 10: ["gh ", "gh auth "], 11: ["hf ", "hf auth "], 12: ["huggingface-cli "],
     13: ["--show-token"], 14: ["gh auth status ", "gh auth status  -tX"], 15: ["security "], 16: ["secret-tool "],
+    17: ["ai-memory/auth-"], 18: [".config/muse/", "XDG_CONFIG_HOME}/muse/"], 19: [".codex/.env", "CODEX_HOME}/.env"],
 }
 _LINEAR_CHILD = (
     "import json, sys, time\n"
@@ -2108,6 +2110,63 @@ class SecretPathGuardTests(unittest.TestCase):
         self.assertEqual(rule, "Read(~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)")
         self.assertIn(rule, deny)
         self.assertEqual(deny[deny.index(rule) + 1], "Read(**/" + rule[len("Read(~/"):])
+
+    # A2 finding G8-A02 (2026-10-17): the ai-memory bearer files, Muse Code's sign-in and Codex's dotenv file. Synthetic fixtures
+    # only: fake files under a temporary HOME, which the hook never opens (it reads the command text).
+    G8_A02_STORES = {
+        ".local/share/ai-memory/auth-token": "service_secret_path",
+        ".local/share/ai-memory/auth-header": "service_secret_path",
+        ".local/share/ai-memory/auth-tokens/default": "service_secret_path",
+        ".config/muse/auth.json": "native_store_path",
+        ".codex/.env": "native_store_path",
+    }
+
+    def test_g8_a02_store_readers_blocked(self):
+        with tempfile.TemporaryDirectory(prefix="g8-a02-home-") as home:
+            for relative, reason in self.G8_A02_STORES.items():
+                fake = Path(home) / relative
+                fake.parent.mkdir(parents=True, exist_ok=True)
+                fake.write_text("SYNTHETIC-NOT-A-SECRET\n")
+                for path in (str(fake), "~/" + relative):
+                    for command in (f"cat {path}", f"cp {path} {home}/copy", f"jq . {path}",
+                                    f"python3 -c 'print(open(\"{path}\").read())'"):
+                        with self.subTest(command=command):
+                            result = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                            self.assertEqual(result.returncode, 2, result.stderr)
+                            self.assertIn(f"({reason})", result.stderr)
+
+    def test_g8_a02_ai_memory_hook_commands_pass(self):
+        settings = json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text(encoding="utf-8"))
+        commands = [hook["command"] for groups in settings["hooks"].values() for group in groups
+                    for hook in group.get("hooks", []) if "--data-dir" in hook.get("command", "")]
+        self.assertTrue(any("pre-tool-use" in command for command in commands))
+        with tempfile.TemporaryDirectory(prefix="g8-a02-home-") as home:
+            for command in commands:
+                expanded = command.replace("${HOME}", home).replace("${AI_MEMORY_BIN}", f"{home}/.local/bin/ai-memory")
+                for text in (command, expanded):
+                    with self.subTest(command=text):
+                        result = run_hook({"tool_name": "Bash", "tool_input": {"command": text}})
+                        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_g8_a02_env_example_sibling_stays_readable(self):
+        with tempfile.TemporaryDirectory(prefix="g8-a02-home-") as home:
+            example = Path(home) / ".codex/.env.example"
+            example.parent.mkdir(parents=True)
+            example.write_text("EXAMPLE_NAME=\n")
+            for command in (f"cat {example}", "cat ~/.codex/.env.example", f"cp {example} {home}/template.txt"):
+                with self.subTest(command=command):
+                    self.assertEqual(run_hook({"tool_name": "Bash", "tool_input": {"command": command}}).returncode, 0)
+
+    def test_g8_a02_template_denies_the_stores(self):
+        deny = json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text(encoding="utf-8"))[
+            "permissions"]["deny"]
+        for relative in (".local/share/ai-memory/auth-token", ".local/share/ai-memory/auth-header",
+                         ".local/share/ai-memory/auth-tokens/**", ".config/muse/auth.json", ".codex/.env"):
+            for rule in (f"Read(~/{relative})", f"Read(**/{relative})", f"Edit(~/{relative})"):
+                with self.subTest(rule=rule):
+                    self.assertIn(rule, deny)
+        # Before both .env carve-outs, which a later rule would re-deny.
+        self.assertLess(deny.index("Read(**/.codex/.env)"), deny.index("Read(!.env.example)"))
 
     def test_documented_keyring_commands_pass(self):
         # The keyring commands in the fenced blocks of the pages that document them.

@@ -222,6 +222,14 @@ STORE_PATHS = (
     (LinearScan(r"\bgh\s+auth\s+status\b[^;&|\n]*\s-t\b", gh_status_token_scan), "native_token_print"),
     (re.compile(r"\bsecurity\s+(?:find-generic-password|find-internet-password|dump-keychain)\b"), "keychain_read"),
     (re.compile(r"\bsecret-tool\s+lookup\b"), "keychain_read"),
+    # A2 finding G8-A02 (2026-10-17), appended so earlier indices keep their place. ai-memory's bearer files in its data directory:
+    # <data-dir>/auth-token and auth-header (akitaonrails/ai-memory v3.1.0, crates/ai-memory-cli/src/config.rs:3347, :3359) and the
+    # per-profile auth-tokens/ directory (src/server_profiles.rs:30). `--data-dir .../ai-memory hook ...` names no such file and passes.
+    (re.compile(r"ai-memory/auth-(?:tokens?|header)(?![\w-])"), "service_secret_path"),
+    # Muse Code's sign-in (tools/muse_file_fence.py --auth default) and Codex's dotenv file, which codex loads from CODEX_HOME
+    # (openai/codex rust-v0.163.0, codex-rs/arg0/src/lib.rs:270-276). A sibling .env.example stays readable.
+    (re.compile(r"(?:\.config|XDG_CONFIG_HOME\}?)/muse/auth\.json"), "native_store_path"),
+    (re.compile(r"(?:\.codex|CODEX_HOME\}?)/\.env(?![\w.-])"), "native_store_path"),
 )
 # Every secret `variables` name and every `must_not_be_set` name of
 # adoption/credential-inventory.json; tests/test_secret_path_guard.py fails when
