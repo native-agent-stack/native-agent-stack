@@ -1,0 +1,3063 @@
+[
+  {
+    "candidate": {
+      "id": "anthropics/claude-code-action",
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "ids": [
+        "anthropics/claude-code-action",
+        "Claude GitHub App"
+      ],
+      "inventory_status": "frozen_inventory",
+      "inventory_sources": [
+        "fs.survivor"
+      ],
+      "component_kind": "Claude GitHub automation action"
+    },
+    "pin": {
+      "tag": "v1",
+      "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+      "read_at": "2026-10-15"
+    },
+    "family": "anthropic",
+    "layer": "git-github-automation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-quality-ci.json#/candidates/anthropics~1claude-code-action",
+    "layer_requirement": "Own Git worktrees, GitHub review/PR automation and structural diffs for changed code.",
+    "scoped_contribution": "Documents PR/issue automation and code review, but the source does not establish the requested independent local fenced reviewer profile.",
+    "requirements_result": [
+      {
+        "id": "scoped-layer-capability",
+        "result": "PASS",
+        "reason": "Documents PR/issue automation and code review, but the source does not establish the requested independent local fenced reviewer profile.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "README.md",
+            "lines": [
+              5,
+              18
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/README.md#L5-L18"
+          },
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "docs/security.md",
+            "lines": [
+              56,
+              64
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/docs/security.md#L56-L64"
+          }
+        ]
+      },
+      {
+        "id": "git-worktrees",
+        "result": "UNKNOWN",
+        "reason": "Not established as a standalone contribution by the consumed source; retained as a complementary layer gap. Documents PR/issue automation and code review, but the source does not establish the requested independent local fenced reviewer profile.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "README.md",
+            "lines": [
+              5,
+              18
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/README.md#L5-L18"
+          },
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "docs/security.md",
+            "lines": [
+              56,
+              64
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/docs/security.md#L56-L64"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "github-review-pr-automation",
+        "result": "PASS",
+        "reason": "Documented contribution in this candidate's scoped role. Documents PR/issue automation and code review, but the source does not establish the requested independent local fenced reviewer profile.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "README.md",
+            "lines": [
+              5,
+              18
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/README.md#L5-L18"
+          },
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "docs/security.md",
+            "lines": [
+              56,
+              64
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/docs/security.md#L56-L64"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "structural-diffs",
+        "result": "UNKNOWN",
+        "reason": "Not established as a standalone contribution by the consumed source; retained as a complementary layer gap. Documents PR/issue automation and code review, but the source does not establish the requested independent local fenced reviewer profile.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "README.md",
+            "lines": [
+              5,
+              18
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/README.md#L5-L18"
+          },
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "docs/security.md",
+            "lines": [
+              56,
+              64
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/docs/security.md#L56-L64"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Frozen non-archived status and recent default-branch activity support ongoing maintenance at read time; no ranking/default inference.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/anthropics/claude-code-action",
+            "read_at": "2026-10-15T20:03:33Z–20:08Z",
+            "section": "frozen archive/activity/licence snapshot; facts-quality-ci.json"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "UNKNOWN",
+        "reason": "UNKNOWN: selected deployment is a composite CI action, not a local macOS/WSL package. The read sources do not establish both requested self-hosted environments.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "action.yml",
+            "lines": [
+              189,
+              190
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/action.yml#L189-L190"
+          },
+          {
+            "url": "https://learn.microsoft.com/en-us/windows/wsl/about",
+            "read_at": "2026-10-15",
+            "section": "WSL2 Linux kernel/full system-call compatibility; source inference for native Linux CLI userspace, not a host run"
+          }
+        ],
+        "applicable": true
+      },
+      {
+        "id": "macos-arm64",
+        "result": "UNKNOWN",
+        "reason": "UNKNOWN: selected deployment is a composite CI action, not a local macOS/WSL package. The read sources do not establish both requested self-hosted environments.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "action.yml",
+            "lines": [
+              189,
+              190
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/action.yml#L189-L190"
+          }
+        ],
+        "applicable": true
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "Runs through a GitHub Actions workflow using Claude's noninteractive invocation.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "README.md",
+            "lines": [
+              5,
+              18
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/README.md#L5-L18"
+          },
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "docs/security.md",
+            "lines": [
+              56,
+              64
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/docs/security.md#L56-L64"
+          }
+        ]
+      },
+      {
+        "id": "per-repository-scoping",
+        "result": "PASS",
+        "reason": "Workflow/app access is repository scoped. Custom MCP configuration merges with built-in GitHub MCP; project configuration restoration covers a fixed list only.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "docs/security.md",
+            "lines": [
+              19,
+              21
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/docs/security.md#L19-L21"
+          },
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "docs/security.md",
+            "lines": [
+              56,
+              64
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/docs/security.md#L56-L64"
+          },
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "docs/configuration.md",
+            "lines": [
+              3,
+              15
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/docs/configuration.md#L3-L15"
+          }
+        ]
+      },
+      {
+        "id": "github-hosted-runners",
+        "result": "UNKNOWN",
+        "reason": "Conditional source-derived support for a documented CLI on a supported runner OS via a run step; no workflow execution or target runner qualification is claimed.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "README.md",
+            "lines": [
+              5,
+              18
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/README.md#L5-L18"
+          },
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "docs/security.md",
+            "lines": [
+              56,
+              64
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/docs/security.md#L56-L64"
+          },
+          {
+            "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstepsrun",
+            "read_at": "2026-10-15",
+            "section": "run steps execute command-line programs through a runner shell"
+          }
+        ]
+      },
+      {
+        "id": "self-hosted-runners",
+        "result": "UNKNOWN",
+        "reason": "Conditional source-derived CLI support on the documented OS/architecture. The operator supplies dependencies, isolation and configuration; no hosted-only integration is assumed.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "action.yml",
+            "lines": [
+              189,
+              190
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/action.yml#L189-L190"
+          },
+          {
+            "url": "https://docs.github.com/en/actions/concepts/runners/self-hosted-runners",
+            "read_at": "2026-10-15",
+            "section": "runner environment is deployed and managed by its operator"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "anthropic candidate uses the documented standalone command/procedure in its explicitly selected profile; automatic worker/API-slot integration is not established.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "README.md",
+            "lines": [
+              24,
+              32
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/README.md#L24-L32"
+          },
+          {
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+            "path": "action.yml",
+            "lines": [
+              189,
+              190
+            ],
+            "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/action.yml#L189-L190"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "uses: anthropics/claude-code-action@374f254f5efaf968abfe15d399fd90972e8138b9 # v1"
+      ],
+      "scope": "anthropic profile: Workflow/app access is repository scoped. Custom MCP configuration merges with built-in GitHub MCP; project configuration restoration covers a fixed list only.",
+      "citations": [
+        {
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+          "path": "README.md",
+          "lines": [
+            24,
+            32
+          ],
+          "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/README.md#L24-L32"
+        },
+        {
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+          "path": "action.yml",
+          "lines": [
+            189,
+            190
+          ],
+          "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/action.yml#L189-L190"
+        }
+      ],
+      "executed": false,
+      "version_substitution": "Version arguments are source-screen candidates. Floating examples are not permission to install latest; unresolved artifact/source binding is recorded in verdict gaps."
+    },
+    "inverse": {
+      "finding": "GitHub documents disabling the owning workflow; this does not uninstall the GitHub App or revoke its grants.",
+      "citations": [
+        {
+          "url": "https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/disabling-and-enabling-a-workflow",
+          "read_at": "2026-10-15",
+          "section": "Disabling a workflow"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "Actor/bot allowlists, workflow permissions, PR-controlled configuration, plugin installs and merged MCP servers affect reviewer isolation. The source explicitly warns about non-write-user/bot bypasses.",
+      "citations": [
+        {
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+          "path": "action.yml",
+          "lines": [
+            30,
+            44
+          ],
+          "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/action.yml#L30-L44"
+        },
+        {
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+          "path": "docs/security.md",
+          "lines": [
+            5,
+            21
+          ],
+          "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/docs/security.md#L5-L21"
+        },
+        {
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+          "path": "docs/security.md",
+          "lines": [
+            56,
+            64
+          ],
+          "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/docs/security.md#L56-L64"
+        }
+      ],
+      "github_lifecycle": "Required-check names and expected GitHub App identities are target-repository inputs; merge-queue required workflows need merge_group. No check/ruleset is created or renamed.",
+      "github_sources": [
+        {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets",
+          "read_at": "2026-10-15",
+          "section": "required reviews and required status checks; expected GitHub App"
+        },
+        {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue",
+          "read_at": "2026-10-15",
+          "section": "required checks need merge_group"
+        }
+      ]
+    },
+    "suited_roles": {
+      "classification": "CANDIDATE / PROPOSAL",
+      "roles": [
+        "reviewer",
+        "builder"
+      ],
+      "reason": "Documents PR/issue automation and code review, but the source does not establish the requested independent local fenced reviewer profile.",
+      "profile_constraint": "anthropic only, selected repository/profile; API slots do not automatically acquire a shell/tool adapter. Runtime-worker use needs its separately screened profile.",
+      "excluded": [
+        "fenced trading sessions",
+        "fenced judge sessions",
+        "fenced review sessions"
+      ],
+      "citations": [
+        {
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+          "path": "README.md",
+          "lines": [
+            5,
+            18
+          ],
+          "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/README.md#L5-L18"
+        },
+        {
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+          "path": "docs/security.md",
+          "lines": [
+            56,
+            64
+          ],
+          "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/docs/security.md#L56-L64"
+        }
+      ],
+      "protocol": "docs/decisions/2026-10-11-layer-resolution-protocol.md@8053f14e7e0817d2502dff2bb284bfb7e1b0152f"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "candidate_status": "CANDIDATE; profile selection is a PROPOSAL",
+      "estimated_tokens": null,
+      "scope": "The action adds no local interactive-host text, but its CI Claude session prompt, built-in MCP schemas and selected plugins are not statically totaled.",
+      "method": "No numeric total: exact session-injected payload not resolved. Zero local-host component must not be presented as zero action-session context.",
+      "counted_ranges": [],
+      "counted_utf8_bytes": null,
+      "citations": [
+        {
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+          "path": "README.md",
+          "lines": [
+            24,
+            32
+          ],
+          "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/README.md#L24-L32"
+        },
+        {
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+          "path": "action.yml",
+          "lines": [
+            189,
+            190
+          ],
+          "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/action.yml#L189-L190"
+        }
+      ],
+      "unknown_components": [
+        "action prompt assembly",
+        "built-in GitHub MCP schemas",
+        "configured plugins and runtime instructions"
+      ],
+      "measured": false
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "trial_eligible": false,
+      "disqualifier": null,
+      "reason": "Read the complete runner/runtime sandbox and prompt assembly at this commit, then source the local fenced-review profile and two-family check provenance. No trial of this review role is admitted yet.",
+      "cheapest_check": "Read the complete runner/runtime sandbox and prompt assembly at this commit, then source the local fenced-review profile and two-family check provenance. No trial of this review role is admitted yet."
+    },
+    "fenced_sessions": {
+      "enabled": false,
+      "scope_constraint": "No installation or automatic injection into trading, judge or review fences. Review-agent fence capability is itself an unresolved screen requirement, not permission to contaminate a fence."
+    },
+    "service_status": "served by the scoped documented candidate route; see verdict",
+    "client_route_notes": [
+      "CANDIDATE: Claude Code operator/CLI or documented plugin profile.",
+      "UNKNOWN: automatic Claude Agent SDK, Anthropic API, Pi or OpenCode worker wiring; source screen of a tool does not grant worker permissions."
+    ],
+    "review_automation_ref": "facts-quality-ci.json#/review_automation"
+  },
+  {
+    "candidate": {
+      "id": "ataraxy-labs/sem",
+      "repository": "https://github.com/Ataraxy-Labs/sem",
+      "ids": [
+        "sem",
+        "sem-cli (Homebrew)"
+      ],
+      "inventory_status": "frozen_inventory",
+      "inventory_sources": [
+        "fs.survivor"
+      ],
+      "component_kind": "semantic Git diff/review CLI"
+    },
+    "pin": {
+      "tag": "v0.27.0",
+      "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+      "read_at": "2026-10-15"
+    },
+    "family": "anthropic",
+    "layer": "git-github-automation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-quality-ci.json#/candidates/ataraxy-labs~1sem",
+    "layer_requirement": "Own Git worktrees, GitHub review/PR automation and structural diffs for changed code.",
+    "scoped_contribution": "Parses code entities and computes semantic diffs; documents impact, project checks and review certificates.",
+    "requirements_result": [
+      {
+        "id": "scoped-layer-capability",
+        "result": "PASS",
+        "reason": "Parses code entities and computes semantic diffs; documents impact, project checks and review certificates.",
+        "citations": [
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "README.md",
+            "lines": [
+              36,
+              40
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L36-L40"
+          },
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "README.md",
+            "lines": [
+              97,
+              118
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L97-L118"
+          }
+        ]
+      },
+      {
+        "id": "git-worktrees",
+        "result": "UNKNOWN",
+        "reason": "Not established as a standalone contribution by the consumed source; retained as a complementary layer gap. Parses code entities and computes semantic diffs; documents impact, project checks and review certificates.",
+        "citations": [
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "README.md",
+            "lines": [
+              36,
+              40
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L36-L40"
+          },
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "README.md",
+            "lines": [
+              97,
+              118
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L97-L118"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "github-review-pr-automation",
+        "result": "UNKNOWN",
+        "reason": "Not established as a standalone contribution by the consumed source; retained as a complementary layer gap. Parses code entities and computes semantic diffs; documents impact, project checks and review certificates.",
+        "citations": [
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "README.md",
+            "lines": [
+              36,
+              40
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L36-L40"
+          },
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "README.md",
+            "lines": [
+              97,
+              118
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L97-L118"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "structural-diffs",
+        "result": "PASS",
+        "reason": "Documented contribution in this candidate's scoped role. Parses code entities and computes semantic diffs; documents impact, project checks and review certificates.",
+        "citations": [
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "README.md",
+            "lines": [
+              36,
+              40
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L36-L40"
+          },
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "README.md",
+            "lines": [
+              97,
+              118
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L97-L118"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Frozen non-archived status and recent default-branch activity support ongoing maintenance at read time; no ranking/default inference.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/Ataraxy-Labs/sem",
+            "read_at": "2026-10-15T20:03:33Z–20:08Z",
+            "section": "frozen archive/activity/licence snapshot; facts-quality-ci.json"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "PASS: installer explicitly supports macOS arm64/x86_64 and Linux x86_64/arm64.",
+        "citations": [
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "install.sh",
+            "lines": [
+              19,
+              25
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/install.sh#L19-L25"
+          },
+          {
+            "url": "https://learn.microsoft.com/en-us/windows/wsl/about",
+            "read_at": "2026-10-15",
+            "section": "WSL2 Linux kernel/full system-call compatibility; source inference for native Linux CLI userspace, not a host run"
+          }
+        ],
+        "applicable": true
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "PASS: installer explicitly supports macOS arm64/x86_64 and Linux x86_64/arm64.",
+        "citations": [
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "install.sh",
+            "lines": [
+              19,
+              25
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/install.sh#L19-L25"
+          }
+        ],
+        "applicable": true
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "diff/impact/check/certify are CLI operations with documented check exit status.",
+        "citations": [
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "README.md",
+            "lines": [
+              36,
+              40
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L36-L40"
+          },
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "README.md",
+            "lines": [
+              97,
+              118
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L97-L118"
+          }
+        ]
+      },
+      {
+        "id": "per-repository-scoping",
+        "result": "PASS",
+        "reason": "Works on the current Git repository; cloud queries are opt-in per repository and separate from local analysis.",
+        "citations": [
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "README.md",
+            "lines": [
+              36,
+              40
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L36-L40"
+          }
+        ]
+      },
+      {
+        "id": "github-hosted-runners",
+        "result": "PASS",
+        "reason": "Conditional source-derived support for a documented CLI on a supported runner OS via a run step; no workflow execution or target runner qualification is claimed.",
+        "citations": [
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "README.md",
+            "lines": [
+              36,
+              40
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L36-L40"
+          },
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "README.md",
+            "lines": [
+              97,
+              118
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L97-L118"
+          },
+          {
+            "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstepsrun",
+            "read_at": "2026-10-15",
+            "section": "run steps execute command-line programs through a runner shell"
+          }
+        ]
+      },
+      {
+        "id": "self-hosted-runners",
+        "result": "PASS",
+        "reason": "Conditional source-derived CLI support on the documented OS/architecture. The operator supplies dependencies, isolation and configuration; no hosted-only integration is assumed.",
+        "citations": [
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "install.sh",
+            "lines": [
+              19,
+              25
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/install.sh#L19-L25"
+          },
+          {
+            "url": "https://docs.github.com/en/actions/concepts/runners/self-hosted-runners",
+            "read_at": "2026-10-15",
+            "section": "runner environment is deployed and managed by its operator"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "anthropic candidate uses the documented standalone command/procedure in its explicitly selected profile; automatic worker/API-slot integration is not established.",
+        "citations": [
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "install.sh",
+            "lines": [
+              8,
+              25
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/install.sh#L8-L25"
+          },
+          {
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+            "path": "install.sh",
+            "lines": [
+              75,
+              85
+            ],
+            "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/install.sh#L75-L85"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "Use the upstream installer at the screened commit with --version v0.27.0 and a profile-owned --install-dir; verify its release checksum using its documented path."
+      ],
+      "scope": "anthropic profile: Works on the current Git repository; cloud queries are opt-in per repository and separate from local analysis.",
+      "citations": [
+        {
+          "repository": "https://github.com/Ataraxy-Labs/sem",
+          "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+          "path": "install.sh",
+          "lines": [
+            8,
+            25
+          ],
+          "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/install.sh#L8-L25"
+        },
+        {
+          "repository": "https://github.com/Ataraxy-Labs/sem",
+          "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+          "path": "install.sh",
+          "lines": [
+            75,
+            85
+          ],
+          "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/install.sh#L75-L85"
+        }
+      ],
+      "executed": false,
+      "version_substitution": "Version arguments are source-screen candidates. Floating examples are not permission to install latest; unresolved artifact/source binding is recorded in verdict gaps."
+    },
+    "inverse": {
+      "finding": "none documented for the local installer in the consumed source; removing its selected install directory is a PROPOSAL. Cloud forget controls are a separate data inverse.",
+      "citations": [
+        {
+          "repository": "https://github.com/Ataraxy-Labs/sem",
+          "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+          "path": "install.sh",
+          "lines": [
+            8,
+            25
+          ],
+          "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/install.sh#L8-L25"
+        },
+        {
+          "repository": "https://github.com/Ataraxy-Labs/sem",
+          "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+          "path": "install.sh",
+          "lines": [
+            75,
+            85
+          ],
+          "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/install.sh#L75-L85"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "sem overlaps difftastic and can invoke project-defined compilers/tests through sem check. Cloud consent and local audit state are separate; no activation or code execution occurred.",
+      "citations": [
+        {
+          "repository": "https://github.com/Ataraxy-Labs/sem",
+          "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+          "path": "README.md",
+          "lines": [
+            36,
+            40
+          ],
+          "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L36-L40"
+        },
+        {
+          "repository": "https://github.com/Ataraxy-Labs/sem",
+          "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+          "path": "README.md",
+          "lines": [
+            97,
+            118
+          ],
+          "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L97-L118"
+        },
+        {
+          "repository": "https://github.com/Ataraxy-Labs/sem",
+          "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+          "path": "README.md",
+          "lines": [
+            36,
+            40
+          ],
+          "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L36-L40"
+        }
+      ],
+      "github_lifecycle": "Required-check names and expected GitHub App identities are target-repository inputs; merge-queue required workflows need merge_group. No check/ruleset is created or renamed.",
+      "github_sources": [
+        {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets",
+          "read_at": "2026-10-15",
+          "section": "required reviews and required status checks; expected GitHub App"
+        },
+        {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue",
+          "read_at": "2026-10-15",
+          "section": "required checks need merge_group"
+        }
+      ]
+    },
+    "suited_roles": {
+      "classification": "CANDIDATE / PROPOSAL",
+      "roles": [
+        "reviewer",
+        "builder"
+      ],
+      "reason": "Parses code entities and computes semantic diffs; documents impact, project checks and review certificates.",
+      "profile_constraint": "anthropic only, selected repository/profile; API slots do not automatically acquire a shell/tool adapter. Runtime-worker use needs its separately screened profile.",
+      "excluded": [
+        "fenced trading sessions",
+        "fenced judge sessions",
+        "fenced review sessions"
+      ],
+      "citations": [
+        {
+          "repository": "https://github.com/Ataraxy-Labs/sem",
+          "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+          "path": "README.md",
+          "lines": [
+            36,
+            40
+          ],
+          "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L36-L40"
+        },
+        {
+          "repository": "https://github.com/Ataraxy-Labs/sem",
+          "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+          "path": "README.md",
+          "lines": [
+            97,
+            118
+          ],
+          "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/README.md#L97-L118"
+        }
+      ],
+      "protocol": "docs/decisions/2026-10-11-layer-resolution-protocol.md@8053f14e7e0817d2502dff2bb284bfb7e1b0152f"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "candidate_status": "CANDIDATE; profile selection is a PROPOSAL",
+      "estimated_tokens": 0,
+      "scope": "Automatic text added to the family model session by the documented standalone CLI/CI-only profile. Excludes invoked command output and downstream agent/evaluation prompts.",
+      "method": "Sum ceil(UTF-8 bytes / 4) over exact injected components. CLI/CI-only profile has an empty automatic injection set (0 bytes, 0 tokens); this is a static profile estimate, not a tokenizer or session measurement.",
+      "counted_ranges": [],
+      "counted_utf8_bytes": 0,
+      "citations": [
+        {
+          "repository": "https://github.com/Ataraxy-Labs/sem",
+          "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+          "path": "install.sh",
+          "lines": [
+            8,
+            25
+          ],
+          "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/install.sh#L8-L25"
+        },
+        {
+          "repository": "https://github.com/Ataraxy-Labs/sem",
+          "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+          "path": "install.sh",
+          "lines": [
+            75,
+            85
+          ],
+          "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/install.sh#L75-L85"
+        }
+      ],
+      "unknown_components": [],
+      "measured": false
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "trial_eligible": true,
+      "disqualifier": null,
+      "reason": "Source requirements support the expressly scoped contribution only. Complete-layer coverage, runtime wiring and defaults are not established.",
+      "cheapest_check": "Next stage may use the upstream's isolated install/test/inverse path at this pin and retain actual invocation/context receipts. This lane does not run the trial."
+    },
+    "fenced_sessions": {
+      "enabled": false,
+      "scope_constraint": "No installation or automatic injection into trading, judge or review fences. Review-agent fence capability is itself an unresolved screen requirement, not permission to contaminate a fence."
+    },
+    "service_status": "served by the scoped documented candidate route; see verdict",
+    "client_route_notes": [
+      "CANDIDATE: Claude Code operator/CLI or documented plugin profile.",
+      "UNKNOWN: automatic Claude Agent SDK, Anthropic API, Pi or OpenCode worker wiring; source screen of a tool does not grant worker permissions."
+    ],
+    "review_automation_ref": "facts-quality-ci.json#/review_automation"
+  },
+  {
+    "candidate": {
+      "id": "cli/cli",
+      "repository": "https://github.com/cli/cli",
+      "ids": [
+        "gh"
+      ],
+      "inventory_status": "frozen_inventory",
+      "inventory_sources": [
+        "fj.cand",
+        "fj.winner",
+        "fs.winner"
+      ],
+      "component_kind": "GitHub lifecycle CLI"
+    },
+    "pin": {
+      "tag": "v2.102.0",
+      "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "read_at": "2026-10-15"
+    },
+    "family": "anthropic",
+    "layer": "git-github-automation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-quality-ci.json#/candidates/cli~1cli",
+    "layer_requirement": "Own Git worktrees, GitHub review/PR automation and structural diffs for changed code.",
+    "scoped_contribution": "GitHub's CLI exposes repository, issue and pull-request operations; GitHub's required checks and review rules are separate platform primitives.",
+    "requirements_result": [
+      {
+        "id": "scoped-layer-capability",
+        "result": "PASS",
+        "reason": "GitHub's CLI exposes repository, issue and pull-request operations; GitHub's required checks and review rules are separate platform primitives.",
+        "citations": [
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "README.md",
+            "lines": [
+              8,
+              14
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L8-L14"
+          }
+        ]
+      },
+      {
+        "id": "git-worktrees",
+        "result": "UNKNOWN",
+        "reason": "Not established as a standalone contribution by the consumed source; retained as a complementary layer gap. GitHub's CLI exposes repository, issue and pull-request operations; GitHub's required checks and review rules are separate platform primitives.",
+        "citations": [
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "README.md",
+            "lines": [
+              8,
+              14
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L8-L14"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "github-review-pr-automation",
+        "result": "PASS",
+        "reason": "Documented contribution in this candidate's scoped role. GitHub's CLI exposes repository, issue and pull-request operations; GitHub's required checks and review rules are separate platform primitives.",
+        "citations": [
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "README.md",
+            "lines": [
+              8,
+              14
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L8-L14"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "structural-diffs",
+        "result": "UNKNOWN",
+        "reason": "Not established as a standalone contribution by the consumed source; retained as a complementary layer gap. GitHub's CLI exposes repository, issue and pull-request operations; GitHub's required checks and review rules are separate platform primitives.",
+        "citations": [
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "README.md",
+            "lines": [
+              8,
+              14
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L8-L14"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Frozen non-archived status and recent default-branch activity support ongoing maintenance at read time; no ranking/default inference.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/cli/cli",
+            "read_at": "2026-10-15T20:03:33Z–20:08Z",
+            "section": "frozen archive/activity/licence snapshot; facts-quality-ci.json"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "PASS: Linux/Ubuntu and macOS release routes are documented, with macOS amd64/arm64 binaries. Linux x86_64 is a source-compatible route; actual host use is unmeasured.",
+        "citations": [
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "README.md",
+            "lines": [
+              10,
+              14
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L10-L14"
+          },
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "docs/install_macos.md",
+            "lines": [
+              25,
+              25
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_macos.md#L25"
+          },
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "docs/install_linux.md",
+            "lines": [
+              35,
+              61
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_linux.md#L35-L61"
+          },
+          {
+            "url": "https://learn.microsoft.com/en-us/windows/wsl/about",
+            "read_at": "2026-10-15",
+            "section": "WSL2 Linux kernel/full system-call compatibility; source inference for native Linux CLI userspace, not a host run"
+          }
+        ],
+        "applicable": true
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "PASS: Linux/Ubuntu and macOS release routes are documented, with macOS amd64/arm64 binaries. Linux x86_64 is a source-compatible route; actual host use is unmeasured.",
+        "citations": [
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "README.md",
+            "lines": [
+              10,
+              14
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L10-L14"
+          },
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "docs/install_macos.md",
+            "lines": [
+              25,
+              25
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_macos.md#L25"
+          },
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "docs/install_linux.md",
+            "lines": [
+              35,
+              61
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_linux.md#L35-L61"
+          }
+        ],
+        "applicable": true
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "Noninteractive repository-scoped CLI operations are documented; authentication/permissions are prerequisites, not invoked here.",
+        "citations": [
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "README.md",
+            "lines": [
+              8,
+              14
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L8-L14"
+          }
+        ]
+      },
+      {
+        "id": "per-repository-scoping",
+        "result": "PASS",
+        "reason": "Select the repository explicitly for each operation. The optional gh skill is excluded from the CLI-only profile.",
+        "citations": [
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "README.md",
+            "lines": [
+              18,
+              24
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L18-L24"
+          },
+          {
+            "url": "https://cli.github.com/manual/gh_pr_review",
+            "read_at": "2026-10-15",
+            "section": "repository flag and review operations; read 2026-10-15"
+          }
+        ]
+      },
+      {
+        "id": "github-hosted-runners",
+        "result": "PASS",
+        "reason": "Conditional source-derived support for a documented CLI on a supported runner OS via a run step; no workflow execution or target runner qualification is claimed.",
+        "citations": [
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "README.md",
+            "lines": [
+              8,
+              14
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L8-L14"
+          },
+          {
+            "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstepsrun",
+            "read_at": "2026-10-15",
+            "section": "run steps execute command-line programs through a runner shell"
+          }
+        ]
+      },
+      {
+        "id": "self-hosted-runners",
+        "result": "PASS",
+        "reason": "Conditional source-derived CLI support on the documented OS/architecture. The operator supplies dependencies, isolation and configuration; no hosted-only integration is assumed.",
+        "citations": [
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "README.md",
+            "lines": [
+              10,
+              14
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L10-L14"
+          },
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "docs/install_macos.md",
+            "lines": [
+              25,
+              25
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_macos.md#L25"
+          },
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "docs/install_linux.md",
+            "lines": [
+              35,
+              61
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_linux.md#L35-L61"
+          },
+          {
+            "url": "https://docs.github.com/en/actions/concepts/runners/self-hosted-runners",
+            "read_at": "2026-10-15",
+            "section": "runner environment is deployed and managed by its operator"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "anthropic candidate uses the documented standalone command/procedure in its explicitly selected profile; automatic worker/API-slot integration is not established.",
+        "citations": [
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "docs/install_macos.md",
+            "lines": [
+              11,
+              25
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_macos.md#L11-L25"
+          },
+          {
+            "repository": "https://github.com/cli/cli",
+            "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+            "path": "docs/install_linux.md",
+            "lines": [
+              35,
+              61
+            ],
+            "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_linux.md#L35-L61"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "Install gh v2.102.0 via the documented platform release archive; macOS also documents brew install gh, which must be version-resolved before trial."
+      ],
+      "scope": "anthropic profile: Select the repository explicitly for each operation. The optional gh skill is excluded from the CLI-only profile.",
+      "citations": [
+        {
+          "repository": "https://github.com/cli/cli",
+          "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+          "path": "docs/install_macos.md",
+          "lines": [
+            11,
+            25
+          ],
+          "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_macos.md#L11-L25"
+        },
+        {
+          "repository": "https://github.com/cli/cli",
+          "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+          "path": "docs/install_linux.md",
+          "lines": [
+            35,
+            61
+          ],
+          "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_linux.md#L35-L61"
+        }
+      ],
+      "executed": false,
+      "version_substitution": "Version arguments are source-screen candidates. Floating examples are not permission to install latest; unresolved artifact/source binding is recorded in verdict gaps."
+    },
+    "inverse": {
+      "finding": "No matching precompiled-binary uninstall is documented in the consumed install pages. GitHub documents gh workflow disable WORKFLOW as a workflow inverse, not package removal.",
+      "citations": [
+        {
+          "url": "https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/disabling-and-enabling-a-workflow",
+          "read_at": "2026-10-15",
+          "section": "Disabling a workflow"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "gh uses shared authentication/config unless a profile supplies its own. Required check contexts, expected app identity, stale approvals and merge_group triggers belong to GitHub rulesets; no model-family enforcement is established by gh itself.",
+      "citations": [
+        {
+          "repository": "https://github.com/cli/cli",
+          "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+          "path": "README.md",
+          "lines": [
+            8,
+            14
+          ],
+          "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L8-L14"
+        },
+        {
+          "repository": "https://github.com/cli/cli",
+          "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+          "path": "README.md",
+          "lines": [
+            18,
+            24
+          ],
+          "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L18-L24"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_pr_review",
+          "read_at": "2026-10-15",
+          "section": "repository flag and review operations; read 2026-10-15"
+        }
+      ],
+      "github_lifecycle": "Required-check names and expected GitHub App identities are target-repository inputs; merge-queue required workflows need merge_group. No check/ruleset is created or renamed.",
+      "github_sources": [
+        {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets",
+          "read_at": "2026-10-15",
+          "section": "required reviews and required status checks; expected GitHub App"
+        },
+        {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue",
+          "read_at": "2026-10-15",
+          "section": "required checks need merge_group"
+        }
+      ]
+    },
+    "suited_roles": {
+      "classification": "CANDIDATE / PROPOSAL",
+      "roles": [
+        "builder",
+        "co-op",
+        "CC"
+      ],
+      "reason": "GitHub's CLI exposes repository, issue and pull-request operations; GitHub's required checks and review rules are separate platform primitives.",
+      "profile_constraint": "anthropic only, selected repository/profile; API slots do not automatically acquire a shell/tool adapter. Runtime-worker use needs its separately screened profile.",
+      "excluded": [
+        "fenced trading sessions",
+        "fenced judge sessions",
+        "fenced review sessions"
+      ],
+      "citations": [
+        {
+          "repository": "https://github.com/cli/cli",
+          "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+          "path": "README.md",
+          "lines": [
+            8,
+            14
+          ],
+          "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L8-L14"
+        }
+      ],
+      "protocol": "docs/decisions/2026-10-11-layer-resolution-protocol.md@8053f14e7e0817d2502dff2bb284bfb7e1b0152f"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "candidate_status": "CANDIDATE; profile selection is a PROPOSAL",
+      "estimated_tokens": 0,
+      "scope": "Automatic text added to the family model session by the documented standalone CLI/CI-only profile. Excludes invoked command output and downstream agent/evaluation prompts.",
+      "method": "Sum ceil(UTF-8 bytes / 4) over exact injected components. CLI/CI-only profile has an empty automatic injection set (0 bytes, 0 tokens); this is a static profile estimate, not a tokenizer or session measurement.",
+      "counted_ranges": [],
+      "counted_utf8_bytes": 0,
+      "citations": [
+        {
+          "repository": "https://github.com/cli/cli",
+          "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+          "path": "docs/install_macos.md",
+          "lines": [
+            11,
+            25
+          ],
+          "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_macos.md#L11-L25"
+        },
+        {
+          "repository": "https://github.com/cli/cli",
+          "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+          "path": "docs/install_linux.md",
+          "lines": [
+            35,
+            61
+          ],
+          "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_linux.md#L35-L61"
+        }
+      ],
+      "unknown_components": [],
+      "measured": false
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "trial_eligible": false,
+      "disqualifier": null,
+      "reason": "Read the pinned PR-command/environment contract and bind a repository-scoped credential profile plus the model-family verdict-to-check contract. This screen does not create that enforcement design.",
+      "cheapest_check": "Read the pinned PR-command/environment contract and bind a repository-scoped credential profile plus the model-family verdict-to-check contract. This screen does not create that enforcement design."
+    },
+    "fenced_sessions": {
+      "enabled": false,
+      "scope_constraint": "No installation or automatic injection into trading, judge or review fences. Review-agent fence capability is itself an unresolved screen requirement, not permission to contaminate a fence."
+    },
+    "service_status": "served by the scoped documented candidate route; see verdict",
+    "client_route_notes": [
+      "CANDIDATE: Claude Code operator/CLI or documented plugin profile.",
+      "UNKNOWN: automatic Claude Agent SDK, Anthropic API, Pi or OpenCode worker wiring; source screen of a tool does not grant worker permissions."
+    ],
+    "review_automation_ref": "facts-quality-ci.json#/review_automation"
+  },
+  {
+    "candidate": {
+      "id": "max-sixty/worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "ids": [
+        "worktrunk",
+        "wt"
+      ],
+      "inventory_status": "frozen_inventory",
+      "inventory_sources": [
+        "fj.cand",
+        "fj.winner",
+        "fs.winner"
+      ],
+      "component_kind": "worktree lifecycle CLI"
+    },
+    "pin": {
+      "tag": "v0.80.0",
+      "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "read_at": "2026-10-15"
+    },
+    "family": "anthropic",
+    "layer": "git-github-automation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-quality-ci.json#/candidates/max-sixty~1worktrunk",
+    "layer_requirement": "Own Git worktrees, GitHub review/PR automation and structural diffs for changed code.",
+    "scoped_contribution": "Owns branch-addressed worktree creation, switching and merge/cleanup workflows; hooks and LLM commits are optional extensions.",
+    "requirements_result": [
+      {
+        "id": "scoped-layer-capability",
+        "result": "PASS",
+        "reason": "Owns branch-addressed worktree creation, switching and merge/cleanup workflows; hooks and LLM commits are optional extensions.",
+        "citations": [
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              20,
+              43
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L20-L43"
+          },
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              45,
+              97
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L45-L97"
+          }
+        ]
+      },
+      {
+        "id": "git-worktrees",
+        "result": "PASS",
+        "reason": "Documented contribution in this candidate's scoped role. Owns branch-addressed worktree creation, switching and merge/cleanup workflows; hooks and LLM commits are optional extensions.",
+        "citations": [
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              20,
+              43
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L20-L43"
+          },
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              45,
+              97
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L45-L97"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "github-review-pr-automation",
+        "result": "UNKNOWN",
+        "reason": "Not established as a standalone contribution by the consumed source; retained as a complementary layer gap. Owns branch-addressed worktree creation, switching and merge/cleanup workflows; hooks and LLM commits are optional extensions.",
+        "citations": [
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              20,
+              43
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L20-L43"
+          },
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              45,
+              97
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L45-L97"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "structural-diffs",
+        "result": "UNKNOWN",
+        "reason": "Not established as a standalone contribution by the consumed source; retained as a complementary layer gap. Owns branch-addressed worktree creation, switching and merge/cleanup workflows; hooks and LLM commits are optional extensions.",
+        "citations": [
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              20,
+              43
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L20-L43"
+          },
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              45,
+              97
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L45-L97"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Frozen non-archived status and recent default-branch activity support ongoing maintenance at read time; no ranking/default inference.",
+        "citations": [
+          {
+            "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/c6a0004525aef204b92caf1a0e4b405478bb0fb1/evidence/artifacts/harness-screens-20261015/candidate-facts-runtime.json",
+            "sha256": "789e9f7979de408ec7efb29758232fe79c7d88d4cf185f5b38770e99be61f042",
+            "section": "candidate max-sixty/worktrunk maintenance/source confirmation",
+            "read_at": "2026-10-15"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "PASS: reuse the wave-1 v0.80.0 platform-asset findings; no new platform claim or measurement.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/max-sixty/worktrunk/releases/tags/v0.80.0",
+            "read_at": "2026-10-15",
+            "section": "release assets for v0.80.0; source commit recorded in pin"
+          },
+          {
+            "url": "https://learn.microsoft.com/en-us/windows/wsl/about",
+            "read_at": "2026-10-15",
+            "section": "WSL2 Linux kernel/full system-call compatibility; source inference for native Linux CLI userspace, not a host run"
+          }
+        ],
+        "applicable": true
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "PASS: reuse the wave-1 v0.80.0 platform-asset findings; no new platform claim or measurement.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/max-sixty/worktrunk/releases/tags/v0.80.0",
+            "read_at": "2026-10-15",
+            "section": "release assets for v0.80.0; source commit recorded in pin"
+          }
+        ],
+        "applicable": true
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "Core commands are explicit CLI operations; the interactive picker is optional.",
+        "citations": [
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              20,
+              43
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L20-L43"
+          },
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              45,
+              97
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L45-L97"
+          }
+        ]
+      },
+      {
+        "id": "per-repository-scoping",
+        "result": "PASS",
+        "reason": "Worktree operations target the current repository. Candidate CLI-only profile leaves optional plugin, hooks and model-generated commit messages unselected.",
+        "citations": [
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              43,
+              97
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L43-L97"
+          }
+        ]
+      },
+      {
+        "id": "github-hosted-runners",
+        "result": "PASS",
+        "reason": "Conditional source-derived support for a documented CLI on a supported runner OS via a run step; no workflow execution or target runner qualification is claimed.",
+        "citations": [
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              20,
+              43
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L20-L43"
+          },
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              45,
+              97
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L45-L97"
+          },
+          {
+            "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstepsrun",
+            "read_at": "2026-10-15",
+            "section": "run steps execute command-line programs through a runner shell"
+          }
+        ]
+      },
+      {
+        "id": "self-hosted-runners",
+        "result": "PASS",
+        "reason": "Conditional source-derived CLI support on the documented OS/architecture. The operator supplies dependencies, isolation and configuration; no hosted-only integration is assumed.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/max-sixty/worktrunk/releases/tags/v0.80.0",
+            "read_at": "2026-10-15",
+            "section": "release assets for v0.80.0; source commit recorded in pin"
+          },
+          {
+            "url": "https://docs.github.com/en/actions/concepts/runners/self-hosted-runners",
+            "read_at": "2026-10-15",
+            "section": "runner environment is deployed and managed by its operator"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "anthropic candidate uses the documented standalone command/procedure in its explicitly selected profile; automatic worker/API-slot integration is not established.",
+        "citations": [
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "README.md",
+            "lines": [
+              108,
+              143
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L108-L143"
+          },
+          {
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+            "path": "docs/src/content/docs/shell-integration.md",
+            "lines": [
+              15,
+              35
+            ],
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/docs/src/content/docs/shell-integration.md#L15-L35"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "Install Worktrunk v0.80.0 through the documented release/Cargo/Homebrew route; resolve and retain that exact version before trial.",
+        "wt config shell install"
+      ],
+      "scope": "anthropic profile: Worktree operations target the current repository. Candidate CLI-only profile leaves optional plugin, hooks and model-generated commit messages unselected.",
+      "citations": [
+        {
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "path": "README.md",
+          "lines": [
+            108,
+            143
+          ],
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L108-L143"
+        },
+        {
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "path": "docs/src/content/docs/shell-integration.md",
+          "lines": [
+            15,
+            35
+          ],
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/docs/src/content/docs/shell-integration.md#L15-L35"
+        }
+      ],
+      "executed": false,
+      "version_substitution": "Version arguments are source-screen candidates. Floating examples are not permission to install latest; unresolved artifact/source binding is recorded in verdict gaps."
+    },
+    "inverse": {
+      "finding": "wt config shell uninstall removes the shell integration; package removal is not documented in this section.",
+      "citations": [
+        {
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "path": "docs/src/content/docs/shell-integration.md",
+          "lines": [
+            40,
+            54
+          ],
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/docs/src/content/docs/shell-integration.md#L40-L54"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "wt can collide with Windows Terminal; shell installation writes rc/function files, and optional hooks run commands. Worktrees do not supply credential/process isolation.",
+      "citations": [
+        {
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "path": "README.md",
+          "lines": [
+            20,
+            43
+          ],
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L20-L43"
+        },
+        {
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "path": "README.md",
+          "lines": [
+            45,
+            97
+          ],
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L45-L97"
+        },
+        {
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "path": "README.md",
+          "lines": [
+            43,
+            97
+          ],
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L43-L97"
+        }
+      ],
+      "github_lifecycle": "Required-check names and expected GitHub App identities are target-repository inputs; merge-queue required workflows need merge_group. No check/ruleset is created or renamed.",
+      "github_sources": [
+        {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets",
+          "read_at": "2026-10-15",
+          "section": "required reviews and required status checks; expected GitHub App"
+        },
+        {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue",
+          "read_at": "2026-10-15",
+          "section": "required checks need merge_group"
+        }
+      ]
+    },
+    "suited_roles": {
+      "classification": "CANDIDATE / PROPOSAL",
+      "roles": [
+        "builder",
+        "co-op",
+        "runtime worker"
+      ],
+      "reason": "Owns branch-addressed worktree creation, switching and merge/cleanup workflows; hooks and LLM commits are optional extensions.",
+      "profile_constraint": "anthropic only, selected repository/profile; API slots do not automatically acquire a shell/tool adapter. Runtime-worker use needs its separately screened profile.",
+      "excluded": [
+        "fenced trading sessions",
+        "fenced judge sessions",
+        "fenced review sessions"
+      ],
+      "citations": [
+        {
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "path": "README.md",
+          "lines": [
+            20,
+            43
+          ],
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L20-L43"
+        },
+        {
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "path": "README.md",
+          "lines": [
+            45,
+            97
+          ],
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L45-L97"
+        }
+      ],
+      "protocol": "docs/decisions/2026-10-11-layer-resolution-protocol.md@8053f14e7e0817d2502dff2bb284bfb7e1b0152f"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "candidate_status": "CANDIDATE; profile selection is a PROPOSAL",
+      "estimated_tokens": 0,
+      "scope": "Automatic text added to the family model session by the documented standalone CLI/CI-only profile. Excludes invoked command output and downstream agent/evaluation prompts.",
+      "method": "Sum ceil(UTF-8 bytes / 4) over exact injected components. CLI/CI-only profile has an empty automatic injection set (0 bytes, 0 tokens); this is a static profile estimate, not a tokenizer or session measurement.",
+      "counted_ranges": [],
+      "counted_utf8_bytes": 0,
+      "citations": [
+        {
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "path": "README.md",
+          "lines": [
+            108,
+            143
+          ],
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L108-L143"
+        },
+        {
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "path": "docs/src/content/docs/shell-integration.md",
+          "lines": [
+            15,
+            35
+          ],
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/docs/src/content/docs/shell-integration.md#L15-L35"
+        }
+      ],
+      "unknown_components": [],
+      "measured": false
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "trial_eligible": true,
+      "disqualifier": null,
+      "reason": "Source requirements support the expressly scoped contribution only. Complete-layer coverage, runtime wiring and defaults are not established.",
+      "cheapest_check": "Next stage may use the upstream's isolated install/test/inverse path at this pin and retain actual invocation/context receipts. This lane does not run the trial."
+    },
+    "fenced_sessions": {
+      "enabled": false,
+      "scope_constraint": "No installation or automatic injection into trading, judge or review fences. Review-agent fence capability is itself an unresolved screen requirement, not permission to contaminate a fence."
+    },
+    "service_status": "served by the scoped documented candidate route; see verdict",
+    "client_route_notes": [
+      "CANDIDATE: Claude Code operator/CLI or documented plugin profile.",
+      "UNKNOWN: automatic Claude Agent SDK, Anthropic API, Pi or OpenCode worker wiring; source screen of a tool does not grant worker permissions."
+    ],
+    "review_automation_ref": "facts-quality-ci.json#/review_automation"
+  },
+  {
+    "candidate": {
+      "id": "openai/codex-plugin-cc",
+      "repository": "https://github.com/openai/codex-plugin-cc",
+      "ids": [
+        "codex@openai-codex"
+      ],
+      "inventory_status": "frozen_inventory",
+      "inventory_sources": [
+        "fj.alt",
+        "fj.cand",
+        "fs.alternate"
+      ],
+      "component_kind": "Claude-to-Codex review bridge"
+    },
+    "pin": {
+      "tag": "v1.0.6",
+      "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "read_at": "2026-10-15"
+    },
+    "family": "anthropic",
+    "layer": "git-github-automation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-quality-ci.json#/candidates/openai~1codex-plugin-cc",
+    "layer_requirement": "Own Git worktrees, GitHub review/PR automation and structural diffs for changed code.",
+    "scoped_contribution": "Invokes a read-only Codex review from Claude Code and exposes delegated jobs. The native GPT executor is reached through a Claude host plugin.",
+    "requirements_result": [
+      {
+        "id": "scoped-layer-capability",
+        "result": "PASS",
+        "reason": "Invokes a read-only Codex review from Claude Code and exposes delegated jobs. The native GPT executor is reached through a Claude host plugin.",
+        "citations": [
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              1,
+              19
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L1-L19"
+          },
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              77,
+              87
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L77-L87"
+          }
+        ]
+      },
+      {
+        "id": "git-worktrees",
+        "result": "UNKNOWN",
+        "reason": "Not established as a standalone contribution by the consumed source; retained as a complementary layer gap. Invokes a read-only Codex review from Claude Code and exposes delegated jobs. The native GPT executor is reached through a Claude host plugin.",
+        "citations": [
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              1,
+              19
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L1-L19"
+          },
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              77,
+              87
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L77-L87"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "github-review-pr-automation",
+        "result": "PASS",
+        "reason": "Documented contribution in this candidate's scoped role. Invokes a read-only Codex review from Claude Code and exposes delegated jobs. The native GPT executor is reached through a Claude host plugin.",
+        "citations": [
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              1,
+              19
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L1-L19"
+          },
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              77,
+              87
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L77-L87"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "structural-diffs",
+        "result": "UNKNOWN",
+        "reason": "Not established as a standalone contribution by the consumed source; retained as a complementary layer gap. Invokes a read-only Codex review from Claude Code and exposes delegated jobs. The native GPT executor is reached through a Claude host plugin.",
+        "citations": [
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              1,
+              19
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L1-L19"
+          },
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              77,
+              87
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L77-L87"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "maintenance",
+        "result": "UNKNOWN",
+        "reason": "No default-branch commit since the cutoff; not archived. Inactivity is not abandonment; current maintenance is unresolved.",
+        "citations": [
+          {
+            "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/c6a0004525aef204b92caf1a0e4b405478bb0fb1/evidence/artifacts/harness-screens-20261015/candidate-facts-runtime.json",
+            "sha256": "789e9f7979de408ec7efb29758232fe79c7d88d4cf185f5b38770e99be61f042",
+            "section": "candidate openai/codex-plugin-cc maintenance/source confirmation",
+            "read_at": "2026-10-15"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "UNKNOWN",
+        "reason": "UNKNOWN: reuse wave-1 platform/client findings; the pinned bridge's compatibility with current native clients and the requested fenced profile remain unresolved.",
+        "citations": [
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              16,
+              65
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L16-L65"
+          },
+          {
+            "url": "https://learn.microsoft.com/en-us/windows/wsl/about",
+            "read_at": "2026-10-15",
+            "section": "WSL2 Linux kernel/full system-call compatibility; source inference for native Linux CLI userspace, not a host run"
+          }
+        ],
+        "applicable": true
+      },
+      {
+        "id": "macos-arm64",
+        "result": "UNKNOWN",
+        "reason": "UNKNOWN: reuse wave-1 platform/client findings; the pinned bridge's compatibility with current native clients and the requested fenced profile remain unresolved.",
+        "citations": [
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              16,
+              65
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L16-L65"
+          }
+        ],
+        "applicable": true
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "Background review/status/result commands are documented; invoking them is outside this source screen.",
+        "citations": [
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              1,
+              19
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L1-L19"
+          },
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              77,
+              87
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L77-L87"
+          }
+        ]
+      },
+      {
+        "id": "per-repository-scoping",
+        "result": "PASS",
+        "reason": "Select a local Claude plugin scope and resolve marketplace bytes to v1.0.6 before trial; no global registration is proposed. Current Codex protocol and a fenced child profile remain unverified.",
+        "citations": [
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              22,
+              65
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L22-L65"
+          }
+        ]
+      },
+      {
+        "id": "github-hosted-runners",
+        "result": "UNKNOWN",
+        "reason": "Conditional source-derived support for a documented CLI on a supported runner OS via a run step; no workflow execution or target runner qualification is claimed.",
+        "citations": [
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              1,
+              19
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L1-L19"
+          },
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              77,
+              87
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L77-L87"
+          },
+          {
+            "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstepsrun",
+            "read_at": "2026-10-15",
+            "section": "run steps execute command-line programs through a runner shell"
+          }
+        ]
+      },
+      {
+        "id": "self-hosted-runners",
+        "result": "UNKNOWN",
+        "reason": "Conditional source-derived CLI support on the documented OS/architecture. The operator supplies dependencies, isolation and configuration; no hosted-only integration is assumed.",
+        "citations": [
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              16,
+              65
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L16-L65"
+          },
+          {
+            "url": "https://docs.github.com/en/actions/concepts/runners/self-hosted-runners",
+            "read_at": "2026-10-15",
+            "section": "runner environment is deployed and managed by its operator"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "anthropic candidate uses the documented standalone command/procedure in its explicitly selected profile; automatic worker/API-slot integration is not established.",
+        "citations": [
+          {
+            "repository": "https://github.com/openai/codex-plugin-cc",
+            "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+            "path": "README.md",
+            "lines": [
+              22,
+              39
+            ],
+            "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L22-L39"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "/plugin marketplace add openai/codex-plugin-cc",
+        "/plugin install codex@openai-codex"
+      ],
+      "scope": "anthropic profile: Select a local Claude plugin scope and resolve marketplace bytes to v1.0.6 before trial; no global registration is proposed. Current Codex protocol and a fenced child profile remain unverified.",
+      "citations": [
+        {
+          "repository": "https://github.com/openai/codex-plugin-cc",
+          "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+          "path": "README.md",
+          "lines": [
+            22,
+            39
+          ],
+          "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L22-L39"
+        }
+      ],
+      "executed": false,
+      "version_substitution": "Version arguments are source-screen candidates. Floating examples are not permission to install latest; unresolved artifact/source binding is recorded in verdict gaps."
+    },
+    "inverse": {
+      "finding": "No plugin-specific uninstall is documented in the README; reuse wave-1's dated Claude host disable/uninstall reference without asserting plugin-specific teardown.",
+      "citations": [
+        {
+          "repository": "https://github.com/openai/codex-plugin-cc",
+          "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+          "path": "README.md",
+          "lines": [
+            22,
+            39
+          ],
+          "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L22-L39"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "This plugin crosses model families and carries a SessionStart environment hook plus advertised command/skill/subagent metadata. A read-only review option alone does not establish an independent clean fence.",
+      "citations": [
+        {
+          "repository": "https://github.com/openai/codex-plugin-cc",
+          "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+          "path": "README.md",
+          "lines": [
+            1,
+            19
+          ],
+          "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L1-L19"
+        },
+        {
+          "repository": "https://github.com/openai/codex-plugin-cc",
+          "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+          "path": "README.md",
+          "lines": [
+            77,
+            87
+          ],
+          "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L77-L87"
+        },
+        {
+          "repository": "https://github.com/openai/codex-plugin-cc",
+          "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+          "path": "README.md",
+          "lines": [
+            22,
+            65
+          ],
+          "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L22-L65"
+        }
+      ],
+      "github_lifecycle": "Required-check names and expected GitHub App identities are target-repository inputs; merge-queue required workflows need merge_group. No check/ruleset is created or renamed.",
+      "github_sources": [
+        {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets",
+          "read_at": "2026-10-15",
+          "section": "required reviews and required status checks; expected GitHub App"
+        },
+        {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue",
+          "read_at": "2026-10-15",
+          "section": "required checks need merge_group"
+        }
+      ]
+    },
+    "suited_roles": {
+      "classification": "CANDIDATE / PROPOSAL",
+      "roles": [
+        "reviewer",
+        "builder"
+      ],
+      "reason": "Invokes a read-only Codex review from Claude Code and exposes delegated jobs. The native GPT executor is reached through a Claude host plugin.",
+      "profile_constraint": "anthropic only, selected repository/profile; API slots do not automatically acquire a shell/tool adapter. Runtime-worker use needs its separately screened profile.",
+      "excluded": [
+        "fenced trading sessions",
+        "fenced judge sessions",
+        "fenced review sessions"
+      ],
+      "citations": [
+        {
+          "repository": "https://github.com/openai/codex-plugin-cc",
+          "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+          "path": "README.md",
+          "lines": [
+            1,
+            19
+          ],
+          "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L1-L19"
+        },
+        {
+          "repository": "https://github.com/openai/codex-plugin-cc",
+          "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+          "path": "README.md",
+          "lines": [
+            77,
+            87
+          ],
+          "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L77-L87"
+        }
+      ],
+      "protocol": "docs/decisions/2026-10-11-layer-resolution-protocol.md@8053f14e7e0817d2502dff2bb284bfb7e1b0152f"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "candidate_status": "CANDIDATE; profile selection is a PROPOSAL",
+      "estimated_tokens": null,
+      "scope": "298-token static metadata subtotal from wave-1; complete native session total UNKNOWN.",
+      "method": "Sum ceil(UTF-8 bytes / 4) over exact injected components. CLI/CI-only profile has an empty automatic injection set (0 bytes, 0 tokens); this is a static profile estimate, not a tokenizer or session measurement.",
+      "counted_ranges": [
+        {
+          "path": "plugins/codex/agents/codex-rescue.md",
+          "line_start": 1,
+          "line_end": 10,
+          "utf8_bytes": 222,
+          "estimated_tokens": 56,
+          "counted_text_sha256": "c887d09bdc63c96e0f81fe8d7ffea8ca96cb7aa653be3fed193d9c5341b132c9"
+        },
+        {
+          "path": "plugins/codex/commands/adversarial-review.md",
+          "line_start": 1,
+          "line_end": 7,
+          "utf8_bytes": 81,
+          "estimated_tokens": 21,
+          "counted_text_sha256": "ef722810c605a79dbac7cccfa07de0a487e47dd53f481c4a4570a8682af373c9"
+        },
+        {
+          "path": "plugins/codex/commands/cancel.md",
+          "line_start": 1,
+          "line_end": 7,
+          "utf8_bytes": 56,
+          "estimated_tokens": 14,
+          "counted_text_sha256": "bae9f7e42f7d3da915587d165364a817ec003c25a2b38fa907fa72ae2c9aa3fb"
+        },
+        {
+          "path": "plugins/codex/commands/rescue.md",
+          "line_start": 1,
+          "line_end": 6,
+          "utf8_bytes": 102,
+          "estimated_tokens": 26,
+          "counted_text_sha256": "67b83d0b2082ab6abbb9e9ad5d62317cfdca7c2915bab564194f49c7782f1e27"
+        },
+        {
+          "path": "plugins/codex/commands/result.md",
+          "line_start": 1,
+          "line_end": 7,
+          "utf8_bytes": 72,
+          "estimated_tokens": 18,
+          "counted_text_sha256": "0c78ab1f0ec19cee97de43b8dd9da62b8dbb243ff29e8ac242868d9a8111b5b6"
+        },
+        {
+          "path": "plugins/codex/commands/review.md",
+          "line_start": 1,
+          "line_end": 7,
+          "utf8_bytes": 47,
+          "estimated_tokens": 12,
+          "counted_text_sha256": "dae6b1db2326b69d0e40a30efb3e64d888f3e50c7ee2abe9b171f99cb033f0e4"
+        },
+        {
+          "path": "plugins/codex/commands/setup.md",
+          "line_start": 1,
+          "line_end": 6,
+          "utf8_bytes": 90,
+          "estimated_tokens": 23,
+          "counted_text_sha256": "8e859b78a3344a6389d6d9722b05128222b0c2402bac20ec0410dd8e177cb7ef"
+        },
+        {
+          "path": "plugins/codex/commands/status.md",
+          "line_start": 1,
+          "line_end": 7,
+          "utf8_bytes": 83,
+          "estimated_tokens": 21,
+          "counted_text_sha256": "0b49fa319c0fd70cc32485a7a33ab479f106c24560c00a08474ad17e367e60d0"
+        },
+        {
+          "path": "plugins/codex/commands/transfer.md",
+          "line_start": 1,
+          "line_end": 7,
+          "utf8_bytes": 70,
+          "estimated_tokens": 18,
+          "counted_text_sha256": "db1c75158948a62456a670cea1edcc6be2d382c9179207d4680bdb291c38fbd4"
+        },
+        {
+          "path": "plugins/codex/skills/codex-cli-runtime/SKILL.md",
+          "line_start": 1,
+          "line_end": 6,
+          "utf8_bytes": 99,
+          "estimated_tokens": 25,
+          "counted_text_sha256": "36fd2430cec1835922b569dea2636fea6e71f7265e4f554dcbb10ead85c497e5"
+        },
+        {
+          "path": "plugins/codex/skills/codex-result-handling/SKILL.md",
+          "line_start": 1,
+          "line_end": 6,
+          "utf8_bytes": 91,
+          "estimated_tokens": 23,
+          "counted_text_sha256": "8255c2c2806a19b2cd0fdf1f0e8c3c29ef90022db9cc558211e4e4da9cb6b2b9"
+        },
+        {
+          "path": "plugins/codex/skills/gpt-5-4-prompting/SKILL.md",
+          "line_start": 1,
+          "line_end": 6,
+          "utf8_bytes": 161,
+          "estimated_tokens": 41,
+          "counted_text_sha256": "86cc252912ded9a4c727e2514ea7a3efd60bce63552643242d7bb8bc5b48c954"
+        }
+      ],
+      "counted_utf8_bytes": 1174,
+      "citations": [
+        {
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/c6a0004525aef204b92caf1a0e4b405478bb0fb1/evidence/artifacts/harness-screens-20261015/workers.anthropic.json",
+          "sha256": "44eecbed9c11e960fb2d2414b53b99639aed1f2761b7a9f83e7a5efb98b865dd",
+          "section": "openai/codex-plugin-cc startup_context_cost; exact component hashes and ranges",
+          "read_at": "2026-10-15"
+        }
+      ],
+      "unknown_components": [
+        "runtime/project instructions",
+        "dynamic skills and memory",
+        "conditional hook output",
+        "live MCP schemas and serializer framing"
+      ],
+      "measured": false,
+      "component_estimated_tokens": 298
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "trial_eligible": false,
+      "disqualifier": null,
+      "reason": "Compare the pinned bridge's app-server/runtime contract with the screened Codex version and read its child sandbox/profile construction; source a project-scoped disable inverse.",
+      "cheapest_check": "Compare the pinned bridge's app-server/runtime contract with the screened Codex version and read its child sandbox/profile construction; source a project-scoped disable inverse."
+    },
+    "fenced_sessions": {
+      "enabled": false,
+      "scope_constraint": "No installation or automatic injection into trading, judge or review fences. Review-agent fence capability is itself an unresolved screen requirement, not permission to contaminate a fence."
+    },
+    "service_status": "served by the scoped documented candidate route; see verdict",
+    "client_route_notes": [
+      "CANDIDATE: Claude Code operator/CLI or documented plugin profile.",
+      "UNKNOWN: automatic Claude Agent SDK, Anthropic API, Pi or OpenCode worker wiring; source screen of a tool does not grant worker permissions."
+    ],
+    "review_automation_ref": "facts-quality-ci.json#/review_automation"
+  },
+  {
+    "candidate": {
+      "id": "wilfred/difftastic",
+      "repository": "https://github.com/Wilfred/difftastic",
+      "ids": [
+        "difftastic",
+        "difft"
+      ],
+      "inventory_status": "frozen_inventory",
+      "inventory_sources": [
+        "fj.cand",
+        "fj.winner",
+        "fs.winner"
+      ],
+      "component_kind": "structural diff CLI"
+    },
+    "pin": {
+      "tag": "0.71.0",
+      "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "read_at": "2026-10-15"
+    },
+    "family": "anthropic",
+    "layer": "git-github-automation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-quality-ci.json#/candidates/wilfred~1difftastic",
+    "layer_requirement": "Own Git worktrees, GitHub review/PR automation and structural diffs for changed code.",
+    "scoped_contribution": "Compares source syntax and integrates with git external-diff/difftool. Output is for human consumption and cannot be applied as a patch.",
+    "requirements_result": [
+      {
+        "id": "scoped-layer-capability",
+        "result": "PASS",
+        "reason": "Compares source syntax and integrates with git external-diff/difftool. Output is for human consumption and cannot be applied as a patch.",
+        "citations": [
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "README.md",
+            "lines": [
+              10,
+              15
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L10-L15"
+          },
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "README.md",
+            "lines": [
+              37,
+              62
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L37-L62"
+          }
+        ]
+      },
+      {
+        "id": "git-worktrees",
+        "result": "UNKNOWN",
+        "reason": "Not established as a standalone contribution by the consumed source; retained as a complementary layer gap. Compares source syntax and integrates with git external-diff/difftool. Output is for human consumption and cannot be applied as a patch.",
+        "citations": [
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "README.md",
+            "lines": [
+              10,
+              15
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L10-L15"
+          },
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "README.md",
+            "lines": [
+              37,
+              62
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L37-L62"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "github-review-pr-automation",
+        "result": "UNKNOWN",
+        "reason": "Not established as a standalone contribution by the consumed source; retained as a complementary layer gap. Compares source syntax and integrates with git external-diff/difftool. Output is for human consumption and cannot be applied as a patch.",
+        "citations": [
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "README.md",
+            "lines": [
+              10,
+              15
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L10-L15"
+          },
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "README.md",
+            "lines": [
+              37,
+              62
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L37-L62"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "structural-diffs",
+        "result": "PASS",
+        "reason": "Documented contribution in this candidate's scoped role. Compares source syntax and integrates with git external-diff/difftool. Output is for human consumption and cannot be applied as a patch.",
+        "citations": [
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "README.md",
+            "lines": [
+              10,
+              15
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L10-L15"
+          },
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "README.md",
+            "lines": [
+              37,
+              62
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L37-L62"
+          }
+        ],
+        "required_for_scoped_trial": false,
+        "coverage_scope": "Complete-layer coverage is separate from eligibility for the candidate's documented complementary role."
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Frozen non-archived status and recent default-branch activity support ongoing maintenance at read time; no ranking/default inference.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/Wilfred/difftastic",
+            "read_at": "2026-10-15T20:03:33Z–20:08Z",
+            "section": "frozen archive/activity/licence snapshot; facts-quality-ci.json"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "PASS: release 0.71.0 provides Linux x86_64 and Apple Darwin aarch64 archives.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/Wilfred/difftastic/releases/tags/0.71.0",
+            "read_at": "2026-10-15",
+            "section": "release assets for 0.71.0; source commit recorded in pin"
+          },
+          {
+            "url": "https://learn.microsoft.com/en-us/windows/wsl/about",
+            "read_at": "2026-10-15",
+            "section": "WSL2 Linux kernel/full system-call compatibility; source inference for native Linux CLI userspace, not a host run"
+          }
+        ],
+        "applicable": true
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "PASS: release 0.71.0 provides Linux x86_64 and Apple Darwin aarch64 archives.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/Wilfred/difftastic/releases/tags/0.71.0",
+            "read_at": "2026-10-15",
+            "section": "release assets for 0.71.0; source commit recorded in pin"
+          }
+        ],
+        "applicable": true
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "CLI comparison requires no interactive GUI.",
+        "citations": [
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "README.md",
+            "lines": [
+              10,
+              15
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L10-L15"
+          },
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "README.md",
+            "lines": [
+              37,
+              62
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L37-L62"
+          }
+        ]
+      },
+      {
+        "id": "per-repository-scoping",
+        "result": "PASS",
+        "reason": "The documented per-command diff.external/GIT_EXTERNAL_DIFF route scopes use without modifying global git configuration.",
+        "citations": [
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "manual/src/git.md",
+            "lines": [
+              12,
+              26
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/manual/src/git.md#L12-L26"
+          }
+        ]
+      },
+      {
+        "id": "github-hosted-runners",
+        "result": "PASS",
+        "reason": "Conditional source-derived support for a documented CLI on a supported runner OS via a run step; no workflow execution or target runner qualification is claimed.",
+        "citations": [
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "README.md",
+            "lines": [
+              10,
+              15
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L10-L15"
+          },
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "README.md",
+            "lines": [
+              37,
+              62
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L37-L62"
+          },
+          {
+            "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstepsrun",
+            "read_at": "2026-10-15",
+            "section": "run steps execute command-line programs through a runner shell"
+          }
+        ]
+      },
+      {
+        "id": "self-hosted-runners",
+        "result": "PASS",
+        "reason": "Conditional source-derived CLI support on the documented OS/architecture. The operator supplies dependencies, isolation and configuration; no hosted-only integration is assumed.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/Wilfred/difftastic/releases/tags/0.71.0",
+            "read_at": "2026-10-15",
+            "section": "release assets for 0.71.0; source commit recorded in pin"
+          },
+          {
+            "url": "https://docs.github.com/en/actions/concepts/runners/self-hosted-runners",
+            "read_at": "2026-10-15",
+            "section": "runner environment is deployed and managed by its operator"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "anthropic candidate uses the documented standalone command/procedure in its explicitly selected profile; automatic worker/API-slot integration is not established.",
+        "citations": [
+          {
+            "repository": "https://github.com/Wilfred/difftastic",
+            "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+            "path": "manual/src/installation.md",
+            "lines": [
+              3,
+              14
+            ],
+            "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/manual/src/installation.md#L3-L14"
+          },
+          {
+            "url": "https://api.github.com/repos/Wilfred/difftastic/releases/tags/0.71.0",
+            "read_at": "2026-10-15",
+            "section": "release assets for 0.71.0; source commit recorded in pin"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "Download the 0.71.0 x86_64-unknown-linux or aarch64-apple-darwin release archive; expose difft on the selected profile PATH."
+      ],
+      "scope": "anthropic profile: The documented per-command diff.external/GIT_EXTERNAL_DIFF route scopes use without modifying global git configuration.",
+      "citations": [
+        {
+          "repository": "https://github.com/Wilfred/difftastic",
+          "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+          "path": "manual/src/installation.md",
+          "lines": [
+            3,
+            14
+          ],
+          "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/manual/src/installation.md#L3-L14"
+        },
+        {
+          "url": "https://api.github.com/repos/Wilfred/difftastic/releases/tags/0.71.0",
+          "read_at": "2026-10-15",
+          "section": "release assets for 0.71.0; source commit recorded in pin"
+        }
+      ],
+      "executed": false,
+      "version_substitution": "Version arguments are source-screen candidates. Floating examples are not permission to install latest; unresolved artifact/source binding is recorded in verdict gaps."
+    },
+    "inverse": {
+      "finding": "none documented for package removal; ending the per-command environment needs no persistent reversal. Global git configuration is outside this profile.",
+      "citations": [
+        {
+          "repository": "https://github.com/Wilfred/difftastic",
+          "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+          "path": "manual/src/installation.md",
+          "lines": [
+            3,
+            14
+          ],
+          "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/manual/src/installation.md#L3-L14"
+        },
+        {
+          "url": "https://api.github.com/repos/Wilfred/difftastic/releases/tags/0.71.0",
+          "read_at": "2026-10-15",
+          "section": "release assets for 0.71.0; source commit recorded in pin"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "Global diff.external aliases alter other sessions' git output; the scoped invocation avoids that configuration. Structural difference is not a test verdict, and large syntax graphs have documented performance limits.",
+      "citations": [
+        {
+          "repository": "https://github.com/Wilfred/difftastic",
+          "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+          "path": "README.md",
+          "lines": [
+            10,
+            15
+          ],
+          "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L10-L15"
+        },
+        {
+          "repository": "https://github.com/Wilfred/difftastic",
+          "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+          "path": "README.md",
+          "lines": [
+            37,
+            62
+          ],
+          "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L37-L62"
+        },
+        {
+          "repository": "https://github.com/Wilfred/difftastic",
+          "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+          "path": "manual/src/git.md",
+          "lines": [
+            12,
+            26
+          ],
+          "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/manual/src/git.md#L12-L26"
+        }
+      ],
+      "github_lifecycle": "Required-check names and expected GitHub App identities are target-repository inputs; merge-queue required workflows need merge_group. No check/ruleset is created or renamed.",
+      "github_sources": [
+        {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets",
+          "read_at": "2026-10-15",
+          "section": "required reviews and required status checks; expected GitHub App"
+        },
+        {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue",
+          "read_at": "2026-10-15",
+          "section": "required checks need merge_group"
+        }
+      ]
+    },
+    "suited_roles": {
+      "classification": "CANDIDATE / PROPOSAL",
+      "roles": [
+        "reviewer",
+        "builder"
+      ],
+      "reason": "Compares source syntax and integrates with git external-diff/difftool. Output is for human consumption and cannot be applied as a patch.",
+      "profile_constraint": "anthropic only, selected repository/profile; API slots do not automatically acquire a shell/tool adapter. Runtime-worker use needs its separately screened profile.",
+      "excluded": [
+        "fenced trading sessions",
+        "fenced judge sessions",
+        "fenced review sessions"
+      ],
+      "citations": [
+        {
+          "repository": "https://github.com/Wilfred/difftastic",
+          "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+          "path": "README.md",
+          "lines": [
+            10,
+            15
+          ],
+          "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L10-L15"
+        },
+        {
+          "repository": "https://github.com/Wilfred/difftastic",
+          "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+          "path": "README.md",
+          "lines": [
+            37,
+            62
+          ],
+          "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md#L37-L62"
+        }
+      ],
+      "protocol": "docs/decisions/2026-10-11-layer-resolution-protocol.md@8053f14e7e0817d2502dff2bb284bfb7e1b0152f"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "candidate_status": "CANDIDATE; profile selection is a PROPOSAL",
+      "estimated_tokens": 0,
+      "scope": "Automatic text added to the family model session by the documented standalone CLI/CI-only profile. Excludes invoked command output and downstream agent/evaluation prompts.",
+      "method": "Sum ceil(UTF-8 bytes / 4) over exact injected components. CLI/CI-only profile has an empty automatic injection set (0 bytes, 0 tokens); this is a static profile estimate, not a tokenizer or session measurement.",
+      "counted_ranges": [],
+      "counted_utf8_bytes": 0,
+      "citations": [
+        {
+          "repository": "https://github.com/Wilfred/difftastic",
+          "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+          "path": "manual/src/installation.md",
+          "lines": [
+            3,
+            14
+          ],
+          "url": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/manual/src/installation.md#L3-L14"
+        },
+        {
+          "url": "https://api.github.com/repos/Wilfred/difftastic/releases/tags/0.71.0",
+          "read_at": "2026-10-15",
+          "section": "release assets for 0.71.0; source commit recorded in pin"
+        }
+      ],
+      "unknown_components": [],
+      "measured": false
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "trial_eligible": true,
+      "disqualifier": null,
+      "reason": "Source requirements support the expressly scoped contribution only. Complete-layer coverage, runtime wiring and defaults are not established.",
+      "cheapest_check": "Next stage may use the upstream's isolated install/test/inverse path at this pin and retain actual invocation/context receipts. This lane does not run the trial."
+    },
+    "fenced_sessions": {
+      "enabled": false,
+      "scope_constraint": "No installation or automatic injection into trading, judge or review fences. Review-agent fence capability is itself an unresolved screen requirement, not permission to contaminate a fence."
+    },
+    "service_status": "served by the scoped documented candidate route; see verdict",
+    "client_route_notes": [
+      "CANDIDATE: Claude Code operator/CLI or documented plugin profile.",
+      "UNKNOWN: automatic Claude Agent SDK, Anthropic API, Pi or OpenCode worker wiring; source screen of a tool does not grant worker permissions."
+    ],
+    "review_automation_ref": "facts-quality-ci.json#/review_automation"
+  }
+]

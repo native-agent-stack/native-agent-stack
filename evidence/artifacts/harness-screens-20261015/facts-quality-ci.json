@@ -1,0 +1,3692 @@
+{
+  "schema_version": "harness-a1-quality-ci/1",
+  "base_commit": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+  "read_date": "2026-10-15",
+  "evidence_class": "source_review",
+  "policy": {
+    "scope": "30 frozen inventory rows, 29 unique repositories; three families, nine tables; A1 source screen only.",
+    "trial": "PASS is eligibility for the expressly scoped candidate contribution, never a whole-layer default or an installed/working integration.",
+    "hard_disqualifiers": [
+      "missing_required_capability (including entitlement/terms conflict)",
+      "abandoned_project"
+    ],
+    "licence": "SPDX/source/read-time compliance note only; never a verdict input.",
+    "zero_context": "CANDIDATE ESTIMATE for the documented standalone CLI/CI profile's empty automatic model-injection set; not the model's full context, command output, downstream agent/evaluation prompt or runtime measurement.",
+    "role_assignment": "Every assignment is a PROPOSAL routed to the layer-resolution protocol, even when the motivating capability is sourced.",
+    "source_named_only": "New names below were encountered in candidate primary sources. They are not extra screened rows, new selections or permission to install."
+  },
+  "inputs": [
+    {
+      "path": "ns2604-coop/screens-20261015/inventory-8053f14e7.json",
+      "sha256": "a95affd3270f14f737a1efa63cc4d184f5475b019c162a9e70034d4550139dc5"
+    },
+    {
+      "path": "ns2604-coop/screens-20261015/gh-facts-20261015T2003Z.json",
+      "sha256": "06ba47908d8506a777478d9331da7a2487225c555addd9519510a550fd07140c"
+    },
+    {
+      "path": "ns2604-coop/notes/screens-plan-20261015T2007Z.md",
+      "sha256": "7da92c9717f1c10df3b4a373bc76684fc07e1b3a6d5df61b607c968e9186cea0"
+    },
+    {
+      "path": "ns2604-coop/notes/screens-plan-20261015T2007Z.addendum-01.md",
+      "sha256": "742481e59cf025805926df0d91f2692e58fc615e25bc43eca6304d649d573c82"
+    },
+    {
+      "path": "ns2604-coop/notes/screens-plan-20261015T2007Z.addendum-02.md",
+      "sha256": "ef2d3259b403fb0883b79e01bd18386d7c6f216ddfbcad45a8fcb58b7b697283"
+    },
+    {
+      "path": "command-center/ROW-cc-20261015T2048Z-correction-practice-by-convergence.md",
+      "sha256": "c75fd83da2664e94ff3064ff9d938ac36b9bde85a733803c3f0ebe4b6d98455c"
+    },
+    {
+      "path": "command-center/ROW-cc-20261015T2048Z-correction-practice-by-convergence.addendum-01.md",
+      "sha256": "10ca572d6ab73d3be54c4dafd5d487941efceb964113a07a8189069c12cde3d6"
+    },
+    {
+      "path": "command-center/ROW-cc-20261015T2048Z-correction-practice-by-convergence.addendum-02.md",
+      "sha256": "bf91dd21113dadb4401be1905a310621f79859e9fcfef8ac3b66e6351db648a0"
+    },
+    {
+      "path": "command-center/research-cc-role-20261008/direction-cc-20261015T1912Z-new-wsl-harness-first.md",
+      "sha256": "464f655d433817e25349ec7cbe335d6d4b3793b0c08a39c9a0fb2697d823b6f9"
+    },
+    {
+      "path": "command-center/research-cc-role-20261008/direction-cc-20261015T1912Z-new-wsl-harness-first.addendum-03.md",
+      "sha256": "bcf3b0ae2e721778ffb49d01edb6201fc12832a253e3d8e6d569521d86b2f044"
+    },
+    {
+      "path": "command-center/research-cc-role-20261008/direction-cc-20261015T1912Z-new-wsl-harness-first.addendum-04.md",
+      "sha256": "7ddd99fb5d9a50367062f854deb3b071077dc5de123b2b2a5270a4e24e01913d"
+    },
+    {
+      "path": "command-center/research-cc-role-20261008/direction-cc-20261015T1912Z-new-wsl-harness-first.addendum-05.md",
+      "sha256": "66cae758e0416f1951f065363b685aa687f3b09fc8af3968e4e7e3e5efbaa438"
+    }
+  ],
+  "reused_files": {
+    "facts-frameworks.json": {
+      "head": "278ecc5de5c6c4cfbf58b13798b1ec6c697459f8",
+      "sha256": "46fb327516a2dee72fd0ed3d5abde3ba0c1d63400b05a3c5c65a1e4981346cec",
+      "pr": 1184,
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/278ecc5de5c6c4cfbf58b13798b1ec6c697459f8/evidence/artifacts/harness-screens-20261015/facts-frameworks.json"
+    },
+    "candidate-facts-runtime.json": {
+      "head": "c6a0004525aef204b92caf1a0e4b405478bb0fb1",
+      "sha256": "789e9f7979de408ec7efb29758232fe79c7d88d4cf185f5b38770e99be61f042",
+      "pr": 1185,
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/c6a0004525aef204b92caf1a0e4b405478bb0fb1/evidence/artifacts/harness-screens-20261015/candidate-facts-runtime.json"
+    },
+    "platform-assets-runtime.json": {
+      "head": "c6a0004525aef204b92caf1a0e4b405478bb0fb1",
+      "sha256": "e079b1aff24d67d29ed837b1a124239ca117faa594a0d3ec3af0027a90123a4f",
+      "pr": 1185,
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/c6a0004525aef204b92caf1a0e4b405478bb0fb1/evidence/artifacts/harness-screens-20261015/platform-assets-runtime.json"
+    },
+    "workers.anthropic.json": {
+      "head": "c6a0004525aef204b92caf1a0e4b405478bb0fb1",
+      "sha256": "44eecbed9c11e960fb2d2414b53b99639aed1f2761b7a9f83e7a5efb98b865dd",
+      "pr": 1185,
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/c6a0004525aef204b92caf1a0e4b405478bb0fb1/evidence/artifacts/harness-screens-20261015/workers.anthropic.json"
+    }
+  },
+  "candidates": {
+    "max-sixty/worktrunk": {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin": {
+        "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "tag": "v0.80.0",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "git-github-automation"
+      ],
+      "reused_family_independent_facts": {
+        "file": "candidate-facts-runtime.json",
+        "json_pointer": "/candidates/max-sixty~1worktrunk",
+        "head": "c6a0004525aef204b92caf1a0e4b405478bb0fb1",
+        "sha256": "789e9f7979de408ec7efb29758232fe79c7d88d4cf185f5b38770e99be61f042",
+        "pr": 1185,
+        "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/c6a0004525aef204b92caf1a0e4b405478bb0fb1/evidence/artifacts/harness-screens-20261015/candidate-facts-runtime.json"
+      },
+      "platform_source_refs": [
+        {
+          "url": "https://api.github.com/repos/max-sixty/worktrunk/releases/tags/v0.80.0",
+          "read_at": "2026-10-15",
+          "section": "release assets for v0.80.0; source commit recorded in pin"
+        }
+      ]
+    },
+    "gitleaks/gitleaks": {
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "pin": {
+        "commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+        "tag": "v8.30.1",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "ci-supply-chain"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "master",
+        "newest_default_branch_commit_since_cutoff": [
+          "b58d3f102cf3a2c84cb7f923d05c25c9b1aed84b",
+          "2026-07-22T16:50:33Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/gitleaks/gitleaks",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/gitleaks/gitleaks/commits?sha=master&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "MIT",
+        "source": "https://api.github.com/repos/gitleaks/gitleaks/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+        "prerelease": false,
+        "published_at": "2026-03-21T02:17:58Z",
+        "tag": "v8.30.1"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/gitleaks/gitleaks",
+          "commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+          "path": ".goreleaser.yml",
+          "lines": [
+            8,
+            22
+          ],
+          "url": "https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/.goreleaser.yml#L8-L22"
+        }
+      ]
+    },
+    "embeddings-benchmark/mteb": {
+      "repository": "https://github.com/embeddings-benchmark/mteb",
+      "pin": {
+        "commit": "99f1290ced5e3ae5eec1fc5f58629d50a4cdbd37",
+        "tag": "2.26.0",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "quality-evaluation"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "5b43459edeef963c13c8d0c61f76d69f441bec60",
+          "2026-10-15T19:42:12Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/embeddings-benchmark/mteb",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/embeddings-benchmark/mteb/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "Apache-2.0",
+        "source": "https://api.github.com/repos/embeddings-benchmark/mteb/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "99f1290ced5e3ae5eec1fc5f58629d50a4cdbd37",
+        "prerelease": false,
+        "published_at": "2026-10-15T16:30:43Z",
+        "tag": "2.26.0"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/embeddings-benchmark/mteb",
+          "commit": "99f1290ced5e3ae5eec1fc5f58629d50a4cdbd37",
+          "path": "pyproject.toml",
+          "lines": [
+            30,
+            58
+          ],
+          "url": "https://github.com/embeddings-benchmark/mteb/blob/99f1290ced5e3ae5eec1fc5f58629d50a4cdbd37/pyproject.toml#L30-L58"
+        }
+      ]
+    },
+    "dependabot/dependabot-core": {
+      "repository": "https://github.com/dependabot/dependabot-core",
+      "pin": {
+        "commit": "ecbee00961d6e88d1f9a1bd5b40965acb025fb2d",
+        "tag": "v0.400.0",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "ci-supply-chain"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "abffc3c9512f572b6bfc36202442975efb700ea3",
+          "2026-10-15T18:34:08Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/dependabot/dependabot-core",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/dependabot/dependabot-core/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "MIT",
+        "source": "https://api.github.com/repos/dependabot/dependabot-core/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "ecbee00961d6e88d1f9a1bd5b40965acb025fb2d",
+        "prerelease": false,
+        "published_at": "2026-10-12T18:43:22Z",
+        "tag": "v0.400.0"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/dependabot/dependabot-core",
+          "commit": "ecbee00961d6e88d1f9a1bd5b40965acb025fb2d",
+          "path": "README.md",
+          "lines": [
+            135,
+            156
+          ],
+          "url": "https://github.com/dependabot/dependabot-core/blob/ecbee00961d6e88d1f9a1bd5b40965acb025fb2d/README.md#L135-L156"
+        }
+      ]
+    },
+    "anchore/grype": {
+      "repository": "https://github.com/anchore/grype",
+      "pin": {
+        "commit": "6f8d854af29d3a3086b11a84afa51554a2a245fe",
+        "tag": "v0.120.1",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "ci-supply-chain"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "a402503ab977cefa6aedf370c6b5b54e67e0e8ba",
+          "2026-10-15T11:21:18Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/anchore/grype",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/anchore/grype/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "Apache-2.0",
+        "source": "https://api.github.com/repos/anchore/grype/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "6f8d854af29d3a3086b11a84afa51554a2a245fe",
+        "prerelease": false,
+        "published_at": "2026-10-06T20:46:45Z",
+        "tag": "v0.120.1"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/anchore/grype",
+          "commit": "6f8d854af29d3a3086b11a84afa51554a2a245fe",
+          "path": ".goreleaser.yaml",
+          "lines": [
+            13,
+            43
+          ],
+          "url": "https://github.com/anchore/grype/blob/6f8d854af29d3a3086b11a84afa51554a2a245fe/.goreleaser.yaml#L13-L43"
+        }
+      ]
+    },
+    "socketdev/sfw-free": {
+      "repository": "https://github.com/SocketDev/sfw-free",
+      "pin": {
+        "commit": "164c32dcbe3bbebcc0b091fd6a31ff93883545b2",
+        "tag": "v1.15.4",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "ci-supply-chain"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": null,
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": true,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/SocketDev/sfw-free",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/SocketDev/sfw-free/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "primary_confirmation": {
+          "source": "https://api.github.com/repos/socketdev/sfw-free/commits?per_page=1",
+          "read_at": "2026-10-15",
+          "latest_commit": "164c32dcbe3bbebcc0b091fd6a31ff93883545b2",
+          "committer_date": "2026-03-31T17:35:07Z",
+          "archived": false,
+          "verdict_effect": "inactivity confirmed; current maintenance UNKNOWN; not abandoned by this observation"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "NOASSERTION",
+        "source": "https://api.github.com/repos/SocketDev/sfw-free/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "164c32dcbe3bbebcc0b091fd6a31ff93883545b2",
+        "prerelease": false,
+        "published_at": "2026-10-01T11:00:57Z",
+        "tag": "v1.15.4"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/SocketDev/sfw-free",
+          "commit": "164c32dcbe3bbebcc0b091fd6a31ff93883545b2",
+          "path": "README.md",
+          "lines": [
+            60,
+            78
+          ],
+          "url": "https://github.com/SocketDev/sfw-free/blob/164c32dcbe3bbebcc0b091fd6a31ff93883545b2/README.md#L60-L78"
+        }
+      ]
+    },
+    "openai/codex-plugin-cc": {
+      "repository": "https://github.com/openai/codex-plugin-cc",
+      "pin": {
+        "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+        "tag": "v1.0.6",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "git-github-automation"
+      ],
+      "reused_family_independent_facts": {
+        "file": "candidate-facts-runtime.json",
+        "json_pointer": "/candidates/openai~1codex-plugin-cc",
+        "head": "c6a0004525aef204b92caf1a0e4b405478bb0fb1",
+        "sha256": "789e9f7979de408ec7efb29758232fe79c7d88d4cf185f5b38770e99be61f042",
+        "pr": 1185,
+        "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/c6a0004525aef204b92caf1a0e4b405478bb0fb1/evidence/artifacts/harness-screens-20261015/candidate-facts-runtime.json"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/openai/codex-plugin-cc",
+          "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+          "path": "README.md",
+          "lines": [
+            16,
+            65
+          ],
+          "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L16-L65"
+        }
+      ]
+    },
+    "ukgovernmentbeis/inspect_ai": {
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "pin": {
+        "commit": "44ff4188232418ead18467596909272850483951",
+        "tag": "0.3.281",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "quality-evaluation"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "44ff4188232418ead18467596909272850483951",
+          "2026-10-15T17:58:29Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "MIT",
+        "source": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "44ff4188232418ead18467596909272850483951",
+        "prerelease": false,
+        "published_at": "2026-10-15T17:58:56Z",
+        "tag": "0.3.281"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+          "commit": "44ff4188232418ead18467596909272850483951",
+          "path": "docs/index.qmd",
+          "lines": [
+            16,
+            38
+          ],
+          "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/44ff4188232418ead18467596909272850483951/docs/index.qmd#L16-L38"
+        }
+      ]
+    },
+    "modelcontextprotocol/inspector": {
+      "repository": "https://github.com/modelcontextprotocol/inspector",
+      "pin": {
+        "commit": "074b8108f340590268f2900741403755e923a11c",
+        "tag": "2.11.0",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "quality-evaluation"
+      ],
+      "reused_family_independent_facts": {
+        "file": "facts-frameworks.json",
+        "json_pointer": "/candidates/modelcontextprotocol~1inspector",
+        "head": "278ecc5de5c6c4cfbf58b13798b1ec6c697459f8",
+        "sha256": "46fb327516a2dee72fd0ed3d5abde3ba0c1d63400b05a3c5c65a1e4981346cec",
+        "pr": 1184,
+        "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/278ecc5de5c6c4cfbf58b13798b1ec6c697459f8/evidence/artifacts/harness-screens-20261015/facts-frameworks.json"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "commit": "074b8108f340590268f2900741403755e923a11c",
+          "path": "package.json",
+          "lines": [
+            1,
+            36
+          ],
+          "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/package.json#L1-L36"
+        }
+      ]
+    },
+    "microsoft/playwright": {
+      "repository": "https://github.com/microsoft/playwright",
+      "pin": {
+        "commit": "cfe490d941f992655948eee8fd4fd94e1c4234bf",
+        "tag": "v1.64.1",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "quality-evaluation"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "b146af244ee4301fe9bfcc45f1d60f6c23cc18c1",
+          "2026-10-15T18:45:56Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/microsoft/playwright",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/microsoft/playwright/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "Apache-2.0",
+        "source": "https://api.github.com/repos/microsoft/playwright/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "cfe490d941f992655948eee8fd4fd94e1c4234bf",
+        "prerelease": false,
+        "published_at": "2026-10-14T11:51:33Z",
+        "tag": "v1.64.1"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/microsoft/playwright",
+          "commit": "cfe490d941f992655948eee8fd4fd94e1c4234bf",
+          "path": "docs/src/intro-js.md",
+          "lines": [
+            303,
+            308
+          ],
+          "url": "https://github.com/microsoft/playwright/blob/cfe490d941f992655948eee8fd4fd94e1c4234bf/docs/src/intro-js.md#L303-L308"
+        }
+      ]
+    },
+    "cli/cli": {
+      "repository": "https://github.com/cli/cli",
+      "pin": {
+        "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+        "tag": "v2.102.0",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "git-github-automation"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "trunk",
+        "newest_default_branch_commit_since_cutoff": [
+          "59e9f78eacdf2554f8534d166808c3e9b8c7ebcb",
+          "2026-10-15T15:15:11Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/cli/cli",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/cli/cli/commits?sha=trunk&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "MIT",
+        "source": "https://api.github.com/repos/cli/cli/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+        "prerelease": false,
+        "published_at": "2026-09-30T02:40:02Z",
+        "tag": "v2.102.0"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/cli/cli",
+          "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+          "path": "README.md",
+          "lines": [
+            10,
+            14
+          ],
+          "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md#L10-L14"
+        },
+        {
+          "repository": "https://github.com/cli/cli",
+          "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+          "path": "docs/install_macos.md",
+          "lines": [
+            25,
+            25
+          ],
+          "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_macos.md#L25"
+        },
+        {
+          "repository": "https://github.com/cli/cli",
+          "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+          "path": "docs/install_linux.md",
+          "lines": [
+            35,
+            61
+          ],
+          "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_linux.md#L35-L61"
+        }
+      ]
+    },
+    "kjanat/actionlint": {
+      "repository": "https://github.com/kjanat/actionlint",
+      "pin": {
+        "commit": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+        "tag": "v1.17.0",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "ci-supply-chain"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "master",
+        "newest_default_branch_commit_since_cutoff": [
+          "8ac13d23f49d0aeccae67d2c33022ef9ef44279c",
+          "2026-10-15T10:21:31Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/kjanat/actionlint",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/kjanat/actionlint/commits?sha=master&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "MIT",
+        "source": "https://api.github.com/repos/kjanat/actionlint/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+        "prerelease": false,
+        "published_at": "2026-09-13T16:07:47Z",
+        "tag": "v1.17.0"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/kjanat/actionlint",
+          "commit": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+          "path": "docs/install.md",
+          "lines": [
+            109,
+            113
+          ],
+          "url": "https://github.com/kjanat/actionlint/blob/08bb2c4f0d039744455b87aef1c647fb8b66d37b/docs/install.md#L109-L113"
+        }
+      ]
+    },
+    "koalaman/shellcheck": {
+      "repository": "https://github.com/koalaman/shellcheck",
+      "pin": {
+        "commit": "aac0823e6b58f8a499e856e93738082691cbf212",
+        "tag": "v0.11.0",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "quality-evaluation"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "master",
+        "newest_default_branch_commit_since_cutoff": [
+          "c36c85a05ed3a1560e31bf7d89db040f84ef4556",
+          "2026-10-14T02:12:16Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/koalaman/shellcheck",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/koalaman/shellcheck/commits?sha=master&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "GPL-3.0",
+        "source": "https://api.github.com/repos/koalaman/shellcheck/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "aac0823e6b58f8a499e856e93738082691cbf212",
+        "prerelease": false,
+        "published_at": "2025-08-04T00:27:19Z",
+        "tag": "v0.11.0"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/koalaman/shellcheck",
+          "commit": "aac0823e6b58f8a499e856e93738082691cbf212",
+          "path": "README.md",
+          "lines": [
+            238,
+            244
+          ],
+          "url": "https://github.com/koalaman/shellcheck/blob/aac0823e6b58f8a499e856e93738082691cbf212/README.md#L238-L244"
+        }
+      ]
+    },
+    "promptfoo/promptfoo": {
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "pin": {
+        "commit": "2041ef9d6ac93637dc363f1f344b955b33f41d5d",
+        "tag": "code-scan-action-0.2.2",
+        "package_version": "0.124.1"
+      },
+      "inventory_layers": [
+        "quality-evaluation"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "132a2d38b1b0adc953b0db650f950d573bc113c4",
+          "2026-10-15T19:48:20Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/promptfoo/promptfoo",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/promptfoo/promptfoo/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "MIT",
+        "source": "https://api.github.com/repos/promptfoo/promptfoo/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "2041ef9d6ac93637dc363f1f344b955b33f41d5d",
+        "prerelease": false,
+        "published_at": "2026-10-08T15:46:03Z",
+        "tag": "code-scan-action-0.2.2"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/promptfoo/promptfoo",
+          "commit": "2041ef9d6ac93637dc363f1f344b955b33f41d5d",
+          "path": "package.json",
+          "lines": [
+            48,
+            51
+          ],
+          "url": "https://github.com/promptfoo/promptfoo/blob/2041ef9d6ac93637dc363f1f344b955b33f41d5d/package.json#L48-L51"
+        }
+      ]
+    },
+    "zizmorcore/zizmor": {
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "pin": {
+        "commit": "3b1f99d843832def9062cddb8a5d0b737e44dfe1",
+        "tag": "v1.31.0",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "ci-supply-chain"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "5eb37696bbf148d4fe74a84fc5073efe14e537a4",
+          "2026-10-15T04:31:38Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/zizmorcore/zizmor",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/zizmorcore/zizmor/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "MIT",
+        "source": "https://api.github.com/repos/zizmorcore/zizmor/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "3b1f99d843832def9062cddb8a5d0b737e44dfe1",
+        "prerelease": false,
+        "published_at": "2026-10-15T04:04:23Z",
+        "tag": "v1.31.0"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/zizmorcore/zizmor",
+          "commit": "3b1f99d843832def9062cddb8a5d0b737e44dfe1",
+          "path": "docs/installation.md",
+          "lines": [
+            25,
+            42
+          ],
+          "url": "https://github.com/zizmorcore/zizmor/blob/3b1f99d843832def9062cddb8a5d0b737e44dfe1/docs/installation.md#L25-L42"
+        },
+        {
+          "url": "https://api.github.com/repos/zizmorcore/zizmor/releases/tags/v1.31.0",
+          "read_at": "2026-10-15",
+          "section": "release assets"
+        }
+      ]
+    },
+    "anchore/syft": {
+      "repository": "https://github.com/anchore/syft",
+      "pin": {
+        "commit": "b254e6d92f28c3868a755f62fb3ca8f26e9fee76",
+        "tag": "v1.54.1",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "ci-supply-chain"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "30200f1d691d4e7e9f78a55e7e7298aeb2672216",
+          "2026-10-15T11:20:55Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/anchore/syft",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/anchore/syft/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "Apache-2.0",
+        "source": "https://api.github.com/repos/anchore/syft/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "b254e6d92f28c3868a755f62fb3ca8f26e9fee76",
+        "prerelease": false,
+        "published_at": "2026-10-06T15:35:10Z",
+        "tag": "v1.54.1"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/anchore/syft",
+          "commit": "b254e6d92f28c3868a755f62fb3ca8f26e9fee76",
+          "path": ".goreleaser.yaml",
+          "lines": [
+            13,
+            33
+          ],
+          "url": "https://github.com/anchore/syft/blob/b254e6d92f28c3868a755f62fb3ca8f26e9fee76/.goreleaser.yaml#L13-L33"
+        }
+      ]
+    },
+    "boostsecurityio/poutine": {
+      "repository": "https://github.com/boostsecurityio/poutine",
+      "pin": {
+        "commit": "8918c66db19ecfd12b2f8379e445c3da4589e599",
+        "tag": "v1.1.6",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "ci-supply-chain"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "fa6dbac32a83a13b26cfcc3e2651ba27f43fc45c",
+          "2026-10-14T16:27:02Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/boostsecurityio/poutine",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/boostsecurityio/poutine/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "Apache-2.0",
+        "source": "https://api.github.com/repos/boostsecurityio/poutine/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "8918c66db19ecfd12b2f8379e445c3da4589e599",
+        "prerelease": false,
+        "published_at": "2026-05-22T20:06:25Z",
+        "tag": "v1.1.6"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/boostsecurityio/poutine",
+          "commit": "8918c66db19ecfd12b2f8379e445c3da4589e599",
+          "path": ".goreleaser.yaml",
+          "lines": [
+            11,
+            16
+          ],
+          "url": "https://github.com/boostsecurityio/poutine/blob/8918c66db19ecfd12b2f8379e445c3da4589e599/.goreleaser.yaml#L11-L16"
+        }
+      ]
+    },
+    "wilfred/difftastic": {
+      "repository": "https://github.com/Wilfred/difftastic",
+      "pin": {
+        "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+        "tag": "0.71.0",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "quality-evaluation",
+        "git-github-automation"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "master",
+        "newest_default_branch_commit_since_cutoff": [
+          "6ee8d012d9b9fc2acb4fbe48af6dfcb64ea33381",
+          "2026-10-14T23:18:40Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/Wilfred/difftastic",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/Wilfred/difftastic/commits?sha=master&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "MIT",
+        "source": "https://api.github.com/repos/Wilfred/difftastic/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+        "prerelease": false,
+        "published_at": "2026-09-18T22:57:29Z",
+        "tag": "0.71.0"
+      },
+      "platform_source_refs": [
+        {
+          "url": "https://api.github.com/repos/Wilfred/difftastic/releases/tags/0.71.0",
+          "read_at": "2026-10-15",
+          "section": "release assets for 0.71.0; source commit recorded in pin"
+        }
+      ]
+    },
+    "ataraxy-labs/sem": {
+      "repository": "https://github.com/Ataraxy-Labs/sem",
+      "pin": {
+        "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+        "tag": "v0.27.0",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "git-github-automation"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "6cb178dc209dc1109b46c8c6ed8173c5209d91b5",
+          "2026-10-13T03:22:38Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/Ataraxy-Labs/sem",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/Ataraxy-Labs/sem/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "Apache-2.0",
+        "source": "https://api.github.com/repos/Ataraxy-Labs/sem/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+        "prerelease": false,
+        "published_at": "2026-10-04T11:22:08Z",
+        "tag": "v0.27.0"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/Ataraxy-Labs/sem",
+          "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+          "path": "install.sh",
+          "lines": [
+            19,
+            25
+          ],
+          "url": "https://github.com/Ataraxy-Labs/sem/blob/9eb4ebf90d85274c822f4bd09124e833d61bcfbb/install.sh#L19-L25"
+        }
+      ]
+    },
+    "mlflow/mlflow": {
+      "repository": "https://github.com/mlflow/mlflow",
+      "pin": {
+        "commit": "7fc49ae9fcd65ed125e46cf68b976060e5a38c77",
+        "tag": "v3.17.1",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "quality-evaluation"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "master",
+        "newest_default_branch_commit_since_cutoff": [
+          "f566a42d64fce8997fe187edb5229221ace09713",
+          "2026-10-15T19:58:23Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/mlflow/mlflow",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/mlflow/mlflow/commits?sha=master&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "Apache-2.0",
+        "source": "https://api.github.com/repos/mlflow/mlflow/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "7fc49ae9fcd65ed125e46cf68b976060e5a38c77",
+        "prerelease": false,
+        "published_at": "2026-10-13T09:33:43Z",
+        "tag": "v3.17.1"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/mlflow/mlflow",
+          "commit": "7fc49ae9fcd65ed125e46cf68b976060e5a38c77",
+          "path": "pyproject.toml",
+          "lines": [
+            10,
+            44
+          ],
+          "url": "https://github.com/mlflow/mlflow/blob/7fc49ae9fcd65ed125e46cf68b976060e5a38c77/pyproject.toml#L10-L44"
+        }
+      ]
+    },
+    "typesafe-ai/skills": {
+      "repository": "https://github.com/typesafe-ai/skills",
+      "pin": {
+        "commit": "65a39f393687675ce170e6094757de20370365b9",
+        "tag": null,
+        "package_version": null
+      },
+      "inventory_layers": [
+        "quality-evaluation"
+      ],
+      "reused_family_independent_facts": {
+        "file": "facts-frameworks.json",
+        "json_pointer": "/candidates/typesafe-ai~1skills",
+        "head": "278ecc5de5c6c4cfbf58b13798b1ec6c697459f8",
+        "sha256": "46fb327516a2dee72fd0ed3d5abde3ba0c1d63400b05a3c5c65a1e4981346cec",
+        "pr": 1184,
+        "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/278ecc5de5c6c4cfbf58b13798b1ec6c697459f8/evidence/artifacts/harness-screens-20261015/facts-frameworks.json"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/typesafe-ai/skills",
+          "commit": "65a39f393687675ce170e6094757de20370365b9",
+          "path": "README.md",
+          "lines": [
+            9,
+            26
+          ],
+          "url": "https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/README.md#L9-L26"
+        }
+      ]
+    },
+    "actions/attest": {
+      "repository": "https://github.com/actions/attest",
+      "pin": {
+        "commit": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+        "tag": "v4.2.2",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "ci-supply-chain"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "7a37fbbab9669658a566371acd1cf2f8c7a40d32",
+          "2026-10-15T16:14:29Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/actions/attest",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/actions/attest/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "MIT",
+        "source": "https://api.github.com/repos/actions/attest/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+        "prerelease": false,
+        "published_at": "2026-08-04T20:36:29Z",
+        "tag": "v4.2.2"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/actions/attest",
+          "commit": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+          "path": "action.yml",
+          "lines": [
+            102,
+            103
+          ],
+          "url": "https://github.com/actions/attest/blob/1e69f48acb82d1966a394da916b4c1698aa569d6/action.yml#L102-L103"
+        },
+        {
+          "repository": "https://github.com/actions/attest",
+          "commit": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+          "path": "README.md",
+          "lines": [
+            35,
+            41
+          ],
+          "url": "https://github.com/actions/attest/blob/1e69f48acb82d1966a394da916b4c1698aa569d6/README.md#L35-L41"
+        }
+      ]
+    },
+    "openai/skills": {
+      "repository": "https://github.com/openai/skills",
+      "pin": {
+        "commit": "49f948faa9258a0c61caceaf225e179651397431",
+        "tag": null,
+        "package_version": null
+      },
+      "inventory_layers": [
+        "quality-evaluation"
+      ],
+      "reused_family_independent_facts": {
+        "file": "facts-frameworks.json",
+        "json_pointer": "/candidates/openai~1skills",
+        "head": "278ecc5de5c6c4cfbf58b13798b1ec6c697459f8",
+        "sha256": "46fb327516a2dee72fd0ed3d5abde3ba0c1d63400b05a3c5c65a1e4981346cec",
+        "pr": 1184,
+        "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/278ecc5de5c6c4cfbf58b13798b1ec6c697459f8/evidence/artifacts/harness-screens-20261015/facts-frameworks.json"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/openai/skills",
+          "commit": "49f948faa9258a0c61caceaf225e179651397431",
+          "path": "README.md",
+          "lines": [
+            15,
+            39
+          ],
+          "url": "https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/README.md#L15-L39"
+        }
+      ]
+    },
+    "datadog/supply-chain-firewall": {
+      "repository": "https://github.com/DataDog/supply-chain-firewall",
+      "pin": {
+        "commit": "44203cf6d3b2e03bd179f466821ec8ae215d7b78",
+        "tag": "v4.0.0",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "ci-supply-chain"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "bcb2b2252ccea0e612ce263716e40913cc4a7515",
+          "2026-10-12T19:55:08Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/DataDog/supply-chain-firewall",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/DataDog/supply-chain-firewall/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "Apache-2.0",
+        "source": "https://api.github.com/repos/DataDog/supply-chain-firewall/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "44203cf6d3b2e03bd179f466821ec8ae215d7b78",
+        "prerelease": false,
+        "published_at": "2026-08-13T07:31:22Z",
+        "tag": "v4.0.0"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/DataDog/supply-chain-firewall",
+          "commit": "44203cf6d3b2e03bd179f466821ec8ae215d7b78",
+          "path": ".goreleaser.yml",
+          "lines": [
+            11,
+            16
+          ],
+          "url": "https://github.com/DataDog/supply-chain-firewall/blob/44203cf6d3b2e03bd179f466821ec8ae215d7b78/.goreleaser.yml#L11-L16"
+        },
+        {
+          "repository": "https://github.com/DataDog/supply-chain-firewall",
+          "commit": "44203cf6d3b2e03bd179f466821ec8ae215d7b78",
+          "path": "README.md",
+          "lines": [
+            21,
+            29
+          ],
+          "url": "https://github.com/DataDog/supply-chain-firewall/blob/44203cf6d3b2e03bd179f466821ec8ae215d7b78/README.md#L21-L29"
+        }
+      ]
+    },
+    "rhysd/actionlint": {
+      "repository": "https://github.com/rhysd/actionlint",
+      "pin": {
+        "commit": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+        "tag": "v1.7.12",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "ci-supply-chain"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": null,
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": true,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/rhysd/actionlint",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/rhysd/actionlint/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "primary_confirmation": {
+          "source": "https://api.github.com/repos/rhysd/actionlint/commits?per_page=1",
+          "read_at": "2026-10-15",
+          "latest_commit": "011a6d15e749bb3f2d771eed9c7aa0e7e3e10ee7",
+          "committer_date": "2026-04-19T14:46:58Z",
+          "archived": false,
+          "verdict_effect": "inactivity confirmed; current maintenance UNKNOWN; not abandoned by this observation"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "MIT",
+        "source": "https://api.github.com/repos/rhysd/actionlint/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+        "prerelease": false,
+        "published_at": "2026-03-30T17:49:21Z",
+        "tag": "v1.7.12"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/rhysd/actionlint",
+          "commit": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+          "path": "docs/install.md",
+          "lines": [
+            90,
+            94
+          ],
+          "url": "https://github.com/rhysd/actionlint/blob/914e7df21a07ef503a81201c76d2b11c789d3fca/docs/install.md#L90-L94"
+        }
+      ]
+    },
+    "aikidosec/safe-chain": {
+      "repository": "https://github.com/AikidoSec/safe-chain",
+      "pin": {
+        "commit": "dffae994572cd9e74dc7cf868ebe4f073832caa6",
+        "tag": "1.5.25",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "ci-supply-chain"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "4ae460b57b6a7a3d6613f604569b291c213b29c3",
+          "2026-10-14T10:33:23Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/AikidoSec/safe-chain",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/AikidoSec/safe-chain/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "NOASSERTION",
+        "source": "https://api.github.com/repos/AikidoSec/safe-chain/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "dffae994572cd9e74dc7cf868ebe4f073832caa6",
+        "prerelease": false,
+        "published_at": "2026-10-09T09:58:36Z",
+        "tag": "1.5.25"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/AikidoSec/safe-chain",
+          "commit": "dffae994572cd9e74dc7cf868ebe4f073832caa6",
+          "path": "README.md",
+          "lines": [
+            44,
+            75
+          ],
+          "url": "https://github.com/AikidoSec/safe-chain/blob/dffae994572cd9e74dc7cf868ebe4f073832caa6/README.md#L44-L75"
+        }
+      ]
+    },
+    "harbor-framework/harbor": {
+      "repository": "https://github.com/harbor-framework/harbor",
+      "pin": {
+        "commit": "b53b8134e1241686dca7759af188f987ecc48e8b",
+        "tag": "v0.24.0",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "quality-evaluation"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "aad19e235922ee5007ac635a96a1c2f72eef9dfc",
+          "2026-10-15T16:22:46Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/harbor-framework/harbor",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/harbor-framework/harbor/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "Apache-2.0",
+        "source": "https://api.github.com/repos/harbor-framework/harbor/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "b53b8134e1241686dca7759af188f987ecc48e8b",
+        "prerelease": false,
+        "published_at": "2026-10-05T05:04:52Z",
+        "tag": "v0.24.0"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/harbor-framework/harbor",
+          "commit": "b53b8134e1241686dca7759af188f987ecc48e8b",
+          "path": "pyproject.toml",
+          "lines": [
+            1,
+            9
+          ],
+          "url": "https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/pyproject.toml#L1-L9"
+        },
+        {
+          "repository": "https://github.com/harbor-framework/harbor",
+          "commit": "b53b8134e1241686dca7759af188f987ecc48e8b",
+          "path": "README.md",
+          "lines": [
+            31,
+            49
+          ],
+          "url": "https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/README.md#L31-L49"
+        }
+      ]
+    },
+    "anthropics/claude-code-action": {
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "pin": {
+        "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+        "tag": "v1",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "git-github-automation"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "374f254f5efaf968abfe15d399fd90972e8138b9",
+          "2026-10-15T19:24:46Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/anthropics/claude-code-action",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/anthropics/claude-code-action/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "MIT",
+        "source": "https://api.github.com/repos/anthropics/claude-code-action/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+        "prerelease": false,
+        "published_at": "2025-08-26T17:01:10Z",
+        "tag": "v1"
+      },
+      "platform_source_refs": [
+        {
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+          "path": "action.yml",
+          "lines": [
+            189,
+            190
+          ],
+          "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/action.yml#L189-L190"
+        }
+      ]
+    },
+    "aquasecurity/trivy": {
+      "repository": "https://github.com/aquasecurity/trivy",
+      "pin": {
+        "commit": "531360e5d2a88e732373f1614ba99a38738538b8",
+        "tag": "v0.76.0",
+        "package_version": null
+      },
+      "inventory_layers": [
+        "ci-supply-chain"
+      ],
+      "maintenance": {
+        "archived": false,
+        "default_branch": "main",
+        "newest_default_branch_commit_since_cutoff": [
+          "032ac48ccfa5c06d96e6ed1add07456231b5ed9a",
+          "2026-10-15T11:41:57Z"
+        ],
+        "cutoff": "2026-07-17T20:03:33Z",
+        "no_commit_since_cutoff": false,
+        "interpretation": "Frozen activity facts are not an abandonment determination.",
+        "source": {
+          "url": "https://api.github.com/repos/aquasecurity/trivy",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        },
+        "commit_source": {
+          "url": "https://api.github.com/repos/aquasecurity/trivy/commits?sha=main&since=2026-07-17T20:03:33Z",
+          "read_at": "2026-10-15T20:03:33Z–20:08Z"
+        }
+      },
+      "license_compliance_note": {
+        "spdx": "Apache-2.0",
+        "source": "https://api.github.com/repos/aquasecurity/trivy/license",
+        "read_at": "2026-10-15T20:03:33Z–20:08Z",
+        "effect_on_verdict": "none"
+      },
+      "release": {
+        "commit": "531360e5d2a88e732373f1614ba99a38738538b8",
+        "prerelease": false,
+        "published_at": "2026-10-14T11:45:44Z",
+        "tag": "v0.76.0"
+      },
+      "platform_source_refs": [
+        {
+          "url": "https://api.github.com/repos/aquasecurity/trivy/releases/tags/v0.76.0",
+          "read_at": "2026-10-15",
+          "section": "release assets at the recorded tag; commit bound by frozen facts"
+        }
+      ]
+    }
+  },
+  "source_reads": {
+    "max-sixty/worktrunk:README.md": {
+      "repository": "max-sixty/worktrunk",
+      "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "README.md",
+      "sha256": "e627eb18fd1f383a0bbdc43531675fc2c93e6c8ab2290bc54c817ae23f4ad0aa",
+      "read_at": "2026-10-15T21:35:32.915620+00:00",
+      "read_method": "local mirror ~/code/upstream/max-sixty/worktrunk",
+      "error": null,
+      "selected_line_numbers": [
+        11,
+        14,
+        20,
+        32,
+        43,
+        45,
+        64,
+        65,
+        68,
+        85,
+        87,
+        89,
+        90,
+        91,
+        92,
+        94,
+        95,
+        97,
+        102,
+        106,
+        108,
+        110,
+        113,
+        121,
+        125,
+        127,
+        130,
+        131
+      ]
+    },
+    "gitleaks/gitleaks:README.md": {
+      "repository": "gitleaks/gitleaks",
+      "commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+      "path": "README.md",
+      "sha256": "022fd4d9fb53a8e7eb6b6e49875052e571f784bafab387deb484e28f8a1ea38b",
+      "read_at": "2026-10-15T21:36:23.540585+00:00",
+      "read_method": "local mirror ~/code/upstream/gitleaks/gitleaks",
+      "error": null,
+      "selected_line_numbers": [
+        16,
+        51,
+        57,
+        67,
+        69,
+        72,
+        73,
+        77,
+        81,
+        83,
+        91,
+        95,
+        97,
+        112,
+        113,
+        123,
+        125,
+        126,
+        145,
+        151,
+        152,
+        153,
+        159,
+        160,
+        162
+      ]
+    },
+    "embeddings-benchmark/mteb:README.md": {
+      "repository": "embeddings-benchmark/mteb",
+      "commit": "99f1290ced5e3ae5eec1fc5f58629d50a4cdbd37",
+      "path": "README.md",
+      "sha256": "7d4d66862ca3fd92d8c1949aca25d684362ee9aa40462d046bdfde5d9e86729a",
+      "read_at": "2026-10-15T21:35:47.492793+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        2,
+        5,
+        8,
+        9,
+        11,
+        12,
+        21,
+        22,
+        24,
+        25,
+        31,
+        35,
+        37,
+        40,
+        43,
+        45,
+        51,
+        66,
+        67,
+        79,
+        86,
+        90,
+        91,
+        95
+      ]
+    },
+    "dependabot/dependabot-core:README.md": {
+      "repository": "dependabot/dependabot-core",
+      "commit": "ecbee00961d6e88d1f9a1bd5b40965acb025fb2d",
+      "path": "README.md",
+      "sha256": "1a6bc301fe8095e9b8acfdaed5b7f5f455c47571ad78d40ab5640f5b0e7a65b1",
+      "read_at": "2026-10-15T21:36:20.985469+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        26,
+        34,
+        38,
+        45,
+        59,
+        68,
+        70,
+        78,
+        105,
+        106,
+        123,
+        135,
+        136,
+        142,
+        144,
+        156,
+        164,
+        173,
+        174,
+        192,
+        195,
+        228,
+        260,
+        269,
+        278
+      ]
+    },
+    "anchore/grype:README.md": {
+      "repository": "anchore/grype",
+      "commit": "6f8d854af29d3a3086b11a84afa51554a2a245fe",
+      "path": "README.md",
+      "sha256": "e0d65fd01f3fc4f2378bcf2750440046b1b9d829172c805a39853f7d34003f0f",
+      "read_at": "2026-10-15T21:36:09.092311+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        7,
+        24,
+        25,
+        26,
+        27,
+        29,
+        34,
+        42,
+        46,
+        58,
+        67,
+        69,
+        72,
+        73,
+        75,
+        76,
+        82,
+        87,
+        94,
+        99
+      ]
+    },
+    "socketdev/sfw-free:README.md": {
+      "repository": "SocketDev/sfw-free",
+      "commit": "164c32dcbe3bbebcc0b091fd6a31ff93883545b2",
+      "path": "README.md",
+      "sha256": "cef8e2d414ac30176795cef7f185b353c7f00df70f458befda378aa1e4767575",
+      "read_at": "2026-10-15T21:43:12.286417+00:00",
+      "read_method": "local mirror ~/code/upstream/socketdev/sfw-free",
+      "error": null,
+      "selected_line_numbers": [
+        17,
+        18,
+        26,
+        29,
+        30,
+        31,
+        43,
+        45,
+        47,
+        50,
+        52,
+        53,
+        56,
+        58,
+        60,
+        64,
+        69,
+        73,
+        78,
+        84,
+        88,
+        89,
+        90,
+        94,
+        96,
+        100,
+        110,
+        118,
+        122,
+        133,
+        138,
+        141,
+        308
+      ]
+    },
+    "openai/codex-plugin-cc:README.md": {
+      "repository": "openai/codex-plugin-cc",
+      "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "path": "README.md",
+      "sha256": "ce66c099deaf61ee3c83b2fdbf51a8d470c90508b2a02855c02898b45016cf16",
+      "read_at": "2026-10-15T21:35:34.309637+00:00",
+      "read_method": "local mirror ~/code/upstream/openai/codex-plugin-cc",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        3,
+        5,
+        12,
+        13,
+        14,
+        19,
+        22,
+        24,
+        27,
+        30,
+        33,
+        45,
+        48,
+        50,
+        53,
+        56,
+        59,
+        62,
+        65,
+        70,
+        71,
+        72,
+        77,
+        79,
+        82,
+        86,
+        87
+      ]
+    },
+    "ukgovernmentbeis/inspect_ai:README.md": {
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "commit": "44ff4188232418ead18467596909272850483951",
+      "path": "README.md",
+      "sha256": "a9a1e07b955d869137d8ad109f1c238268f361dcdfac30cfcc94983a51a99b17",
+      "read_at": "2026-10-15T21:35:51.434234+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        3,
+        5,
+        9,
+        15,
+        20,
+        26,
+        29,
+        31,
+        44,
+        46,
+        52,
+        56,
+        59,
+        64
+      ]
+    },
+    "microsoft/playwright:README.md": {
+      "repository": "microsoft/playwright",
+      "commit": "cfe490d941f992655948eee8fd4fd94e1c4234bf",
+      "path": "README.md",
+      "sha256": "8d2a2d9027d5d6ae2c8080c6c9752624528c5605398f87da730e18442c7e9a84",
+      "read_at": "2026-10-15T21:35:50.571011+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        13,
+        15,
+        16,
+        17,
+        18,
+        19,
+        25,
+        27,
+        30,
+        36,
+        37,
+        53,
+        60,
+        63,
+        67,
+        88,
+        91,
+        92,
+        94,
+        100,
+        103,
+        105,
+        113,
+        115
+      ]
+    },
+    "cli/cli:README.md": {
+      "repository": "cli/cli",
+      "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "path": "README.md",
+      "sha256": "5816da6f27253e6e5544e9c8d7b0f652e03200a0345fae1693e50d72fabb8cc4",
+      "read_at": "2026-10-15T21:35:33.189312+00:00",
+      "read_method": "local mirror ~/code/upstream/cli/cli",
+      "error": null,
+      "selected_line_numbers": [
+        6,
+        10,
+        14,
+        18,
+        21,
+        22,
+        35,
+        37,
+        39,
+        40,
+        42,
+        44,
+        46,
+        47,
+        48,
+        50,
+        52,
+        54,
+        55,
+        57,
+        61,
+        75,
+        77,
+        79,
+        85,
+        87,
+        89,
+        92
+      ]
+    },
+    "kjanat/actionlint:README.md": {
+      "repository": "kjanat/actionlint",
+      "commit": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+      "path": "README.md",
+      "sha256": "3e39189f7c67999034728be8a0acd4df073807f8b50c7cad00da9224d35a7345",
+      "read_at": "2026-10-15T21:36:23.816584+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        7,
+        9,
+        13,
+        17,
+        20,
+        34,
+        39,
+        45,
+        61,
+        64,
+        80,
+        84,
+        88,
+        94,
+        97,
+        101,
+        105,
+        117,
+        118,
+        119,
+        122,
+        125,
+        128,
+        131,
+        133
+      ]
+    },
+    "koalaman/shellcheck:README.md": {
+      "repository": "koalaman/shellcheck",
+      "commit": "aac0823e6b58f8a499e856e93738082691cbf212",
+      "path": "README.md",
+      "sha256": "7020bda9caa75bff217ae400e4a8ea44183f6b915e2c01812f5d912911367462",
+      "read_at": "2026-10-15T21:40:15.030696+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        19,
+        30,
+        32,
+        47,
+        64,
+        84,
+        96,
+        99,
+        104,
+        107,
+        109,
+        114,
+        115,
+        116,
+        119,
+        120,
+        121,
+        123,
+        126,
+        130,
+        132,
+        134,
+        137,
+        139,
+        142,
+        146,
+        148,
+        152,
+        171,
+        173,
+        240,
+        242,
+        243,
+        244,
+        291,
+        304,
+        306,
+        405
+      ]
+    },
+    "promptfoo/promptfoo:README.md": {
+      "repository": "promptfoo/promptfoo",
+      "commit": "2041ef9d6ac93637dc363f1f344b955b33f41d5d",
+      "path": "README.md",
+      "sha256": "9419faaa9d56675b923462d5052a176b3da58f60bf66c84af23159bf3d63c270",
+      "read_at": "2026-10-15T21:35:51.152827+00:00",
+      "read_method": "local mirror ~/code/upstream/promptfoo/promptfoo",
+      "error": null,
+      "selected_line_numbers": [
+        12,
+        23,
+        28,
+        32,
+        37,
+        52,
+        54,
+        55,
+        61,
+        67,
+        69,
+        77
+      ]
+    },
+    "zizmorcore/zizmor:README.md": {
+      "repository": "zizmorcore/zizmor",
+      "commit": "3b1f99d843832def9062cddb8a5d0b737e44dfe1",
+      "path": "README.md",
+      "sha256": "4676e0e205c260f1baff336f97fbdb0b52f93a716ec2e866a370be54a1f7f86b",
+      "read_at": "2026-10-15T21:36:24.680240+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        10,
+        12,
+        16,
+        17,
+        26,
+        27,
+        31,
+        35,
+        47,
+        49,
+        122,
+        123
+      ]
+    },
+    "anchore/syft:README.md": {
+      "repository": "anchore/syft",
+      "commit": "b254e6d92f28c3868a755f62fb3ca8f26e9fee76",
+      "path": "README.md",
+      "sha256": "b072fd6c75f6ba759933b4f035bb9e263309f535e2128f13e6ed50860c328aef",
+      "read_at": "2026-10-15T21:36:09.369058+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        7,
+        22,
+        24,
+        25,
+        26,
+        27,
+        30,
+        32,
+        40,
+        54,
+        57,
+        60,
+        66,
+        75,
+        78,
+        80,
+        86,
+        95,
+        100
+      ]
+    },
+    "boostsecurityio/poutine:README.md": {
+      "repository": "boostsecurityio/poutine",
+      "commit": "8918c66db19ecfd12b2f8379e445c3da4589e599",
+      "path": "README.md",
+      "sha256": "e7628133aa2d9fad48a7d68907874a140e6a7a0fa015f79192e83c3fa49f7b29",
+      "read_at": "2026-10-15T21:36:09.943063+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        13,
+        27,
+        38,
+        40,
+        46,
+        60,
+        99,
+        105,
+        112,
+        114,
+        115,
+        117,
+        118,
+        121,
+        125,
+        133,
+        135,
+        137,
+        140,
+        143,
+        147,
+        148,
+        169,
+        179
+      ]
+    },
+    "wilfred/difftastic:README.md": {
+      "repository": "Wilfred/difftastic",
+      "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "path": "README.md",
+      "sha256": "395325cdaeef69a79d2d39befd278cf24a062f1e4a91848482dcb9613bf20c8f",
+      "read_at": "2026-10-15T21:35:33.454350+00:00",
+      "read_method": "local mirror ~/code/upstream/Wilfred/difftastic",
+      "error": null,
+      "selected_line_numbers": [
+        2,
+        4,
+        5,
+        6,
+        7,
+        10,
+        13,
+        14,
+        15,
+        19,
+        21,
+        24,
+        26,
+        29,
+        31,
+        32,
+        35,
+        37,
+        38,
+        43,
+        44,
+        46,
+        47,
+        51,
+        54,
+        57,
+        61,
+        62
+      ]
+    },
+    "ataraxy-labs/sem:README.md": {
+      "repository": "Ataraxy-Labs/sem",
+      "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+      "path": "README.md",
+      "sha256": "79f2da068b40038b72e140f817b98adc26e6f4b2ba09e19a46ab932f2c8e6b9d",
+      "read_at": "2026-10-15T21:35:34.055981+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        21,
+        36,
+        40,
+        43,
+        55,
+        60,
+        63,
+        69,
+        72,
+        73,
+        74,
+        83,
+        89,
+        93,
+        94,
+        97,
+        99,
+        110,
+        118,
+        123,
+        126,
+        132,
+        135,
+        138,
+        141,
+        144,
+        147
+      ]
+    },
+    "mlflow/mlflow:README.md": {
+      "repository": "mlflow/mlflow",
+      "commit": "7fc49ae9fcd65ed125e46cf68b976060e5a38c77",
+      "path": "README.md",
+      "sha256": "e9b30b8aee35e78fb87bdbbfcf837e8739f596aef5f6def89e735680d7d8b00e",
+      "read_at": "2026-10-15T21:40:14.677617+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        8,
+        9,
+        13,
+        46,
+        48,
+        54,
+        56,
+        59,
+        67,
+        68,
+        74,
+        76,
+        83,
+        87,
+        92,
+        95,
+        97,
+        98,
+        100,
+        105,
+        108,
+        110,
+        113,
+        138,
+        150,
+        151,
+        153
+      ]
+    },
+    "actions/attest:README.md": {
+      "repository": "actions/attest",
+      "commit": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+      "path": "README.md",
+      "sha256": "c513a2a22ce3fa07b67216d36db2c1552be51f7391fe81266f6f1a4cee8da5d6",
+      "read_at": "2026-10-15T21:40:14.258346+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        3,
+        4,
+        6,
+        7,
+        11,
+        13,
+        14,
+        17,
+        18,
+        21,
+        22,
+        23,
+        24,
+        25,
+        27,
+        30,
+        31,
+        35,
+        38,
+        39,
+        41,
+        44,
+        46,
+        53,
+        54,
+        64,
+        67,
+        68,
+        69,
+        73,
+        81,
+        83,
+        95,
+        97,
+        98,
+        99,
+        101,
+        103,
+        105,
+        107,
+        108,
+        109,
+        111,
+        112,
+        113
+      ]
+    },
+    "datadog/supply-chain-firewall:README.md": {
+      "repository": "DataDog/supply-chain-firewall",
+      "commit": "44203cf6d3b2e03bd179f466821ec8ae215d7b78",
+      "path": "README.md",
+      "sha256": "2a2a761be7ee4cc6b6b93741d2c21c70ab013adde5aa04622277a4cbd8987443",
+      "read_at": "2026-10-15T21:43:12.581494+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        3,
+        4,
+        5,
+        11,
+        13,
+        21,
+        23,
+        26,
+        29,
+        31,
+        35,
+        41,
+        46,
+        48,
+        51,
+        55,
+        56,
+        57,
+        65,
+        67,
+        69,
+        74,
+        75,
+        76,
+        77,
+        78,
+        80,
+        88,
+        89,
+        98,
+        101,
+        104,
+        108,
+        111,
+        114,
+        116,
+        121,
+        123,
+        128,
+        129,
+        130,
+        132
+      ]
+    },
+    "rhysd/actionlint:README.md": {
+      "repository": "rhysd/actionlint",
+      "commit": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+      "path": "README.md",
+      "sha256": "d78bc61d23ab010aef426ac6c2985d137a0c1309d87c54d1c80ee9587cadc9e3",
+      "read_at": "2026-10-15T21:36:24.102587+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        6,
+        10,
+        14,
+        17,
+        24,
+        36,
+        46,
+        48,
+        49,
+        55,
+        59,
+        63,
+        65,
+        71,
+        79,
+        81,
+        87,
+        88,
+        92,
+        95,
+        110,
+        111,
+        112,
+        114,
+        115
+      ]
+    },
+    "aikidosec/safe-chain:README.md": {
+      "repository": "AikidoSec/safe-chain",
+      "commit": "dffae994572cd9e74dc7cf868ebe4f073832caa6",
+      "path": "README.md",
+      "sha256": "ada8f39ee08aa790b54c3c247e785a6783217bbfcdb0d886b347e14ffa1788f0",
+      "read_at": "2026-10-15T21:40:12.974223+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        8,
+        9,
+        13,
+        17,
+        44,
+        46,
+        48,
+        51,
+        52,
+        53,
+        54,
+        57,
+        60,
+        61,
+        63,
+        64,
+        65,
+        67,
+        68,
+        71,
+        75,
+        77,
+        80,
+        82,
+        144,
+        154,
+        156,
+        161,
+        167,
+        170,
+        204,
+        424,
+        428,
+        431,
+        433,
+        435,
+        437,
+        444,
+        455,
+        459,
+        484,
+        502
+      ]
+    },
+    "harbor-framework/harbor:README.md": {
+      "repository": "harbor-framework/harbor",
+      "commit": "b53b8134e1241686dca7759af188f987ecc48e8b",
+      "path": "README.md",
+      "sha256": "471eeac02b89640051dd25c0a4bb5a29a76d55862a6ae30da1dbb532f13bd633",
+      "read_at": "2026-10-15T21:35:49.989274+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        10,
+        12,
+        13,
+        14,
+        19,
+        22,
+        26,
+        31,
+        34,
+        37,
+        41,
+        44,
+        48,
+        59,
+        65,
+        71,
+        73,
+        78,
+        85
+      ]
+    },
+    "anthropics/claude-code-action:README.md": {
+      "repository": "anthropics/claude-code-action",
+      "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+      "path": "README.md",
+      "sha256": "a381c47399445c97480d025a406f485644fdd5f4f7ffd880be0567ac2f7b4640",
+      "read_at": "2026-10-15T21:35:33.766105+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        3,
+        5,
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        18,
+        22,
+        26,
+        32,
+        37,
+        39,
+        40,
+        41,
+        42,
+        46,
+        49,
+        56,
+        57,
+        58,
+        61,
+        62,
+        67
+      ]
+    },
+    "aquasecurity/trivy:README.md": {
+      "repository": "aquasecurity/trivy",
+      "commit": "531360e5d2a88e732373f1614ba99a38738538b8",
+      "path": "README.md",
+      "sha256": "217d4d9db626c98b80f0fa214b510705d922f16b9c9452a6ce10d86788be67ba",
+      "read_at": "2026-10-15T21:36:09.649482+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        14,
+        15,
+        17,
+        25,
+        27,
+        29,
+        33,
+        41,
+        43,
+        46,
+        56,
+        63,
+        80,
+        110,
+        122,
+        134,
+        137,
+        139
+      ]
+    },
+    "wilfred/difftastic:manual/src/installation.md": {
+      "repository": "Wilfred/difftastic",
+      "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "path": "manual/src/installation.md",
+      "sha256": "a05c09aa500b683746b50832cc1d6a5f395dda794fdb7d8fb9051fa5e9d91358",
+      "read_at": "2026-10-15T21:38:13.529097+00:00",
+      "read_method": "local mirror ~/code/upstream/Wilfred/difftastic",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        3,
+        9,
+        16,
+        18,
+        22,
+        25,
+        27,
+        28,
+        35,
+        40,
+        43,
+        48,
+        51,
+        56,
+        62,
+        65,
+        68,
+        73,
+        76,
+        81
+      ]
+    },
+    "wilfred/difftastic:manual/src/git.md": {
+      "repository": "Wilfred/difftastic",
+      "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "path": "manual/src/git.md",
+      "sha256": "f55f10dae9de31d9a6257d9eafc4d7649b8718b25908de143d256d9f54c53679",
+      "read_at": "2026-10-15T21:38:16.103691+00:00",
+      "read_method": "local mirror ~/code/upstream/Wilfred/difftastic",
+      "error": null,
+      "selected_line_numbers": [
+        8,
+        10,
+        16,
+        18,
+        44,
+        48,
+        49,
+        56,
+        59,
+        73,
+        89,
+        104,
+        108,
+        123
+      ]
+    },
+    "max-sixty/worktrunk:docs/src/content/docs/shell-integration.md": {
+      "repository": "max-sixty/worktrunk",
+      "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "docs/src/content/docs/shell-integration.md",
+      "sha256": "e955e171906712b1d3014df0e52c6b354f30502a000dbea178b7d76be39597b6",
+      "read_at": "2026-10-15T21:38:16.331014+00:00",
+      "read_method": "local mirror ~/code/upstream/max-sixty/worktrunk",
+      "error": null,
+      "selected_line_numbers": [
+        7,
+        15,
+        18,
+        19,
+        21,
+        23,
+        26,
+        28,
+        29,
+        32,
+        35,
+        40,
+        44,
+        45,
+        50,
+        52,
+        54,
+        60,
+        73,
+        75,
+        77,
+        79
+      ]
+    },
+    "cli/cli:docs/install_macos.md": {
+      "repository": "cli/cli",
+      "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "path": "docs/install_macos.md",
+      "sha256": "18d40b561b31f1007c044a44b027728304e98d53e7608dbc7915428e24c40b12",
+      "read_at": "2026-10-15T21:38:16.585232+00:00",
+      "read_method": "local mirror ~/code/upstream/cli/cli",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        7,
+        9,
+        11,
+        14,
+        20,
+        25,
+        28,
+        33,
+        37,
+        39,
+        41,
+        44,
+        59,
+        62,
+        73,
+        77,
+        80,
+        91,
+        95,
+        98,
+        104
+      ]
+    },
+    "cli/cli:docs/install_linux.md": {
+      "repository": "cli/cli",
+      "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "path": "docs/install_linux.md",
+      "sha256": "6c54aef3c43dcfc99e6ab30dbf3f5875001997d99c2a1e3f52eba1553c793c5c",
+      "read_at": "2026-10-15T21:38:16.827231+00:00",
+      "read_method": "local mirror ~/code/upstream/cli/cli-2.102.0",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        6,
+        10,
+        39,
+        43,
+        46,
+        53,
+        54,
+        60,
+        61,
+        65,
+        75,
+        78,
+        85,
+        87,
+        98,
+        101,
+        102,
+        103,
+        117,
+        120,
+        121
+      ]
+    },
+    "anthropics/claude-code-action:action.yml": {
+      "repository": "anthropics/claude-code-action",
+      "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+      "path": "action.yml",
+      "sha256": "87b706489e63483c9c32c12af36467dd34e309becca35f7a8ead4d1e0664c4df",
+      "read_at": "2026-10-15T21:38:17.163293+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        2,
+        30,
+        31,
+        34,
+        36,
+        38,
+        44,
+        56,
+        66,
+        89,
+        108,
+        109,
+        117,
+        125,
+        137,
+        141,
+        145,
+        149,
+        161,
+        165,
+        189,
+        190
+      ]
+    },
+    "anthropics/claude-code-action:docs/security.md": {
+      "repository": "anthropics/claude-code-action",
+      "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+      "path": "docs/security.md",
+      "sha256": "2dd090ea8027eda1b4148bc46d00767c1bb5fdd78203a5c53525580e8e9cfc5c",
+      "read_at": "2026-10-15T21:38:17.485337+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        5,
+        6,
+        7,
+        10,
+        11,
+        15,
+        16,
+        18,
+        19,
+        21,
+        25,
+        56,
+        58,
+        60,
+        64,
+        68,
+        74,
+        78,
+        82,
+        84,
+        86,
+        92
+      ]
+    },
+    "anthropics/claude-code-action:docs/configuration.md": {
+      "repository": "anthropics/claude-code-action",
+      "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+      "path": "docs/configuration.md",
+      "sha256": "d7b0d1381e846eb6504d452459b450a267858759b565bd4744e88f6470cd75ec",
+      "read_at": "2026-10-15T21:38:17.826343+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        3,
+        5,
+        14,
+        15,
+        24,
+        26,
+        45,
+        54,
+        56,
+        77,
+        78,
+        91,
+        98,
+        99,
+        100,
+        108,
+        110,
+        112,
+        118,
+        120,
+        123
+      ]
+    },
+    "ataraxy-labs/sem:install.sh": {
+      "repository": "Ataraxy-Labs/sem",
+      "commit": "9eb4ebf90d85274c822f4bd09124e833d61bcfbb",
+      "path": "install.sh",
+      "sha256": "2e49b36482851b2ed53e118b47f0b605ed4985b71ee7654d21042068c450927e",
+      "read_at": "2026-10-15T21:38:18.176271+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        2,
+        5,
+        8,
+        11,
+        12,
+        15,
+        16,
+        19,
+        20,
+        21,
+        23,
+        25,
+        33,
+        73,
+        75,
+        78,
+        79,
+        80,
+        81,
+        85,
+        86,
+        95
+      ]
+    },
+    "actions/attest:action.yml": {
+      "repository": "actions/attest",
+      "commit": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+      "path": "action.yml",
+      "sha256": "9e4a1b808433f9ec87120b534e11fc35469a039bdbdc62b019441444c9ad0449",
+      "read_at": "2026-10-15T21:39:21.200543+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        15,
+        38,
+        40,
+        69,
+        72,
+        78,
+        92,
+        93,
+        94,
+        102,
+        103
+      ]
+    },
+    "anchore/grype:.goreleaser.yaml": {
+      "repository": "anchore/grype",
+      "commit": "6f8d854af29d3a3086b11a84afa51554a2a245fe",
+      "path": ".goreleaser.yaml",
+      "sha256": "2b2e0c1c34e32ea4f80d21901aed2da2f955528108a7530accca9e15b471952b",
+      "read_at": "2026-10-15T21:39:24.046983+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        8,
+        9,
+        13,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        24,
+        30,
+        35,
+        38,
+        39,
+        40
+      ]
+    },
+    "anchore/syft:.goreleaser.yaml": {
+      "repository": "anchore/syft",
+      "commit": "b254e6d92f28c3868a755f62fb3ca8f26e9fee76",
+      "path": ".goreleaser.yaml",
+      "sha256": "db62d8ca1698febddda52c21d0550a494292d6e119eb3c31c4285561a5448ebe",
+      "read_at": "2026-10-15T21:39:24.460138+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        2,
+        9,
+        13,
+        16,
+        17,
+        18,
+        24,
+        29,
+        32,
+        33,
+        42,
+        45,
+        46,
+        51,
+        52
+      ]
+    },
+    "gitleaks/gitleaks:.goreleaser.yml": {
+      "repository": "gitleaks/gitleaks",
+      "commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+      "path": ".goreleaser.yml",
+      "sha256": "1e6a76e13378b4ad215b423411ee6b1732f04c82224fbed4dcdb20b99eab9717",
+      "read_at": "2026-10-15T21:39:24.717452+00:00",
+      "read_method": "local mirror ~/code/upstream/gitleaks/gitleaks",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        3,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        16,
+        21,
+        22,
+        26,
+        30,
+        31,
+        33,
+        38
+      ]
+    },
+    "aquasecurity/trivy:docs/docs/getting-started/installation.md": {
+      "repository": "aquasecurity/trivy",
+      "commit": "531360e5d2a88e732373f1614ba99a38738538b8",
+      "path": "docs/docs/getting-started/installation.md",
+      "sha256": null,
+      "read_at": "2026-10-15",
+      "read_method": "public GitHub raw attempt",
+      "error": "HTTP Error 404: Not Found",
+      "selected_line_numbers": []
+    },
+    "boostsecurityio/poutine:.goreleaser.yaml": {
+      "repository": "boostsecurityio/poutine",
+      "commit": "8918c66db19ecfd12b2f8379e445c3da4589e599",
+      "path": ".goreleaser.yaml",
+      "sha256": "dfcb72a8567cb6ea559d1e5eb421cee60814a5064f8bb35ac244b4d484946ccf",
+      "read_at": "2026-10-15T21:39:25.439163+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        2,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        21,
+        30,
+        35,
+        36,
+        38,
+        50,
+        54,
+        60
+      ]
+    },
+    "datadog/supply-chain-firewall:.goreleaser.yml": {
+      "repository": "DataDog/supply-chain-firewall",
+      "commit": "44203cf6d3b2e03bd179f466821ec8ae215d7b78",
+      "path": ".goreleaser.yml",
+      "sha256": "c5c831bb361138d197940be4f2d3d580bbba789c4321e818c103312750761833",
+      "read_at": "2026-10-15T21:39:25.867792+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        21
+      ]
+    },
+    "kjanat/actionlint:docs/install.md": {
+      "repository": "kjanat/actionlint",
+      "commit": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+      "path": "docs/install.md",
+      "sha256": "da673959e636bd9e74a9687948e5a98f55900dbff4aea1d195911f2c699cfc7c",
+      "read_at": "2026-10-15T21:40:15.361702+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        5,
+        9,
+        11,
+        13,
+        15,
+        19,
+        25,
+        28,
+        30,
+        32,
+        34,
+        35,
+        36,
+        40,
+        46,
+        57,
+        62,
+        73,
+        76,
+        80,
+        91,
+        97,
+        111,
+        112,
+        113,
+        125,
+        126,
+        133,
+        206,
+        210,
+        276,
+        289,
+        292
+      ]
+    },
+    "rhysd/actionlint:docs/install.md": {
+      "repository": "rhysd/actionlint",
+      "commit": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+      "path": "docs/install.md",
+      "sha256": "5ca3d27feead184d50bab2040ce3ad82deee07d081234042d7f78e84e8a7b5b2",
+      "read_at": "2026-10-15T21:40:15.682391+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        4,
+        6,
+        13,
+        21,
+        24,
+        26,
+        29,
+        32,
+        34,
+        36,
+        42,
+        44,
+        45,
+        49,
+        60,
+        63,
+        70,
+        78,
+        82,
+        92,
+        93,
+        94,
+        106,
+        107,
+        115,
+        195,
+        198
+      ]
+    },
+    "zizmorcore/zizmor:docs/installation.md": {
+      "repository": "zizmorcore/zizmor",
+      "commit": "3b1f99d843832def9062cddb8a5d0b737e44dfe1",
+      "path": "docs/installation.md",
+      "sha256": "24d83d696e4d80dad9c9daaa94b35c07027c096a7b2201b4b0798ca051b30c90",
+      "read_at": "2026-10-15T21:39:27.184467+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        2,
+        5,
+        18,
+        25,
+        26,
+        30,
+        36,
+        39,
+        42,
+        52,
+        56,
+        57,
+        61,
+        64,
+        69,
+        74
+      ]
+    },
+    "microsoft/playwright:docs/src/intro-js.md": {
+      "repository": "microsoft/playwright",
+      "commit": "cfe490d941f992655948eee8fd4fd94e1c4234bf",
+      "path": "docs/src/intro-js.md",
+      "sha256": "4c932f4316b8791191e5a17404dae5c4b7dc1d38c0479883157264ddd91ff9ae",
+      "read_at": "2026-10-15T21:40:12.037153+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        3,
+        8,
+        12,
+        13,
+        17,
+        19,
+        23,
+        64,
+        72,
+        77,
+        84,
+        90,
+        127,
+        131,
+        139,
+        239,
+        303,
+        305,
+        306,
+        307,
+        308
+      ]
+    },
+    "microsoft/playwright:docs/src/ci.md": {
+      "repository": "microsoft/playwright",
+      "commit": "cfe490d941f992655948eee8fd4fd94e1c4234bf",
+      "path": "docs/src/ci.md",
+      "sha256": "10840b0eb1f075f32b38cf8848a33aec0b84c9400d7784518e8f1dc2f4d22253",
+      "read_at": "2026-10-15T21:39:28.013945+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        8,
+        12,
+        13,
+        14,
+        16,
+        19,
+        20,
+        22,
+        23,
+        24,
+        27,
+        31,
+        38,
+        51,
+        53,
+        54
+      ]
+    },
+    "promptfoo/promptfoo:package.json": {
+      "repository": "promptfoo/promptfoo",
+      "commit": "2041ef9d6ac93637dc363f1f344b955b33f41d5d",
+      "path": "package.json",
+      "sha256": "1f88f2f383feeee5ea79b84070fa77ff722f5467819477088120f22e6fe3e1bd",
+      "read_at": "2026-10-15T21:39:28.343542+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        5,
+        35,
+        50,
+        62,
+        63,
+        64,
+        72,
+        81,
+        91,
+        92,
+        93,
+        95,
+        100,
+        105,
+        108,
+        111
+      ]
+    },
+    "ukgovernmentbeis/inspect_ai:docs/index.qmd": {
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "commit": "44ff4188232418ead18467596909272850483951",
+      "path": "docs/index.qmd",
+      "sha256": "7e5d4a55082b17566609050d44bcfc24a87d6ca2d1872aa94c147d44e62530a5",
+      "read_at": "2026-10-15T21:39:28.765052+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        16,
+        22,
+        23,
+        24,
+        35,
+        38,
+        41,
+        49,
+        57,
+        65,
+        73,
+        82,
+        93,
+        99,
+        101,
+        127
+      ]
+    },
+    "embeddings-benchmark/mteb:pyproject.toml": {
+      "repository": "embeddings-benchmark/mteb",
+      "commit": "99f1290ced5e3ae5eec1fc5f58629d50a4cdbd37",
+      "path": "pyproject.toml",
+      "sha256": "b29049ef683e55c6f09c08fdf04f1959c9bb697029acfe32c8dc1f390390966c",
+      "read_at": "2026-10-15T21:39:29.175320+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        2,
+        5,
+        7,
+        30,
+        32,
+        51,
+        57,
+        58,
+        60,
+        68,
+        83,
+        88,
+        90,
+        101,
+        104,
+        130
+      ]
+    },
+    "harbor-framework/harbor:pyproject.toml": {
+      "repository": "harbor-framework/harbor",
+      "commit": "b53b8134e1241686dca7759af188f987ecc48e8b",
+      "path": "pyproject.toml",
+      "sha256": "d7d5398dfeff698ec1c008a9a122326be6e3e6b69af9dcf7caec8e79efabb43e",
+      "read_at": "2026-10-15T21:39:29.570651+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        3,
+        9,
+        19,
+        36,
+        37,
+        38,
+        39,
+        42,
+        52,
+        57,
+        59,
+        60,
+        61,
+        65,
+        68
+      ]
+    },
+    "mlflow/mlflow:pyproject.toml": {
+      "repository": "mlflow/mlflow",
+      "commit": "7fc49ae9fcd65ed125e46cf68b976060e5a38c77",
+      "path": "pyproject.toml",
+      "sha256": "5e35dd352207457114aca6c5934d8289c9c3796c7680235c7ee70d6891f2a94b",
+      "read_at": "2026-10-15T21:39:29.965181+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        1,
+        2,
+        3,
+        4,
+        7,
+        10,
+        12,
+        23,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32,
+        40,
+        44
+      ]
+    },
+    "promptfoo/promptfoo:site/docs/usage/command-line.md": {
+      "repository": "promptfoo/promptfoo",
+      "commit": "2041ef9d6ac93637dc363f1f344b955b33f41d5d",
+      "path": "site/docs/usage/command-line.md",
+      "sha256": "ff738201b16ffdcf4b395e8769fe7fd6170d1902357abf53e09185cc57e2412e",
+      "read_at": "2026-10-15T21:40:07.856319+00:00",
+      "read_method": "local mirror ~/code/upstream/promptfoo/promptfoo",
+      "error": null,
+      "selected_line_numbers": [
+        5,
+        13,
+        14,
+        16,
+        23,
+        24,
+        27,
+        28,
+        29,
+        30,
+        36,
+        37,
+        44,
+        46,
+        47,
+        48,
+        49,
+        50,
+        53,
+        54
+      ]
+    },
+    "promptfoo/promptfoo:site/docs/integrations/ci-cd.md": {
+      "repository": "promptfoo/promptfoo",
+      "commit": "2041ef9d6ac93637dc363f1f344b955b33f41d5d",
+      "path": "site/docs/integrations/ci-cd.md",
+      "sha256": "1189b32eca6a173203e2fa19bed3998fae042eda70686a6001dfef023225ff10",
+      "read_at": "2026-10-15T21:40:10.715083+00:00",
+      "read_method": "local mirror ~/code/upstream/promptfoo/promptfoo",
+      "error": null,
+      "selected_line_numbers": [
+        4,
+        12,
+        18,
+        24,
+        30,
+        36,
+        46,
+        53,
+        58,
+        72,
+        83,
+        85,
+        101,
+        105,
+        111,
+        117,
+        126,
+        130
+      ]
+    },
+    "ukgovernmentbeis/inspect_ai:docs/eval-logs.qmd": {
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "commit": "44ff4188232418ead18467596909272850483951",
+      "path": "docs/eval-logs.qmd",
+      "sha256": "19ce505b9bbbeca6a0519049e5e1e94f1e645964b34c47b5d3385e194618eb12",
+      "read_at": "2026-10-15T21:40:11.160228+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        2,
+        3,
+        8,
+        11,
+        14,
+        16,
+        22,
+        24,
+        26,
+        28,
+        30,
+        32,
+        34,
+        36,
+        40,
+        42
+      ]
+    },
+    "ukgovernmentbeis/inspect_ai:docs/options.qmd": {
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "commit": "44ff4188232418ead18467596909272850483951",
+      "path": "docs/options.qmd",
+      "sha256": "d353fb32bb178cf3996f81f053f8445a8b3b097772f3ea827889bc7fbbd923b4",
+      "read_at": "2026-10-15T21:40:11.587818+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        3,
+        9,
+        13,
+        19,
+        31,
+        32,
+        33,
+        36,
+        38,
+        46,
+        48,
+        50,
+        51,
+        52,
+        53,
+        63
+      ]
+    },
+    "microsoft/playwright:docs/src/browsers.md": {
+      "repository": "microsoft/playwright",
+      "commit": "cfe490d941f992655948eee8fd4fd94e1c4234bf",
+      "path": "docs/src/browsers.md",
+      "sha256": "5ced381f22f3c8017688150d0a09849192f2ae65dea6d98d77c57726d6f55e8b",
+      "read_at": "2026-10-15T21:43:11.611065+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        8,
+        10,
+        12,
+        14,
+        17,
+        21,
+        25,
+        29,
+        32,
+        35,
+        39,
+        43,
+        1187,
+        1192,
+        1196,
+        1200,
+        1204,
+        1210,
+        1214,
+        1218
+      ]
+    },
+    "microsoft/playwright:packages/playwright-core/src/server/utils/hostPlatform.ts": {
+      "repository": "microsoft/playwright",
+      "commit": "cfe490d941f992655948eee8fd4fd94e1c4234bf",
+      "path": "packages/playwright-core/src/server/utils/hostPlatform.ts",
+      "sha256": null,
+      "read_at": "2026-10-15",
+      "read_method": "public GitHub raw attempt",
+      "error": "HTTP Error 404: Not Found",
+      "selected_line_numbers": []
+    },
+    "socketdev/sfw-free:action.yml": {
+      "repository": "SocketDev/sfw-free",
+      "commit": "164c32dcbe3bbebcc0b091fd6a31ff93883545b2",
+      "path": "action.yml",
+      "sha256": null,
+      "read_at": "2026-10-15",
+      "read_method": "public GitHub raw attempt",
+      "error": "HTTP Error 404: Not Found",
+      "selected_line_numbers": []
+    },
+    "zizmorcore/zizmor:docs/usage.md": {
+      "repository": "zizmorcore/zizmor",
+      "commit": "3b1f99d843832def9062cddb8a5d0b737e44dfe1",
+      "path": "docs/usage.md",
+      "sha256": "f67493a81669ef443dd74fc76e69c9a735abaa6ae07ec3d593edae545a57618d",
+      "read_at": "2026-10-15T21:43:12.958769+00:00",
+      "read_method": "public GitHub raw",
+      "error": null,
+      "selected_line_numbers": [
+        2,
+        9,
+        11,
+        14,
+        27,
+        30,
+        33,
+        51,
+        52,
+        55,
+        65,
+        66,
+        73,
+        77,
+        79,
+        82,
+        83,
+        88
+      ]
+    }
+  },
+  "source_named_not_in_inventory": [
+    {
+      "repository": "https://github.com/openai/plugins",
+      "status": "source-named successor only; not screened",
+      "source": {
+        "repository": "https://github.com/openai/skills",
+        "commit": "49f948faa9258a0c61caceaf225e179651397431",
+        "path": "README.md",
+        "lines": [
+          1,
+          8
+        ],
+        "url": "https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/README.md#L1-L8"
+      }
+    },
+    {
+      "repository": "https://github.com/microsoft/playwright-cli",
+      "status": "source-named separate product only; not screened",
+      "source": {
+        "repository": "https://github.com/microsoft/playwright",
+        "commit": "cfe490d941f992655948eee8fd4fd94e1c4234bf",
+        "path": "README.md",
+        "lines": [
+          13,
+          18
+        ],
+        "url": "https://github.com/microsoft/playwright/blob/cfe490d941f992655948eee8fd4fd94e1c4234bf/README.md#L13-L18"
+      }
+    },
+    {
+      "repository": "https://github.com/microsoft/playwright-mcp",
+      "status": "source-named separate product only; not screened",
+      "source": {
+        "repository": "https://github.com/microsoft/playwright",
+        "commit": "cfe490d941f992655948eee8fd4fd94e1c4234bf",
+        "path": "README.md",
+        "lines": [
+          13,
+          18
+        ],
+        "url": "https://github.com/microsoft/playwright/blob/cfe490d941f992655948eee8fd4fd94e1c4234bf/README.md#L13-L18"
+      }
+    },
+    {
+      "repository": "https://github.com/meridianlabs-ai/inspect-skills",
+      "status": "source-named skill only; not screened",
+      "source": {
+        "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+        "commit": "44ff4188232418ead18467596909272850483951",
+        "path": "docs/index.qmd",
+        "lines": [
+          82,
+          82
+        ],
+        "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/44ff4188232418ead18467596909272850483951/docs/index.qmd#L82"
+      }
+    },
+    {
+      "repository": "https://github.com/gitleaks/gitleaks-action",
+      "status": "source-named action only; not substituted for the CLI",
+      "source": {
+        "repository": "https://github.com/gitleaks/gitleaks",
+        "commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+        "path": "README.md",
+        "lines": [
+          91,
+          91
+        ],
+        "url": "https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/README.md#L91"
+      }
+    },
+    {
+      "repository": "https://github.com/socketdev/action",
+      "pin_named_by_source": "ba6de6cc0565af1f42295590380973573297e31f",
+      "status": "source-named action only; not substituted for sfw-free",
+      "source": {
+        "repository": "https://github.com/SocketDev/sfw-free",
+        "commit": "164c32dcbe3bbebcc0b091fd6a31ff93883545b2",
+        "path": "README.md",
+        "lines": [
+          118,
+          141
+        ],
+        "url": "https://github.com/SocketDev/sfw-free/blob/164c32dcbe3bbebcc0b091fd6a31ff93883545b2/README.md#L118-L141"
+      }
+    }
+  ],
+  "review_automation": {
+    "requirements_source": "Scope requirement: local fenced Claude/GPT reviews, with Muse as a separately held trial; implementation remains subject to research convergence.",
+    "documented_platform_primitives": [
+      {
+        "claim": "Rulesets can require review counts and status contexts, including an expected GitHub App as check source.",
+        "source": {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets",
+          "read_at": "2026-10-15",
+          "section": "required reviews and required status checks; expected GitHub App"
+        }
+      },
+      {
+        "claim": "Actions required checks need the merge_group event to report results for a merge queue.",
+        "source": {
+          "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue",
+          "read_at": "2026-10-15",
+          "section": "required checks need merge_group"
+        }
+      }
+    ],
+    "unresolved_proposals": [
+      "PROPOSAL: map separately evidenced model-family verdicts to attributable required checks. GitHub's review count does not identify model families; no mapping/default or ruleset is created here.",
+      "PROPOSAL: execute each reviewer in its separately screened clean local fence. Claude Code Action's workflow scope and the Codex bridge's read-only review mode do not establish the full requested fence.",
+      "PROPOSAL: determine collision-free required-check names from the target repository's existing rules and workflow sources before adoption; this read-only lane creates none."
+    ],
+    "inventory_coverage": [
+      {
+        "candidate": "anthropics/claude-code-action",
+        "result": "INCOMPLETE",
+        "source": {
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "commit": "374f254f5efaf968abfe15d399fd90972e8138b9",
+          "path": "docs/security.md",
+          "lines": [
+            56,
+            64
+          ],
+          "url": "https://github.com/anthropics/claude-code-action/blob/374f254f5efaf968abfe15d399fd90972e8138b9/docs/security.md#L56-L64"
+        }
+      },
+      {
+        "candidate": "openai/codex-plugin-cc",
+        "result": "INCOMPLETE",
+        "source": {
+          "repository": "https://github.com/openai/codex-plugin-cc",
+          "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+          "path": "README.md",
+          "lines": [
+            77,
+            87
+          ],
+          "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md#L77-L87"
+        }
+      },
+      {
+        "candidate": "Muse",
+        "result": "not in these 30 inventory rows; no new candidate or Meta table; held lane owns its route"
+      }
+    ],
+    "protocol": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/8053f14e7e0817d2502dff2bb284bfb7e1b0152f/docs/decisions/2026-10-11-layer-resolution-protocol.md"
+  },
+  "common_documentation": {
+    "wsl": {
+      "url": "https://learn.microsoft.com/en-us/windows/wsl/about",
+      "read_at": "2026-10-15",
+      "section": "WSL2 Linux kernel/full system-call compatibility; source inference for native Linux CLI userspace, not a host run"
+    },
+    "run_step": {
+      "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstepsrun",
+      "read_at": "2026-10-15",
+      "section": "run steps execute command-line programs through a runner shell"
+    },
+    "self_hosted": {
+      "url": "https://docs.github.com/en/actions/concepts/runners/self-hosted-runners",
+      "read_at": "2026-10-15",
+      "section": "runner environment is deployed and managed by its operator"
+    },
+    "rulesets": {
+      "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets",
+      "read_at": "2026-10-15",
+      "section": "required reviews and required status checks; expected GitHub App"
+    },
+    "merge_queue": {
+      "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue",
+      "read_at": "2026-10-15",
+      "section": "required checks need merge_group"
+    },
+    "workflow_inverse": {
+      "url": "https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/disabling-and-enabling-a-workflow",
+      "read_at": "2026-10-15",
+      "section": "gh workflow disable WORKFLOW"
+    }
+  }
+}
