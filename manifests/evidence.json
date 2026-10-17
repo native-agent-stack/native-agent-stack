@@ -37632,6 +37632,156 @@
       "bytes": 3826
     },
     {
+      "path": "evidence/artifacts/harness-screens-20261015/README-runtime.md",
+      "sha256": "68a3cc40e3965eb07f87ef4398435982bc72b5e402b4ca710c7d98246ce39b58",
+      "bytes": 13292
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/agent-sdks.anthropic.json",
+      "sha256": "15c2f129eb0d8360fa432c45227c1d47b4032df96c49eaae0a90de061718add8",
+      "bytes": 178514
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/agent-sdks.anthropic.md",
+      "sha256": "5e19e9cc2af108137ec927b07c3901c45428b71ef934710df3fb1811f3c5b801",
+      "bytes": 97951
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/agent-sdks.meta.json",
+      "sha256": "1eb744a9c30e6e3259da8140c36ce0cccbe395588e0f852e78cc404f9a7ef184",
+      "bytes": 166864
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/agent-sdks.meta.md",
+      "sha256": "a2bfa1a5f509df706725f7ff5991a697cb82b631eff246c744f4f7a9443f6b70",
+      "bytes": 94718
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/agent-sdks.openai.json",
+      "sha256": "6f898cddadc3b80e8db3ec6c66414b27f93325996fb6c828d249df960063af95",
+      "bytes": 179650
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/agent-sdks.openai.md",
+      "sha256": "406b3ed5f96f56c1be579fe67bc0c52e6906256344b783af745e16280973e46b",
+      "bytes": 98429
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/agent-sdks.research.json",
+      "sha256": "9aeb340c8bdf35663fca15d181f4b69ceb4d5436faa5fe2147bdef2907eb9824",
+      "bytes": 167822
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/agent-sdks.research.md",
+      "sha256": "dbd5a631bfb17e70c17b27a5e761c5beba0d151834d34708e992dba9240b4528",
+      "bytes": 94900
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/candidate-facts-runtime.json",
+      "sha256": "789e9f7979de408ec7efb29758232fe79c7d88d4cf185f5b38770e99be61f042",
+      "bytes": 30693
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/context-counts-runtime.json",
+      "sha256": "616482fd0313be1f68ef71934c09f3af6d17200645df1cc24b799e0811952046",
+      "bytes": 28200
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/native-clients.anthropic.json",
+      "sha256": "7501d3e961dd677e38a9bcbf2b185d02f6f3d7d1d78de81be451de44c27dbb04",
+      "bytes": 340866
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/native-clients.anthropic.md",
+      "sha256": "695a1cf29add35a8611b402cf91d650d6c81703318b4e365394ad74d76f6a26f",
+      "bytes": 177150
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/native-clients.meta.json",
+      "sha256": "8533b697f6c8bd0b0a24ca9fd90f891404aaa9339af9b71f8af223009ccbd159",
+      "bytes": 317120
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/native-clients.meta.md",
+      "sha256": "145cd21a92dc223233de3a0e58da1e75e0106498e7dd6d70e62bb61f1f4b489c",
+      "bytes": 171384
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/native-clients.openai.json",
+      "sha256": "9e56c6a8d07c5a7eac5654519c42fbb4ac292e91913845b5e7f712d5d10e8b28",
+      "bytes": 345076
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/native-clients.openai.md",
+      "sha256": "c864b9a69f414439210f988109929c3a80b1b951ff13c07d8e85ab4b18eed117",
+      "bytes": 178778
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/native-clients.research.json",
+      "sha256": "293d2856ac4ff5ad866f74c1510814b1e3edd2c7d30ec98f1e55cd2bd87252b8",
+      "bytes": 315395
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/native-clients.research.md",
+      "sha256": "95ea1995abbe9c3c701e89dccb4620250d26007c3fe6f3fe12b49d863d3a880a",
+      "bytes": 170244
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/package-metadata-runtime.json",
+      "sha256": "0fda52f101409e790fae383cff7e7642cab40ff7d271ad6aafcf1d4c902f3468",
+      "bytes": 10024
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/platform-assets-runtime.json",
+      "sha256": "e079b1aff24d67d29ed837b1a124239ca117faa594a0d3ec3af0027a90123a4f",
+      "bytes": 6519
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/vendor-metadata-runtime.json",
+      "sha256": "a180d74a1d9db33c957df41682ba26158c0e027d8a946369a6c06e113fa62c80",
+      "bytes": 1189
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/workers.anthropic.json",
+      "sha256": "44eecbed9c11e960fb2d2414b53b99639aed1f2761b7a9f83e7a5efb98b865dd",
+      "bytes": 300857
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/workers.anthropic.md",
+      "sha256": "b655178180e93a960f09e9aba9588b4958225150e32d6a61cc6ca08d17c25fe0",
+      "bytes": 155926
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/workers.meta.json",
+      "sha256": "de68abbe343964791c40a3147b8edcaa684494e072871c2a02963b219b074d21",
+      "bytes": 268826
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/workers.meta.md",
+      "sha256": "1c2f9f20bc9afec832f63d174ab89ebaa5eed7228fa13f6bb11aff7beec36901",
+      "bytes": 148364
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/workers.openai.json",
+      "sha256": "93ad8e9a0c9fb4ba0cb1d66338eef5b22a3b96d86d6247942616ca5fe30bf06b",
+      "bytes": 303033
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/workers.openai.md",
+      "sha256": "d960ff9c455e0c16fe07ef545af25fa2d3343af77fe7ec64e9c2946295bbb061",
+      "bytes": 156970
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/workers.research.json",
+      "sha256": "ee22382ae29ded47a31f6a2bd636f571c934877b6727909933cdd71a0c31eb3b",
+      "bytes": 269611
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/workers.research.md",
+      "sha256": "77a48dbc28bb1fe14bd14035f6b364df1da515fe72e7418f4fd4ac53760696e5",
+      "bytes": 147603
+    },
+    {
       "path": "evidence/artifacts/hcom-relaxation-20261006/README.md",
       "sha256": "f86c374341947023e1778c2a52f25371cc2c8189c9fec17db668805d8d744cc6",
       "bytes": 3341
