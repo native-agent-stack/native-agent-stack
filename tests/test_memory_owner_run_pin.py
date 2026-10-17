@@ -298,7 +298,8 @@ class MemoryOwnerRunPinTests(unittest.TestCase):
             stub = Path(tmp) / "bin/ai-memory"
             stub.parent.mkdir()
             log = Path(tmp) / "calls"
-            stub.write_text('#!/bin/bash\nprintf "%s token=%s\\n" "$*" "${AI_MEMORY_AUTH_TOKEN-unset}" >> "$LOG"\n'
+            stub.write_text('#!/bin/bash\nprintf "%s url=%s token=%s\\n" "$*" "${AI_MEMORY_SERVER_URL-unset}" '
+                            '"${AI_MEMORY_AUTH_TOKEN-unset}" >> "$LOG"\n'
                             'case " $* " in *" setup "*) exit "${SETUP_RC:-0}" ;; esac\n')
             stub.chmod(0o755)
             # With --no-start setup (which starts the service) is deferred and install-hooks writes Codex's hooks, so
@@ -310,7 +311,8 @@ class MemoryOwnerRunPinTests(unittest.TestCase):
                     log.write_text("")
                     env = {"PATH": f"{stub.parent}:/usr/bin:/bin", "HOME": tmp, "LOG": str(log),
                            "SETUP_RC": setup_rc, "NS2604_NO_START": no_start,
-                           "AI_MEMORY_AUTH_TOKEN": "synthetic-not-a-credential"}
+                           "AI_MEMORY_AUTH_TOKEN": "synthetic-not-a-credential",
+                           "AI_MEMORY_SERVER_URL": "http://127.0.0.1:1/another-allocation"}
                     result = subprocess.run(["bash", "-euo", "pipefail", "-c", setup], env=env,
                                             capture_output=True, text=True, timeout=60)
                     self.assertEqual(result.returncode, want_rc, result.stderr)
@@ -321,6 +323,9 @@ class MemoryOwnerRunPinTests(unittest.TestCase):
                     self.assertEqual(no_start == "1", not any(" setup " in f" {call} " for call in calls), calls)
                     # setup and install-mcp copy an exported token into client configs; the step unsets it.
                     self.assertTrue(all(call.endswith("token=unset") for call in calls), calls)
+                    # An exported server URL outranks the bind-derived one (config.rs:2304-2314 at 11ca7c5b); the step
+                    # unsets it too, so setup registers the host allocation's port.
+                    self.assertTrue(all(" url=unset " in call for call in calls), calls)
 
     def test_the_checker_holds_the_one_writer_route(self):
         checker = load_checker()
@@ -331,7 +336,10 @@ class MemoryOwnerRunPinTests(unittest.TestCase):
         body = funcs["memory-owner"]
         mutations = {
             "unit": body + "\n  run_command 'sed s/a/b/ x > \"$HOME/.config/systemd/user/ai-memory.service\"' || return \"$?\"\n",
-            "opt-out": body.replace(" env -u AI_MEMORY_AUTH_TOKEN ai-memory --data-dir \"$HOME/.local/share/ai-memory\" " + OPT_OUT + ";", ""),
+            "opt-out": body.replace(" env -u AI_MEMORY_AUTH_TOKEN -u AI_MEMORY_SERVER_URL ai-memory --data-dir "
+                                    "\"$HOME/.local/share/ai-memory\" " + OPT_OUT + ";", ""),
+            "server-url": body.replace(" -u AI_MEMORY_SERVER_URL ai-memory --data-dir \"$HOME/.local/share/ai-memory\" setup",
+                                       " ai-memory --data-dir \"$HOME/.local/share/ai-memory\" setup"),
             "no-start": body.replace('if [[ "${NS2604_NO_START:-0}" != 1 ]]; then ', "if true; then "),
             "codex-hooks": body.replace("install-hooks --agent codex --apply || rc=$?", "true"),
             # The drop-in under ~/.config while setup's unit is under $XDG_CONFIG_HOME, and with no refusal of other drop-ins.

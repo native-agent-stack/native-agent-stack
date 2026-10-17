@@ -98,7 +98,8 @@ class SelectiveAllocationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             _, host, values = self.fixture(root)
-            env = {"HOME": tmp, "XDG_CONFIG_HOME": str(root / ".config"), "NS2604_HOST_FILE": str(host)}
+            env = {"HOME": tmp, "XDG_CONFIG_HOME": str(root / ".config"), "NS2604_HOST_FILE": str(host),
+                   "PATH": f"{fixture.fake_mise(root)}:{os.environ.get('PATH', '')}"}
             with mock.patch.dict(os.environ, env):
                 readers = {
                     "wsl-mcp": lambda: fixture.profiles.render_wsl_mcp(root, root / "eco"),

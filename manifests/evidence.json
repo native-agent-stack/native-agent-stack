@@ -5617,7 +5617,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "6417f5bb5b44c25bed17fa4a459896a51253fbe87a0d4e51d819a3fb0b4ef87d",
+      "sha256": "3a57bb7ceb62c689ff913ab9538fa9a4bc22e54d1d66b5457188396e991d2e69",
       "bytes": 269436
     },
     {
@@ -19478,7 +19478,7 @@
     },
     {
       "path": "docs/decisions/2026-10-17-currency-sweep-repin.md",
-      "sha256": "2b067e97c8db8ce6115ba2a98de83301b6fa0e1d1a2d9e5a938ec45a642c060e",
+      "sha256": "962d07708aa4003fb1886cd4fb7f6cf6d302619e94c0de3190ed8bc259ea1280",
       "bytes": 30434
     },
     {
@@ -19858,12 +19858,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "6343831e4b15d61a8bce0fb5164110f69a44d811688e7f5bd0ccb22f6a992fca",
+      "sha256": "32e258195bee8bf42eb1bb08675998e02dcd19394acf9b88b3141e1fb360547e",
       "bytes": 714050
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "3a6ba4fa16cab643bf86256637ff4ac2badb77e8f01e0fce7966be67fab72198",
+      "sha256": "6cf91f96164be78980c0b0b67f324af245fb15c3f03f45e90bf6f603d9c9268f",
       "bytes": 378505
     },
     {
@@ -44928,8 +44928,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "debe510ea7696ba2f6fb89bb04e88b89150bd4c092536e09a5f62b643b14e319",
-      "bytes": 88411
+      "sha256": "7b1eb1492b07d52518f2a7d702caae61bfdd47e9acea637104f2aec9e73166a2",
+      "bytes": 88506
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -44968,8 +44968,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
-      "sha256": "d520465ede1c3548341fc1f5fe4781f53954461b1c3f4633e8057a1a88b6cd0d",
-      "bytes": 69734
+      "sha256": "1d0726d76752ac2e945aa7523f27503a7dc250e84afb6ed7a239cfcc853b32a4",
+      "bytes": 70632
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/acceptance-execution-instructions.txt",
@@ -45458,13 +45458,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "ff1b97bc6b891f9e87d397a0f196a42b8ca99451543dcd668cea0cf74d38ae2f",
-      "bytes": 504443
+      "sha256": "65e3c75a3d3fc97cc97f7658bffae6f1ff43d729cc7f19cf8c3fa705f7fba0a6",
+      "bytes": 504539
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "3e057995115cf585cb98e759c5ac8a170d8dd7abe0be003ad3233cceabe1f500",
-      "bytes": 148521
+      "sha256": "11e926258a8bf15cd0f1b93eac475436b78246e6cc2aa84c3a8b6330ba209103",
+      "bytes": 148617
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
@@ -65363,8 +65363,8 @@
     },
     {
       "path": "tests/test_runtime_profiles.py",
-      "sha256": "5ec7921be82e3aac6f2d091bb322fa891a639dd568491c13324de73c4a211031",
-      "bytes": 91488
+      "sha256": "8fd3e7fb6a67b1c3507526cb20b15d64b23f8a6d4aedf59817f03e0666fa08a9",
+      "bytes": 94290
     },
     {
       "path": "tests/test_runtime_publication.py",
@@ -65843,8 +65843,8 @@
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "39f8855ed7a40098e1acbd5524a9431c9937bc525e6dc382c5d8fde009c3b282",
-      "bytes": 106391
+      "sha256": "6682d7324f339852d50e0c993bd29f5ee85a1f7f01844e71304bae3dd3e51369",
+      "bytes": 108436
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",

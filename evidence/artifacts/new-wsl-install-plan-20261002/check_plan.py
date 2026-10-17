@@ -317,9 +317,10 @@ def memory_owner_contract(funcs, bad):
     refusing any other drop-in there, written before setup starts the service; setup runs only without --no-start, because
     it enables and starts the unit, and with --no-start install-hooks writes Codex's hooks instead (ahead of rtk's until the
     deferred setup re-applies them); and the Claude prompt-capture opt-out follows in the same command, run whatever setup
-    returns, because setup passes no capture flag and a first install captures prompts. Sources: akitaonrails/ai-memory@
-    11ca7c5b install.sh, crates/ai-memory-cli/src/commands/setup.rs:755-860 and 982-997, user_service.rs:193-249 and
-    855-864, install_hooks.rs:1247-1261 and 2274-2276."""
+    returns, because setup passes no capture flag and a first install captures prompts; and every ai-memory call unsets
+    AI_MEMORY_AUTH_TOKEN and AI_MEMORY_SERVER_URL. Sources: akitaonrails/ai-memory@11ca7c5b install.sh,
+    crates/ai-memory-cli/src/commands/setup.rs:755-860 and 982-997, user_service.rs:193-249 and 855-864,
+    install_hooks.rs:1247-1261 and 2274-2276, config.rs:772 and 2304-2314."""
     body = "\n".join(line for line in funcs.get("memory-owner", "").splitlines() if not line.lstrip().startswith("#"))
     if not body:
         return
@@ -356,6 +357,14 @@ def memory_owner_contract(funcs, bad):
             or deferred < line.find(" setup --yes ") or "install-hooks --agent codex --apply" not in line[deferred:]):
         bad("memory-owner", "setup enables and starts the service: it runs only without --no-start, where Codex's hooks "
                             "are written by install-hooks instead")
+    # An exported AI_MEMORY_SERVER_URL outranks the bind-derived URL (akitaonrails/ai-memory@11ca7c5b
+    # crates/ai-memory-cli/src/config.rs:2304-2314, read from the environment at :772), so setup would register both clients
+    # and their hooks against another allocation's port; an exported AI_MEMORY_AUTH_TOKEN is copied into client configs.
+    for call in re.finditer(r"(?:\benv((?: -u [A-Z_]+)+) )?\bai-memory --data-dir ", body):
+        if not {"AI_MEMORY_AUTH_TOKEN", "AI_MEMORY_SERVER_URL"} <= set((call.group(1) or "").split()) - {"-u"}:
+            bad("memory-owner", "every ai-memory call of the row unsets AI_MEMORY_AUTH_TOKEN and AI_MEMORY_SERVER_URL, so "
+                                "the host allocation and the token file stay authoritative")
+            break
     opt_out = "install-hooks --agent claude-code --no-capture-prompts --apply"
     if (opt_out not in line or line.find(opt_out) < line.find("; fi; ") or line.count("|| rc=$?;") != 2
             or not line.rstrip().endswith('exit "$rc"\' || return "$?"')):
