@@ -1,0 +1,30 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Scope-locked fold setup or explicitly synthetic masking/custody regression; no broker calls or model adjudication.",
+  "command": [
+    "<fold-scratch>/venv/bin/python",
+    "-P",
+    "-c",
+    "import alpaca_offline_guard;import socket;socket.create_connection((\"127.0.0.1\",9))"
+  ],
+  "cwd": "<fold-scratch>",
+  "declared_inputs": {
+    "component": "audit_hook",
+    "scope": "negative control, not a sandbox"
+  },
+  "exit_code": 86,
+  "finished_utc": "2026-10-16T07:56:44.700009+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
+  "output": "network-guard-final.log",
+  "output_sha256": "b011798ae0ff1358ec06a15a929b6f7e00308a507c1f04eb0eefffb5c3fc96dd",
+  "private_capture_name": "network-guard-final",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T07:56:44.435632+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

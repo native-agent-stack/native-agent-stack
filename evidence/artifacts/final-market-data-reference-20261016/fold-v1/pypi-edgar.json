@@ -1,0 +1,38 @@
+{
+  "capture_class": "projected_native_source_capture",
+  "claim_scope": "Scope-locked fold setup or explicitly synthetic masking/custody regression; no broker calls or model adjudication.",
+  "command": [
+    "/usr/bin/curl",
+    "--fail",
+    "--silent",
+    "--show-error",
+    "--location",
+    "--connect-timeout",
+    "10",
+    "--max-time",
+    "45",
+    "https://pypi.org/pypi/edgartools/5.61.1/json"
+  ],
+  "cwd": "<fold-scratch>",
+  "declared_inputs": {
+    "edgartools": "5.61.1",
+    "source_commit": "7338aa335f6442c52dfa0695422cf1cd27e946e0"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T07:49:50.444584+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Source output is an explicit field projection; metadata is byte-masked after documented correction. Full source retained in vendor custody.",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
+  "output": "pypi-edgar.log",
+  "output_sha256": "f6663cbe9fc65c5fa85dc5b860b9adf8c9853038ee48472f55cd1d972e8e0df7",
+  "private_capture_name": "pypi-edgar",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "projection_scope": "Allowlisted PyPI release/wheel fields only; original source capture moved to horizon vendor custody. Not E2E/invoke evidence.",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T07:49:50.366669+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes",
+  "vendor_custody_name": "market-data-pypi-20261016/pypi-edgar/release.raw.json"
+}

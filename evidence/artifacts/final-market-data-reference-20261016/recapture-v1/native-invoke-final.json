@@ -1,0 +1,33 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Native SDK-returned values and assertions on offline fixtures; no templated pass summary, upstream CLI claim or historical-availability qualification.",
+  "command": [
+    "<scratch>/venv/bin/python",
+    "<repository>/blueprints/us-equities/final-market-data-reference-20261016/native_invoke.py",
+    "<pinned-upstream>/data/secheader.424B5.abeona.txt"
+  ],
+  "cwd": "<scratch>",
+  "declared_inputs": {
+    "scope": "multi-package environment or identity audit",
+    "winner_versions": {
+      "alpaca-py": "0.44.0",
+      "edgartools": "5.61.1",
+      "exchange-calendars": "4.13.2"
+    }
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T06:21:04.300629+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
+  "output": "native-invoke-final.log",
+  "output_sha256": "a0ba7cfaeb46991b472c565db047685c81a54df9232c1c91bd995566e2cb5df7",
+  "private_capture_name": "native-invoke-final",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T06:20:58.466989+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

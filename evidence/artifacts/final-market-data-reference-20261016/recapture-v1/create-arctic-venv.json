@@ -1,0 +1,31 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Native observed command output only; no source acquisition, comparative A6 or FINAL admission.",
+  "command": [
+    "<uv-0-12-22>",
+    "venv",
+    "--python",
+    "3.12.3",
+    "<scratch>/arctic-venv"
+  ],
+  "cwd": "<scratch>",
+  "declared_inputs": {
+    "arcticdb": "6.26.0",
+    "source_commit": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T06:20:57.706465+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
+  "output": "create-arctic-venv.log",
+  "output_sha256": "131b932703542cd9ad1d7547b49d3fb3728f18bf6b9d35069e6785b3186d19c4",
+  "private_capture_name": "create-arctic-venv",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T06:20:57.680906+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

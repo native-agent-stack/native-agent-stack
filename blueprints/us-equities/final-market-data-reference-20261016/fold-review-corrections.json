@@ -1,0 +1,191 @@
+{
+  "schema": "market-data-preparation-review-fold/1",
+  "reviewed_head": "7d740ccb66a9e2f041ea9b34ee1585996f859560",
+  "status": "SMALL_FOLD_PRIVATE_PASS_RELEASED",
+  "review_records": {
+    "CC": "MICRO-full-7d740ccb.md",
+    "GPT": "GPT-VERDICT-7d740ccb6.md"
+  },
+  "corrections": {
+    "survivor_sources": {
+      "record": "survivors.json",
+      "scope": "Four exact sweep reviewed_commit locators and separate older catalog/packet pin drift; no survivor retirement or adoption."
+    },
+    "release_wheels": {
+      "record": "run-pins.json",
+      "source_audit": "fold-v1/wheel-release-bindings.log",
+      "installation": "fold-v1/install-hashed-winners.json",
+      "scope": "Official tag-to-commit identity plus PyPI release wheel SHA256, accepted lock wheel equality, and native require-hashes install; not a bit-for-bit source build."
+    },
+    "closure_drift": {
+      "original_audit": "fold-v1/original-closure-audit.log",
+      "alpaca_test_audit": "fold-v1/fold-closure-audit.log",
+      "final_audit": "fold-v1/fold-final-closure-audit.log",
+      "scope": "Every native freeze package is compared deterministically to the accepted lock; the fresh closures are not locked runtime migrations."
+    },
+    "alpaca_upstream": {
+      "native_output": "fold-v1/alpaca-upstream-tests-fold.log",
+      "result_line": 39,
+      "skip_reason_lines": [
+        20,
+        38
+      ],
+      "scope": "320 passed, 19 upstream live-service/credential/broker cases skipped, 2 warnings; no live flags or real credentials, fail-stop audit guard active."
+    },
+    "calendar_upstream": {
+      "native_output": "fold-v1/calendar-upstream-tests.log",
+      "result_line": 255,
+      "scope": "Full upstream CI test target10042passed/1xfailed/2497warnings, rc0 in707.37seconds within15minute native bound; no subset fallback used.",
+      "source": {
+        "repository": "https://github.com/gerrymanoim/exchange_calendars",
+        "pin": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+        "path": ".github/workflows/main.yml",
+        "line": 51
+      }
+    },
+    "json_escaping": {
+      "baseline_masker": "mask_capture.py at reviewed_head",
+      "before": [
+        "fold-v1/masking-tests-before.log",
+        "fold-v1/recorder-tests-before.log"
+      ],
+      "after": [
+        "fold-v1/masking-tests-after.log",
+        "fold-v1/recorder-tests-after.log"
+      ],
+      "scope": "Native failing/passing synthetic regressions for Unicode, quote and backslash JSON literals; deterministic escaped aliases preserve unmapped bytes and reject collisions."
+    },
+    "uncaptured_setup_exits": {
+      "record": "receipt.json#/setup_failures",
+      "scope": "128 and 1 are explicitly reported historical observations without retained captures; no native evidence or independent verification claimed."
+    },
+    "arctic_pin_scope": {
+      "record": "multi-angle.draft.json",
+      "scope": "A1 at carried 7d30a6ee is source-only; the native 6.26.0/e620d857 diagnostic remains a separately pinned release trial."
+    },
+    "supported_invocations": {
+      "uv_pip_source": "fold-v1/uv-pip-install-help.log",
+      "pytest_override_source": "fold-v1/pytest-override-help-final.log",
+      "edgar_identity_config": "dgunning/edgartools@7338aa335f6442c52dfa0695422cf1cd27e946e0:pyproject.toml:415",
+      "scope": "Native installed-client help documents uv pip and -o override syntax; -o env= suppresses upstream test identity assignment."
+    },
+    "help_example_privacy": {
+      "private_only_retired_capture": "pytest-override-help",
+      "replacement": "fold-v1/pytest-override-help-final.json",
+      "scope": "Native privacy scanner found a generic upstream home-path example; original retained privately and correct declared masking applied to a new native capture, not reconstructed output."
+    },
+    "pypi_vendor_custody": {
+      "private_repository": "seathatflowsinourveins/horizon",
+      "vendor_path": "vendor/market-data-pypi-20261016",
+      "public_transform": "publish_capture.py:release_projection",
+      "scope": "Complete third-party source retained in private vendor custody with provenance/licenses; public release fields are projected, not verbatim README copies or E2E substitutes.",
+      "licenses_scope": "Original upstream package LICENSE files retained for source/README attribution; PyPI API JSON has no separate LICENSE.",
+      "pull_request": "https://github.com/seathatflowsinourveins/horizon/pull/8"
+    },
+    "truncated_scratch_prefix": {
+      "before": "small-fold-v1/masking-before.log",
+      "after": "small-fold-v1/masking-after.log",
+      "scope": "Fail-first known-root partial/truncated repr regression; masker matches prefixes only at explicit truncation markers, unrelated paths untouched."
+    },
+    "declared_inputs": {
+      "source": "publish_capture.py:corrected_inputs",
+      "scope": "Published per-component declarations corrected explicitly; exact native original metadata stays unchanged privately. Commands, observed rc and times unaltered."
+    },
+    "survivor_installation_scope_restatement": {
+      "record": "survivors.json",
+      "pointers": [
+        "/survivors/0/installation_scope",
+        "/survivors/1/installation_scope",
+        "/survivors/3/installation_scope"
+      ],
+      "scope": "Removed misleading no_install_reason wording: package installation is not blocked by vendor keys. These carried SDK records remain source screens without a new trial; the separately cited key/rights requirement applies to acquisition only. No survivor was silently retired or upgraded."
+    },
+    "public_source_raw_digests": {
+      "record": "receipt.json#/vendor_custody/public_source_captures",
+      "scope": "Each exact public PyPI response is recomputed against the immutable native stdout and horizon vendor copy; publish that public-source digest separately from the current projected output digest. No private metadata/original-host digest is disclosed."
+    }
+  },
+  "gpt_follow_ups": [
+    {
+      "priority": "P3",
+      "status": "DEFERRED_FOLLOW_UP",
+      "path": "test_mask_capture.py",
+      "scope": "Support the repository dotted-module runner as well as the currently verified standalone/targeted-discovery entry points. The current import requires the blueprint directory on sys.path."
+    },
+    {
+      "priority": "P3",
+      "status": "DEFERRED_FOLLOW_UP",
+      "path": "native_capture.py",
+      "scope": "Before broader recorder reuse, record explicit private completion on process-launch OSError and add a transition regression. Current launch failure leaves spec/stdout only and creates no successful public receipt."
+    }
+  ],
+  "private_custody": "Earlier PASS is historical. Current57pairs/114derivatives passed co-op private reproduction using publish_capture.py public_pair, including3allowlisted source projections and documented metadata corrections; all originals/maps retained.",
+  "admission": "PREPARATION_ONLY_NO_FINAL_OR_DEFAULT",
+  "capture_counts": {
+    "prior": 51,
+    "small_fold": 6,
+    "total": 57,
+    "derivatives": 114,
+    "inventory_outputs": 115,
+    "private_originals_total": 58,
+    "private_only_retired": 1
+  },
+  "sequential_wheel_digest_verification": {
+    "status": "COOP_FULL_PRIVATE_PASS",
+    "scope": "All three private hashed requirements match published SHA256 values in the retained PyPI release records. Successful native uv --require-hashes install occurred afterwards and verified downloaded wheel bytes. This is not an independent source rebuild.",
+    "published_release_capture_sources": [
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-alpaca.json",
+        "line": 22
+      },
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-edgar.json",
+        "line": 22
+      },
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-calendar.json",
+        "line": 22
+      }
+    ],
+    "install_started_source": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+      "line": 37
+    },
+    "install_finished_source": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+      "line": 25
+    },
+    "install_exit_source": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+      "line": 24
+    },
+    "private_original_digests_published": false,
+    "verification_authority": "Co-op full private check 2026-10-16; no private review fingerprint published."
+  },
+  "small_fold_private_check": {
+    "status": "PASS",
+    "public_capture_pairs": 57,
+    "published_derivatives": 114,
+    "output_bindings": 115,
+    "private_integrity_rows": [
+      80,
+      183,
+      30
+    ],
+    "test_counts": [
+      9,
+      2,
+      4
+    ],
+    "scan_scope": "No full/truncated scratch, pytest-temp-login, UUID-shaped, user/host hits in published files.",
+    "vendor_copy_check": "3original source JSON copies byte-identical;9custody paths checked.",
+    "review_fingerprint": "Cited by co-op check name only; no private original or private commit digest published."
+  },
+  "landing_rebase": {
+    "from_reviewed_head": "151149f186ef15f3d35942f2130bfd7600b25ca2",
+    "onto_main": "9d5bc9f9e076e033a24fcef2a26d41986506c647",
+    "status": "LOCAL_REBASE_PREPARED_PUSH_HELD",
+    "conflict_scope": "Only evidence registry conflicts; keyed3way merge preserved every current-main row and other registry field, native ordering generator used.",
+    "capture_scope": "All57capture pairs/114derivatives unchanged; no new native component evidence."
+  }
+}

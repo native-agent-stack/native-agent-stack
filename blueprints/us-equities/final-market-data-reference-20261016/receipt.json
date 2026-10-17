@@ -1,0 +1,1651 @@
+{
+  "schema": "final-market-data-reference-preparation-index/2",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "recorded_utc": "2026-10-16T06:18:03Z",
+  "evidence_class": "local_integration",
+  "native_commands": [
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-checkout.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-checkout.json",
+        "line": 17
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-clone.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-clone.json",
+        "line": 17
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-import-location.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-import-location.json",
+        "line": 15
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-release-tag.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-release-tag.json",
+        "line": 18
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-test-install.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-test-install.json",
+        "line": 22
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-detailed.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-detailed.json",
+        "line": 22
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-final.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-final.json",
+        "line": 21
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.json",
+        "line": 22
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests.json",
+      "exit_code": 1,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests.json",
+        "line": 22
+      },
+      "outcome": "RETAINED_SETUP_COLLECTION_FAILURE"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-checkout.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-checkout.json",
+        "line": 17
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-clone.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-clone.json",
+        "line": 17
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-release-tag.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-release-tag.json",
+        "line": 18
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-test-install.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-test-install.json",
+        "line": 18
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-upstream-tests.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-upstream-tests.json",
+        "line": 32
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/create-venv.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/create-venv.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/edgar-release-tag.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/edgar-release-tag.json",
+        "line": 16
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-closure-audit.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-closure-audit.json",
+        "line": 18
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-closure-audit.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-closure-audit.json",
+        "line": 18
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-freeze.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-freeze.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-freeze.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-freeze.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+        "line": 24
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/masking-tests-after.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/masking-tests-after.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/masking-tests-before.json",
+      "exit_code": 1,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/masking-tests-before.json",
+        "line": 20
+      },
+      "outcome": "EXPECTED_FAIL_BEFORE_REGRESSION"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-calendar.json",
+      "exit_code": 86,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-calendar.json",
+        "line": 15
+      },
+      "outcome": "EXPECTED_NETWORK_REFUSAL_CONTROL"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-control.json",
+      "exit_code": 86,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-control.json",
+        "line": 15
+      },
+      "outcome": "EXPECTED_NETWORK_REFUSAL_CONTROL"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-final.json",
+      "exit_code": 86,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-final.json",
+        "line": 15
+      },
+      "outcome": "EXPECTED_NETWORK_REFUSAL_CONTROL"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/original-closure-audit.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/original-closure-audit.json",
+        "line": 18
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-alpaca.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-alpaca.json",
+        "line": 21
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-calendar.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-calendar.json",
+        "line": 21
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-edgar.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-edgar.json",
+        "line": 21
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pytest-override-help-final.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pytest-override-help-final.json",
+        "line": 15
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/recorder-tests-after.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/recorder-tests-after.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/recorder-tests-before.json",
+      "exit_code": 1,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/recorder-tests-before.json",
+        "line": 20
+      },
+      "outcome": "EXPECTED_FAIL_BEFORE_REGRESSION"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/uv-pip-install-help.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/uv-pip-install-help.json",
+        "line": 16
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/wheel-release-bindings.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/wheel-release-bindings.json",
+        "line": 23
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-freeze.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-freeze.json",
+        "line": 16
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-install.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-install.json",
+        "line": 19
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.json",
+        "line": 14
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-arctic-venv.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-arctic-venv.json",
+        "line": 16
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-venv.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-venv.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/dependency-check.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/dependency-check.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-commit.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-commit.json",
+        "line": 16
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.json",
+        "line": 26
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.json",
+        "line": 19
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/install.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/install.json",
+        "line": 35
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/installed-freeze.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/installed-freeze.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/masking-tests.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/masking-tests.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.json",
+        "line": 18
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke.json",
+        "line": 18
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/recorder-tests.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/recorder-tests.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.json",
+        "line": 27
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/custody-after.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/custody-after.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/masking-after.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/masking-after.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/masking-before.json",
+      "exit_code": 1,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/masking-before.json",
+        "line": 20
+      },
+      "outcome": "EXPECTED_FAIL_BEFORE_REGRESSION"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/publication-after.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/publication-after.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/publication-checked.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/publication-checked.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/publication-final.json",
+      "exit_code": 0,
+      "exit_code_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/publication-final.json",
+        "line": 20
+      },
+      "outcome": "EXIT_0"
+    }
+  ],
+  "upstream_inputs": [
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "README.md",
+      "bytes": 14765,
+      "sha256": "943bb25c120e0d4965e44f1baa5f3afb82423e5cf9b41155eae5901ca3877f57",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 1
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "CONTRIBUTING.md",
+      "bytes": 13578,
+      "sha256": "08908e1f93e1dc5cc2ecbc369cf323e84d9fc1508e10c6ca88a837898efa9d56",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 2
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "pyproject.toml",
+      "bytes": 17550,
+      "sha256": "3e38e21afd09b0c3e9952b88541a723aaa06a00477c8a93c82266749be82857a",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 3
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "edgar/__about__.py",
+      "bytes": 131,
+      "sha256": "75c8168c47f828a9655c4a294ed7ed32f18732d6f1e57073042cbecc362af1ca",
+      "installed_wheel_bytes_match": true,
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 4
+      },
+      "installed_wheel_capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 12
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "edgar/sgml/sgml_header.py",
+      "bytes": 48662,
+      "sha256": "b54fff3ab146a0fec7fc58ad8360ceccfe017983e97b91f68860bb88452343c0",
+      "installed_wheel_bytes_match": true,
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 5
+      },
+      "installed_wheel_capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 13
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "edgar/ownership/owners.py",
+      "bytes": 5707,
+      "sha256": "bc12963b0933cdb7d1510f5df2dc6540093089e82824b49a96b2d217d843b308",
+      "installed_wheel_bytes_match": true,
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 6
+      },
+      "installed_wheel_capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 14
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "tests/_offline_harness.py",
+      "bytes": 7054,
+      "sha256": "2493d71e5a9dbdcd3e9974692179d18f1fda99283a39dd94868334c6fadc70fd",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 7
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "tests/sgml/test_filing_header.py",
+      "bytes": 21715,
+      "sha256": "2bda87686624b5631e0ec13c247812132cc0943891a01021354b9c763e05d6d5",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 8
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "tests/ownership/test_insider_parse_contract.py",
+      "bytes": 6432,
+      "sha256": "05620ff88aa3eb7589a5f86490897e6b7a80c38f04b8afcec7be0b553ec162b4",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 9
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "tests/documents/test_html_style_parser.py",
+      "bytes": 6404,
+      "sha256": "267230424ca6cef4c693cc5b607be641cf96ef9951df4e00e26af17877b040ba",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 10
+      }
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "data/secheader.424B5.abeona.txt",
+      "bytes": 1135,
+      "sha256": "420ae1977a1664fbf7d3c9d25cc577c7a7197048b21332b5292abb13a6a71396",
+      "capture_locator": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+        "line": 11
+      }
+    }
+  ],
+  "public_release_observation": {
+    "status": "UNQUALIFIED_SOURCE_OBSERVATION_NOT_A_NATIVE_CAPTURE",
+    "note": "Earlier release-API lookup lacked privately retained raw capture. The run-pin proposal does not rely on this as a native receipt."
+  },
+  "outputs": [
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-checkout.json",
+      "bytes": 1260,
+      "sha256": "a7ed3e14429a97d881ac64c4bb57895066fb679b44d1a37fd12bb0b532897747"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-checkout.log",
+      "bytes": 83,
+      "sha256": "651990fac018e9797de7b4d4ff3ebf50dfae28c93c122d2fbbefaa47b9684528"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-clone.json",
+      "bytes": 1273,
+      "sha256": "cc5003ddf2cfb694d768d4b46eb7dbfb13b6681bbe391dd5694d80607ffbdd2b"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-clone.log",
+      "bytes": 47,
+      "sha256": "d4617979dcbbd15086c34c386d5b0b8a11d7e64abb85287300c5975bd25a069c"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-import-location.json",
+      "bytes": 1299,
+      "sha256": "e10e52bad1893db967ccd1029117b204a10142a1feb65fcd2f6773d091b09f88"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-import-location.log",
+      "bytes": 75,
+      "sha256": "8e1c1b44ed2530af93a2486c4e6fa0bc02f30e75fd95a3cf5ffa9ec5cd847642"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-release-tag.json",
+      "bytes": 1310,
+      "sha256": "e07565df5ec0122d9c7f985d241c6b86148bf7a9c54fafbeb3f741a7f0a6665b"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-release-tag.log",
+      "bytes": 59,
+      "sha256": "87b9c71363ac5d5bfe04abbb4d382f604ebbddfd68c054354f0b6945598beee4"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-test-install.json",
+      "bytes": 1400,
+      "sha256": "62d4f94636726ec7df5820bbb0808b82eeae9b8b798e43f9d4a15e407ef89a71"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-test-install.log",
+      "bytes": 1676,
+      "sha256": "4749a5af724b0c9b8cbbc0a9aa1b78b8247423443eed4442258600e5f6c4ecb8"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-detailed.json",
+      "bytes": 1345,
+      "sha256": "e745c538085e622feb1e8846f78092191643a82ee2e4b68775abde1e2a774f08"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-detailed.log",
+      "bytes": 3587,
+      "sha256": "9d42b84c26025687cef9781796884d8ba9f24521a0d748a0fe673868538600a2"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-final.json",
+      "bytes": 1328,
+      "sha256": "3bb379c6768efc7c739d4834771670338c0b4c332d0e3729dee7807b97776d03"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-final.log",
+      "bytes": 1390,
+      "sha256": "daa4c03cb831e22f298d8163fa53600cd7b8443157082855464ea4168ae12e9f"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.json",
+      "bytes": 1337,
+      "sha256": "6a8c669960bb70210aef25ca33d4d476c8df42608f9e20f6d2662e70c8554fb5"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+      "bytes": 3667,
+      "sha256": "8893923a86b7e5219841a43b3055cd9be9182c3849006a3e9236baac6e2ded07"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests.json",
+      "bytes": 1347,
+      "sha256": "76a63e1523d85b7db1ab3a07137a3b6843e0ba5642a9e9547860501b4ce02e56"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests.log",
+      "bytes": 1260,
+      "sha256": "82f2ff9a1fbfdc64f810a7f681c684dab2708ef048c50422810db1710010fb5d"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-checkout.json",
+      "bytes": 1454,
+      "sha256": "988c1b836c3c97860628e833a627f9eed744c66596154b1229ad8c94671c04ad"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-checkout.log",
+      "bytes": 70,
+      "sha256": "4b64707b810ab29b6873c50cdcc484ebe3ef2c7179607b28faa0b0de388ffb8f"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-clone.json",
+      "bytes": 1479,
+      "sha256": "379a79915a48cbe72082393415d3f06bd10fbde8c223b979167d33f4dd66d1e6"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-clone.log",
+      "bytes": 49,
+      "sha256": "b4b9903d530cfb4a70745be2b3a5023c8d90f90cbbc9b3d472a24b0b989405bd"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-release-tag.json",
+      "bytes": 1514,
+      "sha256": "9660986b2a0a628be0d0eeb362d303c2ad5fdca8f31813f2c47eb565b5b6ecb9"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-release-tag.log",
+      "bytes": 58,
+      "sha256": "be61c2dbdaf9ec6bea20469ab71c3f264a9c8d057d75e2c5e36e0da4b5b1f72f"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-test-install.json",
+      "bytes": 1278,
+      "sha256": "6343cad7da6d3a2c22c7040e090835bb789459887e77dd9d673398a0373e40b4"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-test-install.log",
+      "bytes": 339,
+      "sha256": "69506be65a41978ac78bbc7ff26d5326487bd5fa4d281d5c7be335ccbbb6d20d"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-upstream-tests.json",
+      "bytes": 1534,
+      "sha256": "4c968b4e1c3cb12e57cfce74722deb5f4bdec05b9a1e1c11605dec0617d498ae"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-upstream-tests.log",
+      "bytes": 17605,
+      "sha256": "b88f82c077c6cd0b7961901984516ac48dec86f336c27a022884c771539c3925"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/create-venv.json",
+      "bytes": 1470,
+      "sha256": "961b082303f365c70cfa58f33e64aaa3fccb8d28ef0e90ef2819b4715503bb10"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/create-venv.log",
+      "bytes": 179,
+      "sha256": "ea266639a24dc474e6483f152086236119223aa91cb4759637ecd2a600da3b2e"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/edgar-release-tag.json",
+      "bytes": 1438,
+      "sha256": "739a2920c541fc0d4c3706f122cb4dde7e59d2133706997bb7f1b9ab5568d312"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/edgar-release-tag.log",
+      "bytes": 59,
+      "sha256": "56fccd4522c1c8ce9bf10a50c43c9b92b262325520809438b3d5d0b19d3db081"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-closure-audit.json",
+      "bytes": 1666,
+      "sha256": "e3e4927d03c981f1dc22517fc4ada7510065d8d3f34a887824765919d9795d14"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-closure-audit.log",
+      "bytes": 11464,
+      "sha256": "b785eb0519000c78bbe94cbc8fef171f890091bc0da294c118866cb35722c130"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-closure-audit.json",
+      "bytes": 1684,
+      "sha256": "3ef560e348e60220a8297e20ad7d6bef8b9c5efff3753fa9b45f7dae66cf2af0"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-closure-audit.log",
+      "bytes": 12643,
+      "sha256": "5a6cc852a1616b683313fed724398510e7c18a0ef934b54ad6c39a899335109b"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-freeze.json",
+      "bytes": 1492,
+      "sha256": "db0760994b9bf7f40113134c8004a03082d7c7f80f839f2fa0e286d8cbcee75e"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-final-freeze.log",
+      "bytes": 1246,
+      "sha256": "bab444c7629e42d565e3f6e8bdc100d49511092d638e960daf839109e52be503"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-freeze.json",
+      "bytes": 1480,
+      "sha256": "6d7f559408808b81db04c27d8e223dcf23a901f9a6f3acea6b05d85013d0a1ae"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-freeze.log",
+      "bytes": 1123,
+      "sha256": "bfcee7e415c4499618b0f15368c89f15de4d98a38df0299df98636f3c070f9ad"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+      "bytes": 1601,
+      "sha256": "dfb897d1b514dffdbb795a4bc00e714d5f186ff663dc1fb591e160cb98c8cc12"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.log",
+      "bytes": 256,
+      "sha256": "42826dd7785d76e60a758db533857304e12d923bf0e23aded458532a6f4a9017"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/masking-tests-after.json",
+      "bytes": 1507,
+      "sha256": "58439a56348221911ca2a831d8660ce61c25febce2ed421124a2081f6b7cf3ef"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/masking-tests-after.log",
+      "bytes": 1050,
+      "sha256": "f69f450668b57cab61a35f00704df20dcf1a6656dd82120f30d1514909378d16"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/masking-tests-before.json",
+      "bytes": 1509,
+      "sha256": "1048d6e1860f428c5ec74047da4ce1905915025b758357d615a74fdc62263c5a"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/masking-tests-before.log",
+      "bytes": 2432,
+      "sha256": "d716dc9b1e46ffa5657affc836cc19b75be71f6320b685180e46f7d19c9c3288"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-calendar.json",
+      "bytes": 1468,
+      "sha256": "787f5d894507365dd3e9f3a31ed123335dee6e2033e62dc68b7bae9ff2a172cf"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-calendar.log",
+      "bytes": 200,
+      "sha256": "b099f4765a34c694d36cab865a50efc00eadb1b7251594ac85cd7e530f945e10"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-control.json",
+      "bytes": 1444,
+      "sha256": "473cf06b7414bb0519fc4ce6c126b6c34f3fb0939fde97a7cdc7ebe9047eeaf8"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-control.log",
+      "bytes": 52,
+      "sha256": "0ec7ba0e9acd0bb91bb1161f13f827748afc777f102ba60947ec41de0fc9d604"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-final.json",
+      "bytes": 1440,
+      "sha256": "ae53b9e249a8dd6140940989c332ece804e6dddd8f160748280e5d37193bdc16"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-final.log",
+      "bytes": 120,
+      "sha256": "b011798ae0ff1358ec06a15a929b6f7e00308a507c1f04eb0eefffb5c3fc96dd"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/original-closure-audit.json",
+      "bytes": 1684,
+      "sha256": "d10b6592a2270dc8167485d2fa5a19e024405732791e1bea7990025686acd0d4"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/original-closure-audit.log",
+      "bytes": 14331,
+      "sha256": "95c27b89f7b274f0f3d3dec1d200eac0d369dc0a123ea644b207c407fbcf0952"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-alpaca.json",
+      "bytes": 1632,
+      "sha256": "69dae1e315ba7f529dfdbede0c6b250a6bcbed0db7a2eaa9b2a362dade6c7a95"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-alpaca.log",
+      "bytes": 710,
+      "sha256": "cd40ac8c9f8c6e3e21db1995aaf25cee9eb5535eae2d8abb4999b7463c11b972"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-calendar.json",
+      "bytes": 1835,
+      "sha256": "47b40b558a3ea045b0d0d7f6d226026710ba8a6a775014f807f630182df36fce"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-calendar.log",
+      "bytes": 746,
+      "sha256": "f9392f3dc2f7b6a0c1f7b6bea2380b1447950af8934b189360e72211851c823d"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-edgar.json",
+      "bytes": 1810,
+      "sha256": "36b64515f94b3e08c366a018f8e91f9771ca1d8c3a5976f932fd7ccd233b4038"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-edgar.log",
+      "bytes": 714,
+      "sha256": "f6663cbe9fc65c5fa85dc5b860b9adf8c9853038ee48472f55cd1d972e8e0df7"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pytest-override-help-final.json",
+      "bytes": 1368,
+      "sha256": "59b6c43670a220ff9e331d0e93b2e969ac45b830efc1fb7ec0076bf267a9ad68"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pytest-override-help-final.log",
+      "bytes": 30517,
+      "sha256": "883418d0e17bb53f328378005d921e4efd27e1873905382dc133633036ca737e"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/recorder-tests-after.json",
+      "bytes": 1511,
+      "sha256": "6d1fe7b71efec721c35a8db7df019450a0989505d7451d26487fd8b1fc495c11"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/recorder-tests-after.log",
+      "bytes": 440,
+      "sha256": "bf9b7d24fffbafd09f80297fa1c84667d4a6c7b25c5874347bdfe03f7b41743c"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/recorder-tests-before.json",
+      "bytes": 1513,
+      "sha256": "da78bf2d12cd7a2b571768663e7fbc96835bbb2891d6330699c2cf09f498d016"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/recorder-tests-before.log",
+      "bytes": 1248,
+      "sha256": "7b34028b164be9f4b82d10f5b7272e4817d0815db7fcb1842ab3cc72ed90a985"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/uv-pip-install-help.json",
+      "bytes": 1356,
+      "sha256": "4c783b0a617596748c814ad889ca775b466b5eed164bc6132c3006e26c3baa21"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/uv-pip-install-help.log",
+      "bytes": 12530,
+      "sha256": "eb770df4eede6f58ad927391fb205f367bd74ca0971208311b6d4e1259149645"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/wheel-release-bindings.json",
+      "bytes": 1814,
+      "sha256": "65448204e660f9da62b631f173be72d86803f7915840030680248e976896de3c"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/wheel-release-bindings.log",
+      "bytes": 2755,
+      "sha256": "b2f845d768a08ce925f28d6a890f28ea720359f3877c24c04d97267957ffcdbe"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/lane-packet.json",
+      "bytes": 27280,
+      "sha256": "59c1b6ddca1e53299006e93decfb6e755ce83bd33de2c8e557fdf677de082309"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-freeze.json",
+      "bytes": 1364,
+      "sha256": "16dc2c43b3cb5ef06086280a925f645ddac5c0607bf764b159b89598b534817e"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-freeze.log",
+      "bytes": 237,
+      "sha256": "3985cdee50a761bdff06d48c08fc2f49cbbe986b6cf8eb79edfa11c8f1e12981"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-install.json",
+      "bytes": 1425,
+      "sha256": "60a6ea1cfd3ba7fa64a7e257642f5f381b9995403f8b4d10fb324ae6de401a28"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-install.log",
+      "bytes": 463,
+      "sha256": "86b3f85915c2bfb47d49d4b50f58df2d9c0b4b793423777012aa44298b025fcd"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.json",
+      "bytes": 1506,
+      "sha256": "0901bf81fb285dc95d1c9e6a758d4627967325984c933ea34eb331181ae5cb3d"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
+      "bytes": 1023,
+      "sha256": "895b566f5e6ad1ae3f156a6738f68851dea320bf466efeffe48cd02988007c3b"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-arctic-venv.json",
+      "bytes": 1364,
+      "sha256": "cc9d78d973965a865e1569b4e86a129d2ff9ac8a60329e4619374f64e0aec06e"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-arctic-venv.log",
+      "bytes": 66,
+      "sha256": "131b932703542cd9ad1d7547b49d3fb3728f18bf6b9d35069e6785b3186d19c4"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-venv.json",
+      "bytes": 1440,
+      "sha256": "d814bb685c0f82e8d42741363a9c5f68d4b3474eae8aaa25372f12c868709499"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/create-venv.log",
+      "bytes": 179,
+      "sha256": "ea266639a24dc474e6483f152086236119223aa91cb4759637ecd2a600da3b2e"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/dependency-check.json",
+      "bytes": 1459,
+      "sha256": "84741d8f0c803ba095bb02a05dece40c8cc08f40ba2bcec963558664cd170200"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/dependency-check.log",
+      "bytes": 106,
+      "sha256": "fd59bf15ff34f8657883d30df510bb0ba3828ffe012fb3fa0ba0c6fbc37765ef"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-commit.json",
+      "bytes": 1361,
+      "sha256": "c77765ef05c99216fd5fd10a1397392ebf9719c42cf026fefb3bcd732a51bc57"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-commit.log",
+      "bytes": 41,
+      "sha256": "40e8707e0fce0639f4b279933e67edd474b30c42fbe6a44c4a37ff686341efe7"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.json",
+      "bytes": 2106,
+      "sha256": "caf91309fe5da98af37fdf4f4e7e03c1a3f4a62aec3d1e3912f3d6baeda7ec1d"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/edgar-source-wheel-hashes.log",
+      "bytes": 1617,
+      "sha256": "d6dc115080c26747158355827782c4080fec4413455b13e00cc43ec41849cff2"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.json",
+      "bytes": 1574,
+      "sha256": "e0d4d6892ddd902c6ee34ea0b9a613fa4d6122cb33dbbf137742f089cc81697f"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/existing-host-package-metadata.log",
+      "bytes": 80,
+      "sha256": "6e6fbe3eba3fbb52ca067b8a189875a3031b46ffc4a630d1d866a882228f4ae1"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/install.json",
+      "bytes": 1758,
+      "sha256": "d8141e2841eb1d22bd58be3f78ee561c70e7a9c26dabd07ae8efaf583e26e7ca"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/install.log",
+      "bytes": 2103,
+      "sha256": "3bb77b1460ebef9a97e892e01c73625687f0aaf99679c8882241aba31fdab7b6"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/installed-freeze.json",
+      "bytes": 1460,
+      "sha256": "d201c14edc18d634d00cc408a8fe97bf68b87c33fd27bff106a583cbd19d78db"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/installed-freeze.log",
+      "bytes": 1377,
+      "sha256": "4d421b500875687d472dcde44827a59beabc696c1708460feb41f0a7a25e98e1"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/masking-tests.json",
+      "bytes": 1470,
+      "sha256": "2d5cf0285b42dbf76a80e820a27baf72d7b5c8fccaea3b0e64b9653d2fbecff4"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/masking-tests.log",
+      "bytes": 770,
+      "sha256": "ecc47d0e5a0c0b4151c85adcf12f35ce2b9674a0c8761d95ac600f65e12ae393"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.json",
+      "bytes": 1615,
+      "sha256": "c2364a9b0308562ddffa74993febb2d9dc17dd101619e6b1d2c2947f5201a227"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
+      "bytes": 406,
+      "sha256": "a0ba7cfaeb46991b472c565db047685c81a54df9232c1c91bd995566e2cb5df7"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke.json",
+      "bytes": 1603,
+      "sha256": "91c78c44faea5b69a0661034e6c135c2d1e952b4398f4ea22f592249a952d090"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke.log",
+      "bytes": 406,
+      "sha256": "ad8be9f465aab31cc0840a07e0c589935d78b3d69aebe5fb515c0016a2e08355"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/recorder-tests.json",
+      "bytes": 1474,
+      "sha256": "26a70ff63cfdf4b1ae7310755e62ef6104bfaf09712b266669aa4c3bc3e29584"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/recorder-tests.log",
+      "bytes": 440,
+      "sha256": "01ac626eb1a45bb1a7974c739e7dd461905c23be2c3014f40dc97464dbb35e23"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.json",
+      "bytes": 1643,
+      "sha256": "ea2a9bd54f3ab8f49725e1e1769073dce3863631b8c5011e77365543d985d73e"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.log",
+      "bytes": 1439,
+      "sha256": "4b72d3fa2c05fdc729e7f8dbdacebe2830a7129cd18527a45db8959b9ac0a7dc"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/custody-after.json",
+      "bytes": 1298,
+      "sha256": "dd4f44fddfac1e6a8764dea47d0496eae873738b3fd6762701f33d7af4cd4a8b"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/custody-after.log",
+      "bytes": 440,
+      "sha256": "c4dd7905b5b6eadcc4bcfbbc3ee404bc527107a30b13b0e6907f29536b8bc3fb"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/masking-after.json",
+      "bytes": 1296,
+      "sha256": "c11c9285535745367b5e2f5b1f1de80c13321b8d7b34982c20132e199fdc6401"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/masking-after.log",
+      "bytes": 1316,
+      "sha256": "fd82353602c6b4a2a49f03cfa46fb24dd60c213f71649297531f4b8ecd052273"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/masking-before.json",
+      "bytes": 1298,
+      "sha256": "29d605ceaeca368f0facb197cd99d5c8412fdcdb4444f01d0a0d44f4f77ca451"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/masking-before.log",
+      "bytes": 33012,
+      "sha256": "13ff773347eaccda8912f43d0ffe90b5f230e90f95e0b92eda38617608d0c16f"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/publication-after.json",
+      "bytes": 1307,
+      "sha256": "50bfd02a34f464ffd59dd47b62c95c6b4f76fbc83a653371e3f3c6f8d5da6c88"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/publication-after.log",
+      "bytes": 519,
+      "sha256": "a385e56aca2a13361e9af443d45ff39f7d008aeb7a8b68a8d9f894a56586300d"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/publication-checked.json",
+      "bytes": 1311,
+      "sha256": "44787ba2122a3603a00a51789435f5674218e7dc3351af423c51970fb12df246"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/publication-checked.log",
+      "bytes": 678,
+      "sha256": "f0231c2f5e040bef983f4dcd05db2d23de5b96a4a4d9400aa5324498b77502d1"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/publication-final.json",
+      "bytes": 1307,
+      "sha256": "ed04ebeab7b48bc95ab9911b659b82a314eaac854494a8cb0f39ae78b1e6257f"
+    },
+    {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/publication-final.log",
+      "bytes": 678,
+      "sha256": "5eb6452035de2644bed5b125bda1f37b7d2a18ec4b34a7b5dbffc9ef31e04e22"
+    }
+  ],
+  "upstream_test_scope": {
+    "edgartools": {
+      "passed": 29,
+      "network_marked_deselected": 10,
+      "warnings": 4,
+      "full_upstream_suite": false,
+      "command_expands_upstream_hatch_script": "pyproject.toml:253",
+      "environment_override": "-o env= suppresses upstream contact identity injection; upstream socket/DNS blocking plugin remains active",
+      "no_credential_or_SEC_call": true,
+      "sources": [
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/upstream-offline-tests.log",
+          "line": 24
+        }
+      ]
+    },
+    "alpaca_py": {
+      "passed": 320,
+      "skipped": 19,
+      "warnings": 2,
+      "exit_code": 0,
+      "result": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+        "line": 39
+      },
+      "exit_code_source": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.json",
+        "line": 22
+      },
+      "skip_reason_sources": [
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 20
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 21
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 22
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 23
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 24
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 25
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 26
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 27
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 28
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 29
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 30
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 31
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 32
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 33
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 34
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 35
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 36
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 37
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/alpaca-upstream-tests-fold.log",
+          "line": 38
+        }
+      ],
+      "contract_gap_reason": "The19upstream live cases require live service/credentials/broker flags; neither --run-live nor ALPACA_RUN_LIVE was enabled. Upstream tests/live/conftest.py100 supplies the reason.",
+      "live_calls": false
+    },
+    "exchange_calendars": {
+      "passed": 10042,
+      "xfailed": 1,
+      "warnings": 2497,
+      "exit_code": 0,
+      "result": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-upstream-tests.log",
+        "line": 255
+      },
+      "exit_code_source": {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-upstream-tests.json",
+        "line": 32
+      },
+      "upstream_target": ".github/workflows/main.yml:51 pytest tests -n auto --dist loadscope; local concurrency bounded to2workers",
+      "elapsed_reported_seconds": 707.37,
+      "native_timeout_minutes": 15,
+      "fallback_used": false,
+      "warning_sources": [
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-upstream-tests.log",
+          "line": 225
+        },
+        {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/calendar-upstream-tests.log",
+          "line": 235
+        }
+      ],
+      "scope": "Full upstream CI tests/ target at4.13.2 with installed hash-pinned SDK and fail-stop guard; no market-data or historical-availability qualification."
+    }
+  },
+  "invoke_scope": {
+    "edgartools": "Native SDK returned acceptance datetime for pinned public fixture; not historical availability qualification.",
+    "alpaca-py": "Native StockBarsRequest object returned offline, no client.",
+    "exchange-calendars": "Native XNYS is_session and session_close return values printed.",
+    "arcticdb": "Separate 6.26.0 native local-LMDB dataframe return/roundtrip on explicitly synthetic input.",
+    "comparative": false,
+    "production_usage": false,
+    "source": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/native-invoke-final.log",
+      "line": 4
+    },
+    "arctic_source": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
+      "line": 16
+    }
+  },
+  "named_gaps": [
+    "Vendor acquisition E2E requires authorized identity/key and licensed as-known data; none used",
+    "Dependency versions were freshly resolved then frozen; install is not a hash-locked runtime migration",
+    "Existing acceptance timestamps are native wall clocks; no historical SEC availability conclusion follows",
+    "No matched survivor comparison; A6 NOT_RUN, no superiority or FINAL claim.",
+    "Alpaca19upstream live cases require live service/credentials/broker flags; not enabled. Native reasons are individually retained at fold-v1/alpaca-upstream-tests-fold.log20-38; upstream tests/live/conftest.py100."
+  ],
+  "setup_failures": [
+    {
+      "stage": "upstream checkout before asynchronous clone completed",
+      "resolution": "waited for clone completion then checked out exact commit successfully",
+      "reported_exit_code": 128,
+      "capture_status": "UNCAPTURED_HISTORICAL_OBSERVATION",
+      "valid_as_native_evidence": false,
+      "gap": "Original capture was not retained; numeric exit code is reported history only, not independently verifiable native evidence."
+    },
+    {
+      "stage": "first install launcher used unavailable uv path",
+      "exception": "FileNotFoundError",
+      "resolution": "queried mise which uv, reran via installed uv0.12.22; final vendor package install exit0",
+      "reported_process_exit_code": 1,
+      "capture_status": "UNCAPTURED_HISTORICAL_OBSERVATION",
+      "valid_as_native_evidence": false,
+      "gap": "Original capture was not retained; numeric exit code is reported history only, not independently verifiable native evidence."
+    }
+  ],
+  "packet_generation": {
+    "command": [
+      "python3",
+      "tools/sota-convergence/lane_packets.py",
+      "--root",
+      ".",
+      "--out",
+      "<packet-scratch>",
+      "--catalog",
+      "us-equities",
+      "--manifest",
+      "catalogs/sota-convergence/manifest-20260926.json",
+      "--registered-receipts",
+      "--checked-at",
+      "2026-10-16"
+    ],
+    "exit_code": 0,
+    "generator_catalog_packets": 12,
+    "retained_layer_packets": 1,
+    "candidate_scope": "Historical packet includes16candidates; this draft adjudicates only3winners and4carried survivors; other entries are context, not new trials"
+  },
+  "hash_scope": "Only public upstream sources or published sanitized artifact bytes; no hash of raw unpublished host-bearing output, identity or private coordination record.",
+  "status": "PREPARATION_PRIVATE_REPRODUCTION_PASSED",
+  "publication_status": "SMALL_FOLD_PRIVATE_PASS_CUSTODY_PR8_OPEN",
+  "recorded_utc_scope": "Tool-clock observation at recapture start; each command retains its own recorder timestamps.",
+  "masked_capture_contract": {
+    "classification": "3allowlisted native-source projections plus52masked native stdout captures; metadata transformations are deterministic and explicitly labelled.",
+    "originals": "Private capture directories named in each command receipt; directory location shared with co-op outside the public repository.",
+    "command_placeholders": "Marked tokens refer to the private exact argv/cwd in receipt.raw.json.",
+    "masker": "blueprints/us-equities/final-market-data-reference-20261016/mask_capture.py",
+    "tests": [
+      "blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py",
+      "blueprints/us-equities/final-market-data-reference-20261016/test_native_capture.py"
+    ],
+    "reproduction_status": "COOP_PRIVATE_PASS_57_CAPTURE_PAIRS_114_DERIVATIVES_115_OUTPUTS",
+    "no_private_raw_digest_published": true,
+    "publisher": "blueprints/us-equities/final-market-data-reference-20261016/publish_capture.py"
+  },
+  "retired_capture_disposition": {
+    "prior_commands": 10,
+    "status": "EXCLUDED_FROM_PUBLICATION",
+    "reason": "capture not retained; re-capture pending was resolved by fresh native runs, never by reconstruction or relabelling.",
+    "originals_retained": false,
+    "retired_derivatives": "Kept outside the repository as unqualified historical observations; none is included as a receipt."
+  },
+  "recorder_tests": {
+    "initial_masking": 5,
+    "masking": 9,
+    "custody": 2,
+    "scope": "Explicitly synthetic masking/retention fixtures. Unicode/quote/backslash regressions failed before and passed after; not component E2E or market data.",
+    "sources": [
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/masking-after.log",
+        "line": 12
+      },
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/custody-after.log",
+        "line": 5
+      },
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/publication-checked.log",
+        "line": 7
+      }
+    ],
+    "failed_before": [
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/masking-tests-before.log",
+        "line": 30
+      },
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/recorder-tests-before.log",
+        "line": 19
+      },
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/small-fold-v1/masking-before.log",
+        "line": 410
+      }
+    ],
+    "publication_transform": 4
+  },
+  "capture_counts": {
+    "prior_capture_pairs": 51,
+    "small_fold_capture_pairs": 6,
+    "total": {
+      "captures": 57,
+      "derivatives": 114
+    },
+    "inventory_outputs": 115,
+    "private_originals_total": 58,
+    "private_only_retired": 1
+  },
+  "network_guard": {
+    "source": "blueprints/us-equities/final-market-data-reference-20261016/alpaca_offline_guard.py",
+    "mechanism": "Diagnostic refusal of listed Python audit events, not a sandbox or complete isolation. Installed module paths printed before pytest prepend collection are observed import-order evidence only.",
+    "negative_control": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-calendar.log",
+      "line": 3
+    },
+    "negative_control_exit": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/network-guard-calendar.json",
+      "line": 15
+    },
+    "real_broker_calls": false,
+    "scope_limitation": "Native extensions or subprocesses may bypass Python audit hooks; no comprehensive network isolation claim is made."
+  },
+  "supported_invocation_sources": {
+    "uv_pip": [
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/uv-pip-install-help.log",
+        "line": 3
+      },
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/uv-pip-install-help.log",
+        "line": 35
+      },
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/uv-pip-install-help.log",
+        "line": 38
+      }
+    ],
+    "pytest_override": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pytest-override-help-final.log",
+      "line": 173
+    },
+    "upstream_env_config": {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "path": "pyproject.toml",
+      "line": 415
+    },
+    "scope": "Native installed-client help supports uv pip/override syntax; -o env= suppresses the pinned upstream contact assignment."
+  },
+  "privacy_recapture_disposition": {
+    "private_only_capture": "pytest-override-help",
+    "status": "RETIRED_FROM_PUBLICATION_RAW_RETAINED",
+    "reason": "Upstream help contained an unmasked generic home-path example. Re-captured natively with explicit example-home mapping as pytest-override-help-final; no original was reconstructed.",
+    "replacement": "fold-v1/pytest-override-help-final.json"
+  },
+  "sequential_wheel_digest_verification": {
+    "status": "COOP_FULL_PRIVATE_PASS",
+    "scope": "All three private hashed requirements match published SHA256 values in the retained PyPI release records. Successful native uv --require-hashes install occurred afterwards and verified downloaded wheel bytes. This is not an independent source rebuild.",
+    "published_release_capture_sources": [
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-alpaca.json",
+        "line": 22
+      },
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-edgar.json",
+        "line": 22
+      },
+      {
+        "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/pypi-calendar.json",
+        "line": 22
+      }
+    ],
+    "install_started_source": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+      "line": 37
+    },
+    "install_finished_source": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+      "line": 25
+    },
+    "install_exit_source": {
+      "path": "evidence/artifacts/final-market-data-reference-20261016/fold-v1/install-hashed-winners.json",
+      "line": 24
+    },
+    "private_original_digests_published": false,
+    "verification_authority": "Co-op full private check 2026-10-16; no private review fingerprint published."
+  },
+  "vendor_custody": {
+    "repository": "seathatflowsinourveins/horizon",
+    "path": "vendor/market-data-pypi-20261016",
+    "status": "PRIVATE_PASS_HORIZON_PR8_OPEN",
+    "source_scope": "Complete native PyPI JSON/README originals and package licenses retained privately; public3logs contain allowlisted release/wheel fields only. PyPI API response has no separate LICENSE.",
+    "pull_request": "https://github.com/seathatflowsinourveins/horizon/pull/8",
+    "verification": "Co-op checked3source JSON copies byte-equal to retained originals and all9staged custody/provenance/license paths; expanded private-locator scan found zero matches.",
+    "public_source_captures": [
+      {
+        "capture_name": "pypi-alpaca",
+        "package": "alpaca-py",
+        "version": "0.44.0",
+        "source_url": "https://pypi.org/pypi/alpaca-py/0.44.0/json",
+        "fetch_started_utc": "2026-10-16T07:49:50.481158+00:00",
+        "fetch_finished_utc": "2026-10-16T07:49:50.563654+00:00",
+        "public_source_bytes": 15424,
+        "public_source_sha256": "2dbdc42a7121dc4ac4769aa32470f8f9e59e7acc226974c2ccba6caecb8de690",
+        "custody_pull_request": "https://github.com/seathatflowsinourveins/horizon/pull/8",
+        "custody_path": "vendor/market-data-pypi-20261016/pypi-alpaca/release.raw.json",
+        "digest_scope": "Exact PUBLIC PyPI response bytes, including upstream README; not a digest of private host/recorder metadata. Public log is a separate identity-field projection."
+      },
+      {
+        "capture_name": "pypi-calendar",
+        "package": "exchange-calendars",
+        "version": "4.13.2",
+        "source_url": "https://pypi.org/pypi/exchange-calendars/4.13.2/json",
+        "fetch_started_utc": "2026-10-16T07:49:50.355023+00:00",
+        "fetch_finished_utc": "2026-10-16T07:49:50.422131+00:00",
+        "public_source_bytes": 28845,
+        "public_source_sha256": "38a86c1c1058cbaa84cb85ecafea74f9b19a7b87c10998a82f9df230bb52a87a",
+        "custody_pull_request": "https://github.com/seathatflowsinourveins/horizon/pull/8",
+        "custody_path": "vendor/market-data-pypi-20261016/pypi-calendar/release.raw.json",
+        "digest_scope": "Exact PUBLIC PyPI response bytes, including upstream README; not a digest of private host/recorder metadata. Public log is a separate identity-field projection."
+      },
+      {
+        "capture_name": "pypi-edgar",
+        "package": "edgartools",
+        "version": "5.61.1",
+        "source_url": "https://pypi.org/pypi/edgartools/5.61.1/json",
+        "fetch_started_utc": "2026-10-16T07:49:50.366669+00:00",
+        "fetch_finished_utc": "2026-10-16T07:49:50.444584+00:00",
+        "public_source_bytes": 20391,
+        "public_source_sha256": "ff45e22e3e2028f0588eb177ba40381285e0c2bd94c71d316a55efa59b55de33",
+        "custody_pull_request": "https://github.com/seathatflowsinourveins/horizon/pull/8",
+        "custody_path": "vendor/market-data-pypi-20261016/pypi-edgar/release.raw.json",
+        "digest_scope": "Exact PUBLIC PyPI response bytes, including upstream README; not a digest of private host/recorder metadata. Public log is a separate identity-field projection."
+      }
+    ]
+  },
+  "publication_transform_contract": {
+    "publisher": "blueprints/us-equities/final-market-data-reference-20261016/publish_capture.py",
+    "reproduction": "public_pair(stdout.raw,receipt.raw.json,mask-map.json,family,label)",
+    "full_source_projection_count": 3,
+    "masked_native_output_count": 54,
+    "metadata_scope": "Commands, observed rc and timestamps stay original. Input declarations/output hashes/transform labels corrected deterministically; exact original metadata remains private.",
+    "synthetic_fixture_mask": "The failed regression fixture has a declared public root alias; private known-root fragments and this synthetic control are both masked at truncation markers.",
+    "reproduction_status": "COOP_PRIVATE_PASS_114_OF_114",
+    "scan_scope": "Full/truncated scratch prefixes, pytest temporary login forms, UUID-shaped values, user and host: zero hits in published files."
+  }
+}

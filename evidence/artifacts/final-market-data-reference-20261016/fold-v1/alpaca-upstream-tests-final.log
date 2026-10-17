@@ -1,0 +1,18 @@
+<fold-scratch>/venv/lib/python3.12/site-packages/alpaca/__init__.py
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+sssssss...........sssss.....sssssss..................................... [ 84%]
+...................................................                      [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/websockets/legacy/__init__.py:6
+  <fold-scratch>/venv/lib/python3.12/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+tests/data/test_screener.py::test_get_most_actives
+  <fold-scratch>/venv/lib/python3.12/site-packages/pydantic/main.py:520: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `enum` - serialized value may not be as expected [field_name='by', input_value='volume', input_type=str])
+    return self.__pydantic_serializer__.to_python(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+320 passed, 19 skipped, 2 warnings in 4.02s

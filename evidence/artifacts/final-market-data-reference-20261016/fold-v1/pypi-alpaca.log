@@ -1,0 +1,19 @@
+{
+  "info": {
+    "name": "alpaca-py",
+    "version": "0.44.0"
+  },
+  "projection": "Allowlisted factual identity fields; README/description/contacts omitted, full native source in horizon vendor custody.",
+  "schema": "pypi-release-identity-projection/1",
+  "source_url": "https://pypi.org/pypi/alpaca-py/0.44.0/json",
+  "urls": [
+    {
+      "digests": {
+        "sha256": "b54673f967c0c814a5e0223cbb0211a5d9d75a8d107e792872b14e5bae957c03"
+      },
+      "filename": "alpaca_py-0.44.0-py3-none-any.whl",
+      "packagetype": "bdist_wheel",
+      "url": "https://files.pythonhosted.org/packages/8e/9e/69a2d867988578d6f9e52e35d435d8a43296257cf590fb881a3752de7651/alpaca_py-0.44.0-py3-none-any.whl"
+    }
+  ]
+}

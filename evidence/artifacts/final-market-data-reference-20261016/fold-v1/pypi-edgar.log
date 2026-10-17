@@ -1,0 +1,19 @@
+{
+  "info": {
+    "name": "edgartools",
+    "version": "5.61.1"
+  },
+  "projection": "Allowlisted factual identity fields; README/description/contacts omitted, full native source in horizon vendor custody.",
+  "schema": "pypi-release-identity-projection/1",
+  "source_url": "https://pypi.org/pypi/edgartools/5.61.1/json",
+  "urls": [
+    {
+      "digests": {
+        "sha256": "8229753d3fb4dfdc865291bf7fd684d11297094b88ec724c919630cf21e81037"
+      },
+      "filename": "edgartools-5.61.1-py3-none-any.whl",
+      "packagetype": "bdist_wheel",
+      "url": "https://files.pythonhosted.org/packages/9e/c1/10e2baaeb32364a7147a181de1d22cc1e74eaefb57d54a1aaabfe7e95074/edgartools-5.61.1-py3-none-any.whl"
+    }
+  ]
+}

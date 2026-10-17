@@ -1,0 +1,8 @@
+edgartools 5.61.1
+alpaca-py 0.44.0
+exchange-calendars 4.13.2
+2023-06-07 16:10:23
+symbol_or_symbols=['FIXTURE'] start=datetime.datetime(2024, 1, 2, 0, 0) end=datetime.datetime(2024, 1, 3, 0, 0) limit=None currency=None sort=None timeframe=<alpaca.data.timeframe.TimeFrame object at 0x7b009fdd69f0> adjustment=<Adjustment.RAW: 'raw'> feed=<DataFeed.IEX: 'iex'> asof=None
+True
+False
+2024-07-03 17:00:00+00:00

@@ -1,0 +1,803 @@
+{
+ "candidates": [
+  {
+   "adopted": true,
+   "component_id": "data-massive",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json",
+    "catalogs/us-equities/simulation-data-review.json"
+   ],
+   "key": "c1",
+   "name": "Massive Python client",
+   "pin": "v2.8.0; source 3c247d78c603fc13d274fda1aa26749e7c8c3710",
+   "pin_behind_upstream": false,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/massive-com/client-python",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.8.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-07-09",
+    "released_at": "2026-05-26",
+    "renamed_to": null,
+    "stars": 1512
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "data-databento",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json",
+    "catalogs/us-equities/simulation-data-review.json"
+   ],
+   "key": "c2",
+   "name": "Databento",
+   "pin": "v0.86.0; source e675ef30369f5ee9f68b04606080c519adf3be69",
+   "pin_behind_upstream": true,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/databento/databento-python",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.87.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "released_at": "2026-09-22",
+    "renamed_to": null,
+    "stars": 302
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "data-exchange-calendars",
+   "decisions": [],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json",
+    "blueprints/us-equities/data/receipt.json"
+   ],
+   "key": "c3",
+   "name": "exchange_calendars",
+   "pin": "4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+   "pin_behind_upstream": false,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [
+    {
+     "id": "env-freshness-wsl-ubuntu-main-20260924",
+     "kind": "artifact_measurement",
+     "matched_by": "alias",
+     "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json"
+    },
+    {
+     "id": "exchange-calendars-native-check-20260922",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/exchange-calendars-native-check-20260922.json"
+    },
+    {
+     "id": "native-trading-runtime-2604-20261004",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/native-trading-runtime-2604-20261004.json"
+    },
+    {
+     "id": "native-trading-runtime-2604-rerun-d02c0827-20261005",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/native-trading-runtime-2604-rerun-20261005.json"
+    }
+   ],
+   "repository": "https://github.com/gerrymanoim/exchange_calendars",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "4.13.2",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-24",
+    "released_at": "2026-03-10",
+    "renamed_to": null,
+    "stars": 668
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "requirement_fit",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c4",
+   "name": "yfinance",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/ranaroussi/yfinance",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "requirement_fit",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c5",
+   "name": "sec-edgar-downloader",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/jadchaar/sec-edgar-downloader",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "data-edgartools",
+   "decisions": [],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json",
+    "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+    "blueprints/us-equities/lifecycle-sample/native-receipt.json"
+   ],
+   "key": "c6",
+   "name": "EdgarTools",
+   "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+   "pin_behind_upstream": false,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [
+    {
+     "id": "sec-catalyst-dataset-native-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/catalyst-dataset/native-receipt.json"
+    },
+    {
+     "id": "native-sec-access-resolution-20260919",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/catalyst-provenance/access-resolution.json"
+    },
+    {
+     "id": "native-sec-edgartools-5600-20261004",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json"
+    },
+    {
+     "id": "native-sec-new-host-20260924",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/catalyst-provenance/new-host-native-network-20260924.json"
+    },
+    {
+     "id": "native-edgartools-catalyst-20260919",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/catalyst-provenance/receipt.json"
+    },
+    {
+     "id": "native-lifecycle-sample-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "edgartools-5600-pin-move-20261004",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json"
+    },
+    {
+     "id": "env-freshness-wsl-ubuntu-main-20260924",
+     "kind": "artifact_measurement",
+     "matched_by": "alias",
+     "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json"
+    },
+    {
+     "id": "native-trading-runtime-2604-20261004",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/native-trading-runtime-2604-20261004.json"
+    },
+    {
+     "id": "native-trading-runtime-2604-rerun-d02c0827-20261005",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/native-trading-runtime-2604-rerun-20261005.json"
+    },
+    {
+     "id": "runtime-final-lock-binding-20261008",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/runtime-final-lock-binding-20261008.json"
+    },
+    {
+     "id": "runtime-final-native-24-acceptance-20261008",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json"
+    },
+    {
+     "id": "token-practice-artifacts-20260920",
+     "kind": "artifact_measurement",
+     "matched_by": "alias",
+     "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "alias",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/dgunning/edgartools",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v5.58.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "released_at": "2026-09-11",
+    "renamed_to": null,
+    "stars": 2748
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "data-questdb",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c7",
+   "name": "QuestDB",
+   "pin": "10.0.1; source 7a391566ac827e0d8c269b91f2415c16b0a32a84",
+   "pin_behind_upstream": false,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/questdb/questdb",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "10.0.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "released_at": "2026-08-24",
+    "renamed_to": null,
+    "stars": 17352
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "blueprints/us-equities/nanosecond-replay/receipt.json"
+   ],
+   "key": "c8",
+   "name": "pandas exact timestamp support",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "blueprints/us-equities/nanosecond-replay/receipt.json",
+   "registered_receipts": [
+    {
+     "id": "native-exact-nanosecond-replay-20260919",
+     "kind": "native_cli_e2e",
+     "matched_by": "repository",
+     "path": "blueprints/us-equities/nanosecond-replay/receipt.json"
+    },
+    {
+     "id": "native-chronological-controls-20260919",
+     "kind": "native_cli_e2e",
+     "matched_by": "repository",
+     "path": "blueprints/us-equities/research-evaluation/receipt.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "repository",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "env-freshness-wsl-ubuntu-main-20260924",
+     "kind": "artifact_measurement",
+     "matched_by": "repository",
+     "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json"
+    },
+    {
+     "id": "native-trading-runtime-2604-20261004",
+     "kind": "native_cli_e2e",
+     "matched_by": "repository",
+     "path": "evidence/receipts/native-trading-runtime-2604-20261004.json"
+    },
+    {
+     "id": "native-trading-runtime-2604-rerun-d02c0827-20261005",
+     "kind": "native_cli_e2e",
+     "matched_by": "repository",
+     "path": "evidence/receipts/native-trading-runtime-2604-rerun-20261005.json"
+    },
+    {
+     "id": "runtime-final-lock-binding-20261008",
+     "kind": "native_cli_e2e",
+     "matched_by": "repository",
+     "path": "evidence/receipts/runtime-final-lock-binding-20261008.json"
+    },
+    {
+     "id": "runtime-final-native-24-acceptance-20261008",
+     "kind": "native_cli_e2e",
+     "matched_by": "repository",
+     "path": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "repository",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/pandas-dev/pandas",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "data-alpaca-py",
+   "decisions": [],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json",
+    "catalogs/us-equities/runtime-target.json",
+    "blueprints/us-equities/authenticated-data/native-receipt.json"
+   ],
+   "key": "c9",
+   "name": "alpaca-py",
+   "pin": "v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+   "pin_behind_upstream": false,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/alpacahq/alpaca-py",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.44.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-23",
+    "released_at": "2026-08-11",
+    "renamed_to": null,
+    "stars": 1531
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c10",
+   "name": "Polars",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/pola-rs/polars",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": "data-pandera",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c11",
+   "name": "Pandera",
+   "pin": "v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+   "pin_behind_upstream": false,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/unionai-oss/pandera",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.33.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-01",
+    "renamed_to": null,
+    "stars": 4466
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": "data-dvc",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c12",
+   "name": "DVC",
+   "pin": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
+   "pin_behind_upstream": false,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/treeverse/dvc",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "3.67.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-03-31",
+    "renamed_to": null,
+    "stars": 15886
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "data-clickhouse",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c13",
+   "name": "ClickHouse",
+   "pin": "v26.8.7.19-lts; source f29d27def7ee0adb10e7e2fff080ba204054dd4b",
+   "pin_behind_upstream": true,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/clickhouse/clickhouse",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v26.9.2.8-stable",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "released_at": "2026-09-22",
+    "renamed_to": null,
+    "stars": 50078
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "data-duckdb",
+   "decisions": [],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json",
+    "blueprints/us-equities/data/receipt.json",
+    "blueprints/us-equities/lifecycle-sample/native-receipt.json"
+   ],
+   "key": "c14",
+   "name": "DuckDB",
+   "pin": "v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+   "pin_behind_upstream": false,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [
+    {
+     "id": "native-paired-adoption-20260919",
+     "kind": "native_model_e2e",
+     "matched_by": "alias",
+     "path": "adoption/paired/receipt.json"
+    },
+    {
+     "id": "portable-sdk-adoption-20260919",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "adoption/receipt.json"
+    },
+    {
+     "id": "sec-catalyst-dataset-native-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/catalyst-dataset/native-receipt.json"
+    },
+    {
+     "id": "synthetic-catalyst-contract-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/catalyst-experiment/receipt.json"
+    },
+    {
+     "id": "sec-financial-data-20260919",
+     "kind": "compatibility_attempt",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/financial-data/receipt.json"
+    },
+    {
+     "id": "native-security-identity-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/identity-readiness/native-receipt.json"
+    },
+    {
+     "id": "native-lifecycle-sample-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json"
+    },
+    {
+     "id": "native-exact-nanosecond-replay-20260919",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/nanosecond-replay/receipt.json"
+    },
+    {
+     "id": "native-point-in-time-contract-20260919",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/point-in-time/receipt.json"
+    },
+    {
+     "id": "native-research-runtime-20260919",
+     "kind": "native_model_e2e",
+     "matched_by": "alias",
+     "path": "blueprints/us-equities/research-runtime/receipt.json"
+    },
+    {
+     "id": "broad-universe-research-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/broad-universe-research-20260921.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "env-freshness-wsl-ubuntu-main-20260924",
+     "kind": "artifact_measurement",
+     "matched_by": "alias",
+     "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json"
+    },
+    {
+     "id": "native-trading-runtime-2604-20261004",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/native-trading-runtime-2604-20261004.json"
+    },
+    {
+     "id": "native-trading-runtime-2604-rerun-d02c0827-20261005",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/native-trading-runtime-2604-rerun-20261005.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "alias",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/duckdb/duckdb",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.5.5",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "released_at": "2026-07-22",
+    "renamed_to": null,
+    "stars": 41712
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c15",
+   "name": "lakeFS",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/treeverse/lakefs",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c16",
+   "name": "OpenBB",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/data-research.json",
+   "registered_receipts": [],
+   "repository": "https://github.com/openbb-finance/openbb",
+   "review_status": null,
+   "upstream": null
+  }
+ ],
+ "catalog": "us-equities",
+ "checked_at": "2026-10-16",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+ "group": "data-research",
+ "layer_id": "market-data-reference",
+ "limitations": [
+  "The authenticated Alpaca receipt covers 25 AAPL SIP/raw daily bars and two corporate actions over five successful pages, not a survivorship-free universe, complete history or real-time feed entitlement.",
+  "Numeric corporate-action values matched the frozen probe, but missing dividend currency prevented full cash-unit reconciliation. Original historical availability and complete action coverage remain open.",
+  "Three documentary lifecycle cases preserve observed cutoffs and source anchors; retrospective claims do not establish historical as-known eligibility or permanent security identity.",
+  "The prior SEC HTTP 403 remains a historical failure. Later corrected acquisition and parsing qualify their selected requests only; no general filing-completeness or strategy-validity claim follows.",
+  "SQL, schemas and content hashes cannot repair missing provenance, revised fundamentals, access rights or outcome-selected samples."
+ ],
+ "registered_receipts_note": "registered_receipts lists the receipts manifests/evidence.json registers for a candidate's component: matched_by component_id when the receipt names its id, alias when it names the same component under its manifests/stack.json spelling, repository when the receipt names the only registered component with its repository and no other manifest component shares that repository. A receipt may name several components, and its kind is the registrant's label, not a checked evidence class: open it and judge what it actually ran for this component, as for evidence_refs.",
+ "requirement": "Acquire licensed, source-identifiable US-equity observations; preserve feed, timestamps, identity and corporate actions; produce exact reproducible analytical snapshots and reject data whose historical availability or eligibility is unknown.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories. Read only the packet and files under the repository root: no memory stores, code indexes, MCP tools, web search, git history, or other checkouts or work directories, which can carry the verdict you must reach.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. Adoption, incumbency, installation, retained-control status, receipt count, packet position, license, stars and popularity are not evidence of fit; choose among adopted candidates on what their evidence shows was run. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [
+  {
+   "id": "data-dlt",
+   "pin": "1.30.0; source a2f4a21e22e5c266278271b6591c70dbc485aea8",
+   "pin_behind_upstream": false,
+   "registered_receipts": [],
+   "repository": "https://github.com/dlt-hub/dlt",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "1.30.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "released_at": "2026-08-11",
+    "renamed_to": null,
+    "stars": 5892
+   }
+  },
+  {
+   "id": "data-feast",
+   "pin": "v0.66.0; source 1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335",
+   "pin_behind_upstream": false,
+   "registered_receipts": [],
+   "repository": "https://github.com/feast-dev/feast",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.66.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-24",
+    "released_at": "2026-08-21",
+    "renamed_to": null,
+    "stars": 7309
+   }
+  },
+  {
+   "id": "data-fredapi",
+   "pin": "v0.5.2; source bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d",
+   "pin_behind_upstream": false,
+   "registered_receipts": [],
+   "repository": "https://github.com/mortada/fredapi",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.5.2",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-01-28",
+    "released_at": "2024-05-05",
+    "renamed_to": null,
+    "stars": 1661
+   }
+  },
+  {
+   "id": "data-gdeltdoc",
+   "pin": "1.12.0; source f2e500144b0a6090d63723f94453b32717e5fd23",
+   "pin_behind_upstream": false,
+   "registered_receipts": [],
+   "repository": "https://github.com/alex9smith/gdelt-doc-api",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": "1.12.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2025-04-22",
+    "released_at": "2025-04-03",
+    "renamed_to": null,
+    "stars": 232
+   }
+  },
+  {
+   "id": "data-kafka",
+   "pin": "4.3.1; source 26b251a451ce941d3d7a55e6487bcb7f16b5ad48",
+   "pin_behind_upstream": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/apache/kafka",
+   "review_status": "not_individually_reviewed",
+   "upstream": {
+    "archived": false,
+    "latest": null,
+    "latest_flag": {
+     "reason": "tag_listing_only_not_version_shaped",
+     "tag": "show"
+    },
+    "license": "Apache-2.0",
+    "prerelease": null,
+    "pushed_at": "2026-09-26",
+    "released_at": null,
+    "renamed_to": null,
+    "stars": 33839
+   }
+  }
+ ],
+ "title": "Market data and reference",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale"
+ ]
+}

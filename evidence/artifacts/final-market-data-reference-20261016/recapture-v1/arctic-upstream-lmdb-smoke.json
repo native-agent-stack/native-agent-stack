@@ -1,0 +1,29 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Native local LMDB SDK diagnostic on SYNTHETIC 100000x10 data; not real market data, performance, comparative or production evidence.",
+  "command": [
+    "<scratch>/arctic-venv/bin/python",
+    "<repository>/blueprints/us-equities/final-market-data-reference-20261016/arctic_native_invoke.py",
+    "<scratch>/arctic-local-lmdb"
+  ],
+  "cwd": "<scratch>",
+  "declared_inputs": {
+    "arcticdb": "6.26.0",
+    "source_commit": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T06:21:27.014071+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
+  "output": "arctic-upstream-lmdb-smoke.log",
+  "output_sha256": "895b566f5e6ad1ae3f156a6738f68851dea320bf466efeffe48cd02988007c3b",
+  "private_capture_name": "arctic-upstream-lmdb-smoke",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T06:21:24.287614+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

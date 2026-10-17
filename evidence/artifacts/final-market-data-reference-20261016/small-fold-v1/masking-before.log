@@ -1,0 +1,410 @@
+test_conflicting_json_escape_aliases_are_rejected (test_mask_capture.MaskCaptureTests.test_conflicting_json_escape_aliases_are_rejected) ... ok
+test_json_encoded_private_literals_are_masked (test_mask_capture.MaskCaptureTests.test_json_encoded_private_literals_are_masked) ... ok
+test_longest_match_wins_independent_of_rule_order (test_mask_capture.MaskCaptureTests.test_longest_match_wins_independent_of_rule_order) ... ok
+test_no_rules_or_no_matches_leave_bytes_exact (test_mask_capture.MaskCaptureTests.test_no_rules_or_no_matches_leave_bytes_exact) ... ok
+test_partial_root_does_not_eat_unrelated_path (test_mask_capture.MaskCaptureTests.test_partial_root_does_not_eat_unrelated_path) ... ok
+test_preserves_all_unmapped_bytes_and_line_endings (test_mask_capture.MaskCaptureTests.test_preserves_all_unmapped_bytes_and_line_endings) ... ok
+test_rejects_ambiguous_or_unmarked_rules (test_mask_capture.MaskCaptureTests.test_rejects_ambiguous_or_unmarked_rules) ... ok
+test_replacements_are_not_reprocessed (test_mask_capture.MaskCaptureTests.test_replacements_are_not_reprocessed) ... ok
+test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) ... 
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=10) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=11) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=12) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=13) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=14) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=15) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=16) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=17) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=18) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=19) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=20) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=21) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=22) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=23) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=24) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=25) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=26) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=27) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=28) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=29) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=30) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=31) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=32) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=33) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=34) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=35) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=36) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=37) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=38) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=39) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=40) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=41) ... FAIL
+  test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=42) ... FAIL
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=10)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=11)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=12)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=13)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=14)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=15)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=16)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=17)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=18)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=19)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=20)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=21)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=22)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=23)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=24)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=25)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=26)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=27)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=28)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=29)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=30)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=31)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=32)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=33)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=34)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=35)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=36)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=37)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=38)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=39)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=40)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=41)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+======================================================================
+FAIL: test_truncated_scratch_prefixes_are_masked (test_mask_capture.MaskCaptureTests.test_truncated_scratch_prefixes_are_masked) (prefix_length=42)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repository>/blueprints/us-equities/final-market-data-reference-20261016/test_mask_capture.py", line 17, in test_truncated_scratch_prefixes_are_masked
+    self.assertEqual(mask_bytes(raw, rules),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        b"AssertionError: '<scratch>[47 chars]tail'")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: '<private-scratch-prefix>[47 chars]tail'" != b"AssertionError: '<scratch>[47 chars]tail'"
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.009s
+
+FAILED (failures=33)

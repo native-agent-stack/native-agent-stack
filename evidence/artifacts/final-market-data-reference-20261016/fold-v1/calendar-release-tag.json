@@ -1,0 +1,33 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Scope-locked fold setup or explicitly synthetic masking/custody regression; no broker calls or model adjudication.",
+  "command": [
+    "/usr/bin/git",
+    "ls-remote",
+    "https://github.com/gerrymanoim/exchange_calendars.git",
+    "refs/tags/v4.13.2",
+    "refs/tags/v4.13.2^{}",
+    "refs/tags/4.13.2",
+    "refs/tags/4.13.2^{}"
+  ],
+  "cwd": "<fold-scratch>",
+  "declared_inputs": {
+    "exchange-calendars": "4.13.2",
+    "source_commit": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T07:50:35.422701+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
+  "output": "calendar-release-tag.log",
+  "output_sha256": "be61c2dbdaf9ec6bea20469ab71c3f264a9c8d057d75e2c5e36e0da4b5b1f72f",
+  "private_capture_name": "calendar-release-tag",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T07:50:35.222699+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}
