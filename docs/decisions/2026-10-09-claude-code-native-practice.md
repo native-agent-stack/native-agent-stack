@@ -221,7 +221,7 @@ since 2026-02-11 and no releases, which fails the 90-day maintenance rule.
 | Blinded skills-content comparison | skills-library | skills-lifecycle |
 | Mislabel rate on the first real triage runs before any author gate | GitHub triage | api-actions |
 | agentsview retention probe | cleanupPeriodDays recommendation | command center |
-| Paired run 4 (preregistration sha256 `33bd44ca34cb`, approved by the command center 2026-10-11 ~01:12Z; its meters passed Stage 0 at 02:14Z and Stage 1 started at 02:18Z; stopped on 2026-10-11 at the owner's priority after 2 of 8 pairs, with no verdict (private record sha256 `6fdeb8916960`); a restart needs a new ruling that links it to the north star): the advisor on against off (`CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1`) for Workflow subagents on the frozen fixtures, hidden tests, blind-judged diffs and cost by model, with the cost counter, the `api_request` events and the transcripts reconciled | model-effort-routing (native advisor pairing), usage-cost-monitoring | cc-native-practice |
+| Paired run 4 (its private preregistration, approved by the command center 2026-10-11 ~01:12Z; its meters passed Stage 0 at 02:14Z and Stage 1 started at 02:18Z; stopped on 2026-10-11 at the owner's priority after 2 of 8 pairs, with no verdict (private record `addendum-06-owner-priority-stop-20261011.md`); a restart needs a new ruling that links it to the north star): the advisor on against off (`CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1`) for Workflow subagents on the frozen fixtures, hidden tests, blind-judged diffs and cost by model, with the cost counter, the `api_request` events and the transcripts reconciled | model-effort-routing (native advisor pairing), usage-cost-monitoring | cc-native-practice |
 
 ## Refresh loop
 

@@ -77,7 +77,7 @@ def orchestration_rule(o: dict, fixtures: list) -> dict:
 ROUTING_HEADS = [989, 974, 982, 970, 978]
 ROUTING_COST_BOUND = 0.60
 SONNET_CONDITION = "where the change is mechanical or a second Claude-family read exists"  # the command center's ruling: Sonnet at medium takes non-gate foundation changes only under this condition
-STOP_RECORD_PREFIX = "6fdeb8916960"  # paired-advisor/addendum-06-owner-priority-stop-20261011.md, a private working paper
+STOP_RECORD = "addendum-06-owner-priority-stop-20261011.md"  # in paired-advisor/, a private working paper named by file only
 
 
 def noise_floor(p: float, n: int, strict: bool) -> float:
@@ -693,9 +693,10 @@ class RoutingRunTests(unittest.TestCase):
         self.assertEqual(self.record.count(paragraph), 1, "the addendum carries the paragraph the artifact gives")
         self.assertNotIn("Paired run 5 (preregistration", self.record, "a decided run is not owed")
         row = next(line for line in RECORD.read_text(encoding="utf-8").splitlines() if line.startswith("| Paired run 4 ("))
-        self.assertIn("33bd44ca34cb", row)
+        self.assertIn("(its private preregistration, approved by the command center", row)
         self.assertIn("stopped on 2026-10-11 at the owner's priority after 2 of 8 pairs, with no verdict", row)
-        self.assertIn(STOP_RECORD_PREFIX, row)
+        self.assertIn(f"(private record `{STOP_RECORD}`)", row)
+        self.assertNotRegex(row, r"sha256 `[0-9a-f]{7,}`", "the row names its private records by file only")
         self.assertNotIn("its result is a later record", row)
         for needle in ("no slot row, default or skill text changes", f"`{self.r['ruling']['sha256'][:12]}`"):
             self.assertIn(needle, paragraph)
