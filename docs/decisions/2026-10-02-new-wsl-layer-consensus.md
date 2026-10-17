@@ -580,7 +580,7 @@ install plan. F1 is not edited and keeps its qualification meaning.
 The command center's GO of 2026-10-16 at 16:51Z moved ai-memory from 2.6.6 to 3.1.0, and its rulings D1-D9 for condition 4
 of PR (b) direct the plan to follow; its rulings G1-G6 for the pull request's fold (hcom #14261, 2026-10-17) settle the
 configuration text. All are recorded outside this repository: the ns51 handoff receipt (section 8) and the two rulings
-files, each named by file only in the amendment's `by` (this repository publishes no digest of a private record). The plan's `memory-owner` row moves in the same
+files, each named by file only in the amendment's `by` (this record publishes no digest of a private record). The plan's `memory-owner` row moves in the same
 change. `check_plan.py` binds the row's owner to this interim's default.
 
 ### The assembler's amendment path

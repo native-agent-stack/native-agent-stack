@@ -202,9 +202,9 @@ class MemoryOwnerRunPinTests(unittest.TestCase):
             self.assertNotRegex(path.read_text(encoding="utf-8"), r"(?i)MemoryMax=4G|provisional (?:bound|MemoryMax)", path.name)
 
     def test_the_handbook_receipt_keeps_no_state_that_only_the_prs_first_commit_held(self):
-        """Round 2: the receipt recorded the handbook state of the PR's first commit (a regenerations entry and a
-        previous_outputs entry citing that commit as source_head). That commit is not published, and the output digests of
-        its state match no tracked file at the head, so the text-digest guard cannot resolve them. The receipt keeps one
+        """Round 2: a draft of this fold recorded the PR's first commit's handbook state (a regenerations entry and a
+        previous_outputs entry citing that commit as source_head). The output digests of that state match no tracked
+        file at the head, so the text-digest guard cannot resolve them. The receipt keeps one
         regenerations entry for this PR (one entry, found by what it records) whose digests are the tracked files' own while it
         is the current regeneration, and previous_outputs entries whose digests are the blobs at their source_head."""
         receipt_path = ROOT / "evidence/artifacts/new-wsl-handbook-20261001/receipt.json"
@@ -505,7 +505,7 @@ class MemoryOwnerRunPinTests(unittest.TestCase):
         self.assertEqual(amendment["date_utc"], consensus["wave6"]["date_utc"])
 
     def test_the_interim_pin_string_is_the_run_pins_tag_commit_and_archive_in_every_record_that_carries_it(self):
-        """N1: the fold dropped the space before '(tag object' in the interim's pin while it edited the label beside it, in
+        """N1: a draft of this fold dropped the space before '(tag object' in the interim's pin while it edited the label beside it, in
         the consensus record, the definitive manifest and the handbook JSON generated from them, and no check read the
         string. Each record carries the exact pin the run pin's tag resolution and archive give, in the form the install
         plan's SOURCES.md and the layer-consensus decision print (a space before the parenthesis)."""

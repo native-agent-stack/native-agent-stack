@@ -19373,8 +19373,8 @@
     },
     {
       "path": "docs/decisions/2026-10-17-new-wsl-remote-control-at-startup.md",
-      "sha256": "02d11b6cb28da3956516b453dc64dfd00f3f2a17f085adcb7fc3ff11ee10177c",
-      "bytes": 9835
+      "sha256": "bae5b0e20ef7eabe52661273c22424cf0b2b894ea90791ad6fc43952c98d30b4",
+      "bytes": 9977
     },
     {
       "path": "docs/decisions/2026-10-17-zero-tolerance-currency.md",
@@ -44818,8 +44818,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ai-memory-override.conf",
-      "sha256": "9f80b5ec4ebebb14c57b218b38ee76fc1852b67c1919f8f76af64b2d5f9f77c4",
-      "bytes": 2020
+      "sha256": "650b265f62b14ce6e61681f8af0e0ff8d853937fa5d56172029ea9f5ccd05e2a",
+      "bytes": 2022
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/alertmanager-telegram.yaml",

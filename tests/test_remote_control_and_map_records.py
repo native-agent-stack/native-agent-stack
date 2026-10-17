@@ -50,8 +50,11 @@ class AuthorizationEffectsTests(unittest.TestCase):
         """B7: the no-prompt part comes from bypassPermissions alone; accept is about messages; neither is said to come from both."""
         text = flat(section(read(DECISION), "## Why authorization"))
         self.assertNotIn("Together they make Remote Control", text)
-        self.assertIn("https://code.claude.com/docs/en/permission-modes.md, line 571", text)
+        self.assertIn("https://code.claude.com/docs/en/permission-modes.md, lines 571 and 573", text)
         self.assertIn("lines 195 and 203-206", text)
+        # Delta B3: permission-modes.md:573 follows :571 with the actions no mode auto-approves, which still prompt.
+        self.assertIn("except that \"the actions no mode auto-approves still prompt in this mode\" (line 573)", text)
+        self.assertIn("run with no prompt, apart from the actions no mode auto-approves,", text)
         self.assertIn("`bypassPermissions` \"disables permission prompts and safety checks so tool calls execute immediately\"", text)
         self.assertIn("It alone makes a turn started from claude.ai/code or the Claude app run its tool calls with no prompt", text)
         self.assertIn("`crossSessionInbound = \"accept\"` decides only whether a message from the user's other sessions is "

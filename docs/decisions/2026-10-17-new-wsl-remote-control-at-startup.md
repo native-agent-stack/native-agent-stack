@@ -29,10 +29,10 @@ starts the Remote Control bridge, so the owner's own claude.ai/code or Claude ap
 
 The setting grants a remote device control of the session. On this distribution, `--with-authorization-settings` also
 writes `permissions.defaultMode = "bypassPermissions"` and `crossSessionInbound = "accept"`, and each has its own
-effect, as upstream gives it (https://code.claude.com/docs/en/permission-modes.md, line 571, and
+effect, as upstream gives it (https://code.claude.com/docs/en/permission-modes.md, lines 571 and 573, and
 https://code.claude.com/docs/en/cross-session-messaging.md, lines 195 and 203-206, both read 2026-10-17):
 - `bypassPermissions` "disables permission prompts and safety checks so tool calls execute immediately". It alone makes a
-  turn started from claude.ai/code or the Claude app run its tool calls with no prompt, with or without `accept`.
+  turn started from claude.ai/code or the Claude app run its tool calls with no prompt, with or without `accept`, except that "the actions no mode auto-approves still prompt in this mode" (line 573).
 - `crossSessionInbound = "accept"` decides only whether a message from the user's other sessions is delivered to Claude
   ("delivers each message to Claude"). With no value set, Claude Code holds a message for approval in two cases: a
   receiving session that prompts for permissions holds one when the sender identifies itself as bypassing, and a
@@ -41,7 +41,7 @@ https://code.claude.com/docs/en/cross-session-messaging.md, lines 195 and 203-20
 - `remoteControlAtStartup: true` starts the Remote Control bridge in each interactive session, so the owner's own
   claude.ai/code or Claude app can drive it. It changes neither of the other two.
 
-On a host that takes the whole bundle, Remote Control is therefore a remote ingress whose tool calls run with no prompt
+On a host that takes the whole bundle, Remote Control is therefore a remote ingress whose tool calls run with no prompt, apart from the actions no mode auto-approves,
 (from `bypassPermissions`) and which other sessions' messages also reach (from `accept`). The Mac stage disclosed the
 same combination (evidence/artifacts/mac-stage1-client-layer-20260927/README.md:545-560). Classing
 the key practice would write it by default on every apply. The authorization class keeps it with the other settings
