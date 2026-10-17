@@ -1,0 +1,680 @@
+{
+ "schema": "startup-context-receipt/1",
+ "role_id": "CC",
+ "family": "claude-code",
+ "variant": "+ai-memory",
+ "component": "ai-memory",
+ "measured_at": "2026-10-16T05:38:58Z",
+ "client_version": "2.1.301",
+ "cwd": ".",
+ "flags": [
+  "--strict-mcp-config",
+  "--mcp-config",
+  "mcp-ai-memory-serena.json",
+  "--settings",
+  "{\"enabledPlugins\": {\"context-mode@context-mode\": false}}",
+  "--model",
+  "claude-opus-5-5"
+ ],
+ "num_turns": 0,
+ "total_cost_usd": 0,
+ "mcp_servers": [
+  {
+   "name": "serena",
+   "status": "connected"
+  },
+  {
+   "name": "ai-memory",
+   "status": "failed"
+  }
+ ],
+ "plugins": [
+  "cc-plugin-agents-md",
+  "cc-plugin-plugin-authoring",
+  "cc-plugin-telemetry",
+  "cc-plugin-you-should-know",
+  "claude-hud",
+  "codex",
+  "diagram-design",
+  "socraticode",
+  "worktrunk"
+ ],
+ "report": {
+  "model": "claude-opus-5-5",
+  "total_tokens": 25100,
+  "window_tokens": 1000000,
+  "categories": [
+   {
+    "category": "System prompt",
+    "tokens": 2700
+   },
+   {
+    "category": "System tools",
+    "tokens": 1400
+   },
+   {
+    "category": "MCP server instructions",
+    "tokens": 60
+   },
+   {
+    "category": "MCP tools (deferred)",
+    "tokens": 8700
+   },
+   {
+    "category": "System tools (deferred)",
+    "tokens": 14200
+   },
+   {
+    "category": "Custom agents",
+    "tokens": 1700
+   },
+   {
+    "category": "Memory files",
+    "tokens": 10300
+   },
+   {
+    "category": "Skills",
+    "tokens": 8600
+   },
+   {
+    "category": "Messages",
+    "tokens": 369
+   },
+   {
+    "category": "Free space",
+    "tokens": 941900
+   },
+   {
+    "category": "Autocompact buffer",
+    "tokens": 33000
+   }
+  ],
+  "mcp_tools": [
+   {
+    "tool": "mcp__serena__delete_memory",
+    "server": "serena",
+    "tokens": 111
+   },
+   {
+    "tool": "mcp__serena__edit_memory",
+    "server": "serena",
+    "tokens": 453
+   },
+   {
+    "tool": "mcp__serena__find_declaration",
+    "server": "serena",
+    "tokens": 522
+   },
+   {
+    "tool": "mcp__serena__find_implementations",
+    "server": "serena",
+    "tokens": 494
+   },
+   {
+    "tool": "mcp__serena__find_referencing_symbols",
+    "server": "serena",
+    "tokens": 432
+   },
+   {
+    "tool": "mcp__serena__find_symbol",
+    "server": "serena",
+    "tokens": 1400
+   },
+   {
+    "tool": "mcp__serena__get_diagnostics_for_file",
+    "server": "serena",
+    "tokens": 450
+   },
+   {
+    "tool": "mcp__serena__get_symbols_overview",
+    "server": "serena",
+    "tokens": 420
+   },
+   {
+    "tool": "mcp__serena__initial_instructions",
+    "server": "serena",
+    "tokens": 150
+   },
+   {
+    "tool": "mcp__serena__insert_after_symbol",
+    "server": "serena",
+    "tokens": 264
+   },
+   {
+    "tool": "mcp__serena__insert_before_symbol",
+    "server": "serena",
+    "tokens": 315
+   },
+   {
+    "tool": "mcp__serena__list_memories",
+    "server": "serena",
+    "tokens": 88
+   },
+   {
+    "tool": "mcp__serena__onboarding",
+    "server": "serena",
+    "tokens": 111
+   },
+   {
+    "tool": "mcp__serena__open_dashboard",
+    "server": "serena",
+    "tokens": 70
+   },
+   {
+    "tool": "mcp__serena__read_memory",
+    "server": "serena",
+    "tokens": 117
+   },
+   {
+    "tool": "mcp__serena__rename_memory",
+    "server": "serena",
+    "tokens": 203
+   },
+   {
+    "tool": "mcp__serena__rename_symbol",
+    "server": "serena",
+    "tokens": 295
+   },
+   {
+    "tool": "mcp__serena__replace_content",
+    "server": "serena",
+    "tokens": 702
+   },
+   {
+    "tool": "mcp__serena__replace_in_files",
+    "server": "serena",
+    "tokens": 1300
+   },
+   {
+    "tool": "mcp__serena__replace_symbol_body",
+    "server": "serena",
+    "tokens": 340
+   },
+   {
+    "tool": "mcp__serena__safe_delete_symbol",
+    "server": "serena",
+    "tokens": 206
+   },
+   {
+    "tool": "mcp__serena__write_memory",
+    "server": "serena",
+    "tokens": 300
+   }
+  ],
+  "custom_agents": [
+   {
+    "name": "blind-adjudicator",
+    "source": "Project",
+    "tokens": 92
+   },
+   {
+    "name": "blind-judge",
+    "source": "Project",
+    "tokens": 54
+   },
+   {
+    "name": "blind-lane-reviewer",
+    "source": "Project",
+    "tokens": 72
+   },
+   {
+    "name": "codebase-memory",
+    "source": "User",
+    "tokens": 42
+   },
+   {
+    "name": "codebase-memory-auditor",
+    "source": "User",
+    "tokens": 47
+   },
+   {
+    "name": "codebase-memory-scout",
+    "source": "User",
+    "tokens": 49
+   },
+   {
+    "name": "codex:codex-rescue",
+    "source": "Plugin",
+    "tokens": 85
+   },
+   {
+    "name": "evidence-reviewer",
+    "source": "Project",
+    "tokens": 125
+   },
+   {
+    "name": "isolated-builder",
+    "source": "Project",
+    "tokens": 79
+   },
+   {
+    "name": "landscape-sweep-worker",
+    "source": "Project",
+    "tokens": 79
+   },
+   {
+    "name": "security-reviewer",
+    "source": "Project",
+    "tokens": 129
+   },
+   {
+    "name": "semantic-evidence-reviewer",
+    "source": "Project",
+    "tokens": 136
+   },
+   {
+    "name": "semble-search",
+    "source": "User",
+    "tokens": 83
+   },
+   {
+    "name": "socraticode:codebase-explorer",
+    "source": "Plugin",
+    "tokens": 257
+   },
+   {
+    "name": "source-scout",
+    "source": "Project",
+    "tokens": 66
+   },
+   {
+    "name": "stack-researcher",
+    "source": "Project",
+    "tokens": 166
+   },
+   {
+    "name": "stack-verifier",
+    "source": "Project",
+    "tokens": 143
+   }
+  ],
+  "memory_files": [
+   {
+    "type": "User",
+    "path": "~/.claude/CLAUDE.md",
+    "tokens": 966
+   },
+   {
+    "type": "User",
+    "path": "~/.claude/RTK.md",
+    "tokens": 151
+   },
+   {
+    "type": "Project",
+    "path": "<absolute path outside home>",
+    "tokens": 119
+   },
+   {
+    "type": "Project",
+    "path": "<absolute path outside home>",
+    "tokens": 1400
+   },
+   {
+    "type": "AutoMem",
+    "path": "~/.claude/projects/-~-code-native-agent-stack/memory/MEMORY.md",
+    "tokens": 7600
+   }
+  ],
+  "skills": [
+   {
+    "name": "agentic-actions-auditor",
+    "source": "User",
+    "tokens": 200
+   },
+   {
+    "name": "claude-native-practice",
+    "source": "User",
+    "tokens": 130
+   },
+   {
+    "name": "codebase-design",
+    "source": "User",
+    "tokens": 100
+   },
+   {
+    "name": "codebase-memory",
+    "source": "User",
+    "tokens": 160
+   },
+   {
+    "name": "codeql",
+    "source": "User",
+    "tokens": 250
+   },
+   {
+    "name": "diagnosing-bugs",
+    "source": "User",
+    "tokens": 60
+   },
+   {
+    "name": "find-skills",
+    "source": "User",
+    "tokens": 110
+   },
+   {
+    "name": "fp-check",
+    "source": "User",
+    "tokens": 120
+   },
+   {
+    "name": "frontend-design",
+    "source": "User",
+    "tokens": 70
+   },
+   {
+    "name": "gh-address-comments",
+    "source": "User",
+    "tokens": 60
+   },
+   {
+    "name": "gh-fix-ci",
+    "source": "User",
+    "tokens": 110
+   },
+   {
+    "name": "hcom-agent-messaging",
+    "source": "User",
+    "tokens": 60
+   },
+   {
+    "name": "hf-cli",
+    "source": "User",
+    "tokens": 340
+   },
+   {
+    "name": "iterative-retrieval",
+    "source": "User",
+    "tokens": 70
+   },
+   {
+    "name": "loki",
+    "source": "User",
+    "tokens": 140
+   },
+   {
+    "name": "mcp-builder",
+    "source": "User",
+    "tokens": 100
+   },
+   {
+    "name": "mineru",
+    "source": "User",
+    "tokens": 200
+   },
+   {
+    "name": "modern-python",
+    "source": "User",
+    "tokens": 60
+   },
+   {
+    "name": "native-stack-research",
+    "source": "User",
+    "tokens": 60
+   },
+   {
+    "name": "native-stack-worker",
+    "source": "User",
+    "tokens": 50
+   },
+   {
+    "name": "promptfoo-evals",
+    "source": "User",
+    "tokens": 120
+   },
+   {
+    "name": "property-based-testing",
+    "source": "User",
+    "tokens": 290
+   },
+   {
+    "name": "qmd",
+    "source": "User",
+    "tokens": 60
+   },
+   {
+    "name": "sarif-parsing",
+    "source": "User",
+    "tokens": 130
+   },
+   {
+    "name": "search-first",
+    "source": "User",
+    "tokens": 120
+   },
+   {
+    "name": "security-audit",
+    "source": "User",
+    "tokens": 130
+   },
+   {
+    "name": "security-best-practices",
+    "source": "User",
+    "tokens": 140
+   },
+   {
+    "name": "security-threat-model",
+    "source": "User",
+    "tokens": 150
+   },
+   {
+    "name": "skill-creator",
+    "source": "User",
+    "tokens": 110
+   },
+   {
+    "name": "supply-chain-risk-auditor",
+    "source": "User",
+    "tokens": 130
+   },
+   {
+    "name": "tdd",
+    "source": "User",
+    "tokens": 50
+   },
+   {
+    "name": "typesafe-ai",
+    "source": "User",
+    "tokens": 230
+   },
+   {
+    "name": "variant-analysis",
+    "source": "User",
+    "tokens": 200
+   },
+   {
+    "name": "writing-for-agents",
+    "source": "User",
+    "tokens": 40
+   },
+   {
+    "name": "native-skill-routing",
+    "source": "Project",
+    "tokens": 130
+   },
+   {
+    "name": "omniroute-runtime-worker",
+    "source": "Project",
+    "tokens": 50
+   },
+   {
+    "name": "layer-verdict-lane",
+    "source": "User",
+    "tokens": 380
+   },
+   {
+    "name": "readiness-audit",
+    "source": "User",
+    "tokens": 100
+   },
+   {
+    "name": "review-changes",
+    "source": "User",
+    "tokens": 110
+   },
+   {
+    "name": "codex:rescue",
+    "source": "Plugin (codex)",
+    "tokens": 40
+   },
+   {
+    "name": "codex:setup",
+    "source": "Plugin (codex)",
+    "tokens": 40
+   },
+   {
+    "name": "claude-hud:setup",
+    "source": "Plugin (claude-hud)",
+    "tokens": 20
+   },
+   {
+    "name": "claude-hud:configure",
+    "source": "Plugin (claude-hud)",
+    "tokens": 50
+   },
+   {
+    "name": "diagram-design:doctor",
+    "source": "Plugin (diagram-design)",
+    "tokens": 30
+   },
+   {
+    "name": "diagram-design:export-diagram",
+    "source": "Plugin (diagram-design)",
+    "tokens": 30
+   },
+   {
+    "name": "diagram-design:import-drawio",
+    "source": "Plugin (diagram-design)",
+    "tokens": 40
+   },
+   {
+    "name": "diagram-design:import-excalidraw",
+    "source": "Plugin (diagram-design)",
+    "tokens": 40
+   },
+   {
+    "name": "diagram-design:import-mermaid",
+    "source": "Plugin (diagram-design)",
+    "tokens": 40
+   },
+   {
+    "name": "diagram-design:profile",
+    "source": "Plugin (diagram-design)",
+    "tokens": 30
+   },
+   {
+    "name": "codex:codex-cli-runtime",
+    "source": "Plugin (codex)",
+    "tokens": 40
+   },
+   {
+    "name": "codex:codex-result-handling",
+    "source": "Plugin (codex)",
+    "tokens": 30
+   },
+   {
+    "name": "codex:gpt-5-4-prompting",
+    "source": "Plugin (codex)",
+    "tokens": 60
+   },
+   {
+    "name": "worktrunk:worktrunk",
+    "source": "Plugin (worktrunk)",
+    "tokens": 180
+   },
+   {
+    "name": "worktrunk:wt-switch-create",
+    "source": "Plugin (worktrunk)",
+    "tokens": 70
+   },
+   {
+    "name": "socraticode:codebase-exploration",
+    "source": "Plugin (socraticode)",
+    "tokens": 160
+   },
+   {
+    "name": "socraticode:codebase-management",
+    "source": "Plugin (socraticode)",
+    "tokens": 150
+   },
+   {
+    "name": "diagram-design:diagram-design",
+    "source": "Plugin (diagram-design)",
+    "tokens": 290
+   },
+   {
+    "name": "dataviz",
+    "source": "Built-in",
+    "tokens": 480
+   },
+   {
+    "name": "update-config",
+    "source": "Built-in",
+    "tokens": 240
+   },
+   {
+    "name": "keybindings-help",
+    "source": "Built-in",
+    "tokens": 80
+   },
+   {
+    "name": "code-review",
+    "source": "Built-in",
+    "tokens": 330
+   },
+   {
+    "name": "simplify",
+    "source": "Built-in",
+    "tokens": 60
+   },
+   {
+    "name": "fewer-permission-prompts",
+    "source": "Built-in",
+    "tokens": 60
+   },
+   {
+    "name": "loop",
+    "source": "Built-in",
+    "tokens": 120
+   },
+   {
+    "name": "schedule",
+    "source": "Built-in",
+    "tokens": 130
+   },
+   {
+    "name": "claude-api",
+    "source": "Built-in",
+    "tokens": 360
+   },
+   {
+    "name": "workflow-authoring",
+    "source": "Built-in",
+    "tokens": 80
+   },
+   {
+    "name": "run",
+    "source": "Built-in",
+    "tokens": 120
+   },
+   {
+    "name": "plugin-authoring",
+    "source": "Built-in",
+    "tokens": 90
+   },
+   {
+    "name": "init",
+    "source": "Built-in",
+    "tokens": 20
+   },
+   {
+    "name": "security-review",
+    "source": "Built-in",
+    "tokens": 30
+   }
+  ],
+  "mcp_tokens_by_server": {
+   "serena": 8743
+  },
+  "mcp_tools_deferred": true
+ }
+}
