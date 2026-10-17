@@ -682,7 +682,9 @@ def exclusions(home: str, codex: list, env, transcripts: str, group: str, pointe
     inventory = json.loads((ROOT / cs.INVENTORY).read_text(encoding="utf-8"))
     exact += [(str(cs.expand_template(entry["store"]["path_template"], env)), "key")
               for entry in inventory["entries"] if entry["store"]["kind"] in cs.LOCAL_KINDS]
-    exact += [(str(path), "key") for entry in inventory["entries"] for path in cs.override_paths(entry, env)]  # no root moves
+    walked = [path for recipes in sink_roots(h, os.getuid(), codex, "").values() for kind, path in recipes
+              if kind in ("dir", "file", "git") and os.path.isabs(path)]  # each root's own string, as the worker joins children
+    exact += [(path, "key") for entry in inventory["entries"] for path in cs.override_paths(entry, env, walked)]  # no root moves
     glob = [(f"{h}/.claude/sessions", "*.key", "key")]
     for path in codex:
         exact.append((f"{path}/auth.json", "key"))
@@ -718,6 +720,17 @@ def pointer_paths(env) -> list:
     inventory = json.loads((ROOT / cs.INVENTORY).read_text(encoding="utf-8"))
     names = sorted({name for entry in inventory["entries"] for name in entry["pointer_variables"]})
     return [env[name] for name in names if env.get(name) and os.path.isabs(env[name])]
+
+
+def override_refusal(env) -> str | None:
+    """The refusal code when an inventory override variable is set to an empty, blank or relative value: ai-memory then keeps its
+    data directory, token files included, in the working directory of whichever run wrote them (scripts/credential_status.py
+    override_value), which the proof cannot know or exclude. None when every override variable is unset or absolute."""
+    inventory = json.loads((ROOT / cs.INVENTORY).read_text(encoding="utf-8"))
+    names = sorted({name for entry in inventory["entries"] for name in entry.get("override_variables", [])})
+    if any(name in env and not os.path.isabs(cs.override_value(name, env) or "") for name in names):
+        return "override_variable_not_absolute"
+    return None
 
 
 # ---- Launching the contained worker and reading CP03 (contract 10, 11) ----------------------------------------------
@@ -1109,6 +1122,9 @@ def prepare(args, env) -> int:
     codex = [ordinary] + ([os.path.abspath(args.codex_home)] if args.codex_home else [])
     if len(set(codex)) != len(codex) or not os.path.isabs(home):
         raise Refused("codex_home_invalid")
+    refusal = override_refusal(env)
+    if refusal:
+        raise Refused(refusal)
     run.write("homes", json.dumps(codex).encode())
     if args.session:
         if not SESSION.fullmatch(args.session):

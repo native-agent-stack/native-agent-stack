@@ -5392,8 +5392,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "e6756f764cf949b889001af6ef8f41cfe1877b72172f78259a2e9c54664ae663",
-      "bytes": 51942
+      "sha256": "64092cddcdb816f2346eb6a46d9393eabf140be6e93551b7dfec80fef15392e4",
+      "bytes": 52514
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -5407,7 +5407,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "1ccaff4caa388df0c5bfb991d542aa95e3e78397ab1a68468c8ef21bebb05491",
+      "sha256": "7aa895f61aabb397816c1eac82b83440e6e8e7a0bf8f17dd941427dcf9b7abd6",
       "bytes": 1229
     },
     {
@@ -18468,8 +18468,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-key-management.md",
-      "sha256": "2889279ff14e085da1aa06a295120b1deb16719ebc32eb10d9674cf39f2a436c",
-      "bytes": 96249
+      "sha256": "d7429239b953f465a5522f495a7806fd7db2817c5a0c38947212abec488b72d9",
+      "bytes": 97563
     },
     {
       "path": "docs/decisions/2026-09-29-max-default-effort.md",
@@ -19768,8 +19768,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "fe28562a483151fcd4e6623af9257169e214b4db1b7e4ff5f2baa4e34ed41dfd",
-      "bytes": 208578
+      "sha256": "eda2dc9c294d07b2b0ae6ddf38b2bebe9c7f4338846a116501f04d07d7e20507",
+      "bytes": 208585
     },
     {
       "path": "docs/stack.md",
@@ -63118,8 +63118,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "57449fca94af8ce46948a8eaa0ae38dd0f6d5933739c1973fade3ca3b18f20b4",
-      "bytes": 38604
+      "sha256": "f2b7a85050d8671899c6bf4f4bc5286f4718513446aef29f8b22f7b64405659c",
+      "bytes": 40255
     },
     {
       "path": "scripts/currency_due.py",
@@ -63163,8 +63163,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "30da9c04b3f7381e469eb2ecd33215591d17383fe547e0530baf89e211d427fd",
-      "bytes": 302227
+      "sha256": "924ab13d5ab891eb3b69ef694c8220c8ac5c36b2504cacc48c80c23ed78a7735",
+      "bytes": 302239
     },
     {
       "path": "scripts/host_name_scan.py",
@@ -63953,8 +63953,8 @@
     },
     {
       "path": "tests/test_canary_proof.py",
-      "sha256": "71a70af9ba94dc438ddc89ae1d86ce7cff91b8912191fe071235b9e74b5683bd",
-      "bytes": 223389
+      "sha256": "59a0a999fb6049dbb4c6cada69c3ca87cd2934a9d1b33e534340a1a2d4b0159e",
+      "bytes": 228067
     },
     {
       "path": "tests/test_capability_gate.py",
@@ -65658,8 +65658,8 @@
     },
     {
       "path": "tools/credentials/canary_proof.py",
-      "sha256": "a8f0d92b1e8ed285f0cd094404bcb2e5081f818a0a4e8ebc90b1658423f80fd3",
-      "bytes": 103316
+      "sha256": "59a027aa2246655a8de5491bdb2c2f83b5b55d7e8cce920f6215d144ca12c274",
+      "bytes": 104408
     },
     {
       "path": "tools/credentials/canary_scan_worker.py",

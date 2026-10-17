@@ -778,9 +778,10 @@ class UnitTests(unittest.TestCase):
 
     def test_ai_memory_tokens_written_under_a_moved_data_dir_are_keys_under_every_root(self):
         """A2 finding G8-A02, fold 5 (B1): ai-memory init, install-hooks and auth, run without --data-dir while AI_MEMORY_DATA_DIR is
-        exported, write the token files where the variable points. With it under A1 (~/.claude) or under a Codex home (A4), both the
-        default and the moved token names are key exclusions, in the one list prepare digests and the scan uses (exclusions), and no
-        scan root moves. Synthetic: a temporary HOME; no store file is created."""
+        exported, write the token files where the variable points. This covers the variable as exported to the canary proof itself (at
+        scan time): with it under A1 (~/.claude) or under a Codex home (A4), both the default and the moved token names are key
+        exclusions in exclusions(), the function prepare's digest and each scan's plan are built from, and no scan root moves. It does
+        not show that the writer's shell held the same value. Synthetic: a temporary HOME; no store file is created."""
         names = ("auth-token", "auth-header", "auth-tokens/default", "auth.json")
         with tempfile.TemporaryDirectory(prefix="g8-a02-home-") as home:
             codex = f"{home}/.codex"
@@ -794,7 +795,8 @@ class UnitTests(unittest.TestCase):
                         self.assertIn(f"{home}/.local/share/ai-memory/{name}", keys, f"G8-default-{name}")
                         self.assertIn(f"{moved.strip()}/{name}", keys, f"G8-moved-{name}")
                     self.assertEqual(cp.sink_roots(home, os.getuid(), [codex], "-"), before, "G8-no-root-moves")
-            # A blank, relative or default-equal value adds no exclusion beyond the default's.
+            # A blank, relative or default-equal value adds no exclusion beyond the default's (prepare refuses the first three:
+            # test_ai_memory_override_refusal_for_empty_blank_or_relative_values).
             base = {path for path, kind in cp.exclusions(home, [codex], {"HOME": home}, "confirmed", "agent", [])[0]}
             for value in ("", "   ", "relative/ai-memory", f"{home}/.local/share/ai-memory"):
                 env = {"HOME": home, "AI_MEMORY_DATA_DIR": value}
@@ -802,14 +804,18 @@ class UnitTests(unittest.TestCase):
                     self.assertEqual({path for path, kind in cp.exclusions(home, [codex], env, "confirmed", "agent", [])[0]},
                                      base, "G8-no-extra-exclusion")
 
-    def test_ai_memory_override_warning_needs_a_non_blank_value_other_than_the_default(self):
-        """A2 finding G8-A02, fold 5 (B3): ai-memory reads the variable through env_string, which trims it and treats an empty or blank
-        value as unset (v2.4.1 config.rs:2086-2095, v2.3.2 :1808-1817), so only a non-blank value other than the default warns."""
+    def test_ai_memory_override_warning_for_any_set_value_other_than_the_default(self):
+        """A2 finding G8-A02, fold 6 (B2): an empty or blank AI_MEMORY_DATA_DIR is not unset for ai-memory. figment's Env provider keeps
+        it (figment 0.10.19 src/providers/env.rs:504-519; merged at v2.4.1 config.rs:1318) and canonicalise_or_keep keeps "" (:2254-2266),
+        so a run without --data-dir writes the token files into its working directory (ai-memory 3.1.0 `init`, measured). The checker
+        warns for any set value other than the default, empty and blank included; only unset and the default stay quiet."""
         inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text(encoding="utf-8"))
         rows = [entry for entry in inventory["entries"] if entry["id"].startswith("ai-memory-")]
         with tempfile.TemporaryDirectory(prefix="g8-a02-home-") as home:
-            cases = {"": False, "   ": False, f"{home}/.local/share/ai-memory": False, f" {home}/.local/share/ai-memory/ ": False,
-                     f"{home}/.claude/ai-memory": True}
+            quiet = cp.cs.native_store_overrides(inventory["entries"], {"HOME": home})
+            self.assertNotIn("AI_MEMORY_DATA_DIR", quiet, "G8-unset-quiet")
+            cases = {"": True, "   ": True, "relative/ai-memory": True, f"{home}/.local/share/ai-memory": False,
+                     f" {home}/.local/share/ai-memory/ ": False, f"{home}/.claude/ai-memory": True}
             for value, warns in cases.items():
                 env = {"HOME": home, "AI_MEMORY_DATA_DIR": value}
                 with self.subTest(value=value):
@@ -817,6 +823,48 @@ class UnitTests(unittest.TestCase):
                     for row in rows:
                         self.assertEqual("store_path_overridden" in cp.cs.inspect_entry(row, env, os.getuid(), time.time())[
                             "warnings"], warns, row["id"])
+
+    def test_ai_memory_override_refusal_for_empty_blank_or_relative_values(self):
+        """A2 finding G8-A02, fold 6 (B2): prepare refuses with override_variable_not_absolute when AI_MEMORY_DATA_DIR is set to an
+        empty, blank or relative value, because the token files then sit in a working directory the proof cannot know. Unset and
+        absolute values pass this check."""
+        for value, code in (("", "override_variable_not_absolute"), ("   ", "override_variable_not_absolute"),
+                            ("relative/ai-memory", "override_variable_not_absolute"), ("./ai-memory", "override_variable_not_absolute"),
+                            ("/var/tmp/g8-a02-moved", None), (" /var/tmp/g8-a02-moved ", None)):
+            with self.subTest(value=value):
+                self.assertEqual(cp.override_refusal({"HOME": "/var/tmp/g8-a02-home", "AI_MEMORY_DATA_DIR": value}), code)
+        self.assertIsNone(cp.override_refusal({"HOME": "/var/tmp/g8-a02-home"}))
+
+    def test_ai_memory_moved_tokens_are_excluded_in_their_canonical_spellings(self):
+        """A2 finding G8-A02, fold 6 (B1): ai-memory canonicalises its data directory (v2.4.1 config.rs:1366, v2.3.2 :1145, v3.1.0
+        :2357) and the scan worker excludes by exact bytes against children built from each root's own string. So a moved value
+        spelled with `..`, a leading `//`, a symlink alias inside a root, a symlink outside the roots that points into one, or through
+        a symlinked HOME must still put each token file, as the worker spells it under its root, among the key exclusions.
+        Synthetic: temporary directories and symlinks only; no store file is created."""
+        names = ("auth-token", "auth-header", "auth-tokens/default", "auth.json")
+        with tempfile.TemporaryDirectory(prefix="g8-a02-real-") as real, tempfile.TemporaryDirectory(prefix="g8-a02-out-") as out:
+            real = os.path.realpath(real)
+            for directory in (".claude/real-aim", ".claude/aim", ".codex", ".local/share"):
+                os.makedirs(f"{real}/{directory}", exist_ok=True)
+            os.symlink(f"{real}/.claude/real-aim", f"{real}/.claude/alias-aim")
+            os.symlink(f"{real}/.claude/aim", f"{out}/points-in")
+            linked_home = f"{out}/linked-home"
+            os.symlink(real, linked_home)
+            shapes = {  # name: (HOME, value, the moved directory as the worker spells it under its root)
+                "dotdot": (real, f"{real}/.claude/x/../aim", f"{real}/.claude/aim"),
+                "double-slash": (real, f"/{real}/.claude/aim", f"{real}/.claude/aim"),
+                "alias-inside-root": (real, f"{real}/.claude/alias-aim", f"{real}/.claude/real-aim"),
+                "outside-points-in": (real, f"{out}/points-in", f"{real}/.claude/aim"),
+                "symlinked-home": (linked_home, f"{real}/.claude/aim", f"{linked_home}/.claude/aim"),
+            }
+            for shape, (home, value, expected) in shapes.items():
+                env = {"HOME": home, "XDG_CONFIG_HOME": f"{home}/.config", "AI_MEMORY_DATA_DIR": value}
+                with self.subTest(shape=shape):
+                    exact, _glob = cp.exclusions(home, [f"{home}/.codex"], env, "confirmed", "agent", [])
+                    keys = {path for path, kind in exact if kind == "key"}
+                    for name in names:
+                        self.assertIn(f"{expected}/{name}", keys, f"G8-{shape}-{name}")
+                        self.assertIn(f"{home}/.local/share/ai-memory/{name}", keys, f"G8-{shape}-default-{name}")
 
     def test_canary_grammar(self):
         import set_credential as writer
@@ -1990,6 +2038,11 @@ class StabilityTests(unittest.TestCase):
         result = host.tool("prepare", "--transcripts", "confirmed", env=env)
         self.assertEqual(result.returncode, 0, result.stderr[-400:])
         self.assertNotIn(b"pointer_target_not_file", result.stdout + result.stderr)
+        for value in ("", "   ", "relative/ai-memory"):
+            with self.subTest(value=value):
+                refused = host.tool("prepare", "--transcripts", "confirmed", env=host.env(AI_MEMORY_DATA_DIR=value))
+                self.assertEqual(refused.returncode, 1, "G8-override-refused")
+                self.assertIn(b"override_variable_not_absolute", refused.stderr, "G8-override-code")
 
     def test_st9_route_recheck_under_deferred_timestamps(self):
         """Each selected file's format decision is re-derived after its views and in the final re-walk (9.3). A seam

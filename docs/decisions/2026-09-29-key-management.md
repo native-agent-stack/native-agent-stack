@@ -1236,22 +1236,44 @@ An inventory row may now carry an optional `override_variables` list, beside
   pointers from a child's environment. The canary proof binds each pointer at
   prepare and refuses a pointer that names a directory.
 - An **override variable** names the directory a native tool keeps the store
-  in. Today the only one is `AI_MEMORY_DATA_DIR`, ai-memory's data directory:
-  the `--data-dir` flag wins over it, and the default applies when neither is
-  set (akitaonrails/ai-memory v2.4.1, the Linux pin, at `433a19f3`:
-  `crates/ai-memory-cli/src/config.rs:1358-1364`, with the variable read at
-  `:573`; v2.3.2, the macOS pin, at `353841d9`: `:1137-1143` and `:462`).
-  The row's `path_template` stays the default path, under the directory
-  `scripts/credential_status.py` records in `OVERRIDE_DEFAULTS`.
-  - The checker warns `store_path_overridden` only for a non-blank value
-    other than the default. ai-memory trims the value and treats an empty or
-    blank one as unset (`env_string`, v2.4.1 `config.rs:2086-2095`, v2.3.2
-    `:1808-1817`).
-  - The canary proof also excludes the row's file under the variable's
-    absolute value as a key path. No scan root moves, and nothing binds or
-    refuses it at prepare.
-  - The runner leaves the variable in a child's environment.
+  in. Today the only one is `AI_MEMORY_DATA_DIR`, ai-memory's data directory.
+  The `--data-dir` flag wins over it (akitaonrails/ai-memory v2.4.1, the
+  Linux pin, at `433a19f3`: `crates/ai-memory-cli/src/config.rs:1358-1364`,
+  with the variable read at `:573`; v2.3.2, the macOS pin, at `353841d9`:
+  `:1137-1143` and `:462`).
+  - **Without the flag or the variable**, a `config.toml` `data_dir` decides
+    (v2.4.1 `:1316`). Otherwise ai-memory's own default applies,
+    `dirs::data_local_dir()/ai-memory` (v2.4.1 `:2248-2252`, v2.3.2
+    `:1970-1974`).
+    - On Linux that is an absolute `$XDG_DATA_HOME`, else `~/.local/share`
+      (dirs 5.0.1 `src/lin.rs:11-12`).
+    - On macOS it is `~/Library/Application Support` (`src/mac.rs:7`, `:13`).
+  - **The row's `path_template`** is this stack's path,
+    `$HOME/.local/share/ai-memory`, which the settings template's hooks pass
+    as `--data-dir`. `scripts/credential_status.py` records it in
+    `OVERRIDE_DEFAULTS`. The `XDG_DATA_HOME`, macOS and `config.toml` moves
+    are not modelled.
+  - **An empty or blank value is not unset for ai-memory.**
+    - figment's Env provider keeps it (figment 0.10.19, the version
+      ai-memory's `Cargo.lock` pins at all three tags,
+      `src/providers/env.rs:504-519`; merged at v2.4.1 `config.rs:1318`).
+    - The trimming `env_string` branch (`:2086-2095`, used at `:1360-1364`)
+      does not replace it, and `canonicalise_or_keep` keeps `""`
+      (`:2254-2266`).
+    - So a run without the flag puts the data directory, token files
+      included, in its working directory. Measured with ai-memory 3.1.0
+      `init`, keyless, in a throwaway HOME, PR #1240 fold 6.
+  - **The checker** warns `store_path_overridden` for any set value other than
+    the default, empty and blank included.
+  - **The canary proof** refuses at prepare, with
+    `override_variable_not_absolute`, an empty, blank or relative value. For
+    an absolute value it also excludes the row's file as key paths: as
+    written, normalised, resolved through symlinks, and re-anchored on each
+    scan root's own path. No scan root moves.
+  - **The runner** leaves the variable in a child's environment.
 
 The settings template's hooks pass `--data-dir` with the default. Other
-documented ai-memory runs do not, so the canary exclusions cover an exported
-value instead of relying on the flag.
+documented ai-memory runs do not, so the canary exclusions cover the value
+exported to the proof itself instead of relying on the flag. A value exported
+only in the writer's shell is not caught: binding it at prepare is a recorded
+follow-up.

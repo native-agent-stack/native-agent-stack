@@ -76,8 +76,12 @@ CLASSES = {"broker_api_key_pair", "contact_identity", "provider_api_key",
 TEMPLATE_PREFIXES = ("${XDG_CONFIG_HOME:-$HOME/.config}/", "${CODEX_HOME:-$HOME/.codex}/",
                      "${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/", "$HOME/")
 NAME = re.compile(r"^[A-Z][A-Z0-9_]*$")
-# The default directory of each override_variables name, a template prefix of the rows that declare it. AI_MEMORY_DATA_DIR is
-# ai-memory's data directory (env read at akitaonrails/ai-memory v2.4.1 crates/ai-memory-cli/src/config.rs:573, v2.3.2 :462).
+# The inventory's directory for each override_variables name, a template prefix of the rows that declare it: the path this stack's
+# settings-template hooks pass as --data-dir. AI_MEMORY_DATA_DIR overrides ai-memory's data directory (read at akitaonrails/ai-memory
+# v2.4.1 crates/ai-memory-cli/src/config.rs:573 and through figment at :1318; v2.3.2 :462, :1099). ai-memory's own default is
+# dirs::data_local_dir()/ai-memory (v2.4.1 :2248-2252, v2.3.2 :1970-1974): $XDG_DATA_HOME when absolute, else ~/.local/share, on Linux
+# (dirs 5.0.1 src/lin.rs:11-12) and ~/Library/Application Support on macOS (src/mac.rs:7, :13); a config.toml data_dir (v2.4.1
+# :1316) also moves it when neither the flag nor the variable is given. Those moves are not modelled here.
 OVERRIDE_DEFAULTS = {"AI_MEMORY_DATA_DIR": "$HOME/.local/share/ai-memory"}
 # ${NAME:-default}, where the default may hold one nested ${NAME:-default}: huggingface_hub's
 # HF_HOME defaults to ${XDG_CACHE_HOME:-$HOME/.cache}/huggingface (constants.py).
@@ -239,35 +243,50 @@ def git_tracks(path: Path) -> bool:
 
 
 def override_value(name: str, env) -> str | None:
-    """An override variable's value as the tool reads it: trimmed, and None when unset, empty or blank (ai-memory's env_string:
-    akitaonrails/ai-memory v2.4.1 crates/ai-memory-cli/src/config.rs:2086-2095, v2.3.2 :1808-1817, the same at v3.1.0 :3218-3227)."""
+    """An override variable's value trimmed, or None when unset, empty or blank. ai-memory's env_string trims the same way (v2.4.1
+    crates/ai-memory-cli/src/config.rs:2086-2095), but an empty or blank value is NOT unset for ai-memory: figment's Env provider keeps
+    it (figment 0.10.19 src/providers/env.rs:504-519, merged at v2.4.1 config.rs:1318), the env_string branch (:1360-1364) does not
+    replace it, and canonicalise_or_keep (:2254-2266) keeps "", so the data directory becomes the working directory (measured with
+    ai-memory 3.1.0 `init`, PR #1240 fold 6). Callers therefore treat a set-but-blank value as an override (native_store_overrides)
+    and a refusal (canary_proof.py override_refusal), never as unset."""
     value = (env.get(name) or "").strip()
     return value or None
 
 
-def override_paths(entry: dict, env) -> list[Path]:
-    """The entry's store file under each of its override variables' absolute, non-blank values: the template with the variable's
-    default directory (OVERRIDE_DEFAULTS) replaced by the value. A relative value is skipped here (a routed follow-up), and a value
-    naming the default directory adds nothing. These paths only add key exclusions (canary_proof.py); no root follows them."""
-    template, found = entry["store"]["path_template"], []
+def override_paths(entry: dict, env, roots=()) -> list[str]:
+    """The entry's store file under each of its override variables' absolute, non-blank values, in every spelling an exact-byte
+    matcher may meet: the template with the variable's directory (OVERRIDE_DEFAULTS) replaced by the value as written, its normpath,
+    its realpath (ai-memory canonicalises its data directory: v2.4.1 config.rs:1366, v2.3.2 :1145, v3.1.0 :2357), and that realpath
+    re-anchored on each of `roots` whose realpath contains it (the canary worker builds children from each root's own string). A
+    relative or blank value adds nothing here (canary_proof.py refuses it at prepare). These paths only add key exclusions; no root
+    follows them."""
+    template, found = entry["store"]["path_template"], set()
     for name in entry.get("override_variables", []):
         value, default = override_value(name, env), OVERRIDE_DEFAULTS.get(name, "")
-        if value and os.path.isabs(value) and default and template.startswith(default + "/"):
-            moved = Path(value) / template[len(default) + 1:]
-            if os.path.normpath(moved) != os.path.normpath(expand_template(template, env)):
-                found.append(moved)
-    return found
+        if not (value and os.path.isabs(value) and default and template.startswith(default + "/")):
+            continue
+        literal = str(Path(value) / template[len(default) + 1:])
+        real = os.path.realpath(literal)
+        found.update({literal, os.path.normpath(literal), real})
+        for root in roots:
+            anchor = os.path.realpath(root)
+            if real.startswith(anchor.rstrip("/") + "/"):
+                found.add(root.rstrip("/") + real[len(anchor.rstrip("/")):])
+    found.discard(os.path.normpath(str(expand_template(template, env))))
+    return sorted(found)
 
 
 def native_store_overrides(entries, env) -> list[str]:
-    """Names of set pointer variables, and of override variables whose value differs from their default, of native stores.
+    """Names of set pointer variables, and of override variables set to anything but their default, of native stores.
 
     A pointer variable such as HF_TOKEN_PATH moves the store file for a tool that reads it. An override variable such as
-    AI_MEMORY_DATA_DIR names the tool's data directory, which a run without its own path flag (ai-memory's --data-dir) then
-    uses; it warns only for a non-blank value (override_value) other than its default. Names only."""
+    AI_MEMORY_DATA_DIR names the tool's data directory, which a run without its own path flag (ai-memory's --data-dir) then uses;
+    it warns for any set value other than the default, an empty or blank one included (see override_value). Names only."""
     def overridden(name: str) -> bool:
+        if name not in env:
+            return False
         value = override_value(name, env)
-        return bool(value) and os.path.normpath(value) != os.path.normpath(expand_template(OVERRIDE_DEFAULTS.get(name, ""), env))
+        return value is None or os.path.normpath(value) != os.path.normpath(expand_template(OVERRIDE_DEFAULTS.get(name, ""), env))
     return sorted({name for entry in entries if entry["store"]["kind"] == "native_store"
                    for name in entry["pointer_variables"] if name in env}
                   | {name for entry in entries if entry["store"]["kind"] == "native_store"

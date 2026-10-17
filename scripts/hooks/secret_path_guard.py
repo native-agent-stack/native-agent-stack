@@ -284,7 +284,7 @@ SECRET_NAME = re.compile(r"\b(?:" + _NAMES + r")\b")
 SECRET_EXPANSION = re.compile(r"\$\{?!?(?:" + _NAMES + r")\b")
 SECRET_LOOKUP = re.compile(r"(?:environ|getenv|process\.env|ENV\[)[^;\n]{0,40}\b(?:" + _NAMES + r")\b")
 # Every inventory `pointer_variables` and `override_variables` name (tests/test_secret_path_guard.py checks each; AI_MEMORY_DATA_DIR,
-# ai-memory's data-directory override, is a directory and so a warning-only override, never a pointer; A2 finding G8-A02),
+# ai-memory's data-directory override, names a directory: an override variable that drives warnings, refusals and exclusions; G8-A02),
 # each with an optional suffix of a number or one letter:
 # PAPER_ENV_FILE_2 (a further paper account) or PAPER_ENV_FILE_C (paper account C). `_` is a word character (CPython Doc/library/re.rst, `\b`),
 # so without the group (until 2026-09-29) or with digits only (until 2026-10-11) a reader or a `source` on such a pointer passed the guard.

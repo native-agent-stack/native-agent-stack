@@ -2339,8 +2339,8 @@ remain metadata-only. It also reports:
 
 - secret variable names that are set in the current environment, names only;
 - native store path overrides that are set, names only: a pointer variable
-  (`HF_TOKEN_PATH`), and an override variable (`AI_MEMORY_DATA_DIR`) holding a
-  non-blank value other than its default; each affected row also gets the
+  (`HF_TOKEN_PATH`), and an override variable (`AI_MEMORY_DATA_DIR`) set to
+  any value other than its default, empty included; each affected row also gets the
   warning `store_path_overridden`, because a tool run without its own path flag
   then uses a path other than the one inspected;
 - tracked files with credential-shaped basenames;
