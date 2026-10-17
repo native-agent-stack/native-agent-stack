@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "dbcf75029fd745969171dd83a090c848352b8a3cf98377b8d06df9612743c817",
-      "bytes": 169151
+      "sha256": "a23ece22bf7fdd79f03cc892c4b94ec46e0cfd44f43748e258b11f4dcdab1893",
+      "bytes": 169474
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5027,8 +5027,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/token-efficiency.md",
-      "sha256": "81aebd5e32d82fa807f1ad30799cbb8427bdc46d8cde93ca2828f2a4b02054b6",
-      "bytes": 15088
+      "sha256": "d36eae5df749c092fd60da34b35769a5adfbb76f67d30708ac3bc4e97fbac377",
+      "bytes": 15411
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/workers.md",
@@ -19072,11 +19072,6 @@
       "bytes": 8327
     },
     {
-      "path": "docs/decisions/2026-10-09-claude-code-gap-resolution.md",
-      "sha256": "44bdbac9305ea2e741b255e3a077f9fb6b5677bb0c920943df0bcec3e3407fbd",
-      "bytes": 15938
-    },
-    {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
       "sha256": "98947f11f2a3eb693c9c31b3fff6e58e1f20d476411aa49f42f66888d43c6d47",
       "bytes": 54090
@@ -21808,8 +21803,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "8d6c879054bd06fd93952477c4ba77bf7219eb14246a2ce4b0d6d8953d0d6279",
-      "bytes": 238837
+      "sha256": "a9d94bacfde755e8d30b0bbbdc871e53ab55c82eb200e275db21588862b7bffd",
+      "bytes": 238736
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json",
@@ -64713,8 +64708,8 @@
     },
     {
       "path": "tests/test_native_practice_owed_check_corrections.py",
-      "sha256": "7af69cb8b63af81d0419579c93c75f9096ffc7b64c73e7a87e55e5268d3eb61e",
-      "bytes": 5776
+      "sha256": "ecfcd40a9134ea9a98a617561e43fd2abfdef425c613e4d250ae519d9007dd83",
+      "bytes": 10035
     },
     {
       "path": "tests/test_native_practice_retired_routes.py",
@@ -64723,8 +64718,8 @@
     },
     {
       "path": "tests/test_native_practice_snapshot_provenance.py",
-      "sha256": "519686053443eb767abca0dd8067886bde1271e9aecbb12ef55b42424620abd7",
-      "bytes": 8762
+      "sha256": "f3afaf9449c5a7cfb132a51a371ca9528c90da82c0aa37335f8ba541394bde0f",
+      "bytes": 10885
     },
     {
       "path": "tests/test_native_recovery.py",
@@ -65333,8 +65328,8 @@
     },
     {
       "path": "tests/test_upstream_surface_watch.py",
-      "sha256": "a87fccebd1ebbc31b02c665e640d7945211ff9f4a48422a95dbfb8e40ee61cff",
-      "bytes": 128671
+      "sha256": "bc465b566484c19a1c69760ebcd1771dbe3bb11fb5a1632769dcc2545a315fe8",
+      "bytes": 130059
     },
     {
       "path": "tests/test_us_equities_hosting.py",

@@ -2133,6 +2133,26 @@ class DispositionCitationTests(unittest.TestCase):
             self.assertEqual(len(run), 1)
             self.assertRegex(run[0], r"`[0-9a-f]{8,40}`", "the run names the commit it was made at")
 
+    ROUTINES_SEARCH = "An exact-case search of the skill's pages at `8c95a50d` on 2026-10-11"
+    ROUTINES = '"Cloud routines" of the `scheduled-tasks` slot (`reference/slots.json:1625`).'
+
+    def test_the_record_cites_the_routines_line_at_the_revision_it_searched(self):
+        # PR 1234, the command center's ruling on its third fold (P3): the fold added a "current locator" into the
+        # living reference/slots.json, which every edit of that file moves. The sentence reports a search at 8c95a50d,
+        # so its locator is the line at that revision.
+        flat = " ".join((ROOT / "docs/decisions/2026-10-09-claude-code-gap-resolution.md").read_text(encoding="utf-8").split())
+        self.assertIn(self.ROUTINES_SEARCH, flat)
+        search = flat.split(self.ROUTINES_SEARCH, 1)[1].split(" - **", 1)[0]
+        self.assertIn(self.ROUTINES, search)
+        self.assertNotIn("current locator", search)
+
+    def test_the_routines_line_holds_at_the_revision_it_searched(self):
+        shown = subprocess.run(["git", "-C", str(ROOT), "show", "8c95a50d:.claude/skills/claude-native-practice/reference/slots.json"],
+                               capture_output=True, text=True)
+        if shown.returncode != 0:
+            self.skipTest("the history of this checkout does not hold 8c95a50d")
+        self.assertEqual(shown.stdout.split("\n")[1624].strip(), '"Cloud routines",')
+
 
 if __name__ == "__main__":
     unittest.main()
