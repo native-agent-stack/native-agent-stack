@@ -1,7 +1,8 @@
 """Harness atlas view: section order, state marks, labelled tables, stylesheet rules, privacy, URLs, unknowns and copy.
 
 Pages are built from the shared synthetic roots (tests/local_pages_atlas_fixture.py). Private-looking values are
-assembled at run time and written into every source the page reads; none may reach the rendered page.
+assembled at run time and written into every source the page reads; none may reach the rendered page. The cascade
+tests read what the stylesheets do to the built page's own elements (tests/local_pages_css_cascade.py).
 """
 import json
 from pathlib import Path
@@ -11,9 +12,14 @@ import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from local_pages_atlas_fixture import HERE, LATEST, Fixture, final_stack, lane, latest, slots  # noqa: E402
+from local_pages_atlas_fixture import HERE, HISTORY, LATEST, Fixture, final_stack, history, lane, latest, slots  # noqa: E402
+from local_pages_css_cascade import Cascade, Declaration  # noqa: E402
 
 SECTIONS = ["atlas-terms", "atlas-layers", "atlas-stacks", "atlas-measured", "atlas-routing", "atlas-monitoring", "atlas-rules", "atlas-changes", "atlas-evidence"]
+# The sheets the page inlines after the linked site.css, in this order (atlas_data.STYLES).
+INLINE_SHEETS = ("architecture-manifest.css", "overview.css", "atlas.css")
+# 320px, both site.css breakpoint bands (40-62rem and 62-72rem), 1440px, and print at an A4 width (794px), in rem.
+SETTINGS = (("screen", 20.0), ("screen", 50.0), ("screen", 65.0), ("screen", 90.0), ("print", 49.625))
 
 
 class ViewCase(unittest.TestCase):
@@ -86,6 +92,92 @@ class StyleTests(unittest.TestCase):
                 continue  # an at-rule prelude such as @media print, not a selector
             for part in selector.split(","):
                 self.assertTrue(part.strip().startswith(('body[data-page="atlas"]', ".atlas-")), part.strip())
+
+
+def _pixels(value: str) -> float:
+    """A length in px or rem; the root font size is the browser default, 16px (site.css sets none)."""
+    match = re.fullmatch(r"([\d.]+)(px|rem)", value)
+    if match is None:
+        raise ValueError(f"not a px or rem length: {value!r}")
+    return float(match.group(1)) * (16 if match.group(2) == "rem" else 1)
+
+
+class CascadeTests(ViewCase):
+    """What the stylesheets do to the built page's elements; design-plan.md "Atlas page" records the browser measurement."""
+
+    def cascade(self) -> Cascade:
+        fixture = Fixture(self.base)
+        # Sixteen closed days, so the two oldest fold into the older-days disclosure.
+        Fixture.write(fixture.state / HISTORY, json.dumps(history(tuple(f"2026-09-{day:02d}" for day in range(16, 0, -1)))))
+        html = self.page(fixture)
+        inline = [(name, (HERE / "assets" / name).read_text()) for name in INLINE_SHEETS]
+        self.assertIn("<style>\n" + "".join(text for _, text in inline), html)
+        self.assertLess(html.index('<link rel="stylesheet" href="assets/site.css">'), html.index("<style>"))
+        return Cascade(html, [("site.css", (HERE / "assets/site.css").read_text())] + inline)
+
+    def test_every_disclosure_summary_is_at_least_44px_tall(self):
+        """Rule 13 and DP:31: controls are at least 44px tall, and a summary is its disclosure's control."""
+        page = self.cascade()
+        summaries = [element for element in page.elements if element.tag == "summary"]
+        self.assertEqual({re.sub(r"^\d+ ", "", "".join(element.text)) for element in summaries}, {"What each slot sets", "older closed days", "List them"})
+        for setting in SETTINGS[:4]:
+            for summary in summaries:
+                label = f'{"".join(summary.text)} at {setting[1]}rem'
+                floor = page.winner(summary, "min-height", setting)
+                self.assertIsNotNone(floor, label)
+                self.assertGreaterEqual(_pixels(floor.value), 44, label)
+                for cap in ("height", "max-height"):
+                    self.assertIsNone(page.winner(summary, cap, setting), label)
+
+    def test_every_atlas_override_of_a_shared_rule_wins_by_specificity(self):
+        """Rule 15 and FD:55: where atlas.css and a shared sheet set one property of one element to different values at
+        the same importance, the atlas declaration has the higher specificity, so stylesheet order never decides."""
+        page = self.cascade()
+        breaches = set()
+        for setting in SETTINGS:
+            for element in page.elements:
+                declared: dict[str, list[Declaration]] = {}
+                for declaration in page.declarations(element, setting):
+                    declared.setdefault(declaration.property, []).append(declaration)
+                for name, found in declared.items():
+                    own = max((item for item in found if item.sheet == "atlas.css"), key=Declaration.rank, default=None)
+                    if own is None:
+                        continue
+                    for shared in found:
+                        if (shared.sheet != "atlas.css" and shared.value != own.value and shared.important == own.important
+                                and own.specificity <= shared.specificity):
+                            breaches.add(f"{setting[0]} at {setting[1]}rem, {name}: {own.selector} {own.specificity} against "
+                                         f"{shared.sheet} {shared.selector} {shared.specificity}")
+        self.assertEqual(sorted(breaches), [])
+
+    def test_the_display_serif_sets_only_the_title_and_the_matrix_row_headers(self):
+        """The Type line and rule 11: the serif marks the title and the matrix row headers; section headings keep the sans."""
+        page = self.cascade()
+
+        def in_matrix(element) -> bool:
+            while element is not None and "atlas-matrix" not in element.classes:
+                element = element.parent
+            return element is not None
+
+        expected = [element for element in page.elements
+                    if element.tag == "h1" or (element.tag == "th" and element.attrs.get("scope") == "row" and in_matrix(element))]
+        self.assertEqual([element.label() for element in expected], ["h1"] + ["th"] * 7)
+        headings = [element for element in page.elements if element.tag == "h2"]
+        self.assertEqual(len(headings), len(SECTIONS))
+        for setting in SETTINGS:
+            serif = [element for element in page.elements
+                     if (winner := page.winner(element, "font-family", setting)) is not None and winner.value == "var(--mf-display)"]
+            self.assertEqual([id(element) for element in serif], [id(element) for element in expected], (setting, [element.label() for element in serif]))
+            for heading in headings:
+                self.assertEqual(page.winner(heading, "font-family", setting).value, "var(--font)", heading.label())
+
+    def test_print_releases_every_table_minimum_width(self):
+        """atlas.css's print block: the minimum widths that outrank site.css's print table rule (:470) are released."""
+        page = self.cascade()
+        tables = [element for element in page.elements if element.tag == "table"]
+        self.assertGreater(len(tables), 10)
+        for table in tables:
+            self.assertEqual(page.winner(table, "min-width", ("print", 49.625)).value, "0", table.parent.label())
 
 
 class PrivacyTests(ViewCase):

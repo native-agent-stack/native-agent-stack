@@ -1,24 +1,28 @@
 /* Harness atlas: nine ruled sections on the shared local-pages tokens (design-plan.md "Atlas page").
    FD = frontend-design SKILL.md at manifest pin 33375500bcea98d610eb30ce10ac4e59b89c390d; DP = design-plan.md.
    No color literal: every color is a shared token from site.css (FD:48, FD:45; DP:7-14). One display serif for the
-   title and the matrix row headers, the shared sans for reading text (FD:19; DP:16). Tabular numerals for counts
-   (DP:16). No uppercase and no motion (FD:25-28, FD:32). The one bold element is the layer-by-family matrix: a heavier
-   top rule in the ink token and serif row headers (FD:59). Rules are scoped under body[data-page="atlas"] and
-   .atlas-* classes and never restyle a shared .ov-* or .lp-* class (FD:55). */
+   title and the matrix row headers; section headings and reading text keep the shared sans (FD:19; DP:16). Tabular
+   numerals for counts (DP:16). No uppercase and no motion (FD:25-28, FD:32). The one bold element is the
+   layer-by-family matrix: a heavier top rule in the ink token and serif row headers (FD:59). Rules are scoped under
+   body[data-page="atlas"] and .atlas-* classes. A shared rule is restyled only inside that scope and always at a
+   higher specificity, never by stylesheet order (FD:55); for example .atlas-matrix.ov-table table outranks
+   .ov-table table. CascadeTests in tests/test_local_pages_atlas_view.py checks every declaration. */
 body[data-page="atlas"] { --mf-display: "Iowan Old Style", "Sitka Heading", "Palatino Linotype", Palatino, "Book Antiqua", "Noto Serif", Georgia, serif; }
 body[data-page="atlas"] .page-header h1 { font-family: var(--mf-display); font-weight: 500; letter-spacing: -.01em; font-size: clamp(2.1rem, 4.2vw, 3.4rem); }
+/* Defining --mf-display also reaches the shared serif section headings (architecture-manifest.css:31); they keep the sans. */
+body[data-page="atlas"] .mf-view > h2 { font-family: var(--font); }
 .atlas-stat-rule { padding-left: 1.25rem; border-left: 1px solid var(--rule); }
 
 /* Terms: a visible key, one ruled row per term. */
 .atlas-terms { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: .25rem 2.5rem; margin: .75rem 0 0; }
 .atlas-terms > div { min-width: 0; padding-top: .5rem; border-top: 1px solid var(--rule); }
 .atlas-terms dt { font-weight: 650; }
-.atlas-terms dd { margin: .2rem 0 .5rem; }
+.atlas-terms.lp-defs dd { margin: .2rem 0 .5rem; }
 .atlas-terms dd > p { max-width: 72ch; margin: 0 0 .4rem; }
 
 /* The matrix. */
-.atlas-matrix { border-top: 3px solid var(--ink); }
-.atlas-matrix table { min-width: 64rem; table-layout: fixed; font-size: .9rem; line-height: 1.45; }
+.atlas-matrix.table-wrap { border-top: 3px solid var(--ink); }
+.atlas-matrix.ov-table table { min-width: 64rem; table-layout: fixed; font-size: .9rem; line-height: 1.45; }
 .atlas-matrix thead th { vertical-align: bottom; }
 .atlas-matrix thead th:first-child { width: 11rem; }
 .atlas-matrix thead th small { display: block; margin-top: .15rem; color: var(--muted); font-weight: 400; line-height: 1.35; overflow-wrap: anywhere; }
@@ -38,6 +42,9 @@ body[data-page="atlas"] .page-header h1 { font-family: var(--mf-display); font-w
 .atlas-routes { margin-top: .5rem; }
 .atlas-routes .atlas-cite { margin: 0; }
 
+/* Disclosures: each summary is a control, so it takes the 44px floor (DP:31), sized as site.css:322 sizes .pool-note summary. */
+body[data-page="atlas"] .lp-more summary { min-height: 2.75rem; padding-block: .6rem; }
+
 /* Quiet text around the tables. */
 .atlas-cite { max-width: 80ch; margin: .25rem 0 0; color: var(--muted); font-size: .8rem; line-height: 1.45; overflow-wrap: anywhere; }
 .atlas-note { max-width: 80ch; margin: .35rem 0 .75rem; color: var(--muted); font-size: .9rem; }
@@ -48,7 +55,7 @@ body[data-page="atlas"] .page-header h1 { font-family: var(--mf-display); font-w
 .atlas-stack table { min-width: 52rem; }
 .atlas-stack td:nth-child(2) { max-width: 36ch; }
 .atlas-stack td:nth-child(5) { font-variant-numeric: tabular-nums; }
-.atlas-measured table, .atlas-daily table { min-width: 80rem; font-size: .85rem; }
+.atlas-measured.ov-table table, .atlas-daily.ov-table table { min-width: 80rem; font-size: .85rem; }
 .atlas-measured td, .atlas-daily td, .atlas-observed td, .atlas-changes td:first-child { font-variant-numeric: tabular-nums; }
 .atlas-measured th, .atlas-daily th { font-size: .8rem; line-height: 1.3; }
 .atlas-routing table, .atlas-observed table, .atlas-changes table { min-width: 40rem; }
@@ -63,11 +70,11 @@ body[data-page="atlas"] .page-header h1 { font-family: var(--mf-display); font-w
 /* Script-free print keeps the shared light palette (site.css:465-472); these minimum widths outrank its table rule, so they
    are released for print and every table fits the page. */
 @media print {
-  .atlas-matrix table, .atlas-stack table, .atlas-measured table, .atlas-daily table, .atlas-routing table, .atlas-observed table,
-  .atlas-changes table, .atlas-monitoring table, .atlas-rules table, .atlas-skills table { min-width: 0; }
+  .atlas-matrix.ov-table table, .atlas-stack table, .atlas-measured.ov-table table, .atlas-daily.ov-table table, .atlas-routing table,
+  .atlas-observed table, .atlas-changes table, .atlas-monitoring table, .atlas-rules table, .atlas-skills table { min-width: 0; }
   .atlas-matrix tbody { break-inside: avoid; }
   /* The two 13-column measured tables fit an A4 page width only with tight cells; figures never break, headers may. */
-  .atlas-measured th, .atlas-measured td, .atlas-daily th, .atlas-daily td { padding: .2rem .25rem; font-size: .6rem; overflow-wrap: normal; }
+  .atlas-measured.ov-table th, .atlas-measured.ov-table td, .atlas-daily.ov-table th, .atlas-daily.ov-table td { padding: .2rem .25rem; font-size: .6rem; overflow-wrap: normal; }
   .atlas-measured td small, .atlas-daily td small { font-size: 1em; }
-  .atlas-measured th, .atlas-daily th { overflow-wrap: anywhere; }
+  .atlas-measured.ov-table th, .atlas-daily.ov-table th { overflow-wrap: anywhere; }
 }

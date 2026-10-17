@@ -251,9 +251,14 @@ used. Every fact names its record.
 Secondary `#51677b`/`#b6c6d7`, Link and focus `#205c9b`/`#93c7ff`, and the
 reserved status pair Measured `#246d55`/`#86d4b4` and Pending
 `#996421`/`#f4cc8f` (FD:48; DP:7-14). `assets/atlas.css` uses `var(--…)`
-only. Type: the shared sans for reading text, the overview's display serif for
-the title and the matrix row headers, monospace only for pins, paths and record
-names (FD:19; DP:16, DP:175-176).
+only. Type: the shared sans for reading text and section headings, the
+overview's display serif for the title and the matrix row headers only, and
+monospace only for pins, paths and record names (FD:19; DP:16, DP:175-176).
+Unlike the overview, whose section headings take the serif (DP:175-176), the
+atlas keeps them in the sans, so the row headers stay the body's one serif
+element (rule 11). Defining the serif token would otherwise reach every section
+heading through the shared `.mf-view > h2` rule
+(`assets/architecture-manifest.css:31`), so `atlas.css` sets them back.
 
 **Layout.** Left aligned, source order; the order is fixed but is not a
 sequence, so no section is numbered (FD:30):
@@ -300,9 +305,9 @@ the next session needs, the measured section is tables.
 | 10 | Avoid the SaaS-card kit | No cards; ruled rows and one matrix table | FD:42; DP:35, DP:102-106 |
 | 11 | Spend boldness in one place | The matrix's heavier top rule in the ink token and serif row headers | FD:59; DP:185 |
 | 12 | Motion | None; `prefers-reduced-motion` is already honored | FD:32; DP:31 |
-| 13 | Quality floor | 320px layouts, a visible 3px focus, 44px controls, light print | FD:59; DP:31, DP:68 |
+| 13 | Quality floor | 320px layouts, a visible 3px focus, 44px controls (each disclosure summary too, sized as `assets/site.css:322` sizes `.pool-note summary`), light print | FD:59; DP:31, DP:68 |
 | 14 | State never by color alone | Glyph plus label; pending blocks add the left rule and the word | DP:80-84, DP:173-175 |
-| 15 | Watch selector specificity | Rules sit under `body[data-page="atlas"]` or `.atlas-*`; no shared `.ov-*` or `.lp-*` class is restyled | FD:55 |
+| 15 | Watch selector specificity | Rules sit under `body[data-page="atlas"]` or `.atlas-*`; a shared rule is restyled only inside that scope and at a higher specificity, never by stylesheet order (for example, `.atlas-matrix.ov-table table` outranks `.ov-table table`). `CascadeTests` in `tests/test_local_pages_atlas_view.py` checks each atlas declaration against the shared ones on the same element | FD:55 |
 | 16 | Copy: plain verbs, active voice; failures say what is missing and how to fix it | Pending blocks name their trigger; the ledger refusal says the file is kept for inspection | FD:61-71 |
 | 17 | Long identifiers wrap; tables scroll in a labelled region | `.table-wrap` with `role="region"`, `tabindex="0"` and `aria-label` | DP:31; `assets/site.css:268` |
 | 18 | Captions that repeat a visible heading are for screen readers | `_table(..., hide_caption=True)` | DP:210-211 |
@@ -347,6 +352,22 @@ into one disclosure; the repeated "Not measured" cells became one spanning cell.
 No new color pair is introduced, so the stylesheet contrast calculations above
 (DP:66) stand. The shared navigation now wraps to a second line at 1440px with
 eleven pages; that is shared chrome and is left to a later change.
+
+**Review fold.** A review of this build found three claims false at its head;
+each now has a cascade test over the built page (`CascadeTests` in
+`tests/test_local_pages_atlas_view.py`, through `tests/local_pages_css_cascade.py`).
+The disclosure summaries were under the 44px floor of rule 13. Atlas rules
+overrode four shared rules by stylesheet order alone, against rule 15: the
+matrix's heavier top rule over `.table-wrap`, the table type sizes over
+`.ov-table table`, the print cells over `.ov-table td, .ov-table th`, and the
+term margins over `.lp-defs dd`. Defining the serif token set all nine section
+headings in the serif, against the Type line and rule 11. The installed chrome-devtools MCP measured the same synthetic page
+built before and after the fold, at 1440px: the matrix summaries went from 30.47
+to 44px and the full-width summaries from 35.19 to 44.78px; the section headings
+moved to the sans while the title and the seven row headers kept the serif. On
+the real page the same heights held at 1440 and 320px in light and at 1440px in
+dark, with no horizontal page scroll; the overrides render as before and now win
+by specificity.
 
 **Skills.** frontend-design (FD) shaped the brief, the plan, its review and the
 critique. tdd (`mattpocock/skills` at `d81f3a183412e71a5b1e84ca21bc1a35eea03a60`,
