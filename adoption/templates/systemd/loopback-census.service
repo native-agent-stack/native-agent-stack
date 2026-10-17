@@ -7,7 +7,8 @@
 #      tunnel at 10.255.255.254:53;
 #   1: a breach;
 #   2: a census error: ss is missing, failing or hung, ss wrote a diagnostic to stderr (even with exit 0), ss listed
-#      no listener, a line did not parse, the state directory could not be written, or any other exception.
+#      no TCP or no UDP listener, a line did not parse, the state directory could not be written, or any other
+#      exception. The script runs ss without TCPDIAG_FILE and the PROC_* variables.
 # So a broken census never reports clean.
 #
 # Either failure starts stack-alert@%n.service through OnFailure=. That handler sends the command center one named hcom

@@ -60,6 +60,10 @@ udp UNCONN 0 0 [fe80::1]%eth0:546 [::]:*
 BREACH_SET = {("tcp", "0.0.0.0:8080"), ("tcp", "[::]:9090"), ("udp", "*:5353"), ("tcp", "192.168.1.20:8000"),
               ("udp", "10.255.255.254:5353"), ("tcp", "[::ffff:192.168.1.20]:8001"), ("udp", "[fe80::1]%eth0:546")}
 NON_UTF8 = b'tcp LISTEN 0 4096 0.0.0.0:8080 0.0.0.0:* users:(("py\xffthon",pid=9,fd=3))\n'
+# One loopback listener of each protocol. A real host always has both, and a listing without either is a census error,
+# so a test of one row adds these to keep testing that row.
+FLOOR = "udp UNCONN 0 0 127.0.0.1:323 0.0.0.0:*\ntcp LISTEN 0 4096 127.0.0.1:23777 0.0.0.0:*\n"
+UDP_ONLY = "".join(line + "\n" for line in LOOPBACK_ONLY.splitlines() if line.startswith("udp"))
 # The fake ss runs with PATH holding only its own directory (so the real ss stays unreachable), so its tools are absolute.
 CAT, SLEEP = shutil.which("cat"), shutil.which("sleep")
 
@@ -116,14 +120,14 @@ class RuleTests(unittest.TestCase):
                      "tcp LISTEN 0 4096 0.0.0.0:53 0.0.0.0:*", "udp UNCONN 0 0 192.168.1.20:53 0.0.0.0:*",
                      "udp UNCONN 0 0 10.255.255.253:53 0.0.0.0:*"):
             with self.subTest(line=line):
-                self.assertEqual(run(line + "\n")[0], 1)
-        self.assertEqual(run("tcp LISTEN 0 1000 10.255.255.254:53 0.0.0.0:*\n")[0], 0)
+                self.assertEqual(run(FLOOR + line + "\n")[0], 1)
+        self.assertEqual(run(FLOOR + "tcp LISTEN 0 1000 10.255.255.254:53 0.0.0.0:*\n")[0], 0)
         # A device scope is stripped before the match, as for every address, so the scoped tunnel bind is allowed too. The
         # precursor flags this row, and the decision lists the difference.
-        self.assertEqual(run("udp UNCONN 0 0 10.255.255.254%lo:53 0.0.0.0:*\n")[0], 0)
+        self.assertEqual(run(FLOOR + "udp UNCONN 0 0 10.255.255.254%lo:53 0.0.0.0:*\n")[0], 0)
 
     def test_a_listener_listed_twice_is_reported_once(self):
-        _code, report, _ = run(BREACHES.splitlines()[0] + "\n" + BREACHES.splitlines()[0] + "\n")
+        _code, report, _ = run(FLOOR + BREACHES.splitlines()[0] + "\n" + BREACHES.splitlines()[0] + "\n")
         self.assertEqual(len(report["violations"]), 1)
 
     def test_loopback_is_the_whole_of_127_slash_8_and_mapped_loopback_only(self):
@@ -139,7 +143,7 @@ class RuleTests(unittest.TestCase):
                 self.assertEqual(census.parse_address(address), expected)
 
     def test_a_non_utf8_listing_is_read_with_replacement_characters(self):
-        code, report, _ = run(NON_UTF8)
+        code, report, _ = run(FLOOR.encode("utf-8") + NON_UTF8)
         self.assertEqual((code, report["violations"][0]["process"]), (1, "py�thon pid=9"))
 
 
@@ -173,6 +177,16 @@ class CensusErrorTests(unittest.TestCase):
                 self.assertEqual(stderr.splitlines(), [
                     "loopback census error: unparseable local address 'garbage'; 1 non-loopback listener(s) in the other lines",
                     f"loopback census: breach record {records[0]}"])
+
+    def test_a_listing_without_tcp_or_without_udp_is_an_error_that_keeps_its_breaches(self):
+        # ss can drop a whole table with no diagnostic, so a missing protocol is the only trace of it.
+        code, report, _ = run(UDP_ONLY)
+        self.assertEqual((code, report["error"]), (2, "ss listed no tcp listener"))
+        code, report, _ = run("tcp LISTEN 0 4096 127.0.0.1:23777 0.0.0.0:*\n")
+        self.assertEqual((code, report["error"]), (2, "ss listed no udp listener"))
+        code, report, _ = run("udp UNCONN 0 0 *:5353 *:*\n")
+        self.assertEqual((code, report["error"], report["violations"][0]["address"]),
+                         (2, "ss listed no tcp listener", "*:5353"))
 
     def test_an_unreadable_saved_listing_is_an_error(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -220,10 +234,42 @@ class RealInvocationTests(unittest.TestCase):
         self.assertEqual(report["error"],
                          "ss reported an error on stderr: 'fopen(TCPDIAG_FILE): Permission denied'")
 
+    def test_a_dropped_table_with_exit_0_and_no_stderr_is_an_error(self):
+        # iproute2 6.19.0 drops a TCP table it cannot open with no diagnostic and exits 0 (misc/ss.c:4256-4257,
+        # :4276-4285 and :6276-6302 at v6.19.0), so ss prints only the UDP rows.
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = Path(directory) / "fixture"
+            fixture.write_text(UDP_ONLY, encoding="utf-8")
+            fake_ss(directory, f'"{CAT}" "{fixture}"\nexit 0\n')
+            code, report, stderr = run_with_path(directory)
+        self.assertEqual((code, report["error"]), (2, "ss listed no tcp listener"))
+        self.assertEqual(stderr.splitlines(), ["loopback census error: ss listed no tcp listener"])
+
+    def test_ss_runs_without_the_variables_that_point_it_at_files(self):
+        # TCPDIAG_FILE and the PROC_* variables make ss read files instead of the kernel's tables (misc/ss.c:4237, :4240,
+        # :4371, :482-498; lib/utils.c:2054-2066 at v6.19.0). The census must not pass them on; other variables pass.
+        names = ("TCPDIAG_FILE", "PROC_ROOT", "PROC_NET_TCP", "PROC_NET_UDP", "PROC_NET_TCP6", "CENSUS_TEST_MARKER")
+        with tempfile.TemporaryDirectory() as directory:
+            seen = Path(directory) / "seen"
+            fixture = Path(directory) / "fixture"
+            fixture.write_text(LOOPBACK_ONLY, encoding="utf-8")
+            record = " ".join(f'"${{{name}-unset}}"' for name in names)
+            fake_ss(directory, f'printf "%s\\n" {record} > "{seen}"\n"{CAT}" "{fixture}"\n')
+            env = dict(os.environ, PATH=str(directory), CENSUS_TEST_MARKER="kept",
+                       **{name: "/nonexistent/table" for name in names[:-1]})
+            result = subprocess.run([sys.executable, str(SCRIPT)], capture_output=True, text=True, env=env)
+            values = seen.read_text(encoding="utf-8").split()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(values, ["unset"] * 5 + ["kept"])
+
+    def test_the_ss_environment_drops_only_the_file_variables(self):
+        environ = {"TCPDIAG_FILE": "x", "PROC_ROOT": "y", "PROC_NET_UDP6": "z", "PATH": "/bin", "LANG": "C.UTF-8"}
+        self.assertEqual(census.ss_environment(environ), {"PATH": "/bin", "LANG": "C.UTF-8"})
+
     def test_a_non_utf8_ss_output_is_read_with_replacement_characters(self):
         with tempfile.TemporaryDirectory() as directory:
             fixture = Path(directory) / "fixture"
-            fixture.write_bytes(NON_UTF8)
+            fixture.write_bytes(FLOOR.encode("utf-8") + NON_UTF8)
             fake_ss(directory, f'"{CAT}" "{fixture}"\n')
             code, report, _ = run_with_path(directory)
         self.assertEqual((code, report["violations"][0]["process"]), (1, "py�thon pid=9"))

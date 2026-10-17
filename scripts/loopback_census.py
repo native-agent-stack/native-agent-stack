@@ -16,12 +16,14 @@ Exit codes. A systemd OnFailure= handler fires on 1 and 2, and stderr says which
 - 1: a breach, where at least one listener breaks the rule;
 - 2: a census error:
   - ss is missing, cannot start, exits non-zero or times out, or the saved listing cannot be read;
-  - ss writes any diagnostic to stderr. iproute2 6.19.0 exits 0 even when a socket-table dump fails, and reports the
-    failure only on stderr (see run_ss);
-  - the listing names no listener, or a line does not parse;
+  - ss writes any diagnostic to stderr (iproute2 6.19.0 exits 0 even when a socket-table dump fails, see run_ss);
+  - the listing names no listener, no TCP listener or no UDP listener, or a line does not parse. A dump that fails can
+    leave no trace at all, so a missing table is only visible as a missing protocol;
   - --state-dir cannot be written;
   - or any other exception, through main's final handler, so no failure exits 1, the breach code.
-  A real host always has listeners (WSL's DNS tunnel at least), so an empty enumeration is an error, never a clean pass.
+  A real host always has TCP and UDP listeners (WSL's DNS tunnel listens on both), so a listing without either is an
+  error, never a clean pass.
+ss runs without TCPDIAG_FILE and the PROC_* variables, which make it read files instead of the kernel's tables.
 
 Output:
 - stdout: one JSON line {"check", "at", "listeners", "violations"}, or {"check", "at", "error"} for a census error.
@@ -61,6 +63,12 @@ SS_ARGV = ("ss", "-H", "-l", "-t", "-u", "-n", "-p")
 SS_TIMEOUT = 30.0
 ALLOWED = {("udp", "10.255.255.254", "53"), ("tcp", "10.255.255.254", "53")}
 PROTOCOLS = {"tcp", "udp"}
+# iproute2 6.19.0's ss reads a file instead of a kernel table when TCPDIAG_FILE or a PROC_* variable is set: misc/ss.c
+# :4237 and :4240 (TCP), :4371 (UDP) and :482-498 (the PROC_NET_* openers), and lib/utils.c:2054-2066 (PROC_ROOT and
+# each name). A file that cannot be opened drops its table with no diagnostic (ss.c:4256-4257 and :4276-4285 for TCP,
+# :4376-4377 and :4391-4399 for UDP), so the census never passes those variables on.
+SS_FILE_VARIABLE = "TCPDIAG_FILE"
+SS_FILE_PREFIX = "PROC_"
 PROCESS = re.compile(r'\(\("([^"]+)",pid=(\d+)')
 # ss -n prints host:port and [v6host]:port. A %scope may follow the host inside or after the brackets, and * is the
 # wildcard.
@@ -104,7 +112,7 @@ def census(lines):
 
     Every line is read before a line that does not parse raises, so the error carries the other lines' violations.
     """
-    total, violations, unparsed = 0, [], []
+    total, violations, unparsed, seen = 0, [], [], set()
     for line in lines:
         fields = line.split()
         if not fields:
@@ -119,6 +127,7 @@ def census(lines):
             unparsed.append(str(error))
             continue
         total += 1
+        seen.add(proto)
         if (proto, host, port) in ALLOWED or is_loopback(host):
             continue
         match = PROCESS.search(line)
@@ -131,12 +140,23 @@ def census(lines):
         raise CensusError(unparsed[0] + more, violations)
     if total == 0:
         raise CensusError("ss listed no listener")
+    missing = sorted(PROTOCOLS - seen)
+    if missing:
+        raise CensusError(f"ss listed no {' or '.join(missing)} listener", violations)
     return total, violations
+
+
+def ss_environment(environ=None):
+    """The census's environment without TCPDIAG_FILE and the PROC_* variables (see SS_FILE_VARIABLE)."""
+    environ = os.environ if environ is None else environ
+    return {key: value for key, value in environ.items()
+            if key != SS_FILE_VARIABLE and not key.startswith(SS_FILE_PREFIX)}
 
 
 def run_ss(timeout):
     try:
-        result = subprocess.run(SS_ARGV, capture_output=True, encoding="utf-8", errors="replace", timeout=timeout)
+        result = subprocess.run(SS_ARGV, capture_output=True, encoding="utf-8", errors="replace", timeout=timeout,
+                                env=ss_environment())
     except FileNotFoundError:
         raise CensusError("ss is not installed") from None
     except subprocess.TimeoutExpired:
@@ -146,9 +166,10 @@ def run_ss(timeout):
     if result.returncode:
         raise CensusError(f"ss exited {result.returncode}")
     # iproute2 6.19.0's main() calls each table's dump without checking its result, and returns 0
-    # (iproute2@v6.19.0, commit dac1bc60, misc/ss.c:6276-6291 and :6302). A failed dump shows only as a diagnostic on
-    # stderr, for example perror("fopen($TCPDIAG_FILE)") at :4160-4162, beside the other tables' valid stdout. So any
-    # stderr line makes the listing incomplete. A normal run on the workstation writes nothing there.
+    # (iproute2@v6.19.0, commit dac1bc60, misc/ss.c:6276-6291 and :6302). A failed dump may leave a diagnostic, for
+    # example perror("fopen($TCPDIAG_FILE)") at :4160-4162, or nothing at all (see SS_FILE_VARIABLE). So a stderr line
+    # is an error here, and census() also requires a TCP and a UDP listener. A normal run on the workstation writes
+    # nothing to stderr.
     diagnostics = [line.strip() for line in result.stderr.splitlines() if line.strip()]
     if diagnostics:
         more = f" and {len(diagnostics) - 1} more line(s)" if len(diagnostics) > 1 else ""

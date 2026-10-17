@@ -41,16 +41,25 @@
   - Exit 2 means a census error:
     - ss is missing, cannot start, exits non-zero or hangs;
     - ss writes any diagnostic to stderr, even with exit 0;
-    - ss lists no listener, or a line does not parse;
+    - ss lists no listener, no TCP listener or no UDP listener, or a line does not parse;
     - the state directory cannot be written;
     - or any other exception, through a final handler. So no failure exits 1, the breach code.
-    A real host always has listeners, so an empty enumeration is never a clean pass.
-  - **Why a diagnostic counts even with exit 0:** iproute2 6.19.0's `main()` calls each table's dump without checking
-    its result, and returns 0 (iproute2 tag `v6.19.0`, commit `dac1bc6021693902b25a961227e289791e429b91`,
-    `misc/ss.c:6276-6291` and `:6302`).
-    - A failed dump shows only as a diagnostic on stderr, for example `perror("fopen($TCPDIAG_FILE)")` at
-      `:4160-4162`, beside the other tables' valid stdout.
-    - A normal run on the workstation writes nothing to stderr.
+    A real host always has TCP and UDP listeners: WSL's DNS tunnel listens on both. So a listing without either is
+    never a clean pass.
+  - **Why a missing protocol is an error, and a diagnostic is too:** iproute2 6.19.0's `main()` calls each table's
+    dump without checking its result, and returns 0 (iproute2 tag `v6.19.0`, commit
+    `dac1bc6021693902b25a961227e289791e429b91`, `misc/ss.c:6276-6291` and `:6302`). A failed dump can show in two
+    ways:
+    - **A diagnostic**, for example `perror("fopen($TCPDIAG_FILE)")` at `:4160-4162`.
+    - **No trace at all.** A `/proc` table that cannot be opened returns -1 silently: `:4256-4257` and `:4276-4285`
+      for TCP, `:4376-4377` and `:4391-4399` for UDP. So the other tables' rows can arrive with exit 0, an empty stderr
+      and the dropped protocol simply absent.
+    - A normal run on the workstation writes nothing to stderr, and lists 55 TCP and 5 UDP listeners (2026-10-17).
+  - **ss runs without the variables that point it at files.** The census drops `TCPDIAG_FILE` and every `PROC_*`
+    variable from the environment it gives ss.
+    - Each one makes ss read a file instead of the kernel's table: `misc/ss.c:4237`, `:4240` and `:4371`, the
+      `PROC_NET_*` openers at `:482-498`, and `lib/utils.c:2054-2066` for `PROC_ROOT`.
+    - So a variable left in the census's environment cannot hide a table.
   - It prints one JSON line: `check`, `at`, `listeners` and `violations`, or `error` for a census error.
     - An error report also carries the `violations` found in the other lines, so a parse error never hides a breach.
     - When only the state directory cannot be written, the exit is 2, but stdout holds the normal report.
@@ -133,6 +142,22 @@ The two from reading:
   - Records are never pruned.
   - The handler throttles only its Windows toast, to one per hour per unit.
 - **User manager.** This is a user timer, so no census runs while the user manager is down.
+- **The floor is per protocol, not per address family.**
+  - ss reads `/proc` only when its netlink dump fails. In that path, an IPv6 table that cannot be opened is skipped
+    without a trace (`misc/ss.c:4265-4271` at iproute2 `v6.19.0`), so an IPv4 row of the same protocol still meets
+    the floor.
+  - The netlink failure that leads there normally leaves a diagnostic, for example "Cannot open netlink socket"
+    (`lib/libnetlink.c:205`), and a diagnostic is a census error.
+- **A benign diagnostic alerts too.**
+  - Any stderr line from ss is a census error. So a diagnostic after which the listing is still complete fails every
+    run and alerts every 5 minutes.
+  - An example is "Cannot open netlink socket" (`lib/libnetlink.c:205` at iproute2 `v6.19.0`), after which ss reads
+    `/proc` instead.
+  - **The operator's action:**
+    - Read the diagnostic in the unit's journal.
+    - Run `ss -H -l -t -u -n -p` by hand to see whether the listing is complete.
+    - Fix the cause, for example a restriction on netlink sockets.
+  - There is no allowlist for diagnostics, so an unexplained one cannot hide a dropped table.
 - **The exception is address-based.** 10.255.255.254:53 is allowed for UDP and TCP, by address and port, not by process.
 - **Exposure that remains.** Each no-auth service is still reachable by local processes. This rule is that residual's
   control, not its removal.
