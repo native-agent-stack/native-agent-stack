@@ -713,5 +713,12 @@ class RoutingRunTests(unittest.TestCase):
         self.assertNotIn(paragraph, routing_paragraph(mutated))
 
 
+class PrivateRecordNamingTests(unittest.TestCase):
+    def test_the_third_selection_row_names_its_private_sweep_by_file_only(self):
+        row = next(line for line in RECORD.read_text(encoding="utf-8").splitlines() if line.startswith("| Third selection |"))
+        self.assertIn("`research/api-surfaces-20261008/FINAL.md` on the producing host (corrected bytes)", row)
+        self.assertNotRegex(row, r"sha256 `[0-9a-f]{7,}`", "the row names its private sweep by file only")
+
+
 if __name__ == "__main__":
     unittest.main()

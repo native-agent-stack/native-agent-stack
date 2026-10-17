@@ -19173,8 +19173,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
-      "sha256": "3752f6f29107814111d9df242835073737b0df0b462691a7139ef3808728e4ac",
-      "bytes": 54196
+      "sha256": "477f15846fcf8c870665eca5df835a2dbae78942a017e22583deb74ef724aece",
+      "bytes": 54121
     },
     {
       "path": "docs/decisions/2026-10-09-claude-review-worker.md",
@@ -64983,8 +64983,8 @@
     },
     {
       "path": "tests/test_paired_runs_results.py",
-      "sha256": "b91bf6eed1f60de96c02482d8f81752e106695cf09b50883d3ce2c84d99cf8af",
-      "bytes": 56606
+      "sha256": "888a2fa6da701a7e73c5331ea5a65b5c949b3abc6db346ddbb0b997cfa136829",
+      "bytes": 57086
     },
     {
       "path": "tests/test_path_safety.py",
