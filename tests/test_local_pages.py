@@ -454,7 +454,7 @@ class LocalPagesTests(unittest.TestCase):
                 self.write_json(self.current_path, self.current)
                 with patch.object(Path, "home", return_value=home):
                     self.refresh()
-                for name in ("index", "readiness", "gaps", "roadmap", "fleet", "sources"):
+                for name in ("index", "readiness", "gaps", "roadmap", "fleet", "sources", "atlas"):
                     html = (self.output / (name + ".html")).read_text()
                     self.assertNotIn(label, html)
                     self.assertNotIn(home.name.casefold(), html.casefold())
@@ -491,6 +491,22 @@ class LocalPagesTests(unittest.TestCase):
         self.assertFalse(any("receipt" in name for name in self.generated_bytes()))
         self.assertEqual(receipt["inputs"]["gaps"]["sha256"], hashlib.sha256(self.gaps_path.read_bytes()).hexdigest())
         self.assertEqual(receipt["inputs"]["roadmap:board_base"]["status"], "UNAVAILABLE")
+        # The atlas publishes through its own call, so the ten refresh outputs above stay ten; its receipt and
+        # ledger sit beside the refresh receipt, outside the served root.
+        atlas = (self.output / "atlas.html").read_text()
+        self.assertNotIn("Atlas unavailable", atlas)
+        self.assertIn('id="atlas-layers"', atlas)
+        self.assertEqual((receipt["atlas"]["schema"], receipt["atlas"]["ledger"]["status"]), ("local-atlas/1", "appended"))
+        for name in ("atlas-receipt.json", "atlas-ledger.json"):
+            path = self.receipt.parent / "atlas" / name
+            self.assertTrue(path.is_file(), name)
+            self.assertFalse(path.is_relative_to(self.output))
+
+    def test_home_links_the_atlas(self) -> None:
+        self.refresh()
+        home = (self.output / "index.html").read_text()
+        self.assertIn('<li><a href="atlas.html">Harness atlas</a>', home)
+        self.assertIn('href="atlas.html">Atlas</a>', home)
 
     def test_source_dates_and_event_dates_keep_distinct_scope(self) -> None:
         self.refresh()

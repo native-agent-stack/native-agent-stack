@@ -1517,9 +1517,47 @@ uv remains a recorded limit. Available status does not make the runner the defau
 distribution's single-port gateway and its live-dashboard WebSocket, added on
 2026-10-03 before that gateway holds accounts; wave-2 custody ruling, change 11).
 21128 takes the rows of 20128; 21129 serves no management route, so no row names
-it. Recognized scheme-less client targets use HTTP. Each covered
+it. The gateway ports the host's port allocation (#1180) names are covered as well,
+within the read caps below. The port tooling
+(`evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py`)
+reads one flat `NS_PORT_*` map per run: the `--host-file` it is given
+(`adoption/hosts/<host>.json` in the allocation addendum's commands), else the file
+`NS2604_HOST_FILE` names, else the installed allocation (`load_service_ports()`,
+`default_config_root()`). The guard cannot tell which file a run was given, so it
+reads all of them once when it starts: the `adoption/hosts/*.json` under the
+session's project root (`CLAUDE_PROJECT_DIR`) and under the guard's own checkout,
+the file `NS2604_HOST_FILE` names, and the installed allocation
+`${XDG_CONFIG_HOME:-$HOME/.config}/new-wsl-native-stack/.service-ports.json`, which
+also covers sessions in other projects. Every checkout, CI's included, holds the
+committed template `adoption/hosts/example.json`, so the template's ports are
+covered wherever the guard runs from a checkout: 21128 and 21129 are fixed, and its
+`NS_PORT_GATEWAY_EMBED_WS` 21131 is added and serves no row. Each `NS_PORT_GATEWAY*`
+key is a covered port. `NS_PORT_GATEWAY` (dashboard, `/v1` and `/api` in one port)
+takes the rows of 21128, unless it names a fixed port, which keeps its own rows.
+Every other gateway key (`NS_PORT_GATEWAY_WS`, `NS_PORT_GATEWAY_EMBED_WS`) serves no
+row, even where it repeats a port the gateway key or the fixed list names. So on a
+host whose file sets `NS_PORT_GATEWAY=23128` and `NS_PORT_GATEWAY_WS=23129`, 23128
+has the rows of 21128 and 23129 none.
+
+The allocation fails closed: it only adds ports. A file that is not valid JSON
+still covers each `"NS_PORT_GATEWAY…": "D"` pair in its text. An unreadable file, a
+non-regular file, a source that raises an error, or no host file at all adds
+nothing, and the later sources and the fixed ports above stay covered. Two read
+caps bound the work: only the first 64 `*.json` files of an `adoption/hosts`
+directory, in sorted name order, are read, and only the first 1 MiB of each file.
+A file past the 64th and a pair past the first 1 MiB cover nothing. That bounds a
+start at 130 files (two directories and two single files), and the ports at the
+65,535 a port number allows. The allocation is read at import, outside the work
+budget and `main()`'s `guard_error` catch. Every exception is caught there, and an
+import that still fails or outlasts the hook timeout blocks the call under the
+hook's `onFailure: "block"`
+([guard-hook-fails-closed](decisions/2026-10-08-guard-hook-fails-closed.md)).
+Recognized scheme-less client targets use HTTP. Each covered
 `/api/` request refuses `gateway_credential_route` unless the complete request
 matches one row. The rows never override another guard rule.
+
+In the table, 21128 also stands for every host-allocated `NS_PORT_GATEWAY` port
+that is not a fixed port and that no other gateway key names.
 
 | Effective method | Exact path | Ports | Query | Body condition |
 | --- | --- | --- | --- | --- |

@@ -21092,6 +21092,18 @@
       },
       {
         "root": "repo",
+        "path": "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-20261015.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-r1-20261015.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/wsl-new-distro-stage1-nativestack2604-20261002.json"
+      },
+      {
+        "root": "repo",
         "path": "evidence/receipts/wsl-retrieval-20260920.json"
       },
       {
@@ -21742,6 +21754,20 @@
       {
         "root": "state",
         "path": "coordination/cc-native-practice-20261009/floor-2300-20261014/changelog-2.1.296-2.1.300.md"
+      }
+    ]
+  },
+  "atlas": {
+    "atlas_token_rate_latest": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/skills/token-rate-latest.json"
+      }
+    ],
+    "atlas_token_rate_history": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/skills/token-rate-history.json"
       }
     ]
   }

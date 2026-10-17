@@ -38,6 +38,12 @@ POST_PIN_RECEIPT_GRANTS = {
         "CC incident brief 2026-10-15 (GHSA-84m7-p3x7-pcfv relock; names this receipt and directs its exact grant): the new "
         "registered receipt; the Architecture build refuses it without this grant "
         "(tests.test_local_pages_architecture_landscape_exclusions)",
+    "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-20261015.json":
+        "#1235, CI run 39001649622 (validate-shard-6) at b72d3d64: the new registered stage-1 receipt (adoption/platforms/linux-wsl2-new-distro.md:1271-1273, CC ruling 2026-10-17); the Architecture build refused it without this grant (tests.test_local_pages_architecture_landscape_exclusions)",
+    "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-r1-20261015.json":
+        "#1235, CI run 39001649622 (validate-shard-6) at b72d3d64: the new registered stage-1 receipt (adoption/platforms/linux-wsl2-new-distro.md:1271-1273, CC ruling 2026-10-17); the Architecture build refused it without this grant (tests.test_local_pages_architecture_landscape_exclusions)",
+    "evidence/receipts/wsl-new-distro-stage1-nativestack2604-20261002.json":
+        "#1235, CI run 39001649622 (validate-shard-6) at b72d3d64: the new registered stage-1 receipt (adoption/platforms/linux-wsl2-new-distro.md:1271-1273, CC ruling 2026-10-17); the Architecture build refused it without this grant (tests.test_local_pages_architecture_landscape_exclusions)",
 }
 spec = importlib.util.spec_from_file_location("local_policy_grant_tests", ROOT / "scripts/local_pages_policy_grants.py")
 grants = importlib.util.module_from_spec(spec)
