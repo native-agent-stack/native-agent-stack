@@ -62893,7 +62893,7 @@
     },
     {
       "path": "tests/test_claude_review_worker.py",
-      "sha256": "c43ad03599076cf8c55ddba41991c083b07af5f71f61270b85a594d10f4dd2b8",
+      "sha256": "508d0d5c87688330da1ced1f6223bfa82f6aea81a1ea4befa89d4c4d8d606af5",
       "bytes": 141419
     },
     {
@@ -64363,8 +64363,8 @@
     },
     {
       "path": "tools/claude-review-worker/README.md",
-      "sha256": "ac24ba6323da0336bc44c0c5a77c9c66290382aad18e9319dbdbb8c1216bdc95",
-      "bytes": 15204
+      "sha256": "0708ddefd80a05f233cffafd227bd1180c91119bbf407eb2915a1f1813ad100f",
+      "bytes": 15268
     },
     {
       "path": "tools/claude-review-worker/essential-paths.json",
@@ -64388,8 +64388,8 @@
     },
     {
       "path": "tools/claude-review-worker/worker.py",
-      "sha256": "1712f7b0d802896d9043bbca2aa71947448425dc9354e4ce50f981cbc37a204f",
-      "bytes": 135857
+      "sha256": "e61baea1d9e7caa20cb9c9157754be7a464bc6b53a7b712ceb2237823e0d787d",
+      "bytes": 136558
     },
     {
       "path": "tools/credentials/anthropic_key_health.py",

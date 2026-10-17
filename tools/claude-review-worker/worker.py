@@ -96,11 +96,12 @@ SWITCH_CLASSES = ("credit_exhausted", "revoked_key")
 # (https://code.claude.com/docs/en/setup, home directories on network storage), and native auto-update is on. The copy is
 # checked at every tick against the linux-x64 checksum of the release's GPG-verified signed manifest. Pinned roles
 # follow the latest release through such a copy after a function check of their exact invocation (owner direction,
-# 2026-10-14, paraphrased: keep the headless roles on the latest client): 2.1.300, manifest
-# https://downloads.claude.ai/claude-code-releases/2.1.300/manifest.json (sha256 fb62dae2...), checked 2026-10-15
-# against 2.1.299 on claude_flags() with no key (identical init: tools Glob, Grep, Read; no MCP server; dontAsk).
-DEFAULT_CLAUDE_BIN = "~/.local/share/claude-retained/2.1.300/claude"
-DEFAULT_CLAUDE_BIN_SHA256 = "674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453"
+# 2026-10-14, paraphrased: keep the headless roles on the latest client): 2.1.302, manifest
+# https://downloads.claude.ai/claude-code-releases/2.1.302/manifest.json (sha256 d7d4f193...), checked 2026-10-17
+# against 2.1.300 on claude_flags() with no key: `--help` byte-identical, and the same init (tools Glob, Grep, Read; no
+# MCP server; no plugin; dontAsk). 2.1.300 was checked against 2.1.299 the same way on 2026-10-15.
+DEFAULT_CLAUDE_BIN = "~/.local/share/claude-retained/2.1.302/claude"
+DEFAULT_CLAUDE_BIN_SHA256 = "60d7eb7f12fbb28a52533fe8be5884097403562aa02dc73991a021c7067e29a5"
 
 
 def credit_exhausted(status, text) -> bool:
@@ -122,6 +123,11 @@ UPSTREAM_LABEL_CHARS = 200         # one citation label, at most, in the data fi
 # src/sandbox/linux-sandbox-utils.ts:1343-1363 and :3378, src/sandbox/sandbox-manager.ts:355-415). It is installed
 # from its npm tarball (sha256 5a730e4367c264ccc4b592af01dab038a6c39db7c184efbd132841688fa854f1) with
 # `npm install --prefix <CLAUDE_REVIEW_SRT> --ignore-scripts`; npm's lock records the integrity below.
+# 0.0.80 (anthropics/sandbox-runtime@626a59671ee2be556d70a290a8036224be996193) is held back: by default it refuses the
+# sandboxed command new user namespaces (commit 9a277e5, #588; README.md:715 at that tag names a nested bubblewrap), so
+# this chain's inner bwrap --unshare-user stops. Measured 2026-10-17 with boundary_self_check: 0.0.79 passes, 0.0.80
+# fails ("bwrap: No permissions to create a new namespace"). Its opt-out, allowNestedUserNamespaces, gives up srt's
+# write denies against the command; adopting it is the command center's decision.
 SRT_PACKAGE = "@anthropic-ai/sandbox-runtime"
 SRT_VERSION = "0.0.79"
 SRT_INTEGRITY = ("sha512-WjBmS9fbTpnQwQkM9SU+JjhM2CcXo9eWEELktY1100RMvTy/jPhP44yZ3NXhh+GHB350OgPbM3+FubE5WVRtSA==")
@@ -648,9 +654,9 @@ def review_settings() -> dict:
 
 
 def claude_flags(input_view: str) -> list:
-    """claude -p's flags, each checked against `claude --help` of 2.1.299 (byte-identical to 2.1.296's) and of 2.1.300
-    (every flag present; only --restricted's description changed, dropping REPL from the tools it removes). No positional
-    prompt: it comes on stdin."""
+    """claude -p's flags, each checked against `claude --help` of 2.1.299 (byte-identical to 2.1.296's), of 2.1.300
+    (every flag present; only --restricted's description changed, dropping REPL from the tools it removes) and of 2.1.302
+    (byte-identical to 2.1.300's). No positional prompt: it comes on stdin."""
     return [
         "-p", "--model", MODEL, "--effort", EFFORT, "--max-budget-usd", str(BUDGET_USD),
         "--permission-mode", "dontAsk", "--permission-prompts", "none", "--restricted", "--setting-sources", "user",

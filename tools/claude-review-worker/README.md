@@ -58,7 +58,8 @@ directory), deleted after the run. The inner bubblewrap is the filesystem fence.
 `/review/config` (writable, deleted after the run) and the pinned binary. There is no `/home`, so the gh login, the key
 store and every other host file are absent. No CLAUDE.md memory of any kind is loaded: every session runs with
 `CLAUDE_CODE_DISABLE_CLAUDE_MDS=1` (the instruction fence). The flags and settings are listed in `claude_flags()` and
-`review_settings()` in `worker.py`, each checked against `claude --help` of 2.1.299 (byte-identical to 2.1.296's).
+`review_settings()` in `worker.py`, each checked against `claude --help` of 2.1.299 (byte-identical to 2.1.296's), of
+2.1.300 and of 2.1.302 (byte-identical to 2.1.300's).
 
 A trading head (every `us-equities-trading` head, and a `native-agent-stack` head that changes one of its
 `trading_paths`) gets the upstream-alignment rule in its prompt. Every claim or fix about external behaviour must cite
@@ -107,10 +108,10 @@ prompt says the check covers citation presence only.
    # CLAUDE_REVIEW_KEYS=anthropic-api-4,anthropic-api-3,anthropic-api-2,anthropic-api-5,anthropic-api,...
    #   fill-first: the next key only when one is out of credit or revoked; a switch is a ledger row and a warning;
    #   anthropic-api-3 is second (its CI-review purpose ended with #981) and anthropic-api-2 third (owner, 2026-10-11)
-   # CLAUDE_BIN=~/.local/share/claude-retained/2.1.300/claude          # the pinned native binary, a retained copy outside
+   # CLAUDE_BIN=~/.local/share/claude-retained/2.1.302/claude          # the pinned native binary, a retained copy outside
    #   versions/ (the native installer's cleanup keeps only the launcher's, running and two newest versions there)
-   # CLAUDE_BIN_SHA256=674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453   # checked at every tick; the
-   #   default binary's digest is built in (the signed 2.1.300 manifest's linux-x64 checksum); a CLAUDE_BIN naming
+   # CLAUDE_BIN_SHA256=60d7eb7f12fbb28a52533fe8be5884097403562aa02dc73991a021c7067e29a5   # checked at every tick; the
+   #   default binary's digest is built in (the signed 2.1.302 manifest's linux-x64 checksum); a CLAUDE_BIN naming
    #   another path needs this line too, or the worker stops at its settings (exit 2): no binary runs unchecked
    # CLAUDE_REVIEW_STATE=~/.local/state/native-agent-stack/claude-review-worker
    # CLAUDE_REVIEW_TIMEOUT_SECONDS=2700
@@ -149,9 +150,9 @@ prompt says the check covers citation presence only.
 - A head refused for its diff size or its own size needs a paths-limited review by other means; the worker has no
   paths option. (The `paths` input of `claude-pr-review.yml` was one such means until #981 removed that workflow.)
 - Roll the client back to the previous retained release: in `~/.config/claude-review-worker.env`, set the pair
-  `CLAUDE_BIN=~/.local/share/claude-retained/2.1.299/claude` and
-  `CLAUDE_BIN_SHA256=2d894a4b1bfaaa9aab72aeff7803e3c73bc2510f279a171f6b8f59f72d17d077` (the linux-x64 checksum in the
-  2.1.299 release manifest, size 265342136). Check it first with `sha256sum` on that path and `<path> --version`, then run
+  `CLAUDE_BIN=~/.local/share/claude-retained/2.1.300/claude` and
+  `CLAUDE_BIN_SHA256=674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453` (the linux-x64 checksum in the
+  signed 2.1.300 release manifest, size 266972344). Check it first with `sha256sum` on that path and `<path> --version`, then run
   `probes.py offline` with the same two variables set, and enable nothing while a check fails. The next tick checks
   the pair before any key is read. Undo by removing both lines. Nothing under `claude-retained/` is touched by the
   native installer's cleanup; the rule that moves this pin to each new release after a function check of the exact

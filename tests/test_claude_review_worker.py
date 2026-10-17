@@ -1776,7 +1776,7 @@ class InvocationTest(unittest.TestCase):
         self.assertEqual((started, h.rows()), ([], []))  # no run started and nothing debited
 
     def test_preflight_refuses_a_client_binary_that_fails_its_sha256_check(self):
-        # B2 (CC, 2026-10-15): the worker runs a retained copy of the adopted release (2.1.300) and checks it at every tick;
+        # B2 (CC, 2026-10-15): the worker runs a retained copy of the adopted release (2.1.302) and checks it at every tick;
         # a binary whose sha256 is not the pinned one stops the tick before any key is read.
         h = Harness(self)
         repo, _ = h.repo("o/priv", heads={1: {"a.py": "a\n"}})
@@ -1817,20 +1817,20 @@ class InvocationTest(unittest.TestCase):
     def test_settings_read_the_environment(self):
         settings = crw.settings_from({"HOME": "/h", "API_ACTIONS_LEDGER": "~/l.jsonl"})
         self.assertEqual(settings.keys, crw.DEFAULT_KEYS)
-        # The adopted client release: 2.1.300, the latest (owner direction 2026-10-14: pinned roles follow the latest release
+        # The adopted client release: 2.1.302, the latest (owner direction 2026-10-14: pinned roles follow the latest release
         # after a function check). Its binary is the retained copy outside versions/, which the native installer's cleanup
         # does not touch (setup.md: it keeps only the launcher's version, running sessions' versions and the two newest),
         # checked against the signed manifest's linux-x64 digest.
-        self.assertEqual(crw.DEFAULT_CLAUDE_BIN, "~/.local/share/claude-retained/2.1.300/claude")
-        self.assertEqual(settings.claude_bin, Path("/h/.local/share/claude-retained/2.1.300/claude"))
-        self.assertEqual(crw.DEFAULT_CLAUDE_BIN_SHA256, "674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453")
+        self.assertEqual(crw.DEFAULT_CLAUDE_BIN, "~/.local/share/claude-retained/2.1.302/claude")
+        self.assertEqual(settings.claude_bin, Path("/h/.local/share/claude-retained/2.1.302/claude"))
+        self.assertEqual(crw.DEFAULT_CLAUDE_BIN_SHA256, "60d7eb7f12fbb28a52533fe8be5884097403562aa02dc73991a021c7067e29a5")
         self.assertEqual(settings.claude_sha256, crw.DEFAULT_CLAUDE_BIN_SHA256)
         # An override fails closed (GPT full1 blocker 1 and CC micro F1, 2026-10-15): another path needs its own digest, an
         # empty digest is none, and the default path, however it is spelled, keeps the default digest.
         for env in ({"CLAUDE_BIN": "/x/claude"}, {"CLAUDE_BIN": "/x/claude", "CLAUDE_BIN_SHA256": ""}):
             with self.subTest(env=env), self.assertRaisesRegex(crw.ConfigError, "CLAUDE_BIN_SHA256"):
                 crw.settings_from({"HOME": "/h", **env})
-        for spelled in (crw.DEFAULT_CLAUDE_BIN, "/h/.local/share/claude-retained/2.1.300/claude"):
+        for spelled in (crw.DEFAULT_CLAUDE_BIN, "/h/.local/share/claude-retained/2.1.302/claude"):
             with self.subTest(spelled=spelled):
                 self.assertEqual(crw.settings_from({"HOME": "/h", "CLAUDE_BIN": spelled}).claude_sha256,
                                  crw.DEFAULT_CLAUDE_BIN_SHA256)
