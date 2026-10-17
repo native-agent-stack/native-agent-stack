@@ -1,0 +1,2700 @@
+[
+  {
+    "candidate": {
+      "id": "conductor-oss/conductor",
+      "name": "Conductor",
+      "repository_url": "https://github.com/conductor-oss/conductor",
+      "package_or_plugin_ids": [
+        "conductor server",
+        "@conductor-oss/conductor-cli",
+        "conductor-skills (separate, excluded)"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "durable workflow server",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/conductor-oss~1conductor"
+    },
+    "layer": "scheduling-supervision",
+    "family": "research",
+    "family_service": "served as a model-neutral durable workflow server adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "v3.32.5",
+      "commit": "49f972398e533441ba851e2b578a8b96d748a770",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Declarative workflows with persisted steps, retries/timeouts, execution history and external polyglot workers.",
+        "sources": [
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:79-90",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L79-L90",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:309",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L309",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "UNKNOWN",
+        "detail": "Quickstart requires Node >=16 and Java >=21 but does not bind the CLI/server JAR and dependencies to WSL2 x86_64. The separate skills installer's macOS/Linux label is not server support evidence.",
+        "sources": [
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:31-44",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L31-L44",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:173-179",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L173-L179",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "UNKNOWN",
+        "detail": "Exact macOS arm64 CLI/JAR/dependency route is not established by the server quickstart.",
+        "sources": [
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:31-44",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L31-L44",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "CLI/API workflow create/start and external polling workers are documented; UI is optional.",
+        "sources": [
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:47-70",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L47-L70",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:85-90",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L85-L90",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "PASS",
+        "detail": "Node/Java local CLI server route is an ordinary user process/cache, separate from the Docker alternative.",
+        "sources": [
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:31-44",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L31-L44",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "Versioned workflow definitions and systemTaskWorkerExecutionNamespace support explicit logical/server worker scope; family runtime adapters remain proposals.",
+        "sources": [
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:339",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L339",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:docs/documentation/configuration/appconf.md:31-41",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/docs/documentation/configuration/appconf.md#L31-L41",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "visible_history": {
+        "result": "PASS",
+        "detail": "Workflow execution history and per-task input/output/timing/retry visibility are documented.",
+        "sources": [
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:309",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L309",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:345",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L345",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "bounded_process_trees": {
+        "result": "UNKNOWN",
+        "detail": "Task concurrency/timeouts are scheduling limits, not proof that arbitrary external worker descendants are terminated.",
+        "sources": [
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:85-90",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L85-L90",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:docs/documentation/configuration/taskdef.md:23-33",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/docs/documentation/configuration/taskdef.md#L23-L33",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "cancellation": {
+        "result": "PASS",
+        "detail": "Workflow REST resource exposes terminate, pause/resume, restart and retry; this does not prove external process termination.",
+        "sources": [
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:rest/src/main/java/com/netflix/conductor/rest/controllers/WorkflowResource.java:252-325",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/rest/src/main/java/com/netflix/conductor/rest/controllers/WorkflowResource.java#L252-L325",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "recoverable_effects": {
+        "result": "UNKNOWN",
+        "detail": "Durable steps/replay are documented, but concrete worker side-effect idempotency/compensation is not bound for the workload.",
+        "sources": [
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:79-90",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L79-L90",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:docs/documentation/configuration/taskdef.md:18-27",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/docs/documentation/configuration/taskdef.md#L18-L27",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:79-90",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L79-L90",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:309",
+            "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L309",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "npm install -g @conductor-oss/conductor-cli; conductor server start. The quickstart caches/fetches a server JAR and can target latest; bind CLI/server artifacts to v3.32.5 before trial. Do not run the separate all-agent skills installer.",
+      "sources": [
+        {
+          "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:31-44",
+          "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L31-L44",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:167-179",
+          "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L167-L179",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "npm uninstall -g @conductor-oss/conductor-cli removes the CLI package. A complete owned server/JAR/cache/state inverse is not documented in the inspected quickstart.",
+      "sources": [
+        {
+          "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:31-44",
+          "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L31-L44",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://docs.npmjs.com/cli/v11/commands/npm-uninstall (read 2026-10-15)",
+          "url": "https://docs.npmjs.com/cli/v11/commands/npm-uninstall",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "CLI cache ~/.conductor-cli, example ports 5000 and 8080, shared workflow/worker namespaces and task inputs/outputs in history. Separate conductor-skills --all installer writes globally to detected agents and is excluded from this zero-injection server profile.",
+      "sources": [
+        {
+          "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:40-44",
+          "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L40-L44",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:63-67",
+          "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L63-L67",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:173-179",
+          "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L173-L179",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:docs/documentation/configuration/appconf.md:40-41",
+          "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/docs/documentation/configuration/appconf.md#L40-L41",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "conductor server",
+          "@conductor-oss/conductor-cli",
+          "conductor-skills (separate, excluded)"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Declarative workflows with persisted steps, retries/timeouts, execution history and external polyglot workers.",
+      "sources": [
+        {
+          "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:79-90",
+          "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L79-L90",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:309",
+          "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L309",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented durable workflow server profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:47-70",
+          "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L47-L70",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "conductor-oss/conductor@49f972398e533441ba851e2b578a8b96d748a770:README.md:85-90",
+          "url": "https://github.com/conductor-oss/conductor/blob/49f972398e533441ba851e2b578a8b96d748a770/README.md#L85-L90",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "c52919afd0ec2ffde0196afbab10762d2d48ed28",
+        "2026-10-12T16:36:08Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/conductor-oss~1conductor"
+    },
+    "licence_note": {
+      "spdx": "Apache-2.0",
+      "source": "candidate-facts-ops.json#/candidates/conductor-oss~1conductor",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "trial_eligible": false,
+      "disqualifier": null,
+      "reason": "Exact host/CLI-JAR binding, external process-tree containment, workload effect semantics and full inverse remain unverified.",
+      "cheapest_check": "Read the version-matched CLI server selection/stop contract and selected worker SDK's cancellation/side-effect model; no service or worker is run."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "dagster-io/dagster",
+      "name": "Dagster",
+      "repository_url": "https://github.com/dagster-io/dagster",
+      "package_or_plugin_ids": [
+        "dagster",
+        "dagster-webserver",
+        "dagster-dg-cli"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "Python data-workflow orchestrator",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/dagster-io~1dagster"
+    },
+    "layer": "scheduling-supervision",
+    "family": "research",
+    "family_service": "served as a model-neutral Python data-workflow orchestrator adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "1.13.26",
+      "commit": "fb6aeab1df0f2dc72cac644ba1fa332dbfa18593",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Python asset/workflow execution with history, instance storage, run coordination and monitoring.",
+        "sources": [
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:python_modules/dagster/README.md:31-35",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/python_modules/dagster/README.md#L31-L35",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/oss/oss-instance-configuration.md:54-63",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/oss/oss-instance-configuration.md#L54-L63",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "UNKNOWN",
+        "detail": "Install guide declares Python >=3.10 but the selected launcher/dependency set is not bound to WSL2 x86_64.",
+        "sources": [
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/getting-started/installation.md:11-15",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/getting-started/installation.md#L11-L15",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/getting-started/installation.md:63-72",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/getting-started/installation.md#L63-L72",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "UNKNOWN",
+        "detail": "Exact macOS arm64 dependencies and selected launcher support remain unverified by this bounded read.",
+        "sources": [
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/getting-started/installation.md:11-15",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/getting-started/installation.md#L11-L15",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "Run monitoring uses a daemon and instance configuration; execution does not require a browser.",
+        "sources": [
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/execution/run-monitoring.md:7-15",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/execution/run-monitoring.md#L7-L15",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "PASS",
+        "detail": "Instance data can live under user-selected DAGSTER_HOME; Python CLI/daemon route requires no privileged service in the documented local path.",
+        "sources": [
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/oss/oss-instance-configuration.md:17-23",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/oss/oss-instance-configuration.md#L17-L23",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "DAGSTER_HOME/dagster.yaml controls one shared instance; unset home uses temporary storage that disappears on process exit.",
+        "sources": [
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/oss/oss-instance-configuration.md:9-23",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/oss/oss-instance-configuration.md#L9-L23",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "visible_history": {
+        "result": "PASS",
+        "detail": "Run, event, schedule/sensor metadata and per-run stdout/stderr storage are documented.",
+        "sources": [
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/oss/oss-instance-configuration.md:47-63",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/oss/oss-instance-configuration.md#L47-L63",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "bounded_process_trees": {
+        "result": "UNKNOWN",
+        "detail": "Run limits and termination signaling exist, but complete descendant containment for the selected local launcher is not established.",
+        "sources": [
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/execution/run-monitoring.md:24-34",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/execution/run-monitoring.md#L24-L34",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:python_modules/dagster/dagster/_core/launcher/default_run_launcher.py:153-178",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/python_modules/dagster/dagster/_core/launcher/default_run_launcher.py#L153-L178",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "cancellation": {
+        "result": "PASS",
+        "detail": "Termination signals the worker and tracks CANCELING/CANCELED; timeout may only mark state, and concurrency-slot release requires configuration.",
+        "sources": [
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/execution/run-monitoring.md:28-34",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/execution/run-monitoring.md#L28-L34",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/execution/run-monitoring.md:69-80",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/execution/run-monitoring.md#L69-L80",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "recoverable_effects": {
+        "result": "UNKNOWN",
+        "detail": "FROM_FAILURE retry requires cross-run outputs. Crash detection excludes DefaultRunLauncher and resume is limited to specified Docker/Kubernetes launcher/executor combinations; no chosen workload/launcher is bound.",
+        "sources": [
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/execution/run-retries.md:45-59",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/execution/run-retries.md#L45-L59",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/execution/run-monitoring.md:82-106",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/execution/run-monitoring.md#L82-L106",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:python_modules/dagster/README.md:31-35",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/python_modules/dagster/README.md#L31-L35",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/oss/oss-instance-configuration.md:54-63",
+            "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/oss/oss-instance-configuration.md#L54-L63",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "pip install dagster dagster-webserver dagster-dg-cli, or uv add the same packages in the owned project. Bind corresponding 1.13.26 packages; do not scaffold a new project just to perform this screen.",
+      "sources": [
+        {
+          "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/getting-started/installation.md:63-72",
+          "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/getting-started/installation.md#L63-L72",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "pip uninstall dagster dagster-webserver dagster-dg-cli removes these packages. Instance data and daemon termination are separate; no complete owned-state uninstall contract established in the reviewed sections.",
+      "sources": [
+        {
+          "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/getting-started/installation.md:63-72",
+          "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/getting-started/installation.md#L63-L72",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://pip.pypa.io/en/stable/cli/pip_uninstall/ (read 2026-10-15)",
+          "url": "https://pip.pypa.io/en/stable/cli/pip_uninstall/",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "Shared DAGSTER_HOME/dagster.yaml and local storage, persistent raw stdout/stderr, launcher/coordinator configuration and opt-in/out telemetry settings. Mixing instances by omitting home can silently use temporary state.",
+      "sources": [
+        {
+          "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/oss/oss-instance-configuration.md:9-23",
+          "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/oss/oss-instance-configuration.md#L9-L23",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/oss/oss-instance-configuration.md:47-63",
+          "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/oss/oss-instance-configuration.md#L47-L63",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "dagster",
+          "dagster-webserver",
+          "dagster-dg-cli"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Python asset/workflow execution with history, instance storage, run coordination and monitoring.",
+      "sources": [
+        {
+          "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:python_modules/dagster/README.md:31-35",
+          "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/python_modules/dagster/README.md#L31-L35",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/oss/oss-instance-configuration.md:54-63",
+          "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/oss/oss-instance-configuration.md#L54-L63",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented Python data-workflow orchestrator profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "dagster-io/dagster@fb6aeab1df0f2dc72cac644ba1fa332dbfa18593:docs/docs/deployment/execution/run-monitoring.md:7-15",
+          "url": "https://github.com/dagster-io/dagster/blob/fb6aeab1df0f2dc72cac644ba1fa332dbfa18593/docs/docs/deployment/execution/run-monitoring.md#L7-L15",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "c97898c3e4a8a3cc5e32fcc2ca97aea810342ed9",
+        "2026-10-12T16:39:39Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/dagster-io~1dagster"
+    },
+    "licence_note": {
+      "spdx": "Apache-2.0",
+      "source": "candidate-facts-ops.json#/candidates/dagster-io~1dagster",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "trial_eligible": false,
+      "disqualifier": null,
+      "reason": "Host/launcher/process-boundary and recoverable-effect requirements are not fully established; generic retry support does not qualify local crash recovery.",
+      "cheapest_check": "Choose and source-screen one supported launcher/executor and cross-run storage path; inspect its descendant-stop and host-support contracts before a trial."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "dagucloud/dagu",
+      "name": "Dagu",
+      "repository_url": "https://github.com/dagucloud/dagu",
+      "package_or_plugin_ids": [
+        "dagu",
+        "@dagucloud/dagu"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "local shell workflow scheduler",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/dagucloud~1dagu"
+    },
+    "layer": "scheduling-supervision",
+    "family": "research",
+    "family_service": "served as a model-neutral local shell workflow scheduler adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "v2.20.1",
+      "commit": "225d4ee26017f32391ba8d8119c37c392b839614",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Local-first single binary schedules existing scripts with retries, history and optional workers; ordinary tasks need not import an SDK.",
+        "sources": [
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:18-31",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L18-L31",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:61-76",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L61-L76",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "PASS",
+        "detail": "Linux support is explicit and exact v2.20.1 release includes linux_amd64 binary.",
+        "sources": [
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:18-26",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L18-L26",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.20.1 (read 2026-10-15)",
+            "url": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.20.1",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "PASS",
+        "detail": "macOS support is explicit and exact v2.20.1 release includes darwin_arm64 binary.",
+        "sources": [
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:18-26",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L18-L26",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.20.1 (read 2026-10-15)",
+            "url": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.20.1",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "CLI start/scheduler/worker/stop/status/history operations are documented.",
+        "sources": [
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:833-853",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L833-L853",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "PASS",
+        "detail": "Single user binary with user-owned default paths; optional installer wizard can create background services and is not required by the Homebrew route.",
+        "sources": [
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:109-118",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L109-L118",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:148",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L148",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:901-915",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L901-L915",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "DAGU_HOME and granular DAG/log/data/work-dir paths, worker ID/labels and coordinator addresses are explicit.",
+        "sources": [
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:901-915",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L901-L915",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:998-1007",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L998-L1007",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "visible_history": {
+        "result": "PASS",
+        "detail": "history/status commands and log/data paths are documented.",
+        "sources": [
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:848-853",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L848-L853",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:909-914",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L909-L914",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "bounded_process_trees": {
+        "result": "PASS",
+        "detail": "Signal propagation to owned DAG-run process groups is an explicit option, default false; workers have max-active-runs and bounded shutdown drain/cancel settings. This does not contain hostile escaped processes.",
+        "sources": [
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:988-1005",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L988-L1005",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "cancellation": {
+        "result": "PASS",
+        "detail": "dagu stop <dag> and worker shutdown cancellation after a bounded drain are documented.",
+        "sources": [
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:843-845",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L843-L845",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:1004",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L1004",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "recoverable_effects": {
+        "result": "PASS",
+        "detail": "Retry a failed run by ID and persisted per-run state are documented. This establishes a retry mechanism, not exactly-once external effects or proof that older crash-recovery failures are fixed.",
+        "sources": [
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:844-845",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L844-L845",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:909-914",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L909-L914",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:18-31",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L18-L31",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:61-76",
+            "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L61-L76",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "brew install dagu; alternative npm install -g --ignore-scripts=false @dagucloud/dagu. Exact release v2.20.1 host archives also exist. Source installer wizard can change PATH/services, so its effects are not inferred from the package route.",
+      "sources": [
+        {
+          "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:109-148",
+          "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L109-L148",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.20.1 (read 2026-10-15)",
+          "url": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.20.1",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "dagu stop <owned-dag>; stop the owned server/scheduler with documented SIGINT/SIGTERM propagation policy. brew uninstall dagu removes a Homebrew package. dagu cleanup <dag> removes old run data and is a separate ownership decision.",
+      "sources": [
+        {
+          "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:843-853",
+          "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L843-L853",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:992-1004",
+          "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L992-L1004",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://docs.brew.sh/Manpage (read 2026-10-15)",
+          "url": "https://docs.brew.sh/Manpage",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "HTTP 8080, scheduler health 8090, coordinator 50055/8091 and worker health 8092; DAGU_HOME/default paths and optional shared base config; signal propagation defaults false, worker drain defaults 60s. Optional Dagu Console emits metadata to an external endpoint.",
+      "sources": [
+        {
+          "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:172",
+          "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L172",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:901-915",
+          "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L901-L915",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:988-1007",
+          "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L988-L1007",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:33",
+          "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L33",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "dagu",
+          "@dagucloud/dagu"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Local-first single binary schedules existing scripts with retries, history and optional workers; ordinary tasks need not import an SDK.",
+      "sources": [
+        {
+          "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:18-31",
+          "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L18-L31",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:61-76",
+          "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L61-L76",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented local shell workflow scheduler profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "dagucloud/dagu@225d4ee26017f32391ba8d8119c37c392b839614:README.md:833-853",
+          "url": "https://github.com/dagucloud/dagu/blob/225d4ee26017f32391ba8d8119c37c392b839614/README.md#L833-L853",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "2067738679c4290436511451d976a31b2cca3c1a",
+        "2026-10-15T11:36:39Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/dagucloud~1dagu"
+    },
+    "licence_note": {
+      "spdx": "GPL-3.0",
+      "source": "candidate-facts-ops.json#/candidates/dagucloud~1dagu",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "trial_eligible": true,
+      "disqualifier": null,
+      "reason": "Documented local workflow, scoped state, history, process-group cancellation and retry mechanisms at the pin admit only a bounded trial; earlier recovery evidence is not superseded by this screen.",
+      "cheapest_check": "Use the existing layer recovery fixture with explicitly sourced signal/drain/stale-run settings; distinguish configuration changes from a pin improvement and qualify actual side effects in the later trial."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "microsoft/pg_durable",
+      "name": "pg_durable",
+      "repository_url": "https://github.com/microsoft/pg_durable",
+      "package_or_plugin_ids": [
+        "pg_durable PostgreSQL extension",
+        "df SQL API"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "PostgreSQL durable SQL execution",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/microsoft~1pg_durable"
+    },
+    "layer": "scheduling-supervision",
+    "family": "research",
+    "family_service": "served as a model-neutral PostgreSQL durable SQL execution adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "v0.2.9",
+      "commit": "2ccb746756e1071b24172b541f7af130166c0c6b",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Durable SQL functions run inside PostgreSQL with checkpoint/resume, statuses and per-role ownership.",
+        "sources": [
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:14-16",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L14-L16",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:89-92",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L89-L92",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:USER_GUIDE.md:80-90",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/USER_GUIDE.md#L80-L90",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "PASS",
+        "detail": "Release Debian packages and images target PostgreSQL17/18 amd64; source installation is documented for Linux.",
+        "sources": [
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:104-110",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L104-L110",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:142-158",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L142-L158",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "UNKNOWN",
+        "detail": "Source installation is documented on macOS, but exact Apple Silicon toolchain/artifact support is not bound; release packages/images are amd64-only.",
+        "sources": [
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:104-110",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L104-L110",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:142-158",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L142-L158",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "SQL API and PostgreSQL background worker execute without an interactive UI.",
+        "sources": [
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:89-101",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L89-L101",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:134-140",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L134-L140",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "UNKNOWN",
+        "detail": "Build runs as a normal user but install/preload/restart needs elevated provisioning; the exact rootless host PostgreSQL deployment is not bound.",
+        "sources": [
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:142-158",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L142-L158",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "Configured control database plus role grants and ownership checks isolate SQL usage; these are database privileges, not an OS sandbox.",
+        "sources": [
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:USER_GUIDE.md:80-90",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/USER_GUIDE.md#L80-L90",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:USER_GUIDE.md:2750",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/USER_GUIDE.md#L2750",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "visible_history": {
+        "result": "PASS",
+        "detail": "df.status/df.result and instance/node state are documented.",
+        "sources": [
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:USER_GUIDE.md:287-289",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/USER_GUIDE.md#L287-L289",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:USER_GUIDE.md:1873-1879",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/USER_GUIDE.md#L1873-L1879",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "bounded_process_trees": {
+        "result": "UNKNOWN",
+        "detail": "Connection pools and timeouts bound database resources; no arbitrary family worker-process tree contract is established.",
+        "sources": [
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:USER_GUIDE.md:3011-3023",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/USER_GUIDE.md#L3011-L3023",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "cancellation": {
+        "result": "PASS",
+        "detail": "df.cancel by instance ID cascades to active loop children, with explicit terminal state semantics.",
+        "sources": [
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:USER_GUIDE.md:1867-1879",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/USER_GUIDE.md#L1867-L1879",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "recoverable_effects": {
+        "result": "UNKNOWN",
+        "detail": "Checkpoint/resume is documented, but sink side effects can leave unreferenced rows after crash/cancellation; concrete workflow retention/compensation remains unbound.",
+        "sources": [
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:89-92",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L89-L92",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:USER_GUIDE.md:900-913",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/USER_GUIDE.md#L900-L913",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:14-16",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L14-L16",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:89-92",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L89-L92",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:USER_GUIDE.md:80-90",
+            "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/USER_GUIDE.md#L80-L90",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "Vendor source path: cargo pgrx init --pg17 <pg_config>; make PG_CONFIG=<pg_config>; sudo make install PG_CONFIG=<pg_config>; add pg_durable to shared_preload_libraries, restart PostgreSQL and CREATE EXTENSION pg_durable. No command/SQL was executed.",
+      "sources": [
+        {
+          "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:134-158",
+          "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L134-L158",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "sudo make uninstall PG_CONFIG=<pg_config> removes installed files without a build; existing extension/database/preload state requires separate owned cleanup before removing a loaded library.",
+      "sources": [
+        {
+          "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:159-162",
+          "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L159-L162",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:134-140",
+          "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L134-L140",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "Existing PostgreSQL shared_preload_libraries/control database/role grants; example PostgreSQL ports 5432/5433; package files are server-global while SQL ownership is per role. Published demo image enables superuser instances and is evaluation-only.",
+      "sources": [
+        {
+          "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:104-124",
+          "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L104-L124",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:134-158",
+          "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L134-L158",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:USER_GUIDE.md:80-90",
+          "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/USER_GUIDE.md#L80-L90",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "pg_durable PostgreSQL extension",
+          "df SQL API"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Durable SQL functions run inside PostgreSQL with checkpoint/resume, statuses and per-role ownership.",
+      "sources": [
+        {
+          "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:14-16",
+          "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L14-L16",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:89-92",
+          "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L89-L92",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:USER_GUIDE.md:80-90",
+          "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/USER_GUIDE.md#L80-L90",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented PostgreSQL durable SQL execution profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:89-101",
+          "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L89-L101",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "microsoft/pg_durable@2ccb746756e1071b24172b541f7af130166c0c6b:README.md:134-140",
+          "url": "https://github.com/microsoft/pg_durable/blob/2ccb746756e1071b24172b541f7af130166c0c6b/README.md#L134-L140",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "74dc45783329fcff276dd897c82b63df5b927237",
+        "2026-10-14T17:33:47Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/microsoft~1pg_durable"
+    },
+    "licence_note": {
+      "spdx": "NOASSERTION",
+      "source": "candidate-facts-ops.json#/candidates/microsoft~1pg_durable",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "trial_eligible": false,
+      "disqualifier": null,
+      "reason": "macOS arm64, rootless host deployment, native worker process bounds and workload effect semantics remain unverified.",
+      "cheapest_check": "Read the Apple Silicon pgrx/PostgreSQL compatibility and a matched SQL workload's side-effect contract; do not use a superuser demo to stand in for the family profile."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "prefecthq/prefect",
+      "name": "Prefect",
+      "repository_url": "https://github.com/prefecthq/prefect",
+      "package_or_plugin_ids": [
+        "prefect",
+        "prefect server",
+        "Prefect process worker"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "Python workflow scheduler",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/prefecthq~1prefect"
+    },
+    "layer": "scheduling-supervision",
+    "family": "research",
+    "family_service": "served as a model-neutral Python workflow scheduler adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "3.8.8",
+      "commit": "b73b09dc3699489c799dbb40ac5ed2da459e391c",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Python flow/task scheduling, retries, event automation and local tracked workflow activity are documented.",
+        "sources": [
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:README.md:54-63",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/README.md#L54-L63",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "UNKNOWN",
+        "detail": "Python >=3.10,<3.15 is declared; exact WSL2 x86_64 transitive dependency/process-worker platform support is unverified in the bounded read.",
+        "sources": [
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:pyproject.toml:10-23",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/pyproject.toml#L10-L23",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/get-started/install.mdx:9",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/get-started/install.mdx#L9",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "UNKNOWN",
+        "detail": "Exact macOS arm64 dependency/process-worker support is unbound.",
+        "sources": [
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:pyproject.toml:10-23",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/pyproject.toml#L10-L23",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/get-started/install.mdx:9",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/get-started/install.mdx#L9",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "prefect server start and .serve scheduling are programmatic; work-pool worker monitors cancellation.",
+        "sources": [
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:README.md:104-118",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/README.md#L104-L118",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/advanced/cancel-workflows.mdx:13-17",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/advanced/cancel-workflows.mdx#L13-L17",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "PASS",
+        "detail": "Vendor recommends an owned Python virtual environment and supports a local process/server route.",
+        "sources": [
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/get-started/install.mdx:9",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/get-started/install.mdx#L9",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:README.md:104-107",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/README.md#L104-L107",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "Environment, project TOML and named profiles configure API URLs and per-run overrides.",
+        "sources": [
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/concepts/settings-and-profiles.mdx:45-68",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/concepts/settings-and-profiles.mdx#L45-L68",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/concepts/settings-and-profiles.mdx:145-147",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/concepts/settings-and-profiles.mdx#L145-L147",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "visible_history": {
+        "result": "PASS",
+        "detail": "Workflow activity is tracked by local server or Cloud; the source makes those separate choices.",
+        "sources": [
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:README.md:58-60",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/README.md#L58-L60",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "bounded_process_trees": {
+        "result": "UNKNOWN",
+        "detail": "Cancellation targets infrastructure identified by hostname/PID and depends on worker support; complete descendant containment is not established by this read.",
+        "sources": [
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/advanced/cancel-workflows.mdx:36-57",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/advanced/cancel-workflows.mdx#L36-L57",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/advanced/cancel-workflows.mdx:61-74",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/advanced/cancel-workflows.mdx#L61-L74",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "cancellation": {
+        "result": "PASS",
+        "detail": "Deployed runs can be cancelled through CLI; worker requests termination then kills after default 30s. A running monitor and matching infrastructure identifier are required; state-only cancellation is possible on missing PID.",
+        "sources": [
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/advanced/cancel-workflows.mdx:7-30",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/advanced/cancel-workflows.mdx#L7-L30",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/advanced/cancel-workflows.mdx:61-83",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/advanced/cancel-workflows.mdx#L61-L83",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "recoverable_effects": {
+        "result": "UNKNOWN",
+        "detail": "Retries/caching exist, but selected task effects/worker recovery contract is not bound; retries alone do not establish exactly-once effects.",
+        "sources": [
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:README.md:58-63",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/README.md#L58-L63",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:README.md:54-63",
+            "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/README.md#L54-L63",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "pip install -U prefect or uv add prefect in an owned environment; prefect server start is the local server activation. Bind 3.8.8 before trial because install commands float.",
+      "sources": [
+        {
+          "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:README.md:69-76",
+          "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/README.md#L69-L76",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:README.md:104-107",
+          "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/README.md#L104-L107",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "prefect flow-run cancel <owned-run-id> cancels a deployed run under the documented monitor requirements; pip uninstall prefect removes the package. This is not a complete server/database/state inverse.",
+      "sources": [
+        {
+          "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/advanced/cancel-workflows.mdx:27-30",
+          "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/advanced/cancel-workflows.mdx#L27-L30",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/advanced/cancel-workflows.mdx:77-83",
+          "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/advanced/cancel-workflows.mdx#L77-L83",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://pip.pypa.io/en/stable/cli/pip_uninstall/ (read 2026-10-15)",
+          "url": "https://pip.pypa.io/en/stable/cli/pip_uninstall/",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "Local API/UI 4200, shared profile API URL and environment precedence, Python dependencies and workflow state. A profile can point to Prefect Cloud; local selection must be explicit. Marking CANCELLED may precede or outlive actual infrastructure termination.",
+      "sources": [
+        {
+          "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:README.md:60",
+          "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/README.md#L60",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:README.md:104-107",
+          "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/README.md#L104-L107",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/concepts/settings-and-profiles.mdx:45-68",
+          "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/concepts/settings-and-profiles.mdx#L45-L68",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/advanced/cancel-workflows.mdx:61-74",
+          "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/advanced/cancel-workflows.mdx#L61-L74",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "prefect",
+          "prefect server",
+          "Prefect process worker"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Python flow/task scheduling, retries, event automation and local tracked workflow activity are documented.",
+      "sources": [
+        {
+          "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:README.md:54-63",
+          "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/README.md#L54-L63",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented Python workflow scheduler profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:README.md:104-118",
+          "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/README.md#L104-L118",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "prefecthq/prefect@b73b09dc3699489c799dbb40ac5ed2da459e391c:docs/v3/advanced/cancel-workflows.mdx:13-17",
+          "url": "https://github.com/prefecthq/prefect/blob/b73b09dc3699489c799dbb40ac5ed2da459e391c/docs/v3/advanced/cancel-workflows.mdx#L13-L17",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "d8c84c2acfff796ba0698977ab09a09690b0ac39",
+        "2026-10-15T14:35:26Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/prefecthq~1prefect"
+    },
+    "licence_note": {
+      "spdx": "Apache-2.0",
+      "source": "candidate-facts-ops.json#/candidates/prefecthq~1prefect",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "trial_eligible": false,
+      "disqualifier": null,
+      "reason": "Host dependency support, descendant termination, recoverable effects and complete server inverse are not established.",
+      "cheapest_check": "Read the chosen process executor's kill-tree/host contract and workload side-effect/recovery rules, then the owned server shutdown/state removal path."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "restatedev/restate",
+      "name": "Restate",
+      "repository_url": "https://github.com/restatedev/restate",
+      "package_or_plugin_ids": [
+        "restate-server",
+        "restate CLI"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "durable invocation server",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/restatedev~1restate"
+    },
+    "layer": "scheduling-supervision",
+    "family": "research",
+    "family_service": "served as a model-neutral durable invocation server adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "v1.8.0",
+      "commit": "bc456b30db5316ba34dc78c07bc9878cc9ffa31d",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Durable workflows/agents through separate language SDKs; server and CLI are independently documented.",
+        "sources": [
+          {
+            "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:19-40",
+            "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L19-L40",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:43-81",
+            "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L43-L81",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "PASS",
+        "detail": "Exact v1.8.0 release includes server x86_64-unknown-linux-musl archive.",
+        "sources": [
+          {
+            "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:43-45",
+            "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L43-L45",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "https://api.github.com/repos/restatedev/restate/releases/tags/v1.8.0 (read 2026-10-15)",
+            "url": "https://api.github.com/repos/restatedev/restate/releases/tags/v1.8.0",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "PASS",
+        "detail": "Exact v1.8.0 release includes server aarch64-apple-darwin archive.",
+        "sources": [
+          {
+            "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:43-45",
+            "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L43-L45",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "https://api.github.com/repos/restatedev/restate/releases/tags/v1.8.0 (read 2026-10-15)",
+            "url": "https://api.github.com/repos/restatedev/restate/releases/tags/v1.8.0",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "Standalone server and CLI/API support noninteractive operation.",
+        "sources": [
+          {
+            "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:49-81",
+            "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L49-L81",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "PASS",
+        "detail": "Homebrew/npx local server route and user-relative restate-data default are documented.",
+        "sources": [
+          {
+            "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:49-64",
+            "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L49-L64",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:crates/types/src/config/common.rs:49",
+            "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/crates/types/src/config/common.rs#L49",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:crates/types/src/config/common.rs:953-961",
+            "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/crates/types/src/config/common.rs#L953-L961",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "base_dir/node identity at source; official configuration supports --config-file/RESTATE_CONFIG with explicit override order.",
+        "sources": [
+          {
+            "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:crates/types/src/config/common.rs:356",
+            "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/crates/types/src/config/common.rs#L356",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:crates/types/src/config/common.rs:953-967",
+            "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/crates/types/src/config/common.rs#L953-L967",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "https://docs.restate.dev/server/configuration (read 2026-10-15)",
+            "url": "https://docs.restate.dev/server/configuration",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "visible_history": {
+        "result": "PASS",
+        "detail": "Official docs expose invocation journals, SQL introspection and UI/CLI state management.",
+        "sources": [
+          {
+            "citation": "https://docs.restate.dev/develop/local_dev (read 2026-10-15)",
+            "url": "https://docs.restate.dev/develop/local_dev",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "https://docs.restate.dev/services/invocation/managing-invocations (read 2026-10-15)",
+            "url": "https://docs.restate.dev/services/invocation/managing-invocations",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "bounded_process_trees": {
+        "result": "UNKNOWN",
+        "detail": "Invocation cancellation cooperates with handler code; no arbitrary external SDK worker descendant-kill contract is established.",
+        "sources": [
+          {
+            "citation": "https://docs.restate.dev/services/invocation/managing-invocations (read 2026-10-15)",
+            "url": "https://docs.restate.dev/services/invocation/managing-invocations",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "cancellation": {
+        "result": "PASS",
+        "detail": "Cancel and kill are distinct documented operations. Cancel is nonblocking/cooperative and may need retry; kill can sacrifice side-effect consistency.",
+        "sources": [
+          {
+            "citation": "https://docs.restate.dev/services/invocation/managing-invocations (read 2026-10-15)",
+            "url": "https://docs.restate.dev/services/invocation/managing-invocations",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "recoverable_effects": {
+        "result": "UNKNOWN",
+        "detail": "Durable handlers require their own compensation logic for rollback; no workload/SDK version is bound by this server screen.",
+        "sources": [
+          {
+            "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:33-40",
+            "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L33-L40",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "https://docs.restate.dev/services/invocation/managing-invocations (read 2026-10-15)",
+            "url": "https://docs.restate.dev/services/invocation/managing-invocations",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:19-40",
+            "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L19-L40",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:43-81",
+            "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L43-L81",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "brew install restatedev/tap/restate-server and brew install restatedev/tap/restate; server alternative npx @restatedev/restate-server. Resolve exact v1.8.0 artifacts; SDK is a separate package/pin.",
+      "sources": [
+        {
+          "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:49-81",
+          "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L49-L81",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "brew uninstall restate-server restate removes Homebrew packages. Official local-development docs identify restate-data as the full state-wipe boundary; deleting it removes invocations/state/services and requires explicit ownership.",
+      "sources": [
+        {
+          "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:49-81",
+          "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L49-L81",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://docs.restate.dev/develop/local_dev (read 2026-10-15)",
+          "url": "https://docs.restate.dev/develop/local_dev",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://docs.brew.sh/Manpage (read 2026-10-15)",
+          "url": "https://docs.brew.sh/Manpage",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "Server examples expose 8080, 9070 and 9071; default restate-data; RESTATE_CONFIG/env/CLI precedence; opt-out usage tracking via DO_NOT_TRACK is documented by the official local-dev page. SDK handler endpoints are additional, unbound ports.",
+      "sources": [
+        {
+          "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:61-64",
+          "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L61-L64",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:crates/types/src/config/common.rs:49",
+          "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/crates/types/src/config/common.rs#L49",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://docs.restate.dev/develop/local_dev (read 2026-10-15)",
+          "url": "https://docs.restate.dev/develop/local_dev",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://docs.restate.dev/server/configuration (read 2026-10-15)",
+          "url": "https://docs.restate.dev/server/configuration",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "restate-server",
+          "restate CLI"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Durable workflows/agents through separate language SDKs; server and CLI are independently documented.",
+      "sources": [
+        {
+          "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:19-40",
+          "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L19-L40",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:43-81",
+          "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L43-L81",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented durable invocation server profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "restatedev/restate@bc456b30db5316ba34dc78c07bc9878cc9ffa31d:README.md:49-81",
+          "url": "https://github.com/restatedev/restate/blob/bc456b30db5316ba34dc78c07bc9878cc9ffa31d/README.md#L49-L81",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "30b49a3a7e0d43ac18a08a7eb66a44273398f81d",
+        "2026-10-15T17:33:28Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/restatedev~1restate"
+    },
+    "licence_note": {
+      "spdx": "NOASSERTION",
+      "source": "candidate-facts-ops.json#/candidates/restatedev~1restate",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "trial_eligible": false,
+      "disqualifier": null,
+      "reason": "Server host support is documented but selected SDK, worker process-tree containment and recoverable effects are unbound.",
+      "cheapest_check": "Read one pinned family handler/SDK cancellation and compensation contract, then its process supervisor; server cancellation cannot substitute for OS process containment."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "systemd/systemd",
+      "name": "systemd user supervision",
+      "repository_url": "https://github.com/systemd/systemd",
+      "package_or_plugin_ids": [
+        "systemd-run",
+        "systemctl",
+        "user .service/.scope/.timer units"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "Linux user service manager",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/systemd~1systemd"
+    },
+    "layer": "scheduling-supervision",
+    "family": "research",
+    "family_service": "served as a model-neutral Linux user service manager adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "v262",
+      "commit": "8cc40e0c5e9234bf45084751ac53b1fbfe70b492",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Named user units/scopes can supervise processes, apply unit properties and terminate whole cgroups; restart policy is documented.",
+        "sources": [
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd-run.xml:73-98",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd-run.xml#L73-L98",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd-run.xml:115-165",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd-run.xml#L115-L165",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd.kill.xml:63-84",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd.kill.xml#L63-L84",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd.service.xml:876-899",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd.service.xml#L876-L899",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "PASS",
+        "detail": "Requires a supported Linux kernel; source baseline says kernels below 5.10 unsupported. WSL2 must supply enabled systemd/user manager/cgroup support, not measured in this screen.",
+        "sources": [
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:README:31-70",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/README#L31-L70",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "FAIL",
+        "detail": "Upstream requires Linux kernel facilities/cgroups; this is not a native macOS service manager.",
+        "sources": [
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:README:31-70",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/README#L31-L70",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "systemd-run scopes/services and systemctl are noninteractive control commands.",
+        "sources": [
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd-run.xml:73-98",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd-run.xml#L73-L98",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "PASS",
+        "detail": "--user mode and user unit control are documented; an available user manager is a host prerequisite.",
+        "sources": [
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd-run.xml:165",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd-run.xml#L165",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemctl.xml:992-997",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemctl.xml#L992-L997",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "--unit and --property scope named transient work; user units can be stopped/disabled by exact names.",
+        "sources": [
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd-run.xml:127-165",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd-run.xml#L127-L165",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemctl.xml:962-983",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemctl.xml#L962-L983",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "visible_history": {
+        "result": "UNKNOWN",
+        "detail": "Unit management is documented, but the required durable workflow/effect history (as distinct from service status/logs) is not established by this supervisor alone.",
+        "sources": [
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd-run.xml:73-98",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd-run.xml#L73-L98",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "bounded_process_trees": {
+        "result": "PASS",
+        "detail": "KillMode=control-group terminates remaining cgroup processes; process/none modes intentionally do not provide that bound.",
+        "sources": [
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd.kill.xml:63-84",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd.kill.xml#L63-L84",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "cancellation": {
+        "result": "PASS",
+        "detail": "systemctl stop and disable --now target exact units; disable alone does not stop them.",
+        "sources": [
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemctl.xml:444",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemctl.xml#L444",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemctl.xml:962-983",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemctl.xml#L962-L983",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "recoverable_effects": {
+        "result": "UNKNOWN",
+        "detail": "Restart=on-failure restarts a service; it does not specify application side-effect checkpointing or replay.",
+        "sources": [
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd.service.xml:876-899",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd.service.xml#L876-L899",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd-run.xml:73-98",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd-run.xml#L73-L98",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd-run.xml:115-165",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd-run.xml#L115-L165",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd.kill.xml:63-84",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd.kill.xml#L63-L84",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd.service.xml:876-899",
+            "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd.service.xml#L876-L899",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "No user-only v262 package install is established here. Upstream development path is mkosi -f box -- meson setup -Dbpf-framework=disabled build; mkosi -f box -- meson compile -C build, with a separate test OS image target. This is not permission to replace the host manager; the family-specific surface is an owned user unit on a qualified manager.",
+      "sources": [
+        {
+          "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:docs/HACKING.md:29-56",
+          "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/docs/HACKING.md#L29-L56",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "systemctl --user disable --now <owned-unit> reverses activation and stops it; disable may remove all symlinks including manually created ones, so operate only on exact owned units. OS package removal is not a family-profile inverse.",
+      "sources": [
+        {
+          "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemctl.xml:962-997",
+          "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemctl.xml#L962-L997",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "Shared user-manager unit namespace, cgroups/resource controls, global systemd PATH tools and enabled-unit symlinks; no intrinsic TCP port. A full manager source install affects the host, not one family profile.",
+      "sources": [
+        {
+          "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd-run.xml:127-165",
+          "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd-run.xml#L127-L165",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemctl.xml:962-997",
+          "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemctl.xml#L962-L997",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:README:31-70",
+          "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/README#L31-L70",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "systemd-run",
+          "systemctl",
+          "user .service/.scope/.timer units"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Named user units/scopes can supervise processes, apply unit properties and terminate whole cgroups; restart policy is documented.",
+      "sources": [
+        {
+          "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd-run.xml:73-98",
+          "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd-run.xml#L73-L98",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd-run.xml:115-165",
+          "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd-run.xml#L115-L165",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd.kill.xml:63-84",
+          "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd.kill.xml#L63-L84",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd.service.xml:876-899",
+          "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd.service.xml#L876-L899",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented Linux user service manager profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "systemd/systemd@8cc40e0c5e9234bf45084751ac53b1fbfe70b492:man/systemd-run.xml:73-98",
+          "url": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/man/systemd-run.xml#L73-L98",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "cb987c164ba8798f225917966556a66e4da6a54b",
+        "2026-10-15T17:56:38Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/systemd~1systemd"
+    },
+    "licence_note": {
+      "spdx": "GPL-2.0",
+      "source": "candidate-facts-ops.json#/candidates/systemd~1systemd",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "FAIL",
+      "trial_eligible": false,
+      "disqualifier": "missing_required_capability",
+      "reason": "Missing native macOS capability for this dual-host row; application-effect recovery also needs a separate workflow component.",
+      "cheapest_check": "Keep Linux-specific supervisor evidence separate; a macOS service manager is outside this inventory and cannot be silently substituted."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "temporalio/temporal",
+      "name": "Temporal",
+      "repository_url": "https://github.com/temporalio/temporal",
+      "package_or_plugin_ids": [
+        "Temporal server",
+        "temporal CLI (separate distribution)"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "durable workflow server",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/temporalio~1temporal"
+    },
+    "layer": "scheduling-supervision",
+    "family": "research",
+    "family_service": "not served by a bound research worker profile: language SDK/activity adapter unverified",
+    "pin": {
+      "tag": "v1.32.1",
+      "commit": "af08a5e5f2dd40f545f2afac7780daaa6987001e",
+      "selection": "reused wave-1 PR #1185 at c6a0004525aef204b92caf1a0e4b405478bb0fb1",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Server runs durable workflows and retries failed operations, with separately supported language SDKs.",
+        "sources": [
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:23-24",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L23-L24",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:64",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L64",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "UNKNOWN",
+        "detail": "Reused wave-1 result: quickstart does not bind the server/CLI version and requested Linux architecture.",
+        "sources": [
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:33-42",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L33-L42",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "UNKNOWN",
+        "detail": "Reused wave-1 result: quickstart does not bind the server/CLI version and macOS arm64 artifact.",
+        "sources": [
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:33-42",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L33-L42",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "Server/workflow execution and CLI namespace/workflow queries are programmatic.",
+        "sources": [
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:23-24",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L23-L24",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:51-55",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L51-L55",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "UNKNOWN",
+        "detail": "Server README's separate CLI development-server recipe does not establish the complete pinned rootless worker/server deployment.",
+        "sources": [
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:33-42",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L33-L42",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "UNKNOWN",
+        "detail": "Namespace listing exists, but a pinned SDK, namespace/task queue and worker-profile contract remain unbound (wave-1 gap retained).",
+        "sources": [
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:51-64",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L51-L64",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "visible_history": {
+        "result": "PASS",
+        "detail": "CLI workflow list and Web UI expose workflow execution state; history-depth/retention specifics remain outside this bounded read.",
+        "sources": [
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:51-60",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L51-L60",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "bounded_process_trees": {
+        "result": "UNKNOWN",
+        "detail": "Temporal server is not an OS worker-process sandbox/supervisor; no selected SDK descendant-termination contract established.",
+        "sources": [
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:23-24",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L23-L24",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:64",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L64",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "cancellation": {
+        "result": "UNKNOWN",
+        "detail": "Exact cancellation behavior for the selected language SDK/worker is unbound; durable execution alone does not establish process cancellation.",
+        "sources": [
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:64",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L64",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "recoverable_effects": {
+        "result": "UNKNOWN",
+        "detail": "Retries are documented but no pinned worker's idempotency/side-effect/checkpoint contract is bound.",
+        "sources": [
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:23-24",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L23-L24",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:64",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L64",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "UNKNOWN",
+        "detail": "Reused wave-1 research gap: no pinned DeerFlow/GPT Researcher activity binding.",
+        "sources": [
+          {
+            "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:64",
+            "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L64",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "Reused wave-1 quickstart: brew install temporal; temporal server start-dev. This installs a separate CLI artifact, not a source-bound v1.32.1 server distribution; do not equate their versions.",
+      "sources": [
+        {
+          "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:33-42",
+          "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L33-L42",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "Reused wave-1 finding: server README has no complete durable-state inverse. brew uninstall temporal removes a Homebrew CLI package but does not erase workflow state.",
+      "sources": [
+        {
+          "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:33-64",
+          "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L33-L64",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://docs.brew.sh/Manpage (read 2026-10-15)",
+          "url": "https://docs.brew.sh/Manpage",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "Quickstart UI localhost:8233 and separate CLI/server state/config; namespace/task-queue choices belong to the worker SDK. Development-server persistence and complete endpoint set are unbound in this source screen.",
+      "sources": [
+        {
+          "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:33-64",
+          "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L33-L64",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "Temporal server",
+          "temporal CLI (separate distribution)"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Server runs durable workflows and retries failed operations, with separately supported language SDKs.",
+      "sources": [
+        {
+          "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:23-24",
+          "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L23-L24",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:64",
+          "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L64",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented durable workflow server profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:23-24",
+          "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L23-L24",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "temporalio/temporal@af08a5e5f2dd40f545f2afac7780daaa6987001e:README.md:51-55",
+          "url": "https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L51-L55",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "b2fa32d430b79e912b56ed362fc0dd649f200915",
+        "2026-10-15T19:17:12Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/temporalio~1temporal"
+    },
+    "licence_note": {
+      "spdx": "MIT",
+      "source": "candidate-facts-ops.json#/candidates/temporalio~1temporal",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "trial_eligible": false,
+      "disqualifier": null,
+      "reason": "Reused host/install gaps remain; SDK-specific cancellation, process bounds and recoverable effects are not established.",
+      "cheapest_check": "Bind the official CLI/server/SDK version tuple and namespace/worker contract from primary sources before any trial."
+    },
+    "evidence_class": "source_review",
+    "reused_evidence": {
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/c6a0004525aef204b92caf1a0e4b405478bb0fb1/evidence/artifacts/harness-screens-20261015/candidate-facts-runtime.json",
+      "row": "workers.research.json",
+      "fields": [
+        "pin",
+        "maintenance",
+        "licence",
+        "platform",
+        "installation",
+        "inverse",
+        "CLI startup estimate"
+      ],
+      "note": "Family-independent facts reused, not re-derived. Layer-specific requirement judgment is new."
+    }
+  }
+]
