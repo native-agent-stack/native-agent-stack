@@ -17703,7 +17703,7 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "0270f74ecf6ab097a1f565f5f1848395d9690e951cde4c0216930e332292e825",
+      "sha256": "95fc744c271f0a6188bf345e56aa186d9ba54c0cb170176fc72950691079e51f",
       "bytes": 339603
     },
     {
@@ -18233,8 +18233,8 @@
     },
     {
       "path": "docs/active-model-currency.md",
-      "sha256": "8649c77be086124b4afe0f742158d78b4c736fa50b87aa7111d574ddb2bb86a5",
-      "bytes": 17195
+      "sha256": "8755168063f4a75d1119680fcb8f6eed34a9e9e49d710e308a8d46e44ef091f3",
+      "bytes": 17290
     },
     {
       "path": "docs/automation-upgrade-evidence.json",
@@ -19463,8 +19463,8 @@
     },
     {
       "path": "docs/decisions/2026-10-17-background-haiku-currency-correction.md",
-      "sha256": "4e59c64c0ebe5d0a5f5b519e84ba5339ec262f3714d405cacd1c1fdfeed11a0a",
-      "bytes": 6459
+      "sha256": "8193733f1cb55b1ad8532f1275065085607a538a995678705ee500fd92f4b8cc",
+      "bytes": 8828
     },
     {
       "path": "docs/decisions/2026-10-17-codex-job-lane-hooks-mcp-memory.md",
@@ -19768,8 +19768,8 @@
     },
     {
       "path": "docs/model-currency.md",
-      "sha256": "76e7aa43d641b89ffeea1fbfbaceb803d800e5ea384e613863e5bd767c023f01",
-      "bytes": 9777
+      "sha256": "4858342bec212ce5a7d4cf7c999382344133667451a9f50b070c6b2a3d1897d2",
+      "bytes": 10030
     },
     {
       "path": "docs/native-dashboard-data.md",
@@ -62478,8 +62478,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "2bfa2d4784a73ecdbc9b3c7d5deea7a422a81abd083d071c22fe5414c28be178",
-      "bytes": 132533
+      "sha256": "75a8d01edce7db61a97e8e1749719fdc5b092beff4c9a55c97187ee76ce6bd17",
+      "bytes": 132704
     },
     {
       "path": "notes/muse-file-fence-20261014/fix-round-1.json",
@@ -64723,8 +64723,8 @@
     },
     {
       "path": "tests/test_model_currency.py",
-      "sha256": "65910f1998337e5869aa72136b4b80dfdd6a6aebfc6b1acabdc1b716f553fa6e",
-      "bytes": 18662
+      "sha256": "7b8c74680f5496486786be061b52eec9edb10e71b743fc733fe9e11d1eb43e4e",
+      "bytes": 20828
     },
     {
       "path": "tests/test_model_currency_propose.py",

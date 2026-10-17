@@ -56,7 +56,8 @@ class ModelCurrencyTests(unittest.TestCase):
         """The background-haiku row follows the client default for the version it names.
 
         Claude Code 2.1.293 made Haiku 5.5 the default Haiku on the Anthropic API
-        (CHANGELOG.md:642 of the installed client), so a row that names a client at
+        (anthropics/claude-code v2.1.302, commit c017428c8c27e604840435048d5bce6a9a22c040,
+        CHANGELOG.md:642), so a row that names a client at
         or after 2.1.293 and still pins Haiku 4.5 is stale. This replaces the
         2026-10-15 receipt test that asserted the Haiku 4.5 pin; the correction
         record is docs/decisions/2026-10-17-background-haiku-currency-correction.md.
@@ -81,6 +82,34 @@ class ModelCurrencyTests(unittest.TestCase):
         self.assertIn("2.1.295", row["overturn"])
         self.assertIn("gateway", row["overturn"])
         self.assertIn("2026-10-17-background-haiku-currency-correction.md", row["overturn"])
+
+    def test_background_haiku_selection_records_and_correction_citations_follow_the_row(self):
+        """The hand-kept selection records agree with the row; the record cites upstream, not a host path.
+
+        Zero-tolerance policy: docs/decisions/2026-10-17-zero-tolerance-currency.md.
+        """
+        root = Path(__file__).resolve().parents[1]
+        row = next(model for model in json.loads((root / "catalogs/foundation/model-currency.json").read_text())["models"]
+                   if model["id"] == "background-haiku")
+        stack = json.loads((root / "manifests/stack.json").read_text())
+        entries = [model for model in stack["models"] if "background-haiku" in model.get("currency_rows", [])]
+        self.assertEqual([(model["id"], model["revision"], model["release_date"], model["release_source"],
+                           model["currency_status"]) for model in entries],
+                         [(row["model_id"], row["revision"], row["release_date"], row["release_source"], row["status"])])
+        self.assertEqual(entries[0]["overturn"], row["overturn"].split(" Gateway exception:")[0])
+        doc = " ".join((root / "docs/model-currency.md").read_text().split())
+        self.assertNotIn("retains Haiku 4.5", doc)
+        self.assertIn("follows Haiku 5.5", doc)
+        self.assertNotIn("remains a dated claim requiring separate reconciliation",
+                         " ".join((root / "docs/active-model-currency.md").read_text().split()))
+        latest = json.loads((root / "catalogs/foundation/latest-models.json").read_text())
+        self.assertEqual(latest["latest"]["claude-haiku"], row["model_id"])
+        record = (root / "docs/decisions/2026-10-17-background-haiku-currency-correction.md").read_text()
+        for parts in (("var", "tmp"), ("home",), ("tmp",)):  # host-private path roots
+            self.assertNotIn("/" + "/".join(parts) + "/", record)
+        self.assertIn("c017428c8c27e604840435048d5bce6a9a22c040", record)
+        for cited in ("CHANGELOG.md:642", "CHANGELOG.md:594", "CHANGELOG.md:421"):
+            self.assertIn(cited, record)
 
     def assert_valid(self, document):
         self.assertEqual(model_currency_problems(document, TODAY), [])

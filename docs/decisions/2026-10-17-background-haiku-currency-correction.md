@@ -1,7 +1,7 @@
 # Correction: the background-haiku catalog row follows Haiku 5.5 (2026-10-17)
 
-**Status:** correction record. It amends one row of the model-currency catalog and supersedes the parts of the earlier
-records listed below. It changes no host configuration and no settings file.
+**Status:** correction record. It amends one row of the model-currency catalog, refreshes the selection records that
+repeated the old pick (see the last section) and supersedes the parts of the earlier records listed below. It changes no host configuration and no settings file.
 **Base:** `origin/main` at `83dff3b73226289effd49bf65099680369a1da95`.
 **Policy:** [zero tolerance for stale models, runtimes and repositories](2026-10-17-zero-tolerance-currency.md) (a stale
 catalog record is refreshed at once; a pending review is not an end state).
@@ -51,10 +51,12 @@ to the session model. That does not apply on this host (direct Anthropic API); r
 
 ## Sources
 
-1. Installed Claude Code 2.1.302 `CHANGELOG.md` (copy at `/var/tmp/cc-cc-work/background-slot-currency/facts/CHANGELOG.md`):
-   - `:642` (2.1.293): "Added Claude Haiku 5.5 (`claude-haiku-5-5`), now the default Haiku model on the Anthropic API — 1M context, $0.10/$0.50 per Mtok ($0.50/$2.50 for prompts over 100K)".
-   - `:594` (2.1.295): "Improved background requests behind a Claude apps gateway to use Haiku 4.5 instead of the session's model, falling back to the session's model where the gateway does not serve Haiku 4.5".
-   - `:421` (2.1.296): "Fixed token counts for Haiku 5.5 and other models that take only adaptive thinking, which failed behind some gateways and were counted with budget thinking elsewhere".
+1. `anthropics/claude-code` at tag `v2.1.302`, commit `c017428c8c27e604840435048d5bce6a9a22c040`, `CHANGELOG.md`
+   (each line read at that commit with `gh api repos/anthropics/claude-code/contents/CHANGELOG.md?ref=c017428c8c27e604840435048d5bce6a9a22c040`
+   and the raw accept header):
+   - `CHANGELOG.md:642` (under `## 2.1.293`, header at `:640`): "Added Claude Haiku 5.5 (`claude-haiku-5-5`), now the default Haiku model on the Anthropic API — 1M context, $0.10/$0.50 per Mtok ($0.50/$2.50 for prompts over 100K)".
+   - `CHANGELOG.md:594` (under `## 2.1.295`, header at `:489`): "Improved background requests behind a Claude apps gateway to use Haiku 4.5 instead of the session's model, falling back to the session's model where the gateway does not serve Haiku 4.5".
+   - `CHANGELOG.md:421` (under `## 2.1.296`, header at `:407`): "Fixed token counts for Haiku 5.5 and other models that take only adaptive thinking, which failed behind some gateways and were counted with budget thinking elsewhere".
    - No entry from 2.1.294 to 2.1.302 moves the slot back to Haiku 4.5.
 2. <https://code.claude.com/docs/en/model-config>: from v2.1.293 the `haiku` alias resolves to Haiku 5.5 on the Anthropic API;
    Bedrock, Vertex, Foundry and the AWS platform stay on Haiku 4.5.
@@ -71,9 +73,18 @@ to the session model. That does not apply on this host (direct Anthropic API); r
 from the client default plus the absent override, not counted directly. The 509 messages are subagent and headless Haiku
 runs that resolve the same alias. A direct confirmation needs a request-level log of a title call.
 
-## Left unchanged (follow-ups)
+## Selection records refreshed with this correction
 
-`manifests/stack.json` (the `claude-haiku-4-5-20251001` model entry with `currency_rows: ["background-haiku"]`),
-`catalogs/foundation/latest-models.json`, `catalogs/landscape/final-stack.json` and `docs/model-currency.md` still describe
-the 2026-10-07 owner ruling and the Haiku 4.5 selection. They are selection records, not the age-review inventory, and no
-check reads them against this row; refreshing them is a separate change for the command center to route.
+Each file below was read at the head of this change, then updated by its own route.
+
+| Record | State at `e54f0697` | Route and result |
+| --- | --- | --- |
+| `manifests/stack.json` (model entry for the background slot, near `:2469`) | named `claude-haiku-4-5-20251001`, release 2025-10-15, "latest Haiku line retained as the owner's dated exception", overturn "An Anthropic Haiku 5.x model ID becomes available" | hand-kept file, edited: the entry is now `claude-haiku-5-5` (release 2026-10-07, source the Haiku 5.5 overview page), with the overturn and scope of the corrected row; `currency_rows` still `["background-haiku"]`; evidence row re-registered |
+| `docs/model-currency.md` (the "Currency follows the newest release" paragraph, `:69-71`) | said the slot "retains Haiku 4.5 as a dated exception" and "A published Haiku 5.x ID reopens that selection" | hand-kept file, edited: the slot follows Haiku 5.5 at Claude Code 2.1.302; evidence row re-registered |
+| `docs/active-model-currency.md` (`:164-166`, not named by the verdict) | called the October 7 inventory entry a "Haiku 4.5 observed-use declaration" awaiting reconciliation | hand-kept file, edited to state that the inventory row now follows Haiku 5.5 and cites this record; evidence row re-registered |
+| `catalogs/foundation/latest-models.json` | already maps `claude-haiku` to `claude-haiku-5-5` and carries no Haiku 4.5 text (`:8`, `:23`, `:24`) | read, no change needed; the verdict's claim that it describes Haiku 4.5 does not hold at the head |
+| `catalogs/landscape/final-stack.json` | generated; its only Haiku entry is `claude-code-claude-haiku-5-5` pinned `claude-haiku-5-5` (`:6576-6577`) and it has no Haiku 4.5 text, but its `sources` block records the `sha256` of `manifests/stack.json`, which this change edits | re-run by its generator, `python3 scripts/final_stack.py --write` (documented option; `--check` reported the `stack.json` hash change first); the only difference is that one recorded hash, and the generator re-registered the file; `--check` is clean afterwards |
+
+Other files that mention `claude-haiku-4-5-20251001` (`manifests/candidates.json`, `catalogs/sota-convergence/manifest-20260923.json`,
+the 2026-09-27 and 2026-10-07 decision records, `scripts/angle_records.py`, receipts and fixtures) record what a third-party tool
+defaults to or what a dated run observed. They are history, not the background-slot selection, and stay as they are.
