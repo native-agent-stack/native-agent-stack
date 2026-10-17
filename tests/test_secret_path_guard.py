@@ -2186,15 +2186,17 @@ class SecretPathGuardTests(unittest.TestCase):
                 self.assertIsNone(guard.check(command))
 
     def test_g8_a02_inventory_rows(self):
-        # The protection-only rows: each store's path template is a native_store the guard refuses to read, and ai-memory's rows declare
-        # its data-directory override (config.rs:760) as their pointer variable.
+        # The protection-only rows: each store's path template is a native_store the guard refuses to read. ai-memory's data-directory
+        # override (config.rs:760) is a directory, so its rows read it as a template default (the CODEX_HOME and HF_HOME shape), never as a
+        # pointer variable, which names a store file (docs/secret-storage.md); the guard still refuses a read through it.
         inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text(encoding="utf-8"))
         rows = {entry["id"]: entry for entry in inventory["entries"]}
+        data = "${AI_MEMORY_DATA_DIR:-$HOME/.local/share/ai-memory}"
         expected = {
-            "ai-memory-auth-token": "$HOME/.local/share/ai-memory/auth-token",
-            "ai-memory-auth-header": "$HOME/.local/share/ai-memory/auth-header",
-            "ai-memory-auth-tokens": "$HOME/.local/share/ai-memory/auth-tokens/default",
-            "ai-memory-provider-auth": "$HOME/.local/share/ai-memory/auth.json",
+            "ai-memory-auth-token": f"{data}/auth-token",
+            "ai-memory-auth-header": f"{data}/auth-header",
+            "ai-memory-auth-tokens": f"{data}/auth-tokens/default",
+            "ai-memory-provider-auth": f"{data}/auth.json",
             "muse-native": "$HOME/.config/muse/auth.json",
             "codex-dotenv": "${CODEX_HOME:-$HOME/.codex}/.env",
         }
@@ -2202,11 +2204,13 @@ class SecretPathGuardTests(unittest.TestCase):
             with self.subTest(row=identifier):
                 entry = rows[identifier]
                 self.assertEqual(entry["store"], {"kind": "native_store", "path_template": template})
-                self.assertEqual((entry["variables"], entry["optional_variables"]), ([], []))
-                self.assertEqual(entry["pointer_variables"],
-                                 ["AI_MEMORY_DATA_DIR"] if identifier.startswith("ai-memory-") else [])
+                self.assertEqual((entry["variables"], entry["optional_variables"], entry["pointer_variables"]), ([], [], []))
                 self.assertIsNotNone(guard.check(f'cat "{template}"'))
         self.assertIsNotNone(guard.check(f'cat "{rows["codex-native"]["store"]["path_template"]}"'))
+        self.assertNotIn("AI_MEMORY_DATA_DIR", {name for entry in inventory["entries"] for name in entry["pointer_variables"]})
+        for command in ('cat "$AI_MEMORY_DATA_DIR/config.toml"', "cp -r ${AI_MEMORY_DATA_DIR} /var/tmp/g8-copy"):
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), "credential_file_read")
 
     def test_g8_a02_ai_memory_hook_commands_pass(self):
         settings = json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text(encoding="utf-8"))

@@ -740,6 +740,26 @@ class IntegratedTests(unittest.TestCase):
 class UnitTests(unittest.TestCase):
     """Pure functions: canary grammar, forms, tags, CP03 layout, version codes and every routing row."""
 
+    def test_ai_memory_data_dir_override_is_no_pointer(self):
+        """A2 finding G8-A02: AI_MEMORY_DATA_DIR names ai-memory's whole data directory, not a store file. Exported, it is not one of
+        prepare's pointer paths (pointer_paths, the list the worker's pointer_binding facts are read from and refused as
+        pointer_target_not_file when a target is a directory). The exclusions keep the ai-memory token files under it as key paths,
+        never the directory itself, and credential_run leaves it in a child's environment. Synthetic: a fake directory, never created."""
+        import credential_run as runner
+        with tempfile.TemporaryDirectory(prefix="g8-a02-home-") as home:
+            data = Path(home) / ".local" / "share" / "ai-memory-moved"
+            env = {"HOME": home, "XDG_CONFIG_HOME": f"{home}/.config", "AI_MEMORY_DATA_DIR": str(data)}
+            self.assertEqual(cp.pointer_paths(env), [], "G8-not-a-pointer")
+            exact, _glob = cp.exclusions(home, [f"{home}/.codex"], env, "confirmed", "agent", cp.pointer_paths(env))
+            keys = {path for path, kind in exact if kind == "key"}
+            self.assertNotIn(str(data), keys, "G8-directory-not-a-key-path")
+            for name in ("auth-token", "auth-header", "auth-tokens/default", "auth.json"):
+                self.assertIn(str(data / name), keys, f"G8-{name}-excluded")
+            inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text(encoding="utf-8"))
+            entry = next(entry for entry in inventory["entries"] if entry["id"] == "tavily")
+            self.assertEqual(runner.child_environment(inventory, entry, {}, env).get("AI_MEMORY_DATA_DIR"), str(data),
+                             "G8-not-stripped-as-a-pointer")
+
     def test_canary_grammar(self):
         import set_credential as writer
         for _ in range(200):
@@ -1899,6 +1919,19 @@ class StabilityTests(unittest.TestCase):
                          "ST9-bound-target-excluded")
         self.assertEqual(bound.finished()["sinks"]["A1"]["counters"]["excluded_key"], 1, "ST9-bound-target-counted")
         self.assertNotIn(str(target).encode(), (bound.path / "events.jsonl").read_bytes(), "ST9-no-raw-pointer-path")
+
+    def test_st9_ai_memory_data_dir_override_passes_prepare(self):
+        """A2 finding G8-A02: with AI_MEMORY_DATA_DIR exported to a directory, prepare binds no pointer to it, so it does not refuse
+        with pointer_target_not_file (UnitTests.test_ai_memory_data_dir_override_is_no_pointer covers the same without the worker).
+        Synthetic: a fake data directory under the test's temporary HOME."""
+        host = Host(self)
+        host.constants["AGENT_SINKS"] = ["A1"]
+        data = host.home / ".local" / "share" / "ai-memory-moved"
+        data.mkdir(parents=True)
+        env = host.env(AI_MEMORY_DATA_DIR=str(data))
+        result = host.tool("prepare", "--transcripts", "confirmed", env=env)
+        self.assertEqual(result.returncode, 0, result.stderr[-400:])
+        self.assertNotIn(b"pointer_target_not_file", result.stdout + result.stderr)
 
     def test_st9_route_recheck_under_deferred_timestamps(self):
         """Each selected file's format decision is re-derived after its views and in the final re-walk (9.3). A seam

@@ -73,8 +73,8 @@ STATUSES = {"required", "optional", "user_only_paid", "generated_local", "native
 CLASSES = {"broker_api_key_pair", "contact_identity", "provider_api_key",
            "local_service_secret", "native_signin", "ci_secret", "test_canary",
            "github_app_private_key"}  # a GitHub App's PEM key, a private_file (set_credential.py --from-file)
-TEMPLATE_PREFIXES = ("${XDG_CONFIG_HOME:-$HOME/.config}/", "${CODEX_HOME:-$HOME/.codex}/",
-                     "${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/", "$HOME/")
+TEMPLATE_PREFIXES = ("${XDG_CONFIG_HOME:-$HOME/.config}/", "${CODEX_HOME:-$HOME/.codex}/", "${AI_MEMORY_DATA_DIR:-$HOME/.local/share/ai-memory}/",
+                     "${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/", "$HOME/")  # AI_MEMORY_DATA_DIR: a directory (G8-A02)
 NAME = re.compile(r"^[A-Z][A-Z0-9_]*$")
 # ${NAME:-default}, where the default may hold one nested ${NAME:-default}: huggingface_hub's
 # HF_HOME defaults to ${XDG_CACHE_HOME:-$HOME/.cache}/huggingface (constants.py).

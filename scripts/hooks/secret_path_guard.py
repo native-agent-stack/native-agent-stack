@@ -283,7 +283,9 @@ _NAMES = "|".join(SECRET_NAMES)
 SECRET_NAME = re.compile(r"\b(?:" + _NAMES + r")\b")
 SECRET_EXPANSION = re.compile(r"\$\{?!?(?:" + _NAMES + r")\b")
 SECRET_LOOKUP = re.compile(r"(?:environ|getenv|process\.env|ENV\[)[^;\n]{0,40}\b(?:" + _NAMES + r")\b")
-# Every inventory `pointer_variables` name (tests/test_secret_path_guard.py checks each), with an optional suffix of a number or one letter:
+# Every inventory `pointer_variables` name (tests/test_secret_path_guard.py checks each), and AI_MEMORY_DATA_DIR, the directory override
+# that the ai-memory rows' path templates read as `${AI_MEMORY_DATA_DIR:-...}` (a directory, so not a pointer variable; A2 finding G8-A02),
+# each with an optional suffix of a number or one letter:
 # PAPER_ENV_FILE_2 (a further paper account) or PAPER_ENV_FILE_C (paper account C). `_` is a word character (CPython Doc/library/re.rst, `\b`),
 # so without the group (until 2026-09-29) or with digits only (until 2026-10-11) a reader or a `source` on such a pointer passed the guard.
 POINTER_VARIABLE = re.compile(
@@ -292,9 +294,13 @@ POINTER_VARIABLE = re.compile(
 # The Hugging Face home itself (or everything in it) as a reader's operand: a recursive search or a
 # copy of it includes both token files. Its subdirectories such as hub/ stay readable.
 HF_HOME_ROOT = re.compile(r"(?:(?:\.cache|XDG_CACHE_HOME)\}?/huggingface\}?|^\$\{?HF_HOME\}?)(?:/\**)?$")
-# A2 finding G8-A02 (fold 2), the same precedent: the ai-memory data directory and the Muse Code config directory, each itself or a glob
-# over its top level, as a reader's operand (both hold token files). Files in them such as config.toml or settings.json stay readable,
-# and `ai-memory backup --to FILE` (blueprints/us-equities/state-recovery/memory/README.md) names neither directory.
+# A2 finding G8-A02 (fold 2), the same precedent, for the ai-memory data directory and the Muse Code config directory (both hold token
+# files). A reader's operand is refused when it is the directory itself, spelled `.local/share/ai-memory`, `$XDG_DATA_HOME/ai-memory`,
+# `$AI_MEMORY_DATA_DIR`, `.config/muse` or `$XDG_CONFIG_HOME/muse` (braces allowed), optionally followed by `/` and stars only: `/`, `/*`
+# and `/**` are refused, but a partial glob such as `/auth*` or `/*.json` is not this rule. A literal file path in either directory, such
+# as `~/.local/share/ai-memory/config.toml` or `~/.config/muse/settings.json`, is not this rule either; any operand that names
+# `$AI_MEMORY_DATA_DIR`, a file in it included, is refused by POINTER_VARIABLE. `ai-memory backup --to FILE`
+# (blueprints/us-equities/state-recovery/memory/README.md) names neither directory and passes.
 STORE_ROOTS = re.compile(r"(?:(?:\.local/share|XDG_DATA_HOME)\}?/ai-memory\}?|^\$\{?AI_MEMORY_DATA_DIR\}?"
                          r"|(?:\.config|XDG_CONFIG_HOME)\}?/muse\}?)(?:/\**)?$")
 HF_HOME_ROOT = re.compile(HF_HOME_ROOT.pattern + "|" + STORE_ROOTS.pattern)
