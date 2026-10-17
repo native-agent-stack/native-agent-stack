@@ -227,3 +227,132 @@ caption names only the states the figure draws. The dataviz skill bundled with
 Claude Code 2.1.300 set the strip as stat figures, not a chart; its validator again
 reports the shared status pair at light ΔE 15.8 normal and 7.1 protan, dark 13.8 and
 5.4, so each state carries its glyph and label as on the layer pages.
+
+## Atlas page
+
+`atlas.html` is the harness atlas. Citation keys in this section: **FD** is the
+installed frontend-design `SKILL.md` at the manifest pin
+`33375500bcea98d610eb30ce10ac4e59b89c390d` (tree
+`d79e2a5bb4df4a386c2adcdd9ab8709bba28c3f6`, SHA-256
+`d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3`, row
+`adoption/skills/manifest.json:525`); **DP** is this file above this section.
+The approved brief controls palette and layout (DP:3), and FD itself says a
+brief's pinned direction wins (FD:45).
+
+**Brief** (FD:11-13). Subject: the native agent harness, three model families
+each in its vendor's client across the seven harness layers, with the catalog
+verdict and the measured use. Audience: the owner opening the local desk, and
+the next agent session. Primary job: in one pass, what each family runs at each
+layer, what is settled and what is not, and what measurement shows the lanes
+used. Every fact names its record.
+
+**Tokens.** The palette above is unchanged and the atlas adds no color: Canvas
+`#f6f8fb`/`#101c2a`, Surface `#ffffff`/`#17283b`, Ink `#183047`/`#e8eef5`,
+Secondary `#51677b`/`#b6c6d7`, Link and focus `#205c9b`/`#93c7ff`, and the
+reserved status pair Measured `#246d55`/`#86d4b4` and Pending
+`#996421`/`#f4cc8f` (FD:48; DP:7-14). `assets/atlas.css` uses `var(--…)`
+only. Type: the shared sans for reading text, the overview's display serif for
+the title and the matrix row headers, monospace only for pins, paths and record
+names (FD:19; DP:16, DP:175-176).
+
+**Layout.** Left aligned, source order; the order is fixed but is not a
+sequence, so no section is numbered (FD:30):
+
+```text
+title "Harness atlas" + lede (one sentence)
+count strip: FINAL sentence | states (glyph + label + figure) | measured days | last measured day | changes since previous row
+section links (9)
+atlas-terms      four definitions as a visible key; the stack terms generated from catalog requirements and slots
+atlas-layers     layer | Claude (Claude Code) | GPT (Codex) | Muse (Muse Code)      <- the one bold element
+                 each cell: a cited mechanism, the Claude practice slots, or "No recorded mechanism";
+                 a ruled foot row per layer: catalog state glyph + label (status), winners at 12-character pins
+atlas-stacks     per stack: layer | requirement | state | winners | survivors; slots; MCP servers with their role
+atlas-measured   closed days per lane | today so far | daily rows (14, older in <details>) | coverage and unknowns
+atlas-routing    role | family and client | declared model | declared effort; then observed models per lane
+atlas-monitoring surface | what it shows | how to open it | record (+ one-line port note)
+atlas-rules      rule | recorded in | mechanism | state (Recorded, or Pending with its trigger)
+atlas-changes    the ledger: rows newest first | what changed; chain check
+atlas-evidence   repository records | private records by name | skills at their pins
+```
+
+**Review before implementation.** The default first draft would be a card per
+family and per layer (FD:42), led by a large "0 / 32 FINAL" hero (FD:17). It
+would give 21 unlike cells equal weight and put a number the protocol frames as
+a gap in the hero. The revision: one ruled matrix as the only bold element, the
+FINAL count as a sentence (DP:196-198), the stacks and measured use as ruled
+tables, and no section numbers (DP:199-200). The measured-use draft would be
+charts; with no pinned dataviz skill, and since tables carry the exact values
+the next session needs, the measured section is tables.
+
+**Rules, each cited.**
+
+| # | Rule | Applied as | Citation |
+| --- | --- | --- | --- |
+| 1 | Plan in two passes: a compact token plan, a review against the brief, then build | This section's Tokens, Layout and Review come before the code; the Critique pass after it | FD:47-53 |
+| 2 | Ground the design in the subject's real content | Every word comes from the records; the hero is the layer-by-family question | FD:11-13 |
+| 3 | No default hero | The FINAL count is the strip's sentence | FD:17; DP:196-198 |
+| 4 | A 4-6 value palette, and the brief's tokens win | The shared tokens only; no color literal in `atlas.css` | FD:48, FD:45; DP:7-14 |
+| 5 | One or two clearly distinct families | Shared sans and the display serif, scoped to `body[data-page="atlas"]` | FD:19; DP:16 |
+| 6 | A clear type scale; lines under 80 characters | Body text at 72ch; notes and citations at 80ch | FD:21-23; DP:16 |
+| 7 | Tabular numerals for counts and dates | Every numeric table column | DP:16; `assets/site.css:128` |
+| 8 | No one-word accent, all-caps labels or unnecessary labels | Sentence-case headings, no eyebrow, no `text-transform` | FD:25-28; FD:43 |
+| 9 | Structure is information; number only real sequences | Ruled sections and rows; no 01/02 markers | FD:30; DP:199-200 |
+| 10 | Avoid the SaaS-card kit | No cards; ruled rows and one matrix table | FD:42; DP:35, DP:102-106 |
+| 11 | Spend boldness in one place | The matrix's heavier top rule in the ink token and serif row headers | FD:59; DP:185 |
+| 12 | Motion | None; `prefers-reduced-motion` is already honored | FD:32; DP:31 |
+| 13 | Quality floor | 320px layouts, a visible 3px focus, 44px controls, light print | FD:59; DP:31, DP:68 |
+| 14 | State never by color alone | Glyph plus label; pending blocks add the left rule and the word | DP:80-84, DP:173-175 |
+| 15 | Watch selector specificity | Rules sit under `body[data-page="atlas"]` or `.atlas-*`; no shared `.ov-*` or `.lp-*` class is restyled | FD:55 |
+| 16 | Copy: plain verbs, active voice; failures say what is missing and how to fix it | Pending blocks name their trigger; the ledger refusal says the file is kept for inspection | FD:61-71 |
+| 17 | Long identifiers wrap; tables scroll in a labelled region | `.table-wrap` with `role="region"`, `tabindex="0"` and `aria-label` | DP:31; `assets/site.css:268` |
+| 18 | Captions that repeat a visible heading are for screen readers | `_table(..., hide_caption=True)` | DP:210-211 |
+| 19 | Layer-wide facts once, not per row | A family's statement once per cell, catalog state once per layer, an unmeasured lane's reason once per row | DP:149-152, DP:211-213 |
+| 20 | Both themes and the shared theme picker | The shared `document()` shell and `site.js`; no page script | DP:42-43; `build_pages.py:170-171` |
+
+No figure or chart is drawn, so the design-plan rules that rest on
+diagram-design or dataviz (DP:112-126, DP:221-229) are not cited. The state
+glyphs are the shared ones (`overview_view.glyph`, which draws
+`architecture_diagrams.STATE_GLYPH`, drawn under diagram-design); whether to
+keep them or use text-only state labels is the CC's call.
+
+**Critique pass.** A browser pass with the installed chrome-devtools MCP read
+the built page at 320, 390 and 1440 px in light and dark. No width scrolls the
+page horizontally; every table scrolls inside its labelled region. Tab order
+runs skip link, brand, the eleven pages, the theme picker, the nine section
+links, then each table region in order, each with the 3px focus ring. The pass
+changed these things:
+
+- **Matrix foot rows.** The shared rule that sets `small` to a block in table
+  cells split each winner without a run pin over three lines; the foot rows now
+  read as one sentence, with the status in parentheses after the state.
+- **Family headers.** The route paths read as "through" and "inside" their
+  record.
+- **Measured tables.** A lane with no collector reads its reason once across the
+  row instead of in twelve cells; zero counts drop their "per 100" note; the
+  window states its inclusive last day; the closed-day table fits 1440px.
+- **Section verdicts** sit in the overview's `ov-statement` wrapper, which keeps
+  them in the ink color, and the list labels are `h4` headings.
+- **Monitoring commands** wrap at spaces only, never inside a flag.
+- **Narrow widths** drop the strip's separator rule, which started a wrapped
+  line, and narrow the matrix's layer column.
+- **Print.** The page's minimum table widths outranked the shared print rule
+  (`assets/site.css:465-472`), so they are released for print, and the two
+  13-column measured tables print with tight cells. The MCP exposes no print
+  emulation, so print was checked by applying the print rules at an A4 width
+  (794px): every table then fits.
+
+Remove one accessory (FD:59): the routing table's separate Client column became
+"Family and client"; the sixteen agent definitions in the evidence list fold
+into one disclosure; the repeated "Not measured" cells became one spanning cell.
+No new color pair is introduced, so the stylesheet contrast calculations above
+(DP:66) stand. The shared navigation now wraps to a second line at 1440px with
+eleven pages; that is shared chrome and is left to a later change.
+
+**Skills.** frontend-design (FD) shaped the brief, the plan, its review and the
+critique. tdd (`mattpocock/skills` at `d81f3a183412e71a5b1e84ca21bc1a35eea03a60`,
+SKILL.md SHA-256 `93ea419b76e9caaf26153b828e984f7c3fb136f4caa67b14af95f32ea965a1cc`)
+set red before green, one seam at a time. codebase-design (same pin, SKILL.md
+SHA-256 `2c20617f87ec8af6a434859f381b2f061a69b530444e74eb39e78bb016a6d1e2`) set
+the shared source-map loader and reader behind small interfaces now that a
+second page uses them. claude-native-practice supplied data only: the Claude
+practice slots.

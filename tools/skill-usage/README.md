@@ -45,6 +45,80 @@ skill is actually invoked, on each client that lists it. It is the measurement h
 skills trial (`trial.measurement` in the manifest); the trial's own `prune_rule` decides what a
 host does with the numbers, this tool only produces them.
 
+## Daily token projection
+
+`daily_token_usage.py` publishes the per-lane token and tool rates that the
+harness atlas page reads (`tools/local-pages/atlas_data.py`). It runs the same
+two native collectors, unchanged, once per window: Codex `skill_usage.py
+--lanes` and Claude `child-usage.mjs --lanes-sweep`, built by
+`daily_skill_usage.lane_commands` and run by `run_reports`. It never runs
+`--run-skill-doctor`, the paid `claude -p` call. Muse runs come from
+`muse-file-fence/1` receipts (`<root>/<run>/receipt.json`, one level deep,
+regular files of at most 1 MiB, no symlink followed) under each explicit
+`--muse-logs-root`; without one the Muse lane is `not_configured`.
+
+- **Outputs**, both outside every git worktree and written atomically through
+  `daily_skill_usage.publish`: `token-rate-latest.json` (`token-rate-daily/1`:
+  the rollup of the seven closed UTC days, today so far, coverage, the listed
+  servers and source digests) and `token-rate-history.json`
+  (`token-rate-history/1`: one row per closed UTC day, at most 400).
+- **Lanes** are spawn kinds, never named sessions: `claude:main`,
+  `claude:agent_tool`, `claude:workflow`, `gpt:codex` and `muse:muse`. The
+  Claude root is all of `~/.claude/projects`, so the rates include every
+  project on the host. Codex jobs with a lane-local `CODEX_HOME` count only
+  when their root is named with another `--codex-root`.
+- **Numerators only.** Each lane holds counts and token numerators; readers
+  divide them, and a share is never stored or averaged. Claude usage sums the
+  messages of agents whose usage the kernel marks complete; cache writes split
+  by TTL where the 5-minute and 1-hour split adds up to
+  `cache_creation_input_tokens`, else they count as TTL unknown. Advisor
+  sub-inference, which the kernel counts apart, is summed apart too. Codex
+  keeps its own counters (`codex_usage`; its input already includes cached
+  input) and they are never added to Claude's. Models are counted per message
+  (Claude), per turn's configured model (Codex, whose rollouts carry no
+  per-message model) and per run (Muse), kept only on a full
+  `(claude|gpt|muse)-…` match. RTK counts Claude's hook rewrites and the calls
+  typed with the `rtk` prefix against shell calls; Codex runs no rewrite hook,
+  so its RTK count is typed calls only.
+- **Names.** An MCP server is published only as a `docs/role-tool-sets.json`
+  tool id after `server_aliases` folding; every other name is counted in
+  `mcp_other`. No transcript text, prompt, tool input or output, path, session
+  id or agent-type name is copied.
+- **Unknown is never zero.** A collector that did not run leaves its lanes
+  null with a reason code (`collector_failed`, `not_configured`,
+  `no_usage_keys`, `no_rows_in_window`); `partial_today` is null when no
+  collector measured today.
+- **History.** Closed days only. A row is complete when both the Claude and
+  Codex collectors measured, and a complete row is never rewritten; an
+  incomplete one is superseded only by a later measurement that is complete or
+  measured at least the same collectors, so a failed re-collection never erases
+  a measured lane. The new row records the old row's digest. Each run re-measures every missing or incomplete date of the
+  last seven days (one sweep and one Codex report per date), then today so far.
+  Every row's digest is verified before a new history is written.
+- **Exit status:** 0 published with any unmeasured parts recorded, 1 published
+  but no collector measured, 2 a hard failure with nothing written and one
+  fixed stderr line.
+
+Render the hourly timer for the live main clone; the CC installs it after
+landing, and until then the atlas shows its measured section as pending:
+
+```sh
+python3 tools/skill-usage/daily_token_usage.py \
+  --render-units /tmp/token-rate-units \
+  --repository <absolute-live-main-clone> \
+  --python /usr/bin/python3 --node <absolute-node-executable>
+```
+
+Replay one closed day from pre-captured reports, for fixtures or a check that
+runs no live client:
+
+```sh
+python3 tools/skill-usage/daily_token_usage.py --date 2026-10-16 \
+  --claude-lanes-report claude.json --codex-lanes-report codex.json \
+  --out /path/outside/checkout/token-rate-latest.json \
+  --history /path/outside/checkout/token-rate-history.json
+```
+
 ## Why per-skill invoke-rate needs its own tool
 
 - **Not OTel.** Claude Code's OpenTelemetry export redacts a tool's `skill.name` attribute to the
