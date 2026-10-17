@@ -4967,8 +4967,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/agent-sdks.md",
-      "sha256": "ae0ddea0656ce4fa60fc7540c09650021be8919f851a4f2056cdd648d3a49141",
-      "bytes": 3666
+      "sha256": "1866604496c27aea2a7d81ab3f4256839896f702f55b04161d777f9a03ece5a6",
+      "bytes": 3714
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/ci-supply-chain.md",
@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "4ac41ee491883e8ad161630ecaa21afe83f7b6d9d45ca8b10f0a64777e880a3b",
-      "bytes": 166464
+      "sha256": "521dee88358697e03d6c1f9cc08c312303be4ac46a1e22d0a0700520234390dc",
+      "bytes": 166512
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
