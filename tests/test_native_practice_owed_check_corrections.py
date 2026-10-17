@@ -19,9 +19,11 @@ restore it:
   GenAI span attributes of CHANGELOG@v2.1.302 L130 (2.1.300) never pass those log allowlists: the Claude templates set
   `OTEL_TRACES_EXPORTER=none`, which the note cites at its test line.
 - output-compression (reference/token-efficiency.md and its slots.json row), F3.2: the note's L916 sentence (2.1.290)
-  named only the `rtk git push` twins of the force-push denies. rtk 0.51.0 rewrites every npx command, and none of the
-  19 `npx *skills` deny rules had an `rtk npx` twin (the CC's read of 1af2052c, P3); PR #1238 adds the twins to the
-  template. The rule count is checked against the template; the user settings themselves are not readable here.
+  named only the `rtk git push` twins of the force-push denies. rtk 0.51.0 rewrites an npx command that no deny rule
+  matches and leaves one that a deny rule matches as written to Claude Code's own deny, and none of the 19 `npx *skills`
+  deny rules had an `rtk npx` twin for the spelling rtk's own deny check does not cover (the CC's reads of 1af2052c and
+  609d3e14, P3); PR #1238 adds the twins to the template. The rule count is checked against the template; the user
+  settings themselves are not readable here.
 
 These are repository-text checks, not a run of Claude Code, the collector or rtk, or a read of the host's agent folder
 or settings.
@@ -145,13 +147,16 @@ class UsageCostMonitoringSpanAttributeTests(unittest.TestCase):
 
 
 class OutputCompressionRtkNpxGapTests(unittest.TestCase):
-    """F3.2 (OWED-CHECKS-2.1.302-20261017.md, F3.2; the CC's read of #1234 at 1af2052c, P3): the rtk-hook note names
-    the skills-CLI deny rules' missing `rtk npx` spelling and the PR that adds it."""
+    """F3.2 (OWED-CHECKS-2.1.302-20261017.md, F3.2; the CC's reads of #1234 at 1af2052c and 609d3e14, P3): the
+    rtk-hook note names the skills-CLI deny rules' missing `rtk npx` spelling and the PR that adds it, and says that rtk
+    rewrites only the npx commands that no deny rule matches."""
 
-    CLAUSE = ("Every npx command is rewritten too (src/discover/rules.rs:120), yet none of the 19 `npx *skills` deny rules "
+    CLAUSE = ("An npx command that no deny rule matches is rewritten too (src/discover/rules.rs:120); one that a deny "
+              "rule matches as written is left unrewritten, so Claude Code's own deny applies "
+              "(src/hooks/permissions.rs:84-90, src/hooks/hook_cmd.rs:688-691). None of the 19 `npx *skills` deny rules "
               "in the user settings has an `rtk npx` twin (exact-key read, 2026-10-17), so no deny rule there matches the "
-              "skills CLI in that spelling; PR #1238 adds the 19 twins to the template the user settings are applied "
-              "from.")
+              "skills CLI in the `rtk npx` spelling, which rtk's own deny check does not cover; PR #1238 adds the 19 "
+              "twins, which cover that spelling, to the template the user settings are applied from.")
 
     def setUp(self):
         self.row = row("output-compression")

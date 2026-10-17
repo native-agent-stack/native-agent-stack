@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "a23ece22bf7fdd79f03cc892c4b94ec46e0cfd44f43748e258b11f4dcdab1893",
-      "bytes": 169474
+      "sha256": "f186a40d8752fcbbfa64a173982aae131ac4541dd25b775fc7866f19085a0dda",
+      "bytes": 169733
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5027,8 +5027,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/token-efficiency.md",
-      "sha256": "d36eae5df749c092fd60da34b35769a5adfbb76f67d30708ac3bc4e97fbac377",
-      "bytes": 15411
+      "sha256": "193051d03b2f9531d01241b906832f9cb1f05d85ca4eb15b12866df40244f8a2",
+      "bytes": 15670
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/workers.md",
@@ -19072,6 +19072,11 @@
       "bytes": 8327
     },
     {
+      "path": "docs/decisions/2026-10-09-claude-code-gap-resolution.md",
+      "sha256": "a36476e614fee6e5669299f64c0da4461050275b79924590e47058a7494ea19f",
+      "bytes": 15899
+    },
+    {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
       "sha256": "98947f11f2a3eb693c9c31b3fff6e58e1f20d476411aa49f42f66888d43c6d47",
       "bytes": 54090
@@ -21803,7 +21808,7 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "a9d94bacfde755e8d30b0bbbdc871e53ab55c82eb200e275db21588862b7bffd",
+      "sha256": "fe4e9cebcb0926e26da46bee2e1bf555f30cc4e39ea98fd71aa5a0712e2e54b8",
       "bytes": 238736
     },
     {
@@ -64708,8 +64713,8 @@
     },
     {
       "path": "tests/test_native_practice_owed_check_corrections.py",
-      "sha256": "ecfcd40a9134ea9a98a617561e43fd2abfdef425c613e4d250ae519d9007dd83",
-      "bytes": 10035
+      "sha256": "4d00a173e8c420dea994ceca608a1207d29c3e5824a8e79f34dd0815c6a08ca4",
+      "bytes": 10593
     },
     {
       "path": "tests/test_native_practice_retired_routes.py",
