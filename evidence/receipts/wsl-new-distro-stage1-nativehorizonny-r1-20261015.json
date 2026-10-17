@@ -8,23 +8,33 @@
   ],
   "claim": "W2 printed 'image already present with the expected hash; not downloaded again' and one hash, 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104, as computed, published and listed for https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl, with 'length 418495746'; W3 printed '#cloud-config', the '- name:' and 'default=' lines for <WSL_USER>, 'user-data sha256 11f92916bad4607c19cee3452eb07bb80f4590e9f16ec295370cd1d416744502' and 'placeholders left: 0'. The run printed 'install exit 0', 'launch exit 0', 'status exit 2', 'schema exit 0' and 'windows_region US', and W7 printed 'running after terminate: [NativeStack2604]', 'owner 1000:1000' and 'removed'. Its last block, r1-remove.ps1, then printed 'quiet before: NativeStack2604,NativeHorizonNY-r1', 'unregister exit 0', 'interop ok' and 'folder left: False'.",
   "limitations": [
-    "One run on one Windows host, recorded only by its stage-1 PowerShell transcript (Start-Transcript, adoption/platforms/linux-wsl2-new-distro.md:68). The P1 to P3 pre-checks, the workstation-shell baseline and paired-isolation commands, R1's comparison probes and the F outputs are not in the transcript, so their steps and fields are null.",
-    "Most native command output is missing from the transcript. Those steps record an exit value when the transcript prints one, and otherwise say what the transcript shows.",
-    "steps[] holds the recipe commands of the checked-in template at the base commit (adoption/templates/wsl/stage1-receipt.example.json), with <Name> and <RELEASE> filled. This run's own step scripts (source_transcript.step_scripts) are not in the repository, so a step is filled only where the transcript's label or output names that operation.",
-    "Sanitized: Windows and Linux user names, home and profile paths and the computer name are replaced (<win-user>, <WSL_USER>, %USERPROFILE%, <win-host>), and the transcript has no GUID. The raw transcript stays private on Z:; source_transcript gives its path, size and sha256.",
-    "Content items the transcript does not hold stay null: the wsl.exe --version lines, the default distribution before and after, W1's workstation_baseline, W5's common-unit process ids, active user manager and paired_isolation, F1's outcome, F3's rootless-container result, the clone's commit, the subordinate-id outcome, F9's authorization_settings, the pre_checks of P1 and P2, the storage_errors of P3 and W5 and F2's idle_observation (adoption/platforms/linux-wsl2-new-distro.md:1251-1270).",
+    "One run on one Windows host, recorded only by its stage-1 PowerShell transcript (Start-Transcript, adoption/platforms/linux-wsl2-new-distro.md:68). The P1 to P3 pre-checks, the Linux-shell baseline and paired-isolation commands, R1's comparison probes and the F outputs are not in the transcript.",
+    "Most native command output is missing from the transcript. Those steps record an exit value only where the transcript labels one, and otherwise say what the transcript shows.",
+    "steps[] holds the 212 recipe commands of the template (adoption/templates/wsl/stage1-receipt.example.json) in order. Rows the transcript records have <Name> and <RELEASE> filled; every other row keeps the template's text, as adoption/platforms/linux-wsl2-new-distro.md:1269-1270 directs, so no operation the transcript does not show is listed against a named distribution. This run's own step scripts (source_transcript.step_scripts) are not in the repository, so a row counts as recorded only where the transcript's label or output names that operation. R1's recorded rows use this distribution's own name, because this run is taken as the R1 rehearsal (rehearsal.basis).",
+    "Sanitized per adoption/platforms/linux-wsl2-new-distro.md:1248-1250, plus <win-host> for the computer name (docs/decisions/2026-10-09-host-name-scan.md:160-161). In values copied from the transcript this receipt uses <WSL_USER> for the Linux user name. The recipe commands in steps[] keep the template's own placeholders, such as <WSL_USER>, <checkout>, <Survivor> and ~. The Windows user name and the computer name occur only in transcript header lines that this receipt does not copy, so <win-user> and <win-host> do not appear. The transcript holds no GUID. The raw transcript stays private on Z:; source_transcript gives its path, size and sha256.",
+    "This transcript prints labeled summaries ('test-path location: False', '== id', 'install exit 0') instead of commands, and has no [exit=N] markers. Exit values come only from the lines 'install exit 0', 'launch exit 0', 'schema exit 0', 'status exit 2', 'unregister exit 0'; elsewhere steps[].exit is null.",
+    "Each null field is named below with its reason. Null means the transcript records nothing for that field, not that the item was absent.",
+    "Null (the transcript shows the source command but not the output this field records): host.default_distribution_after, first_launch.user_prompt_marker, first_launch.oobe_failed_marker, first_launch.cloud_init_version, first_launch.systemd_user_session_warning, first_launch.getty_mask.is_enabled, first_launch.getty_mask.load_state, first_launch.getty_mask.active_state, first_launch.getty_mask.n_restarts.",
+    "Null (the transcript has no line for the source command): host.wsl_version, host.default_distribution_before.",
+    "Null (the P1 and P2 pre-checks run in the workstation shell, outside the PowerShell transcript): pre_checks.signed_sums, pre_checks.user_data_schema.",
+    "Null (P3's and W5's storage-error reads run in a Linux shell, outside the PowerShell transcript): storage_errors.baseline, storage_errors.newest_line_time, storage_errors.swap, storage_errors.second_count, storage_errors.new_lines.",
+    "Null (W1's workstation baseline and W5's paired reads run in a Linux shell, outside the PowerShell transcript): host.workstation_baseline.uid, host.workstation_baseline.system_state, host.workstation_baseline.failed_units, host.workstation_baseline.user_manager, host.workstation_baseline.cgroup_namespace, first_launch.cgroup_isolation, paired_isolation.recorded_with, paired_isolation.workstation.uid, paired_isolation.workstation.system_state, paired_isolation.workstation.failed_units, paired_isolation.workstation.user_manager, paired_isolation.workstation.cgroup_namespace, paired_isolation.new_distribution.uid, paired_isolation.new_distribution.system_state, paired_isolation.new_distribution.failed_units, paired_isolation.new_distribution.user_manager, paired_isolation.new_distribution.cgroup_namespace.",
+    "Null (the F outputs (F2, F3, F5, F7, F9) are kept separately from the transcript (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input): recipe.catalog_revision, idle_observation, subordinate_ids, authorization_settings, rootless_container.",
+    "Null (path B's W6 export: the transcript has no W6 block): failed_attempt_export.file, failed_attempt_export.sha256, failed_attempt_export.bytes.",
+    "Null (W5's failure export: the W5 block shows no removal or export): w5_failure_export.file, w5_failure_export.sha256, w5_failure_export.bytes, w5_failure_export.cause.",
+    "Null (this transcript holds the rehearsal's stage-1 blocks and its removal only: no F2 idle observation, storage reading or export): rehearsal.idle_observation, rehearsal.storage_readings, rehearsal.export.file, rehearsal.export.sha256, rehearsal.export.bytes.",
+    "Null (R1's comparison probes are not in this transcript): comparison_arms.26.04.1.name, comparison_arms.26.04.1.first_boot, comparison_arms.26.04.1.systemd_user_from_second_instance, comparison_arms.26.04.1.wsl_gpu, comparison_arms.26.04.1.uv_cpython_3_13, comparison_arms.26.04.1.node_24, comparison_arms.24.04.5.name, comparison_arms.24.04.5.first_boot, comparison_arms.24.04.5.systemd_user_from_second_instance, comparison_arms.24.04.5.wsl_gpu, comparison_arms.24.04.5.uv_cpython_3_13, comparison_arms.24.04.5.node_24.",
     "cloud-init status --long exited 2 and its output is not in the transcript, so its reason is not recorded here.",
     "Transcript times (source_transcript.*_local) are Windows local time, EDT (UTC-4).",
-    "This transcript prints labeled summaries ('test-path location: False', '== id', 'install exit 0') instead of commands, and has no [exit=N] markers. An exit value is recorded only where a line prints one; null means the transcript prints none.",
     "jcodemunch_registration is skipped: F11 is not in the stage-1 transcript.",
     "Taken as NativeHorizonNY's R1 rehearsal on the basis given in rehearsal.basis. R1's comparison probes and its F1 to F3 outputs are not in the transcript."
   ],
-  "recorded_at_utc": "2026-10-17T03:43:44Z",
+  "recorded_at_utc": "2026-10-17T05:56:31Z",
   "recipe": {
     "path": "adoption/platforms/linux-wsl2-new-distro.md",
     "catalog_revision": null,
     "creation_path": "A",
-    "creation_path_basis": "W3 wrote the cloud-init user-data and W4 installed with --from-file; the transcript has no W6 block"
+    "creation_path_basis": "W3 wrote user-data whose first line is '#cloud-config' (path A's input), and the transcript has no W6 block (path B's import and manual user). W5's markers, which would show path B, are not in the transcript."
   },
   "supported_images": {
     "26.04.1": {
@@ -44,9 +54,9 @@
   },
   "rehearsal": {
     "name": "NativeHorizonNY-r1",
-    "result": "removed on R1's no-export path ('unregister exit 0', then 'interop ok'); whether F1 to F3 passed is not in the transcript",
+    "result": "removed: r1-remove.ps1 printed 'unregister exit 0', 'interop ok' and 'folder left: False'. F1 to F3 are not in this transcript; docs/decisions/2026-10-15-new-wsl-clean-install-plan.md:914-915 records that stage R passed and was removed at 18:37:42Z with interop intact.",
     "creation_path": "A",
-    "schema_system": "cloud-init schema --system: the block printed 'schema exit 0'; its output line is not in the transcript",
+    "schema_system": "the block printed 'schema exit 0'; its output line is not in the transcript",
     "ownership_probe": "1000:1000 (W7 printed 'owner 1000:1000')",
     "idle_observation": null,
     "storage_readings": null,
@@ -55,7 +65,7 @@
       "sha256": null,
       "bytes": null
     },
-    "basis": "its name; its last block, r1-remove.ps1, reads the list first and unregisters without an export, as R1 does when every proof held (adoption/platforms/linux-wsl2-new-distro.md:220-221); and its timing: this transcript ends at 14:37:42 local and the NativeHorizonNY transcript starts at 14:38:16"
+    "basis": "its name; its last block, r1-remove.ps1, which read the list ('quiet before: NativeStack2604,NativeHorizonNY-r1'), printed 'unregister exit 0' and 'interop ok' and no export line; and its timing: this transcript's last End time, 14:37:42 local (EDT), is 18:37:42Z, the time docs/decisions/2026-10-15-new-wsl-clean-install-plan.md:914-915 gives for stage R's removal, and the NativeHorizonNY transcript starts at 14:38:16 local"
   },
   "pre_checks": {
     "signed_sums": null,
@@ -136,43 +146,43 @@
   "steps": [
     {
       "step": "R1",
-      "cmd": "wsl.exe -d 'NativeHorizonNY-r1' --exec bash -lc 'stat -c %U,%F /run/user/$(id -u) /run/user/$(id -u)/bus'",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'stat -c %U,%F /run/user/$(id -u) /run/user/$(id -u)/bus'",
       "exit": null,
       "output_excerpt": "not in this transcript"
     },
     {
       "step": "R1",
-      "cmd": "wsl.exe -d 'NativeHorizonNY-r1' --exec systemctl --user is-system-running --wait",
+      "cmd": "wsl.exe -d '<Name>' --exec systemctl --user is-system-running --wait",
       "exit": null,
       "output_excerpt": "not in this transcript"
     },
     {
       "step": "R1",
-      "cmd": "wsl.exe -d 'NativeHorizonNY-r1' --exec test -c /dev/dxg",
+      "cmd": "wsl.exe -d '<Name>' --exec test -c /dev/dxg",
       "exit": null,
       "output_excerpt": "not in this transcript"
     },
     {
       "step": "R1",
-      "cmd": "wsl.exe -d 'NativeHorizonNY-r1' --exec /usr/lib/wsl/lib/nvidia-smi",
+      "cmd": "wsl.exe -d '<Name>' --exec /usr/lib/wsl/lib/nvidia-smi",
       "exit": null,
       "output_excerpt": "not in this transcript"
     },
     {
       "step": "R1",
-      "cmd": "wsl.exe -d 'NativeHorizonNY-r1' --exec bash -lc 'python3 --version'",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'python3 --version'",
       "exit": null,
       "output_excerpt": "not in this transcript"
     },
     {
       "step": "R1",
-      "cmd": "wsl.exe -d 'NativeHorizonNY-r1' --exec bash -lc 'uv run --no-project --python 3.13 python --version'",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'uv run --no-project --python 3.13 python --version'",
       "exit": null,
       "output_excerpt": "not in this transcript"
     },
     {
       "step": "R1",
-      "cmd": "wsl.exe -d 'NativeHorizonNY-r1' --exec bash -lc 'node --version'",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'node --version'",
       "exit": null,
       "output_excerpt": "not in this transcript"
     },
@@ -190,9 +200,9 @@
     },
     {
       "step": "R1",
-      "cmd": "wsl.exe --terminate 'NativeHorizonNY-r1'",
+      "cmd": "wsl.exe --terminate '<Name>'",
       "exit": null,
-      "output_excerpt": "no line of its own (blank lines follow the list)"
+      "output_excerpt": "no line in the transcript"
     },
     {
       "step": "R1",
@@ -222,91 +232,91 @@
       "step": "R1",
       "cmd": "$env:WSL_UTF8 = '1'",
       "exit": null,
-      "output_excerpt": "not run: the removal took R1's no-export path (no export; 'unregister exit 0')"
+      "output_excerpt": "no line in the transcript: r1-remove.ps1 printed no export line before 'unregister exit 0'"
     },
     {
       "step": "R1",
       "cmd": "wsl.exe --list --quiet",
       "exit": null,
-      "output_excerpt": "not run: the removal took R1's no-export path (no export; 'unregister exit 0')"
+      "output_excerpt": "no line in the transcript: r1-remove.ps1 printed no export line before 'unregister exit 0'"
     },
     {
       "step": "R1",
-      "cmd": "wsl.exe --terminate 'NativeHorizonNY-r1'",
+      "cmd": "wsl.exe --terminate '<Name>'",
       "exit": null,
-      "output_excerpt": "not run: the removal took R1's no-export path (no export; 'unregister exit 0')"
+      "output_excerpt": "no line in the transcript: r1-remove.ps1 printed no export line before 'unregister exit 0'"
     },
     {
       "step": "R1",
-      "cmd": "wsl.exe --export 'NativeHorizonNY-r1' 'Z:\\WSL\\downloads\\NativeHorizonNY-r1-rehearsal.tar'",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar'",
       "exit": null,
-      "output_excerpt": "not run: the removal took R1's no-export path (no export; 'unregister exit 0')"
+      "output_excerpt": "no line in the transcript: r1-remove.ps1 printed no export line before 'unregister exit 0'"
     },
     {
       "step": "R1",
       "cmd": "$LASTEXITCODE",
       "exit": null,
-      "output_excerpt": "not run: the removal took R1's no-export path (no export; 'unregister exit 0')"
+      "output_excerpt": "no line in the transcript: r1-remove.ps1 printed no export line before 'unregister exit 0'"
     },
     {
       "step": "R1",
       "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
       "exit": null,
-      "output_excerpt": "not run: the removal took R1's no-export path (no export; 'unregister exit 0')"
+      "output_excerpt": "no line in the transcript: r1-remove.ps1 printed no export line before 'unregister exit 0'"
     },
     {
       "step": "R1",
-      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\NativeHorizonNY-r1-rehearsal.tar').Hash.ToLowerInvariant()",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar').Hash.ToLowerInvariant()",
       "exit": null,
-      "output_excerpt": "not run: the removal took R1's no-export path (no export; 'unregister exit 0')"
+      "output_excerpt": "no line in the transcript: r1-remove.ps1 printed no export line before 'unregister exit 0'"
     },
     {
       "step": "R1",
-      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\NativeHorizonNY-r1-rehearsal.tar').Length",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar').Length",
       "exit": null,
-      "output_excerpt": "not run: the removal took R1's no-export path (no export; 'unregister exit 0')"
+      "output_excerpt": "no line in the transcript: r1-remove.ps1 printed no export line before 'unregister exit 0'"
     },
     {
       "step": "R1",
-      "cmd": "wsl.exe --unregister 'NativeHorizonNY-r1'",
+      "cmd": "wsl.exe --unregister '<Name>'",
       "exit": null,
-      "output_excerpt": "not run: the removal took R1's no-export path (no export; 'unregister exit 0')"
+      "output_excerpt": "no line in the transcript: r1-remove.ps1 printed no export line before 'unregister exit 0'"
     },
     {
       "step": "R1",
       "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
       "exit": null,
-      "output_excerpt": "not run: the removal took R1's no-export path (no export; 'unregister exit 0')"
+      "output_excerpt": "no line in the transcript: r1-remove.ps1 printed no export line before 'unregister exit 0'"
     },
     {
       "step": "R1",
       "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
       "exit": null,
-      "output_excerpt": "not run: the removal took R1's no-export path (no export; 'unregister exit 0')"
+      "output_excerpt": "no line in the transcript: r1-remove.ps1 printed no export line before 'unregister exit 0'"
     },
     {
       "step": "R1",
       "cmd": "wsl.exe --list --verbose",
       "exit": null,
-      "output_excerpt": "not run: the removal took R1's no-export path (no export; 'unregister exit 0')"
+      "output_excerpt": "no line in the transcript: r1-remove.ps1 printed no export line before 'unregister exit 0'"
     },
     {
       "step": "R1",
       "cmd": "test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver",
       "exit": null,
-      "output_excerpt": "not run: the interop check printed 'interop ok'"
+      "output_excerpt": "no line in the transcript (the interop check printed 'interop ok')"
     },
     {
       "step": "R1",
       "cmd": "ls /proc/sys/fs/binfmt_misc",
       "exit": null,
-      "output_excerpt": "not run: the interop check printed 'interop ok'"
+      "output_excerpt": "no line in the transcript (the interop check printed 'interop ok')"
     },
     {
       "step": "R1",
       "cmd": "systemctl status systemd-binfmt.service --no-pager",
       "exit": null,
-      "output_excerpt": "not run: the interop check printed 'interop ok'"
+      "output_excerpt": "no line in the transcript (the interop check printed 'interop ok')"
     },
     {
       "step": "P1",
@@ -364,7 +374,7 @@
     },
     {
       "step": "P2",
-      "cmd": "python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/cloud-init.user-data.template '<WSL_USER>' > \"$RENDER_DIR/NativeHorizonNY-r1.user-data\"",
+      "cmd": "python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/cloud-init.user-data.template '<WSL_USER>' > \"$RENDER_DIR/<Name>.user-data\"",
       "exit": null,
       "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
     },
@@ -376,13 +386,13 @@
     },
     {
       "step": "P2",
-      "cmd": "cloud-init schema -c \"$RENDER_DIR/NativeHorizonNY-r1.user-data\"",
+      "cmd": "cloud-init schema -c \"$RENDER_DIR/<Name>.user-data\"",
       "exit": null,
       "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
     },
     {
       "step": "P2",
-      "cmd": "sha256sum \"$RENDER_DIR/NativeHorizonNY-r1.user-data\"",
+      "cmd": "sha256sum \"$RENDER_DIR/<Name>.user-data\"",
       "exit": null,
       "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
     },
@@ -520,7 +530,7 @@
     },
     {
       "step": "W2",
-      "cmd": "$Release = '26.04.1'",
+      "cmd": "$Release = '<RELEASE>'",
       "exit": null,
       "output_excerpt": "no line in the transcript"
     },
@@ -640,7 +650,7 @@
     },
     {
       "step": "W3",
-      "cmd": "[System.IO.File]::WriteAllText((Join-Path $env:USERPROFILE '.cloud-init\\NativeHorizonNY-r1.user-data'), $Text)",
+      "cmd": "[System.IO.File]::WriteAllText((Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data'), $Text)",
       "exit": null,
       "output_excerpt": "no line in the transcript"
     },
@@ -814,7 +824,7 @@
     },
     {
       "step": "W5",
-      "cmd": "/mnt/c/Windows/System32/wsl.exe -d 'NativeHorizonNY-r1' --exec systemctl is-active '<COMMON_UNIT>'",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-active '<COMMON_UNIT>'",
       "exit": null,
       "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
     },
@@ -826,7 +836,7 @@
     },
     {
       "step": "W5",
-      "cmd": "/mnt/c/Windows/System32/wsl.exe -d 'NativeHorizonNY-r1' --exec sh -c 'systemctl is-active \"user@$(id -u).service\"'",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active \"user@$(id -u).service\"'",
       "exit": null,
       "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
     },
@@ -862,31 +872,31 @@
     },
     {
       "step": "W5",
-      "cmd": "/mnt/c/Windows/System32/wsl.exe -d 'NativeHorizonNY-r1' --exec id -u",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec id -u",
       "exit": null,
       "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
     },
     {
       "step": "W5",
-      "cmd": "/mnt/c/Windows/System32/wsl.exe -d 'NativeHorizonNY-r1' --exec systemctl is-system-running",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-system-running",
       "exit": null,
       "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
     },
     {
       "step": "W5",
-      "cmd": "/mnt/c/Windows/System32/wsl.exe -d 'NativeHorizonNY-r1' --exec systemctl --failed --no-legend --plain",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl --failed --no-legend --plain",
       "exit": null,
       "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
     },
     {
       "step": "W5",
-      "cmd": "/mnt/c/Windows/System32/wsl.exe -d 'NativeHorizonNY-r1' --exec sh -c 'systemctl is-active \"user@$(id -u).service\"'",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active \"user@$(id -u).service\"'",
       "exit": null,
       "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
     },
     {
       "step": "W5",
-      "cmd": "/mnt/c/Windows/System32/wsl.exe -d 'NativeHorizonNY-r1' --exec readlink /proc/self/ns/cgroup",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec readlink /proc/self/ns/cgroup",
       "exit": null,
       "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
     },
@@ -894,73 +904,73 @@
       "step": "W5",
       "cmd": "$env:WSL_UTF8 = '1'",
       "exit": null,
-      "output_excerpt": "not run: W7 then ran against the same distribution, so no W5 failure removal"
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
     },
     {
       "step": "W5",
       "cmd": "wsl.exe --list --quiet",
       "exit": null,
-      "output_excerpt": "not run: W7 then ran against the same distribution, so no W5 failure removal"
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
     },
     {
       "step": "W5",
-      "cmd": "wsl.exe --terminate 'NativeHorizonNY-r1'",
+      "cmd": "wsl.exe --terminate '<Name>'",
       "exit": null,
-      "output_excerpt": "not run: W7 then ran against the same distribution, so no W5 failure removal"
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
     },
     {
       "step": "W5",
-      "cmd": "wsl.exe --export 'NativeHorizonNY-r1' 'Z:\\WSL\\downloads\\NativeHorizonNY-r1-w5-failed.tar'",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar'",
       "exit": null,
-      "output_excerpt": "not run: W7 then ran against the same distribution, so no W5 failure removal"
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
     },
     {
       "step": "W5",
       "cmd": "$LASTEXITCODE",
       "exit": null,
-      "output_excerpt": "not run: W7 then ran against the same distribution, so no W5 failure removal"
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
     },
     {
       "step": "W5",
       "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
       "exit": null,
-      "output_excerpt": "not run: W7 then ran against the same distribution, so no W5 failure removal"
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
     },
     {
       "step": "W5",
-      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\NativeHorizonNY-r1-w5-failed.tar').Hash.ToLowerInvariant()",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar').Hash.ToLowerInvariant()",
       "exit": null,
-      "output_excerpt": "not run: W7 then ran against the same distribution, so no W5 failure removal"
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
     },
     {
       "step": "W5",
-      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\NativeHorizonNY-r1-w5-failed.tar').Length",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar').Length",
       "exit": null,
-      "output_excerpt": "not run: W7 then ran against the same distribution, so no W5 failure removal"
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
     },
     {
       "step": "W5",
-      "cmd": "wsl.exe --unregister 'NativeHorizonNY-r1'",
+      "cmd": "wsl.exe --unregister '<Name>'",
       "exit": null,
-      "output_excerpt": "not run: W7 then ran against the same distribution, so no W5 failure removal"
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
     },
     {
       "step": "W5",
       "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
       "exit": null,
-      "output_excerpt": "not run: W7 then ran against the same distribution, so no W5 failure removal"
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
     },
     {
       "step": "W5",
       "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
       "exit": null,
-      "output_excerpt": "not run: W7 then ran against the same distribution, so no W5 failure removal"
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
     },
     {
       "step": "W5",
       "cmd": "wsl.exe --list --verbose",
       "exit": null,
-      "output_excerpt": "not run: W7 then ran against the same distribution, so no W5 failure removal"
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
     },
     {
       "step": "W5",
@@ -972,145 +982,145 @@
       "step": "W6",
       "cmd": "$env:WSL_UTF8 = '1'",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "wsl.exe --list --quiet",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
-      "cmd": "wsl.exe --terminate 'NativeHorizonNY-r1'",
+      "cmd": "wsl.exe --terminate '<Name>'",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
-      "cmd": "wsl.exe --export 'NativeHorizonNY-r1' 'Z:\\WSL\\downloads\\NativeHorizonNY-r1-failed.tar'",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-failed.tar'",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "$LASTEXITCODE",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
-      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\NativeHorizonNY-r1-failed.tar').Hash.ToLowerInvariant()",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-failed.tar').Hash.ToLowerInvariant()",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
-      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\NativeHorizonNY-r1-failed.tar').Length",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-failed.tar').Length",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
-      "cmd": "wsl.exe --unregister 'NativeHorizonNY-r1'",
+      "cmd": "wsl.exe --unregister '<Name>'",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
-      "cmd": "wsl.exe --import 'NativeHorizonNY-r1' 'Z:\\WSL\\NativeHorizonNY-r1' 'Z:\\WSL\\downloads\\ubuntu-26.04.1-wsl-amd64.wsl' --version 2",
+      "cmd": "wsl.exe --import '<Name>' 'Z:\\WSL\\<Name>' 'Z:\\WSL\\downloads\\ubuntu-<RELEASE>-wsl-amd64.wsl' --version 2",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
-      "cmd": "wsl.exe -d 'NativeHorizonNY-r1' -u root --exec cloud-init status --wait --long",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "systemctl mask --now getty@tty1.service",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "id -u '<WSL_USER>' || useradd --create-home --uid 1000 --groups adm,cdrom,sudo,dip,plugdev --shell /bin/bash '<WSL_USER>'",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "printf '%s ALL=(ALL) NOPASSWD:ALL\\n' '<WSL_USER>' > /etc/sudoers.d/90-wsl-default-user",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "chmod 0440 /etc/sudoers.d/90-wsl-default-user",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "visudo -cf /etc/sudoers.d/90-wsl-default-user",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "grep -q '^\\[user\\]' /etc/wsl.conf || printf '\\n[user]\\ndefault=%s\\n' '<WSL_USER>' >> /etc/wsl.conf",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "python3 -c 'import configparser, io; from pathlib import Path; p = Path(\"/etc/wsl.conf\"); c = configparser.ConfigParser(interpolation=None); c.optionxform = str; c.read_string(p.read_text() if p.exists() else \"\"); c.has_section(\"time\") or c.add_section(\"time\"); c.set(\"time\", \"useWindowsTimezone\", \"true\"); out = io.StringIO(); c.write(out, space_around_delimiters=False); p.write_text(out.getvalue())' || exit \"$?\"",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "touch /etc/cloud/cloud-init.disabled",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
-      "cmd": "wsl.exe --terminate 'NativeHorizonNY-r1'",
+      "cmd": "wsl.exe --terminate '<Name>'",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
       "cmd": "wsl.exe --list --running",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W6",
-      "cmd": "wsl.exe -d 'NativeHorizonNY-r1' --exec id -un",
+      "cmd": "wsl.exe -d '<Name>' --exec id -un",
       "exit": null,
-      "output_excerpt": "not run: path A (W3 wrote the cloud-init user-data, W4 installed with --from-file, and the transcript has no W6 block)"
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
     },
     {
       "step": "W7",
@@ -1132,15 +1142,15 @@
     },
     {
       "step": "W7",
-      "cmd": "wsl.exe -d 'NativeHorizonNY-r1' --exec id -un",
+      "cmd": "wsl.exe -d '<Name>' --exec id -un",
       "exit": null,
       "output_excerpt": "no line in the transcript"
     },
     {
       "step": "W7",
-      "cmd": "New-Item -ItemType File -Path '\\\\wsl.localhost\\NativeHorizonNY-r1\\home\\<WSL_USER>\\wsl-owner-probe'",
+      "cmd": "New-Item -ItemType File -Path '\\\\wsl.localhost\\<Name>\\home\\<WSL_USER>\\wsl-owner-probe'",
       "exit": null,
-      "output_excerpt": "no line of its own; the stat below read the probe"
+      "output_excerpt": "no line in the transcript (the stat and 'removed' lines below read the probe)"
     },
     {
       "step": "W7",
@@ -1372,13 +1382,13 @@
     },
     {
       "step": "F10",
-      "cmd": "wsl.exe -d 'NativeHorizonNY-r1' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'",
+      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'",
       "exit": null,
       "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
     },
     {
       "step": "F10",
-      "cmd": "wsl.exe -d 'NativeHorizonNY-r1' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=$(type -P $n); [[ -f $p && -x $p ]] && echo executable: $p; done'",
+      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=$(type -P $n); [[ -f $p && -x $p ]] && echo executable: $p; done'",
       "exit": null,
       "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
     },
