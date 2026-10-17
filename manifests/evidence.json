@@ -4957,8 +4957,8 @@
     },
     {
       "path": ".claude/settings.json",
-      "sha256": "8f65ca76f754b9c829de60685443fe1a16044cf2522a429076e0196683806117",
-      "bytes": 3069
+      "sha256": "37f910c043b24ef9e2f64b11f5abefba5d7e8835b67af6528119d3ea8c0f7a71",
+      "bytes": 3906
     },
     {
       "path": ".claude/skills/claude-native-practice/SKILL.md",
@@ -5392,8 +5392,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "89fe8ffcdee0d2b7315ccf67497ee3557a2a66cc210975d2806e7fe6bfd3cab7",
-      "bytes": 49402
+      "sha256": "1649f956c7a8475603d19f2424fce853ddf8efae85e1396e0b8dead4eaf71310",
+      "bytes": 50546
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -5407,7 +5407,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "e8f32f6d7a6cac02e01f62e9e08d43ead25054834e0030ef45a5f7c1e4fa1c0f",
+      "sha256": "2765f99aea8be91497043dcde3089daccd379c11660bbfbc99eea09e05f4cec8",
       "bytes": 1229
     },
     {
@@ -5782,8 +5782,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "1ad0da8be8a8001ddceec1876fd8455d44252560738e48046ce57c59a26d48aa",
-      "bytes": 14589
+      "sha256": "c4830d344ee3aad4ee122b5fba8ce6d8c2090dd691374d95df1a05ee5cccba4a",
+      "bytes": 14740
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -18583,8 +18583,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "c187d391a6fac63f58c9fcccdcb87a12bb64576591c43ee0c27cb0ea7adb340f",
-      "bytes": 151391
+      "sha256": "112550b9ec5b3d778e6f4a6d6d93a2dc26a774496f82084a20ebd657f739dc73",
+      "bytes": 151405
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -19768,8 +19768,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "2b163760b42a608ce53bf27f204e3b25944e051fafaf03950ed45974adc8634e",
-      "bytes": 207692
+      "sha256": "ce2ef87e02e3389b47b6b60e40b4ba209c8cffd25e3aaa7c9425a975417f2470",
+      "bytes": 208421
     },
     {
       "path": "docs/stack.md",
@@ -63163,8 +63163,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "149858ae4c0f4085d729c403f3a5d206a850bd7bfef53a57a8619b03e231038b",
-      "bytes": 298998
+      "sha256": "db652808d89cca168f2b5873c5aff3ea57bfda856f8f9fdb1b75cb104f86cefd",
+      "bytes": 301535
     },
     {
       "path": "scripts/host_name_scan.py",
@@ -65108,8 +65108,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "61262c5b6b6fe4b9dc17677afbaa7ba2de07b27bc0878aca988673db11bb8dd3",
-      "bytes": 398157
+      "sha256": "2d8dd653d992dc0e4515f92e0d0b7416154d952e7a377e24c773cb35c203cea7",
+      "bytes": 406126
     },
     {
       "path": "tests/test_secret_scan_metrics.py",

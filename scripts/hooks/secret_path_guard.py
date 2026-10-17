@@ -122,7 +122,8 @@ class LinearScan:
     engine reads that run again from every repeat: 102,016 characters of `XDG_CONFIG_HOME:-` took 11.9 s, 54,000 of `HF_HOME:-` 13 to 14 s
     and 80,000 of `/proc` 13 to 15 s (third verification review, 2026-09-29), past a hook timeout of 10 s that fails open, before any work
     budget was charged. Each scan below reads only the runs of the text that the pattern cannot cross and that hold its literal, once each,
-    and searches them for literals."""
+    and searches them for literals. Four more `${NAME:-default}` store patterns (CODEX_HOME twice, AI_MEMORY_DATA_DIR, XDG_CONFIG_HOME for
+    Muse Code; A2 finding G8-A02, 2026-10-17) have the same shape and are scans from the start."""
     __slots__ = ("pattern", "_scan")
 
     def __init__(self, pattern: str, scan) -> None:
@@ -143,6 +144,15 @@ XDG_STORE_TAIL = re.compile(r"/native-agent-stack(?:/|\b)")
 HF_TOKEN_PLAIN = re.compile(r"(?:huggingface|HF_HOME)\}?[\"']?/(?:token|stored_tokens)(?![\w-])")
 HF_TOKEN_TAIL = re.compile(r"[\"']?/(?:token|stored_tokens)(?![\w-])")
 ENVIRON_TAIL = re.compile(r"/environ\b")
+# A2 finding G8-A02 (fold 2): the `${NAME:-default}` spellings of the Codex, ai-memory and Muse Code stores, read by default_run_scan.
+CODEX_AUTH_PLAIN = re.compile(r"(?:\.codex|CODEX_HOME)\}?/auth\.json")
+CODEX_AUTH_TAIL = re.compile(r"/auth\.json")
+AI_MEMORY_AUTH_PLAIN = re.compile(r"(?:ai-memory|AI_MEMORY_DATA_DIR)\}?/auth(?:-(?:tokens?|header)(?![\w-])|\.json)")
+AI_MEMORY_AUTH_TAIL = re.compile(r"/auth(?:-(?:tokens?|header)(?![\w-])|\.json)")
+MUSE_AUTH_PLAIN = re.compile(r"(?:\.config|XDG_CONFIG_HOME)\}?/muse/auth\.json")
+MUSE_AUTH_TAIL = re.compile(r"/muse/auth\.json")
+CODEX_DOTENV_PLAIN = re.compile(r"(?:\.codex|CODEX_HOME)\}?/\.env(?![\w.-])")
+CODEX_DOTENV_TAIL = re.compile(r"/\.env(?![\w.-])")
 GH_STATUS_HEAD = re.compile(r"\bgh\s+auth\s+status\b")
 GH_STATUS_FLAG = re.compile(r"\s-t\b")
 GH_STATUS_STOP = re.compile(r"[;&|\n]")
@@ -204,7 +214,9 @@ STORE_PATHS = (
     (LinearScan(r"XDG_CONFIG_HOME(?::-[^}\s]*)?\}?/native-agent-stack(?:/|\b)",
                 lambda text: default_run_scan(text, XDG_STORE_PLAIN, "XDG_CONFIG_HOME:-", XDG_STORE_TAIL)), "credential_store_path"),
     (re.compile(r"\.claude/\.credentials\.json"), "native_store_path"),
-    (re.compile(r"(?:\.codex|CODEX_HOME\}?)/auth\.json"), "native_store_path"),
+    # Until 2026-10-17 `(?:\.codex|CODEX_HOME\}?)/auth\.json`, which missed the inventory's own `${CODEX_HOME:-$HOME/.codex}/auth.json`.
+    (LinearScan(r"(?:\.codex|CODEX_HOME(?::-[^}\s]*)?)\}?/auth\.json",
+                lambda text: default_run_scan(text, CODEX_AUTH_PLAIN, "CODEX_HOME:-", CODEX_AUTH_TAIL)), "native_store_path"),
     (re.compile(r"gh/hosts\.yml"), "native_store_path"),
     # Hugging Face token files: the default home, $XDG_CACHE_HOME/huggingface, $HF_HOME or a
     # ${HF_HOME:-...} form, a closing quote allowed before the slash; tokenizers/ and hub/ pass.
@@ -224,12 +236,19 @@ STORE_PATHS = (
     (re.compile(r"\bsecret-tool\s+lookup\b"), "keychain_read"),
     # A2 finding G8-A02 (2026-10-17), appended so earlier indices keep their place. ai-memory's bearer files in its data directory:
     # <data-dir>/auth-token and auth-header (akitaonrails/ai-memory v3.1.0, crates/ai-memory-cli/src/config.rs:3347, :3359) and the
-    # per-profile auth-tokens/ directory (src/server_profiles.rs:30). `--data-dir .../ai-memory hook ...` names no such file and passes.
-    (re.compile(r"ai-memory/auth-(?:tokens?|header)(?![\w-])"), "service_secret_path"),
-    # Muse Code's sign-in (tools/muse_file_fence.py --auth default) and Codex's dotenv file, which codex loads from CODEX_HOME
-    # (openai/codex rust-v0.163.0, codex-rs/arg0/src/lib.rs:270-276). A sibling .env.example stays readable.
-    (re.compile(r"(?:\.config|XDG_CONFIG_HOME\}?)/muse/auth\.json"), "native_store_path"),
-    (re.compile(r"(?:\.codex|CODEX_HOME\}?)/\.env(?![\w.-])"), "native_store_path"),
+    # per-profile auth-tokens/ directory (src/server_profiles.rs:30), and the provider-token file <data-dir>/auth.json (config.rs:3031),
+    # under the default directory name or $AI_MEMORY_DATA_DIR (config.rs:760), also as ${AI_MEMORY_DATA_DIR:-...}.
+    # `--data-dir .../ai-memory hook ...` names no such file and passes.
+    (LinearScan(r"(?:ai-memory|AI_MEMORY_DATA_DIR(?::-[^}\s]*)?)\}?/auth(?:-(?:tokens?|header)(?![\w-])|\.json)",
+                lambda text: default_run_scan(text, AI_MEMORY_AUTH_PLAIN, "AI_MEMORY_DATA_DIR:-", AI_MEMORY_AUTH_TAIL)),
+     "service_secret_path"),
+    # Muse Code's sign-in (tools/muse_file_fence.py --auth default), also under ${XDG_CONFIG_HOME:-$HOME/.config}, and Codex's dotenv
+    # file, which codex loads from CODEX_HOME (openai/codex rust-v0.163.0, codex-rs/arg0/src/lib.rs:270-276), also under
+    # ${CODEX_HOME:-$HOME/.codex}. A sibling .env.example stays readable.
+    (LinearScan(r"(?:\.config|XDG_CONFIG_HOME(?::-[^}\s]*)?)\}?/muse/auth\.json",
+                lambda text: default_run_scan(text, MUSE_AUTH_PLAIN, "XDG_CONFIG_HOME:-", MUSE_AUTH_TAIL)), "native_store_path"),
+    (LinearScan(r"(?:\.codex|CODEX_HOME(?::-[^}\s]*)?)\}?/\.env(?![\w.-])",
+                lambda text: default_run_scan(text, CODEX_DOTENV_PLAIN, "CODEX_HOME:-", CODEX_DOTENV_TAIL)), "native_store_path"),
 )
 # Every secret `variables` name and every `must_not_be_set` name of
 # adoption/credential-inventory.json; tests/test_secret_path_guard.py fails when
@@ -269,10 +288,16 @@ SECRET_LOOKUP = re.compile(r"(?:environ|getenv|process\.env|ENV\[)[^;\n]{0,40}\b
 # so without the group (until 2026-09-29) or with digits only (until 2026-10-11) a reader or a `source` on such a pointer passed the guard.
 POINTER_VARIABLE = re.compile(
     r"\$\{?(?:PAPER_ENV_FILE|ENV_FILE|SEC_CONTACT_ENV|PIT_ALPACA_ENV_PATH|PIT_SEC_ENV_PATH|HF_TOKEN_PATH"
-    r"|GITHUB_REVIEW_APP_KEY_PATH)(?:_(?:[0-9]+|[A-Z]))?\b")
+    r"|GITHUB_REVIEW_APP_KEY_PATH|AI_MEMORY_DATA_DIR)(?:_(?:[0-9]+|[A-Z]))?\b")
 # The Hugging Face home itself (or everything in it) as a reader's operand: a recursive search or a
 # copy of it includes both token files. Its subdirectories such as hub/ stay readable.
 HF_HOME_ROOT = re.compile(r"(?:(?:\.cache|XDG_CACHE_HOME)\}?/huggingface\}?|^\$\{?HF_HOME\}?)(?:/\**)?$")
+# A2 finding G8-A02 (fold 2), the same precedent: the ai-memory data directory and the Muse Code config directory, each itself or a glob
+# over its top level, as a reader's operand (both hold token files). Files in them such as config.toml or settings.json stay readable,
+# and `ai-memory backup --to FILE` (blueprints/us-equities/state-recovery/memory/README.md) names neither directory.
+STORE_ROOTS = re.compile(r"(?:(?:\.local/share|XDG_DATA_HOME)\}?/ai-memory\}?|^\$\{?AI_MEMORY_DATA_DIR\}?"
+                         r"|(?:\.config|XDG_CONFIG_HOME)\}?/muse\}?)(?:/\**)?$")
+HF_HOME_ROOT = re.compile(HF_HOME_ROOT.pattern + "|" + STORE_ROOTS.pattern)
 # Home and tool credential stores as a reader's operand (2026-09-27): every path the settings template's
 # credential-store Read denies cover. That is anything in an SSH, GnuPG, AWS, Azure or kube directory, an OmniRoute
 # data directory (~/.omniroute, ~/.config/omniroute, and Windows' AppData/Roaming/omniroute reached from WSL2), a
