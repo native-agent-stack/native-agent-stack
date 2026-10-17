@@ -13,7 +13,10 @@ One run:
   4. new sealed files go into ONE batch STAGING/<UTC>/cc-cc-work/<pr>-micro/<file> (mtime kept), with SHA256SUMS written LAST
      by rename; the ledger records each file only after the batch is complete. If staging fails part-way (for example ENOSPC
      while copying), a batch without its SHA256SUMS is removed, the failure is printed FAILED and alerted once per distinct
-     error (a .publisher-failed flag in the staging root, removed by the next successful stage), and the next run retries.
+     normalised fault (a .publisher-failed flag in the staging root holding phase, exception type, errno and batch-relative
+     path with the per-run STAGING/<UTC>/ prefix stripped, removed by the next successful stage), and the next run retries.
+     If the ledger append fails after SHA256SUMS is in place, the complete batch stays and the failure is reported as a
+     ledger-append failure; a ledger line without a whole digest is a truncated append and is ignored, not refused.
 Exit 0 (nothing to do, or a batch staged), 2 (refused, or staging failed), 3 (REVERSE_SYNC_STAGING unset, empty, relative or contains '@', or a root unreadable).
 """
 import hashlib
@@ -68,14 +71,52 @@ def alert(text):
         print(f'alert send failed ({type(e).__name__})')
 
 
+DIGEST = re.compile(r'^[0-9a-f]{64}$')
+
+
 def read_ledger():
     done = {}
     if LEDGER.exists():
         for line in LEDGER.read_text().splitlines():
             parts = line.split('\t')
-            if len(parts) >= 2:
+            if len(parts) >= 2 and DIGEST.match(parts[1]):
                 done[parts[0]] = parts[1]
+            # a line without a whole digest is a truncated append, not a published record: the file is staged again
     return done
+
+
+def error_rel(e):
+    """The stable path a staging fault belongs to, relative to the batch: the failing file with the per-run
+    STAGING/<UTC>/ prefix stripped (the destination for a copy, which names both paths), else relative to SRC."""
+    for attr in ('filename2', 'filename'):
+        fn = getattr(e, attr, None)
+        if not fn:
+            continue
+        p = Path(fn)
+        try:
+            rel = p.relative_to(STAGING)
+        except (TypeError, ValueError):
+            try:
+                return str(p.relative_to(SRC))
+            except (TypeError, ValueError):
+                return p.name
+        parts = rel.parts[1:] if rel.parts and BATCH.match(rel.parts[0]) else rel.parts
+        return '/'.join(parts) if parts else '<batch>'
+    return '-'
+
+
+def error_detail(e):
+    """The stable part of an error's text: an OSError's strerror (its rendered form carries the per-run batch
+    name), else the message with any batch stamp normalised away."""
+    s = e.strerror if isinstance(e, OSError) and e.strerror else str(e)
+    return re.sub(r'(?<![0-9A-Za-z])\d{8}T\d{6}Z(?![0-9A-Za-z])', '<batch>', s).strip()
+
+
+def failure_key(e, after_sums):
+    """Dedup key for a staging or ledger fault: phase, exception type, errno and batch-relative path, plus the
+    stable detail, so the same fault dedupes across runs despite the fresh batch name each run."""
+    phase = 'ledger-append' if after_sums else 'staging'
+    return f'{phase}: {type(e).__name__}: errno={getattr(e, "errno", None)}: {error_rel(e)}: {error_detail(e)}'.strip()
 
 
 def cleanup():
@@ -125,9 +166,12 @@ def stage(new):
         complete = True  # SHA256SUMS is in place: the batch itself is whole from here on
         LEDGER.parent.mkdir(parents=True, exist_ok=True)
         with open(LEDGER, 'a') as f:
-            for rel, _, digest in new:
-                f.write(f'{rel}\t{digest}\t{name}\t{utc()}\n')
-    except BaseException:
+            f.write(''.join(f'{rel}\t{digest}\t{name}\t{utc()}\n' for rel, _, digest in new))
+    except BaseException as e:
+        try:
+            e.coord_after_sums = complete  # main() labels a post-SHA256SUMS fault as the ledger append it is
+        except Exception:
+            pass
         if not complete:
             shutil.rmtree(b, ignore_errors=True)  # no SHA256SUMS: cleanup() could never retire this batch
         raise
@@ -161,16 +205,24 @@ def main():
     try:
         name = stage(new)
     except OSError as e:
-        err = f'staging failed: {type(e).__name__}: {e}'
+        after_sums = getattr(e, 'coord_after_sums', False)
+        if after_sums:
+            err = f'ledger append failed after SHA256SUMS was staged: {type(e).__name__}: {e}'
+            alert_text = (f'cc-reverse-sync FAILED: {err}. The staged batch is complete and will be ingested; '
+                          f'the next run retries and may stage the same files again until the ledger append succeeds.')
+        else:
+            err = f'staging failed: {type(e).__name__}: {e}'
+            alert_text = f'cc-reverse-sync FAILED: {err}. The next run retries.'
+        key = failure_key(e, after_sums)
         flag = STAGING / '.publisher-failed'
         try:
-            seen = flag.read_text().strip() == err
+            seen = flag.read_text().strip() == key.strip()
         except OSError:
             seen = False
         if not seen:
-            alert(f'cc-reverse-sync FAILED: {err}. The next run retries.')
+            alert(alert_text)
             try:
-                flag.write_text(err + '\n')
+                flag.write_text(key + '\n')
             except OSError:
                 pass  # the alert already went out; without the flag the next run may alert again
         print(f'FAILED: {err}')

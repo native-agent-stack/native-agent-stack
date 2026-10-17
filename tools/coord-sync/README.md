@@ -48,17 +48,23 @@ for each one that is not already marked ingested:
    side then deletes the batch and the marker. A later run that finds a marker matching the batch's `SHA256SUMS`
    does nothing for that batch.
 
-A refusal writes **`<batch>.refused`** (the `SHA256SUMS` sha256, the UTC time and the reason), logs one `REFUSED`
-line, alerts once (see below) and **stops the run**: later batches wait until the refused one is resolved and its
-marker removed. While the marker matches the batch's `SHA256SUMS`, reruns return the refusal without re-verifying,
+A refusal writes **`<batch>.refused`** (the `SHA256SUMS` sha256, the UTC time and the reason), alerts once (see
+below; the alert goes before the log line, so a failing log write cannot lose it, and the line then falls back to
+stdout), logs one `REFUSED` line and **stops the run**: later batches wait until the refused one is resolved and
+its `.refused` marker removed. A refusal also removes any **`<batch>.failed`** left by an earlier part-way failure
+of the same batch, and the alert names that flag for removal too if it remains. While the marker matches the batch's `SHA256SUMS`, reruns return the refusal without re-verifying,
 re-logging or re-alerting; a batch whose `SHA256SUMS` changed is verified again. A refusal writes nothing in the run
 that refuses, because verification happens first; files copied into the mirror by an earlier run stay there (each
 matched `SHA256SUMS` when it was copied). A failure part-way through a batch (for example `ENOSPC` while copying, or
 a copy whose hash no longer matches `SHA256SUMS`) writes no ingested or refused marker: instead it writes
-**`<batch>.failed`** (the `SHA256SUMS` sha256, the UTC time and the error), logs one `FAILED` line, alerts once and
-stops the run with exit 2. While the same `SHA256SUMS` and the same error last, reruns retry the batch but do not
-re-log or re-alert; a different error, or a changed `SHA256SUMS`, is reported again, and the flag is removed when
-the batch ingests. Files already copied stay in the mirror. For a copy fault (for example `ENOSPC`) recovery needs
+**`<batch>.failed`** (the `SHA256SUMS` sha256, the UTC time and a normalised fault key: exception type, errno,
+operation and batch-relative path, with per-run temporary file names mapped to their destination), logs one
+`FAILED` line, alerts once and stops the run with exit 2. While the same `SHA256SUMS` and the same normalised
+fault last, reruns retry the batch but do not re-log or re-alert; a different fault (including the same kind of
+fault on a different file), or a changed `SHA256SUMS`, is reported again. The flag must be removed before the
+ingested marker is written: if it cannot be removed, the run fails without writing the marker (for a batch whose
+marker already stands, the stale flag is instead reported once and later batches wait), and once the marker is
+written the summary log is best-effort (stdout fallback), so it cannot recreate the flag. Files already copied stay in the mirror. For a copy fault (for example `ENOSPC`) recovery needs
 no manual step beyond clearing the fault, because the next run retries the same batch, sees the copied files as
 identical and completes it. A copy whose hash no longer matches `SHA256SUMS` is different: the mismatched file is
 never installed, and unless the staged bytes again match `SHA256SUMS` before the next run, that run refuses the batch
@@ -66,8 +72,9 @@ in verification, so it is then resolved like a refusal. One summary line per bat
 to `.sync-ingest.log` in the coordination mirror. Exit 0 when every pending batch ingests or none is pending, 2 when
 a batch is refused or fails part-way, 3 when the staging root is unreadable or when `COORD_SYNC_STAGING` is unset,
 empty, relative or contains `@` (one line naming the variable, before anything is touched). An incomplete batch (no
-`SHA256SUMS` yet), a batch directory that is itself a symlink, and a batch that vanishes before its `SHA256SUMS` is
-hashed are skipped silently.
+`SHA256SUMS` yet), a batch directory that is itself a symlink, and a batch that vanishes at any point before its
+ingested marker is written (before its `SHA256SUMS` is hashed, during verification, or during copying) are skipped
+silently and later batches proceed; files already copied from a vanished batch stay in the mirror.
 
 ## Reverse: NativeHorizonNY to 2604 (`publish_cc_verdicts.py`)
 
@@ -89,8 +96,13 @@ at `/var/tmp/cc-cc-work/<pr>-micro/<file>` at 0400 and writes `<batch>.ingested`
    `SHA256SUMS` last by rename from `SHA256SUMS.tmp`, and only then appends the files to the ledger, so the ledger
    never claims a file whose batch is incomplete. If staging fails before `SHA256SUMS` is renamed into place, the
    incomplete batch directory is removed (cleanup could never retire it) and the ledger is not appended; the run
-   prints one `FAILED` line, alerts once per distinct error (a `.publisher-failed` flag in the staging root, removed
-   by the next successful stage) and the next run retries.
+   prints one `FAILED` line, alerts once per distinct normalised fault (a `.publisher-failed` flag in the staging
+   root holding phase, exception type, errno and batch-relative path with the per-run `STAGING/<UTC>/` prefix
+   stripped, removed by the next successful stage) and the next run retries. If instead the ledger append fails
+   after `SHA256SUMS` is in place, the complete batch stays for ingestion and the failure is reported as a
+   ledger-append failure, not a staging failure; the next run may stage the same files again until the append
+   succeeds, and a ledger line without a whole digest (a truncated append) is ignored rather than treated as a
+   published record.
 
 Exit 0 when there is nothing to do or a batch was staged, 2 when refused or staging fails, 3 when a root is unreadable or when
 `REVERSE_SYNC_STAGING` is unset, empty, relative or contains `@` (one line naming the variable, before anything is
@@ -184,7 +196,7 @@ reinstalling (these templates, or the command center's earlier unit files) resum
 
 ## Tests
 
-`python3 -m unittest tests.test_coord_sync_ingest tests.test_coord_sync_publish` (35 tests, stdlib only). Each test
+`python3 -m unittest tests.test_coord_sync_ingest tests.test_coord_sync_publish` (50 tests, stdlib only). Each test
 runs a script against temporary roots through its environment overrides: all four scopes landing read-only, tampered,
 unlisted, symlinked and out-of-scope batches refusing with nothing written in that run, same-path changes refusing in
 every scope, a refused batch blocking later batches and alerting exactly once, a mid-batch failure logging `FAILED`,
@@ -197,4 +209,11 @@ placeholder, the publish staging root under a missing parent also exiting 3 and 
 staging with `SHA256SUMS` written last, a staging failure removing the incomplete batch, alerting once and staging
 on the next run, cleanup only on a matching marker, the README renderer escaping a literal `%` (and keeping a space)
 in the staging value while preserving the intentional `%h`, a nonzero hcom exit being reported by the publish alert,
-and the alert reaching an off-PATH stub hcom addressed to the CC and the fallback holder.
+a fault carrying a per-run temporary name (ingest) or batch-stamp path (publish) still alerting only once, an
+empty-message fault alerting only once, successive copy mismatches on different files sharing a basename alerting
+separately, a `REFUSED` alert surviving a failing log write, a later refusal clearing an earlier `<batch>.failed`,
+a failed-flag removal failure blocking acknowledgment for both a fresh and an already-ingested batch, a
+success-log failure leaving the ingested state standing, a batch vanishing during verification, the directory
+walk or copying being skipped, a ledger-append failure labelled as such with the complete batch left staged, a
+truncated ledger line ignored, a failed hcom send printed when the ingest log also fails, and the alert reaching
+an off-PATH stub hcom addressed to the CC and the fallback holder.

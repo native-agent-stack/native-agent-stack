@@ -110,6 +110,77 @@ class PublishTests(unittest.TestCase):
         self.assertFalse((self.staging / '.publisher-failed').exists())
         self.assertEqual(len(self.alerts), 1)
 
+    def test_staging_failure_with_per_run_batch_name_alerts_once(self):
+        # Each run stages under a fresh STAGING/<UTC>/ name; the dedup key must strip that prefix.
+        put(self.src / 'uet131-micro/CC-FULL-6d5c8c00.md', 'VERDICT: PASS at 6d5c8c00\n')
+        orig_copy2, orig_utc = self.m.shutil.copy2, self.m.utc
+        stamps = iter(['20261017T050000Z', '20261017T050100Z', '20261017T050200Z'])
+
+        def fake_utc(fmt='%Y-%m-%dT%H:%M:%SZ'):
+            return next(stamps) if fmt == '%Y%m%dT%H%M%SZ' else '2026-10-17T05:00:00Z'
+
+        def failing_copy2(src, dst, *args, **kwargs):
+            e = OSError(28, 'No space left on device', str(src))
+            e.filename2 = str(dst)
+            raise e
+
+        self.m.utc, self.m.shutil.copy2 = fake_utc, failing_copy2
+        try:
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                rc1, rc2 = self.m.main(), self.m.main()
+            flag_text = (self.staging / '.publisher-failed').read_text()
+            self.m.shutil.copy2 = orig_copy2
+            rc3 = self.m.main()
+        finally:
+            self.m.shutil.copy2, self.m.utc = orig_copy2, orig_utc
+        self.assertEqual((rc1, rc2, rc3), (2, 2, 0))
+        self.assertIn('FAILED', out.getvalue())
+        self.assertEqual(len(self.alerts), 1)
+        self.assertNotIn('20261017T050000Z', flag_text)
+        self.assertNotIn('20261017T050100Z', flag_text)
+        self.assertEqual(len(self.batches()), 1)
+        self.assertFalse((self.staging / '.publisher-failed').exists())
+
+    def test_ledger_append_failure_is_labelled_and_batch_stays(self):
+        put(self.src / 'uet131-micro/CC-FULL-6d5c8c00.md', 'VERDICT: PASS at 6d5c8c00\n')
+        orig_copy2 = self.m.shutil.copy2
+
+        def ledger_blocking_copy2(src, dst, *args, **kwargs):
+            result = orig_copy2(src, dst, *args, **kwargs)
+            self.ledger.mkdir(exist_ok=True)  # the append then fails after SHA256SUMS is in place
+            return result
+
+        self.m.shutil.copy2 = ledger_blocking_copy2
+        try:
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                rc = self.m.main()
+        finally:
+            self.m.shutil.copy2 = orig_copy2
+        self.assertEqual(rc, 2)
+        [b] = self.batches()
+        self.assertTrue((b / 'SHA256SUMS').exists())
+        self.assertEqual(len(self.alerts), 1)
+        self.assertIn('ledger append failed', self.alerts[0])
+        self.assertNotIn('staging failed', self.alerts[0])
+        self.assertIn('complete', self.alerts[0])
+        self.assertIn('ledger append failed', out.getvalue())
+        self.ledger.rmdir()
+        (self.staging / f'{b.name}.ingested').write_text(
+            hashlib.sha256((b / 'SHA256SUMS').read_bytes()).hexdigest() + ' 2026-10-17T05:10:00Z\n')
+        self.assertEqual(self.m.main(), 0)
+        self.assertEqual(len(self.ledger.read_text().splitlines()), 1)
+        self.assertFalse((self.staging / '.publisher-failed').exists())
+
+    def test_truncated_ledger_line_is_ignored_not_refused(self):
+        put(self.src / 'a-micro/CC-DELTA-11111111.md', 'one\n')
+        self.ledger.write_text('cc-cc-work/a-micro/CC-DELTA-11111111.md\tabc123\t20200101T000000Z\t2020-01-01T00:00:00Z\n')
+        self.assertEqual(self.m.main(), 0)
+        self.assertEqual(len(self.batches()), 1)
+        self.assertEqual(self.alerts, [])
+        self.assertEqual(len(self.ledger.read_text().splitlines()), 2)
+
     def test_cleanup_removes_only_batches_with_a_matching_marker(self):
         put(self.src / 'a-micro/CC-DELTA-11111111.md', 'one\n')
         self.assertEqual(self.m.main(), 0)

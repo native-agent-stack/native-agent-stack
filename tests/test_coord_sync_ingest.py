@@ -259,6 +259,229 @@ class IngestTests(unittest.TestCase):
         log_text = (self.coord / '.sync-ingest.log').read_text() if (self.coord / '.sync-ingest.log').exists() else ''
         self.assertNotIn('FAILED', log_text)
 
+    def test_temp_name_failure_alerts_once_across_runs(self):
+        # mkstemp names a fresh random temp file each run; the dedup key must map it to the destination.
+        batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+        orig_mkstemp = tempfile.mkstemp
+        runs = []
+
+        def failing_mkstemp(*args, **kwargs):
+            runs.append(1)
+            raise PermissionError(13, 'Permission denied', str(Path(kwargs['dir']) / f'.ingest-run{len(runs)}xxxx'))
+
+        tempfile.mkstemp = failing_mkstemp
+        try:
+            rc1, rc2 = self.m.main(), self.m.main()
+        finally:
+            tempfile.mkstemp = orig_mkstemp
+        self.assertEqual((rc1, rc2), (2, 2))
+        self.assertEqual(len(self.alerts), 1)
+        flag = self.staging / '20261016T205433Z.failed'
+        self.assertTrue(flag.exists())
+        self.assertNotIn('.ingest-run', flag.read_text())
+        failed = [l for l in (self.coord / '.sync-ingest.log').read_text().splitlines() if 'FAILED' in l]
+        self.assertEqual(len(failed), 1)
+        self.assertEqual(self.m.main(), 0)
+        self.assertTrue((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertFalse(flag.exists())
+
+    def test_empty_message_failure_alerts_once(self):
+        batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+
+        def failing_place(src, dst, *args):
+            raise OSError()
+
+        self.m.place = failing_place
+        self.assertEqual(self.m.main(), 2)
+        self.assertEqual(self.m.main(), 2)
+        self.assertEqual(len(self.alerts), 1)
+
+    def test_same_basename_different_files_alert_separately(self):
+        a = 'cc-reads-20261005/alpha-pr1/GPT-VERDICT-aaaaaaaa.md'
+        b_rel = 'cc-reads-20261005/beta-pr2/GPT-VERDICT-aaaaaaaa.md'
+        b = batch(self.staging, '20261016T205433Z', {a: 'alpha\n', b_rel: 'beta\n'})
+        orig_place = self.m.place
+        target = [a]
+
+        def tampering_place(src, dst, *args):
+            if str(src).endswith(target[0]):
+                Path(src).write_text('evil\n')
+            return orig_place(src, dst, *args)
+
+        self.m.place = tampering_place
+        self.assertEqual(self.m.main(), 2)
+        self.assertEqual(len(self.alerts), 1)
+        self.assertEqual(self.written(), [])
+        (b / a).write_text('alpha\n')  # the first file is restored; the second then fails instead
+        target[0] = b_rel
+        self.assertEqual(self.m.main(), 2)
+        self.assertEqual(len(self.alerts), 2)
+        self.assertIn(b_rel, self.alerts[1])
+        self.assertEqual(self.written(), [a])
+
+    def test_refusal_alert_survives_log_failure(self):
+        b = batch(self.staging, '20261016T205433Z', {GPT: 'a\n'})
+        (b / GPT).write_text('tampered\n')
+
+        def failing_log(line):
+            raise OSError('injected log failure')
+
+        self.m.log = failing_log
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rc1, rc2 = self.m.main(), self.m.main()
+        self.assertEqual((rc1, rc2), (2, 2))
+        self.assertEqual(len(self.alerts), 1)
+        self.assertIn('REFUSED', self.alerts[0])
+        self.assertIn('.refused', self.alerts[0])
+        self.assertNotIn('FAILED', self.alerts[0])
+        self.assertIn('REFUSED', out.getvalue())
+        self.assertTrue((self.staging / '20261016T205433Z.refused').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.failed').exists())
+
+    def test_failed_flag_cleared_when_batch_later_refuses(self):
+        b = batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+        orig_place = self.m.place
+
+        def failing_place(src, dst, *args):
+            raise OSError('injected copy failure')
+
+        self.m.place = failing_place
+        self.assertEqual(self.m.main(), 2)
+        self.assertTrue((self.staging / '20261016T205433Z.failed').exists())
+        self.m.place = orig_place
+        (b / GPT).write_text('tampered\n')
+        self.assertEqual(self.m.main(), 2)
+        self.assertTrue((self.staging / '20261016T205433Z.refused').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.failed').exists())
+        self.assertEqual(len(self.alerts), 2)
+        self.assertIn('.failed', self.alerts[1])
+
+    def test_flag_removal_failure_blocks_fresh_ingest_acknowledgement(self):
+        batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+        flag = self.staging / '20261016T205433Z.failed'
+        flag.write_text('deadbeef 2026-01-01T00:00:00Z old fault\n')
+        cls, orig_unlink = type(flag), type(flag).unlink
+
+        def denying_unlink(self, *args, **kwargs):
+            if str(self).endswith('.failed'):
+                raise PermissionError(13, 'Permission denied', str(self))
+            return orig_unlink(self, *args, **kwargs)
+
+        cls.unlink = denying_unlink
+        try:
+            rc = self.m.main()
+        finally:
+            cls.unlink = orig_unlink
+        self.assertEqual(rc, 2)
+        self.assertFalse((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertTrue(flag.exists())
+        self.assertEqual(self.written(), [GPT])
+        self.assertEqual(len(self.alerts), 1)
+        self.assertEqual(self.m.main(), 0)
+        self.assertTrue((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertFalse(flag.exists())
+        self.assertEqual(len(self.alerts), 1)
+
+    def test_flag_removal_failure_on_ingested_batch_is_reported(self):
+        batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+        self.assertEqual(self.m.main(), 0)
+        flag = self.staging / '20261016T205433Z.failed'
+        flag.write_text('deadbeef 2026-01-01T00:00:00Z stale fault\n')
+        cls, orig_unlink = type(flag), type(flag).unlink
+
+        def denying_unlink(self, *args, **kwargs):
+            if str(self).endswith('.failed'):
+                raise PermissionError(13, 'Permission denied', str(self))
+            return orig_unlink(self, *args, **kwargs)
+
+        cls.unlink = denying_unlink
+        try:
+            rc1, rc2 = self.m.main(), self.m.main()
+        finally:
+            cls.unlink = orig_unlink
+        self.assertEqual((rc1, rc2), (2, 2))
+        self.assertEqual(len(self.alerts), 1)
+        self.assertIn('already ingested', self.alerts[0])
+        self.assertNotIn('No ingested marker was written', self.alerts[0])
+        self.assertTrue((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertTrue(flag.exists())
+        self.assertEqual(self.m.main(), 0)
+        self.assertFalse(flag.exists())
+
+    def test_success_log_failure_keeps_ingested_state(self):
+        batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+
+        def failing_log(line):
+            raise OSError('injected log failure')
+
+        self.m.log = failing_log
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rc = self.m.main()
+        self.assertEqual(rc, 0)
+        self.assertTrue((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.failed').exists())
+        self.assertEqual(self.alerts, [])
+        self.assertIn('INGESTED', out.getvalue())
+
+    def test_batch_vanishing_during_verify_is_skipped(self):
+        b = batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+        batch(self.staging, '20261016T210000Z', {TCC: 'later\n'})
+        orig_sha256 = self.m.sha256
+
+        def vanishing_sha256(path):
+            if Path(path) == b / GPT and b.exists():
+                shutil.rmtree(b)
+            return orig_sha256(path)
+
+        self.m.sha256 = vanishing_sha256
+        self.assertEqual(self.m.main(), 0)
+        self.assertEqual(self.written(), [TCC])
+        self.assertEqual(self.alerts, [])
+        self.assertFalse((self.staging / '20261016T205433Z.failed').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.refused').exists())
+
+    def test_batch_vanishing_during_walk_is_not_refused(self):
+        b = batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+        batch(self.staging, '20261016T210000Z', {TCC: 'later\n'})
+        orig_walk = os.walk
+
+        def vanishing_walk(top, *args, **kwargs):
+            if Path(top) == b and b.exists():
+                shutil.rmtree(b)
+            yield from orig_walk(top, *args, **kwargs)
+
+        os.walk = vanishing_walk
+        try:
+            rc = self.m.main()
+        finally:
+            os.walk = orig_walk
+        self.assertEqual(rc, 0)
+        self.assertEqual(self.written(), [TCC])
+        self.assertEqual(self.alerts, [])
+        self.assertFalse((self.staging / '20261016T205433Z.failed').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.refused').exists())
+
+    def test_batch_vanishing_during_copy_is_skipped(self):
+        b = batch(self.staging, '20261016T205433Z', {GPT: 'g\n', TCC: 't\n'})
+        batch(self.staging, '20261016T210000Z', {MIC: 'later\n'})
+        orig_place = self.m.place
+
+        def vanishing_place(src, dst, *args):
+            if Path(src) == b / TCC and b.exists():
+                shutil.rmtree(b)
+            return orig_place(src, dst, *args)
+
+        self.m.place = vanishing_place
+        self.assertEqual(self.m.main(), 0)
+        self.assertEqual(self.written(), sorted([GPT, MIC]))
+        self.assertEqual(self.alerts, [])
+        self.assertFalse((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.failed').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.refused').exists())
+        self.assertTrue((self.staging / '20261016T210000Z.ingested').exists())
+
     def test_symlinked_batch_directory_is_skipped(self):
         target_root = Path(self.tmp.name) / 'elsewhere'
         target_root.mkdir()
@@ -400,6 +623,35 @@ class AlertTests(unittest.TestCase):
             self.assertEqual(argv[:3], ['send', '@nhny-gino', '@nami'])  # dula closed (#2427); the co-op holds the fallback
             self.assertNotIn('@dula', argv)
             self.assertEqual(argv[-1], 'probe text')
+
+    def test_alert_send_failure_is_printed_when_log_fails(self):
+        with tempfile.TemporaryDirectory() as t:
+            home = Path(t)
+            stub = home / '.local/bin/hcom'
+            stub.parent.mkdir(parents=True)
+            stub.write_text('#!/bin/sh\nexit 7\n')
+            stub.chmod(0o755)
+            saved = {k: os.environ.get(k) for k in ('PATH', 'HOME', 'COORD_SYNC_NO_ALERT')}
+            out = io.StringIO()
+            try:
+                m = load(home / 'staging', home / 'coord')
+                os.environ.update(PATH='/usr/bin:/bin', HOME=str(home))
+                os.environ['COORD_SYNC_NO_ALERT'] = '0'
+
+                def failing_log(line):
+                    raise OSError('injected log failure')
+
+                m.log = failing_log
+                with contextlib.redirect_stdout(out):
+                    m.alert('probe text')
+            finally:
+                for k, v in saved.items():
+                    if v is None:
+                        os.environ.pop(k, None)
+                    else:
+                        os.environ[k] = v
+            self.assertIn('ALERT send failed', out.getvalue())
+            self.assertIn('7', out.getvalue())
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
