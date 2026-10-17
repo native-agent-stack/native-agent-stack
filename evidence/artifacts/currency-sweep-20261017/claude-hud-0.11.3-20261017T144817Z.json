@@ -243,7 +243,12 @@
     "stderr_head": ""
    },
    {
-    "label": "B0 marketplace update (the host's v0.11.2 move saw 'Marketplace not found' here)",
+    "label": "S1 settings edit: extraKnownMarketplaces.claude-hud.source.ref v0.11.2 -> v0.11.3 in the isolated settings.json (a file edit, no command)",
+    "exit": 0,
+    "position": "between A2 and B0. The private original did not time-stamp the edit; the position follows from the state blocks (ref v0.11.2 after phase A, v0.11.3 after phase B, the tagged add does not write the ref itself: without S1 it fails, see b0_cause_reproduction) and from the reproduction in b0_cause_reproduction, where B0 fails exactly when the edit precedes it"
+   },
+   {
+    "label": "B0 marketplace update (after S1; the host's v0.11.2 move saw 'Marketplace not found' here)",
     "exit": 1,
     "seconds": 0.2,
     "stdout_head": "Updating marketplace: claude-hud...",
@@ -271,7 +276,7 @@
     "stderr_head": ""
    }
   ],
-  "note": "B0 is the step the host's v0.11.2 move reported as 'Marketplace not found': the refresh of a marketplace that is not yet on disk fails; the tagged add then works",
+  "note": "B0 fails with \"Marketplace 'claude-hud' not found\" although known_marketplaces.json lists claude-hud with an installLocation (state_after_phase_A_v0_11_2). Cause, reproduced by the fold's second run (b0_cause_reproduction): the settings declaration (ref v0.11.3, after S1) no longer matches the source recorded for the marketplace on disk (ref v0.11.2); without S1, B0 succeeds. The tagged add then works because it matches the declaration. The client's internal check was not read; this is an observed condition, not a source-level explanation.",
   "state_after_phase_A_v0_11_2": {
    "cache_versions": [
     "0.11.2"
@@ -362,6 +367,27 @@
      }
     }
    }
+  },
+  "b0_cause_reproduction": {
+   "recorded_utc": "2026-10-17T17:27:21Z",
+   "client": "2.1.302 (Claude Code), the version of the run above",
+   "isolation": "HOME and CLAUDE_CONFIG_DIR in scratch (<scratch>); the live ~/.claude, ~/.claude.json and plugin cache not read or written",
+   "run_without_S1": {
+    "A1": 0,
+    "A2": 0,
+    "B0_marketplace_update": "exit 0, 'Successfully updated marketplace: claude-hud'",
+    "B1_tagged_add_v0_11_3": "fails: 'its source doesn't match its extraKnownMarketplaces entry in user or managed settings; add it from the source that entry lists, or change the entry' (the settings ref must be edited first)"
+   },
+   "run_with_S1_between_A2_and_B0": {
+    "A1": 0,
+    "A2": 0,
+    "S1": "settings ref edited to v0.11.3; known_marketplaces.json still records v0.11.2",
+    "B0_marketplace_update": "exit 1, \"Marketplace 'claude-hud' not found. Available marketplaces: anthropic-plugin-directory\"",
+    "B1_tagged_add_v0_11_3": "exit 0",
+    "B2_install": "exit 0",
+    "B3_update": "exit 0, 'updated from 0.11.2 to 0.11.3'"
+   },
+   "meaning": "the documented upgrade order (edit the settings ref, then marketplace update, then plugin update) fails at the marketplace update on this client; the working order is the settings edit, then the tagged marketplace add, then install and plugin update"
   }
  },
  "verification": {
@@ -416,6 +442,14 @@
   "of": "claude-hud-0.11.3-20261017T144817Z.json (written by the fold of PR #1243; private original kept on the host)",
   "subject": "claude-hud v0.11.3 through the tagged marketplace route, run in an isolated config directory",
   "sanitized": "account name, home paths, a lane builder's name, session names, scratch paths and private record locations are replaced by placeholders; every digest kept is a digest of public bytes",
-  "private_original_name": "claude-hud-0.11.3-20261017T144817Z.json"
+  "private_original_name": "claude-hud-0.11.3-20261017T144817Z.json",
+  "amended_by_the_second_fold": {
+   "blocks": [
+    "smoke.steps S1",
+    "smoke.note",
+    "smoke.b0_cause_reproduction"
+   ],
+   "why": "the review of the fold (F1, F8) found the settings edit missing as a step and the 'not yet on disk' explanation of B0 contradicted by the receipt's own state"
+  }
  }
 }

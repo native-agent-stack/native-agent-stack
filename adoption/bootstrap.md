@@ -695,33 +695,44 @@ GitHub-hosted macOS runner; see
    claude plugin install codex@openai-codex --scope user --json
    ```
 
-   **Upgrade an existing claude-hud installation (0.8.0, or 0.10.0 or 0.11.2 before 2026-10-17):** first apply the
+   **Upgrade an existing claude-hud installation (0.8.0, 0.10.0, or 0.11.2 on 2026-10-17):** first apply the
    template's `extraKnownMarketplaces.claude-hud.source.ref` value `v0.11.3`
    in the host's user settings, retaining the other marketplace declarations.
    [The loading reference](https://code.claude.com/docs/en/plugins/loading#plugins-and-marketplaces-that-arent-on-disk-at-session-start)
    documents re-fetching a changed declared source at the next native session
-   start. Let that synchronization finish before updating. A marketplace
+   start. Let that synchronization finish before the next step. A marketplace
    refresh follows its configured tag; it does not advance a source that still
    names `v0.8.0` ([CLI reference](https://code.claude.com/docs/en/plugins/cli-reference#plugin-marketplace-update)).
-   Then refresh the retargeted marketplace and update the installed plugin:
+   Then re-add the marketplace at the tag, install and update the plugin (the
+   route that ran on a host and in isolation, below):
    ```sh
-   claude plugin marketplace update claude-hud
-   claude plugin update claude-hud@claude-hud --scope user
+   claude plugin marketplace add jarrodwatts/claude-hud@v0.11.3 --scope user
+   claude plugin install claude-hud@claude-hud --scope user --json
+   claude plugin update claude-hud@claude-hud
    ```
-   These are separate steps: the shell marketplace command refreshes the
-   listing, and the plugin command updates the installed plugin
+   Do not put `claude plugin marketplace update claude-hud` first: after the
+   settings edit it failed with "Marketplace 'claude-hud' not found" on the host's
+   v0.11.2 move and on both isolated runs that edited the settings first, although in
+   those runs the marketplace was on disk. The condition that reproduces it is a settings declaration that no
+   longer matches the source recorded for the marketplace on disk (the isolated
+   run without the settings edit refreshes fine, and its tagged add then fails
+   with "its source doesn't match its extraKnownMarketplaces entry"); the client's
+   own check was not read, so the cause is established as that condition only
+   ([receipt](../evidence/artifacts/currency-sweep-20261017/claude-hud-0.11.3-20261017T144817Z.json), `smoke.b0_cause_reproduction`).
+   The shell marketplace command refreshes the listing and the plugin command
+   updates the installed plugin
    ([Update plugins now](https://code.claude.com/docs/en/plugins/install#update-plugins-now)).
    Restart Claude Code or run `/reload-plugins`, then use the revision check
    below to compare the installed `gitCommitSha` with `5621429b84ea2503185221244c43a06797bfd05e`.
-   Status: **documented, host verification pending**. R642b checked the native
-   2.1.288 command help with both `HOME` and `CLAUDE_CONFIG_DIR` in temporary
-   directories; it did not execute a marketplace or plugin update. A safe
-   offline reproduction of the GitHub-tag transition remains unverified.
-   Main's [2026-10-04 host receipt and limitations](../evidence/receipts/claude-hud-0100-qualification-20261004.json)
+   Status: the tagged add, install and plugin update are verified on a host (the
+   v0.11.2 move) and in isolation (v0.11.3), both below; the marketplace-update-first
+   order is not a route. R642b checked the native 2.1.288 command help with both
+   `HOME` and `CLAUDE_CONFIG_DIR` in temporary directories and executed no marketplace
+   or plugin update. Main's [2026-10-04 host receipt and limitations](../evidence/receipts/claude-hud-0100-qualification-20261004.json)
    record the observed path after a tagged marketplace add failed on the old
    source entry: the host ran `claude plugin marketplace remove claude-hud`,
    repeated the tagged add and ran `claude plugin install claude-hud@claude-hud --scope user --json`
-   successfully; W1's marketplace-update/plugin-update path above remains unverified.
+   successfully.
 
    The 2026-10-17 move from v0.10.0 to v0.11.2 (v0.11.1's fix for
    [GHSA-fq7j-8hxj-jfqh](https://github.com/jarrodwatts/claude-hud/security/advisories/GHSA-fq7j-8hxj-jfqh): a repository whose git
@@ -734,8 +745,8 @@ GitHub-hosted macOS runner; see
 
    The same day the pin moved on to v0.11.3 (published 2026-10-17T00:42:18Z, before that host move; a fix for background agents that stay marked running; no security content, and the
    hardening of `dist/git.js` is unchanged). v0.11.3's tag is lightweight, so it points straight at the commit the release was cut from, `5621429b84ea2503185221244c43a06797bfd05e`. The route was run for it in an isolated
-   config directory (`HOME` and `CLAUDE_CONFIG_DIR` in scratch, so no user settings were touched), from the state of the host above: `claude plugin marketplace update claude-hud` failed again
-   ("Marketplace 'claude-hud' not found"); the tagged `claude plugin marketplace add jarrodwatts/claude-hud@v0.11.3 --scope user`, `claude plugin install claude-hud@claude-hud --scope user --json` and
+   config directory (`HOME` and `CLAUDE_CONFIG_DIR` in scratch, so no user settings were touched): the v0.11.2 add and install, the settings edit to v0.11.3 (a recorded step), then `claude plugin marketplace update claude-hud`
+   failed again ("Marketplace 'claude-hud' not found"; a second isolated run without the edit refreshed fine and then refused the tagged add); the tagged `claude plugin marketplace add jarrodwatts/claude-hud@v0.11.3 --scope user`, `claude plugin install claude-hud@claude-hud --scope user --json` and
    `claude plugin update claude-hud@claude-hud` each returned 0, and the installed `gitCommitSha` is that commit
    ([route record](../evidence/artifacts/currency-sweep-20261017/claude-hud-0.11.3-20261017T144817Z.json)). That record also holds the commands for the host, which still runs v0.11.2 until the command center applies them.
 

@@ -12,10 +12,10 @@
   "link_mtime_utc": "2026-10-17T04:21:11Z (ls -l --time-style of bin/rtk read by this sweep)",
   "lane_builder_receipt": "<lane builder upgrade records (private)>/<receipt notes> (sections '(G6) ... RTK screened and trialed' and '(G6b) RTK switched to rtk-oss 1.0.1: DONE')",
   "lane_builder_scripts_and_logs": [
-   "<lane builder upgrade records (private)>/22-rtk-trial.sh",
-   "<lane builder upgrade records (private)>/22-rtk-trial-20261017T041859Z.log",
-   "<lane builder upgrade records (private)>/24-rtk-oss-switch.sh",
-   "<lane builder upgrade records (private)>/24-rtk-oss-switch-20261017T042111Z.log"
+   "<lane builder script (private)>",
+   "<lane builder log (private)>",
+   "<lane builder script (private)>",
+   "<lane builder log (private)>"
   ],
   "tracker": "<command-center tracker (private)>:847-848",
   "lane_builder_trial": "36 PreToolUse payloads (18 commands through rtk hook claude and rtk hook codex) gave identical decisions 36 of 36 against 0.51.0",

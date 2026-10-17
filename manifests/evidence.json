@@ -5482,8 +5482,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "3bb991aec4b73665c09abb4549db3e4f80a72c51f875e33de0caa064503bb009",
-      "bytes": 76895
+      "sha256": "852802c73e3137eb3048951eb0fc6baea6cda2cda074fe58190c26e7110f6faa",
+      "bytes": 77932
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5617,13 +5617,13 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "8589ba1933ce1589a817ae6d69a713f7c0ee30c14e3fa0db3297621d05431ffb",
-      "bytes": 268256
+      "sha256": "abbea7713de2719ad65b072e759ffadc4ed6fa6c3bd846164cff73355e577e06",
+      "bytes": 269436
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "2f2af980578eac21e4fb6225515e987e8a268fb6c526a57832f594d9c2a7c700",
-      "bytes": 28910
+      "sha256": "661f016a17ffa49831b0ff2481d92b55a304fe2a43ddc3ad7634febe51427d46",
+      "bytes": 29022
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
@@ -19463,8 +19463,8 @@
     },
     {
       "path": "docs/decisions/2026-10-17-currency-sweep-repin.md",
-      "sha256": "08fa6d9e5040bbd4afac96f7f2356df470ceb0d5b7a49c42ce12254516056135",
-      "bytes": 27179
+      "sha256": "fd276f3c392fd75dd17a688ee6e177ff3c277046eb48d6ea0fb67995db39c33c",
+      "bytes": 30434
     },
     {
       "path": "docs/decisions/2026-10-17-zero-tolerance-currency.md",
@@ -19838,13 +19838,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "338077c0711891bc3159e3c326e6a22c1a152a0f878c377bf373f407fe611067",
-      "bytes": 704972
+      "sha256": "fc084659740ea5d543c592ae6a9a9ca85b2a69ba7b6b3e1340ad5d6353a40fcc",
+      "bytes": 706152
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "f1417f93594b137f8833f197880b2756515fef1d7d74310e3837f427dd6d5c02",
-      "bytes": 375151
+      "sha256": "b07ab00fc67df4f55e24b5527f36ebd13864c04ba9a3394efb4b0f9464f42fc6",
+      "bytes": 376331
     },
     {
       "path": "docs/next-host-stages.md",
@@ -22653,8 +22653,8 @@
     },
     {
       "path": "evidence/artifacts/currency-sweep-20261017/claude-hud-0.11.3-20261017T144817Z.json",
-      "sha256": "98e9bf423a5634125dfe7d68b7b2f3341f1d17d9945ba4d389f4d08b3b5b6213",
-      "bytes": 14046
+      "sha256": "af45295eeb4c1f2e3ada0a2bb4c530f12f8f8e63ce11dba3d1f6dcb8af0ed4d6",
+      "bytes": 16643
     },
     {
       "path": "evidence/artifacts/currency-sweep-20261017/currency-chrome-devtools-mcp-20261017T083216Z.json",
@@ -22693,8 +22693,8 @@
     },
     {
       "path": "evidence/artifacts/currency-sweep-20261017/currency-rtk-20261017T081134Z.json",
-      "sha256": "e748563b9db48a9b69984ec6b16994d210208703b844e623c5285aa9945204ba",
-      "bytes": 90640
+      "sha256": "9a0c6ab45e99027429712351320acb80439bf685b02afcdd069b579902a74d74",
+      "bytes": 90488
     },
     {
       "path": "evidence/artifacts/currency-sweep-20261017/currency-semble-20261017T082840Z.json",
@@ -22708,8 +22708,8 @@
     },
     {
       "path": "evidence/artifacts/currency-sweep-20261017/currency-socraticode-20261017T083215Z.json",
-      "sha256": "d41b19707ef1218e6cce13a751df4cbaf20f5d79283fe7f467af2b2a190649ca",
-      "bytes": 12550
+      "sha256": "2a3e42d9ac926115fbf0866a6df21b80237cf68daf6958c9a6c5ae755d34b9aa",
+      "bytes": 15311
     },
     {
       "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/move-hold-judges.json",
@@ -44833,8 +44833,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "b608bb1a679ed4c4e147f78adcb7099a649a17d8dff5df46834f6291ea11ca9f",
-      "bytes": 84238
+      "sha256": "842aa53ab77a41f599770a122b0e6a1ce62a7e923b7d844b70e91cfe623ced18",
+      "bytes": 85211
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",

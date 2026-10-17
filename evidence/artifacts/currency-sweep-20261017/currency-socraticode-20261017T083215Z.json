@@ -177,6 +177,12 @@
    ],
    "from_private_addendum": "currency-fold-digests-20261017T144813Z.json",
    "why": "the verdict on PR #1243 asked that each public receipt carry the registry's own digests, the locally computed digests of the same bytes and how the source commit was resolved"
+  },
+  "amended_by_the_second_fold": {
+   "blocks": [
+    "no_buffer_command_scratch_run"
+   ],
+   "why": "the review of the fold (F7) found that the no-buffer install command had never been run and that the audited tree came from the --before command"
   }
  },
  "digest_comparison": {
@@ -288,5 +294,51 @@
   "tag_commit": "eb94e073cb8aa80d08fd56c8aecfe7f2fa065be8",
   "tag_commit_equals_profile_or_recorded_commit": true,
   "method": "git ls-remote https://github.com/<repo>.git refs/tags/<tag> refs/tags/<tag>^{} (an annotated tag lists its object and, peeled, its commit; a lightweight tag lists only the commit); for npm packages the version document's gitHead and, when it differs from the tag commit, the GitHub compare API between the two"
+ },
+ "no_buffer_command_scratch_run": {
+  "read_utc": "2026-10-17T17:26:29Z",
+  "why": "the profile row's install command carries no --before, but the install and the audit above ran the lane builder's command, which did (verdict F7). This block records the exact row command run in a scratch prefix, its audit, and a comparison of the resolved tree with the --before tree.",
+  "row_command": "npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.16.1\" --ignore-scripts socraticode@1.16.1",
+  "ran": "the row command with --prefix <scratch>/nobuf in place of the tools prefix and a scratch HOME and npm cache; the comparison tree used the same command with --before=2026-10-16T02:43:00Z and --prefix <scratch>/before",
+  "node": "v24.22.0",
+  "npm": "11.19.1",
+  "install_exit": {
+   "without_before": 0,
+   "with_before": 0
+  },
+  "tree_comparison": {
+   "method": "every package directory under lib/node_modules (scoped packages included): relative path and the version in its package.json, compared as two maps",
+   "package_directories": {
+    "without_before": 188,
+    "with_before": 188
+   },
+   "differences": 0,
+   "meaning": "on 2026-10-17 the no-buffer command resolves the same 188 package versions as the --before command; the audited tree and the no-buffer tree are one tree for this release (a later install may resolve newer dependency releases, which is what the zero-tolerance record asks for)"
+  },
+  "npm_audit_signatures": {
+   "without_before": {
+    "cwd": "<scratch>/nobuf/lib",
+    "exit": 0,
+    "audited_packages": "187",
+    "verified_registry_signatures": "187",
+    "verified_attestations": "19"
+   },
+   "with_before": {
+    "cwd": "<scratch>/before/lib",
+    "exit": 0,
+    "audited_packages": "187",
+    "verified_registry_signatures": "187",
+    "verified_attestations": "19"
+   },
+   "project_form_check": {
+    "command": "npm install --ignore-scripts socraticode@1.16.1 into an empty scratch project, then npm audit signatures",
+    "exit": 0,
+    "audited_packages": "188",
+    "verified_registry_signatures": "188",
+    "verified_attestations": "19"
+   },
+   "count_note": "a global-prefix audit counts the 187 dependencies; socraticode itself is the 188th, which the project form counts: 188 here equals the 188 of the audit above, which was taken on the --before tree"
+  },
+  "tarball_note": "the registry's sha512 and sha1 of socraticode-1.16.1.tgz and the installed-bytes match are in provenance above; this scratch install was not byte-compared again"
  }
 }

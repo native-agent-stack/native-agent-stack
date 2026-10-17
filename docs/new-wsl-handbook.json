@@ -7891,7 +7891,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "8589ba1933ce1589a817ae6d69a713f7c0ee30c14e3fa0db3297621d05431ffb"
+      "sha256": "abbea7713de2719ad65b072e759ffadc4ed6fa6c3bd846164cff73355e577e06"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -8991,7 +8991,7 @@
       "blocking_gaps": [
         "Package pin is verified; Codex/Claude plugin pinning, Docker and embedding-provider configuration remain comparison prerequisites.",
         "The source recommendation installs a native plugin. A pin-matching plugin install is unresolved; a global npm install is not established by the reviewed primary README.",
-        "The plan's code-search row installs 1.15.0 into tools/socraticode-1.15.0 and the client map's two dist/index.js path entries (asserted by tests/test_new_wsl_client_config.py) point at that prefix, so they stay at 1.15.0 until the install-plan carriers are amended in their own change. Both clients on the host already run tools/socraticode-1.16.1."
+        "The plan's code-search row installs 1.15.0 into tools/socraticode-1.15.0 and the client map's two dist/index.js path entries (asserted by tests/test_new_wsl_client_config.py) point at that prefix, so they stay at 1.15.0 until the install-plan carriers are amended in their own change. Both clients on the host already run tools/socraticode-1.16.1. The same carriers also keep the age buffer of ours that this row's command drops: install.sh and install-plan.json of evidence/artifacts/new-wsl-install-plan-20261002 install SocratiCode 1.15.0 with --before=2026-09-24T12:00:00Z, and the handbook's dated layer table names it; a fresh install through the plan keeps the buffer until they are amended in their own change."
       ],
       "checksum": {
         "algorithm": "sha256",
@@ -9708,7 +9708,7 @@
         "RTK"
       ],
       "blocking_gaps": [
-        "Owed before the plan's Codex hook trust step accepts this pin: tools/adoption/codex_hook_trust.py refuses an rtk whose version differs from the one tools/adoption/exec_rules_reviewed.json was reviewed for (0.51.0). Re-derive rtk-rewrite-heads at v1.0.1 and re-review that entry; 0.52.0 and later also rewrite the inner command of quoted sh, bash and zsh -c wrappers (measured: bash -c 'git status' becomes bash -c 'rtk git status').",
+        "Owed before the plan's Codex hook trust step accepts this pin: tools/adoption/codex_hook_trust.py refuses an rtk whose version differs from the one tools/adoption/exec_rules_reviewed.json was reviewed for (0.51.0). Re-derive rtk-rewrite-heads at v1.0.1 and re-review that entry; 0.52.0 and later also rewrite the inner command of quoted sh, bash and zsh -c wrappers (measured: bash -c 'git status' becomes bash -c 'rtk git status'). tools/adoption/runtime_profiles.py:562 (the pi and opencode profile build) also compares rtk --version and the source checkout's commit with 0.51.0 and e001f773 and raises 'RTK installer/source version mismatch' for any other pin; it is routed with this review, as its own change.",
         "The plan's install artifacts (evidence/artifacts/new-wsl-install-plan-20261002) and adoption/pins-linux-x86_64.json still carry 0.51.0 until the install-plan carriers are amended in their own change."
       ],
       "checksum": {
@@ -12236,7 +12236,7 @@
         "codebase-memory-mcp"
       ],
       "blocking_gaps": [
-        "Held at 0.11.0: v0.12.1 is staged and verified (hashes agree four ways; gh release verify and verify-asset pass) but not activated. Upstream README v0.12.1 :155 requires every active CBM process to run the exact same version, build, coordination ABI and cache root; :157-159 documents the native install, update and uninstall commands as the coordinated exception, which stops running sessions. Measured on copies in an isolated namespace: on this host's layout (bin/codebase-memory-mcp is a symlink into tools/codebase-memory-mcp-0.11.0) that route refuses at staging ('target-entry-snapshot'); on a regular-file layout it stops every running session and appends a PATH line to the user's shell profile. The switch therefore needs a layout change and the command center's choice of moment; evidence/artifacts/currency-sweep-20261017/currency-codebase-memory-mcp-native-route-20261017T144817Z.json holds the command."
+        "Held at 0.11.0: v0.12.1 is staged and verified (hashes agree four ways; gh release verify and verify-asset pass) but not activated. Upstream README v0.12.1 :155 requires every active CBM process to run the exact same version, build, coordination ABI and cache root; :157-159 documents the native install, update and uninstall commands as the coordinated exception, which stops running sessions. Measured on copies in an isolated namespace: on this host's layout (bin/codebase-memory-mcp is a symlink into tools/codebase-memory-mcp-0.11.0) that route refuses at staging ('target-entry-snapshot'); on a regular-file layout it stops every running session and appends a PATH line to the user's shell profile. The older route needs no layout change and stays valid when no codebase-memory process is running: relink with ln -s and mv -T (switch_when_ready in evidence/artifacts/currency-sweep-20261017/currency-codebase-memory-mcp-20261017T080146Z.json); only upstream's native route needs the regular-file layout. The coordination condition of the native route held on a regular-file layout, so the hold rests on the remit reading in docs/decisions/2026-10-17-currency-sweep-repin.md (stopping sessions and editing a shell profile are not a builder's to do), and the switch waits for the command center's choice of moment; evidence/artifacts/currency-sweep-20261017/currency-codebase-memory-mcp-native-route-20261017T144817Z.json holds the command."
       ],
       "checksum": {
         "algorithm": "sha256",

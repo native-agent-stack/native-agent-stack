@@ -3,13 +3,13 @@
 The A2 stage-1 audit (G3-01, G3-05, G3-09 to G3-12) listed stale tools on the NativeHorizonNY host. This record re-pins seven rows of the new-WSL plan to the versions the host runs after that list
 was worked, moves the claude-hud marketplace tag to the newest release, v0.11.3 (the host itself runs v0.11.2 until the command center applies it), and keeps what was verified, switched, left and
 found. It applies [the zero-tolerance record](2026-10-17-zero-tolerance-currency.md): a stale pick starts replacement at once, and only an upstream's own documented cooldown window still applies
-(`:27`, `:52-57`). No age buffer of ours applied, and the one the SocratiCode row carried, an install command with `--before=` set 24 hours ahead of the install, is dropped. For each upstream the
+(`:27`, `:52-57`). No age buffer of ours applied, and the one the SocratiCode row carried, an install command with `--before=` set 24 hours ahead of the install, is dropped; the exact command without it was run in a scratch prefix and resolves the same 188 package versions as the `--before` command, with `npm audit signatures` clean on both (the receipt's `no_buffer_command_scratch_run` block; the host's install and the receipt's first audit ran the `--before` command). For each upstream the
 release notes and README were read for such a window, and its SECURITY file where it has one (Serena and semble have none); none documents one for consumers (the two hits are
 vulnerability-disclosure embargoes).
 
 The private receipts are kept on the host; their public copies, with the account, home paths and private locators replaced by placeholders and with only digests of public bytes, are in
 [`evidence/artifacts/currency-sweep-20261017/`](../../evidence/artifacts/currency-sweep-20261017/). The fold that answered the review of this change added to the public receipt of each re-pinned tool a `digest_comparison` and a `source_commit_resolution` block, taken from a
-new private addendum, and added the receipts of the claude-hud v0.11.3 route, the Headroom recheck and the codebase-memory-mcp measurement.
+new private addendum, and added the receipts of the claude-hud v0.11.3 route, the Headroom recheck and the codebase-memory-mcp measurement. A second fold answered the review of that fold (F1 to F12): the RTK receipt's private script and log names are placeholders, the SocratiCode no-buffer command was run in scratch, the claude-hud route record gained its settings-edit step and a reproduced cause for the failed marketplace update, and the carriers and wording named below were corrected or listed as left.
 
 ## What moved
 
@@ -100,7 +100,7 @@ A history database written by 1.0.1 is read and appended by 0.51.0 and read back
   the tag); on a regular-file layout it drained the running session (exit 0 in about 2.8 s, `cohort drained`), activated 0.12.1 and appended the install directory to the user's `~/.profile`
   (also with the directory already on `PATH` and with `--skip-config`). Switching by that route here therefore means converting the active entry from a versioned link to a regular file, stopping every
   running CBM session of every agent, and editing a user shell profile. None of that is within a builder's remit (it may not stop processes it did not start or edit user configuration), so the
-  switch stays with the command center, which has the verified command and its rollback in the receipt. Index format moves 1 to 2: each existing project index is rebuilt in full once at its next index; the old graph keeps answering until then. Live indexes: _config.db 0 MB, native-agent-stack.db 1741 MB, us-equities-trading.db 476 MB.
+  switch stays with the command center, which has the verified command and its rollback in the receipt. That is a remit reading, not a failed condition: the native route's coordination condition (it drains running sessions) held on a regular-file layout. The older route needs no layout change: once no codebase-memory process runs, `ln -s` and `mv -T` relink `bin/codebase-memory-mcp` to `tools/codebase-memory-mcp-0.12.1/` ([the older receipt's `switch_when_ready`](../../evidence/artifacts/currency-sweep-20261017/currency-codebase-memory-mcp-20261017T080146Z.json)); only the native route needs the regular-file layout. Index format moves 1 to 2: each existing project index is rebuilt in full once at its next index; the old graph keeps answering until then. Live indexes: _config.db 0 MB, native-agent-stack.db 1741 MB, us-equities-trading.db 476 MB.
 - **Headroom** stays at 0.37.0 under the [W1b hold](2026-10-03-currency-wave-w1b.md), while the repository carries three pins: this row 0.37.0, `adoption/pins-linux-x86_64.json:319-320` and
   `manifests/stack.json:521-523` 0.40.0 (the 2026-10-08 drift refresh; what `bootstrap-linux.sh` installs) and the host 0.41.0. The hold's overturn condition names a release containing the #3828 fix; PR #3828
   (merged 2026-09-29T04:11:36Z) is an ancestor of v0.40.0 and v0.41.0 and not of v0.39.1, and it changes how pytest short-summary failures are kept, not how the omission notice is counted. The owed recheck
@@ -111,7 +111,7 @@ A history database written by 1.0.1 is read and appended by 0.51.0 and read back
   center's decision.
 - **Install-plan carriers and the pins files.** `evidence/artifacts/new-wsl-install-plan-20261002/` (install.sh, accept.sh, install-plan.json, owners.json and its configs),
   `adoption/pins-linux-x86_64.json`, `adoption/pins-macos-arm64.json` (no macOS asset checksums were read) and the platform pages still carry the earlier versions, and each re-pinned
-  row's blocking gaps say so. Amend them in their own change, with the hash-bound receipts, before a fresh install uses this profile.
+  row's blocking gaps say so. For SocratiCode that includes the age buffer the row's command drops: `install.sh` and `install-plan.json` of the plan install SocratiCode 1.15.0 with `--before=2026-09-24T12:00:00Z`, so a fresh install through the plan still uses the buffer, at the old version, until they are amended. Amend them in their own change, with the hash-bound receipts, before a fresh install uses this profile.
 - **The client map's Chrome DevTools MCP owner strings and SocratiCode path entries, and the two client template additions** (`adoption/new-wsl/templates/`) stay at the plan's 1.10.1 and 1.15.0 in their
   arguments and paths. They were first re-pinned in this change and put back when the tests showed the coupling: the plan's own checker (`evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py`,
   `browser_contract`) requires the template arguments and the map's owner string to equal the plan row's (a re-pin there failed `tests.test_new_wsl_definitive_defaults`, and the render then dropped the
@@ -130,22 +130,24 @@ A history database written by 1.0.1 is read and appended by 0.51.0 and read back
 - **The handbook's dated layer tables.** `docs/new-wsl-handbook.md` and `.json` are generated, and their slot-default tables (RTK 0.51.0, jcodemunch-mcp 1.108.327, promptfoo 0.123.1, semble 0.6.1,
   Chrome DevTools MCP 1.10.1, claude-hud 0.10.0) come from the dated definitive manifest of 2026-10-01 and the layer consensus of 2026-10-02 (`evidence/artifacts/new-wsl-definitive-defaults-20261001/`,
   `evidence/artifacts/new-wsl-layer-consensus-20261002/`); the tool rows of the same handbook follow the profile and carry the new pins.
+- **SocratiCode 1.15.0 in the handbook.** `docs/new-wsl-handbook.json`'s dated layer table (and the handbook page's two mentions of SocratiCode 1.15.0) still say that 1.15.0 is installed with `--ignore-scripts --before=2026-09-24T12:00:00Z`; they come from the same dated layer tables as above, and the SocratiCode row of the same handbook carries 1.16.1 and no `--before`.
+- **The jcodemunch-mcp row's two previous-pin references.** Its `evidence_refs` still list `manifests/stack.json` (`components[id=jcodemunch-mcp]`, version 1.108.327) and `evidence/receipts/jcodemunch-1108327-qualification-20261003.json`; both describe the previous pin 1.108.327, not 1.108.374. The row's blocking gap says that this row does not inherit that qualification, and the references stay because the catalog snapshot and the W1 receipt are the row's lineage; the evidence of 1.108.374 is the public receipt cited last.
 - **Catalog snapshots** (`manifests/stack.json`, `docs/token-efficiency-stack.json`, `catalogs/`, dated decision records and evidence) are records of their own date and stay.
 
 ## Findings that need a decision
 
 1. **RTK's Codex hook trust step refuses 1.0.1** until the exec rules are re-reviewed (or `--allow-exec-rules` is passed): `tools/adoption/codex_hook_trust.py` compares `rtk --version` with the version
-   `tools/adoption/exec_rules_reviewed.json` was reviewed for (0.51.0), and the derive script's own header says a pin move must re-derive `rtk-rewrite-heads.json` and re-review that entry. Measured on
-   the Codex hook path: 0.52.0 and 1.0.1 rewrite `bash -c 'git status'`, `sh -c 'git log --oneline -3'` and `env FOO=1 bash -c 'git status'` to the `rtk` form of the inner command; `hcom ...`,
-   `bash -c 'hcom ...'` and `uvx ...` are not rewritten in any version. The review is owed and is recorded as a blocking gap on the RTK row.
+   `tools/adoption/exec_rules_reviewed.json` was reviewed for (0.51.0), and the derive script's own header says a pin move must re-derive `rtk-rewrite-heads.json` and re-review that entry. Measured in the
+   public RTK receipt: 0.52.0 and 1.0.1 rewrite `bash -c 'git status'` to the `rtk` form of the inner command; the receipt's rows for `bash -c 'git log --oneline -3'` and `env FOO=1 bash -c 'git log --oneline -3'` defer in every version under the deny-log configuration. Wrapper cases such as `sh -c`, and the non-rewrite of `hcom ...` and `uvx ...`, are
+   not in any public receipt: they come from the lane builder's trial runs, which are private, and are unverified here. Also owed: `tools/adoption/runtime_profiles.py:562` (the pi and opencode profile build) requires `rtk 0.51.0` and its source commit and raises `RTK installer/source version mismatch` for the 1.0.1 pin; it is routed with this review, as its own change. The review is owed and is recorded as a blocking gap on the RTK row.
 2. **Serena 2.0.0 defaults a fresh configuration to the REPL interface** (`agent_interface: REPL`, two or three tools); this host's `serena_config.yml` carries `agent_interface: tools` (21 tools in the
    claude-code context, 23 in codex, the same names as before). The plan seeds no `agent_interface` anywhere (`serena init` at `install.sh:432`), so a fresh install would expose only the REPL set unless
    the plan seeds `tools` or adopts the REPL deliberately; this is now the Serena row's blocking gap. The seeding is the plan owner's change (the install plan is a hash-bound carrier).
 3. **codebase-memory-mcp 0.12.1**: the switch needs the command center's decision on the moment and the layout. The command, its prerequisites and its rollback are in the
-   [measurement receipt](../../evidence/artifacts/currency-sweep-20261017/currency-codebase-memory-mcp-native-route-20261017T144817Z.json); the alternative is to wait until the last 0.11.0 session closes and move the link as before (an index rebuilt by 0.12.1 may not be readable by 0.11.0).
+   [measurement receipt](../../evidence/artifacts/currency-sweep-20261017/currency-codebase-memory-mcp-native-route-20261017T144817Z.json); the alternative needs no layout change: once the last 0.11.0 session closes (no codebase-memory process running), move the link as before with `ln -s` and `mv -T` (an index rebuilt by 0.12.1 may not be readable by 0.11.0).
 4. **Headroom**: the host (0.41.0) and the pins files (0.40.0) run ahead of the W1b hold, whose first overturn criterion the recheck finds unmet; see above.
 5. **claude-hud v0.11.3 is pinned in the plan, not yet on the host.** The host runs v0.11.2. The commands for the host are in the [route record](../../evidence/artifacts/currency-sweep-20261017/claude-hud-0.11.3-20261017T144817Z.json); they edit the user's
-   `~/.claude/settings.json` declared pin and run the three tagged-route commands, which this change's builder does not do.
+   `~/.claude/settings.json` declared pin and run the three tagged-route commands, which this change's builder does not do. `claude plugin marketplace update claude-hud` is not one of them: after the settings edit it fails with "Marketplace 'claude-hud' not found" (reproduced in a second isolated run; the receipt's `smoke.b0_cause_reproduction`).
 6. **Python tool layout.** jcodemunch-mcp and semble were installed side by side (`tools/jcodemunch-mcp-1.108.374/`, `tools/semble-0.7.0/`, each a `uv tool` directory) and their entrypoints repointed,
    because live sessions import from the old venvs. The old directories' `uv-receipt.toml` files (`python-tools/jcodemunch-mcp`, `~/.local/share/uv/tools/semble`) still name the old versions and no longer
    describe what is live.
@@ -166,7 +168,7 @@ A history database written by 1.0.1 is read and appended by 0.51.0 and read back
 - Amend the install-plan evidence and the pins files in this change: rejected, they are hash-bound or platform-specific carriers that need their own review, and the profile rows say where they still lag.
 - Re-pin Headroom now: rejected, the W1b hold's criterion is unmet on the recheck. Re-pin codebase-memory-mcp now: rejected for the reasons above (one build per account; the native route refuses this layout and
   stops every session).
-- Keep the SocratiCode `--before=` buffer: rejected, it is an age buffer of ours, which the zero-tolerance record forbids; 1.16.1 resolves without it.
+- Keep the SocratiCode `--before=` buffer: rejected, it is an age buffer of ours, which the zero-tolerance record forbids; the row's command without it was run in scratch and resolves the same tree, audited clean (the receipt's `no_buffer_command_scratch_run`).
 - Pin claude-hud at v0.11.2 and disclose v0.11.3: rejected by the review; v0.11.3 was published before the host's v0.11.2 move and no advisory names it.
 
 ## Inverse
