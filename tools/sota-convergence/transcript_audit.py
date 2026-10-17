@@ -53,6 +53,9 @@ def transcripts_sha256(directory) -> str:
     record = run_record_path(directory)
     if record is not None and record.is_file():
         digest.update(f"run\0{hashlib.sha256(record.read_bytes()).hexdigest()}\n".encode("utf-8"))
+    journal = Path(directory) / "journal.jsonl"
+    if journal.is_file():
+        digest.update(f"journal\0{hashlib.sha256(journal.read_bytes()).hexdigest()}\n".encode("utf-8"))
     return digest.hexdigest()
 
 
@@ -92,6 +95,49 @@ def run_agents(directory) -> dict:
             and isinstance(entry.get("agentId"), str) and entry["agentId"]}
 
 
+def journal_agents(directory) -> tuple:
+    """(started agent id -> {key, label}, issue). None preserves pre-journal retry accounting.
+
+    Claude Code 2.1.296's native journal retains started rows across resume, while workflowProgress is rebuilt.
+    Use exact identities and labels, never an unused attempt count, when a journal exists.
+    """
+    path = Path(directory) / "journal.jsonl"
+    if not path.exists():
+        return None, None
+    started, completed = {}, set()
+    try:
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            if not isinstance(row, dict) or row.get("type") not in {
+                    "launched", "started", "result", "failed", "restoring", "restored"}:
+                return {}, "the workflow journal has an unrecognized row"
+            if row["type"] in {"launched", "restoring", "restored"}:
+                continue
+            if row["type"] in {"result", "failed"}:
+                agent_id, key = row.get("agentId"), row.get("key")
+                if not all(isinstance(value, str) and value for value in (agent_id, key)):
+                    return started, "the workflow journal has a completion row without agentId and key"
+                if agent_id not in started or started[agent_id]["key"] != key:
+                    return started, "the workflow journal has a completion without its matching preceding started identity"
+                if agent_id in completed:
+                    return started, "the workflow journal repeats a completion identity"
+                completed.add(agent_id)
+                continue
+            if not all(isinstance(row.get(key), str) and row[key] for key in ("agentId", "key", "label")):
+                return {}, "the workflow journal has a started row without agentId, key and label"
+            identity = {"key": row["key"], "label": row["label"]}
+            if row["agentId"] in started and started[row["agentId"]] != identity:
+                return {}, "the workflow journal assigns conflicting identities to an agent"
+            if row["agentId"] in started:
+                return started, "the workflow journal repeats a started identity"
+            started[row["agentId"]] = identity
+    except (OSError, UnicodeError, ValueError):
+        return {}, "the workflow journal is unreadable"
+    return started, None
+
+
 def run_issue(directory, files, result=None):
     """Why the transcripts are not one completed run's record (of ``result``, when given), or None. Transcripts the
     record does not list are earlier attempts, which ``audit`` accounts per item."""
@@ -107,7 +153,7 @@ def run_issue(directory, files, result=None):
     agents = set(run_agents(directory))
     missing = agents - {_agent_id(path) for path in files}
     if not agents or missing:
-        return f"the run's agents ({len(agents)}) have no transcript: missing {sorted(missing, key=str)[:3]}"
+        return f"the run's agents ({len(agents)}) have no transcript: missing {sorted(missing, key=str)}"
     if result is not None:
         returned = record.get("result")
         candidates = [result] + ([result["result"]] if isinstance(result, dict) and "result" in result else [])
@@ -117,8 +163,8 @@ def run_issue(directory, files, result=None):
 
 
 def _parse(path: Path) -> tuple:
-    """(first user prompt text, [(tool name, input)], working directory, unreadable line count) of a transcript."""
-    prompt, calls, cwd, unreadable = None, [], None, 0
+    """(first prompt, calls, cwd, unreadable lines, advisor available) of a transcript."""
+    prompt, calls, cwd, unreadable, advisor_available = None, [], None, 0, False
     for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
         if not line.strip():
             continue
@@ -131,6 +177,12 @@ def _parse(path: Path) -> tuple:
             unreadable += 1
             continue
         cwd = cwd or (record.get("cwd") if isinstance(record.get("cwd"), str) else None)
+        # Claude Code 2.1.296 records this attachment even when the advisor was never called. Its encrypted
+        # replies cannot be audited; tools: Read, Glob, Grep in the role does not disable this server-side tool.
+        attachment = record.get("attachment")
+        if (record.get("type") == "attachment" and isinstance(attachment, dict)
+                and attachment.get("type") == "advisor_tool" and attachment.get("available") is not False):
+            advisor_available = True
         message = record.get("message") if isinstance(record.get("message"), dict) else {}
         content = message.get("content")
         if prompt is None and record.get("type") == "user":
@@ -141,7 +193,7 @@ def _parse(path: Path) -> tuple:
                 # tool_use, server_tool_use (web search and fetch), mcp_tool_use: every kind of call counts.
                 if isinstance(part, dict) and str(part.get("type", "")).endswith("tool_use"):
                     calls.append((part.get("name"), part.get("input")))
-    return prompt or "", calls, cwd, unreadable
+    return prompt or "", calls, cwd, unreadable, advisor_available
 
 
 def _pattern_prefix(pattern: str) -> str:
@@ -225,6 +277,14 @@ def audit(directory, items: dict, marker_prefix: str = None, export=None, result
               "items": {key: {"agents": 0, "flagged": []} for key in items}, "unmapped_flagged": []}
     export_real = os.path.realpath(export) if export else None
     attempts = run_agents(directory)
+    journal, journal_issue = journal_agents(directory)
+    if journal_issue and not report["run_issue"]:
+        report["run_issue"] = journal_issue
+    if journal is not None:
+        missing = sorted(set(journal) - {_agent_id(path) for path in files})
+        if missing:
+            issue = f"journaled started agents have no transcript: missing {missing}"
+            report["run_issue"] = f"{report['run_issue']}; {issue}" if report["run_issue"] else issue
     parsed = {path: _parse(path) for path in files}
     mapped = {path: [key for key, item in items.items() if item["marker"] and item["marker"] in parsed[path][0]]
               for path in files}
@@ -233,10 +293,23 @@ def audit(directory, items: dict, marker_prefix: str = None, export=None, result
     # against that item's boundary; any other extra fails the run (a planted transcript cannot hide in another item's
     # allowance).
     allowance = {key: 0 for key in items}
+    labels = {key: set() for key in items}
+    if journal is not None and not report["run_issue"]:
+        record = json.loads(run_record_path(directory).read_text(encoding="utf-8"))
+        for entry in record.get("workflowProgress") or []:
+            if not isinstance(entry, dict) or entry.get("type") != "workflow_agent" or not entry.get("agentId"):
+                continue
+            start = journal.get(entry["agentId"])
+            if start is None or start["label"] != entry.get("label"):
+                report["run_issue"] = "the workflow journal does not bind the run record's agents and labels"
+                break
     for path in files:
-        attempt = attempts.get(_agent_id(path))
+        agent_id = _agent_id(path)
+        attempt = attempts.get(agent_id)
         if attempt and attempt > 1 and len(mapped[path]) == 1:
             allowance[mapped[path][0]] += attempt - 1
+        if attempt and journal is not None and agent_id in journal and len(mapped[path]) == 1:
+            labels[mapped[path][0]].add(journal[agent_id]["label"])
     unaccounted = []
     for path in files:
         if _agent_id(path) in attempts:
@@ -244,20 +317,28 @@ def audit(directory, items: dict, marker_prefix: str = None, export=None, result
         keys = mapped[path]
         if not keys and marker_prefix and marker_prefix in parsed[path][0]:
             continue  # an earlier attempt for an item outside this audit, accounted in that item's audit
-        if len(keys) == 1 and allowance[keys[0]] > 0:
+        if journal is not None:
+            start = journal.get(_agent_id(path))
+            if len(keys) == 1 and start is not None and start["label"] in labels[keys[0]]:
+                continue
+            unaccounted.append(path.name)
+        elif len(keys) == 1 and allowance[keys[0]] > 0:
             allowance[keys[0]] -= 1
         else:
             unaccounted.append(path.name)
-    if unaccounted and not report["run_issue"]:
-        report["run_issue"] = (f"transcripts the run record does not account for as an earlier attempt of their "
-                               f"item: {unaccounted[:3]}")
+    report["unaccounted_transcripts"] = unaccounted
+    if unaccounted:
+        issue = f"transcripts the run record does not account for as an earlier attempt of their item: {unaccounted}"
+        report["run_issue"] = f"{report['run_issue']}; {issue}" if report["run_issue"] else issue
     for path in files:
-        prompt, calls, cwd, unreadable = parsed[path]
+        prompt, calls, cwd, unreadable, advisor_available = parsed[path]
         keys = mapped[path]
         if not keys and marker_prefix and marker_prefix in prompt:
             continue
         roots = items[keys[0]]["roots"] if len(keys) == 1 else union
         reasons = [f"{unreadable} unreadable transcript line(s)"] if unreadable else []
+        if advisor_available:
+            reasons.append("advisor available (its encrypted replies cannot be audited)")
         if len(keys) > 1:
             reasons.append(f"the prompt names {len(keys)} items")
         if export_real and (not cwd or os.path.realpath(cwd) != export_real):
