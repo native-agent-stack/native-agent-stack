@@ -40,7 +40,7 @@ ROAD_REFERENCE_FILES = {
     "css_from": ("coordination/command-center/cc-tools/invoke-evidence/build_page.py",),
 }
 _SANITIZER = None
-PAGES = {"index": "Home", "overview": "Overview", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "fleet": "Fleet", "architecture": "Architecture", "architecture-foundation": "Foundation", "architecture-north-star": "North star", "sources": "Sources"}
+PAGES = {"index": "Home", "overview": "Overview", "atlas": "Atlas", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "fleet": "Fleet", "architecture": "Architecture", "architecture-foundation": "Foundation", "architecture-north-star": "North star", "sources": "Sources"}
 
 
 def utc_now() -> str:
@@ -149,7 +149,7 @@ def document(page: str, title: str, lede: str, scope: str, body: str,
     nav = "".join(f'<a href="{name}.html"' + (' aria-current="page"' if name == page else '') + f'>{text}</a>' for name, text in PAGES.items())
     heading = leading if leading is not None else f'<header class="page-header"><h1>{esc(title)}</h1><p class="lede">{esc(lede)}</p></header>'
     source_link = ("#architecture-custody" if page == "architecture" else "#layer-sources" if page.startswith("architecture-")
-                   else "#overview-evidence" if page == "overview" else f"sources.html#{page}")
+                   else "#overview-evidence" if page == "overview" else "#atlas-evidence" if page == "atlas" else f"sources.html#{page}")
     return f'''<!doctype html>
 <html lang="en">
 <head>
@@ -403,7 +403,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     current = strict_json(current_input["raw"])
     view = load_local("current_view")
     view.validate(current)
-    for name in ("current_view", "workstation", "sanitization", "fleet_data", "fleet_view", "adoption_view"):
+    for name in ("current_view", "workstation", "sanitization", "fleet_data", "fleet_view", "adoption_view", "atlas_data", "atlas_view"):
         capture("module:" + name, Path(__file__).resolve().parent / (name + ".py"))
     workstation = collect_workstation(current["workstation"])
     fleet_cache = no_symlinks(receipt.parent / "fleet/cache")
@@ -483,7 +483,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         if name.startswith("roadmap:"):
             description = "; ".join(f"{key} = {value}" for key, value in item.get("source_dates", {}).items()) or item.get("status") or "source date unspecified"
             road_notes.append('<code>' + esc(label_path(item["path"], root, state_root)) + '</code> — ' + esc(description))
-    overview = '<section class="panel"><h2>Choose a page</h2><ul class="page-index"><li><a href="overview.html">Overview</a><p>See the layers, feeds, workers, candidates and pull requests on one page.</p></li><li><a href="readiness.html">North-star readiness</a><p>What is done, what is left and what needs a decision.</p></li>' + northstar_entry(output_dir) + '<li><a href="gaps.html">Grand Gap Board</a><p>Find open gaps and their next actions.</p></li><li><a href="roadmap.html">Roadmap</a><p>Read the dated milestones and server records.</p></li><li><a href="fleet.html">Worker fleet</a><p>See the lanes, sessions, jobs and spend.</p></li><li><a href="sources.html">Sources</a><p>Check input dates, hashes and evidence scope.</p></li></ul></section>'
+    overview = '<section class="panel"><h2>Choose a page</h2><ul class="page-index"><li><a href="overview.html">Overview</a><p>See the layers, feeds, workers, candidates and pull requests on one page.</p></li><li><a href="atlas.html">Harness atlas</a><p>See what each model family runs at each harness layer, what is settled and what was measured.</p></li><li><a href="readiness.html">North-star readiness</a><p>What is done, what is left and what needs a decision.</p></li>' + northstar_entry(output_dir) + '<li><a href="gaps.html">Grand Gap Board</a><p>Find open gaps and their next actions.</p></li><li><a href="roadmap.html">Roadmap</a><p>Read the dated milestones and server records.</p></li><li><a href="fleet.html">Worker fleet</a><p>See the lanes, sessions, jobs and spend.</p></li><li><a href="sources.html">Sources</a><p>Check input dates, hashes and evidence scope.</p></li></ul></section>'
     current_scope = 'command-center current view snapshot; ' + view.observation_time(current["updated_utc"], plain=True)
     current_notes = [f'<code>{esc(label_path(current_input["path"], root, state_root))}</code> — {esc(current_scope)}; SHA-256 <code>{current_input["sha256"]}</code>', 'Workstation readings use an exact Prometheus metric when present, otherwise the CC-owned value and its recorded read time.']
     fleet_notes = [f'<code>{esc(key)}</code> — {esc(value or "not reported")}' for key, value in fleet.get("source_times", {}).items()]
@@ -587,6 +587,8 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         refresh_layer_pages(root, state_root, output_dir, receipt, refreshed, manifest_sha, outputs, receipt_doc)
     if (Path(__file__).resolve().parent / "overview_data.py").exists():
         refresh_overview(root, state_root, output_dir, receipt, refreshed, manifest_sha, outputs, receipt_doc)
+    if (Path(__file__).resolve().parent / "atlas_data.py").exists():
+        refresh_atlas(root, state_root, output_dir, receipt, refreshed, manifest_sha, outputs, receipt_doc)
     publish(output_dir, receipt, outputs, receipt_doc)
     return receipt_doc
 
@@ -628,6 +630,9 @@ def unavailable_page(page: str, refreshed: str, manifest_sha: str) -> bytes:
     if page == "overview":
         section, title, scope = "overview-evidence", "Overview unavailable", "Overview unavailable; no gate or execution claim."
         text = "This overview is unavailable. The Foundation and North-star pages and the other pages retain their own current observations."
+    elif page == "atlas":
+        section, title, scope = "atlas-evidence", "Atlas unavailable", "Atlas unavailable; no gate or execution claim."
+        text = "The harness atlas is unavailable. Its ledger is kept unchanged, and the other pages retain their own current observations."
     else:
         section, title, scope = "layer-sources", PAGES[page] + " architecture unavailable", "Layer pages unavailable; no gate or execution claim."
         text = "This architecture page is unavailable. Other pages retain their own current observations."
@@ -655,6 +660,31 @@ def refresh_overview(root: Path, state_root: Path, output_dir: Path, receipt: Pa
         receipt_doc["overview"]["page_status"] = "unreported placeholder"
 
 
+def atlas_receipt(receipt: Path) -> Path:
+    """The atlas's own receipt beside a refresh receipt (its ledger sits next to it); never the refresh receipt itself."""
+    return receipt.parent / "atlas/atlas-receipt.json"
+
+
+def refresh_atlas(root: Path, state_root: Path, output_dir: Path, receipt: Path, refreshed: str, manifest_sha: str,
+                  outputs: dict, receipt_doc: dict) -> None:
+    """Render the harness atlas, which reads only the records its source map names and builds no layer page.
+
+    Modeled on refresh_overview: Home and every page's navigation link it, so on failure a missing atlas gets an
+    UNREPORTED placeholder and an existing one is kept without a new observation; its ledger is never touched then.
+    """
+    try:
+        atlas = load_local("atlas_data").build_atlas_page(root, state_root, output_dir, atlas_receipt(receipt), generated=refreshed)
+        receipt_doc["atlas"] = {key: atlas.get(key) for key in ("schema", "generated_utc", "commit", "page", "present", "pending", "ledger", "outputs")}
+    except LAYER_PAGE_ERRORS as error:
+        receipt_doc["atlas"] = {"status": "UNREPORTED", "reason": "Atlas unavailable (" + type(error).__name__ + ")"}
+        if (output_dir / "atlas.html").exists():
+            receipt_doc["atlas"]["page_status"] = "previous page retained without a new observation"
+            return
+        outputs["atlas.html"] = unavailable_page("atlas", refreshed, manifest_sha)
+        receipt_doc.setdefault("outputs", {})["atlas.html"] = {"sha256": hashlib.sha256(outputs["atlas.html"]).hexdigest(), "bytes": len(outputs["atlas.html"])}
+        receipt_doc["atlas"]["page_status"] = "unreported placeholder"
+
+
 def prune_architecture_details(output_dir: Path, outputs: dict) -> None:
     """Remove superseded generated details from their fixed serving namespace."""
     directory = no_symlinks(output_dir / "architecture/layers")
@@ -668,21 +698,40 @@ def prune_architecture_details(output_dir: Path, outputs: dict) -> None:
 
 
 def publish(output_dir: Path, receipt: Path, outputs: dict[str, bytes], receipt_doc: dict[str, Any],
-            *, architecture_details: bool = False) -> None:
-    """Prepare every file first; replace only generated files, receipt last."""
+            *, architecture_details: bool = False, nonserved: dict[Path, bytes] | None = None) -> None:
+    """Prepare every file first; replace the generated files, then each nonserved record, the receipt last.
+
+    A nonserved record (the atlas ledger) is refused inside the served root or as the receipt itself, and the
+    directories of the records and the receipt are made 0700, or tightened to it, before anything is written.
+    """
+    records = {no_symlinks(Path(path)): raw for path, raw in (nonserved or {}).items()}
+    if records:
+        served, receipt_path = no_symlinks(output_dir), no_symlinks(receipt)
+        if any(path.is_relative_to(served) or path == receipt_path for path in records):
+            raise ValueError("a nonserved record must remain outside the served root and apart from the receipt")
     receipt.parent.mkdir(parents=True, exist_ok=True)
+    for custody in {receipt.parent, *(path.parent for path in records)} if records else ():
+        # Nonserved records are custody records: their directories are 0700 whether new or already looser.
+        custody.mkdir(parents=True, exist_ok=True, mode=0o700)
+        if custody.stat().st_mode & 0o077:
+            os.chmod(custody, 0o700)
     with tempfile.TemporaryDirectory(prefix="local-pages-refresh-", dir=receipt.parent) as staging:
         stage = Path(staging)
         for name, raw in outputs.items():
             path = stage / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(raw)
+        (stage / ".nonserved").mkdir()
+        for index, raw in enumerate(records.values()):
+            (stage / ".nonserved" / str(index)).write_bytes(raw)
         receipt_raw = (json.dumps(receipt_doc, indent=2, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n").encode("utf-8")
         (stage / "refresh-receipt.json").write_bytes(receipt_raw)
         # Tempfiles in each destination directory keep os.replace on its filesystem.
         replacements: list[tuple[Path, Path]] = []
         try:
-            for destination, raw in [(output_dir / name, (stage / name).read_bytes()) for name in outputs] + [(receipt, receipt_raw)]:
+            for destination, raw in ([(output_dir / name, (stage / name).read_bytes()) for name in outputs]
+                                     + [(path, (stage / ".nonserved" / str(index)).read_bytes()) for index, path in enumerate(records)]
+                                     + [(receipt, receipt_raw)]):
                 no_symlinks(destination)
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 with tempfile.NamedTemporaryFile(prefix=".local-pages-", dir=destination.parent, delete=False) as handle:
@@ -716,9 +765,26 @@ def main(argv: list[str] | None = None) -> int:
                         help="render only the Foundation and North-star architecture pages, which read committed repository records")
     parser.add_argument("--overview-only", action="store_true",
                         help="render only the overview page and the layer pages it links into; the receipt lists the present and pending sources")
+    parser.add_argument("--atlas-only", action="store_true",
+                        help="render only the harness atlas and advance its ledger; it builds no layer pages, and its receipt names the ledger row it matched")
     args = parser.parse_args(argv)
     output = args.output_dir or args.state_root / "coordination/command-center/local-pages"
     receipt = args.receipt or args.state_root / "research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json"
+    if args.atlas_only:
+        # As for --overview-only: the refresh receipt records the last full refresh and is never written here.
+        if args.overview_only or args.layer_pages_only:
+            parser.exit(2, "local-pages: --atlas-only renders the atlas alone; drop the other --*-only flag\n")
+        if args.receipt is None:
+            receipt = atlas_receipt(receipt)
+        elif receipt.name == "refresh-receipt.json":
+            parser.exit(2, "local-pages: --atlas-only never writes a refresh receipt; name another --receipt\n")
+        try:
+            result = load_local("atlas_data").build_atlas_page(args.root, args.state_root, output, receipt)
+        except LAYER_PAGE_ERRORS as error:
+            parser.exit(1, f"local-pages: atlas failed ({type(error).__name__}): {error}\n")
+        print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "commit": result["commit"],
+                          "page": result["page"], "present": result["present"], "pending": result["pending"], "ledger": result["ledger"]}, sort_keys=True))
+        return 0
     if args.overview_only:
         # As for --layer-pages-only: the refresh receipt records the last full refresh and is never written here.
         refresh_receipt = receipt
@@ -767,7 +833,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.exit(1, f"local-pages: refresh failed ({type(error).__name__})\n")
     except (OSError, ValueError, KeyError, TypeError, AttributeError, ImportError) as error:
         parser.exit(1, f"local-pages: refresh failed ({type(error).__name__}): {error}\n")
-    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "native_readiness_manifest_sha256": result["native_readiness_manifest_sha256"], "pages": 6, "API_errors": result["workstation"].get("API_errors", []) + result["fleet"].get("API_errors", [])}, sort_keys=True))
+    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "native_readiness_manifest_sha256": result["native_readiness_manifest_sha256"], "pages": 7, "API_errors": result["workstation"].get("API_errors", []) + result["fleet"].get("API_errors", [])}, sort_keys=True))
     return 0
 
 

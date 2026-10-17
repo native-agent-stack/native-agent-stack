@@ -95,20 +95,22 @@ def project_reports(host, codex, claude, *, now, window):
                          "claude": isinstance(claude, dict) and claude.get("kind") == KINDS[2]}}
 
 
-def collect_reports(codex_roots, claude_roots, *, window, now, node="node", runner=subprocess.run):
-    since, until = (now - timedelta(days=window)).isoformat(), now.isoformat()
+def lane_commands(codex_roots, claude_roots, *, since, until, now, node="node"):
+    """The Codex --lanes and Claude --lanes-sweep argv for one explicit window [since, until), in that order."""
     codex_args = [arg for root in codex_roots for arg in ("--codex-root", str(root))]
     claude_args = [arg for root in claude_roots for arg in ("--root", str(root))]
-    commands = [
-        [sys.executable, str(ROOT / "tools/skill-usage/skill_usage.py"), "--run-skill-doctor",
-         *codex_args, "--window", str(window), "--now", until, "--json"],
+    return [
         [sys.executable, str(ROOT / "tools/skill-usage/skill_usage.py"), "--lanes", *codex_args,
-         "--since", since, "--until", until, "--now", until, "--json"],
+         "--since", since, "--until", until, "--now", now, "--json"],
         [node, str(ROOT / "examples/claude-native/workflows/child-usage.mjs"), "--lanes-sweep",
          *claude_args, "--since", since, "--until", until],
     ]
+
+
+def run_reports(commands, kinds, runner=subprocess.run):
+    """Run each native command once; keep a report only when it exits 0 with the expected kind, else None."""
     reports = []
-    for command, kind in zip(commands, KINDS):
+    for command, kind in zip(commands, kinds):
         try:
             result = runner(command, cwd=ROOT, stdin=subprocess.DEVNULL, capture_output=True,
                             text=True, timeout=1200)
@@ -119,10 +121,33 @@ def collect_reports(codex_roots, claude_roots, *, window, now, node="node", runn
     return tuple(reports)
 
 
+def collect_reports(codex_roots, claude_roots, *, window, now, node="node", runner=subprocess.run):
+    since, until = (now - timedelta(days=window)).isoformat(), now.isoformat()
+    codex_args = [arg for root in codex_roots for arg in ("--codex-root", str(root))]
+    commands = [
+        [sys.executable, str(ROOT / "tools/skill-usage/skill_usage.py"), "--run-skill-doctor",
+         *codex_args, "--window", str(window), "--now", until, "--json"],
+        *lane_commands(codex_roots, claude_roots, since=since, until=until, now=until, node=node),
+    ]
+    return run_reports(commands, KINDS, runner)
+
+
+def require_live_clone(codex_roots, claude_roots, run=None):
+    """Live collection needs both client roots named explicitly and this checkout on main."""
+    if not codex_roots or not claude_roots:
+        raise ValueError("both client roots must be explicit")
+    branch = (run or subprocess.run)(["git", "branch", "--show-current"], cwd=ROOT,
+                                     capture_output=True, text=True, check=True).stdout.strip()
+    if branch != "main":
+        raise ValueError("scheduled live collection requires the main clone")
+
+
 def publish(path, report):
     if skill_usage.inside_git_work_tree(path.parent) or path.is_relative_to(ROOT):
         raise ValueError("report destination must be outside git worktrees")
     path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    if path.parent.stat().st_mode & 0o077:
+        os.chmod(path.parent, 0o700)  # a directory that already exists looser is tightened, never kept as it was
     descriptor, temp = tempfile.mkstemp(prefix=".skill-usage-", dir=path.parent)
     try:
         with os.fdopen(descriptor, "w") as stream:
@@ -134,13 +159,14 @@ def publish(path, report):
             os.unlink(temp)
 
 
-def render_units(destination, repository, python, node):
+def render_units(destination, repository, python, node, *, names=("skill-invoke-rate.service", "skill-invoke-rate.timer")):
+    """Render the named adoption/templates/systemd units; rendering never loads or starts a unit."""
     destination.mkdir(parents=True, exist_ok=True)
     values = {"@REPOSITORY@": str(repository), "@PYTHON@": str(python), "@NODE@": str(node)}
     for value in values.values():
         if not Path(value).is_absolute() or any(char in value for char in ('\n', '\r', '"', '\\')):
             raise ValueError("unit values must be absolute paths without unit quoting characters")
-    for name in ("skill-invoke-rate.service", "skill-invoke-rate.timer"):
+    for name in names:
         text = (ROOT / "adoption/templates/systemd" / name).read_text()
         for key, value in values.items():
             text = text.replace(key, value.replace("%", "%%").replace("$", "$$"))
@@ -176,12 +202,7 @@ def main(argv=None):
         if any(sources):
             reports = tuple(json.loads(path.read_text()) if path else None for path in sources)
         else:
-            if not args.codex_root or not args.claude_root:
-                raise ValueError("both client roots must be explicit")
-            branch = subprocess.run(["git", "branch", "--show-current"], cwd=ROOT,
-                                    capture_output=True, text=True, check=True).stdout.strip()
-            if branch != "main":
-                raise ValueError("scheduled live collection requires the main clone")
+            require_live_clone(args.codex_root, args.claude_root)
             reports = collect_reports(args.codex_root, args.claude_root, window=args.window, now=now, node=args.node)
         report = project_reports(*reports, now=now.isoformat(), window=args.window)
         if args.out:
