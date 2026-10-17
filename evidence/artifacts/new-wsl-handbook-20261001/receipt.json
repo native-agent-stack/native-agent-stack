@@ -4,10 +4,10 @@
   "source_main": "86bb669ad6c81b9adafdb222d545a1bf2aa95218",
   "evidence_class": "local_integration",
   "generator_sha256": "c861fa6a8a35ec5178b151dae03f20c9615a6f1d42b79ab3300102fc8a36c332",
-  "profile_sha256": "abbea7713de2719ad65b072e759ffadc4ed6fa6c3bd846164cff73355e577e06",
+  "profile_sha256": "6417f5bb5b44c25bed17fa4a459896a51253fbe87a0d4e51d819a3fb0b4ef87d",
   "outputs": {
-    "docs/new-wsl-handbook.md": "3c16742bfc5e6d095682a437d4aab420a0fb3aae94ba28609f2a81bf7a5d50a5",
-    "docs/new-wsl-handbook.json": "c79576f8f6b2234aae49295f8db36bac27644cf5efda1b9007d70425f75e4574"
+    "docs/new-wsl-handbook.md": "3a6ba4fa16cab643bf86256637ff4ac2badb77e8f01e0fce7966be67fab72198",
+    "docs/new-wsl-handbook.json": "6343831e4b15d61a8bce0fb5164110f69a44d811688e7f5bd0ccb22f6a992fca"
   },
   "inventory": {
     "layers": 37,
@@ -1129,11 +1129,11 @@
       "native_exit_code": 0,
       "generator_sha256": "c861fa6a8a35ec5178b151dae03f20c9615a6f1d42b79ab3300102fc8a36c332",
       "current_outputs": {
-        "docs/new-wsl-handbook.md": "3c16742bfc5e6d095682a437d4aab420a0fb3aae94ba28609f2a81bf7a5d50a5",
-        "docs/new-wsl-handbook.json": "c79576f8f6b2234aae49295f8db36bac27644cf5efda1b9007d70425f75e4574"
+        "docs/new-wsl-handbook.md": "3a6ba4fa16cab643bf86256637ff4ac2badb77e8f01e0fce7966be67fab72198",
+        "docs/new-wsl-handbook.json": "6343831e4b15d61a8bce0fb5164110f69a44d811688e7f5bd0ccb22f6a992fca"
       },
       "evidence_class": "local_integration",
-      "scope": "Condition 4 of the CC's ruling (a), retargeted by its GO of 2026-10-16 (16:51Z), rulings D1-D9 (hcom #9109, 2026-10-17) and the fold rulings G1-G6 (hcom #14261, 2026-10-17): the memory-owner interim and plan row move to ai-memory 3.1.0; and the PR #1242 fold (finding B2): the generator says what an amendment by direct consensus changed and on whose authority, and the memory-owner interim's label names both authorities. No native service acceptance; fold 5 records both families' acknowledgements of the wave-6 batch (consensus.json wave6, and the definitive manifest's consensus digest that follows it); re-run in #1242's merge of origin/main on the merged inputs, after #1243's currency re-pin (source_base is that main commit)"
+      "scope": "Condition 4 of the CC's ruling (a), retargeted by its GO of 2026-10-16 (16:51Z), rulings D1-D9 (hcom #9109, 2026-10-17) and the fold rulings G1-G6 (hcom #14261, 2026-10-17): the memory-owner interim and plan row move to ai-memory 3.1.0; and the PR #1242 fold (finding B2): the generator says what an amendment by direct consensus changed and on whose authority, and the memory-owner interim's label names both authorities. No native service acceptance; fold 5 records both families' acknowledgements of the wave-6 batch (consensus.json wave6, and the definitive manifest's consensus digest that follows it); re-run in #1242's merge of origin/main on the merged inputs, after #1243's currency re-pin (source_base is that main commit); the RTK row's runtime_profiles.py locator re-pointed from :562 to :571, the line this PR moved"
     }
   ],
   "previous_outputs": [

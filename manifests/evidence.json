@@ -5617,7 +5617,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "abbea7713de2719ad65b072e759ffadc4ed6fa6c3bd846164cff73355e577e06",
+      "sha256": "6417f5bb5b44c25bed17fa4a459896a51253fbe87a0d4e51d819a3fb0b4ef87d",
       "bytes": 269436
     },
     {
@@ -19473,7 +19473,7 @@
     },
     {
       "path": "docs/decisions/2026-10-17-currency-sweep-repin.md",
-      "sha256": "fd276f3c392fd75dd17a688ee6e177ff3c277046eb48d6ea0fb67995db39c33c",
+      "sha256": "2b067e97c8db8ce6115ba2a98de83301b6fa0e1d1a2d9e5a938ec45a642c060e",
       "bytes": 30434
     },
     {
@@ -19853,12 +19853,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "c79576f8f6b2234aae49295f8db36bac27644cf5efda1b9007d70425f75e4574",
+      "sha256": "6343831e4b15d61a8bce0fb5164110f69a44d811688e7f5bd0ccb22f6a992fca",
       "bytes": 714050
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "3c16742bfc5e6d095682a437d4aab420a0fb3aae94ba28609f2a81bf7a5d50a5",
+      "sha256": "3a6ba4fa16cab643bf86256637ff4ac2badb77e8f01e0fce7966be67fab72198",
       "bytes": 378505
     },
     {
@@ -44923,8 +44923,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "089ea90c3c323dcacfb631bd1a0bffbc36c3c871a761925d1b6d5602da9d0c59",
-      "bytes": 88315
+      "sha256": "debe510ea7696ba2f6fb89bb04e88b89150bd4c092536e09a5f62b643b14e319",
+      "bytes": 88411
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
