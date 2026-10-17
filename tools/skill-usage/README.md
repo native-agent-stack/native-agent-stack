@@ -61,7 +61,12 @@ regular files of at most 1 MiB, no symlink followed) under each explicit
   `daily_skill_usage.publish`: `token-rate-latest.json` (`token-rate-daily/1`:
   the rollup of the seven closed UTC days, today so far, coverage, the listed
   servers and source digests) and `token-rate-history.json`
-  (`token-rate-history/1`: one row per closed UTC day, at most 400).
+  (`token-rate-history/1`: one row per closed UTC day, at most 400). The files
+  are 0600 and their directory is 0700: made so when new, tightened to it when
+  it already exists looser. A history row whose shape the readers cannot walk
+  (a date that is not a calendar day, collectors or lanes that are not objects)
+  is refused like a digest failure, and any other unexpected collector shape ends
+  as exit 2 with the one fixed line.
 - **Lanes** are spawn kinds, never named sessions: `claude:main`,
   `claude:agent_tool`, `claude:workflow`, `gpt:codex` and `muse:muse`. The
   Claude root is all of `~/.claude/projects`, so the rates include every

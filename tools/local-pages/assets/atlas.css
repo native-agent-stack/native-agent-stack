@@ -6,7 +6,7 @@
    layer-by-family matrix: a heavier top rule in the ink token and serif row headers (FD:59). Rules are scoped under
    body[data-page="atlas"] and .atlas-* classes. A shared rule is restyled only inside that scope and always at a
    higher specificity, never by stylesheet order (FD:55); for example .atlas-matrix.ov-table table outranks
-   .ov-table table. CascadeTests in tests/test_local_pages_atlas_view.py checks every declaration. */
+   .ov-table table. CascadeTests in tests/test_local_pages_atlas_view.py compares same-named properties. */
 body[data-page="atlas"] { --mf-display: "Iowan Old Style", "Sitka Heading", "Palatino Linotype", Palatino, "Book Antiqua", "Noto Serif", Georgia, serif; }
 body[data-page="atlas"] .page-header h1 { font-family: var(--mf-display); font-weight: 500; letter-spacing: -.01em; font-size: clamp(2.1rem, 4.2vw, 3.4rem); }
 /* Defining --mf-display also reaches the shared serif section headings (architecture-manifest.css:31); they keep the sans. */

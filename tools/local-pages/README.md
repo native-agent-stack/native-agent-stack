@@ -292,7 +292,8 @@ The atlas compounds. Each build reduces its model to a timestamp-free state
 pins and the measured extent) and appends one hash-chained row to
 `atlas/atlas-ledger.json` beside the refresh receipt only when that state
 changed; every build writes `atlas/atlas-receipt.json` (`local-atlas/1`) naming
-the row it matched and the checks since it. Both are nonserved. A ledger that
+the row it matched and the checks since it. Both are nonserved, and their
+directory is 0700, tightened to it when it already exists looser. A ledger that
 fails its digest or chain check is left untouched for inspection and nothing is
 appended. The read, append and publish hold one `flock` on
 `atlas/.atlas.lock`. `build_pages.py --atlas-only --output-dir DIR --receipt
@@ -571,8 +572,12 @@ nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p t
 ```
 
 The fixtures use the repository's real native builder and local temporary
-receipts. They need no external network, shared service, credentials or
-third-party packages; the redirect tests bind an isolated loopback socket.
+receipts. They need no external network, shared service or credentials, and
+no third-party package except that the four stylesheet cascade tests in
+`test_local_pages_atlas_view.py` import tinycss2 and cssselect2 from the
+hash-pinned `.github/requirements-ci.txt` (install it with
+`python3 -m pip install --only-binary=:all: --require-hashes -r .github/requirements-ci.txt`);
+the redirect tests bind an isolated loopback socket.
 Browser interaction and actual host reachability are separate co-op checks.
 
 Primary references: the native readiness API at the commit above; the retained

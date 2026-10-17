@@ -9,13 +9,14 @@ inside each test, so a run before it exists fails test by test.
 import copy
 import hashlib
 import json
+import re
 from pathlib import Path
 import sys
 import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from local_pages_atlas_fixture import (HERE, HISTORY, LATEST, ROOT, SKILL_BYTES, SKILL_SHA, Fixture, atlas, lane, latest,  # noqa: E402
+from local_pages_atlas_fixture import (HERE, HISTORY, LATEST, ROOT, SKILL_BYTES, SKILL_SHA, Fixture, atlas, lane, latest, policy,  # noqa: E402
                                        source_policy)
 
 
@@ -145,6 +146,31 @@ class ModelTests(AtlasCase):
         self.assertNotIn("loose-server", html)
         self.assertIn("memory-server", html)
 
+    def test_a_stack_lists_only_servers_with_a_recorded_call(self):
+        """servers[] is the publish allowlist, so an allowlisted server nobody called is not shown as called (review B1)."""
+        def listed(data):
+            return {stack["id"]: [row["name"] for row in stack["servers"]] for stack in data["stacks"]}
+        fixture = Fixture(self.base)
+        data = fixture.model()
+        names = [name for names in listed(data).values() for name in names]
+        self.assertIn("memory-server", names)
+        self.assertNotIn("nav-server", names)
+        self.assertEqual(data["measured"]["called"], ["loose-server", "memory-server"])
+        _, html, _ = fixture.build(self.base)
+        self.assertNotIn("nav-server", html)
+        self.assertIn("No MCP server that joins a layer of this stack has a recorded call.", html)
+        # Zero calls do not count: the allowlisted server is still not listed.
+        raw = latest()
+        raw["rollup"]["lanes"]["claude:workflow"]["mcp"]["nav-server"] = 0
+        Fixture.write(fixture.state / LATEST, json.dumps(raw))
+        self.assertNotIn("nav-server", [name for names in listed(fixture.model()).values() for name in names])
+        # A call in any window lists it: here only a closed day's row records one.
+        history_document = json.loads((fixture.state / HISTORY).read_text())
+        history_document["rows"][0]["lanes"]["claude:workflow"]["mcp"]["nav-server"] = 3
+        Fixture.write(fixture.state / HISTORY, json.dumps(history_document))
+        self.assertIn("nav-server", [name for names in listed(fixture.model()).values() for name in names])
+        self.assertEqual(atlas().called_servers([{"a": {"mcp": None}, "b": None}, {"a": {"mcp": {"x": 0, "y": 1}}}]), ["y"])
+
     def test_layer_states_equal_overview_data_on_the_real_repository(self):
         data = atlas().model(ROOT, self.base / "state", user_root=self.base / "user")
         overview = atlas().load("overview_data")
@@ -190,6 +216,47 @@ class JoinTests(unittest.TestCase):
         for rule in joins["standing_rules"]:
             if not rule["recorded_in"]:
                 self.assertTrue(rule["trigger"].strip(), rule["id"])
+
+    def test_monitoring_links_are_page_names_or_loopback_like_the_url(self):
+        """Review B5: open.links[] is rendered as href values, so it passes the same screen as open.url."""
+        temporary = tempfile.TemporaryDirectory(prefix="atlas-map-test-")
+        self.addCleanup(temporary.cleanup)
+        source = json.loads((HERE / "atlas_map.json").read_text())
+        index = next(position for position, entry in enumerate(source["monitoring"]) if (entry.get("open") or {}).get("links"))
+
+        def load_with(links=None, url=None):
+            document = copy.deepcopy(source)
+            document["monitoring"][index]["open"] = {"links": links} if url is None else {"url": url}
+            path = Path(temporary.name) / "map.json"
+            path.write_text(json.dumps(document))
+            return atlas().load_map(path)
+        load_with(["index.html", "pages/overview.html#top", "http://127.0.0.1:21301/d/x"])
+        self.assertEqual(load_with(url="http://127.0.0.1:21301/d/x")[0]["monitoring"][index]["open"], {"url": "http://127.0.0.1:21301/d/x"})
+        for bad in ("http://example.com/x", "https://127.0.0.1:21301/", "//example.com/x.html", "javascript:alert(1)", "../secret.html", "/etc/passwd.html",
+                    "a b.html", "index.html?x=1", "file:///x.html", "http://127.0.0.1.example.com:21301/", "overview"):
+            with self.subTest(link=bad), self.assertRaises(policy().SourcePolicyError):
+                load_with([bad])
+        with self.assertRaises(policy().SourcePolicyError):
+            load_with(["index.html", 5])
+        with self.assertRaises(policy().SourcePolicyError):
+            load_with("index.html")
+        with self.assertRaises(policy().SourcePolicyError):
+            load_with(url="http://example.com/")
+
+    def test_the_ttl_note_docstring_cites_the_line_the_map_cites_for_the_slot(self):
+        """Both slots.json locators move together: the docstring's range starts where the map's prompt-caching anchor sits and ends at its route."""
+        joins, _ = atlas().load_map()
+        mapped = [cite for cite in atlas().cites(joins) if cite["anchor"] == '"id": "prompt-caching"']
+        self.assertTrue(mapped)
+        found = re.search(r"slots\.json:(\d+)-(\d+)", atlas()._ttl_note.__doc__)
+        self.assertIsNotNone(found)
+        first, last = int(found.group(1)), int(found.group(2))
+        lines = (ROOT / ".claude/skills/claude-native-practice/reference/slots.json").read_text().splitlines()
+        for cite in mapped:
+            self.assertEqual(cite["line"], first)
+        self.assertIn('"id": "prompt-caching"', lines[first - 1])
+        self.assertIn('"status"', lines[first + 1])
+        self.assertIn('"route"', lines[last - 1])
 
     def test_server_join_matches_host_receipts_normalization_and_the_observed_classes(self):
         sys.path.insert(0, str(ROOT / "scripts"))

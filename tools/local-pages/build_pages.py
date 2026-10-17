@@ -701,7 +701,8 @@ def publish(output_dir: Path, receipt: Path, outputs: dict[str, bytes], receipt_
             *, architecture_details: bool = False, nonserved: dict[Path, bytes] | None = None) -> None:
     """Prepare every file first; replace the generated files, then each nonserved record, the receipt last.
 
-    A nonserved record (the atlas ledger) is refused inside the served root or as the receipt itself.
+    A nonserved record (the atlas ledger) is refused inside the served root or as the receipt itself, and the
+    directories of the records and the receipt are made 0700, or tightened to it, before anything is written.
     """
     records = {no_symlinks(Path(path)): raw for path, raw in (nonserved or {}).items()}
     if records:
@@ -709,6 +710,11 @@ def publish(output_dir: Path, receipt: Path, outputs: dict[str, bytes], receipt_
         if any(path.is_relative_to(served) or path == receipt_path for path in records):
             raise ValueError("a nonserved record must remain outside the served root and apart from the receipt")
     receipt.parent.mkdir(parents=True, exist_ok=True)
+    for custody in {receipt.parent, *(path.parent for path in records)} if records else ():
+        # Nonserved records are custody records: their directories are 0700 whether new or already looser.
+        custody.mkdir(parents=True, exist_ok=True, mode=0o700)
+        if custody.stat().st_mode & 0o077:
+            os.chmod(custody, 0o700)
     with tempfile.TemporaryDirectory(prefix="local-pages-refresh-", dir=receipt.parent) as staging:
         stage = Path(staging)
         for name, raw in outputs.items():

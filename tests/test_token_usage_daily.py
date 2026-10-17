@@ -316,6 +316,77 @@ class CollectionTests(TokenCase):
         self.assertEqual(history.read_text(), "{not json")
 
 
+class DirectoryModeTests(TokenCase):
+    def test_the_projection_directory_is_private_whether_new_or_already_looser(self):
+        """Review B6: the token writer tightens an existing looser directory to 0700 and writes both files at 0600."""
+        claude, codex_path = write_json(self.base / "c.json", sweep()), write_json(self.base / "x.json", codex())
+        for name, existing in (("new", None), ("loose", 0o755), ("open", 0o777)):
+            with self.subTest(directory=name):
+                directory = self.base / name / "state"
+                if existing is not None:
+                    directory.mkdir(parents=True)
+                    directory.chmod(existing)
+                code = self.module.main(["--date", "2026-10-16", "--claude-lanes-report", str(claude), "--codex-lanes-report", str(codex_path),
+                                         "--out", str(directory / "latest.json"), "--history", str(directory / "history.json"), "--now", "2026-10-17T05:00:00Z"])
+                self.assertEqual(code, 0)
+                self.assertEqual(oct(directory.stat().st_mode & 0o777), "0o700")
+                for file in ("latest.json", "history.json"):
+                    self.assertEqual(oct((directory / file).stat().st_mode & 0o777), "0o600", file)
+
+
+class MalformedShapeTests(TokenCase):
+    """Review B3: a collector report or history row of an unexpected shape ends as exit 2 with the one fixed line, never a traceback."""
+    def replay(self, claude_report, codex_report, history_path):
+        out, stderr = self.base / "state/latest.json", io.StringIO()
+        with redirect_stderr(stderr):
+            code = self.module.main(["--date", "2026-10-16", "--claude-lanes-report", str(write_json(self.base / "c.json", claude_report)),
+                                     "--codex-lanes-report", str(write_json(self.base / "x.json", codex_report)),
+                                     "--out", str(out), "--history", str(history_path), "--now", "2026-10-17T05:00:00Z"])
+        return code, stderr.getvalue(), out
+
+    def seeded(self, mutate):
+        """A history whose one row passes the digest check after `mutate` changed it and the digest was recomputed."""
+        row = {**self.day(sweep(), codex(), date="2026-10-15"), "measured_at": "2026-10-16T01:00:00Z"}
+        history = self.module.merge_history(None, [row], now=datetime(2026, 10, 17, 5, tzinfo=timezone.utc))
+        mutate(history["rows"][0])
+        history["rows"][0]["row_sha256"] = self.module.digest({key: value for key, value in history["rows"][0].items() if key != "row_sha256"})
+        return history
+
+    def test_a_malformed_collector_report_ends_as_the_fixed_line(self):
+        history = self.base / "state/history.json"
+        broken_sweep = {**sweep(), "groups": ["not", "an", "object"]}
+        broken_codex = codex()
+        broken_codex["groups"]["workers"]["mcp_calls"] = ["not", "an", "object"]
+        for name, (claude_report, codex_report) in {"sweep groups": (broken_sweep, codex()), "codex mcp_calls": (sweep(), broken_codex)}.items():
+            with self.subTest(report=name):
+                code, stderr, out = self.replay(claude_report, codex_report, history)
+                self.assertEqual((code, stderr), (2, self.module.FAILURE + "\n"))
+                self.assertFalse(out.exists())
+                self.assertFalse(history.exists())
+
+    def test_a_malformed_history_row_with_a_valid_digest_ends_as_the_fixed_line(self):
+        shapes = {"lanes list": lambda row: row.update(lanes=[]), "collectors list": lambda row: row.update(collectors=[]),
+                  "impossible date": lambda row: row.update(date="2026-13-45"),
+                  "lane models list": lambda row: row["lanes"]["claude:main"].update(models=["x"]),
+                  "lane not an object": lambda row: row["lanes"].update({"claude:main": 7})}
+        for name, mutate in shapes.items():
+            with self.subTest(row=name):
+                history = self.seeded(mutate)
+                with self.assertRaises(ValueError):
+                    self.module.check_history(history)
+                path = write_json(self.base / f"state/{name.replace(' ', '-')}.json", history)
+                code, stderr, out = self.replay(sweep(), codex(), path)
+                self.assertEqual((code, stderr), (2, self.module.FAILURE + "\n"))
+                self.assertFalse(out.exists())
+                self.assertEqual(json.loads(path.read_text()), history)
+
+    def test_a_well_formed_history_row_still_passes_the_shape_check(self):
+        history = self.seeded(lambda row: None)
+        self.assertEqual(self.module.check_history(history), history)
+        null_lane = self.seeded(lambda row: row["lanes"].update({"muse:muse": None}))
+        self.assertEqual(self.module.check_history(null_lane), null_lane)
+
+
 class UnitTests(TokenCase):
     def test_the_rendered_units_name_the_projection_paths(self):
         daily = importlib.import_module("daily_skill_usage")

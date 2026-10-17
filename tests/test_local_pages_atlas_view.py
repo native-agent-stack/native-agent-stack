@@ -102,6 +102,42 @@ def _pixels(value: str) -> float:
     return float(match.group(1)) * (16 if match.group(2) == "rem" else 1)
 
 
+class CascadeRecordTests(unittest.TestCase):
+    """Reviews B7 to B9: the cascade helper's packages are pinned, and the plan and the stylesheet say what the tests and the page do."""
+    ROOT = HERE.parents[1]
+
+    def test_the_cascade_helper_packages_are_hash_pinned_for_ci(self):
+        text = (self.ROOT / ".github/requirements-ci.txt").read_text()
+        for name, version in (("cssselect2", "0.10.1"), ("tinycss2", "1.5.1"), ("webencodings", "0.6.1")):
+            with self.subTest(package=name):
+                entry = re.search(rf"^{name}=={re.escape(version)} \\\n((?:    --hash=sha256:[0-9a-f]{{64}}(?: \\)?\n?)+)", text, re.M)
+                self.assertIsNotNone(entry, f"{name}=={version} with hashes")
+                self.assertGreaterEqual(len(re.findall(r"--hash=sha256:", entry.group(1))), 2)
+        plan = (HERE / "design-plan.md").read_text()
+        self.assertIn("**CSS cascade helper.**", plan)
+        for named in ("cssselect2 0.10.1", "tinycss2 1.5.1", "9,905", "76,717"):
+            self.assertIn(named, " ".join(plan.split()))
+
+    def test_the_plan_and_the_stylesheet_say_same_named_properties(self):
+        """B8: the helper compares only same-named properties at one importance, so no text claims to check each or every declaration."""
+        plan, css = (HERE / "design-plan.md").read_text(), (HERE / "assets/atlas.css").read_text()
+        self.assertIn("same-named property", " ".join(plan.split()))
+        self.assertIn("compares same-named properties", css)
+        for text in (plan, css):
+            self.assertNotRegex(text, r"checks (each|every) (atlas )?declaration")
+
+    def test_the_plan_says_which_identifiers_the_page_sets_in_monospace(self):
+        """B9: atlas_view renders <code> for more than pins, paths and record names, and the Type line says so."""
+        plan = (HERE / "design-plan.md").read_text()
+        self.assertNotIn("monospace only for pins, paths and record names", plan)
+        start = plan.index("**Tokens.** The palette above is unchanged and the atlas")
+        type_line = " ".join(plan[start:plan.index("**Layout.**", start)].split())
+        for named in ("pins", "paths", "record", "slot keys", "model ids", "MCP server names", "agent roles", "change kinds"):
+            self.assertIn(named, type_line)
+        view = (HERE / "atlas_view.py").read_text()
+        self.assertGreater(view.count("<code>"), 10)
+
+
 class CascadeTests(ViewCase):
     """What the stylesheets do to the built page's elements; design-plan.md "Atlas page" records the browser measurement."""
 
@@ -272,6 +308,22 @@ class UnknownAndCopyTests(ViewCase):
         section = self.section(self.page(fixture), "atlas-measured")
         self.assertIn("Advisor sub-inference, which the kernel counts apart, adds 1,234 input and 56 output tokens", section)
         self.assertNotIn("Advisor sub-inference", self.section(self.page(Fixture(self.base / "plain")), "atlas-measured"))
+
+    def test_an_unknown_advisor_field_renders_as_unknown_never_zero_or_a_partial_sum(self):
+        """Review B4: {"input": 5, "output": null} is 5 input and unknown output, and a lane that leaves a field unknown makes the total unknown."""
+        def note(**advisors):
+            fixture = Fixture(self.base / "-".join(advisors))
+            projection = latest()
+            for lane_key, value in advisors.items():
+                projection["rollup"]["lanes"].setdefault("claude:" + lane_key, lane())["advisor"] = value
+            Fixture.write(fixture.state / LATEST, json.dumps(projection))
+            return re.search(r"Advisor sub-inference.*?</p>", self.section(self.page(fixture), "atlas-measured"), re.S).group(0)
+        half = note(workflow={"input": 5, "output": None})
+        self.assertIn("adds 5 input and unknown output tokens", half)
+        self.assertNotIn("0 output", half)
+        mixed = note(workflow={"input": 5, "output": None}, main={"input": 1, "output": 2})
+        self.assertIn("adds 6 input and unknown output tokens", mixed)
+        self.assertIn("adds 1,234 input and 56 output tokens", note(workflow={"input": 1234, "output": 56}, agent_tool={"input": None, "output": None}))
 
     def test_pending_and_failure_blocks_name_what_makes_them_present(self):
         fixture = Fixture(self.base, projections=False, agents=())

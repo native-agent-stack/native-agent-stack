@@ -135,7 +135,40 @@ class AtlasOnlyTests(BuildCase):
         self.assertFalse(any(path.name.startswith("architecture-") for path in (self.base / "served").iterdir()))
 
 
+    def test_the_custody_directory_is_private_whether_new_or_already_looser(self):
+        """Review B6: a new custody directory is 0700 and an existing looser one is tightened; the ledger and receipt live in it."""
+        mode = lambda path: path.stat().st_mode & 0o777
+        for name, existing in (("new", None), ("loose", 0o755), ("open", 0o777)):
+            with self.subTest(directory=name):
+                custody = self.base / name / "atlas"
+                if existing is not None:
+                    custody.mkdir(parents=True)
+                    custody.chmod(existing)
+                with redirect_stdout(io.StringIO()):
+                    code = PAGES.main(["--atlas-only", "--output-dir", str(self.base / name / "served"), "--receipt", str(custody / "atlas-receipt.json"),
+                                       "--state-root", str(self.base / "state")])
+                self.assertEqual(code, 0)
+                self.assertEqual(oct(mode(custody)), "0o700")
+                self.assertEqual(oct(mode(custody / "atlas-receipt.json")), "0o600")
+
+
 class PublishTests(BuildCase):
+    def test_publish_tightens_custody_directories_that_already_exist_looser(self):
+        """Review B6, at the composer: nonserved records and the receipt land in 0700 directories; a served-only publish is unchanged."""
+        mode = lambda path: oct(path.stat().st_mode & 0o777)
+        output, receipt, ledger = self.base / "served", self.base / "custody/atlas/receipt.json", self.base / "ledgers/atlas/ledger.json"
+        for directory in (receipt.parent, ledger.parent):
+            directory.mkdir(parents=True)
+            directory.chmod(0o755)
+        PAGES.publish(output, receipt, {"atlas.html": b"page"}, {"schema": "fixture"}, nonserved={ledger: b"ledger\n"})
+        self.assertEqual((mode(receipt.parent), mode(ledger.parent)), ("0o700", "0o700"))
+        self.assertEqual((mode(ledger), mode(receipt)), ("0o600", "0o600"))
+        plain_receipt = self.base / "refresh/receipt.json"
+        plain_receipt.parent.mkdir(parents=True)
+        plain_receipt.parent.chmod(0o755)
+        PAGES.publish(self.base / "served2", plain_receipt, {"atlas.html": b"page"}, {"schema": "fixture"})
+        self.assertEqual(mode(plain_receipt.parent), "0o755")
+
     def test_nonserved_records_are_replaced_before_the_receipt_and_never_inside_the_served_root(self):
         output, receipt, ledger = self.base / "served", self.base / "custody/atlas/receipt.json", self.base / "custody/atlas/ledger.json"
         order, real = [], os.replace

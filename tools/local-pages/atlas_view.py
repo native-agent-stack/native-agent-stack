@@ -266,7 +266,7 @@ def stacks_view(data: dict) -> str:
             servers = ('<h4 class="atlas-sub">MCP servers the lanes call in this stack</h4><ul class="ov-rows">'
                        + "".join(f'<li><code>{esc(row["name"])}</code>: {esc(row["role"])} in <code>{esc(row["layer"])}</code></li>' for row in stack["servers"]) + "</ul>")
         else:
-            servers = '<p class="lp-empty">No listed MCP server joins a layer of this stack.</p>'
+            servers = '<p class="lp-empty">No MCP server that joins a layer of this stack has a recorded call.</p>'
         out.append(f'<h3 id="atlas-stack-{esc(stack["id"])}">{esc(stack["title"])}</h3>{table}{slot_html}{servers}')
     return "".join(out) + '<p class="atlas-cite">Layers, winners and survivors from <code>catalogs/landscape/final-stack.json</code>; server roles from its <code>index.by_repository</code>.</p>'
 
@@ -409,10 +409,13 @@ def coverage(latest: dict) -> str:
         parts.append(f'{cover["codex_sessions"]:,} Codex sessions, {_number(cover.get("codex_usage_incomplete"))} of them with incomplete usage')
     parts.append(f'{cover["muse_receipts"]:,} Muse runs' if isinstance(cover.get("muse_receipts"), int) else "Muse runs not measured")
     advised = [((latest["rollup"]["lanes"].get(lane) or {}).get("advisor") or {}) for lane in ("claude:main", "claude:agent_tool", "claude:workflow")]
-    advisor = {key: sum(row[key] for row in advised if isinstance(row.get(key), int)) for key in ("input", "output")}
+    # A lane with any known advisor field takes part; a field it leaves unknown makes that field's total unknown, never a partial sum or zero.
+    taking_part = [row for row in advised if any(isinstance(row.get(key), int) for key in ("input", "output"))]
+    advisor = {key: None if any(not isinstance(row.get(key), int) for row in taking_part) else sum(row[key] for row in taking_part) for key in ("input", "output")}
+    known = lambda value: "unknown" if value is None else f"{value:,}"
     advisor_line = ""
-    if any(isinstance(row.get(key), int) for row in advised for key in ("input", "output")):
-        advisor_line = (f'<p class="atlas-note">Advisor sub-inference, which the kernel counts apart, adds {advisor["input"]:,} input and {advisor["output"]:,} '
+    if taking_part:
+        advisor_line = (f'<p class="atlas-note">Advisor sub-inference, which the kernel counts apart, adds {known(advisor["input"])} input and {known(advisor["output"])} '
                         'output tokens for the complete agents; it is in neither the token columns nor the cache-read share. '
                         '<code>ccusage claude daily</code> counts it and the incomplete agents too, so its totals run higher.</p>')
     measured = latest["measured"]

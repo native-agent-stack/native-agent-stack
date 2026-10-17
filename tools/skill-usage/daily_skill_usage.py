@@ -146,6 +146,8 @@ def publish(path, report):
     if skill_usage.inside_git_work_tree(path.parent) or path.is_relative_to(ROOT):
         raise ValueError("report destination must be outside git worktrees")
     path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    if path.parent.stat().st_mode & 0o077:
+        os.chmod(path.parent, 0o700)  # a directory that already exists looser is tightened, never kept as it was
     descriptor, temp = tempfile.mkstemp(prefix=".skill-usage-", dir=path.parent)
     try:
         with os.fdopen(descriptor, "w") as stream:

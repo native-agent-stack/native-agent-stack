@@ -341,8 +341,27 @@ def check_history(history) -> dict | None:
             raise ValueError("token-rate history row is malformed or repeats a date")
         if row.get("row_sha256") != digest({key: value for key, value in row.items() if key != "row_sha256"}):
             raise ValueError("token-rate history row digest does not verify")
+        _check_row_shape(row)
         seen.add(row["date"])
     return history
+
+
+def _check_row_shape(row: dict) -> None:
+    """A verified digest says the row is unchanged, not that its shape is one the readers can walk: the date is a real
+    YYYY-MM-DD, collectors is an object and lanes is an object of lane objects (or null) whose nested fields are objects."""
+    try:
+        Date.fromisoformat(row["date"])
+    except ValueError:
+        raise ValueError("token-rate history row date is not a calendar date") from None
+    lanes, collectors = row.get("lanes"), row.get("collectors", {})
+    if not isinstance(collectors, dict) or not isinstance(lanes, dict):
+        raise ValueError("token-rate history row collectors or lanes is not an object")
+    for lane in lanes.values():
+        if lane is None:
+            continue
+        if not isinstance(lane, dict) or any(lane.get(key) is not None and not isinstance(lane.get(key), dict)
+                                             for key in ("mcp", "models", "usage", "advisor", "codex_usage", "rtk", "spawn", "runs")):
+            raise ValueError("token-rate history row lane is not an object of counters")
 
 
 def _measured(row: dict) -> set:
@@ -531,7 +550,8 @@ def main(argv=None) -> int:
         daily_skill_usage.publish(history_path, merged)
         daily_skill_usage.publish(out_path, document)
         return 0 if any(state.get(client) == "measured" for state in states for client in ("claude", "codex", "muse")) else 1
-    except (OSError, ValueError, subprocess.SubprocessError):
+    except (OSError, ValueError, subprocess.SubprocessError, AttributeError, TypeError, KeyError):
+        # A collector report or history of an unexpected shape raises one of the last three; it ends as the one fixed line.
         print(FAILURE, file=sys.stderr)
         return 2
 

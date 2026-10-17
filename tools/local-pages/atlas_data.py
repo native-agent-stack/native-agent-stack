@@ -77,6 +77,8 @@ _CODEX_EFFORTS = ("none", "minimal", "low", "medium", "high", "xhigh", "max", "u
 _DATE = re.compile(r"\d{4}-\d{2}-\d{2}\Z")
 _HEX40, _HEX64 = re.compile(r"[0-9a-f]{40}\Z"), re.compile(r"[0-9a-f]{64}\Z")
 _LOOPBACK = re.compile(r"http://127\.0\.0\.1:\d{2,5}(?:/[A-Za-z0-9._~/-]*)?\Z")
+# A monitoring link is a page in this served folder (a relative .html name, optionally in subfolders, with a plain fragment); never a scheme or a path out.
+_PAGE_LINK = re.compile(r"(?:[A-Za-z0-9][A-Za-z0-9._-]*/)*[A-Za-z0-9][A-Za-z0-9._-]*\.html(?:#[A-Za-z0-9_-]+)?\Z")
 _QUOTED = re.compile(r'"([^"]+)"')
 # overview_data.repos() needs a finalize-all rows source; the atlas reads none, so it gets this pending stand-in.
 NOT_READ = {"status": "pending", "name": "finalize-all rows", "declared": "not an atlas source", "root": "repo", "trigger": "not read by the atlas"}
@@ -158,8 +160,12 @@ def load_map(path: Path = ATLAS_MAP) -> tuple[dict, dict]:
         if isinstance(cite["line"], bool) or not isinstance(cite["line"], int) or cite["line"] < 1 or not isinstance(cite["anchor"], str) or not cite["anchor"].strip():
             raise policy.SourcePolicyError("atlas citation needs a repository path, a positive line and an anchor")
     for entry in document.get("monitoring") or []:
-        if "url" in (entry.get("open") or {}) and not _LOOPBACK.fullmatch(str(entry["open"]["url"])):
+        opened = entry.get("open") if isinstance(entry.get("open"), dict) else {}
+        if "url" in opened and not _LOOPBACK.fullmatch(str(opened["url"])):
             raise policy.SourcePolicyError("atlas monitoring URLs are loopback URLs only")
+        if "links" in opened and (not isinstance(opened["links"], list)
+                                  or not all(isinstance(link, str) and (_PAGE_LINK.fullmatch(link) or _LOOPBACK.fullmatch(link)) for link in opened["links"])):
+            raise policy.SourcePolicyError("atlas monitoring links are page names in this folder or loopback URLs only")
     return document, {"path": "tools/local-pages/" + Path(path).name, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
 
 
@@ -293,12 +299,14 @@ def _server_classes(servers: list, final_stack: dict | None, stacks: list) -> di
 
 def stacks(joins: dict, layers: dict, slots: dict, measured: dict) -> list[dict]:
     """The memory and retrieval, code-intelligence and token-efficiency stacks: each catalog layer with its requirement,
-    state, winners and survivors; the practice slots; and the MCP servers the projection lists in each, with their role."""
+    state, winners and survivors; the practice slots; and the MCP servers the lanes called in each, with their role. The
+    projection's servers[] is only the publish allowlist, so a server with no recorded call (summed over every window) is not listed."""
     by_slot = {row["slot"]: row for row in slots.get("rows") or []} if slots.get("status") == "present" else {}
     classes = measured.get("classes") or {}
+    called = set(measured.get("called") or [])
     result = []
     for stack in joins["stacks"]:
-        servers = sorted(({"name": name, "layer": info["layer"], "role": info["role"]} for name, info in classes.items() if info["stack"] == stack["id"]),
+        servers = sorted(({"name": name, "layer": info["layer"], "role": info["role"]} for name, info in classes.items() if info["stack"] == stack["id"] and name in called),
                          key=lambda row: (ROLE_ORDER.get(row["role"], 9), row["name"]))
         result.append({"id": stack["id"], "title": stack["title"], "layers": [layers.get(key) or {"layer": key, "missing": True} for key in stack["catalog_layers"]],
                        "slots": [_slot(by_slot, slot_id) for slot_id in stack["slots"]], "slots_status": slots.get("status"),
@@ -434,11 +442,22 @@ def measured(sources: dict, joins: dict) -> dict:
         for lane in lanes.values():
             if lane is not None:
                 lane["metrics"] = {"mcp": mcp_classes(lane, classes), "cache_read_share": cache_read_share(lane)}
-    return {"status": "present", "latest": latest, "history": history, "history_source": history_source, "classes": classes, "ttl_note": ttl}
+    return {"status": "present", "latest": latest, "history": history, "history_source": history_source, "classes": classes,
+            "called": called_servers(windows), "ttl_note": ttl}
+
+
+def called_servers(windows: list) -> list[str]:
+    """The servers whose calls, summed over every window, are above zero: the allowlist alone never says a server was called."""
+    totals: dict = {}
+    for lanes in windows:
+        for lane in lanes.values():
+            for name, number in ((lane or {}).get("mcp") or {}).items():
+                totals[name] = totals.get(name, 0) + number
+    return sorted(name for name, number in totals.items() if number > 0)
 
 
 def _ttl_note(source: dict) -> dict | None:
-    """The prompt-caching slot's status and route text (slots.json:648-652), stated beside the TTL columns without a judgment."""
+    """The prompt-caching slot's status and route text (slots.json:661-665), stated beside the TTL columns without a judgment."""
     content = source.get("content") if source["status"] == "present" and isinstance(source.get("content"), dict) else None
     slot = next((row for row in (content or {}).get("slots") or [] if isinstance(row, dict) and row.get("id") == "prompt-caching"), None)
     if slot is None:
@@ -705,6 +724,9 @@ def _locked(directory_path: Path):
     coordinates its cache (fleet_data.py:484-493): a no-symlink directory walk, O_NOFOLLOW and mode 0600."""
     fleet = load("fleet_data")
     with fleet._directory(directory_path, create=True) as directory:
+        # New directories are made 0700; one that already exists looser (the ledger and receipt live here) is tightened through its descriptor.
+        if stat.S_IMODE(os.fstat(directory).st_mode) & 0o077:
+            os.fchmod(directory, 0o700)
         fleet._destination(directory, LOCK_NAME)
         lock = os.open(LOCK_NAME, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK, mode=0o600, dir_fd=directory)
         try:

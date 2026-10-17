@@ -118,7 +118,7 @@
      "open": {"commands": ["ccusage claude daily --offline --no-cost --json --timezone UTC", "ccusage codex daily --offline --no-cost --json --timezone UTC"]},
      "cites": [{"path": "tools/token-report/README.md", "line": 242, "anchor": "ccusage claude daily"},
                {"path": "docs/new-wsl-handbook.json", "line": 2317, "anchor": "ccusage codex daily --offline --no-cost --json"},
-               {"path": "docs/decisions/2026-10-17-harness-atlas.md", "line": 75, "anchor": "--timezone UTC"}]},
+               {"path": "docs/decisions/2026-10-17-harness-atlas.md", "line": 76, "anchor": "--timezone UTC"}]},
     {"id": "observability", "title": "Observability stack", "shows": "OTLP from the clients and workers into the collector, then Loki and Prometheus, read in Grafana.",
      "open": {"via": "cc-board"},
      "cites": [{"path": "docs/decisions/2026-10-13-command-center-god-view.md", "line": 6, "anchor": "OTLP through the OTel Collector into Loki and Prometheus"}]}
@@ -134,7 +134,7 @@
     {"id": "api-keys-quality-caching", "text": "Anthropic API keys serve only the highest-quality resolution that the subscription lanes cannot give, and always with prompt caching.",
      "recorded_in": [],
      "mechanism": [{"path": "docs/decisions/2026-10-10-anthropic-key-slots-and-practice.md", "line": 15, "anchor": "Record the command center's key practice"},
-                   {"path": ".claude/skills/claude-native-practice/reference/slots.json", "line": 648, "anchor": "\"id\": \"prompt-caching\""}],
+                   {"path": ".claude/skills/claude-native-practice/reference/slots.json", "line": 661, "anchor": "\"id\": \"prompt-caching\""}],
      "trigger": "the CC names the ruling record"},
     {"id": "gpt-reserve", "text": "The GPT account pool keeps a 30-point reserve.",
      "recorded_in": [],

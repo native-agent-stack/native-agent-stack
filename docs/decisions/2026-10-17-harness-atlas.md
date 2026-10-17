@@ -28,6 +28,7 @@ contracts, grants, tests and validators below.
 | [Anthropic prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching), read 2026-10-17T05:18:15Z, 3,118,775 bytes, SHA-256 `0e35580db9777497e447cb9e9cc14fd4e792d479ca137976a59c6946d7c361b3` | `usage.cache_creation.ephemeral_5m_input_tokens` and `ephemeral_1h_input_tokens`; `cache_creation_input_tokens` equals the sum of the `cache_creation` values |
 | systemd 259 (259.5-0ubuntu3.4), `systemd.service(5)` `ExecStart=` (man page gzip SHA-256 `e25f4928eb2e90eb2ffead15800d49893b34344ee972471d72b7271a2f3161d8`) and `systemd.timer(5)` `OnCalendar=`, `Persistent=` (`90f5229f48bd3f2ba617225b41b4b514efa1c5a834cfc70fca0e9626ebee03f9`), read 2026-10-17T05:18:04Z | A oneshot unit's commands run in order and a failing one stops the rest; an hourly persistent timer catches up a missed run |
 | Python 3.13.16 `os.replace`, `tempfile`, `fcntl.flock`, `html.escape`, `tomllib` | Atomic publication, the ledger lock, escaping and the Codex agent files |
+| [cssselect2](https://pypi.org/pypi/cssselect2/0.10.1/json) 0.10.1 and [tinycss2](https://pypi.org/pypi/tinycss2/1.5.1/json) 1.5.1 (webencodings 0.6.1), read 2026-10-17; wheel and sdist hashes in `.github/requirements-ci.txt` | `Matcher.match` and `compile_selector_list` (selector matching and specificity) and `parse_stylesheet`, `parse_rule_list` and `parse_blocks_contents` (rules, declarations, importance) for the test-only stylesheet cascade; screened and measured in `tools/local-pages/design-plan.md` "CSS cascade helper" |
 
 ## What changed
 
