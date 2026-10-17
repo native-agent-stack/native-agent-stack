@@ -1,0 +1,20 @@
+Cloning into '<SCRATCH_ARM>/work/codex'...
+warning: refs/tags/rust-v0.160.0 79b1b666f2e8551f8abbbca34957227f67f3f553 is not a commit!
+Note: switching to 'a956835d020762cb2b570053af06f643a11c0ecc'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+Updating files:  59% (5222/8775)Updating files:  60% (5265/8775)Updating files:  61% (5353/8775)Updating files:  62% (5441/8775)Updating files:  63% (5529/8775)Updating files:  64% (5616/8775)Updating files:  65% (5704/8775)Updating files:  66% (5792/8775)Updating files:  67% (5880/8775)Updating files:  68% (5967/8775)Updating files:  69% (6055/8775)Updating files:  70% (6143/8775)Updating files:  71% (6231/8775)Updating files:  72% (6318/8775)Updating files:  73% (6406/8775)Updating files:  74% (6494/8775)Updating files:  75% (6582/8775)Updating files:  76% (6669/8775)Updating files:  77% (6757/8775)Updating files:  78% (6845/8775)Updating files:  79% (6933/8775)Updating files:  80% (7020/8775)Updating files:  81% (7108/8775)Updating files:  82% (7196/8775)Updating files:  83% (7284/8775)Updating files:  84% (7371/8775)Updating files:  85% (7459/8775)Updating files:  86% (7547/8775)Updating files:  87% (7635/8775)Updating files:  88% (7722/8775)Updating files:  89% (7810/8775)Updating files:  90% (7898/8775)Updating files:  91% (7986/8775)Updating files:  92% (8073/8775)Updating files:  93% (8161/8775)Updating files:  94% (8249/8775)Updating files:  95% (8337/8775)Updating files:  96% (8424/8775)Updating files:  97% (8512/8775)Updating files:  98% (8600/8775)Updating files:  99% (8688/8775)Updating files: 100% (8775/8775)Updating files: 100% (8775/8775), done.

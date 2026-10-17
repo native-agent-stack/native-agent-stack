@@ -1,0 +1,114 @@
+{
+  "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+  "privacy": "Only committed public input bytes sealed; no co-op/CC/private record hashes",
+  "public_repository_inputs": {
+    "AGENTS.md": {
+      "bytes": 4320,
+      "sha256": "badc1a93731095641e71ae1bf1d5ae5d5021e522c1da62926ddc65268f5c10a1"
+    },
+    "adoption/pins-linux-x86_64.json": {
+      "bytes": 35096,
+      "sha256": "964d085d8fe2cb8aba3d44678938e34a2b1d8b6e320227db4152352a0d0e2449"
+    },
+    "adoption/pins-macos-arm64.json": {
+      "bytes": 40598,
+      "sha256": "539a4840e1c5e2d5377685c274932f697d22bd16e28f99e70c12b2f86dc9f24c"
+    },
+    "blueprints/us-equities/workers/README.md": {
+      "bytes": 14924,
+      "sha256": "bf84fc7f15c3d8a53331e9b36fea43a98b80191195ceadddda64d83280b12b78"
+    },
+    "blueprints/us-equities/workers/native_worker.py": {
+      "bytes": 24591,
+      "sha256": "bbdbad012df99ae2c6a2384865c9acd8a5241db32d2596e6f904525be40fe74b"
+    },
+    "blueprints/us-equities/workers/receipt.json": {
+      "bytes": 9036,
+      "sha256": "2e8e5742bae1629b951d87cb140d53e2f1cc04dc88f77e65de183bc8a7a1c5f6"
+    },
+    "catalogs/foundation/decisions.json": {
+      "bytes": 140670,
+      "sha256": "ea9ea339a2fda04b779f3782930ef234c9e39f79ec7a6c4f79156e49a4240107"
+    },
+    "catalogs/landscape/angles/foundation-agent-sdks.json": {
+      "bytes": 12401,
+      "sha256": "2ca80cb4cbf9ab3abc3ad8c561b76334eba91125d0ab41e5702de354b8435cde"
+    },
+    "catalogs/landscape/final-stack.json": {
+      "bytes": 339603,
+      "sha256": "d1bf813f10095b096b9f3eb90d7376286ef8d7679d03f8634d2f7b73286c54ba"
+    },
+    "catalogs/landscape/foundation.json": {
+      "bytes": 480209,
+      "sha256": "55751afc9a6e3d2dd814d5ba35d811ea9424464ccc417234b8cb6d08864e48b8"
+    },
+    "catalogs/saturation/ledger.json": {
+      "bytes": 413173,
+      "sha256": "b6ca3220516a515bd6dec13f122f48acdd8ef738565f9c0145839d99dd0c21f2"
+    },
+    "catalogs/sota-convergence/layer-verdict-waves.json": {
+      "bytes": 651,
+      "sha256": "7f7056066fec1d5ea6e6cc5e243a668e509b1d74add94ec3d74cbd3025ebc756"
+    },
+    "catalogs/sota-convergence/layer-verdicts-20260922.json": {
+      "bytes": 609126,
+      "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+    },
+    "catalogs/sota-convergence/manifest-20260923.json": {
+      "bytes": 1118651,
+      "sha256": "304d75dd0dabb02ba46191161732c17d234c3608a194f538c6bee6b64b8069c8"
+    },
+    "catalogs/sota-convergence/manifest-20260926.json": {
+      "bytes": 1548502,
+      "sha256": "a72177d162f84ba827028a7bff5ebc78ea9195c7a99ed2b411c75f7869b20e0e"
+    },
+    "catalogs/sota-convergence/manifest-20260929.json": {
+      "bytes": 1149103,
+      "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee"
+    },
+    "docs/decisions/2026-10-08-sdk-runtime-worker-adoption.md": {
+      "bytes": 31210,
+      "sha256": "6a8b6e8ee76eb04d7ab6036d0435805f6063b45ee6c48bf2f3b1fe9d65da8f57"
+    },
+    "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md": {
+      "bytes": 100830,
+      "sha256": "18a250dc0e52d1459805720ac9b9a15f89c32a7d171d522e4aa30e8fe095555f"
+    },
+    "docs/foundation-closure-20260921.md": {
+      "bytes": 19475,
+      "sha256": "6c9b8acd56ea82ddd2841b3e7f638ee9d980bb648b519e116f5771f8a5ea0e4b"
+    },
+    "evidence/artifacts/comparison-progress-20260922/summary.json": {
+      "bytes": 10021,
+      "sha256": "0a19fd133aca4bffdc692f8dd851a333dab80b4f2ecd5959cb000a75165adc92"
+    },
+    "evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json": {
+      "bytes": 11131,
+      "sha256": "5b43a56c1bb8be4df24431ab5f947925c328a36f01c9b7bf308143809e5f1ddd"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/returns.json": {
+      "bytes": 3114964,
+      "sha256": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/agentproto-ts.json": {
+      "bytes": 2601,
+      "sha256": "26fde660fcca6ba0434939322fc3240b1fefd4edde9ce1999b6143be0bc5b9d9"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/github-copilot-sdk.json": {
+      "bytes": 1681,
+      "sha256": "6764e80e51e578a900ccdf89e89117b3becf86bcbca8084a59080d0873e29089"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/returns.json": {
+      "bytes": 2378440,
+      "sha256": "2f93067652c0f1e8e4f3d726895d2017eafef018412e47e9bc9b48e7ef931a9c"
+    },
+    "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json": {
+      "bytes": 89936,
+      "sha256": "212af1da8d35c262ebe172956aceaaafe5345bb3a5157f9f485f9bc0caae8b42"
+    },
+    "evidence/receipts/omniroute-sdk-worker-0160-20261003.json": {
+      "bytes": 149558,
+      "sha256": "9ad1db0b9e841cd780d04e544f6e75dde57fd88ebc6fc4f5b0bafd84287f20da"
+    }
+  }
+}

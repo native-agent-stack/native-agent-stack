@@ -1,0 +1,33 @@
+{
+  "candidates": [
+    {
+      "evidence_refs": [],
+      "name": "agentproto/ts",
+      "pin": null,
+      "repository": "https://github.com/agentproto/ts"
+    },
+    {
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "docs/foundation-closure-20260921.md"
+      ],
+      "name": "Codex SDK/CLI",
+      "pin": "0.157.1",
+      "repository": "https://github.com/openai/codex"
+    },
+    {
+      "evidence_refs": [],
+      "name": "github/copilot-sdk",
+      "pin": null,
+      "repository": "https://github.com/github/copilot-sdk"
+    }
+  ],
+  "command": "python3 tools/sota-convergence/lane_packets.py --root . --out <PACKET_SCRATCH> --catalog foundation --manifest catalogs/sota-convergence/manifest-20260929.json --checked-at 2026-10-16 --registered-receipts --manifest-newcomers",
+  "generated_by": "tools/sota-convergence/lane_packets.py at 65d66a370d9a5f129662d14c84f2820e940b3a83",
+  "generator_output": "packet-generation.txt",
+  "generator_status_capture": "check-receipts.json",
+  "layer": "foundation/agent-sdks",
+  "projection": "Only assigned layer winner and cumulative survivors; no other layer dispatched or researched",
+  "read_dispatch": "co-op only; no self-dispatched model read",
+  "requirement": "Give a worker structured events, custom tools or session control through a supported SDK when the native CLI's bounded review is not enough."
+}

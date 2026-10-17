@@ -1,0 +1,1 @@
+{"id":1,"result":{"userAgent":"agent-sdks-native-capture/0.160.0 (Ubuntu 26.4.0; x86_64) unknown (agent-sdks-native-capture; 1)","codexHome":"<SCRATCH_ARM>/work/invoke-codex-home","platformFamily":"unix","platformOs":"linux"}}

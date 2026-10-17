@@ -1,0 +1,26 @@
+test_all_private_input_seals_stay_outside_public_receipt (test_evidence_integrity.EvidenceIntegrityTests.test_all_private_input_seals_stay_outside_public_receipt) ... ok
+test_every_native_capture_is_bound_without_generated_status (test_evidence_integrity.EvidenceIntegrityTests.test_every_native_capture_is_bound_without_generated_status) ... ok
+test_historical_host_and_unsupported_snapshots_are_explicit (test_evidence_integrity.EvidenceIntegrityTests.test_historical_host_and_unsupported_snapshots_are_explicit) ... ok
+test_invoke_output_is_native_response_not_driver_summary (test_evidence_integrity.EvidenceIntegrityTests.test_invoke_output_is_native_response_not_driver_summary) ... ok
+test_pin_citation_supports_each_specific_pin (test_evidence_integrity.EvidenceIntegrityTests.test_pin_citation_supports_each_specific_pin) ... ok
+test_survivors_never_borrow_codex_runtime_and_no_numeric_scores (test_evidence_integrity.EvidenceIntegrityTests.test_survivors_never_borrow_codex_runtime_and_no_numeric_scores) ... ok
+test_generated_status_cannot_reproduce_native_install_output (test_mask_capture.LiteralMaskTests.test_generated_status_cannot_reproduce_native_install_output) ... ok
+test_idempotence (test_mask_capture.LiteralMaskTests.test_idempotence) ... ok
+test_masks_every_literal_occurrence_without_line_filtering (test_mask_capture.LiteralMaskTests.test_masks_every_literal_occurrence_without_line_filtering) ... ok
+test_native_test_context_is_not_replaced_with_a_summary (test_mask_capture.LiteralMaskTests.test_native_test_context_is_not_replaced_with_a_summary) ... ok
+test_preserves_nonmatching_bytes_including_binary_and_newlines (test_mask_capture.LiteralMaskTests.test_preserves_nonmatching_bytes_including_binary_and_newlines) ... ok
+test_rejects_nonabsolute_or_root_parameter (test_mask_capture.LiteralMaskTests.test_rejects_nonabsolute_or_root_parameter) ... ok
+test_every_root_and_nonmatching_byte_preserved (test_recording.AuxMaskTests.test_every_root_and_nonmatching_byte_preserved) ... ok
+test_identity_without_roots (test_recording.AuxMaskTests.test_identity_without_roots) ... ok
+test_invalid_name_rejected (test_recording.AuxiliaryRecorderTests.test_invalid_name_rejected) ... ok
+test_output_rc_and_exact_command_retained (test_recording.AuxiliaryRecorderTests.test_output_rc_and_exact_command_retained) ... ok
+test_cwd_escape_rejected_before_command (test_recording.RecorderTests.test_cwd_escape_rejected_before_command) ... ok
+test_existing_ledger_handle_is_closed (test_recording.RecorderTests.test_existing_ledger_handle_is_closed) ... ok
+test_missing_command_records_failure_not_success (test_recording.RecorderTests.test_missing_command_records_failure_not_success) ... ok
+test_subprocess_rc_full_bytes_and_sequence_bound_to_ledger (test_recording.RecorderTests.test_subprocess_rc_full_bytes_and_sequence_bound_to_ledger) ... ok
+test_usage_names_committed_script (test_recording.RecorderTests.test_usage_names_committed_script) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.084s
+
+OK
