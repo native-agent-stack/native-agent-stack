@@ -1,24 +1,25 @@
 # Decision: zero tolerance for stale models, runtimes and repositories (2026-10-17)
 
-**Status:** proposed for the command center's (CC) review, on the owner's direction of 2026-10-17 (paraphrased, not
-quoted). It changes no CI check, unit template, catalog row, model setting or host file.
+**Status:** proposed for the command center's (CC) review, on the owner's directions, each dated by the day it was
+given (paraphrased, not quoted). It changes no CI check, unit template, catalog row, model setting or host file.
 **Base:** `origin/main` at `90471d63f20918efa3a63ef949caffd8c012656c`; every `path:line` below is at that commit.
 **Supersession:** only the parts listed under "Superseded". The earlier records stay unchanged as dated history; this
 file amends them.
 
 ## The rule
 
-1. No stale model, runtime, repository or reference stays in use. A stale verdict starts replacement work at once; a
-   notice does not answer it. The work is the newest best-evidenced successor through the layer's screen, a smoke
-   test, a measured trial against the current pick, the switch, then removal of the old artifacts with the inverse
-   recorded. A stale reference mirror or catalog record is refreshed.
-2. No pick is stale, whether a default, a live pick or a trial arm. Each pick comes from a current cross-vendor
-   landscape screen, and each release date in it from a tool read, never from memory.
-3. Enforcement does not break the workflow mechanically. There is no new clock-triggered required CI check of the kind
-   that failed every pull request at the 2026-10-15 UTC rollover. Currency work runs in parallel lanes, never
-   displaces a gate read, and is never rationed on usage.
-4. A release is never set aside for being new. It is screened, and quantization or on-demand loading is tried before
-   anyone concludes that it cannot fit.
+1. **2026-10-17.** No stale model, runtime, repository or reference stays in use. A stale verdict starts replacement
+   work at once; a notice does not answer it. The work is the newest best-evidenced successor through the layer's
+   screen, a smoke test, a measured trial against the current pick, the switch, then removal of the old artifacts
+   with the inverse recorded. A stale reference mirror or catalog record is refreshed. Replacements are never rationed
+   on usage.
+2. **2026-10-16.** No pick is stale, whether a default, a live pick or a trial arm. Each pick comes from a current
+   cross-vendor landscape screen, and each release date in it from a tool read, never from memory.
+3. **2026-10-15.** Enforcement does not break the workflow mechanically. There is no new clock-triggered required CI
+   check of the kind that failed every pull request at that day's UTC rollover. Currency work runs in parallel lanes
+   and never displaces a gate read.
+4. **2026-10-16.** A release is never set aside for being new. It is screened, and quantization or on-demand loading
+   is tried before anyone concludes that it cannot fit. An upstream's own cooldown window still applies (Kept).
 
 ## Superseded
 
@@ -38,12 +39,12 @@ file amends them.
   (`:21-25`) stay dated observations. A pick needs the cross-vendor screen.
 - **Release watches that wait.** The [2026-10-13 engine record](2026-10-13-engine-currency.md) `:3-6` and `:188-190`
   hold three "behind" releases as inputs for a later screen. Each now starts its screen in its owning lane at once.
-- **Release age as a reason to keep an older pick.** A release-age wait no longer delays a model or runtime switch on
-  its own: the 7-day cooldown of the [2026-09-25 workstation refresh](2026-09-25-workstation-sota-refresh.md)
-  `:237-238`, named again in the [2026-09-27 record](2026-09-27-model-currency.md) `:494-496`, and the word
-  "cooldown" at `docs/model-currency.md:106`. The release, security and integrity gates on that line stay.
-  Dependabot's version-update cooldown (`docs/github-automation.md:145-146`) is a separate supply-chain control that
-  this record does not touch.
+- **Release age beyond the upstream's own window.** Release age no longer keeps an older pick once the upstream's own
+  cooldown has passed, and no age buffer of ours extends that window. That ends the 7-day cooldown of the
+  [2026-09-25 workstation refresh](2026-09-25-workstation-sota-refresh.md) `:237-238`, named again in the
+  [2026-09-27 record](2026-09-27-model-currency.md) `:494-496`, wherever it is longer than the upstream's. The
+  "cooldown" at `docs/model-currency.md:106` now means the upstream's own window. The CC's 2026-10-17 review ruling
+  sets this scope; the windows themselves stay (Kept).
 
 ## Kept
 
@@ -55,6 +56,11 @@ file amends them.
   turned eight days old and it reported nine errors (2026-10-15 record `:4-5,48-49`). This record adds no new
   date-triggered required check and leaves this one as it is. Open PR #1201 proposes to change its failure mode; this
   record neither adopts nor rejects that.
+- **Upstream cooldowns and supply-chain gates.** Each upstream's documented cooldown stays, such as Dependabot's
+  version-update cooldown (`docs/github-automation.md:145-146`) and a tool's own minimum release age, such as mise's
+  `minimum_release_age` (Sources). So do the lanes' release, security and integrity gates
+  (`docs/model-currency.md:105-106`). Inside such a window the pick is the newest release past it; a security fix that
+  exists only in the newer release overrides the window.
 - **Read-only detectors.** The collectors never apply a pin, download weights, change a model or publish a PR
   (`scripts/freshness_propose.py:22-26`; `adoption/templates/systemd/stack-currency.service:37`). Replacement is lane
   work, not a timer that switches. The [2026-10-07 record](2026-10-07-model-currency-enforcement.md)'s rejection of a
@@ -144,6 +150,10 @@ file amends them.
   [GitHub latest-release API](https://docs.github.com/en/rest/releases/releases#get-the-latest-release), cited by the
   2026-10-07 record; the [npm registry document](https://registry.npmjs.org/@anthropic-ai/claude-code) (`time`), cited
   by the 2026-09-27 record.
+- **Minimum release age:** `jdx/mise` at `v2026.10.12` (commit `de922674adb7aa8927e0c6a425e252053dbeb03c`),
+  the installed client:
+  [`settings.toml:2090-2096`](https://github.com/jdx/mise/blob/de922674adb7aa8927e0c6a425e252053dbeb03c/settings.toml#L2090-L2096)
+  (`minimum_release_age` holds back newly published versions to limit supply-chain risk). Re-read 2026-10-17.
 - **Fast-forward:** git v2.53.0, the installed client,
   [`Documentation/merge-options.adoc:56-59,79-81`](https://github.com/git/git/blob/v2.53.0/Documentation/merge-options.adoc#L56-L81).
 - **systemd:** `systemd/systemd@v259.5`,
