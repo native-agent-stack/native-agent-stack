@@ -409,18 +409,18 @@ redacted a fixture's own vocabulary, a refuter that was given untranslated reaso
 Read, Glob and Grep; the home tree and the other runs' directories denied; the network closed), reviewed 5 pull-request heads of this repository whose findings were known from earlier Opus
 and GPT reads, two trials each (20 runs). A blind first judge and a refuter (Opus 5.5 at max effort) scored each run's recall of the 12 decisive known findings, its false positives and its
 cost from the counter. The rule fixed before the first run: Sonnet takes review micros only if, for every decisive finding, it found the finding in at least as many of its runs as Opus did,
-and its runs cost at most 60% of Opus's. Opus found 7 detections of 24 and Sonnet 6; Sonnet missed 1 decisive finding that Opus found (G10, found in 1 of Opus's 2 runs and 0 of Sonnet's), at
-17% of Opus's cost, so by the strict rule Opus stays. Trial 1 alone met the rule and said Sonnet takes micros (its noise floor was 0.08); the registered trigger ended the run there (Sonnet
+and its runs cost at most 60% of Opus's. Opus found 7 detections of 24 and Sonnet 6; Sonnet missed 1 decisive finding that Opus found (G10, found in 1 of Opus's 2 runs and 0 of Sonnet's),
+at 17% of Opus's cost, so by the strict rule Opus stays. Trial 1 alone met the rule and said Sonnet takes micros (its noise floor was 0.08); the registered trigger ended the run there (Sonnet
 takes review micros, no second trial), and the command center added one after seeing the result, so the two-trial verdict is a ruled extension and not a preregistered outcome, and extending
 after a pass can only move the verdict toward Opus. Over the two trials the strict rule's noise floor is 0.02 at one shared detection rate of 0.27 (two identical reviewers would pass it that
 rarely) and 0.73 with each finding's own pooled rate (a plug-in calculation from these runs, not a significance test: a miss is less easily put down to chance than the first figure suggests,
 though it rests on one Opus detection); the tolerant reading, reported and not decisive, holds, and two identical reviewers would satisfy it 0.56 of the time (0.62 for its per-finding clause
-alone, the figure the result record prints; the command center's ruling prints it too and is corrected in a sidecar file, sha256 `338600a94e55`, which leaves the ruling's bytes unchanged).
-Beside the rule, not inputs: outside the known findings Opus reported 7 real and new P1 or P2 findings against Sonnet's 1, and Sonnet approved #982 in both trials where Opus requested
-changes. The command center ruled the strict reading on 2026-10-11 (ruling sha256 `a6beedb039e6`, `research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md`): Opus for trading
-code, gate code and any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation changes (docs, pages, catalogs, generated reports) where the change
-is mechanical or a second Claude-family read exists, which is the command center's routing discretion under the owner's direction to use the cheapest model that holds quality and not
-something run 5 measured (none of the 5 heads was a docs, pages or generated-report change); no slot row, default or skill text changes. Limits: the same 5 heads in both trials, so the
-second trial measures run-to-run variation on them; one brief; medium effort only; the judge and refuter are one family; the fence denies the client's persisted tool outputs and refused the
-runs that tried to read them (3 Opus runs in trial 2, 2 in trial 1); costs are API-list-equivalent, not billed. The preregistration is sha256 `66f87a9eb2b9`, the result record
-`5642e6a1b989`, and the registration allows no third trial.
+alone, the figure the result record prints; the command center's ruling prints it too and is corrected in a sidecar file `research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.correction-01.md`,
+which leaves the ruling's bytes unchanged). Beside the rule, not inputs: outside the known findings Opus reported 7 real and new P1 or P2 findings against Sonnet's 1, and Sonnet approved
+#982 in both trials where Opus requested changes. The command center ruled the strict reading on 2026-10-11 (ruling `research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md`):
+Opus for trading code, gate code and any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation changes (docs, pages, catalogs, generated reports)
+where the change is mechanical or a second Claude-family read exists, which is the command center's routing discretion under the owner's direction to use the cheapest model that holds quality
+and not something run 5 measured (none of the 5 heads was a docs, pages or generated-report change); no slot row, default or skill text changes. Limits: the same 5 heads in both trials, so
+the second trial measures run-to-run variation on them; one brief; medium effort only; the judge and refuter are one family; the fence denies the client's persisted tool outputs and refused
+the runs that tried to read them (3 Opus runs in trial 2, 2 in trial 1); costs are API-list-equivalent, not billed. The preregistration is `paired-routing/preregistration.md` and the result
+record `paired-routing/RESULT-trials-1-2.md`, both private, and the registration allows no third trial.
