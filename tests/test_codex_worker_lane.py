@@ -576,7 +576,8 @@ class TemplateTests(unittest.TestCase):
         fixture = {"HOME": "/home/example", "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
                    "PROJECT_ROOT": "/home/example/code/agent-lab", "HOST_PATH": "/usr/bin:/bin",
                    "OTEL_ENDPOINT": "127.0.0.1:1", "AI_MEMORY_URL": "127.0.0.1:1", "QDRANT_URL": "127.0.0.1:1",
-                   "EMBED_URL": "127.0.0.1:1", "SOCRATICODE_VERSION": "1.15.0", "CODEX_MODEL": "gpt-6.1-sol"}
+                   "EMBED_URL": "127.0.0.1:1", "SOCRATICODE_VERSION": "1.15.0", "CODEX_MODEL": "gpt-6.1-sol",
+                   "QMD_URL": "127.0.0.1:1"}
         rendered = string.Template((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
         data = tomllib.loads(rendered.substitute(fixture))
         nested = {"a": {"b": [{"x": 1, "c": {"y": "z"}}, {"x": 2}], "d": [], "e": ["s"]}}
@@ -670,7 +671,10 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(provider["env_key"], "OMNIROUTE_API_KEY")
         self.assertEqual(provider["wire_api"], "responses")
         self.assertIs(provider["requires_openai_auth"], False)
-        self.assertIs(provider["supports_standalone_web_search"], True)
+        # Off: web.run POSTs <base_url>/alpha/search, which OmniRoute 3.8.51 answers with 404 (openai/codex rust-v0.163.0,
+        # 83086188, codex-rs/codex-api/src/endpoint/search.rs:14-15; the provider flag defaults false,
+        # codex-rs/model-provider-info/src/lib.rs:200-202).
+        self.assertIs(provider["supports_standalone_web_search"], False)
         self.assertNotIn("supports_websockets", provider)
         self.assertNotIn("auth", provider)  # env_key, not a command (K3)
         instructions = provider["env_key_instructions"]
@@ -684,7 +688,7 @@ class TemplateTests(unittest.TestCase):
         # The canonical keyed form only: mixing it with the legacy exclude/include_only arrays in one layer is a
         # config error, and no `set` here, so the base config's [shell_environment_policy.set] keeps applying.
         self.assertEqual(profile["shell_environment_policy"], {"filters": {"OMNIROUTE_API_KEY": "exclude"}})
-        self.assertEqual(profile["features"], {"standalone_web_search": True, "shell_snapshot": False})
+        self.assertEqual(profile["features"], {"standalone_web_search": False, "shell_snapshot": False})
         # K2: the base template stays gateway-free, so render_config.py --check still compares like with like. Its
         # interactive default is GPT-6.1 Sol at ultra (the user's decision of 2026-09-30, model-currency addendum)
         # where the platform's Codex pin lists it: rendered here for the Linux pin, the lane's CODEX_VERSION. This
@@ -2915,7 +2919,7 @@ class CodexIntegrationTests(unittest.TestCase):
         fixture = {"HOME": "/home/example", "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
                    "PROJECT_ROOT": "/home/example/code/agent-lab", "HOST_PATH": "/usr/bin:/bin",
                    "OTEL_ENDPOINT": "127.0.0.1:1", "AI_MEMORY_URL": "127.0.0.1:1", "QDRANT_URL": "127.0.0.1:1",
-                   "EMBED_URL": "127.0.0.1:1", "SOCRATICODE_VERSION": "1.15.0",
+                   "EMBED_URL": "127.0.0.1:1", "SOCRATICODE_VERSION": "1.15.0", "QMD_URL": "127.0.0.1:1",
                    "CODEX_MODEL": render_config.codex_model_for(lane.CODEX_VERSION)}  # the model this codex lists
         base = string.Template((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
         with tempfile.TemporaryDirectory() as tmp:

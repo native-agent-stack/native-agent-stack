@@ -395,7 +395,11 @@
       ],
       "wiring": "slot:tobi-qmd",
       "owner": "qmd",
-      "source": "tobi/qmd v2.8.3 at facd35e01359e59d938bc9418e93fb9318addee3, README native shared HTTP and installed dist/mcp/server.js /mcp and /health. Both portable clients use the same HTTP URL; the service owns the named index. Native transport, service scope and inverse are in docs/decisions/2026-10-08-qmd-shared-mcp.md."
+      "override": {
+        "type": "http",
+        "url": "http://${QMD_URL}/mcp"
+      },
+      "source": "tobi/qmd v2.8.3 at facd35e01359e59d938bc9418e93fb9318addee3, README native shared HTTP and installed dist/mcp/server.js /mcp and /health. Both portable clients use the same HTTP URL; the service owns the named index. Native transport, service scope and inverse are in docs/decisions/2026-10-08-qmd-shared-mcp.md. adoption/mcp/claude-user.json names the repository's default bind, 127.0.0.1:21851; this entry takes the host's optional QMD_URL, as the Codex entry does (render_config.py defaults it to that bind), so a host whose service moved has one port truth. This tool fills the host value in the override; install_claude_profile.py fills only ${HOME} and ${ECO_ROOT}."
     },
     {
       "match": [

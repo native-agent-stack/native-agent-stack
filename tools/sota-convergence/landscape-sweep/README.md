@@ -313,11 +313,11 @@ With `build_args.py --gpt6-provider omniroute --codex-host <HOST>`, the GPT-6 la
 What the lane config also sets:
 - **`[features] shell_snapshot = false`.** Codex's shell snapshot writes the exported environment, the provider key included, into `<CODEX_HOME>/shell_snapshots/*.sh` with mode 0644 (`codex-rs/shell-command/src/shell_snapshot_exports.rs` at rust-v0.157.1). A GPT-6 probe reproduced this.
 - **`[shell_environment_policy.filters] OMNIROUTE_API_KEY = "exclude"`.** Codex 0.157.1 applies its default `*KEY*`, `*SECRET*` and `*TOKEN*` excludes only when `ignore_default_excludes` is false, and that setting defaults to true (`codex-rs/config/src/shell_environment_policy.rs`, `codex-rs/protocol/src/shell_environment.rs`). Without the filter, a real key would reach every command the model runs.
-- **Web search for GPT-6 Astra.** Astra runs Responses Lite, which carries no hosted tools, so search reaches it only as Codex's standalone web search (`web.run`). The lane therefore sets:
-  - `supports_standalone_web_search = true` on the provider, which defaults to false for custom providers ([Codex advanced config](https://learn.chatgpt.com/docs/config-file/config-advanced));
-  - `[features] standalone_web_search = true`, which is under development in 0.157.1.
+- **Web search for GPT-6 Astra: opt-in, default off.** Astra runs Responses Lite, which sends no hosted tool, so search reaches it only as Codex's standalone web search (`web.run`). The lane config writes both switches `false`, which parse as false and expose no search tool, unless `--standalone-web-search` is given, which writes:
+  - `supports_standalone_web_search = true` on the provider, which defaults to false for custom providers (`codex-rs/model-provider-info/src/lib.rs:200-202` at openai/codex rust-v0.163.0, `83086188ae0614bd882818ff1aa23f3194962012`; it makes `codex-rs/ext/web-search/src/extension.rs:46-50` offer `web.run` to a non-OpenAI provider);
+  - `[features] standalone_web_search = true`, which is under development and off by default (`codex-rs/features/src/lib.rs:1250-1255`). Core selects the standalone executor when it is on or the model is Lite (`codex-rs/core/src/tools/spec_plan.rs:1199-1207`).
 
-  The capability flag alone enables nothing: OmniRoute must serve a compatible endpoint, and the parity check below has to show it working before a sweep counts on GPT-6 search through the gateway.
+  The reason for the default: `web.run` POSTs `<base_url>/alpha/search` (`codex-rs/codex-api/src/endpoint/search.rs:14-15` and `41-44`), and an OmniRoute release without that route (3.8.51) answers 404 `unknown_route`, so with the switches on every search call of a lane through that gateway failed. A Lite model gets no hosted search tool either way (`spec_plan.rs:691-693`). `docs/decisions/2026-10-06-codex-omniroute-opt-in-search.md` already keeps the workhorse profile's switches false. Turn them on only for a gateway that serves the route, and let the parity check below show it working before a sweep counts on GPT-6 search through the gateway. `--standalone-web-search` also stages `codex.standalone_web_search = true`, which the `--gpt6-fallback` provider reads.
 
   Measured 2026-09-27: `web.run` POSTs `<base_url>/alpha/search`. OmniRoute release/v3.8.51 at `a58000c7` answers 404 there. Upstream PR #13788 adds the route, but answers from OmniRoute's own search registry, not OpenAI's hosted search: the keyless `duckduckgo-free` provider, unless a keyed provider is configured. Through that route, `site:` queries returned nothing and plain queries few results. GPT-6 fell back to fetched pages and the GitHub API through context-mode.
 - **Skills.** Codex lists user skills from `$CODEX_HOME/skills` and `$HOME/.agents/skills` (`codex-rs/ext/skills/src/host_roots.rs` at rust-v0.157.1). In the lane, `$CODEX_HOME/skills` holds only Codex's `.system` cache; the pinned skills are in `$HOME/.agents/skills`, where `install_skills.py` puts them.
@@ -405,7 +405,8 @@ by the remaining budget, and an expired budget prevents probe launch. Failed pro
 
 The fallback keeps the native `CODEX_HOME`, its global `AGENTS.md`, `--ignore-user-config`, read-only sandbox,
 staged effort and web-search mode. Its inline provider has `wire_api = "responses"`, `requires_openai_auth = false`,
-`env_key = "OMNIROUTE_API_KEY"` and `supports_standalone_web_search = true`. It enables standalone web search,
+`env_key = "OMNIROUTE_API_KEY"` and `supports_standalone_web_search` set from `codex.standalone_web_search` (false unless
+`build_args.py --standalone-web-search` staged it). It sets `features.standalone_web_search` the same way,
 disables shell snapshots, filters the key out of model-run shells, and requests
 `cx/<native model>-<request_effort>` under the
 [pinned gateway's suffix convention](https://github.com/HouMinXi/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts#L35).
@@ -429,7 +430,7 @@ and archives the earlier result.
 
 The installed gateway's carried
 [search adapter](https://github.com/amsjavan/OmniRoute/blob/6c7990058c4ce9677de79452c8cefb10b4bf1b3d/src/app/api/v1/alpha/search/route.ts)
-handles `/alpha/search` through its web-search registry with a DuckDuckGo fallback. It supports `search_query` and
+handles `/alpha/search` through its web-search registry with a DuckDuckGo fallback (the route that `--standalone-web-search` calls). It supports `search_query` and
 rejects `open`, `click`, `find` and `screenshot`. Prompt equality does not establish tool or search-recall parity.
 Outbound effort and operation-level parity remain unqualified until the gateway's measured parity check passes.
 The implementation never consumes a reset credit or changes the shared gateway's settings, combos or keys.

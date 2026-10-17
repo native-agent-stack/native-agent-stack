@@ -1129,6 +1129,7 @@ def host_values(host: str, plan: dict, home: Path | None, wired_dirs: list) -> d
     except ValueError as error:
         raise ConfigError(str(error)) from error
     values["OTEL_ENDPOINT"] = f"127.0.0.1:{ports['OTEL_HTTP']}"
+    values = render_config.resolve_qmd_url(values)  # the optional QMD_URL selector, so both clients render one URL
     values["CODEX_MODEL"] = plan["codex_model"]
     if plan.get("ai_memory_bin"):
         values["AI_MEMORY_BIN"] = f"{base}/{plan['ai_memory_bin']}"

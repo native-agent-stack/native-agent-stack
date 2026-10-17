@@ -42,6 +42,8 @@ FIXTURE_VALUES = {
             encoding="utf-8"))["tools"] if tool["id"] == "socraticode"),
     # Derived from the platform's Codex pin (CodexModelTests), spelled out as the Linux pin's (0.159.2) model.
     "CODEX_MODEL": "gpt-6.1-sol",
+    # Optional host selector with a default (QmdUrlTests), spelled out for the direct substitutions.
+    "QMD_URL": "127.0.0.1:21851",
 }
 
 
@@ -730,6 +732,61 @@ class CodexModelTests(unittest.TestCase):
                     self.assertIn("0.159.1", note)
                     self.assertIn("rust-v0.159.1", note)
                     self.assertIn("evidence/receipts/codex-01592-qualification-20260930.json", note)
+
+
+class QmdUrlTests(unittest.TestCase):
+    """The Codex template's qmd server takes its URL from the optional QMD_URL host value (default 127.0.0.1:21851)."""
+
+    TEMPLATE = TEMPLATES / "codex.config.template.toml"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.hosts_dir = ROOT / "adoption" / "hosts"
+        self.host = "test-fixture-qmd"
+        self.addCleanup((self.hosts_dir / f"{self.host}.json").unlink, missing_ok=True)
+
+    def render(self, **extra):
+        """(completed process, rendered qmd url or None) for a host that sets QMD_URL only through extra."""
+        values = {key: value for key, value in FIXTURE_VALUES.items() if key != "QMD_URL"}
+        (self.hosts_dir / f"{self.host}.json").write_text(json.dumps({**values, **extra}, indent=2))
+        out_dir = Path(self.tmp.name) / f"out-{len(list(Path(self.tmp.name).iterdir()))}"
+        done = run("--host", self.host, "--out", str(out_dir))
+        if done.returncode != 0:
+            return done, None
+        import tomllib  # Python 3.11+, as above
+        rendered = tomllib.loads((out_dir / "codex.config.toml").read_text(encoding="utf-8"))
+        return done, rendered["mcp_servers"]["qmd"]["url"]
+
+    def test_the_template_names_no_qmd_port(self):
+        text = self.TEMPLATE.read_text(encoding="utf-8")
+        self.assertNotIn("http://127.0.0.1:21851", text)
+        self.assertIn('url = "http://${QMD_URL}/mcp"', text)
+
+    def test_a_host_that_sets_no_qmd_url_renders_the_default_bind(self):
+        for extra in ({}, {"QMD_URL": ""}):
+            with self.subTest(extra=extra):
+                done, url = self.render(**extra)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                self.assertEqual(url, "http://127.0.0.1:21851/mcp")
+
+    def test_a_host_qmd_url_is_the_rendered_url(self):
+        done, url = self.render(QMD_URL="127.0.0.1:23851")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(url, "http://127.0.0.1:23851/mcp")
+
+    def test_the_example_host_names_the_default(self):
+        self.assertEqual(json.loads((ROOT / "adoption" / "hosts" / "example.json").read_text())["QMD_URL"],
+                         "127.0.0.1:21851")
+
+    def test_a_non_loopback_or_malformed_qmd_url_is_refused(self):
+        for bad in ("example.org:21851", "127.0.0.1", "127.0.0.1:0", "127.0.0.1:65536", '127.0.0.1:1"x',
+                    "http://127.0.0.1:21851"):
+            with self.subTest(value=bad):
+                done, url = self.render(QMD_URL=bad)
+                self.assertNotEqual(done.returncode, 0)
+                self.assertIn("QMD_URL must be", done.stderr)
+                self.assertIsNone(url)
 
 
 class VerifyStdinTests(unittest.TestCase):
