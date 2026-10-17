@@ -4997,18 +4997,18 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/mcp-surfaces.md",
-      "sha256": "9743d036862df4e10c7d093880e4b0cc939f302b2a685efc2c834d3098284172",
-      "bytes": 5839
+      "sha256": "34d2cca61edddaed717b4138be0633c068038bebe2169e429c324c3e3f3be178",
+      "bytes": 6644
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/native-clients.md",
-      "sha256": "16d2020ef01a3f10a321cf6e37f5cc2cc66dae7cf5a6287b4e14fa8f3117b0b5",
-      "bytes": 20703
+      "sha256": "913cd8932e9c267700fb9c11292c467e5d56af6848114d324707e2cd6fdf65c6",
+      "bytes": 21187
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/observation-inference.md",
-      "sha256": "5e8ef2e982c132eda889fe8048b432ad64b6cc02295b79ff44b0faf2c55c6b80",
-      "bytes": 6789
+      "sha256": "f3c5367b9da4b8b8678c38a47b73414c24e91041da81c73246d87d9573f42ab8",
+      "bytes": 7327
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/scheduling-supervision.md",
@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "521dee88358697e03d6c1f9cc08c312303be4ac46a1e22d0a0700520234390dc",
-      "bytes": 166512
+      "sha256": "dbcf75029fd745969171dd83a090c848352b8a3cf98377b8d06df9612743c817",
+      "bytes": 169151
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5027,13 +5027,13 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/token-efficiency.md",
-      "sha256": "d0d66412606bdc2eca1e73407a88425acc4bf690c0dcc53dadbc1add7b246bc3",
-      "bytes": 14597
+      "sha256": "81aebd5e32d82fa807f1ad30799cbb8427bdc46d8cde93ca2828f2a4b02054b6",
+      "bytes": 15088
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/workers.md",
-      "sha256": "ea931bca40f56307da4394847c9915cecb5ad685d7eb5c6acfbb92e63bf7efdd",
-      "bytes": 29498
+      "sha256": "d102113fde8e8a4a8626a5e81c5448a822dc4eebf08544025fa620adeff32f56",
+      "bytes": 29795
     },
     {
       "path": ".claude/skills/native-skill-routing/SKILL.md",
@@ -21803,7 +21803,7 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "b7923358ea89de4230e27894a75ff566125792393732ce4c9f80df0d0105d055",
+      "sha256": "8d6c879054bd06fd93952477c4ba77bf7219eb14246a2ce4b0d6d8953d0d6279",
       "bytes": 238837
     },
     {
