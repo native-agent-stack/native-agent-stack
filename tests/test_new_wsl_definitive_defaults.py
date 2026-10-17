@@ -1061,9 +1061,17 @@ class Manifest(unittest.TestCase):
         self.assertLess(start, end)
         self.assertLess(end, lines.index("<!-- tables:end -->"))
         table = [[cell.strip() for cell in line.split("|")[1:-1]] for line in lines[start:end] if line.startswith("| ")]
-        self.assertEqual(table[:2], [["Slot", "Date", "Decision"], ["---"] * 3])
-        self.assertEqual(table[2:], [[row["slot_id"], amendment["date_utc"], amendment["decision"]]
-                                     for row in self.rows for amendment in row.get("amendments", [])])
+        self.assertEqual(table[:2], [["Slot", "Date", "Changed", "Decision"], ["---"] * 4])
+        self.assertEqual([cells[:2] + cells[3:] for cells in table[2:]],
+                         [[row["slot_id"], amendment["date_utc"], amendment["decision"]]
+                          for row in self.rows for amendment in row.get("amendments", [])])
+        # B2: the Changed column says what each amendment changed. Only the wave-6 amendment of the memory-owner interim
+        # replaced fields, and it names exactly the interim fields it replaced; every other amendment changes no field.
+        changed = {(cells[0], cells[1]): cells[2] for cells in table[2:]}
+        self.assertEqual(changed.pop(("memory-owner", "2026-10-17")),
+                         "the interim's " + ", ".join(self.consensus_interim_amends["memory-owner"]["interim"])
+                         + " (by direct consensus; the replaced values stay under interim_replaced)")
+        self.assertEqual(set(changed.values()), {"no field"})
         self.assertEqual(len(table) - 2, len(self.amend_rows) + len(self.consensus_interim_amends))
         start, end = lines.index("### Owner decisions (amendment 4)"), lines.index("<!-- tables:end -->")
         table = [[cell.strip() for cell in line.split("|")[1:-1]] for line in lines[start:end] if line.startswith("| ")]
@@ -1086,9 +1094,51 @@ class Manifest(unittest.TestCase):
         stop = lines.index("### Amendments by direct consensus")
         table = [[cell.strip() for cell in line.split("|")[1:-1]] for line in lines[start:stop] if line.startswith("| ")]
         self.assertEqual(table[0], ["Slot", "Date", "Interim", "Authority", "Decided by"])
-        self.assertEqual(table[2:], [[row["slot_id"], row["interim"]["date_utc"], row["interim"]["default"],
-                                      row["interim"]["authority"]["kind"].replace("_", " "), row["interim"]["decided_by"]]
-                                     for row in self.rows if row.get("interim")])
+        authorities = {cells[0]: cells[3] for cells in table[2:]}
+        self.assertEqual([cells[:3] + cells[4:] for cells in table[2:]],
+                         [[row["slot_id"], row["interim"]["date_utc"], row["interim"]["default"], row["interim"]["decided_by"]]
+                          for row in self.rows if row.get("interim")])
+        # B2: the interim's version is no longer credited to the owner. The owner's decision is the install's authority; the
+        # wave-6 direct consensus set the fields it replaced, and the cell says so. An interim that no amendment by direct
+        # consensus touched keeps the plain authority.
+        self.assertEqual(authorities["code-search"], "owner decision")
+        self.assertEqual(
+            authorities["memory-owner"],
+            "owner decision (the install); amended 2026-10-17 by direct consensus, which set the interim's "
+            + ", ".join(self.consensus_interim_amends["memory-owner"]["interim"]))
+
+    def test_the_generated_amendment_sentence_says_what_an_amendment_changed_and_on_what_authority(self):
+        """B2: the sentence under the amendments heading no longer says an amendment changes nothing, now that wave 6 changed
+        the memory-owner interim by direct consensus. It names the exception and the authority, word for word."""
+        text = RECORD.read_text(encoding="utf-8")
+        sentence = ("An amendment records a later decision on its row, on the authority of a direct consensus of the two model "
+                    "families that its batch records. It replaces none of the row's decided fields in the tables above. The "
+                    "exception is an amendment of a row's interim (amendment 3): it replaces the interim fields named in the "
+                    "Changed column, and the table of interim installs above prints the interim as amended and says on which "
+                    "authority.")
+        self.assertIn("\n" + sentence + "\n", text)
+        self.assertNotIn("and replaces none of the row's fields in the tables above", text)
+        # The generator, not the record, carries the sentence: with no interim amendment it keeps the plain one.
+        tables = load_source(ART / "render_tables.py", "render_tables")
+        plain = tables.amendments_sentence([("codex", {"date_utc": "2026-10-02", "decision": "keep"})])
+        self.assertEqual(plain, "An amendment records a later decision on its row, on the authority of a direct consensus of the "
+                                "two model families that its batch records. It replaces none of the row's fields in the tables above.")
+        self.assertEqual(tables.amendments_sentence([("memory-owner", {"interim_replaced": {"default": "x"}})]), sentence)
+        self.assertEqual(tables.amendment_changed({"decision": "keep"}), "no field")
+
+    def test_the_memory_owner_interim_label_names_both_authorities(self):
+        """B2: the label was 'interim install on the owner's decision' beside a version the owner did not choose (3.1.0 comes
+        from the 2026-10-17 direct consensus). The amended label names the owner's decision that authorizes the install and
+        the direct consensus that set the version, still starts with 'interim install' and says what decides it."""
+        row = next(row for row in self.rows if row["slot_id"] == "memory-owner")
+        label = row["interim"]["label"]
+        self.assertTrue(label.startswith("interim install on the owner's decision of 2026-10-03"), label)
+        self.assertIn("direct consensus of 2026-10-17", label)
+        self.assertIn("3.1.0", label)
+        self.assertIn("the memory head-to-head decides", label)
+        self.assertNotEqual(label, self.interims["memory-owner"]["label"])
+        self.assertEqual(self.consensus_interim_amends["memory-owner"]["interim"]["label"], label)
+        self.assertIn("label", row["amendments"][-1]["interim_replaced"])
 
     def test_current_consensus_record_preserves_authority_without_owner_quote(self):
         text = CONSENSUS_RECORD.read_text(encoding="utf-8")

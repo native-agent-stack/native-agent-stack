@@ -554,7 +554,13 @@ amendment moves the `memory-owner` interim from ai-memory 2.5.2 to 3.1.0:
   `codex_tool_approval` records that setup writes `default_tools_approval_mode = "approve"` unconditionally
   (akitaonrails/ai-memory@11ca7c5b `install_mcp.rs`:1923), accepted because it matches the host's
   `approval_policy = never` (the CC's ruling G1);
-- `sources` move to the 3.1.0 run pin and the v3.1.0 release at `11ca7c5b`.
+- `sources` move to the 3.1.0 run pin and the v3.1.0 release at `11ca7c5b`;
+- `label` is corrected. Wave 2 labelled the interim "on the owner's decision", and the manifest kept that label (and the
+  tables printed the interim's authority as the owner's decision) beside a version that the owner did not choose. The
+  label now names both authorities: the owner's decision of 2026-10-03 authorizes installing ai-memory with a fresh
+  store, and this direct consensus sets the version, 3.1.0. The interim's `authority` field stays the owner's
+  decision, which is what authorizes the install; the generated tables and the handbook say that this amendment changed
+  the interim's fields, and on whose authority.
 
 Every other interim field stays as wave 2 recorded it, and the memory head-to-head still decides. The batch is dated
 2026-10-17, the date its evidence exists: the run pin was captured at 2026-10-17T01:15:59Z, after the CC's rulings D1-D9
@@ -574,7 +580,7 @@ install plan. F1 is not edited and keeps its qualification meaning.
 The command center's GO of 2026-10-16 at 16:51Z moved ai-memory from 2.6.6 to 3.1.0, and its rulings D1-D9 for condition 4
 of PR (b) direct the plan to follow; its rulings G1-G6 for the pull request's fold (hcom #14261, 2026-10-17) settle the
 configuration text. All are recorded outside this repository: the ns51 handoff receipt (section 8) and the two rulings
-files, each named with its sha256 in the amendment's `by`. The plan's `memory-owner` row moves in the same
+files, each named by file only in the amendment's `by` (this repository publishes no digest of a private record). The plan's `memory-owner` row moves in the same
 change. `check_plan.py` binds the row's owner to this interim's default.
 
 ### The assembler's amendment path

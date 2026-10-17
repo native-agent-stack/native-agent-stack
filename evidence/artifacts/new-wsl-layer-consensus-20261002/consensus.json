@@ -1688,7 +1688,7 @@
   "records": {
    "run_pin": {
     "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/run-pin.json",
-    "sha256": "6e9bd86ffc32c1adefad5ef7b13d0ab8566e4f449e08aaae33c288d2846e656c"
+    "sha256": "e1c84835aafdbe9a2c0742e22899507a83babc8e5bf81125e43a26b6cf251f32"
    },
    "upstream_tag_resolution": {
     "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/outputs/upstream-tag-resolution.txt",
@@ -1715,10 +1715,11 @@
     "amendment": {
      "date_utc": "2026-10-17",
      "by": "direct consensus of both model families (wave 6; each family's pull-request acknowledgement is recorded under acknowledgements before the merge), on the command center's GO of 2026-10-16 at 16:51Z that moves ai-memory from 2.6.6 to 3.1.0 (the builder's private handoff receipt RECEIPT-model-picks-20261016.md, outside the repository, section 8, lines 99-114) and on its rulings D1-D9 for condition 4 of PR (b) (nhny-gino, hcom #9109, sent 2026-10-17T00:58:42Z by the hcom event time; the private record RULINGS-gino-9109.md, outside the repository) and on its rulings G1-G6 for the fold of that pull request (nhny-gino, hcom #14261, sent 2026-10-17T03:11:03Z by the hcom event time; the private record RULINGS-gino-fold.md, outside the repository)",
-     "decision": "install ai-memory 3.1.0 for the memory-owner interim: tag v3.1.0 at 11ca7c5b, its release archive verified against the publisher's sha256 sidecar (the memory-owner 3.1.0 run pin and its checksum receipt, which supersede the F1 run pin as the plan's pin source); the plan row follows in the same change, and the other interim fields stay as recorded except the open acceptance gates, which name 3.1.0, its client entries and the memory port of the host allocation; the configuration's listen, service and codex_tool_approval, which the 3.1.0 route makes false as recorded (the port is the host allocation's, setup renders and owns the unit, and setup writes Codex's tool approval unconditionally); and the sources, which move to the 3.1.0 run pin and the v3.1.0 release at 11ca7c5b"
+     "decision": "install ai-memory 3.1.0 for the memory-owner interim: tag v3.1.0 at 11ca7c5b, its release archive verified against the publisher's sha256 sidecar (the memory-owner 3.1.0 run pin and its checksum receipt, which supersede the F1 run pin as the plan's pin source); the plan row follows in the same change, and the other interim fields stay as recorded except the open acceptance gates, which name 3.1.0, its client entries and the memory port of the host allocation; the configuration's listen, service and codex_tool_approval, which the 3.1.0 route makes false as recorded (the port is the host allocation's, setup renders and owns the unit, and setup writes Codex's tool approval unconditionally); and the sources, which move to the 3.1.0 run pin and the v3.1.0 release at 11ca7c5b; and the label, which named only the owner's decision, and now names both authorities: the owner's decision of 2026-10-03 to install ai-memory with a fresh store, and this direct consensus for the 3.1.0 version"
     },
     "interim": {
      "default": "ai-memory 3.1.0",
+     "label": "interim install on the owner's decision of 2026-10-03 (amendment 3) to install ai-memory with a fresh store, at the version 3.1.0 that wave 6's direct consensus of 2026-10-17 set (amendment 3's direct-consensus authority); not a blind result and not a measurement; the memory head-to-head decides, and its result replaces or removes it",
      "pin": "tag v3.1.0 (tag object 8daaf92829ccc55fc0d203a758eb455dd86eb4ac) = commit 11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea; release asset ai-memory-linux-x86_64.tar.gz sha256 10b2411ff6988e2a275e17734170a617341a51eec8162ba3166bdd4284cde651",
      "open_acceptance_gates": [
       "the user unit is active, /healthz on the memory port of the host allocation (NS_PORT_MEMORY in ~/.config/new-wsl-native-stack/.service-ports.json) returns 200, and ai-memory status reports 3.1.0 with the local embedder",
@@ -1729,7 +1730,7 @@
      ],
      "configuration": {
       "listen": "127.0.0.1 on the memory port of the host allocation (NS_PORT_MEMORY in ~/.config/new-wsl-native-stack/.service-ports.json, the CC's ruling D3), whose default is 29374, the port the host template and the client templates carry (synthesis X5); the ruling's 21374 is not used",
-      "service": "the systemd user unit ai-memory setup renders from packaging/systemd/ai-memory-user.service at the pin and owns, with the plan's drop-in ai-memory.service.d/override.conf (PATH, CPUWeight=idle and a provisional MemoryMax), under linger",
+      "service": "the systemd user unit ai-memory setup renders from packaging/systemd/ai-memory-user.service at the pin and owns, with the plan's drop-in ai-memory.service.d/override.conf (PATH, CPUWeight=idle, MemoryHigh=1G and MemoryMax=2G), under linger",
       "codex_tool_approval": "default_tools_approval_mode = \"approve\", which ai-memory's own setup writes unconditionally (akitaonrails/ai-memory@11ca7c5b crates/ai-memory-cli/src/commands/install_mcp.rs:1923), and the client configuration only with --with-authorization-settings (memory change 13); accepted because it matches the host's approval_policy = never (the CC's ruling G1), and never stripped, since a second writer of the key would break the one-writer rule (D1)"
      },
      "sources": [

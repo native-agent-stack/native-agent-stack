@@ -1365,6 +1365,20 @@ class NewWslHandbookTests(unittest.TestCase):
         for slot_id, item in amendments:
             with self.subTest(amended=slot_id):
                 self.assertIn(f"- Amendment to `{slot_id}` ({item['date_utc']}; {item['by']}): {item['decision']}.", markdown)
+        # B2: the paragraph no longer says an amendment by direct consensus changes no field of its row, now that wave 6
+        # changed the memory-owner interim; it names that exception and the authority, word for word.
+        self.assertNotIn("and changes no field of its row. Rows of kind consensus", markdown)
+        self.assertIn(
+            "An amendment by direct consensus is listed under its layer's table, on the authority of a direct consensus of "
+            "the two model families. It changes no field of its row that the rounds decided; the exception is an amendment "
+            "of the row's interim (amendment 3), which replaces the interim fields it names, and the row's install cell says "
+            f"which fields that amendment set. Rows of kind consensus: {len(added)}; amendments: {len(amendments)}.", markdown)
+        self.assertIn("interim install (2026-10-03, amendment 3; amended 2026-10-17 by direct consensus, which set its configuration, "
+                      "default, label, open_acceptance_gates, pin, sources): [ai-memory 3.1.0]", markdown)
+        # With no interim amendment on record the generator keeps its plain sentence.
+        plain = handbook.amendment_sentence({"layers": [{"default_slots": [{"record": {"amendments": [{"decision": "keep"}]}}]}]})
+        self.assertEqual(plain, "An amendment by direct consensus is listed under its layer's table, on the authority of a "
+                                "direct consensus of the two model families. It changes no field of its row.")
         # The record a consensus row came from is one of the manifest's hashed sources.
         recorded = next(row for row in data["sources"] if row["path"] == manifest["sources"]["consensus"]["path"])
         self.assertEqual(recorded["sha256"], manifest["sources"]["consensus"]["sha256"])
@@ -1512,8 +1526,12 @@ class NewWslHandbookTests(unittest.TestCase):
                     repositories = [part.strip() for part in interim["repository"].split(";")]
                     named = (f"[{interim['default']}]({repositories[0]})" if len(repositories) == 1
                              else f"{interim['default']} ({', '.join(repositories)})")
+                # B2: an interim that a direct consensus amended says which fields that amendment set (wave 6, memory-owner).
+                amended = [item for item in record.get("amendments", []) if "interim_replaced" in item]
+                note = (f"; amended {amended[-1]['date_utc']} by direct consensus, which set its "
+                        + ", ".join(sorted({key for item in amended for key in item["interim_replaced"]})) if amended else "")
                 expected = ("not installed: " + reason if not interim else
-                            f"interim install ({interim['date_utc']}, amendment 3): {named}"
+                            f"interim install ({interim['date_utc']}, amendment 3{note}): {named}"
                             f"; its decided default is not installed: {reason}")
                 self.assertEqual(lines[record["slot_id"]][4], expected)
         self.assertEqual(sorted(slot["record"]["slot_id"] for slot in waiting if slot["record"].get("interim")),

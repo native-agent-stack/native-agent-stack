@@ -1429,7 +1429,7 @@ Today: 405 pieces, 357 wired (211 practice, 146 through a slot), 32 not wired (0
 | `claude/settings/permission/allow/mcp__semble__search` | `"mcp__semble__search"` | no | an allow rule lets Claude Code call the tool without asking outside bypass mode; the rules name each tool exactly, so an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3) | slot `code-search` installing `semble` |
 | `claude/settings/permission/allow/mcp__semble__find_related` | `"mcp__semble__find_related"` | no | an allow rule lets Claude Code call the tool without asking outside bypass mode; the rules name each tool exactly, so an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3) | slot `code-search` installing `semble` |
 | `claude/settings/setting/skipDangerousModePermissionPrompt` | `true` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
-| `claude/settings/setting/crossSessionInbound` | `"accept"` | no | "accept" delivers messages from the user's other sessions to Claude without the approval hold that otherwise applies to a sender that is not in bypass mode, so it is written only with --with-authorization-settings and never over a value the file already has | - |
+| `claude/settings/setting/crossSessionInbound` | `"accept"` | no | "accept" delivers each message from the user's other sessions to Claude (cross-session-messaging.md:195 at https://code.claude.com/docs/en/cross-session-messaging.md, read 2026-10-17), where Claude Code otherwise holds a message for approval in two cases (:203-206): a session that prompts holds a message from a session that bypasses permission prompts, and a session that bypasses holds a message from a session that does not; "accept" delivers both. It decides only whether a message is delivered; whether tool calls prompt is permissions.defaultMode's effect. It is written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/config/approval_policy` | `"never"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/config/sandbox_mode` | `"danger-full-access"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/config/mcp_servers.ai-memory.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `memory-owner` installing `ai-memory` |
@@ -1445,14 +1445,42 @@ Today: 405 pieces, 357 wired (211 practice, 146 through a slot), 32 not wired (0
 | Project agent | MCP servers of its tools that are not wired | Skills the plan does not install |
 | --- | --- | --- |
 
+## Addendum 2026-10-17: SocratiCode and context-mode launch commands, and SocratiCode's embedder pins
+
+The map (`adoption/new-wsl/client-config-map.json`) changed three things for the code-search and context-supply
+interims in the same pull request as the ai-memory 3.1.0 wiring, and no addendum recorded them. This one does. Each is a
+map override of a template value, rendered by this tool; none changes which pieces are wired.
+
+- **Node launcher for the Node MCP servers.** The `claude/mcp/server/socraticode` entry, and the Codex pieces
+  `codex/config/mcp_servers.socraticode.command` and `codex/config/mcp_servers.context-mode.command`, now run
+  `${HOME}/.local/share/mise/shims/node`. The templates name `${ECO_ROOT}/bin/node`, which exists only where
+  `adoption/bootstrap-linux.sh:370-383` (`install_node`) links the bootstrap's Node. This plan's Node owner is mise, which
+  creates no such link, so the servers failed with ENOENT and Codex's context-mode server could not start on
+  NativeHorizonNY (the resolver lane's receipts 3.7 and 3.7b of 2026-10-16, private records outside the repository, cited
+  by name only). The mise shim runs without `PATH` and follows the mise pin (jdx/mise@bc11f90c
+  `docs/dev-tools/shims.md#L70`, the mechanism `accept.sh` `prepare_path` uses).
+- **SocratiCode's embedder.** The `claude/mcp/server/socraticode` entry's env, and the Codex pieces
+  `codex/config/mcp_servers.socraticode.env.EMBEDDING_MODEL` and `.EMBEDDING_DIMENSIONS`, pin
+  `EMBEDDING_MODEL = nvidia/Nemotron-3.5-Embed-1B-BF16` and `EMBEDDING_DIMENSIONS = 2048`. That model is the host's live
+  vLLM embedder (the CC's never-stale ruling of 2026-10-16). Its width is 2048: the model card at revision `2a4f9cb5`
+  says one 2048-dimensional embedding per input (`README.md:116`). SocratiCode 1.15.0's LM Studio provider never sends a
+  `dimensions` parameter and trusts the setting to match the model's native width
+  (`dist/services/provider-lmstudio.js:10` and `:262` in the npm package `socraticode@1.15.0`), so the width is pinned
+  to the native one.
+- **A gap this addendum records and does not change.** The install plan's embedder is Qwen3-Embedding-0.6B through Ollama
+  (`install-plan.json`:1170), not the host's Nemotron embedder that the map pins for SocratiCode. The base already had
+  this gap, with the 8B Qwen model; it goes to the client-configuration follow-up.
+
 ## Addendum 2026-10-17: Remote Control at startup
 
 The new distribution's Claude settings additions carry `remoteControlAtStartup: true`
 ([2026-10-17-new-wsl-remote-control-at-startup.md](2026-10-17-new-wsl-remote-control-at-startup.md), the CC's ruling D6).
 Its piece `claude/settings/setting/remoteControlAtStartup` is an authorization setting. The key is in the tool's
 `AUTHORIZATION_PIECES`, and the map classes it `authorization`. It is rendered and written only with
-`--with-authorization-settings` and never over a value the file already has, because on a bypassPermissions host it is a
-remote ingress. Claude Code honors a `true` only from user or managed settings
+`--with-authorization-settings` and `--with-remote-control-at-startup` together, and never over a value the file already
+has, because on a bypassPermissions host it is a remote ingress. This addendum first wrote the key with the bundle alone;
+the next addendum (the CC's ruling G3) made the option its own opt-in, and the text and the authorization table's row in
+this addendum state that final rule. Claude Code honors a `true` only from user or managed settings
 (https://code.claude.com/docs/en/remote-control.md, line 198), which the user-scope additions are. `agentPushNotifEnabled`
 is not carried. The `--apply` line and the option's help now name the setting beside crossSessionInbound. No piece is
 unwired and no sentence of the instruction blocks changes. All earlier projections remain historical observations.
@@ -1500,8 +1528,8 @@ Today: 406 pieces, 357 wired (211 practice, 146 through a slot), 32 not wired (0
 | `claude/settings/permission/allow/mcp__semble__search` | `"mcp__semble__search"` | no | an allow rule lets Claude Code call the tool without asking outside bypass mode; the rules name each tool exactly, so an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3) | slot `code-search` installing `semble` |
 | `claude/settings/permission/allow/mcp__semble__find_related` | `"mcp__semble__find_related"` | no | an allow rule lets Claude Code call the tool without asking outside bypass mode; the rules name each tool exactly, so an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3) | slot `code-search` installing `semble` |
 | `claude/settings/setting/skipDangerousModePermissionPrompt` | `true` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
-| `claude/settings/setting/crossSessionInbound` | `"accept"` | no | "accept" delivers messages from the user's other sessions to Claude without the approval hold that otherwise applies to a sender that is not in bypass mode, so it is written only with --with-authorization-settings and never over a value the file already has | - |
-| `claude/settings/setting/remoteControlAtStartup` | `true` | no | true starts the Remote Control bridge in every interactive session, so claude.ai/code or the Claude app can drive this host's sessions, a bypassPermissions one included, which makes it a remote ingress; it is written only with --with-authorization-settings and never over a value the file already has | - |
+| `claude/settings/setting/crossSessionInbound` | `"accept"` | no | "accept" delivers each message from the user's other sessions to Claude (cross-session-messaging.md:195 at https://code.claude.com/docs/en/cross-session-messaging.md, read 2026-10-17), where Claude Code otherwise holds a message for approval in two cases (:203-206): a session that prompts holds a message from a session that bypasses permission prompts, and a session that bypasses holds a message from a session that does not; "accept" delivers both. It decides only whether a message is delivered; whether tool calls prompt is permissions.defaultMode's effect. It is written only with --with-authorization-settings and never over a value the file already has | - |
+| `claude/settings/setting/remoteControlAtStartup` | `true` | no | true starts the Remote Control bridge in every interactive session, so claude.ai/code or the Claude app can drive this host's sessions, a bypassPermissions one included, which makes it a remote ingress wider than the launchers' named --remote-control sessions; it is a separate opt-in inside the authorization class, off by default: written only with --with-authorization-settings and --with-remote-control-at-startup together, and never over a value the file already has | `--with-remote-control-at-startup` |
 | `codex/config/approval_policy` | `"never"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/config/sandbox_mode` | `"danger-full-access"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/config/mcp_servers.ai-memory.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `memory-owner` installing `ai-memory` |
@@ -1577,7 +1605,7 @@ Today: 406 pieces, 357 wired (211 practice, 146 through a slot), 32 not wired (0
 | `claude/settings/permission/allow/mcp__semble__search` | `"mcp__semble__search"` | no | an allow rule lets Claude Code call the tool without asking outside bypass mode; the rules name each tool exactly, so an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3) | slot `code-search` installing `semble` |
 | `claude/settings/permission/allow/mcp__semble__find_related` | `"mcp__semble__find_related"` | no | an allow rule lets Claude Code call the tool without asking outside bypass mode; the rules name each tool exactly, so an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3) | slot `code-search` installing `semble` |
 | `claude/settings/setting/skipDangerousModePermissionPrompt` | `true` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
-| `claude/settings/setting/crossSessionInbound` | `"accept"` | no | "accept" delivers messages from the user's other sessions to Claude without the approval hold that otherwise applies to a sender that is not in bypass mode, so it is written only with --with-authorization-settings and never over a value the file already has | - |
+| `claude/settings/setting/crossSessionInbound` | `"accept"` | no | "accept" delivers each message from the user's other sessions to Claude (cross-session-messaging.md:195 at https://code.claude.com/docs/en/cross-session-messaging.md, read 2026-10-17), where Claude Code otherwise holds a message for approval in two cases (:203-206): a session that prompts holds a message from a session that bypasses permission prompts, and a session that bypasses holds a message from a session that does not; "accept" delivers both. It decides only whether a message is delivered; whether tool calls prompt is permissions.defaultMode's effect. It is written only with --with-authorization-settings and never over a value the file already has | - |
 | `claude/settings/setting/remoteControlAtStartup` | `true` | no | true starts the Remote Control bridge in every interactive session, so claude.ai/code or the Claude app can drive this host's sessions, a bypassPermissions one included, which makes it a remote ingress wider than the launchers' named --remote-control sessions; it is a separate opt-in inside the authorization class, off by default: written only with --with-authorization-settings and --with-remote-control-at-startup together, and never over a value the file already has | `--with-remote-control-at-startup` |
 | `codex/config/approval_policy` | `"never"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/config/sandbox_mode` | `"danger-full-access"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |

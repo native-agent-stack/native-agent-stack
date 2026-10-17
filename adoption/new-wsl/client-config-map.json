@@ -334,7 +334,7 @@
       "match": [
         "claude/settings/setting/crossSessionInbound"
       ],
-      "wiring": "authorization:\"accept\" delivers messages from the user's other sessions to Claude without the approval hold that otherwise applies to a sender that is not in bypass mode, so it is written only with --with-authorization-settings and never over a value the file already has",
+      "wiring": "authorization:\"accept\" delivers each message from the user's other sessions to Claude (cross-session-messaging.md:195 at https://code.claude.com/docs/en/cross-session-messaging.md, read 2026-10-17), where Claude Code otherwise holds a message for approval in two cases (:203-206): a session that prompts holds a message from a session that bypasses permission prompts, and a session that bypasses holds a message from a session that does not; \"accept\" delivers both. It decides only whether a message is delivered; whether tool calls prompt is permissions.defaultMode's effect. It is written only with --with-authorization-settings and never over a value the file already has",
       "note": "Claude Code crossSessionInbound = \"accept\" (one of \"accept\", \"hold\" or \"refuse\": settings reference, crossSessionInbound, and https://code.claude.com/docs/en/cross-session-messaging#control-inbound-messages, read 2026-10-04), which NativeStack carries. It overturns the wave-2 messaging ruling, which left the key unset because a message between two bypass-mode sessions delivers anyway, on the owner's directive of 2026-10-04 to enable every current upstream feature and changelog addition in the new distribution's native workflow, and the owner's yes on the Claude-Codex messaging posture of 2026-10-02 (the new-WSL must-haves)."
     },
     {

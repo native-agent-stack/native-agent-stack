@@ -1930,13 +1930,13 @@
   {
    "key": "claude:setting:remoteControlAtStartup",
    "disposition": "enabled",
-   "reason": "User-scope true starts Remote Control in every new-WSL session: a separate opt-in inside the authorization class, off by default.",
-   "source": "docs/decisions/2026-10-17-new-wsl-remote-control-at-startup.md:14",
+   "reason": "Enabled as the NativeHorizonNY host read (user settings true); the repository default is off: a separate opt-in inside the authorization class.",
+   "source": "docs/decisions/2026-10-17-new-wsl-remote-control-at-startup.md:98-108",
    "carrier": "adoption/new-wsl/templates/claude.settings.additions.json (authorization class)",
    "value": true,
    "scope": "NativeHorizonNY",
    "overturn": "a measured unwanted remote tool call on a bypassPermissions host, or the owner asks for launcher-flag-only Remote Control",
-   "reviewed_utc": "2026-10-17T02:19:36Z",
+   "reviewed_utc": "2026-10-17T09:52:24Z",
    "version": "2.1.302"
   },
   {

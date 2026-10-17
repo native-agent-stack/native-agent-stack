@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Native capture of ai-memory v3.1.0's tag resolution and release checksums for the memory-owner run pin.
-# Usage: capture_v310.sh <outputs-dir> <scratch-dir>
+# Usage: capture.sh <outputs-dir> <scratch-dir>
 set -euo pipefail
 out="$1"; scratch="$2"
 repo=akitaonrails/ai-memory

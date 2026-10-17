@@ -31,6 +31,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN = ROOT / "evidence/artifacts/new-wsl-install-plan-20261002"
+FIXTURE = ROOT / "tests/fixtures/ai-memory-3.1.0-claude-hooks.json"
+# CLAUDE_CODE_EVENTS, the nine Claude Code events ai-memory 3.1.0's install-hooks writes (akitaonrails/ai-memory@11ca7c5b
+# crates/ai-memory-cli/src/commands/render_shared.rs:37-50, read through raw.githubusercontent.com on 2026-10-17). The row's
+# opt-out (--no-capture-prompts) omits UserPromptSubmit (install_hooks.rs:46 CLAUDE_PROMPT_EVENT, 1247-1274).
+UPSTREAM_CLAUDE_EVENTS = ("SessionStart", "UserPromptSubmit", "PreToolUse", "PostToolUse", "PreCompact", "Stop", "SessionEnd",
+                          "SubagentStart", "SubagentStop")
 RUN_PIN = ROOT / "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/run-pin.json"
 ASSETS = RUN_PIN.parent / "outputs/github-api-release-assets.json"
 # setup puts the unit under $XDG_CONFIG_HOME when that is absolute, otherwise ~/.config (akitaonrails/ai-memory@11ca7c5b
@@ -154,13 +160,87 @@ class MemoryOwnerRunPinTests(unittest.TestCase):
         active = [line for line in conf.splitlines() if line.strip() and not line.lstrip().startswith("#")]
         self.assertEqual(active[0], "[Service]")
         keys = {line.split("=", 1)[0] for line in active[1:]}
-        self.assertEqual(keys, {"Environment", "CPUWeight", "MemoryMax"})
+        self.assertEqual(keys, {"Environment", "CPUWeight", "MemoryHigh", "MemoryMax"})
         self.assertIn("CPUWeight=idle", active)
         self.assertTrue(any(line.startswith("Environment=PATH=%h/.local/bin:") for line in active), active)
         self.assertFalse(any(line.startswith("ExecStart") for line in active))
-        # MemoryMax is a labelled provisional bound until a measured peak sets it (the CC's ruling G5).
-        self.assertIn("MemoryMax=4G", active)
-        self.assertRegex(conf, r"(?m)^# PROVISIONAL: MemoryMax=4G ")
+        # G5 (the CC's ruling for the fold): the bound is measured, not provisional. MemoryHigh=1G is the working limit and
+        # MemoryMax=2G the last line, from two transient-unit MemoryPeak readings of 3.1.0 with the local embedder (the model
+        # fetch and 50 embedded writes; startup, the acceptance checks and one hybrid search), cited by the private receipt's name.
+        self.assertIn("MemoryHigh=1G", active)
+        self.assertIn("MemoryMax=2G", active)
+        self.assertNotIn("MemoryMax=4G", active)
+        self.assertNotRegex(conf, r"(?i)provisional")
+        self.assertRegex(conf, r"(?m)^# MEASURED \(the CC's ruling G5 ")
+        peaks = [int(n) for n in re.findall(r"MemoryPeak (\d+) bytes", conf)]
+        self.assertEqual(peaks, [362442752, 201592832])
+        high, last = (int(value.removesuffix("G")) << 30 for value in ("1G", "2G"))
+        self.assertGreater(high, max(peaks))
+        self.assertGreater(last, high)
+        for method in ("RECEIPT-g5-20261017.md", "cited by name only", "transient user unit", "embedding_provider = \"local\"",
+                       "50 embedded writes", "hybrid search", "page\n# cache charged to the unit"):
+            self.assertIn(method, conf)
+        # What the readings do not cover is named, so the bound is not read as covering it.
+        self.assertRegex(conf, r"NOT MEASURED: a large store's startup\n# backfill and a consolidation run")
+        # The interim and the plan row say the same bound, not the provisional one.
+        self.assertIn("MemoryHigh=1G as the working limit and MemoryMax=2G as the last line", json.dumps(self.row))
+        self.assertNotIn("PROVISIONAL", json.dumps(self.row))
+        manifest = (ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json").read_text(encoding="utf-8")
+        self.assertIn("CPUWeight=idle, MemoryHigh=1G and MemoryMax=2G", manifest)
+        self.assertNotIn("a provisional MemoryMax", manifest)
+        # Round 2: the install plan's SOURCES.md prints the same measured bound, with the method, both readings and the
+        # unmeasured residual, and no record that carries the row's bound calls it provisional or prints 4G.
+        sources = (PLAN / "SOURCES.md").read_text(encoding="utf-8")
+        self.assertIn("`MemoryHigh=1G` is the working limit and `MemoryMax=2G` the last line", sources)
+        for reading in peaks:
+            self.assertIn(f"{reading} bytes", sources)
+        for part in ("RECEIPT-g5-20261017.md, cited by name only", "not measured: a large store's startup backfill and a consolidation run"):
+            self.assertIn(part, sources)
+        for path in (PLAN / "SOURCES.md", PLAN / "install-plan.json", PLAN / "config/ai-memory-override.conf",
+                     ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+                     ROOT / "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json", ROOT / "docs/new-wsl-handbook.json"):
+            self.assertNotRegex(path.read_text(encoding="utf-8"), r"(?i)MemoryMax=4G|provisional (?:bound|MemoryMax)", path.name)
+
+    def test_the_handbook_receipt_keeps_no_state_that_only_the_prs_first_commit_held(self):
+        """Round 2: the receipt recorded the handbook state of the PR's first commit (a regenerations entry and a
+        previous_outputs entry citing that commit as source_head). That commit is not published, and the output digests of
+        its state match no tracked file at the head, so the text-digest guard cannot resolve them. The receipt keeps one
+        regenerations entry for this PR (one entry, found by what it records) whose digests are the tracked files' own while it
+        is the current regeneration, and previous_outputs entries whose digests are the blobs at their source_head."""
+        receipt_path = ROOT / "evidence/artifacts/new-wsl-handbook-20261001/receipt.json"
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        day = "2026-10-17"
+
+        def sha(relative):
+            return hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()
+
+        regenerations = receipt["regenerations"]
+        # The PR's entry is found by what it records (the condition-4 move and the fold's B2 change), not by its date or position.
+        split = [entry["source_base"] for entry in regenerations
+                 if ("Condition 4" in entry.get("scope", "")) != ("finding B2" in entry.get("scope", ""))]
+        self.assertEqual(split, [], "the PR's regeneration is one entry, not one per commit")
+        mine = [index for index, entry in enumerate(regenerations) if "Condition 4" in entry.get("scope", "") and "finding B2" in entry.get("scope", "")]
+        self.assertEqual(len(mine), 1, mine)
+        entry = regenerations[mine[0]]
+        previous_entries = receipt["previous_outputs"]
+        if mine[0] == len(regenerations) - 1:
+            # Still the current regeneration: its digests are the tracked files' own.
+            self.assertEqual(entry["generator_sha256"], sha("scripts/build_new_wsl_handbook.py"))
+            self.assertEqual(entry["current_outputs"], {path: sha(path) for path in entry["current_outputs"]})
+            self.assertEqual(entry["current_outputs"], receipt["outputs"])
+            self.assertEqual(receipt["generator_sha256"], entry["generator_sha256"])
+        else:
+            # A later regeneration moved the state on: this entry's outputs are then recorded as a superseded state.
+            self.assertIn(entry["current_outputs"], [prev["outputs"] for prev in previous_entries])
+        # A previous_outputs entry names a state its source_head held: the blobs there give its digests, wherever that
+        # commit is present (a shallow checkout does not have it).
+        for previous in (prev for prev in previous_entries if prev.get("superseded_at_utc") == day):
+            head = previous["source_head"]
+            if subprocess.run(["git", "-C", str(ROOT), "cat-file", "-e", f"{head}^{{commit}}"], capture_output=True).returncode:
+                continue
+            for path, digest in previous["outputs"].items():
+                blob = subprocess.run(["git", "-C", str(ROOT), "show", f"{head}:{path}"], capture_output=True, check=True).stdout
+                self.assertEqual(digest, hashlib.sha256(blob).hexdigest(), (head, path))
 
     def test_the_drop_in_goes_to_setups_unit_directory_and_only_the_plans_bytes_stay(self):
         # setup writes the unit under $XDG_CONFIG_HOME when that is absolute (user_service.rs:236-249 at 11ca7c5b), so a
@@ -302,14 +382,26 @@ class MemoryOwnerRunPinTests(unittest.TestCase):
             plan_bytes = (PLAN / "config/ai-memory-override.conf").read_bytes()
             env = {"PATH": f"{home / 'bin'}:/usr/bin:/bin", "HOME": tmp, "XDG_CONFIG_HOME": str(home / "xdg"),
                    "plan_dir": str(PLAN)}
-            claude = ("SessionStart", "PreToolUse", "PostToolUse", "PreCompact", "Stop", "SessionEnd",
-                      "SubagentStart", "SubagentStop")
+            # B12: the set is the one ai-memory 3.1.0's setup installs once the opt-out ran, read from the captured fixture
+            # (and, in the next test, from render_shared.rs:37-50 at the tagged commit), not typed here.
+            claude = tuple(json.loads(FIXTURE.read_text(encoding="utf-8"))["settings"]["hooks"])
+            self.assertEqual(len(claude), 8)
             opted_out = {e: hook(e, "claude-code") for e in claude}
+            both = {"override.conf": plan_bytes}
+            duplicated_in_group = {**opted_out, "Stop": [{"matcher": "", "hooks": opted_out["Stop"][0]["hooks"] * 2}]}
             for name, settings, drop_ins, want in (
                     ("opted out", opted_out, {"override.conf": plan_bytes}, 0),
                     ("captures prompts", {e: hook(e, "claude-code") for e in (*claude, "UserPromptSubmit")},
                      {"override.conf": plan_bytes}, 1),
                     ("no ai-memory hooks", {}, {"override.conf": plan_bytes}, 1),
+                    # B12: a partial set (any one event missing, and a single hook), a duplicated set (an event twice, as two
+                    # groups or as two hooks in one group) and a set with an extra event all fail; each passed before.
+                    *((f"a partial set without {e}", {k: v for k, v in opted_out.items() if k != e}, both, 1) for e in claude),
+                    ("a single hook", {"SessionStart": opted_out["SessionStart"]}, both, 1),
+                    ("an event as two groups", {**opted_out, "PreToolUse": opted_out["PreToolUse"] * 2}, both, 1),
+                    ("an event as two hooks in one group", duplicated_in_group, both, 1),
+                    ("the whole set twice", {e: opted_out[e] * 2 for e in claude}, both, 1),
+                    ("an extra event", {**opted_out, "Notification": hook("Notification", "claude-code")}, both, 1),
                     ("an edited drop-in", opted_out, {"override.conf": b"[Service]\n"}, 1),
                     ("another drop-in", opted_out, {"override.conf": plan_bytes, "10-x.conf": b"[Service]\n"}, 1),
                     ("no drop-in", opted_out, {}, 1)):
@@ -322,6 +414,25 @@ class MemoryOwnerRunPinTests(unittest.TestCase):
                     result = subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env,
                                             capture_output=True, text=True, timeout=60)
                     self.assertEqual(result.returncode != 0, bool(want), result.stderr)
+
+    def test_the_claude_hook_check_names_exactly_the_set_setup_installs(self):
+        """B12: the smoke accepted one or more Claude ai-memory hooks. It now lists the event of every ai-memory hook and
+        compares the sorted list with exactly the set that setup installs after the opt-out, each event once."""
+        installed = json.loads(FIXTURE.read_text(encoding="utf-8"))
+        self.assertIn("11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea", installed["upstream"])
+        fixture_events = tuple(installed["settings"]["hooks"])
+        self.assertEqual(sorted(fixture_events), sorted(set(UPSTREAM_CLAUDE_EVENTS) - {"UserPromptSubmit"}))
+        self.assertEqual(len(fixture_events), len(set(fixture_events)))
+        for event, groups in installed["settings"]["hooks"].items():
+            with self.subTest(event=event):
+                self.assertEqual(len([h for g in groups for h in g["hooks"]]), 1, "setup installs each event's hook once")
+        program = self.row["acceptance"]["post_install"]["command"]
+        listed = re.search(r'sort == \[("[A-Za-z]+"(?:, "[A-Za-z]+")*)\]', program)
+        self.assertIsNotNone(listed, "the check compares the sorted event list with a literal set")
+        self.assertEqual(re.findall(r'"([A-Za-z]+)"', listed.group(1)), sorted(fixture_events))
+        self.assertNotIn("length > 0", program)
+        self.assertEqual(program, next(c for stage, _, kind, c in load_checker().checks_of(
+            load_checker().functions(self.accept)["memory-owner"]) if stage == "post_install"))
 
     def test_the_row_reads_its_port_from_the_host_allocation(self):
         # The CC's ruling D3: the row reads its port from ~/.config/new-wsl-native-stack/.service-ports.json, the way
@@ -392,6 +503,42 @@ class MemoryOwnerRunPinTests(unittest.TestCase):
         captured = json.loads(RUN_PIN.read_text(encoding="utf-8"))["proposed_run_pin"]["tag_resolution"]["read_at"][:10]
         self.assertGreaterEqual(consensus["wave6"]["date_utc"], captured)
         self.assertEqual(amendment["date_utc"], consensus["wave6"]["date_utc"])
+
+    def test_the_interim_pin_string_is_the_run_pins_tag_commit_and_archive_in_every_record_that_carries_it(self):
+        """N1: the fold dropped the space before '(tag object' in the interim's pin while it edited the label beside it, in
+        the consensus record, the definitive manifest and the handbook JSON generated from them, and no check read the
+        string. Each record carries the exact pin the run pin's tag resolution and archive give, in the form the install
+        plan's SOURCES.md and the layer-consensus decision print (a space before the parenthesis)."""
+        pin = json.loads(RUN_PIN.read_text(encoding="utf-8"))["proposed_run_pin"]
+        expected = (f"tag v{self.version} (tag object {pin['tag_resolution']['annotated_tag_object']}) = commit {self.commit}; "
+                    f"release asset ai-memory-linux-x86_64.tar.gz sha256 {self.archive_sha}")
+        manifest = json.loads((ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json")
+                              .read_text(encoding="utf-8"))
+        consensus = json.loads((ROOT / "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json")
+                               .read_text(encoding="utf-8"))
+        handbook_path = ROOT / "docs/new-wsl-handbook.json"
+        handbook = json.loads(handbook_path.read_text(encoding="utf-8"))
+        row = next(row for row in manifest["slots"] if row["slot_id"] == "memory-owner")
+        self.assertEqual(row["interim"]["pin"], expected)
+        amended, = [entry for entry in consensus["wave6"]["amend_rows"] if entry["slot_id"] == "memory-owner"]
+        self.assertEqual(amended["interim"]["pin"], expected)
+
+        def pins(node):
+            if isinstance(node, dict):
+                if node.get("default") == "ai-memory 3.1.0" and "pin" in node:
+                    yield node["pin"]
+                for value in node.values():
+                    yield from pins(value)
+            elif isinstance(node, list):
+                for value in node:
+                    yield from pins(value)
+
+        self.assertEqual(set(pins(handbook)), {expected})
+        # No generated or recorded text prints the tag object glued to the tag.
+        for path in (ROOT / "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+                     ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json", handbook_path,
+                     ROOT / "docs/new-wsl-handbook.md"):
+            self.assertNotRegex(path.read_text(encoding="utf-8"), r"v3\.1\.0\(tag object", path.name)
 
     def test_every_cited_ai_memory_source_is_at_the_run_pin_commit(self):
         for where, text in (("install-plan.json", json.dumps(self.row)),
