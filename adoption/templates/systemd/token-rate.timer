@@ -1,0 +1,11 @@
+[Unit]
+Description=Hourly token-rate projection
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+RandomizedDelaySec=5m
+Unit=token-rate.service
+
+[Install]
+WantedBy=timers.target
