@@ -199,6 +199,7 @@ remain open for part 2. This repair does not qualify the future V2 runner.
 | `build_args.py` | checkout | Stages a run into the work directory: frozen dated templates, schemas, the GPT-6 runtime, first-round GPT-6 prompts, `staged.json`, `prompts_sha256.txt`, the compact `args.json` and `sweep.embedded.js`. |
 | `sweep.js` | Workflow | The lane itself (`const A = args`; its header documents the args object). |
 | `codex_call.sh`, `codex_job.py` | staged | The GPT-6 job runner the wrapper agents call (`start`, `wait`, `result`). |
+| `paired_probe.py` | checkout | The paired before/after probe of the opt-in lane hardening, staged for a day GPT capacity returns (it prints the plan; `--run` is the only mode that starts jobs). |
 | `codex_quota.py` | staged | A copy of the checkout's `scripts/codex_quota.py`, the account quota probe the runner's optional quota gate runs. |
 | `make_prompt.py` | staged | Composes a GPT-6 prompt from the frozen templates. |
 | `templates.json`, `schemas/` | staged | The prompts, with `<<DATE>>`, `<<LAYER_COUNT>>`, `<<SKILLS_CHECKED_AT>>` and `<<MODALITY>>` open, and the strict return schemas (`discover-skills.json` for the skills modality). `probe.json` is for the one-call lane probe. |
@@ -330,7 +331,7 @@ What the lane config also sets:
   - A native restage of the work directory removes the file, because the native lane has no context-mode.
 
 What the lane does not carry or allow:
-- Project and hook trust are left out, because they describe the host's interactive client.
+- Project and hook trust are left out of the lane's `config.toml`, because they describe the host's interactive client. The opt-in per-job trust below is carried on the command line instead and leaves the file trust-free.
 - `supports_websockets` stays unset. OmniRoute forwards the Codex client version only on its HTTP `/v1/responses` path.
 - `--omniroute-base-url` must point at loopback.
 
@@ -351,6 +352,28 @@ Before a full run through the gateway, run the lane's parity check on the staged
 - `--output-schema` output;
 - reported usage;
 - whether hosted web search passes through for a custom provider.
+
+#### Opt-in lane hardening (hooks, `--disable apps`, OTEL, rollout usage, ai-memory bearer)
+
+Decision record: [docs/decisions/2026-10-17-codex-job-lane-hooks-mcp-memory.md](../../../docs/decisions/2026-10-17-codex-job-lane-hooks-mcp-memory.md).
+Every item is a `build_args.py` option that writes one `staged.json` `codex` key; with no option the argv, the
+environment, `inputs.json`, `result` and the lane home are byte-identical to before. Pins: openai/codex `rust-v0.163.0`
+at `83086188ae0614bd882818ff1aa23f3194962012`, rtk 1.0.1, ai-memory 3.1.0. A restage rewrites `staged.json`, so repeat the options.
+
+| Option | Staged key | What the runner does | Bound in `inputs.json` |
+| --- | --- | --- | --- |
+| `--codex-hook rtk` | `hooks.rtk` | One `-c hooks.state={...}` inline table trusts the one `rtk hook codex` PreToolUse handler found in `<home>/hooks.json` (by command, never by position; the realpath of `CODEX_HOME`, else `$HOME/.codex`; for a gateway lane `<work-dir>/codex-home`, where `build_args.py` runs upstream's own `rtk init -g --codex`). Sets `RTK_TELEMETRY_DISABLED=1` and the same value for the model's shells. A missing or duplicate handler ends the job before codex starts (exit 2, failure kind `hook_trust`). `--ignore-user-config` stays on the native lane. | `hooks` |
+| `--codex-hook secret_guard` | `hooks.secret_guard` | Registers the staged, hash-checked copy of `scripts/hooks/secret_path_guard.py` as a PreToolUse hook for `Bash` only (timeout 10) with `-c hooks.PreToolUse=[...]`, trusted under the session-flags key in the same `hooks.state` table. A missing or changed copy ends the job before codex starts, and the registered command itself exits 2 with a reason if the copy or the interpreter vanishes later. | `hooks` |
+| `--codex-disable-feature apps`, `--web-search disabled` | `disable`, `web_search` | `codex exec --disable apps` (Codex validates the name). `web_search` was already a staged key; nothing couples it to `disable`. | `disable`, `web_search` |
+| `--codex-otel-endpoint 127.0.0.1:PORT [--codex-otel-lane NAME]` | `otel` | `otel.exporter` and `otel.metrics_exporter` (OTLP/HTTP binary to the loopback collector), `otel.tool_result.max_bytes=0` and `otel.environment=<NAME>-<job id>`. A tag the collector would delete (longer than 128 characters or outside its id pattern) is refused before state changes. | `otel` |
+| `--rollout-usage` | `rollout_usage` | After each attempt, a field of its own, `rollout_usage {status, thread_id, rollout, usage, reason}`, from the last `token_count` of the thread's rollout under the attempt's recorded Codex home, found by thread id and never by date. `usage` and `usage_status` stay as they were, `total_tokens` is dropped, and a job that died before `thread.started` stays `unavailable`. | no (it only reads a finished attempt) |
+| `--ai-memory-bearer-env [NAME]` (gateway) | `ai_memory_token_env` | The lane's ai-memory MCP entry carries `bearer_token_env_var = "NAME"` (default `AI_MEMORY_AUTH_TOKEN`), the host's own form. The lane config filters `NAME` out of the model's shells, the runner refuses a start while it is unset or blank (exit 6, kind `no_key`), and the value is written nowhere. | `ai_memory_token_env` |
+
+`rollout_usage` is not summed by `convert.py`: an attempt with an empty `usage` still counts as `usage_unavailable`, so
+`gpt6_usage` totals do not change. `sweep.js` copies a fixed list of `result` keys (and `attempts[]` whole), so a final failed attempt's top-level `rollout_usage` is read with `codex_call.sh result`; carrying it into the sweep record is a separate change. Codex lets a tool call continue when a hook crashes, times out or exits with anything but 2 and a
+stderr reason, so the guard is a heuristic layer here, not a boundary. The inline-hook trust key and the hash of an inline definition are
+read from the pinned source and not yet measured with `codex app-server` `hooks/list`; run that, the paired probe
+(`paired_probe.py`, staged and not run until a GPT account has capacity) and the checks in the decision record before relying on them.
 
 #### Automatic native-to-OmniRoute failover (`--gpt6-fallback omniroute`)
 
@@ -975,7 +998,8 @@ is its cost reference:
 - `child-usage-<run>.json` (`usage_record.py`) for the Claude workers;
 - `returns.json` `gpt6_usage` for GPT-6: `usage` sums the final attempt of each job and `earlier_attempts` the
   attempts the runner kept, with `usage_unavailable` counting attempts that reported none. Complete GPT-6 usage is
-  the per-counter sum of the two.
+  the per-counter sum of the two. A lane staged with `--rollout-usage` also keeps each failed attempt's rollout-derived
+  figure in that attempt's `rollout_usage`; it is a separate, best-effort receipt that `convert.py` never adds to these sums.
 
 Each counter is its own kind, so Claude and GPT-6 counters are never summed together. A full sweep has up to one
 round per due layer, plus at most 8 follow-up rounds and a critic; the recipe classes the lane as high cost. Plan a
@@ -1221,12 +1245,15 @@ The deliberate changes:
 
 ```sh
 python3 -m unittest tests.test_landscape_sweep_harness -v
+python3 -m unittest tests.test_codex_job_lane_hardening -v   # the opt-in lane hardening
 ```
 
 The suite uses synthetic fixtures and makes no network or model calls:
 
 - A fake `codex` and a fake `gh` sit early on PATH; the fake `codex app-server` answers the quota probe.
   `tests/test_codex_quota.py` covers the probe itself against a stricter protocol fake.
+- `tests/test_codex_job_lane_hardening.py` reuses that fake `codex` (plus a stub `rtk` installer) and parses every recorded
+  `-c` value as TOML, the way Codex does; no test runs the real `codex`, `rtk` or `ai-memory`.
 - `sweep.js` runs under node with stubbed `agent`, `parallel` and `pipeline`.
 - The converted evidence is appended to a synthetic ledger checkout with `saturation_ledger.py` itself.
 
