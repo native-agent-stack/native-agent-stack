@@ -1356,7 +1356,10 @@ class NewWslHandbookTests(unittest.TestCase):
                 self.assertIn(f"{row['catalog']} / {row['layer_id']} / consensus", cells[9])
                 self.assertFalse(row["definitive"])
         amendments = [(row["slot_id"], item) for row in manifest["slots"] for item in row.get("amendments", [])]
-        self.assertEqual(len(amendments), len(consensus["amend_rows"]) + len(wave2.get("amend_rows", [])))
+        # The wave-6 batch (2026-10-17) adds a direct consensus's interim amendment, recorded among the amendments.
+        wave6 = consensus.get("wave6") or {}
+        self.assertEqual(len(amendments), len(consensus["amend_rows"]) + len(wave2.get("amend_rows", []))
+                         + len(wave6.get("amend_rows", [])))
         self.assertEqual(data["default_decisions"]["inventory"]["amendments"], len(amendments))
         self.assertIn(f"Rows of kind consensus: {len(added)}; amendments: {len(amendments)}.", markdown)
         for slot_id, item in amendments:

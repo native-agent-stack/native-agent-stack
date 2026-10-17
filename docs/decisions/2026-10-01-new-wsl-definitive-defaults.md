@@ -183,7 +183,7 @@ An interim install is what the destination installs in its row's place until the
 | Slot | Date | Interim | Authority | Decided by |
 | --- | --- | --- | --- | --- |
 | code-search | 2026-10-03 | semble 0.6.1 + SocratiCode 1.15.0 | owner decision | the frozen code-search confirmatory (its section 6) decides between the two installed arms: semble selected, SocratiCode is removed and semble becomes final once its pins equal the executable annex's; SocratiCode selected, semble is removed; ColGREP selected, it replaces both; no selection, both are removed and the slot returns to empty |
-| memory-owner | 2026-10-03 | ai-memory 2.5.2 | owner decision | the memory head-to-head at its frozen revision (D3r2 or later), binding once its hash is posted and the Codex lane has read it; it checks that each arm actually uses its vectors, and its best eligible system takes the slot with no protected incumbent |
+| memory-owner | 2026-10-03 | ai-memory 3.1.0 | owner decision | the memory head-to-head at its frozen revision (D3r2 or later), binding once its hash is posted and the Codex lane has read it; it checks that each arm actually uses its vectors, and its best eligible system takes the slot with no protected incumbent |
 
 ### Amendments by direct consensus
 
@@ -194,6 +194,7 @@ An amendment records a later decision on its row and replaces none of the row's 
 | claude-code | 2026-10-02 | keep |
 | codex | 2026-10-02 | keep |
 | agent-messaging | 2026-10-02 | the owner wants messaging between sessions and between the two clients; the transport is measured before one is selected |
+| memory-owner | 2026-10-17 | install ai-memory 3.1.0 for the memory-owner interim: tag v3.1.0 at 11ca7c5b, its release archive verified against the publisher's sha256 sidecar (the memory-owner 3.1.0 run pin and its checksum receipt, which supersede the F1 run pin as the plan's pin source); the plan row follows in the same change, and the other interim fields stay as recorded except the open acceptance gates, which name 3.1.0, its client entries and the memory port of the host allocation; the configuration's listen, service and codex_tool_approval, which the 3.1.0 route makes false as recorded (the port is the host allocation's, setup renders and owns the unit, and setup writes Codex's tool approval unconditionally); and the sources, which move to the 3.1.0 run pin and the v3.1.0 release at 11ca7c5b |
 | credential-custody | 2026-10-03 | keep the measurement; gate each arm on eligibility before it is scored; HASP 1.0.44 is ineligible on Linux as documented; systemd-creds --user becomes the deciding storage comparison |
 | agent-runtime-worker | 2026-10-02 | keep the selection meanwhile; measure the alternatives |
 | research-harnesses | 2026-10-02 | keep GPT Researcher 3.7.0; measure the second gatherer |

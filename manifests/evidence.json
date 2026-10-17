@@ -5537,8 +5537,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "2ade836cc0fef1aab6adc1c1acc436036bcdd59f692142d86f30ccc8373cd56c",
-      "bytes": 57780
+      "sha256": "fb10d077ffc04d089381ba0a0f726a249129420de4ebf1eddd49d5a4ad9b94ce",
+      "bytes": 64844
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5557,13 +5557,13 @@
     },
     {
       "path": "adoption/new-wsl/templates/claude.settings.additions.json",
-      "sha256": "86a51eb928ef3d38033f2630bbaa06447a0c9c7a62cdfdd6a6d77614591aa646",
-      "bytes": 2197
+      "sha256": "c825241da341d17d644a8b06784b5c6ea755d9fd743e2a54263b0173e4331760",
+      "bytes": 2906
     },
     {
       "path": "adoption/new-wsl/templates/codex.config.additions.toml",
-      "sha256": "07cd31390bb93b4364976952ca40a85741e4c4d3700f0e08b61c3b6af151be8b",
-      "bytes": 5216
+      "sha256": "1420b08bf84c862dfa797a13bd4860ecf2af574a712bd7c83e8681b2923c9d01",
+      "bytes": 7579
     },
     {
       "path": "adoption/paired/README.md",
@@ -17548,8 +17548,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "d5fd7bacdb28191027aa2305d875434bf1915b0ae607baea970d27d46615504d",
-      "bytes": 193410
+      "sha256": "14fb6262436bc12ac6d2f2c985f9a5aedb7c2f0c46fac8556ae13450ee797799",
+      "bytes": 193583
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -18558,8 +18558,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "9930cc66e281b7caad644491767827cd937ab8ab4f974e4abfa5a3570957af0a",
-      "bytes": 81435
+      "sha256": "36e269bfe6e6ee16a4c10265c08fa698f2fd653309b6c9a194921b332d92f8cd",
+      "bytes": 82248
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
@@ -18583,8 +18583,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "43cc2ff82481dbf509418b036aabbe868b52812c78870c587eeaadfc64c23490",
-      "bytes": 150626
+      "sha256": "ada6751bda0d8c480335021a48f1d86c64fe78ac0c4c37ca7abb942935f9e3ff",
+      "bytes": 236532
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -19367,6 +19367,16 @@
       "bytes": 6429
     },
     {
+      "path": "docs/decisions/2026-10-17-ai-memory-one-hook-writer.md",
+      "sha256": "d1e12ca8b3d88d6cfbc4f72e667b24c331d35aa78f941002496c93e6c14e17c5",
+      "bytes": 10782
+    },
+    {
+      "path": "docs/decisions/2026-10-17-new-wsl-remote-control-at-startup.md",
+      "sha256": "79a809555a560667ea9f0c84f750f3d4bb0cea2d247ac0ec4e139f75540e00a8",
+      "bytes": 7652
+    },
+    {
       "path": "docs/decisions/2026-10-17-zero-tolerance-currency.md",
       "sha256": "00eb7228052fb3b1afeb1e92b81e2108412d4f74f544aab042dda14a7c1eee1c",
       "bytes": 18602
@@ -19738,13 +19748,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "ebc83bb69269c45b1f02edb4ad544fcb6621922f6aa85d1c23b19668001078b4",
-      "bytes": 698867
+      "sha256": "97b5f509466728ad4fbe9d8ed7064fd536361090d4615e1928f28405d9365e8e",
+      "bytes": 704516
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "eecab4436abed523af18d7f35a12248835621dd74a13409959280d6eb416c5ba",
-      "bytes": 369930
+      "sha256": "e79b41c764eb7eb90cdb71455d1aad05ac91377d40ede9f723d32a35ba325c63",
+      "bytes": 371506
     },
     {
       "path": "docs/next-host-stages.md",
@@ -41492,6 +41502,61 @@
       "bytes": 3915
     },
     {
+      "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/capture.sh",
+      "sha256": "78beabcb5dad1933e3c3fa9a7a89ff6edccccf2ae506710a117c4f4fbf12c3a0",
+      "bytes": 2766
+    },
+    {
+      "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/outputs/download-sha256.txt",
+      "sha256": "29a9fee0c87bbbbf17959e49c4c8b1ca9d958836a87c6f24889b25e054d3bc3f",
+      "bytes": 173
+    },
+    {
+      "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/outputs/github-api-release-assets.json",
+      "sha256": "f25576e2dbb133e65239125aecd16cf773d4fd6751a4d9302165e3aebcf49bef",
+      "bytes": 1114
+    },
+    {
+      "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/outputs/github-api-tag.json",
+      "sha256": "93efc96ca2947bd41af18fdbe7a0ebaf7a74cb5d640db425f64fabd6a58fab4e",
+      "bytes": 738
+    },
+    {
+      "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/outputs/recorder-time.txt",
+      "sha256": "82dfe732e7e42a5c8349dc81c141c247e5c274fbec35fa0ab4b27f0816f143a8",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/outputs/release-archive-members.txt",
+      "sha256": "507c25aee04193de6e512c15193bb9e0f73a4a188ddc401ebe866ab7387d7965",
+      "bytes": 114
+    },
+    {
+      "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/outputs/release-binary-sha256.txt",
+      "sha256": "325c0702b8ecd7da8e27f9ad278fefa06e1a4b757ebf810c172e4019bac0bc1a",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/outputs/upstream-tag-resolution.txt",
+      "sha256": "85a42159a3178b51956fe1f4989559f2060d878a502f45a665c1cfa609daaaa6",
+      "bytes": 119
+    },
+    {
+      "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/outputs/verify-install-script-checksum.txt",
+      "sha256": "a0e3d35f6402554912572b4d59d223771e9f23766fd8f7eda8957a7441384f8c",
+      "bytes": 15
+    },
+    {
+      "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/outputs/verify-release-checksum.txt",
+      "sha256": "4cf9beca8201431f08123596d1063a0d4f52419632a9c1d48cf5efb8b6bc672b",
+      "bytes": 34
+    },
+    {
+      "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/run-pin.json",
+      "sha256": "6e9bd86ffc32c1adefad5ef7b13d0ab8566e4f449e08aaae33c288d2846e656c",
+      "bytes": 7268
+    },
+    {
       "path": "evidence/artifacts/memory-rag-lifecycle-20260921/catalog-lifecycle.png",
       "sha256": "7e2bce14ded57666c62edd5a7de74a5f7b9f7e2ad7caef8aedd60490bd16d9d3",
       "bytes": 118237
@@ -43868,8 +43933,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py",
-      "sha256": "2e54cf448127f68be86ee22eec531e7eb5ad90b4926c73164dc3502243689e99",
-      "bytes": 61328
+      "sha256": "7917b405698f87323292ee1373b920c0a9b0fb28c48f17ad884589ff5481181c",
+      "bytes": 66426
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/build_decide_packets.py",
@@ -43913,8 +43978,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "5bace4abad48ef09ddf80f77ef42461668706a0617859bfda0c1304ea3adac3f",
-      "bytes": 235109
+      "sha256": "7380fd415ffccf3d788edf466d06bdd1caa848a6c5b5a2e0502bd2466caf62f3",
+      "bytes": 240348
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -44668,8 +44733,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "307fcdacd17dfbf5b1d290341a4b94a9fcd6dcf2a360a6c995a1f1ccf18bc64d",
-      "bytes": 83244
+      "sha256": "f35e333dabacc7bd3083b344a605ced5ae2698ea93cad6d77c4e464a72f550fe",
+      "bytes": 85018
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -44678,18 +44743,18 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/NO_START_PORTS.md",
-      "sha256": "d240fecbab60f578413b447501ae70259ab52621fb494d071a2bbd61ec38da8c",
-      "bytes": 45887
+      "sha256": "86f2fbe30d4336dd9e6572f6d8ef54ec62a3de7c8e0bd432e298c955f0de6894",
+      "bytes": 50553
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "141886fae0fe62389c9fa322dea82dc11e0ca7a510e9dec3b30ddee881aedaa6",
-      "bytes": 106597
+      "sha256": "6a4cb44ea574e96c4ef48ae77189d6b264586540a100d3e44ae219109548b514",
+      "bytes": 106898
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "08850cba7b6e00466807e1e971434f0255f8682485cbd1acf3c30e1782081cbf",
-      "bytes": 227898
+      "sha256": "70d63786c1bffec958383f670667fb27a2b4fe627c4d205d4af2f344ec4eeb71",
+      "bytes": 232631
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -44698,8 +44763,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "8baf520416c4e484d852c47a8cecb3474551823745450664838036a4fef25c18",
-      "bytes": 201658
+      "sha256": "2d829d56ce37bbdb08007acece206e63a98734ce5ac418e9c476e7e79a2a8464",
+      "bytes": 203007
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/activation-followup-receipt.json",
@@ -44708,8 +44773,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
-      "sha256": "ab3ea506682cb5dff2c4073a7d50f0feed590fe60f8b10c62968d9744403ddd3",
-      "bytes": 64721
+      "sha256": "d520465ede1c3548341fc1f5fe4781f53954461b1c3f4633e8057a1a88b6cd0d",
+      "bytes": 69734
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/acceptance-execution-instructions.txt",
@@ -44730,6 +44795,11 @@
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/agentsview.toml",
       "sha256": "365891dfe87978f1fbd1a8df445c6654c2836c9f0ee9e69b03dbd49010d4f9f3",
       "bytes": 280
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ai-memory-override.conf",
+      "sha256": "b7de64b64d5922aebf7bf538a8035983002658054a095e1781676f8aa7b42661",
+      "bytes": 1205
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/alertmanager-telegram.yaml",
@@ -45193,13 +45263,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "10648a8d67c6a0505f65e4e2b70e4fad1e95241d168580168a3505b03a761b19",
-      "bytes": 495812
+      "sha256": "ed8fc2faa14fc589d0459404a33d35b7f037afac2db90ecea570cc66da531cc0",
+      "bytes": 504299
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "cfd1a6e51336cb6bd661ea09d93730fd685b9c570b0772602215fb671bbf2dbd",
-      "bytes": 144702
+      "sha256": "3e057995115cf585cb98e759c5ac8a170d8dd7abe0be003ad3233cceabe1f500",
+      "bytes": 148521
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
@@ -45233,8 +45303,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
-      "sha256": "94bbe6256be9e554e7549707cd012a2a9857f7e0fdf599be2ed558fb62a06d3b",
-      "bytes": 35564
+      "sha256": "5a91c059b6547222365416463fc58dce1064b2b3d6dd34cbda82632cdcc23176",
+      "bytes": 35689
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json",
@@ -45313,8 +45383,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "3d35d64d44571ee4bc91b5ffb0329eefdbbc5017c11c57f16fbfea5a59e3b9c7",
-      "bytes": 143461
+      "sha256": "a2b4baf128cc31c6e6db55923bc789ceac118950151827101e9af44e0c611f98",
+      "bytes": 151167
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/copy-notes.json",
@@ -63367,6 +63437,16 @@
       "bytes": 341189
     },
     {
+      "path": "tests/fixtures/ai-memory-3.1.0-claude-hooks.capture.sh",
+      "sha256": "66543dfc39a2baae589d5a99dedbc206a5f93fdca244975db423904e3a0bdee7",
+      "bytes": 4592
+    },
+    {
+      "path": "tests/fixtures/ai-memory-3.1.0-claude-hooks.json",
+      "sha256": "9bf8637551dc7e5ffac5de26d93b9fccf02f1ec9f31af635b37ff14fa8565741",
+      "bytes": 3974
+    },
+    {
       "path": "tests/fixtures/codex-worker-lane/README.md",
       "sha256": "14f7463dcdc7180bc4c4c46aa8fb321a5f5494dafeb5d6e57ba2b58686ae5b63",
       "bytes": 1128
@@ -64768,18 +64848,18 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "4f66cc1318f1b00cc589f7cff24b2e4c234ddbc6e1295ba20bdc6b269322555d",
-      "bytes": 345889
+      "sha256": "68d286880d2cf38d2814b3f4a0c84e2b476384bcbe5a0b6b325bd6d791415a8e",
+      "bytes": 367247
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "2a0a6100becb2e22d416d0d0606402cad717febc9596b256d2bd789318201993",
-      "bytes": 314996
+      "sha256": "31b388a298202b8cc35a21eb4cf09ef7d29896d4023cf24d3494ea36c429702a",
+      "bytes": 317958
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "c4d9cf02b2dbb302d5294d75d2fef24adc20f1ecc401a8fe7b30b9082bc39deb",
-      "bytes": 108787
+      "sha256": "eae53a873f87d420195e539948ad041e7e86bb23d4d64f594d42ea97c841df23",
+      "bytes": 109008
     },
     {
       "path": "tests/test_new_wsl_profile.py",
@@ -65068,8 +65148,8 @@
     },
     {
       "path": "tests/test_runtime_profiles.py",
-      "sha256": "c9af3264e0fbb911e9d8fcabb0e951231328f9c2ec23ea802788c7ee370e842d",
-      "bytes": 91228
+      "sha256": "5ec7921be82e3aac6f2d091bb322fa891a639dd568491c13324de73c4a211031",
+      "bytes": 91488
     },
     {
       "path": "tests/test_runtime_publication.py",
@@ -65523,8 +65603,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "f10bcc847295aa29a2a7f2829753f390d2b5928a17af4662020e77b786b1af1f",
-      "bytes": 167892
+      "sha256": "54c3b587f08cd8fba8ed60b31af9d9da76a8f4a91cfcab6348fd1f274a795d0a",
+      "bytes": 175914
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
@@ -65548,8 +65628,8 @@
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "cfd44384626f7213f00fe18a139867e544acc46d1a8952c5dff5bf6a64bedc84",
-      "bytes": 105522
+      "sha256": "39f8855ed7a40098e1acbd5524a9431c9937bc525e6dc382c5d8fde009c3b282",
+      "bytes": 106391
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",

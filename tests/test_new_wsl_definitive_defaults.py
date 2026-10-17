@@ -128,6 +128,9 @@ class Manifest(unittest.TestCase):
         cls.wave3 = cls.consensus["wave3"]
         cls.wave4 = cls.consensus["wave4"]
         cls.wave5 = cls.consensus["wave5"]
+        # The wave-6 batch (2026-10-17, a direct consensus under amendment 3): its interim amendment (memory-owner).
+        cls.wave6 = cls.consensus["wave6"]
+        cls.consensus_interim_amends = {entry["slot_id"]: entry for entry in cls.wave6["amend_rows"] if "interim" in entry}
         cls.owner_rows = {row["slot_id"]: row for batch in (cls.wave3, cls.wave5) for row in batch["add_rows"]}
         cls.owner_amends = {entry["slot_id"]: entry for batch in (cls.wave3, cls.wave4, cls.wave5)
                             for entry in batch["amend_rows"]}
@@ -138,17 +141,37 @@ class Manifest(unittest.TestCase):
                            for row in cls.owner_rows.values() if row["layer_id"] == layer["layer_id"]]
         cls.rows = cls.manifest["slots"]
 
+    @staticmethod
+    def with_interim_change(interim, change):
+        """An interim with an amendment's values put in: configuration key by key, as amend_interim changes it (only the
+        keys the amendment names), every other field whole."""
+        merged = {**interim, **{key: value for key, value in change.items() if key != "configuration"}}
+        if "configuration" in change:
+            merged["configuration"] = {**interim.get("configuration", {}), **change["configuration"]}
+        return merged
+
+    @staticmethod
+    def replaced_by(interim, change):
+        """What an amendment replaced: the values of the fields it names, and of configuration only the keys it names."""
+        return {key: ({name: interim["configuration"][name] for name in change["configuration"]}
+                      if key == "configuration" else interim[key]) for key in change}
+
     def as_decided(self, row):
         """The row as the rounds or an earlier batch decided it: an owner default (amendment 4) puts back the fields it
-        replaced and the interim it dropped, and an interim the owner amended gets its replaced values back."""
+        replaced and the interim it dropped, and an interim the owner or a direct consensus amended gets its replaced
+        values back."""
         kept = row.get("overturned")
-        if not kept:
+        replaced = [item["interim_replaced"] for item in row.get("amendments", []) if "interim_replaced" in item]
+        if not kept and not replaced:
             return row
         decided = {key: value for key, value in row.items() if key != "overturned"}
-        decided.update(kept.get("fields", {}))
-        if "interim" in kept:
-            decided["interim"] = (kept["interim"] if "fields" in kept or "interim" not in row
-                                  else {**row["interim"], **kept["interim"]})
+        if kept:
+            decided.update(kept.get("fields", {}))
+            if "interim" in kept:
+                decided["interim"] = (kept["interim"] if "fields" in kept or "interim" not in row
+                                      else self.with_interim_change(row["interim"], kept["interim"]))
+        for values in reversed(replaced):
+            decided["interim"] = self.with_interim_change(decided["interim"], values)
         return decided
 
     def source_slots(self):
@@ -899,6 +922,12 @@ class Manifest(unittest.TestCase):
             self.assertEqual(set(entry["amendment"]) & PROTECTED, set(), entry["slot_id"])
             self.assertNotIn("interim", entry["amendment"])
             recorded.setdefault(entry["slot_id"], []).append(entry["amendment"])
+        # A direct consensus's interim amendment (wave 6) is recorded beside them, with the interim values it replaced.
+        for sid, entry in self.consensus_interim_amends.items():
+            self.assertEqual(set(entry), {"slot_id", "amendment", "interim"})
+            self.assertEqual(set(entry["amendment"]) & (PROTECTED | {"interim"}), set(), sid)
+            recorded.setdefault(sid, []).append(
+                {**entry["amendment"], "interim_replaced": self.replaced_by(self.interims[sid], entry["interim"])})
         self.assertTrue(recorded)
         # The record's own amendments name rows the rounds decided; the wave-2 batch also amends a row the record added.
         self.assertTrue({entry["slot_id"] for entry in self.consensus["amend_rows"]} <= set(before),
@@ -1035,7 +1064,7 @@ class Manifest(unittest.TestCase):
         self.assertEqual(table[:2], [["Slot", "Date", "Decision"], ["---"] * 3])
         self.assertEqual(table[2:], [[row["slot_id"], amendment["date_utc"], amendment["decision"]]
                                      for row in self.rows for amendment in row.get("amendments", [])])
-        self.assertEqual(len(table) - 2, len(self.amend_rows))
+        self.assertEqual(len(table) - 2, len(self.amend_rows) + len(self.consensus_interim_amends))
         start, end = lines.index("### Owner decisions (amendment 4)"), lines.index("<!-- tables:end -->")
         table = [[cell.strip() for cell in line.split("|")[1:-1]] for line in lines[start:end] if line.startswith("| ")]
         self.assertEqual(table[:2], [["Slot", "Date", "Decision", "Replaced"], ["---"] * 4])
@@ -1117,8 +1146,15 @@ class Manifest(unittest.TestCase):
                           for sid in self.interims},
                          {"code-search": ("split", False), "context-supply": ("definitive", True),
                           "memory-owner": ("measurement", False)})
-        # memory-owner is the wave-2 interim unchanged; code-search's carries the owner's amendment over it.
-        self.assertEqual(rows["memory-owner"]["interim"], self.interims["memory-owner"])
+        # memory-owner's wave-2 interim carries the wave-6 direct consensus's amendment (ai-memory 3.1.0, its run pin),
+        # with the values it replaced in its amendments; code-search's carries the owner's amendment over it.
+        consensus_change = self.consensus_interim_amends["memory-owner"]["interim"]
+        self.assertEqual(rows["memory-owner"]["interim"],
+                         self.with_interim_change(self.interims["memory-owner"], consensus_change))
+        self.assertEqual(rows["memory-owner"]["interim"]["default"], "ai-memory 3.1.0")
+        self.assertEqual(rows["memory-owner"]["amendments"][-1]["interim_replaced"],
+                         self.replaced_by(self.interims["memory-owner"], consensus_change))
+        self.assertNotIn("overturned", rows["memory-owner"])
         change = self.owner_amends["code-search"]["interim"]
         self.assertEqual(rows["code-search"]["interim"], {**self.interims["code-search"], **change})
         self.assertEqual(rows["code-search"]["overturned"]["interim"], {key: self.interims["code-search"][key] for key in change})
@@ -1791,10 +1827,13 @@ class InterimPlanChecks(unittest.TestCase):
         result = subprocess.run(["bash", "-euo", "pipefail", "-c", f"{function.group(0)}\ninterim_acknowledged code-search\n"],
                                 env={**os.environ, "repo_root": str(ROOT)}, capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 1 if owed else 0, result.stderr)
-        # The owner's batch owes none; the wave-2 batch's owed acknowledgements are what the committed gate reports.
+        # The owner's batch owes none; every batch that owes acknowledgements is what the committed gate reports, in
+        # the file's order, as the client configuration's owed_acknowledgements reports them.
         self.assertEqual(consensus["wave3"]["acknowledgements_owed"], [])
+        reported = "; ".join(f"{key}: {', '.join(batch['acknowledgements_owed'])}" for key, batch in consensus.items()
+                             if re.fullmatch(r"wave[0-9]+", key) and batch["acknowledgements_owed"])
         if owed:
-            self.assertIn("wave2: " + ", ".join(consensus["wave2"]["acknowledgements_owed"]), result.stderr)
+            self.assertIn("still owed by the wave batches: " + reported + " (", result.stderr)
 
 
 class SkillAuthoringAcceptance(unittest.TestCase):
