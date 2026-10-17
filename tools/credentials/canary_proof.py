@@ -682,6 +682,7 @@ def exclusions(home: str, codex: list, env, transcripts: str, group: str, pointe
     inventory = json.loads((ROOT / cs.INVENTORY).read_text(encoding="utf-8"))
     exact += [(str(cs.expand_template(entry["store"]["path_template"], env)), "key")
               for entry in inventory["entries"] if entry["store"]["kind"] in cs.LOCAL_KINDS]
+    exact += [(str(path), "key") for entry in inventory["entries"] for path in cs.override_paths(entry, env)]  # no root moves
     glob = [(f"{h}/.claude/sessions", "*.key", "key")]
     for path in codex:
         exact.append((f"{path}/auth.json", "key"))

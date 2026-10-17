@@ -1225,3 +1225,33 @@ Residuals from the re-check that this round does not fix:
 - The scan's own exit code comes from in-memory events that `Run.append` never
   validates (`scan` returns `report(..., exit_only=True)`). This round removes
   the one known disagreement (`inventory_unreconciled`), not the mechanism.
+
+## Addendum (2026-10-17): `override_variables`, a store directory's override
+
+An inventory row may now carry an optional `override_variables` list, beside
+`pointer_variables` (PR #1240, A2 finding G8-A02). The two fields differ:
+
+- A **pointer variable** holds the path of the row's store file
+  (`PAPER_ENV_FILE`, `HF_TOKEN_PATH`). The runner removes other rows'
+  pointers from a child's environment. The canary proof binds each pointer at
+  prepare and refuses a pointer that names a directory.
+- An **override variable** names the directory a native tool keeps the store
+  in. Today the only one is `AI_MEMORY_DATA_DIR`, ai-memory's data directory:
+  the `--data-dir` flag wins over it, and the default applies when neither is
+  set (akitaonrails/ai-memory v2.4.1, the Linux pin, at `433a19f3`:
+  `crates/ai-memory-cli/src/config.rs:1358-1364`, with the variable read at
+  `:573`; v2.3.2, the macOS pin, at `353841d9`: `:1137-1143` and `:462`).
+  The row's `path_template` stays the default path, under the directory
+  `scripts/credential_status.py` records in `OVERRIDE_DEFAULTS`.
+  - The checker warns `store_path_overridden` only for a non-blank value
+    other than the default. ai-memory trims the value and treats an empty or
+    blank one as unset (`env_string`, v2.4.1 `config.rs:2086-2095`, v2.3.2
+    `:1808-1817`).
+  - The canary proof also excludes the row's file under the variable's
+    absolute value as a key path. No scan root moves, and nothing binds or
+    refuses it at prepare.
+  - The runner leaves the variable in a child's environment.
+
+The settings template's hooks pass `--data-dir` with the default. Other
+documented ai-memory runs do not, so the canary exclusions cover an exported
+value instead of relying on the flag.

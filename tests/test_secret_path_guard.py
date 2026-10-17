@@ -2187,9 +2187,9 @@ class SecretPathGuardTests(unittest.TestCase):
 
     def test_g8_a02_inventory_rows(self):
         # The protection-only rows: each store's path template is a native_store the guard refuses to read. ai-memory's rows keep the
-        # default path, where this stack pins --data-dir (which wins over the variable, config.rs:2349-2355); its data-directory override
-        # (config.rs:760) is a directory, so it is a warning-only override_variables name, never a pointer variable (which names a store
-        # file, docs/secret-storage.md). The guard still refuses a read through it.
+        # default path, which the settings template's hooks pin with --data-dir; its data-directory override (v2.4.1 config.rs:573) is a
+        # directory, so it is an override_variables name (the checker's warning, and key exclusions under its value), never a pointer
+        # variable (which names a store file, docs/secret-storage.md). The guard still refuses a read through it.
         inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text(encoding="utf-8"))
         rows = {entry["id"]: entry for entry in inventory["entries"]}
         data = "$HOME/.local/share/ai-memory"

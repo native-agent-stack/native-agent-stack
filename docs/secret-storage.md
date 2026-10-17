@@ -2338,9 +2338,11 @@ whether a grammar check read a file. Native sign-in and service-held stores
 remain metadata-only. It also reports:
 
 - secret variable names that are set in the current environment, names only;
-- native store path overrides that are set (`HF_TOKEN_PATH`), names only; each
-  affected row also gets the warning `store_path_overridden`, because it then
-  inspects a path the tool no longer uses;
+- native store path overrides that are set, names only: a pointer variable
+  (`HF_TOKEN_PATH`), and an override variable (`AI_MEMORY_DATA_DIR`) holding a
+  non-blank value other than its default; each affected row also gets the
+  warning `store_path_overridden`, because a tool run without its own path flag
+  then uses a path other than the one inspected;
 - tracked files with credential-shaped basenames;
 - whether `core.hooksPath` points at `scripts/git-hooks`;
 - whether gitleaks is on `PATH`;

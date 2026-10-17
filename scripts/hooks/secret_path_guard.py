@@ -235,9 +235,9 @@ STORE_PATHS = (
     (re.compile(r"\bsecurity\s+(?:find-generic-password|find-internet-password|dump-keychain)\b"), "keychain_read"),
     (re.compile(r"\bsecret-tool\s+lookup\b"), "keychain_read"),
     # A2 finding G8-A02 (2026-10-17), appended so earlier indices keep their place. ai-memory's bearer files in its data directory:
-    # <data-dir>/auth-token and auth-header (akitaonrails/ai-memory v3.1.0, crates/ai-memory-cli/src/config.rs:3347, :3359) and the
-    # per-profile auth-tokens/ directory (src/server_profiles.rs:30), and the provider-token file <data-dir>/auth.json (config.rs:3031),
-    # under the default directory name or $AI_MEMORY_DATA_DIR (config.rs:760), also as ${AI_MEMORY_DATA_DIR:-...}.
+    # <data-dir>/auth-token, auth-header and auth.json (akitaonrails/ai-memory v2.4.1 crates/ai-memory-cli/src/config.rs:2164, :2176, :1915;
+    # v2.3.2 :1886, :1898, :1663) and, from v3.1.0 (installed on the WSL host), the per-profile auth-tokens/ (src/server_profiles.rs:30),
+    # under the default directory name or $AI_MEMORY_DATA_DIR (v2.4.1 config.rs:573, v2.3.2 :462), also as ${AI_MEMORY_DATA_DIR:-...}.
     # `--data-dir .../ai-memory hook ...` names no such file and passes.
     (LinearScan(r"(?:ai-memory|AI_MEMORY_DATA_DIR(?::-[^}\s]*)?)\}?/auth(?:-(?:tokens?|header)(?![\w-])|\.json)",
                 lambda text: default_run_scan(text, AI_MEMORY_AUTH_PLAIN, "AI_MEMORY_DATA_DIR:-", AI_MEMORY_AUTH_TAIL)),
