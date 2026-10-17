@@ -44,8 +44,9 @@ import subprocess
 import sys
 import tempfile
 
-REPO = "seathatflowsinourveins/native-agent-stack"
-OWNER, REPO_NAME = REPO.split("/", 1)
+REPO = "native-agent-stack/native-agent-stack"
+REPO_OWNER, REPO_NAME = REPO.split("/", 1)
+AUTHORIZED_LOGIN = "seathatflowsinourveins"
 HOST = "github.com"
 ORIGIN_URL = f"https://{HOST}/{REPO}.git"
 API = f"repos/{REPO}"
@@ -193,7 +194,7 @@ ISSUE_PROVENANCE_QUERY = (
 
 
 def op_issue_provenance(number):
-    return ["gh", "api", "graphql", "-f", f"query={ISSUE_PROVENANCE_QUERY}", "-F", f"owner={OWNER}",
+    return ["gh", "api", "graphql", "-f", f"query={ISSUE_PROVENANCE_QUERY}", "-F", f"owner={REPO_OWNER}",
             "-F", f"name={REPO_NAME}", "-F", f"number={number}"]
 
 
@@ -574,7 +575,7 @@ def check_auth_status(text):
         raise HarnessRefused("auth_not_active")
     if entry.get("host") != HOST:
         raise HarnessRefused("auth_host_mismatch")
-    if entry.get("login") != OWNER:
+    if entry.get("login") != AUTHORIZED_LOGIN:
         raise HarnessRefused("auth_login_mismatch")
     if entry.get("gitProtocol") != "https":
         raise HarnessRefused("git_protocol_not_https")
@@ -587,7 +588,7 @@ def check_auth_status(text):
     names = sorted({scope.strip() for scope in scopes.split(",") if scope.strip()})
     if "repo" not in names:
         raise HarnessRefused("repo_scope_missing")
-    return {"host": HOST, "login": OWNER, "git_protocol": "https", "token_source_class": source, "scopes": names}
+    return {"host": HOST, "login": AUTHORIZED_LOGIN, "git_protocol": "https", "token_source_class": source, "scopes": names}
 
 
 def check_branch_rules(text):
@@ -622,6 +623,8 @@ def check_repository(text):
     Fields of GitHub's "Get a repository" (docs.github.com/en/rest/repos/repos):
     full_name, default_branch, archived and disabled. An archived or disabled
     repository takes no push, so it refuses here, before any container starts.
+    Name comparison follows same_repository in tools/claude-review-worker/worker.py:1091-1094
+    at native-agent-stack/native-agent-stack@681752e4: require a string and casefold it.
     """
     try:
         data = json.loads(text)
@@ -629,7 +632,8 @@ def check_repository(text):
         raise HarnessRefused("repository_unparseable") from None
     if not isinstance(data, dict):
         raise HarnessRefused("repository_unparseable")
-    if data.get("full_name") != REPO:
+    full_name = data.get("full_name")
+    if not isinstance(full_name, str) or full_name.casefold() != REPO.casefold():
         raise HarnessRefused("repository_mismatch")
     if data.get("default_branch") != "main":
         raise HarnessRefused("default_branch_not_main")

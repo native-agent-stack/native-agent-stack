@@ -9,5 +9,5 @@ serves both ([vercel-labs/skills v1.7.0](https://github.com/vercel-labs/skills/t
 "Installation Methods").
 
 Skills every repository uses are global and are not copied here: each host installs them once from
-[native-agent-stack](https://github.com/seathatflowsinourveins/native-agent-stack)'s `adoption/skills/manifest.json`,
+[native-agent-stack](https://github.com/native-agent-stack/native-agent-stack)'s `adoption/skills/manifest.json`,
 through its `tools/adoption/install_skills.py` or `adoption/bootstrap-linux.sh --configure-full-profile`.

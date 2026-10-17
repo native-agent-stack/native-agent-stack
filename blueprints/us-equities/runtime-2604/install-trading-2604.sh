@@ -76,8 +76,8 @@ status_fd=3
 project=$(realpath --canonicalize-missing -- "$HOME/projects/us-equities-runtime") || die 'Runtime directory cannot be resolved.' 73
 readonly project
 # Both the pinned adapter requirements and accepted rc5 receipt use Python 3.12.
-# https://github.com/seathatflowsinourveins/native-agent-stack/blob/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper/requirements.txt
-# https://github.com/seathatflowsinourveins/native-agent-stack/blob/d323b53437e025be3d054b9b5e4d292fe396c75e/evidence/receipts/native-nautilus-v2-20260920.json
+# https://github.com/native-agent-stack/native-agent-stack/blob/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper/requirements.txt
+# https://github.com/native-agent-stack/native-agent-stack/blob/d323b53437e025be3d054b9b5e4d292fe396c75e/evidence/receipts/native-nautilus-v2-20260920.json
 readonly owner='native-stack-trading-2604-v1'
 readonly completion='native-stack-trading-2604-no-dvc-r4'
 script_directory=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
@@ -275,7 +275,7 @@ fi
 
 # adaptive-paper has no distributable project: preserve its selected source as
 # a separate sparse checkout. Do not execute runner.py, recovery.py or LiveNode.
-# https://github.com/seathatflowsinourveins/native-agent-stack/blob/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper/README.md
+# https://github.com/native-agent-stack/native-agent-stack/blob/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper/README.md
 # https://github.com/git/git/blob/v2.43.0/Documentation/git-sparse-checkout.txt
 # https://github.com/git/git/blob/v2.43.0/Documentation/git-fetch.txt
 # https://github.com/git/git/blob/v2.43.0/Documentation/git-clone.txt
@@ -287,9 +287,9 @@ if [[ ! -d "$adapter/.git" ]]; then
     "${safe[@]}" git init "$adapter"
 fi
 if adapter_origin=$("${safe[@]}" git -C "$adapter" remote get-url origin 2>/dev/null); then
-    [[ $adapter_origin == https://github.com/seathatflowsinourveins/native-agent-stack.git ]] || die 'Adapter origin differs from the public source.' 73
+    [[ $adapter_origin == https://github.com/native-agent-stack/native-agent-stack.git ]] || die 'Adapter origin differs from the public source.' 73
 else
-    "${safe[@]}" git -C "$adapter" remote add origin https://github.com/seathatflowsinourveins/native-agent-stack.git
+    "${safe[@]}" git -C "$adapter" remote add origin https://github.com/native-agent-stack/native-agent-stack.git
 fi
 # A clean status is meaningful only after checkout has created the index.
 # An interrupted initial setup can resume only if it has no worktree files.

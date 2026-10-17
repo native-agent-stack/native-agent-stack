@@ -16,8 +16,10 @@ from __future__ import annotations
 
 import json
 import re
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 CANONICAL = "native-agent-stack/native-agent-stack"
@@ -25,7 +27,8 @@ CANONICAL = "native-agent-stack/native-agent-stack"
 OLD_PATH = re.compile(r"seathatflowsinourveins(?:/|%2f|\\/)native-agent-stack", re.IGNORECASE)
 
 # Directories and files the guard covers: where code, workflows, templates and units that call GitHub live.
-SCAN_ROOTS = ("tools", "scripts", ".github/workflows", "adoption/templates")
+SCAN_ROOTS = ("tools", "scripts", ".github/workflows", "adoption/templates", "adoption/scaffold")
+BLUEPRINT_SUFFIXES = {".py", ".sh", ".service", ".toml", ".yml"}
 SKIPPED_PARTS = {"__pycache__", ".git", "node_modules"}
 
 # A documented historical file may keep the old path. The reason says why editing it would be wrong.
@@ -55,6 +58,13 @@ ALLOWED = {
     "adoption/templates/wsl/stage1-receipt.example.json":
         "its clone step mirrors the install guides under adoption/platforms, which still name the old path "
         "and move together as one follow-up",
+    "blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/fixture_abstention_bootstrap.py":
+        "dated experiment: the repository name labels chunks of the frozen bf99d340 corpus, not a GitHub request",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/lineage_mlflow.py":
+        "dated experiment: the producer and facet schema URLs label locally emitted OpenLineage records, not fetches",
+    "blueprints/us-equities/runtime-2604/accept-trading-2604.sh":
+        "the only old path is a source comment pinned to dfeea13377cfb15936f856d9ed8df3c6575a7895; "
+        "acceptance reads the already installed adapter offline",
 }
 
 
@@ -65,6 +75,9 @@ def scanned_files():
         if base.is_dir():
             seen.update(path for path in base.rglob("*") if path.is_file())
     seen.update(path for path in (ROOT / "blueprints").rglob("manifest.json") if path.is_file())
+    # Operational blueprint code is covered; dated JSON evidence stays outside this scan.
+    seen.update(path for path in (ROOT / "blueprints").rglob("*")
+                if path.is_file() and path.suffix in BLUEPRINT_SUFFIXES)
     seen.update(path for path in ROOT.rglob("*.service")
                 if path.is_file() and path.relative_to(ROOT).parts[0] not in ("evidence", "docs"))
     return sorted(path for path in seen if not SKIPPED_PARTS & set(path.relative_to(ROOT).parts))
@@ -83,9 +96,28 @@ class CanonicalRepoPathTest(unittest.TestCase):
         for expected in (".github/workflows/publish-catalog.yml", "tools/claude-review-worker/worker.py",
                          "tools/claude-review-worker/essential-paths.json", "tools/local-pages/fleet_data.py",
                          "blueprints/runtime-workers/skills/manifest.json",
+                         "blueprints/runtime-workers/openhands/resolver.py",
+                         "blueprints/runtime-workers/openhands/resolver/gh_harness.py",
+                         "blueprints/runtime-workers/openhands/host.py",
+                         "adoption/scaffold/.agents/skills/README.md",
                          "tools/claude-review-worker/systemd/claude-review-worker.service"):
             self.assertIn(expected, names)
         self.assertGreater(len(names), 100)
+
+    def test_blueprint_code_and_hidden_scaffold_are_scanned_without_dated_json(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            expected = {f"blueprints/example/runtime{suffix}" for suffix in (".py", ".sh", ".service", ".toml", ".yml")}
+            expected.update({"blueprints/example/manifest.json", "adoption/scaffold/.agents/skills/README.md"})
+            historical = "blueprints/example/receipt-20261017.json"
+            for name in expected | {historical}:
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("fixture\n", encoding="utf-8")
+            with mock.patch(__name__ + ".ROOT", root):
+                names = {path.relative_to(root).as_posix() for path in scanned_files()}
+            self.assertEqual(names, expected)
+            self.assertNotIn(historical, names)
 
     def test_no_functional_file_names_the_old_path(self):
         offenders = {}

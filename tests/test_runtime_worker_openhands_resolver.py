@@ -34,6 +34,7 @@ from tests import hermetic_git_environment
 
 ROOT = Path(__file__).resolve().parents[1]
 RECIPE = ROOT / "blueprints/runtime-workers/openhands"
+OWNER_LOGIN = "seathatflowsinourveins"
 
 
 def load_resolver():
@@ -46,7 +47,7 @@ def load_resolver():
 
 
 def owner_item(**extra):
-    item = {"author_association": "OWNER", "user": {"login": "owner", "type": "User"},
+    item = {"author_association": "MEMBER", "user": {"login": OWNER_LOGIN, "type": "User"},
             "performed_via_github_app": None}
     item.update(extra)
     return item
@@ -58,15 +59,12 @@ def issue_fixture(**extra):
     return item
 
 
-OWNER_LOGIN = "seathatflowsinourveins"
-
-
 def actor(login=OWNER_LOGIN, typename="User"):
     return None if login is None else {"__typename": typename, "login": login}
 
 
 def provenance_node(database_id, body, *, edits=(), deleted=(), editor="last", edited_at="auto", total=None,
-                    more=False, author=OWNER_LOGIN, association="OWNER"):
+                    more=False, author=OWNER_LOGIN, association="MEMBER"):
     """One issue or comment as gh_harness.ISSUE_PROVENANCE_QUERY returns it. `edits` lists the
     editors of the history, newest first, and `deleted` the actors who deleted a revision;
     None stands for a deleted account."""
@@ -103,6 +101,65 @@ class IssueSelectionTests(unittest.TestCase):
 
     def provenance(self, *args, **kwargs):
         return self.r.parse_issue_provenance(provenance_json(*args, **kwargs), 12)
+
+    def test_org_member_issue_and_comments_accept_the_authorized_human(self):
+        selected = self.r.select_issue(
+            issue_fixture(), [owner_item(id=1, body="Member detail")], 12,
+            provenance=self.provenance(comments=[provenance_node(1, "Member detail")]))
+        self.assertEqual(selected["body"], "The widget breaks.")
+        self.assertEqual([comment["body"] for comment in selected["comments"]], ["Member detail"])
+        self.assertEqual(selected["dropped_comments"], 0)
+
+    def test_every_other_association_is_refused_on_rest_and_graphql_issue_reads(self):
+        # github/docs@dae83f7d, schema.docs.graphql:5512-5555: only MEMBER applies
+        # to the authorized human on this organization-owned repository.
+        for association in ("OWNER", "COLLABORATOR", "CONTRIBUTOR", "FIRST_TIMER", "FIRST_TIME_CONTRIBUTOR",
+                            "MANNEQUIN", "NONE", "member", ""):
+            for read in ("rest", "graphql"):
+                issue = issue_fixture(author_association=association) if read == "rest" else issue_fixture()
+                node = provenance_node(1200, "The widget breaks.", association=association if read == "graphql" else "MEMBER")
+                with self.subTest(association=association, read=read), self.assertRaises(self.r.IssueRefused) as caught:
+                    self.r.select_issue(issue, [], 12, provenance=self.provenance(node))
+                self.assertEqual(caught.exception.reason, "issue_not_owner_authored")
+
+    def test_another_member_login_is_refused_on_each_issue_read(self):
+        for login in ("another-member", "native-agent-stack"):
+            for read in ("rest", "graphql"):
+                issue = issue_fixture(user={"login": login, "type": "User"}) if read == "rest" else issue_fixture()
+                node = provenance_node(1200, "The widget breaks.", author=login if read == "graphql" else OWNER_LOGIN)
+                with self.subTest(login=login, read=read), self.assertRaises(self.r.IssueRefused) as caught:
+                    self.r.select_issue(issue, [], 12, provenance=self.provenance(node))
+                self.assertEqual(caught.exception.reason, "issue_not_owner_authored")
+
+    def test_the_human_login_on_a_non_user_is_refused_on_each_issue_read(self):
+        for typename in ("Bot", "Organization", "Mannequin", None):
+            for read in ("rest", "graphql"):
+                issue = issue_fixture(user={"login": OWNER_LOGIN, "type": typename}) if read == "rest" else issue_fixture()
+                node = provenance_node(1200, "The widget breaks.")
+                if read == "graphql":
+                    node["author"] = actor(typename=typename)
+                with self.subTest(typename=typename, read=read), self.assertRaises(self.r.IssueRefused) as caught:
+                    self.r.select_issue(issue, [], 12, provenance=self.provenance(node))
+                self.assertEqual(caught.exception.reason, "issue_not_owner_authored")
+
+    def test_comments_require_the_member_user_binding_on_both_reads(self):
+        cases = [("another login", {"user": {"login": "another-member", "type": "User"}}, actor("another-member"), "MEMBER"),
+                 ("bot", {"user": {"login": OWNER_LOGIN, "type": "Bot"}}, actor(typename="Bot"), "MEMBER")]
+        cases += [(association, {"author_association": association}, actor(), association)
+                  for association in ("OWNER", "COLLABORATOR", "CONTRIBUTOR", "FIRST_TIMER", "FIRST_TIME_CONTRIBUTOR",
+                                      "MANNEQUIN", "NONE")]
+        for label, rest_changes, author, association in cases:
+            for read in ("rest", "graphql"):
+                comment = owner_item(id=1, body="Refused detail", **(rest_changes if read == "rest" else {}))
+                node = provenance_node(1, "Refused detail")
+                if read == "graphql":
+                    node.update(author=author, authorAssociation=association)
+                with self.subTest(case=label, read=read):
+                    selected = self.r.select_issue(issue_fixture(), [comment], 12,
+                                                   provenance=self.provenance(comments=[node]))
+                    self.assertEqual(selected["comments"], [])
+                    self.assertEqual(selected["dropped_reasons"]["not_owner"], 1)
+                    self.assertNotIn("Refused detail", json.dumps(selected))
 
     def test_open_owner_issue_keeps_only_owner_comments_and_counts_dropped(self):
         comments = [
@@ -1138,8 +1195,8 @@ def auth_status_json(**changes):
     return json.dumps({"hosts": {"github.com": [entry]}})
 
 
-API = "repos/seathatflowsinourveins/native-agent-stack"
-ORIGIN = "https://github.com/seathatflowsinourveins/native-agent-stack.git"
+API = "repos/native-agent-stack/native-agent-stack"
+ORIGIN = "https://github.com/native-agent-stack/native-agent-stack.git"
 
 
 class GhHarnessTests(unittest.TestCase):
@@ -1170,7 +1227,7 @@ class GhHarnessTests(unittest.TestCase):
         self.assertEqual(env, {
             "PATH": f"{self.fake.bin}:/usr/bin:/bin", "HOME": str(self.home),
             "XDG_CONFIG_HOME": str(self.tmp / "xdg"), "LANG": "C.UTF-8", "GH_HOST": "github.com",
-            "GH_REPO": "seathatflowsinourveins/native-agent-stack", "GH_PROMPT_DISABLED": "1",
+            "GH_REPO": "native-agent-stack/native-agent-stack", "GH_PROMPT_DISABLED": "1",
             "GH_NO_UPDATE_NOTIFIER": "1", "GH_TELEMETRY": "false", "GH_PAGER": "cat",
             "GIT_TERMINAL_PROMPT": "0", "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": "/dev/null",
             "GIT_CEILING_DIRECTORIES": os.path.dirname(self.workdir)})
@@ -1353,7 +1410,7 @@ class GhHarnessTests(unittest.TestCase):
         argv = h.op_issue_provenance(12)
         self.assertEqual(argv[:4], ["gh", "api", "graphql", "-f"])
         self.assertEqual(argv[4], "query=" + h.ISSUE_PROVENANCE_QUERY)
-        self.assertEqual(argv[5:], ["-F", "owner=seathatflowsinourveins", "-F", "name=native-agent-stack",
+        self.assertEqual(argv[5:], ["-F", "owner=native-agent-stack", "-F", "name=native-agent-stack",
                                     "-F", "number=12"])
         query = h.ISSUE_PROVENANCE_QUERY
         self.assertTrue(query.startswith("query($owner: String!, $name: String!, $number: Int!) {"))
@@ -1483,6 +1540,7 @@ class GhHarnessTests(unittest.TestCase):
             ("auth_not_success", auth_status_json(state="timeout")),
             ("auth_not_active", auth_status_json(active=False)),
             ("auth_login_mismatch", auth_status_json(login="someone-else")),
+            ("auth_login_mismatch", auth_status_json(login="native-agent-stack")),
             ("git_protocol_not_https", auth_status_json(gitProtocol="ssh")),
             ("token_from_environment", auth_status_json(tokenSource="GH_TOKEN")),
             ("token_from_environment", auth_status_json(tokenSource="GITHUB_TOKEN")),
@@ -2021,7 +2079,7 @@ class ScriptedGitHub:
     def __call__(self, args, **kwargs):
         argv = list(args[1:])
         self.calls.append(argv)
-        url = f"https://github.com/seathatflowsinourveins/native-agent-stack/pull/{self.number}"
+        url = f"https://github.com/native-agent-stack/native-agent-stack/pull/{self.number}"
         if argv[:2] == ["pr", "create"]:
             self.state["headRefName"] = argv[argv.index("--head") + 1]
             self.state["labels"] = [{"name": argv[argv.index("--label") + 1]}]
@@ -2076,7 +2134,7 @@ class FakeClock:
         self.now += seconds
 
 
-def check_list(*buckets, link="https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/555/job/1"):
+def check_list(*buckets, link="https://github.com/native-agent-stack/native-agent-stack/actions/runs/555/job/1"):
     return json.dumps([{"name": f"check-{index}", "state": bucket.upper(), "bucket": bucket, "link": link,
                         "workflow": "validate"} for index, bucket in enumerate(buckets)])
 
@@ -2203,7 +2261,7 @@ class PullRequestLoopTests(unittest.TestCase):
         harness, record = self.opened(github)
         self.assertEqual(record, {"number": 34, "head": "a" * 40, "branch": "openhands/issue-12",
                                   "lane": "lane:foundation", "base": "e" * 40,
-                                  "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/34"})
+                                  "url": "https://github.com/native-agent-stack/native-agent-stack/pull/34"})
         self.assertEqual(github.ops(), ["pr_create", "pr_view"])
         create = github.calls[0]
         self.assertEqual(create[:9], ["pr", "create", "--draft", "--base", "main", "--head", "openhands/issue-12",
@@ -2223,6 +2281,27 @@ class PullRequestLoopTests(unittest.TestCase):
                 self.r.check_read_back(view, number=34, branch="openhands/issue-12", lane="lane:foundation",
                                        body=github.state["body"])
             self.assertEqual(caught.exception.reason, reason)
+
+    def test_pr_creation_parses_the_canonical_url(self):
+        github = ScriptedGitHub(number=1255)
+        _, record = self.opened(github)
+        self.assertEqual((record["number"], record["url"]),
+                         (1255, "https://github.com/native-agent-stack/native-agent-stack/pull/1255"))
+        self.assertEqual(github.ops(), ["pr_create", "pr_view"])
+
+    def test_pr_creation_refuses_an_old_path_url_before_read_back(self):
+        class OldPathGitHub(ScriptedGitHub):
+            def __call__(self, args, **kwargs):
+                answer = super().__call__(args, **kwargs)
+                if list(args[1:3]) == ["pr", "create"]:
+                    return completed(args, "https://github.com/seathatflowsinourveins/native-agent-stack/pull/34\n")
+                return answer
+
+        github = OldPathGitHub()
+        with self.assertRaises(self.r.LoopStopped) as caught:
+            self.opened(github)
+        self.assertEqual(caught.exception.reason, "pr_create_unparseable")
+        self.assertEqual(github.ops(), ["pr_create"])
 
     def test_checks_wait_counts_missing_checks_as_pending_and_is_bounded(self):
         missing = (1, "", "no required checks reported on the 'openhands/issue-12' branch\n")
@@ -2742,7 +2821,7 @@ class ResolverSkillTests(unittest.TestCase):
 # fixture repositories. Nothing reaches GitHub, OmniRoute or a container.
 
 SHA_BASE_LINE = "{sha}\trefs/heads/main\n"
-REPOSITORY_JSON = {"full_name": "seathatflowsinourveins/native-agent-stack", "default_branch": "main",
+REPOSITORY_JSON = {"full_name": "native-agent-stack/native-agent-stack", "default_branch": "main",
                    "archived": False, "disabled": False}
 
 
@@ -2813,6 +2892,24 @@ class Stage2HarnessTests(unittest.TestCase):
                 with self.assertRaises(self.h.HarnessRefused) as caught:
                     self.h.check_repository(text)
                 self.assertEqual(caught.exception.reason, "repository_unparseable")
+
+    def test_repository_preflight_accepts_canonical_names_in_any_case(self):
+        for full_name in ("native-agent-stack/native-agent-stack", "Native-Agent-Stack/Native-Agent-Stack"):
+            with self.subTest(full_name=full_name):
+                harness = self.harness(lambda args, **kwargs: completed(
+                    args, json.dumps({**REPOSITORY_JSON, "full_name": full_name})))
+                self.assertEqual(harness.repository(),
+                                 {"full_name": "native-agent-stack/native-agent-stack", "default_branch": "main"})
+
+    def test_repository_preflight_refuses_foreign_and_non_string_names(self):
+        for full_name in ("another/native-agent-stack", "native-agent-stack/another",
+                          "seathatflowsinourveins/native-agent-stack", None, 1255, ["native-agent-stack/native-agent-stack"]):
+            with self.subTest(full_name=full_name):
+                harness = self.harness(lambda args, **kwargs: completed(
+                    args, json.dumps({**REPOSITORY_JSON, "full_name": full_name})))
+                with self.assertRaises(self.h.HarnessRefused) as caught:
+                    harness.repository()
+                self.assertEqual(caught.exception.reason, "repository_mismatch")
 
     def test_harness_reads_base_repository_and_branch_rules_through_its_runner(self):
         sha = "b" * 40
@@ -3263,8 +3360,8 @@ class ResolverHostTests(unittest.TestCase):
         self.assertEqual([entry["name"] for entry in manifest["skills"]], ["tdd", "search-first", "resolver"])
         self.assertEqual(manifest["skills"][:2], [entries["tdd"], entries["search-first"]])
         self.assertEqual(manifest["skills"][2], {
-            "name": "resolver", "source": "seathatflowsinourveins/native-agent-stack",
-            "url": f"https://github.com/seathatflowsinourveins/native-agent-stack/tree/{'1' * 40}/{SKILL_PATH}",
+            "name": "resolver", "source": "native-agent-stack/native-agent-stack",
+            "url": f"https://github.com/native-agent-stack/native-agent-stack/tree/{'1' * 40}/{SKILL_PATH}",
             "ref": "1" * 40, "path": SKILL_PATH, "tree_sha": "2" * 40, "skill_md_sha256": "3" * 64,
             "status": "trial"})
         self.assertEqual((manifest["scope"], manifest["cli"], manifest["kind"]),

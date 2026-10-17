@@ -11748,8 +11748,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/host.py",
-      "sha256": "0bd757852494738de6d336f8c444ffac4625fdad6fe890c93b31621290d8068c",
-      "bytes": 104013
+      "sha256": "a1669528d743a5d52189228b10078a8ca3a9aa7b8fdb636c17278b3e0639e48d",
+      "bytes": 104009
     },
     {
       "path": "blueprints/runtime-workers/openhands/install-container.sh",
@@ -11803,8 +11803,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver.py",
-      "sha256": "9ca877e1fce797196a0b24980def08a812fade5366fbcedaa4f01caa7571610f",
-      "bytes": 103645
+      "sha256": "d464732cf198e3cd98ca4c68d012780d1f17373c7eec21c085dde053e38081a1",
+      "bytes": 104051
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gate_reads.py",
@@ -11813,8 +11813,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gh_harness.py",
-      "sha256": "7fa783ad5d2b9c99d9f82565718c12ccd7fc6a693f05e72c4f5e00686c52f600",
-      "bytes": 35857
+      "sha256": "4940ea3cb4efbb582651205f683327c3c9933192a3aecaaba788dc7587e5fe2e",
+      "bytes": 36194
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/outgoing_guard.py",
@@ -14848,8 +14848,8 @@
     },
     {
       "path": "blueprints/us-equities/catalyst-convergence/capture_sources.py",
-      "sha256": "1a8157ce0e851265e4df4323699c2a9dd6fa384595f5aafbf962f1b9d0d0712f",
-      "bytes": 6766
+      "sha256": "6d75e55f1940ef562ab05e45b53076fab40b86e62e14ec24d0496717953e7a0d",
+      "bytes": 6762
     },
     {
       "path": "blueprints/us-equities/catalyst-convergence/plan.json",
@@ -16653,8 +16653,8 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/data-tools/verify_fee_sources.py",
-      "sha256": "c9a1617b63d46bfda0af8f7c95efc14e3c935030b99f6a135d42d1274b5b6652",
-      "bytes": 5296
+      "sha256": "a0c53710670f2f3342671f5486d2ef8816ab04dcc30bb9fb31baa2ffab5a67d1",
+      "bytes": 5292
     },
     {
       "path": "blueprints/us-equities/mover-v3/data/fees-v3.json",
@@ -17128,8 +17128,8 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
-      "sha256": "587479df742819313788dceb4ca7a6e406e76915d8d7a1444f9f26121542095a",
-      "bytes": 21242
+      "sha256": "6c6814fd6eb285f85d8c7a8b5ffea5fd4c315228eb9232571afd9aaee0623837",
+      "bytes": 21222
     },
     {
       "path": "blueprints/us-equities/runtime-2604/receipts/acceptance-20261008.json",
@@ -65213,8 +65213,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "6ee381d57efc9bf2d136da4de6c5aa63247a4bccc1424d997d1be232c888fe63",
-      "bytes": 276714
+      "sha256": "c5dbaaaaf4dcd39dc4322aedb8e1c1688fcc781b4000515b970ca958ba346089",
+      "bytes": 283484
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
