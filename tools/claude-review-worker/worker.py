@@ -28,8 +28,8 @@ did until #981 removed it; the verdict is parsed without a model; a commit statu
 sanitized comment) is posted through the ambient gh login by this process, never by the sandboxed one. Nothing is
 posted unless CLAUDE_REVIEW_POST=1.
 
-Environment: API_ACTIONS_LEDGER (required), CLAUDE_REVIEW_POST, CLAUDE_REVIEW_KEYS, CLAUDE_BIN, CLAUDE_REVIEW_STATE,
-CLAUDE_REVIEW_TIMEOUT_SECONDS, CLAUDE_REVIEW_UPSTREAM. No key is ever read, logged or written by this file.
+Environment: API_ACTIONS_LEDGER (required), CLAUDE_REVIEW_POST, CLAUDE_REVIEW_KEYS, CLAUDE_BIN, CLAUDE_BIN_SHA256,
+CLAUDE_REVIEW_STATE, CLAUDE_REVIEW_TIMEOUT_SECONDS, CLAUDE_REVIEW_UPSTREAM. No key is ever read, logged or written by this file.
 """
 from __future__ import annotations
 
@@ -91,7 +91,17 @@ SWITCH_CLASSES = ("credit_exhausted", "revoked_key")
 # background reconnect closed the connection they were running on". Its `--help` is byte-identical to 2.1.296's, and
 # the offline probes (probes.py offline) give the same result on it: 16 PASS, 9 INFO, no FAIL. A comment below that
 # names a measurement on 2.1.296 dates that measurement.
-DEFAULT_CLAUDE_BIN = "~/.local/share/claude/versions/2.1.299"
+# The binary is a retained copy outside ~/.local/share/claude/versions/: the native installer deletes old versions there,
+# keeping only the launcher's version, any version a running session uses and the two newest
+# (https://code.claude.com/docs/en/setup, home directories on network storage), and native auto-update is on. The copy is
+# checked at every tick against the linux-x64 checksum of the release's GPG-verified signed manifest. Pinned roles
+# follow the latest release through such a copy after a function check of their exact invocation (owner direction,
+# 2026-10-14, paraphrased: keep the headless roles on the latest client): 2.1.302, manifest
+# https://downloads.claude.ai/claude-code-releases/2.1.302/manifest.json (sha256 d7d4f193...), checked 2026-10-17
+# against 2.1.300 on claude_flags() with no key: `--help` byte-identical, and the same init (tools Glob, Grep, Read; no
+# MCP server; no plugin; dontAsk). 2.1.300 was checked against 2.1.299 the same way on 2026-10-15.
+DEFAULT_CLAUDE_BIN = "~/.local/share/claude-retained/2.1.302/claude"
+DEFAULT_CLAUDE_BIN_SHA256 = "60d7eb7f12fbb28a52533fe8be5884097403562aa02dc73991a021c7067e29a5"
 
 
 def credit_exhausted(status, text) -> bool:
@@ -109,16 +119,34 @@ UPSTREAM_LABEL_CHARS = 200         # one citation label, at most, in the data fi
 # so these leave twice its size before a head is refused as too large to review whole.
 # The network boundary (#953 P2-3; the command center's ruling of 2026-10-10): Anthropic's sandbox runtime, srt, wraps
 # the bwrap fence. srt's own bwrap unshares the network, and its host proxy, reached through a bound unix socket,
-# passes only SRT_ALLOWED (anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e, tag v0.0.79:
-# src/sandbox/linux-sandbox-utils.ts:1343-1363 and :3378, src/sandbox/sandbox-manager.ts:355-415). It is installed
-# from its npm tarball (sha256 5a730e4367c264ccc4b592af01dab038a6c39db7c184efbd132841688fa854f1) with
-# `npm install --prefix <CLAUDE_REVIEW_SRT> --ignore-scripts`; npm's lock records the integrity below.
+# passes only SRT_ALLOWED (anthropics/sandbox-runtime@626a59671ee2be556d70a290a8036224be996193, tag v0.0.80:
+# src/sandbox/linux-sandbox-utils.ts:1484-1504 and :3692, src/sandbox/sandbox-manager.ts:482-560). srt's seccomp helper
+# refuses the command socket(AF_UNIX) and socket(AF_VSOCK) with EPERM (vendor/seccomp-src/seccomp-unix-block.c:212-229
+# at v0.0.80). A network namespace does not fence VM sockets: on WSL2, this host, a vsock connection leaves the sandbox
+# past the proxy and the allowlist (#691; the AF_VSOCK rule is absent at v0.0.79). The helper is not used under
+# allowAllUnixSockets (README.md:717 at v0.0.80), which SRT_FORBIDDEN keeps out of the settings.
+# It is installed from its npm tarball (sha256 7da66e1a5161bbcb57cf8a6f7ba7d85f1e6bb7897040b295885dc74c1a255f95) with
+# `npm install --prefix <CLAUDE_REVIEW_SRT> --ignore-scripts`; npm's lock records the integrity below, the registry's
+# own value for 0.0.80.
+# 0.0.80 by default refuses the sandboxed command new user namespaces (commit 9a277e5, #588; README.md:715), which stops
+# this chain's inner bwrap --unshare-user. Boundary.settings therefore sets allowNestedUserNamespaces (README.md:592,
+# example at :445-446; src/sandbox/sandbox-config.ts:1179-1187, all at v0.0.80). In the helper it lifts the namespace
+# filter and the user.max_user_namespaces limit for the command (vendor/seccomp-src/apply-seccomp.c:887-888 and
+# :954-958), and the helper's outer stub then also skips PR_SET_NO_NEW_PRIVS as well as its namespace filter
+# (:804-811); with no helper it drops bubblewrap's --disable-userns (src/sandbox/linux-sandbox-utils.ts:3844-3852). The
+# command still gets PR_SET_NO_NEW_PRIVS (apply-seccomp.c:943-945) and the socket filter, installed either way. The
+# v0.0.79 stub set neither no_new_privs nor a filter (apply-seccomp.c:764-769 at v0.0.79), so nothing widens against
+# it. Its price, that srt's write denies do not hold against a command that makes a user namespace, costs nothing
+# against 0.0.79, which had no namespace limit at any layer; the filesystem fence is the inner bwrap.
+# Measured 2026-10-17 with boundary_self_check (keyless, the vsock line included): 0.0.79 fails on vsock alone (the
+# socket opens inside the chain); 0.0.80 without the opt-out fails ("bwrap: No permissions to create a new
+# namespace"); 0.0.80 with it passes, vsock refused EPERM.
 SRT_PACKAGE = "@anthropic-ai/sandbox-runtime"
-SRT_VERSION = "0.0.79"
-SRT_INTEGRITY = ("sha512-WjBmS9fbTpnQwQkM9SU+JjhM2CcXo9eWEELktY1100RMvTy/jPhP44yZ3NXhh+GHB350OgPbM3+FubE5WVRtSA==")
+SRT_VERSION = "0.0.80"
+SRT_INTEGRITY = ("sha512-WG4P8faU/JDH90I8NLUBPmg7e72zhanlW3AVCD0OF06JCtId9IDFewFgv4YRvHLcnn//h1r6a1AMosBsMLpxnA==")
 SRT_ALLOWED = ("api.anthropic.com",)  # with nonessential traffic off, the client's only host (measured on 2.1.296)
 SRT_FORBIDDEN = ("tlsTerminate", "mitmProxy", "parentProxy", "allowLocalBinding", "credentials",
-                 "enableWeakerNestedSandbox")
+                 "enableWeakerNestedSandbox", "allowAllUnixSockets")
 NODE_MIN = (22, 12)  # srt's engines.node
 DEFAULT_SRT = "~/.local/share/claude-review-worker/srt"
 DEFAULT_NODE = "~/.local/share/mise/installs/node/24.21.0/bin/node"  # the host's mise install (command center)
@@ -302,6 +330,16 @@ class Settings:
     upstream: Path = Path("/nonexistent")  # the local upstream mirrors, ~/code/upstream/<owner>/<repo>
     srt: Path = Path("/nonexistent")  # the npm prefix srt is installed under
     node: Path = Path("/nonexistent")
+    # The client binary's pinned sha256, required: every gate compares the file with it, and no value turns them off.
+    claude_sha256: str = field(default=None, kw_only=True)
+
+    def __post_init__(self):
+        if not (isinstance(self.claude_sha256, str) and re.fullmatch(r"[0-9a-f]{64}", self.claude_sha256)):
+            raise ConfigError("the client binary needs its 64-hex sha256 pin; nothing runs on an unpinned binary")
+        # The worker hashes the binary from its own working directory and bwrap binds it from srt's run directory, so
+        # only an absolute path names one file to both.
+        if not Path(self.claude_bin).is_absolute():
+            raise ConfigError("CLAUDE_BIN must be an absolute path (after ~ expansion)")
 
 
 def settings_from(env: dict) -> Settings:
@@ -313,21 +351,56 @@ def settings_from(env: dict) -> Settings:
         raise ConfigError("CLAUDE_REVIEW_TIMEOUT_SECONDS must be a whole number of seconds")
     ledger = env.get("API_ACTIONS_LEDGER", "")
     home = env.get("HOME", str(Path.home()))
-    expand = lambda value: Path(value.replace("~", home, 1) if value.startswith("~") else value)  # noqa: E731
+    if not home.startswith("/"):
+        raise ConfigError("HOME must be an absolute path; the default paths are under it")
+
+    def tilde(value: str) -> Path:
+        return Path(value.replace("~", home, 1) if value.startswith("~") else value)
+
+    def expand(name: str, default: str) -> Path:
+        # Absolute after ~ expansion, or refused: the worker reads these paths from its own working directory, and the
+        # srt chain starts in its run directory, so a relative path could name two files (#1127, Muse P2 at 37dfd70a).
+        path = tilde(env.get(name, default))
+        if not path.is_absolute():
+            raise ConfigError(f"{name} must be an absolute path (after ~ expansion)")
+        return path
+
+    # The digest: an override keeps the default one only when it names the default path, and any other path needs its
+    # own CLAUDE_BIN_SHA256 (an empty one is none). The test is a pathlib Path comparison after ~ expansion: it folds
+    # repeated slashes, `.` segments and a trailing slash, but not `..` or a leading `//`, so a spelling with those
+    # counts as another binary and needs CLAUDE_BIN_SHA256 too.
+    claude_bin = expand("CLAUDE_BIN", DEFAULT_CLAUDE_BIN)
+    claude_sha256 = env.get("CLAUDE_BIN_SHA256") or None
+    if claude_sha256 is None:
+        if "CLAUDE_BIN" in env and claude_bin != tilde(DEFAULT_CLAUDE_BIN):
+            raise ConfigError("CLAUDE_BIN names another binary than the default, so CLAUDE_BIN_SHA256 must give its "
+                              "64-hex sha256; nothing runs on an unpinned client binary")
+        claude_sha256 = DEFAULT_CLAUDE_BIN_SHA256
+    if not re.fullmatch(r"[0-9a-f]{64}", claude_sha256):
+        raise ConfigError("CLAUDE_BIN_SHA256 must be a 64-hex sha256")
     return Settings(
-        state=expand(env.get("CLAUDE_REVIEW_STATE", DEFAULT_STATE)),
-        ledger=expand(ledger) if ledger else None,
+        state=expand("CLAUDE_REVIEW_STATE", DEFAULT_STATE),
+        ledger=expand("API_ACTIONS_LEDGER", "") if ledger else None,
         keys=keys,
-        claude_bin=expand(env.get("CLAUDE_BIN", DEFAULT_CLAUDE_BIN)),
+        claude_bin=claude_bin,
         post=env.get("CLAUDE_REVIEW_POST", "0") == "1",
         timeout=int(timeout),
-        upstream=expand(env.get("CLAUDE_REVIEW_UPSTREAM", DEFAULT_UPSTREAM)),
-        srt=expand(env.get("CLAUDE_REVIEW_SRT", DEFAULT_SRT)),
-        node=expand(env.get("CLAUDE_REVIEW_NODE", DEFAULT_NODE)),
+        upstream=expand("CLAUDE_REVIEW_UPSTREAM", DEFAULT_UPSTREAM),
+        srt=expand("CLAUDE_REVIEW_SRT", DEFAULT_SRT),
+        node=expand("CLAUDE_REVIEW_NODE", DEFAULT_NODE),
+        claude_sha256=claude_sha256,
     )
 
 
 # --------------------------------------------------------------------------- small helpers
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def utc_now() -> dt.datetime:
@@ -619,8 +692,9 @@ def review_settings() -> dict:
 
 
 def claude_flags(input_view: str) -> list:
-    """claude -p's flags, each checked against `claude --help` of 2.1.299 (byte-identical to 2.1.296's). No positional
-    prompt: it comes on stdin."""
+    """claude -p's flags, each checked against `claude --help` of 2.1.299 (byte-identical to 2.1.296's), of 2.1.300
+    (every flag present; only --restricted's description changed, dropping REPL from the tools it removes) and of 2.1.302
+    (byte-identical to 2.1.300's). No positional prompt: it comes on stdin."""
     return [
         "-p", "--model", MODEL, "--effort", EFFORT, "--max-budget-usd", str(BUDGET_USD),
         "--permission-mode", "dontAsk", "--permission-prompts", "none", "--restricted", "--setting-sources", "user",
@@ -716,9 +790,11 @@ class Boundary:
 
     @staticmethod
     def settings(config_dir) -> dict:
-        """The whole srt settings file: the API host only, and writes to the run's CLAUDE_CONFIG_DIR only."""
+        """The whole srt settings file: the API host only, writes to the run's CLAUDE_CONFIG_DIR only, and the inner
+        bwrap's user namespace allowed (allowNestedUserNamespaces; its price is in the comment at SRT_VERSION)."""
         return {"network": {"allowedDomains": list(SRT_ALLOWED), "deniedDomains": []},
-                "filesystem": {"denyRead": [], "allowWrite": [str(config_dir)], "denyWrite": []}}
+                "filesystem": {"denyRead": [], "allowWrite": [str(config_dir)], "denyWrite": []},
+                "allowNestedUserNamespaces": True}
 
     def problems(self) -> list:
         """What stops a run before any key is read: the node, the pinned srt install, socat, the socket path room."""
@@ -757,7 +833,7 @@ class Boundary:
             write_private(net / "srt.json", json.dumps(self.settings(config_dir), sort_keys=True))
             yield net
         finally:
-            shutil.rmtree(net, ignore_errors=True)  # srt 0.0.79 leaves its socket files in TMPDIR
+            shutil.rmtree(net, ignore_errors=True)  # with what srt leaves in TMPDIR (0.0.79 left its socket files)
 
     def prefix(self, net: Path) -> list:
         """env (HOME, TMPDIR and PATH for srt only) -> node srt --settings -- ... The chain has no key at this point:
@@ -802,7 +878,7 @@ class SandboxLauncher:
                  SANDBOX_CLAUDE, *(self.flags if self.flags is not None else claude_flags(SANDBOX_INPUT))]
         if self.boundary is None or net is None:
             return [*runner, *inner]
-        # srt runs its command through a shell with its own environment (src/cli.ts:545-548 at the pin), so the
+        # srt runs its command through a shell with its own environment (src/cli.ts:558-561 at the pin), so the
         # runner, which injects the key, is that command: the runner gets back the home it finds the key store under.
         return [*self.boundary.prefix(net), "/usr/bin/env", "-u", "TMPDIR", f"HOME={home}", "PATH=/usr/bin:/bin",
                 *runner, *inner]
@@ -820,8 +896,9 @@ class SandboxLauncher:
                                stderr_path, timeout, cwd=net / "cwd")
 
 
-# Run inside srt and the bwrap fence by boundary_self_check, with no key: the interfaces, then five requests. $1 is a
-# host loopback port the check listens on; nothing may reach it.
+# Run inside srt and the bwrap fence by boundary_self_check, with no key: the interfaces, then five requests, then one
+# socket(AF_VSOCK) creation (never a connect), which srt's seccomp filter must refuse with EPERM. $1 is a host loopback
+# port the check listens on; nothing may reach it.
 BOUNDARY_PROBE = r"""
 port=$1
 echo "interfaces $(tail -n +3 /proc/net/dev | cut -d: -f1 | tr -d ' ' | sort | tr '\n' ' ')"
@@ -831,6 +908,15 @@ try other https://example.com/
 try direct --noproxy '*' https://api.anthropic.com/
 try loopback_direct --noproxy '*' "http://127.0.0.1:$port/"
 try loopback_proxy --noproxy '' "http://127.0.0.1:$port/"
+/usr/bin/python3 -I -S -c '
+import errno, socket
+try:
+    socket.socket(socket.AF_VSOCK, socket.SOCK_STREAM).close()
+except OSError as error:
+    print("vsock refused", errno.errorcode.get(error.errno, error.errno))
+else:
+    print("vsock opened")
+' 2>/dev/null
 """
 
 
@@ -844,11 +930,17 @@ def judge_boundary(output: str, reached: int) -> tuple:
         parts = line.split()
         if parts and parts[0] == "interfaces":
             seen["interfaces"] = parts[1:]
+        elif parts and parts[0] == "vsock":
+            seen["vsock"] = parts[1:]
         elif len(parts) == 4 and parts[1].isdigit():
             seen[parts[0]] = (int(parts[1]), parts[2], parts[3])
     unmet = []
     if seen.get("interfaces") != ["lo"]:
         unmet.append(f"interfaces {seen.get('interfaces')}, not lo alone")
+    # A network namespace does not fence VM sockets: only srt's seccomp filter stops them, and its answer is EPERM. Any
+    # other errno (EAFNOSUPPORT on a host without a vsock transport) means no filter refused the call.
+    if seen.get("vsock") != ["refused", "EPERM"]:
+        unmet.append(f"vsock: {' '.join(seen['vsock']) if 'vsock' in seen else 'no answer'}, not refused with EPERM")
     expect = {
         "api": lambda rc, code, connect: rc == 0 and code != "000",  # the proxy is live and passes the API
         "other": lambda rc, code, connect: rc != 0 and connect == "403",  # refused by the allowlist
@@ -866,8 +958,9 @@ def judge_boundary(output: str, reached: int) -> tuple:
     if reached:
         unmet.append(f"the host loopback listener took {reached} connection(s)")
     detail = "; ".join(f"{k} {' '.join(map(str, v)) if isinstance(v, (list, tuple)) else v}" for k, v in seen.items())
-    return (not unmet), ("network boundary: " + ("; ".join(unmet) if unmet else "lo only, API through srt, the rest refused")
-                         + f" [{detail}]")
+    passed = ("lo only; the API through srt's proxy; another host, a direct route and the host's loopback refused; "
+              "socket(AF_VSOCK) refused")
+    return (not unmet), ("network boundary: " + ("; ".join(unmet) if unmet else passed) + f" [{detail}]")
 
 
 def boundary_self_check(bwrap: str, claude_bin: Path, boundary: Boundary, scratch: Path) -> tuple:
@@ -1633,6 +1726,15 @@ class Worker:
             problems.append("API_ACTIONS_LEDGER is not set; nothing is spent without a ledger")
         if not self.settings.claude_bin.is_file():
             problems.append("CLAUDE_BIN is not a file")
+        else:  # Settings refuses a missing pin, so this check always runs
+            try:
+                actual = file_sha256(self.settings.claude_bin)
+            except OSError as error:  # unreadable, or removed after is_file: a recorded refusal, not a traceback
+                problems.append(f"CLAUDE_BIN could not be read for its sha256 check ({type(error).__name__}); nothing runs")
+            else:
+                if actual != self.settings.claude_sha256:
+                    problems.append(f"CLAUDE_BIN failed its sha256 check (expected {self.settings.claude_sha256[:12]}...); "
+                                    "nothing runs on a client binary that is not the pinned one")
         if isinstance(self.launcher, SandboxLauncher):
             if not CREDENTIAL_RUN.is_file():
                 problems.append("tools/credentials/credential_run.py is missing")
@@ -1918,13 +2020,23 @@ class Worker:
                 self.usable[key] = False
         return self.usable[key]
 
-    def binary_identity(self) -> dict:
+    def binary_identity(self, *, fresh: bool = False) -> dict:
+        """The client binary's sha256 and name. Cached by (path, size, mtime_ns) for reporting; ``fresh`` hashes the
+        file again, since a replacement can keep its size and mtime (shutil.copystat copies nanosecond timestamps)."""
         path = self.settings.claude_bin
         info = path.stat()
         key = (str(path), info.st_size, info.st_mtime_ns)
-        if self.binary.get("key") != key:
+        if fresh or self.binary.get("key") != key:
             self.binary = {"key": key, "sha256": sha256_file(path), "name": path.name}
         return {"sha256": self.binary["sha256"], "name": self.binary["name"]}
+
+    def readable_binary_identity(self) -> dict | None:
+        """binary_identity() for a receipt, or None when the file is absent or cannot be read: a refusal's receipt is still
+        written when the binary stays unreadable (CC adjudication of #1127 at 0fb64d83, item e)."""
+        try:
+            return self.binary_identity() if self.settings.claude_bin.is_file() else None
+        except OSError:
+            return None
 
     def new_ref(self, candidate: Candidate) -> str:
         return f"{WORKLOAD}:{stamp(self.clock())}:{candidate.repo.short}#{candidate.pr}:{candidate.sha[:12]}"
@@ -2012,7 +2124,17 @@ class Worker:
         no silent retry."""
         launcher = launcher or self.launcher
         label = f"{candidate.repo.name}#{candidate.pr}@{candidate.sha[:12]}"
-        binary = self.binary_identity()
+        try:
+            binary = self.binary_identity(fresh=True)  # every run hashes the file it is about to start
+        except OSError:
+            self.log(f"{label}: CLAUDE_BIN could not be read for its sha256 check; nothing runs")
+            return {"tries": [], "numbers": None, "stop": "no_stream",
+                    "unmet": ["the client binary could not be read for its sha256 check; no review ran"]}
+        if binary["sha256"] != self.settings.claude_sha256:
+            # Replaced after the tick's check: nothing is debited or started (no_stream: not counted, the tick stops).
+            self.log(f"{label}: CLAUDE_BIN no longer matches its sha256 pin (now {binary['sha256'][:12]}...); nothing runs")
+            return {"tries": [], "numbers": None, "stop": "no_stream",
+                    "unmet": ["the client binary no longer matches its sha256 pin; no review ran"]}
         tries, numbers, stop, unmet = [], None, "no_stream", []
         previous, skipped = None, 0
         for index, key in enumerate(self.settings.keys):
@@ -2021,6 +2143,18 @@ class Worker:
                 skipped += 1
                 continue
             if previous is not None:
+                # Each key's launch hashes the file again (CC adjudication of #1127 at 0fb64d83): a binary replaced while
+                # the previous key was refused stops the run before the switch row, the debit and the launch.
+                try:
+                    again = self.binary_identity(fresh=True)
+                except OSError:
+                    again = None
+                if again is None or again["sha256"] != self.settings.claude_sha256:
+                    now = "could not be read" if again is None else f"now {again['sha256'][:12]}..."
+                    self.log(f"{label}: CLAUDE_BIN no longer matches its sha256 pin before {key} ({now}); nothing more runs")
+                    stop, unmet = "no_stream", [f"the client binary changed or became unreadable before {key}; no "
+                                                "further key ran"]
+                    break
                 self.ledger.switch(previous[0], key, previous[1], self.clock())
             detail = {"repo": candidate.repo.name, "pr": candidate.pr, "head_sha": candidate.sha, "run_id": run_id,
                       **extra, "model": MODEL, "effort": EFFORT, "budget_usd": BUDGET_USD, "client": binary["name"],
@@ -2098,11 +2232,21 @@ class Worker:
             # Nothing started (the key store, the runner or the sandbox refused): not counted, and the tick stops.
             attempt.update(outcome="launch_failed", counted=False, final=False, finished=iso(self.clock()),
                            unmet=unmet, tries=tries)
+            if not any(entry is attempt for entry in record["attempts"]):
+                # Refused before any debit: recorded all the same (uncounted), so the next attempt gets its own number
+                # and report directory and never overwrites this receipt.
+                record["attempts"].append(attempt)
             self.attempts.save(repo, record)
             write_json(report_dir / "receipt.json", self.receipt(candidate, attempt, plan, tries, numbers, stop, None,
                                                                  None, None))
-            self.log(f"{label}: the review did not start (exit {tries[-1]['returncode'] if tries else '?'}); "
-                     "not counted; the tick stops")
+            if tries and tries[-1]["class"] in SWITCH_CLASSES:
+                # Keys ran and the API refused them; then run_keys' per-key check stopped the next key.
+                ran = ", ".join(f"{t['key']} ({t['class']})" for t in tries)
+                self.log(f"{label}: the run stopped before the next key: {ran} ran and were refused, then "
+                         f"{unmet[0] if unmet else 'the run stopped'}; not counted; the tick stops")
+            else:
+                self.log(f"{label}: the review did not start (exit {tries[-1]['returncode'] if tries else '?'}); "
+                         "not counted; the tick stops")
             return {"head": label, "ran": False, "stop_tick": True, "outcome": "launch_failed"}
         if stop == "key_check_refused":
             # No key passed the credential runner's --check, so nothing was debited or started, and the API said
@@ -2188,7 +2332,7 @@ class Worker:
             "keys": [t["key"] for t in tries], "ledger_refs": attempt.get("ledger_refs", []),
             "tries": tries, "cost_usd": round(sum(t["cost_usd"] or 0 for t in tries), 6),
             "client_version": numbers.get("claude_code_version") if numbers else None,
-            "binary": self.binary_identity() if self.settings.claude_bin.is_file() else None,
+            "binary": self.readable_binary_identity(),
             "sandbox": self.preflight_detail or None, "stop_class": stop, "outcome": attempt.get("outcome"),
             "final": attempt.get("final"), "verdict": parsed["verdict"] if parsed else None,
             "counts": parsed["counts"] if parsed else None, "status": {"state": state, "description": description},
