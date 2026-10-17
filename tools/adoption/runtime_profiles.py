@@ -550,17 +550,21 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
     subprocess.run(["npm", "rebuild", "--prefix", str(destination / "vendor/context-mode"),
                     "better-sqlite3"], env=install_env, check=True,
                    stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-    # RTK 0.51.0 e001f773 src/hooks/init/{pi,opencode}.rs: vendor installer
-    # owns these extension bytes. Pi honors its agent-dir override; OpenCode's
-    # installer uses HOME/.config, so give *that installer only* a private HOME
-    # and reference its installed plugin through OpenCode's native file URI.
+    # RTK 1.0.1 4ef8730c src/hooks/init/{pi,opencode}.rs (Apache-2.0: LICENSE:1-2, Cargo.toml:30): vendor installer
+    # owns these extension bytes. Pi honors its agent-dir override (pi.rs:82-84); OpenCode's installer uses
+    # HOME/.config (opencode.rs:77-86), so give *that installer only* a private HOME and reference its installed
+    # plugin through OpenCode's native file URI. Details of the 1.0.1 installer follow the version check.
     rtk = shutil.which("rtk")
     if not rtk:
         raise ProfileError("the selected RTK vendor CLI is required")
     version = subprocess.check_output([rtk, "--version"], text=True).strip()
     pin = subprocess.check_output(["git", "-C", str(rtk_source), "rev-parse", "HEAD"], text=True).strip()
-    if version != "rtk 0.51.0" or pin != "e001f773f80b22b7dc4c7a79521b30e35aaef026":
+    if version != "rtk 1.0.1" or pin != "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100":
         raise ProfileError("RTK installer/source version mismatch")
+    # rtk-ai/rtk@4ef8730c: `--opencode` no longer implies opencode-only mode (lib.rs:2951), so hook-only mode also
+    # runs the Claude branch (init/claude.rs:894-974), which under --no-patch writes no Claude settings and only
+    # prints the manual step; measured with the installed rtk 1.0.1 in a private HOME. The OpenCode plugin is skipped, silently under
+    # our stdout redirect, when `opencode` on PATH is older than 1.18.29 (init/opencode.rs:14,96-150).
     if runtime == "pi":
         command = [rtk, "init", "--global", "--agent", "pi", "--hook-only", "--no-patch"]
         environment = {**os.environ, **profile_environment(profile, state, role_scope)}

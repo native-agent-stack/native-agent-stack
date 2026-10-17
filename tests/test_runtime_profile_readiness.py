@@ -71,6 +71,32 @@ class RuntimeReadinessTests(unittest.TestCase):
                         shim.write_text('#!/bin/sh\nprintf "' + shape.format(r=runtime, v=current) + '\\n"\n')
                         self.assertEqual(profiles.verify_runtime_binary(runtime, shim), current)
 
+    def test_the_rtk_installer_check_refuses_0_51_0_and_admits_1_0_1(self):
+        # rtk-ai/rtk v1.0.1 = 4ef8730c (Apache-2.0: LICENSE:1-2, Cargo.toml:30 at that commit); v0.51.0 = e001f773.
+        previous = ('rtk 0.51.0\n', 'e001f773f80b22b7dc4c7a79521b30e35aaef026\n')
+        current = ('rtk 1.0.1\n', '4ef8730cf3a0dea11c8d64a9b90bc0616fe52100\n')
+        cases = [('previous release and commit', previous, False), ('current version, previous commit',
+                 (current[0], previous[1]), False), ('previous version, current commit', (previous[0], current[1]), False),
+                 ('current release and commit', current, True)]
+        for profile, scope in [('opencode-gpt', 'reviewer'), ('pi-gpt', 'reviewer')]:
+            for label, reported, admitted in cases:
+                with self.subTest(profile=profile, case=label), tempfile.TemporaryDirectory(dir='/var/tmp') as temporary:
+                    state = Path(temporary)
+                    with mock.patch.object(profiles, 'canonical_servers', return_value={'context-mode': {
+                            'type': 'stdio', 'command': '/fixture/mcp'}}), \
+                            mock.patch.object(profiles, 'verify_runtime_binary', return_value='1.0.0', create=True), \
+                            mock.patch.object(profiles.shutil, 'which', return_value='/fixture/rtk'), \
+                            mock.patch.object(profiles.subprocess, 'check_output', side_effect=list(reported)), \
+                            mock.patch.object(profiles.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)):
+                        call = lambda: profiles.render(profile, state=state, home=state, eco_root=state, templates=[],
+                                                       pi_bin=state / 'pi', opencode_bin=state / 'opencode',
+                                                       rtk_source=state, role_scope=scope)
+                        if admitted:
+                            call()
+                        else:
+                            with self.assertRaisesRegex(profiles.ProfileError, 'RTK installer/source version mismatch'):
+                                call()
+
     def test_installed_public_runtime_versions_match_the_qualified_releases(self):
         import os
         supplied={'pi':os.environ.get('NS_PI_TEST_BIN'),'opencode':os.environ.get('NS_OPENCODE_TEST_BIN')}

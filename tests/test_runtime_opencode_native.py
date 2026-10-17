@@ -98,7 +98,7 @@ class NativeOpenCodeContractTests(unittest.TestCase):
                     mock.patch.object(module, "verify_runtime_binary", return_value="1.19.3", create=True), \
                     mock.patch.object(module.shutil, "which", return_value="/fixture/rtk"), \
                     mock.patch.object(module.subprocess, "check_output", side_effect=[
-                        "rtk 0.51.0\n", "e001f773f80b22b7dc4c7a79521b30e35aaef026\n"]), \
+                        "rtk 1.0.1\n", "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100\n"]), \
                     mock.patch.object(module.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)):
                 module.render("opencode-gpt", state=state, home=home, eco_root=scratch, templates=[],
                     pi_bin=Path("/fixture/pi"), opencode_bin=Path(binary), rtk_source=scratch, role_scope="reviewer")

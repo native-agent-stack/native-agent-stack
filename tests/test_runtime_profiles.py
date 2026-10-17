@@ -981,7 +981,7 @@ process.stdin.on('end', () => {
             with mock.patch.object(profiles, "canonical_servers", return_value=servers), \
                     mock.patch.object(profiles.shutil, "which", return_value="/fixture/rtk"), \
                     mock.patch.object(profiles.subprocess, "check_output", side_effect=[
-                        "rtk 0.51.0\n", "e001f773f80b22b7dc4c7a79521b30e35aaef026\n"]), \
+                        "rtk 1.0.1\n", "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100\n"]), \
                     mock.patch.object(profiles.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)):
                 profiles.render("opencode-gpt", state=state, home=state, eco_root=state, templates=[],
                                 pi_bin=state / "pi", opencode_bin=state / "opencode", rtk_source=state,
@@ -1198,7 +1198,7 @@ let input=''; process.stdin.on('data',x=>input+=x); process.stdin.on('end',()=>{
             with mock.patch.object(profiles, "canonical_servers", return_value=servers), \
                     mock.patch.object(profiles.shutil, "which", return_value="/fixture/rtk"), \
                     mock.patch.object(profiles.subprocess, "check_output", side_effect=[
-                        "rtk 0.51.0\n", "e001f773f80b22b7dc4c7a79521b30e35aaef026\n"]), \
+                        "rtk 1.0.1\n", "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100\n"]), \
                     mock.patch.object(profiles.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)):
                 profiles.render("opencode-gpt", state=state, home=state, eco_root=state, templates=[],
                                 pi_bin=state / "pi", opencode_bin=state / "opencode", rtk_source=state,
@@ -1233,7 +1233,7 @@ let input=''; process.stdin.on('data',x=>input+=x); process.stdin.on('end',()=>{
                 with mock.patch.object(profiles, "canonical_servers", return_value=servers), \
                         mock.patch.object(profiles.shutil, "which", return_value="/fixture/rtk"), \
                         mock.patch.object(profiles.subprocess, "check_output", side_effect=[
-                            "rtk 0.51.0\n", "e001f773f80b22b7dc4c7a79521b30e35aaef026\n"]), \
+                            "rtk 1.0.1\n", "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100\n"]), \
                         mock.patch.object(profiles.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)) as installs:
                     profiles.render(profile, state=state, home=state, eco_root=state, templates=[],
                                     pi_bin=state / "pi", opencode_bin=state / "opencode", rtk_source=state)
