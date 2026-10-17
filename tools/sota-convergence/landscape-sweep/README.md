@@ -358,11 +358,11 @@ Stage a native lane with an explicit fallback to the keyless loopback gateway:
 
 ```sh
 python3 "$H/build_args.py" --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --layers "$LAYERS" \
-  --gpt6-fallback omniroute --fallback-codex-host 127.0.0.1:20128
+  --gpt6-fallback omniroute --fallback-codex-host 127.0.0.1:21128
 ```
 
 The fallback is off unless `staged.json` carries `codex.fallback`. The host flag names the gateway's loopback
-address and port (default `127.0.0.1:20128`). The stager requires a native primary provider and a bare native model
+address and port (default `127.0.0.1:21128`). The stager requires a native primary provider and a bare native model
 name whose requested effort has a reasoning alias in the pinned gateway. It records the fallback provider and
 base URL without creating a lane home. Restaging changes no frozen
 templates, `prompts_sha256.txt`, workflow arguments or embedded script when only provider/fallback flags change.
@@ -417,7 +417,7 @@ the choice.
 
 #### Staging on the framework instance (20129)
 
-The default gateway stays 20128: `--omniroute-base-url` defaults to `http://127.0.0.1:20128/v1`, the model to `cx/gpt-6-astra`, and no provider headers are sent. To stage the lane on the framework OmniRoute instance at port 20129, which compresses a request and then passes it to 20128 through its `sharedgw` node:
+The default gateway is 21128: `--omniroute-base-url` defaults to `http://127.0.0.1:21128/v1`, the model to `cx/gpt-6-astra`, and no provider headers are sent. This follows [build_args.py:116 at 0f4ee075](https://github.com/native-agent-stack/native-agent-stack/blob/0f4ee075b2ab3af1b099d5ca1ecb8cae02ee3f5b/tools/sota-convergence/landscape-sweep/build_args.py#L116) and [client-config-map.json entry 81](../../../adoption/new-wsl/client-config-map.json) (`rewrite.from = 127.0.0.1:21128`). To stage the lane on the framework OmniRoute instance at port 20129, which compresses a request and then passes it to 21128 through its `sharedgw` node:
 
 ```sh
 python3 $H/build_args.py --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --smoke mcp-surfaces \
@@ -427,7 +427,7 @@ python3 $H/build_args.py --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --smo
   --omniroute-header x-omniroute-compression=allow-lossy
 ```
 
-Use exactly one slash for this lane: `sharedgw/gpt-6-astra-max`. The established 2026-09-27 route check returned HTTP 200 with reasoning: 20129 forwards the bare `gpt-6-astra-max` through `sharedgw` to 20128, whose built-in Codex provider serves it at max. This route observation does not qualify a landscape sweep.
+Use exactly one slash for this lane: `sharedgw/gpt-6-astra-max`. The historical 2026-09-27 route check returned HTTP 200 with reasoning: at that time, 20129 forwarded the bare `gpt-6-astra-max` through `sharedgw` to 20128, whose built-in Codex provider served it at max. This historical route observation does not qualify a landscape sweep or verify the current forwarding configuration.
 
 Every manual framework-lane invocation must pass `-m sharedgw/gpt-6-astra-max`. Under `-p stack-worker`, the profile's `model = "gpt-6-astra"` otherwise overrides the lane home's `model`. The established 2026-09-27 probe omitted `-m`, sent `gpt-6-astra` to 20129 and received six 401 responses. `codex_job.py` already passes `-m` explicitly. Profile precedence follows [openai/codex rust-v0.157.1, config loader L286-334](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs#L286-L334).
 
@@ -788,6 +788,24 @@ This repair does not edit `scripts/validate.py`.
 
 Read these fields of `convert.py`'s summary before appending:
 
+- **`calls.gpt6_web_search`**: completed search tool calls measured from each discovery and fit job's
+  `gpt6/<job>/events.jsonl`, across first and follow-up rounds. A unique `item.completed` web-search event
+  with action `search` counts once, including an empty result set; page opens, finds, starts and the model's
+  final-answer counters do not count. `gpt6_web_search_failed` counts failed tools and starts still without
+  results when their turn ends; each affected job creates a retained failure and reopens its layer.
+  `gpt6_web_search_incomplete` counts starts without a terminal turn, and `gpt6_web_search_unavailable`
+  counts jobs with missing, empty or malformed logs (including conversion without `--work-dir`). Zero
+  completed searches with unmeasured jobs does not establish that search was unavailable. Counts cover
+  the final attempt of the named jobs; probes and archived retry attempts are outside this counter.
+  Per-role counts are retained under `raw/<layer>/<round>/gpt6_web_search`. The generated discovery
+  limit uses only discovery jobs: observed when a search completed, unavailable when searches failed
+  with no incomplete or unmeasured jobs, otherwise unverified. Other call counters retain their existing
+  provenance. This corrects the S0-shaped case where the model claimed three searches but none completed;
+  the regression uses synthetic events and does not rerun the archived smoke.
+  Source: Codex `rust-v0.162.1` at `092d3acd`,
+  [exec event contract](https://github.com/openai/codex/blob/092d3acd6bec3e3a14bdc7e7a2810ab628ab759d/codex-rs/exec/src/exec_events.rs#L125-L127),
+  [web tool completion after the response](https://github.com/openai/codex/blob/092d3acd6bec3e3a14bdc7e7a2810ab628ab759d/codex-rs/ext/web-search/src/tool.rs#L135-L191),
+  and [rollout retention of tool outputs](https://github.com/openai/codex/blob/092d3acd6bec3e3a14bdc7e7a2810ab628ab759d/codex-rs/rollout/src/policy.rs#L82-L100).
 - **`retained_failures`** and **`reopened_layers`**: each layer's failures (`<round>:<cause>`), all of them reopened.
   `degraded_discovery`, `critic_lost`, `effort_deviations` and each vote's `notes` give the detail.
   `effort_deviations_unmapped` lists a worker at another effort whose label names no layer of this sweep;
