@@ -4912,6 +4912,69 @@
         "The smoke trial's four named phases sum to 184.51 s of its 204.17 s; the other 19.66 s is measured in three windows (data.smoke.trial) and attributed from source to log sync, trajectory conversion, artifact collection and environment teardown, without timing those sub-steps."
       ],
       "path": "evidence/receipts/harbor-smoke-20261012.json"
+    },
+    {
+      "id": "wsl-new-distro-stage1-nativestack2604-20261002",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "systemd"
+      ],
+      "claim": "W2 printed one hash, 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104, as computed, published and listed for https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl, with length 418495746, and ended '[W2 completed without throw]'; W3's user-data starts '#cloud-config', names <WSL_USER> and has sha256 6eebab9fe9892c48931e4eccb1935411203ee27286edb7d6a6b535864f104e7e. W4 printed $LASTEXITCODE 0 after the install and W5 printed 0 after the first launch, cloud-init status --long exited 2 and cloud-init schema --system exited 0, and in W7 the terminate of NativeStack2604, the probe's creation, its stat and its removal each ended [exit=0] or [ok=True].",
+      "limitations": [
+        "One run on one Windows host, recorded only by its stage-1 PowerShell transcript (Start-Transcript, adoption/platforms/linux-wsl2-new-distro.md:68). The P1 to P3 pre-checks, the workstation-shell baseline and paired-isolation commands, R1's comparison probes and the F outputs are not in the transcript, so their steps and fields are null.",
+        "Most native command output is missing from the transcript. Those steps record an exit value when the transcript prints one, and otherwise say what the transcript shows.",
+        "steps[] holds the recipe commands of the checked-in template at the base commit (adoption/templates/wsl/stage1-receipt.example.json), with <Name> and <RELEASE> filled. This run's own step scripts (source_transcript.step_scripts) are not in the repository, so a step is filled only where the transcript's label or output names that operation.",
+        "Sanitized: Windows and Linux user names, home and profile paths and the computer name are replaced (<win-user>, <WSL_USER>, %USERPROFILE%, <win-host>), and the transcript has no GUID. The raw transcript stays private on Z:; source_transcript gives its path, size and sha256.",
+        "Content items the transcript does not hold stay null: the wsl.exe --version lines, the default distribution before and after, W1's workstation_baseline, W5's common-unit process ids, active user manager and paired_isolation, F1's outcome, F3's rootless-container result, the clone's commit, the subordinate-id outcome, F9's authorization_settings, the pre_checks of P1 and P2, the storage_errors of P3 and W5 and F2's idle_observation (adoption/platforms/linux-wsl2-new-distro.md:1251-1270).",
+        "cloud-init status --long exited 2 and its output is not in the transcript, so its reason is not recorded here.",
+        "Transcript times (source_transcript.*_local) are Windows local time, EDT (UTC-4).",
+        "Exit values are the transcript's markers: [exit=N] for native commands, [ok=True] as 0 and [ok=False] as 1 for PowerShell lines, and 0 for W2's hash line, hash check and image length, whose block ends '[W2 completed without throw]'. null means the transcript prints no exit value.",
+        "No rehearsal transcript for NativeStack2604 was among the harvested logs, so the rehearsal block is null.",
+        "jcodemunch_registration is skipped: F11 is not in the stage-1 transcript."
+      ],
+      "path": "evidence/receipts/wsl-new-distro-stage1-nativestack2604-20261002.json"
+    },
+    {
+      "id": "wsl-new-distro-stage1-nativehorizonny-20261015",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "systemd"
+      ],
+      "claim": "W2 printed 'image already present with the expected hash; not downloaded again' and one hash, 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104, as computed, published and listed for https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl, with 'length 418495746'; W3 printed '#cloud-config', the '- name:' and 'default=' lines for <WSL_USER>, 'user-data sha256 11f92916bad4607c19cee3452eb07bb80f4590e9f16ec295370cd1d416744502' and 'placeholders left: 0'. The run printed 'install exit 0', 'launch exit 0', 'status exit 2', 'schema exit 0' and 'windows_region US', and W7 printed 'running after terminate: [NativeStack2604]', 'owner 1000:1000' and 'removed'.",
+      "limitations": [
+        "One run on one Windows host, recorded only by its stage-1 PowerShell transcript (Start-Transcript, adoption/platforms/linux-wsl2-new-distro.md:68). The P1 to P3 pre-checks, the workstation-shell baseline and paired-isolation commands, R1's comparison probes and the F outputs are not in the transcript, so their steps and fields are null.",
+        "Most native command output is missing from the transcript. Those steps record an exit value when the transcript prints one, and otherwise say what the transcript shows.",
+        "steps[] holds the recipe commands of the checked-in template at the base commit (adoption/templates/wsl/stage1-receipt.example.json), with <Name> and <RELEASE> filled. This run's own step scripts (source_transcript.step_scripts) are not in the repository, so a step is filled only where the transcript's label or output names that operation.",
+        "Sanitized: Windows and Linux user names, home and profile paths and the computer name are replaced (<win-user>, <WSL_USER>, %USERPROFILE%, <win-host>), and the transcript has no GUID. The raw transcript stays private on Z:; source_transcript gives its path, size and sha256.",
+        "Content items the transcript does not hold stay null: the wsl.exe --version lines, the default distribution before and after, W1's workstation_baseline, W5's common-unit process ids, active user manager and paired_isolation, F1's outcome, F3's rootless-container result, the clone's commit, the subordinate-id outcome, F9's authorization_settings, the pre_checks of P1 and P2, the storage_errors of P3 and W5 and F2's idle_observation (adoption/platforms/linux-wsl2-new-distro.md:1251-1270).",
+        "cloud-init status --long exited 2 and its output is not in the transcript, so its reason is not recorded here.",
+        "Transcript times (source_transcript.*_local) are Windows local time, EDT (UTC-4).",
+        "This transcript prints labeled summaries ('test-path location: False', '== id', 'install exit 0') instead of commands, and has no [exit=N] markers. An exit value is recorded only where a line prints one; null means the transcript prints none.",
+        "jcodemunch_registration is skipped: F11 is not in the stage-1 transcript.",
+        "R1 ran on NativeHorizonNY-r1; its stage-1 run and removal are in receipt wsl-new-distro-stage1-nativehorizonny-r1-20261015."
+      ],
+      "path": "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-20261015.json"
+    },
+    {
+      "id": "wsl-new-distro-stage1-nativehorizonny-r1-20261015",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "systemd"
+      ],
+      "claim": "W2 printed 'image already present with the expected hash; not downloaded again' and one hash, 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104, as computed, published and listed for https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl, with 'length 418495746'; W3 printed '#cloud-config', the '- name:' and 'default=' lines for <WSL_USER>, 'user-data sha256 11f92916bad4607c19cee3452eb07bb80f4590e9f16ec295370cd1d416744502' and 'placeholders left: 0'. The run printed 'install exit 0', 'launch exit 0', 'status exit 2', 'schema exit 0' and 'windows_region US', and W7 printed 'running after terminate: [NativeStack2604]', 'owner 1000:1000' and 'removed'. Its last block, r1-remove.ps1, then printed 'quiet before: NativeStack2604,NativeHorizonNY-r1', 'unregister exit 0', 'interop ok' and 'folder left: False'.",
+      "limitations": [
+        "One run on one Windows host, recorded only by its stage-1 PowerShell transcript (Start-Transcript, adoption/platforms/linux-wsl2-new-distro.md:68). The P1 to P3 pre-checks, the workstation-shell baseline and paired-isolation commands, R1's comparison probes and the F outputs are not in the transcript, so their steps and fields are null.",
+        "Most native command output is missing from the transcript. Those steps record an exit value when the transcript prints one, and otherwise say what the transcript shows.",
+        "steps[] holds the recipe commands of the checked-in template at the base commit (adoption/templates/wsl/stage1-receipt.example.json), with <Name> and <RELEASE> filled. This run's own step scripts (source_transcript.step_scripts) are not in the repository, so a step is filled only where the transcript's label or output names that operation.",
+        "Sanitized: Windows and Linux user names, home and profile paths and the computer name are replaced (<win-user>, <WSL_USER>, %USERPROFILE%, <win-host>), and the transcript has no GUID. The raw transcript stays private on Z:; source_transcript gives its path, size and sha256.",
+        "Content items the transcript does not hold stay null: the wsl.exe --version lines, the default distribution before and after, W1's workstation_baseline, W5's common-unit process ids, active user manager and paired_isolation, F1's outcome, F3's rootless-container result, the clone's commit, the subordinate-id outcome, F9's authorization_settings, the pre_checks of P1 and P2, the storage_errors of P3 and W5 and F2's idle_observation (adoption/platforms/linux-wsl2-new-distro.md:1251-1270).",
+        "cloud-init status --long exited 2 and its output is not in the transcript, so its reason is not recorded here.",
+        "Transcript times (source_transcript.*_local) are Windows local time, EDT (UTC-4).",
+        "This transcript prints labeled summaries ('test-path location: False', '== id', 'install exit 0') instead of commands, and has no [exit=N] markers. An exit value is recorded only where a line prints one; null means the transcript prints none.",
+        "jcodemunch_registration is skipped: F11 is not in the stage-1 transcript.",
+        "Taken as NativeHorizonNY's R1 rehearsal on the basis given in rehearsal.basis. R1's comparison probes and its F1 to F3 outputs are not in the transcript."
+      ],
+      "path": "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-r1-20261015.json"
     }
   ],
   "files": [
@@ -39492,26 +39555,6 @@
       "bytes": 16887
     },
     {
-      "path": "evidence/artifacts/live-distro-stage1-logs-20261017/NativeHorizonNY-r1-stage1.log",
-      "sha256": "42bdd8a9852323206e2919a57c80f97e6859eff8e1363097e2bbf6fb811ef93b",
-      "bytes": 5045
-    },
-    {
-      "path": "evidence/artifacts/live-distro-stage1-logs-20261017/NativeHorizonNY-stage1.log",
-      "sha256": "dc8871bd2cad469d0f8f385df8c8806b77ebc52d3c31e91cd095223307f97532",
-      "bytes": 4175
-    },
-    {
-      "path": "evidence/artifacts/live-distro-stage1-logs-20261017/NativeStack2604-stage1.log",
-      "sha256": "c0dc4d89c1e7f4c3021f5385e44b1e90b25c19ddda7dbd69359d33be356e7bba",
-      "bytes": 9034
-    },
-    {
-      "path": "evidence/artifacts/live-distro-stage1-logs-20261017/receipt.json",
-      "sha256": "9c023483feec7f6a1da52b8f33c6600e69937db569d37f264de9ee3550bddc28",
-      "bytes": 12800
-    },
-    {
       "path": "evidence/artifacts/local-model-alignment-20260923/ai-memory-embedder-deployment.json",
       "sha256": "7db664c997713c029c0f3c84c57357c1c63e394157e8baf0c668ca37afd66cca",
       "bytes": 3828
@@ -61832,6 +61875,21 @@
       "bytes": 891
     },
     {
+      "path": "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-20261015.json",
+      "sha256": "8e2f9167f86b73fee275f1d9dd1769becf58abf2e12e97eb2e7496beeb03ebad",
+      "bytes": 64490
+    },
+    {
+      "path": "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-r1-20261015.json",
+      "sha256": "b19dfe511ea55fd96ee2993f78efd84c8ca6f7c044837927c00b5650c8a15ca7",
+      "bytes": 63947
+    },
+    {
+      "path": "evidence/receipts/wsl-new-distro-stage1-nativestack2604-20261002.json",
+      "sha256": "57ab4d604572138daf4d43f2b0b665cdef505eed755a45845d2c1f4cea674c9a",
+      "bytes": 62646
+    },
+    {
       "path": "evidence/receipts/wsl-retrieval-20260920.json",
       "sha256": "02fc96b030e8e8d48c977809a80f1a5d0409523cffb12a79aa0c9f4a9de8a56c",
       "bytes": 2455
@@ -64568,8 +64626,8 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "cb7f60e625f4746ddc5b03a3839ecf4b55050c1d07c79e06ad1ea2f2ed52c142",
-      "bytes": 28161
+      "sha256": "5d4000c22c6c0daa28e6ae149d153eab8da515b3fcfdbb9b2e0df94f687af878",
+      "bytes": 29280
     },
     {
       "path": "tests/test_managed_block.py",
@@ -65793,8 +65851,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "63cdac3d500229b69c9a1177242871fd6b891ad637028e4208f9a4706a5d8bd7",
-      "bytes": 764878
+      "sha256": "2a3d0f9418f9a0ff2b4df5ac8fd52a2a1947cc96777601e01973fd66b337cfc5",
+      "bytes": 765268
     },
     {
       "path": "tools/muse_file_fence.py",

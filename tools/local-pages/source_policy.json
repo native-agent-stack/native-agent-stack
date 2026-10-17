@@ -21092,6 +21092,18 @@
       },
       {
         "root": "repo",
+        "path": "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-20261015.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-r1-20261015.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/wsl-new-distro-stage1-nativestack2604-20261002.json"
+      },
+      {
+        "root": "repo",
         "path": "evidence/receipts/wsl-retrieval-20260920.json"
       },
       {
