@@ -730,6 +730,46 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(build_args.OMNIROUTE_DEFAULT_URL, provider["base_url"])
         self.assertEqual(build_args.OMNIROUTE_DEFAULT_MODEL, profile["model"])
 
+    def test_landscape_sweep_lane_home_ai_memory_bearer_variable_is_opt_in_and_filtered(self):
+        # The gateway lane's ai-memory MCP entry uses the host's own form, bearer_token_env_var (never a literal
+        # Authorization header, which `ai-memory install-mcp --apply` would write, ai-memory 3.1.0), only when
+        # staged (build_args.py --ai-memory-bearer-env). The shell filter then excludes that variable as it
+        # excludes the gateway key; everything else still equals the omniroute profile, and the default staging
+        # above stays byte-identical. No token is read or written here: stage_lane_home runs no subprocess.
+        spec = importlib.util.spec_from_file_location(
+            "landscape_sweep_build_args_for_bearer_test", ROOT / "tools/sota-convergence/landscape-sweep/build_args.py")
+        build_args = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(build_args)
+        profile = tomllib.loads((TEMPLATES / "codex.omniroute.config.toml").read_text(encoding="utf-8"))
+        provider = profile["model_providers"]["omniroute"]
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            host = work / "fixture-host.json"
+            host.write_text(json.dumps({
+                "HOME": "/home/example", "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
+                "PROJECT_ROOT": "/home/example/code/agent-lab", "HOST_PATH": "/usr/bin:/bin",
+                "CODE_INDEX_PATH": "/home/example/.code-index", "OTEL_ENDPOINT": "127.0.0.1:14318",
+                "AI_MEMORY_URL": "127.0.0.1:49374", "QDRANT_URL": "127.0.0.1:16333", "EMBED_URL": "127.0.0.1:8231"}))
+            kwargs = dict(model=profile["model"], base_url=provider["base_url"], host=str(host),
+                          profile=TEMPLATES / "codex.stack-worker.config.toml", repo_root=ROOT)
+            default = build_args.stage_lane_home(work, **kwargs)
+            plain_text = (work / build_args.LANE_HOME / "config.toml").read_text(encoding="utf-8")
+            staged = build_args.stage_lane_home(work, **kwargs, bearer_env="AI_MEMORY_AUTH_TOKEN")
+            text = (work / build_args.LANE_HOME / "config.toml").read_text(encoding="utf-8")
+        plain, lane = tomllib.loads(plain_text), tomllib.loads(text)
+        self.assertNotIn("ai_memory_token_env", default)
+        self.assertNotIn("bearer_token_env_var", plain["mcp_servers"]["ai-memory"])
+        self.assertEqual(plain["shell_environment_policy"], profile["shell_environment_policy"])
+        self.assertEqual(staged["ai_memory_token_env"], "AI_MEMORY_AUTH_TOKEN")
+        self.assertEqual(lane["mcp_servers"]["ai-memory"],
+                         {**plain["mcp_servers"]["ai-memory"], "bearer_token_env_var": "AI_MEMORY_AUTH_TOKEN"})
+        self.assertEqual(lane["shell_environment_policy"],
+                         {"filters": {**profile["shell_environment_policy"]["filters"],
+                                      "AI_MEMORY_AUTH_TOKEN": "exclude"}})
+        for key in ("model", "model_provider", "model_reasoning_effort", "features", "model_providers"):
+            self.assertEqual(lane[key], plain[key], key)
+        self.assertNotIn("Authorization", text)
+
 
 class BlockTests(unittest.TestCase):
     def test_insert_replace_and_remove(self):
