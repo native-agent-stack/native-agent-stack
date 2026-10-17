@@ -130,10 +130,14 @@ UPSTREAM_LABEL_CHARS = 200         # one citation label, at most, in the data fi
 # own value for 0.0.80.
 # 0.0.80 by default refuses the sandboxed command new user namespaces (commit 9a277e5, #588; README.md:715), which stops
 # this chain's inner bwrap --unshare-user. Boundary.settings therefore sets allowNestedUserNamespaces (README.md:592,
-# example at :445-446; src/sandbox/sandbox-config.ts:1179-1187, all at v0.0.80). It lifts the namespace filter and the
-# user.max_user_namespaces limit only (vendor/seccomp-src/apply-seccomp.c:887-888 and :954-958); the socket filter is
-# installed either way. Its price, that srt's write denies do not hold against a command that makes a user namespace,
-# costs nothing against 0.0.79, which had no namespace limit at any layer; the filesystem fence is the inner bwrap.
+# example at :445-446; src/sandbox/sandbox-config.ts:1179-1187, all at v0.0.80). In the helper it lifts the namespace
+# filter and the user.max_user_namespaces limit for the command (vendor/seccomp-src/apply-seccomp.c:887-888 and
+# :954-958), and the helper's outer stub then also skips PR_SET_NO_NEW_PRIVS as well as its namespace filter
+# (:804-811); with no helper it drops bubblewrap's --disable-userns (src/sandbox/linux-sandbox-utils.ts:3844-3852). The
+# command still gets PR_SET_NO_NEW_PRIVS (apply-seccomp.c:943-945) and the socket filter, installed either way. The
+# v0.0.79 stub set neither no_new_privs nor a filter (apply-seccomp.c:764-769 at v0.0.79), so nothing widens against
+# it. Its price, that srt's write denies do not hold against a command that makes a user namespace, costs nothing
+# against 0.0.79, which had no namespace limit at any layer; the filesystem fence is the inner bwrap.
 # Measured 2026-10-17 with boundary_self_check (keyless, the vsock line included): 0.0.79 fails on vsock alone (the
 # socket opens inside the chain); 0.0.80 without the opt-out fails ("bwrap: No permissions to create a new
 # namespace"); 0.0.80 with it passes, vsock refused EPERM.
@@ -361,9 +365,10 @@ def settings_from(env: dict) -> Settings:
             raise ConfigError(f"{name} must be an absolute path (after ~ expansion)")
         return path
 
-    # The digest: an override keeps the default one only when it names the default path, spelled with ~ or expanded
-    # (the comparison is lexical, so another spelling of that file needs CLAUDE_BIN_SHA256 too), and any other path
-    # needs its own CLAUDE_BIN_SHA256 (an empty one is none).
+    # The digest: an override keeps the default one only when it names the default path, and any other path needs its
+    # own CLAUDE_BIN_SHA256 (an empty one is none). The test is a pathlib Path comparison after ~ expansion: it folds
+    # repeated slashes, `.` segments and a trailing slash, but not `..` or a leading `//`, so a spelling with those
+    # counts as another binary and needs CLAUDE_BIN_SHA256 too.
     claude_bin = expand("CLAUDE_BIN", DEFAULT_CLAUDE_BIN)
     claude_sha256 = env.get("CLAUDE_BIN_SHA256") or None
     if claude_sha256 is None:

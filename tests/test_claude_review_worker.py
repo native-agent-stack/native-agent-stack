@@ -1952,9 +1952,9 @@ class InvocationTest(unittest.TestCase):
         self.assertEqual(crw.DEFAULT_CLAUDE_BIN_SHA256, "60d7eb7f12fbb28a52533fe8be5884097403562aa02dc73991a021c7067e29a5")
         self.assertEqual(settings.claude_sha256, crw.DEFAULT_CLAUDE_BIN_SHA256)
         # An override fails closed (GPT full1 blocker 1 and CC micro F1, 2026-10-15): another path needs its own digest, an
-        # empty digest is none, and the default path keeps the default digest when it is spelled with ~ or as its
-        # expanded absolute path. The comparison is lexical (#1127 B7), so any other spelling of the same file, such as
-        # one with a .. segment, counts as another binary and needs its own digest.
+        # empty digest is none, and the default path keeps the default digest. The comparison is a pathlib Path
+        # comparison (#1127 B7): it folds repeated slashes, `.` segments and a trailing slash, but not `..` or a leading
+        # `//`, so a spelling of the same file with a .. segment counts as another binary and needs its own digest.
         for env in ({"CLAUDE_BIN": "/x/claude"}, {"CLAUDE_BIN": "/x/claude", "CLAUDE_BIN_SHA256": ""},
                     {"CLAUDE_BIN": "/h/.local/share/claude-retained/../claude-retained/2.1.302/claude"}):
             with self.subTest(env=env), self.assertRaisesRegex(crw.ConfigError, "CLAUDE_BIN_SHA256"):
