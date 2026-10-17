@@ -4,16 +4,16 @@
   "source_main": "86bb669ad6c81b9adafdb222d545a1bf2aa95218",
   "evidence_class": "local_integration",
   "generator_sha256": "c861fa6a8a35ec5178b151dae03f20c9615a6f1d42b79ab3300102fc8a36c332",
-  "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+  "profile_sha256": "abbea7713de2719ad65b072e759ffadc4ed6fa6c3bd846164cff73355e577e06",
   "outputs": {
-    "docs/new-wsl-handbook.md": "57e03127ffee78c956390ad2ce3aea4e0c99a9955d445c196c54fe297c3ac23c",
-    "docs/new-wsl-handbook.json": "3e4d43906740299b560595aec2f56274ed25a1f3bafb1ee9e2a9982d38f24450"
+    "docs/new-wsl-handbook.md": "3c16742bfc5e6d095682a437d4aab420a0fb3aae94ba28609f2a81bf7a5d50a5",
+    "docs/new-wsl-handbook.json": "c79576f8f6b2234aae49295f8db36bac27644cf5efda1b9007d70425f75e4574"
   },
   "inventory": {
     "layers": 37,
     "profile_entries": 78,
     "projected_tools": 82,
-    "canonical_package_ids": 26
+    "canonical_package_ids": 27
   },
   "validation": [
     {
@@ -1096,16 +1096,44 @@
     },
     {
       "date": "2026-10-17",
-      "source_base": "93aabf30a5c954411326fce8a353083a121a1b65",
+      "source_base": "cdaf31f50dfe4ddeb75b9f59cc2dd087a469b569",
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "a57a56c5d9d935d0f5a73eec9fab9b716b37924a43f0022bd66ec542d9566048",
+      "profile_sha256": "8589ba1933ce1589a817ae6d69a713f7c0ee30c14e3fa0db3297621d05431ffb",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "f1417f93594b137f8833f197880b2756515fef1d7d74310e3837f427dd6d5c02",
+        "docs/new-wsl-handbook.json": "338077c0711891bc3159e3c326e6a22c1a152a0f878c377bf373f407fe611067"
+      },
+      "evidence_class": "local_integration",
+      "scope": "Currency re-pin of seven profile rows (docs/decisions/2026-10-17-currency-sweep-repin.md): generated-byte binding refresh after the profile's pins, blocking gaps and evidence references changed, and the inventory's canonical package count follows the handbook; no host or upstream acceptance."
+    },
+    {
+      "date": "2026-10-17",
+      "source_base": "cdaf31f50dfe4ddeb75b9f59cc2dd087a469b569",
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "a57a56c5d9d935d0f5a73eec9fab9b716b37924a43f0022bd66ec542d9566048",
+      "profile_sha256": "abbea7713de2719ad65b072e759ffadc4ed6fa6c3bd846164cff73355e577e06",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "b07ab00fc67df4f55e24b5527f36ebd13864c04ba9a3394efb4b0f9464f42fc6",
+        "docs/new-wsl-handbook.json": "fc084659740ea5d543c592ae6a9a9ca85b2a69ba7b6b3e1340ad5d6353a40fcc"
+      },
+      "evidence_class": "local_integration",
+      "scope": "Second fold of PR #1243 (docs/decisions/2026-10-17-currency-sweep-repin.md): generated-byte binding refresh after the RTK, SocratiCode and codebase-memory-mcp rows' blocking gaps changed; no host or upstream acceptance. The entry before it records the first fold's bytes."
+    },
+    {
+      "date": "2026-10-17",
+      "source_base": "a887cc4bbc5825391f622bb1fd71580ea97511fb",
       "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
       "native_exit_code": 0,
       "generator_sha256": "c861fa6a8a35ec5178b151dae03f20c9615a6f1d42b79ab3300102fc8a36c332",
       "current_outputs": {
-        "docs/new-wsl-handbook.md": "57e03127ffee78c956390ad2ce3aea4e0c99a9955d445c196c54fe297c3ac23c",
-        "docs/new-wsl-handbook.json": "3e4d43906740299b560595aec2f56274ed25a1f3bafb1ee9e2a9982d38f24450"
+        "docs/new-wsl-handbook.md": "3c16742bfc5e6d095682a437d4aab420a0fb3aae94ba28609f2a81bf7a5d50a5",
+        "docs/new-wsl-handbook.json": "c79576f8f6b2234aae49295f8db36bac27644cf5efda1b9007d70425f75e4574"
       },
       "evidence_class": "local_integration",
-      "scope": "Condition 4 of the CC's ruling (a), retargeted by its GO of 2026-10-16 (16:51Z), rulings D1-D9 (hcom #9109, 2026-10-17) and the fold rulings G1-G6 (hcom #14261, 2026-10-17): the memory-owner interim and plan row move to ai-memory 3.1.0; and the PR #1242 fold (finding B2): the generator says what an amendment by direct consensus changed and on whose authority, and the memory-owner interim's label names both authorities. No native service acceptance; fold 5 records both families' acknowledgements of the wave-6 batch (consensus.json wave6, and the definitive manifest's consensus digest that follows it)"
+      "scope": "Condition 4 of the CC's ruling (a), retargeted by its GO of 2026-10-16 (16:51Z), rulings D1-D9 (hcom #9109, 2026-10-17) and the fold rulings G1-G6 (hcom #14261, 2026-10-17): the memory-owner interim and plan row move to ai-memory 3.1.0; and the PR #1242 fold (finding B2): the generator says what an amendment by direct consensus changed and on whose authority, and the memory-owner interim's label names both authorities. No native service acceptance; fold 5 records both families' acknowledgements of the wave-6 batch (consensus.json wave6, and the definitive manifest's consensus digest that follows it); re-run in #1242's merge of origin/main on the merged inputs, after #1243's currency re-pin (source_base is that main commit)"
     }
   ],
   "previous_outputs": [
@@ -1382,6 +1410,23 @@
       "superseded_at_utc": "2026-10-17",
       "source_head": "90471d63f20918efa3a63ef949caffd8c012656c",
       "reason": "The wave-6 batch amends the memory-owner interim to ai-memory 3.1.0 (the CC's condition 4, retargeted by its GO of 2026-10-16); native handbook regeneration refreshes its source bindings."
+    },
+    {
+      "generator_sha256": "a57a56c5d9d935d0f5a73eec9fab9b716b37924a43f0022bd66ec542d9566048",
+      "profile_sha256": "abbea7713de2719ad65b072e759ffadc4ed6fa6c3bd846164cff73355e577e06",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "b07ab00fc67df4f55e24b5527f36ebd13864c04ba9a3394efb4b0f9464f42fc6",
+        "docs/new-wsl-handbook.json": "fc084659740ea5d543c592ae6a9a9ca85b2a69ba7b6b3e1340ad5d6353a40fcc"
+      },
+      "inventory": {
+        "layers": 37,
+        "profile_entries": 78,
+        "projected_tools": 82,
+        "canonical_package_ids": 27
+      },
+      "superseded_at_utc": "2026-10-17",
+      "source_head": "a887cc4bbc5825391f622bb1fd71580ea97511fb",
+      "reason": "main's handbook state after #1243's currency re-pin, superseded when #1242's regeneration was re-run on the merged inputs in #1242's merge of origin/main"
     }
   ]
 }

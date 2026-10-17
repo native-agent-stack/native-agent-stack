@@ -5102,8 +5102,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/observation-inference.md",
-      "sha256": "f3c5367b9da4b8b8678c38a47b73414c24e91041da81c73246d87d9573f42ab8",
-      "bytes": 7327
+      "sha256": "4401385e283788cf5ed51e580ce7d34f30b3e2e3c96267b7eb909b41c9e1934e",
+      "bytes": 7371
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/scheduling-supervision.md",
@@ -5112,8 +5112,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "f186a40d8752fcbbfa64a173982aae131ac4541dd25b775fc7866f19085a0dda",
-      "bytes": 169733
+      "sha256": "3d63a1c245361ad42aa7b7632051a9a2bc6bd0265ccb96e46d3a1b200cc77e7e",
+      "bytes": 169777
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5482,8 +5482,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "aa82f6f3a9df2c3c96c3154752a2b5de145498fb0d045af08fa0da7079a09c37",
-      "bytes": 74974
+      "sha256": "852802c73e3137eb3048951eb0fc6baea6cda2cda074fe58190c26e7110f6faa",
+      "bytes": 77932
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5617,13 +5617,13 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
-      "bytes": 261886
+      "sha256": "abbea7713de2719ad65b072e759ffadc4ed6fa6c3bd846164cff73355e577e06",
+      "bytes": 269436
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "63383931ce83151ff3228863f9a565d8d3e78364ec3287ad7c8feeff63d0806f",
-      "bytes": 27194
+      "sha256": "661f016a17ffa49831b0ff2481d92b55a304fe2a43ddc3ad7634febe51427d46",
+      "bytes": 29022
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
@@ -5632,8 +5632,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "2fa42833417a3f4adb48a678159540c43bd0faf03415e4a103ef559a382ca3e6",
-      "bytes": 65250
+      "sha256": "6a60ce54a9525262f57409b34c744717ffd4ed0e9db0042a9b6a5e16821cf221",
+      "bytes": 65811
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5647,8 +5647,8 @@
     },
     {
       "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
-      "sha256": "fc92181246725362e574467fb1bcfbf062a72833f59cd310a56f29bb8571eabb",
-      "bytes": 2099
+      "sha256": "a7a6172108fefee4de27577d070c107da8c0054a2325c7b3009c5598caf2b1df",
+      "bytes": 2203
     },
     {
       "path": "adoption/new-wsl/templates/claude.settings.additions.json",
@@ -5657,8 +5657,8 @@
     },
     {
       "path": "adoption/new-wsl/templates/codex.config.additions.toml",
-      "sha256": "1420b08bf84c862dfa797a13bd4860ecf2af574a712bd7c83e8681b2923c9d01",
-      "bytes": 7579
+      "sha256": "73e369c06d33e489f15ac7198c6c8d3d5deffdd2433d01d94b890867f52db0ce",
+      "bytes": 7630
     },
     {
       "path": "adoption/paired/README.md",
@@ -5692,13 +5692,13 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "964d085d8fe2cb8aba3d44678938e34a2b1d8b6e320227db4152352a0d0e2449",
-      "bytes": 35096
+      "sha256": "df050f84c58c778530713fa2fdc16d938906d299c2f5debcc41fea63f00f2e34",
+      "bytes": 35238
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "539a4840e1c5e2d5377685c274932f697d22bd16e28f99e70c12b2f86dc9f24c",
-      "bytes": 40598
+      "sha256": "a8f510cdcc0488581b0efe03f8c39684456a64006a9051ec945e2ef0d67bfa3a",
+      "bytes": 40740
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -5877,7 +5877,7 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "dd39aee7815e52aed292ee3c0e9c6c0e232e6be3c5aef943bb78237b6e81cb99",
+      "sha256": "cd5a84fcbb9a0df225c45ad0d4e52a4fb4c8cc6092883cafbf511d034d807118",
       "bytes": 13903
     },
     {
@@ -17703,7 +17703,7 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "0270f74ecf6ab097a1f565f5f1848395d9690e951cde4c0216930e332292e825",
+      "sha256": "edb5035818fef0363236e198e68844bae1e4a21ef3dd084aaf7ecd05df9ba04e",
       "bytes": 339603
     },
     {
@@ -18328,8 +18328,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "4334eda38f9961f971e4c5394cd6fef418cef236d3ad73c34a0e080b5b71be21",
-      "bytes": 56958
+      "sha256": "5664850b3848a48a5e75d6feb292340d5b2d45885084ad214e8f3c52e0e006e1",
+      "bytes": 57858
     },
     {
       "path": "docs/comparison-progress-20260922.md",
@@ -19173,8 +19173,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
-      "sha256": "98947f11f2a3eb693c9c31b3fff6e58e1f20d476411aa49f42f66888d43c6d47",
-      "bytes": 54090
+      "sha256": "477f15846fcf8c870665eca5df835a2dbae78942a017e22583deb74ef724aece",
+      "bytes": 54121
     },
     {
       "path": "docs/decisions/2026-10-09-claude-review-worker.md",
@@ -19470,6 +19470,11 @@
       "path": "docs/decisions/2026-10-17-codex-job-lane-hooks-mcp-memory.md",
       "sha256": "ccbc1bf0857979e470ad788ea3acf6000f63a8916c047b6340a08615fdaf73d3",
       "bytes": 17710
+    },
+    {
+      "path": "docs/decisions/2026-10-17-currency-sweep-repin.md",
+      "sha256": "fd276f3c392fd75dd17a688ee6e177ff3c277046eb48d6ea0fb67995db39c33c",
+      "bytes": 30434
     },
     {
       "path": "docs/decisions/2026-10-17-new-wsl-remote-control-at-startup.md",
@@ -19848,13 +19853,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "3e4d43906740299b560595aec2f56274ed25a1f3bafb1ee9e2a9982d38f24450",
-      "bytes": 706765
+      "sha256": "c79576f8f6b2234aae49295f8db36bac27644cf5efda1b9007d70425f75e4574",
+      "bytes": 714050
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "57e03127ffee78c956390ad2ce3aea4e0c99a9955d445c196c54fe297c3ac23c",
-      "bytes": 372104
+      "sha256": "3c16742bfc5e6d095682a437d4aab420a0fb3aae94ba28609f2a81bf7a5d50a5",
+      "bytes": 378505
     },
     {
       "path": "docs/next-host-stages.md",
@@ -21923,7 +21928,7 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "fe4e9cebcb0926e26da46bee2e1bf555f30cc4e39ea98fd71aa5a0712e2e54b8",
+      "sha256": "9ae4cffcf37a2ffa757c489ebf9ee159c7960a558d2f041151445a4770f027c0",
       "bytes": 238736
     },
     {
@@ -22655,6 +22660,71 @@
       "path": "evidence/artifacts/context-mode-codex-binding-20260926/upstream-resolver-tests.txt",
       "sha256": "b849a10dea3bd5741faa9828be0ee934a36214819056de3012cbcf028c652e6a",
       "bytes": 14197
+    },
+    {
+      "path": "evidence/artifacts/currency-sweep-20261017/claude-hud-0.11.2-20261017T072723Z.json",
+      "sha256": "26e6530b813560d97586f3eec523e4bb13958be8501a791bd2d7585a5988d246",
+      "bytes": 2364
+    },
+    {
+      "path": "evidence/artifacts/currency-sweep-20261017/claude-hud-0.11.3-20261017T144817Z.json",
+      "sha256": "af45295eeb4c1f2e3ada0a2bb4c530f12f8f8e63ce11dba3d1f6dcb8af0ed4d6",
+      "bytes": 16643
+    },
+    {
+      "path": "evidence/artifacts/currency-sweep-20261017/currency-chrome-devtools-mcp-20261017T083216Z.json",
+      "sha256": "431ea36d820678a2089fd150333dbc5be618b3eb79e85eabd43a60a98db7f0ab",
+      "bytes": 13894
+    },
+    {
+      "path": "evidence/artifacts/currency-sweep-20261017/currency-codebase-memory-mcp-20261017T080146Z.json",
+      "sha256": "ff6a0c93311947cc326982d764c071bf31f855ece35d1d5570aa1e4ec4cb034f",
+      "bytes": 13233
+    },
+    {
+      "path": "evidence/artifacts/currency-sweep-20261017/currency-codebase-memory-mcp-native-route-20261017T144817Z.json",
+      "sha256": "76a625d9684daf6ae1ff8d8f9ca20260b665562c5a96800f341d7980ee5de022",
+      "bytes": 21560
+    },
+    {
+      "path": "evidence/artifacts/currency-sweep-20261017/currency-headroom-ai-20261017T081908Z.json",
+      "sha256": "69e0fa3db8c6a5b0084bbfe129e70ff9072b18bd1cb850357e004059646a05d5",
+      "bytes": 8532
+    },
+    {
+      "path": "evidence/artifacts/currency-sweep-20261017/currency-headroom-recheck-20261017T144817Z.json",
+      "sha256": "ee4f48568824dd640906f7e66892044aec3a405c12ed4570ea0c7f5fe681acf3",
+      "bytes": 12575
+    },
+    {
+      "path": "evidence/artifacts/currency-sweep-20261017/currency-jcodemunch-mcp-20261017T082641Z.json",
+      "sha256": "5fc3a89c36611742d5cd0eb8d5d9086049998866f798760a1581e794f3417c1f",
+      "bytes": 19043
+    },
+    {
+      "path": "evidence/artifacts/currency-sweep-20261017/currency-promptfoo-20261017T083212Z.json",
+      "sha256": "33fdba618ba9f6d446a417153c7faadbd77525122c679e28c404885d0256ef8a",
+      "bytes": 12570
+    },
+    {
+      "path": "evidence/artifacts/currency-sweep-20261017/currency-rtk-20261017T081134Z.json",
+      "sha256": "9a0c6ab45e99027429712351320acb80439bf685b02afcdd069b579902a74d74",
+      "bytes": 90488
+    },
+    {
+      "path": "evidence/artifacts/currency-sweep-20261017/currency-semble-20261017T082840Z.json",
+      "sha256": "c4e70ab7f2001087c69812bf1d0f26b85f9a8f28361a48072db9bc4484d10936",
+      "bytes": 16870
+    },
+    {
+      "path": "evidence/artifacts/currency-sweep-20261017/currency-serena-20261017T081640Z.json",
+      "sha256": "3ec59a2f161fdaa21aa1dfe995ad8fbb23ba281e7026cae4623e2934971849bc",
+      "bytes": 15291
+    },
+    {
+      "path": "evidence/artifacts/currency-sweep-20261017/currency-socraticode-20261017T083215Z.json",
+      "sha256": "2a3e42d9ac926115fbf0866a6df21b80237cf68daf6958c9a6c5ae755d34b9aa",
+      "bytes": 15311
     },
     {
       "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/move-hold-judges.json",
@@ -44853,8 +44923,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "1e60c01764f5155c9d185287c6b0b6191335b22955bfbb077f84edb70e0e6316",
-      "bytes": 85358
+      "sha256": "089ea90c3c323dcacfb631bd1a0bffbc36c3c871a761925d1b6d5602da9d0c59",
+      "bytes": 88315
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -63223,8 +63293,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "9a3d20b35b69dd1d998340d14b1f87ad4cb8ac6159aa2dfcef4f3f0dedfaf4a4",
-      "bytes": 134596
+      "sha256": "98f4e5fd3f7002c5785cfb62f4166184ec0ced50ca2c0bff66d8c8728d849890",
+      "bytes": 135221
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -64043,7 +64113,7 @@
     },
     {
       "path": "tests/test_adoption_docs_consistency.py",
-      "sha256": "eba46fbb6d69aac405f9b01c9cd708281c074401336df24155f27221022deeaa",
+      "sha256": "0f07b9d4a7fd96f6732cd994f1e9997357fd845e60a97c1c079d6e672ee758a4",
       "bytes": 52123
     },
     {
@@ -64933,8 +65003,8 @@
     },
     {
       "path": "tests/test_native_practice_meter_windows.py",
-      "sha256": "05c3dcaaa7eb0e5afebb730423c3abb883ef21fd9c695affcc77dc3e857e1ded",
-      "bytes": 9198
+      "sha256": "dbc05df4e0ef802d0dfb33c4176aa4bee1c330cd45ca6d6f539b22f8b868a014",
+      "bytes": 9218
     },
     {
       "path": "tests/test_native_practice_owed_check_corrections.py",
@@ -64988,7 +65058,7 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "68d286880d2cf38d2814b3f4a0c84e2b476384bcbe5a0b6b325bd6d791415a8e",
+      "sha256": "8cdea0db39f00f6afc6933a60d353f3f3595eda8d27fbcfa6c210b65efa90887",
       "bytes": 367247
     },
     {
@@ -65003,8 +65073,8 @@
     },
     {
       "path": "tests/test_new_wsl_profile.py",
-      "sha256": "c9590847c0b040e80b7f4d8615269da7c0aa5a33ca08b8ff0a084fb4b4dfe41e",
-      "bytes": 19560
+      "sha256": "92b87ed0f17cbc930b4530efc6cfc036f32802e3eceec02579e0cc4285126918",
+      "bytes": 19602
     },
     {
       "path": "tests/test_ns2604_dashboards.py",
@@ -65093,8 +65163,8 @@
     },
     {
       "path": "tests/test_paired_runs_results.py",
-      "sha256": "1f152a8c62d7cedb4a7fdecb263cd80a1e3a8bae2db7741f7bdafc763d8ceac8",
-      "bytes": 56366
+      "sha256": "888a2fa6da701a7e73c5331ea5a65b5c949b3abc6db346ddbb0b997cfa136829",
+      "bytes": 57086
     },
     {
       "path": "tests/test_path_safety.py",
