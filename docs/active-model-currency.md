@@ -161,10 +161,11 @@ commands. Other lanes' N2, paper-open-e2e and STOP paths are outside this
 currency scan's ownership and are not read.
 
 The existing model-age inventory is source-review metadata for
-`freshness_propose.py`; it does not select a runtime model. Its October 7
-Haiku 4.5 observed-use declaration remains a dated claim requiring separate
-reconciliation after owner application/readback. This check does not rewrite
-it into evidence that a host switched. Local weights/package age and their
+`freshness_propose.py`; it does not select a runtime model. Its
+`background-haiku` row follows Haiku 5.5 at Claude Code 2.1.302 after the
+[2026-10-17 correction](decisions/2026-10-17-background-haiku-currency-correction.md),
+which replaced the October 7 Haiku 4.5 observed-use declaration. This check does
+not rewrite either into evidence that a host switched. Local weights/package age and their
 landscape exceptions remain under that existing inventory and validator.
 
 The maintained research supervisor had an actual Opus 5 default. Its current
