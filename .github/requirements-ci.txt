@@ -167,3 +167,21 @@ typing-extensions==4.16.0 \
 # Official textfile exposition and atomic writer for the offline Claude usage collector.
 # Share the runtime's reviewed universal-wheel hash.
 -r ../observability/claude-usage/requirements.txt
+
+# Stylesheet cascade test of the harness atlas (tests/local_pages_css_cascade.py): CSS parsing and selector matching
+# with specificity are upstream's, not a rebuilt helper. Linux x86_64 / Python >=3.12; all three are pure-Python
+# BSD-3-Clause wheels (METADATA License-File, LICENSE read at the pins), screened 2026-10-17 from PyPI and each
+# package's documentation and source; the measured parity run is recorded in tools/local-pages/design-plan.md.
+# cssselect2 0.10.1 requires tinycss2 and webencodings; tinycss2 1.5.1 requires webencodings>=0.4; webencodings
+# 0.6.1 has no dependency. Public PyPI metadata, read 2026-10-17:
+# https://pypi.org/pypi/cssselect2/0.10.1/json, https://pypi.org/pypi/tinycss2/1.5.1/json,
+# https://pypi.org/pypi/webencodings/0.6.1/json (wheel and sdist digests below are PyPI's).
+cssselect2==0.10.1 \
+    --hash=sha256:25cc4494d55985d6a6da359be48da6ce98c28dcbafa2314c383ace3fc32ec868 \
+    --hash=sha256:83b0d820ef589dabaf693289b647c2f5b410f76d285f56deba911ffa75a7b9d1
+tinycss2==1.5.1 \
+    --hash=sha256:3415ba0f5839c062696996998176c4a3751d18b7edaaeeb658c9ce21ec150661 \
+    --hash=sha256:d339d2b616ba90ccce58da8495a78f46e55d4d25f9fd71dfd526f07e7d53f957
+webencodings==0.6.1 \
+    --hash=sha256:565f9ad031c702dae404e27a099e3e09186a3ab1b9520f06d215502b651fd910 \
+    --hash=sha256:7fab6269c8bf237c657876b52058ccb182e861518d1c695c1a9aaa8c1c105d5b

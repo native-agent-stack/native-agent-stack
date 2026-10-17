@@ -5207,8 +5207,8 @@
     },
     {
       "path": ".github/requirements-ci.txt",
-      "sha256": "70284e31eff0b705be1fd2c2770bcce068fa8c787d02a700f50fe77f76aa150a",
-      "bytes": 13346
+      "sha256": "6210d2535f4625ff4a91589b1a5b0dee61a388fd67a96e60e53c29bba6aa9171",
+      "bytes": 14726
     },
     {
       "path": ".github/requirements-validation.txt",
@@ -65308,8 +65308,8 @@
     },
     {
       "path": "tests/test_skill_usage_daily.py",
-      "sha256": "04719068560e1e4daa32ed6b3363646c29e1e6e73f3eb9b75f22d074f0e3993f",
-      "bytes": 17439
+      "sha256": "7dcc3f903bf40d31d5687f207a4408490be437dd682517c00ea1bb5bb3180d06",
+      "bytes": 19915
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -65868,8 +65868,8 @@
     },
     {
       "path": "tools/local-pages/README.md",
-      "sha256": "14d294af1400d6a0e646f4bcc5c149982b70b2ac8d1fc754b25f19621739d3b2",
-      "bytes": 37540
+      "sha256": "404f28ec41edb9fd31638dcb5e7a5861506081a0959eb2b2394e786e2b772bcd",
+      "bytes": 41169
     },
     {
       "path": "tools/local-pages/architecture_manifest.py",
@@ -65898,8 +65898,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "2a3d0f9418f9a0ff2b4df5ac8fd52a2a1947cc96777601e01973fd66b337cfc5",
-      "bytes": 765268
+      "sha256": "ddf8b2d0c2724063847c9c91067bf3ef43c2cb66b6a3bf460bd3dd54aafd6f79",
+      "bytes": 765601
     },
     {
       "path": "tools/muse_file_fence.py",
@@ -65978,13 +65978,13 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "4a603c06bef574515481b8794c1ae264dd2e5bff1911e96e2adb2ec1b97e3277",
-      "bytes": 57941
+      "sha256": "6700fb0b65beb2778ba1b63576d8ab39c67f7517ed802dcd142042e7e433b35b",
+      "bytes": 62589
     },
     {
       "path": "tools/skill-usage/daily_skill_usage.py",
-      "sha256": "1936dc7c54fc098431017eb769b4caf8914616698435a53b4146ed76b44b9d07",
-      "bytes": 11118
+      "sha256": "d36672ba78f2896ddf642c8a80c23fbc52d3e95ea6de2e5ab356318d609c3a2a",
+      "bytes": 12192
     },
     {
       "path": "tools/skill-usage/runtime_usage.py",

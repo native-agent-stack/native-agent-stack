@@ -376,38 +376,45 @@ class OverviewReads:
     and the explicit pointer to the current record. The source map selects
     among these grants; it cannot extend them. final-stack.json stays on its
     dedicated Architecture role, so no overview role may grant it.
+
+    SECTION names the policy's role map and PREFIX its role names; a subclass
+    reuses every check for another page's map. BOUNDS caps a role's read below
+    the caller's bound; the overview sets none, so its reads are unchanged.
     """
 
     limit_error = SourceReadLimitError
+    SECTION = "overview"
+    PREFIX = "overview_"
+    BOUNDS = {}
 
     def __init__(self, root, state_root, policy_path=POLICY_PATH):
         self.policy = load_policy(policy_path)
         self.roots = {"repo": Path(root).absolute(), "state": Path(state_root).absolute()}
-        entries = self.policy.document.get("overview", {})
+        entries = self.policy.document.get(self.SECTION, {})
         if not isinstance(entries, dict):
-            raise SourcePolicyError("overview permissions must be a role map")
+            raise SourcePolicyError(f"{self.SECTION} permissions must be a role map")
         self.allowed = {}
         for role, paths in entries.items():
-            if not isinstance(role, str) or not role.startswith("overview_") or not isinstance(paths, list):
-                raise SourcePolicyError("invalid overview exact-path role")
+            if not isinstance(role, str) or not role.startswith(self.PREFIX) or not isinstance(paths, list):
+                raise SourcePolicyError(f"invalid {self.SECTION} exact-path role")
             self.allowed[role] = set()
             for record in paths:
                 if not isinstance(record, dict) or set(record) != {"root", "path"} or record["root"] not in self.roots:
-                    raise SourcePolicyError("overview permission requires exactly a known root and a path")
+                    raise SourcePolicyError(f"{self.SECTION} permission requires exactly a known root and a path")
                 relative = _relative(record["path"])
                 if (record["root"], relative) == ("repo", FINAL_STACK_PATH):
                     raise SourcePolicyError("final-stack.json is read only through its dedicated Architecture role")
                 self.allowed[role].add((record["root"], relative))
-        if "overview_families" in self.policy.document:
-            raise SourcePolicyError("overview reads are exact-path grants only; overview_families is not accepted")
+        if f"{self.SECTION}_families" in self.policy.document:
+            raise SourcePolicyError(f"{self.SECTION} reads are exact-path grants only; {self.SECTION}_families is not accepted")
 
     def validate(self, role, root, *, path=None, glob=None):
         """Check one source-map declaration against its exact grant before anything is opened."""
         if glob is not None or path is None:
-            raise SourcePolicyError("an overview source names exactly one path; a glob is not a grant")
+            raise SourcePolicyError(f"an {self.SECTION} source names exactly one path; a glob is not a grant")
         relative = _relative(path)
         if (root, relative) not in self.allowed.get(role, set()):
-            raise SourcePolicyError("overview role/path has no independent approval: " + str(role))
+            raise SourcePolicyError(f"{self.SECTION} role/path has no independent approval: " + str(role))
 
     def authorize(self, role, path):
         path = Path(path).absolute()
@@ -419,22 +426,38 @@ class OverviewReads:
             relative = _relative(relative)
             if (root, relative) in self.allowed.get(role, set()):
                 return path
-        raise SourcePolicyError("overview role/path has no independent approval: " + str(role))
+        raise SourcePolicyError(f"{self.SECTION} role/path has no independent approval: " + str(role))
 
 
     def read(self, role, path, max_bytes=MAX_SOURCE_BYTES):
         path = self.authorize(role, path)
         if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes <= 0:
-            raise SourcePolicyError("overview read bound must be a positive integer")
+            raise SourcePolicyError(f"{self.SECTION} read bound must be a positive integer")
+        max_bytes = min(max_bytes, self.BOUNDS.get(role, max_bytes))
         _check_target(path)
         with _open_regular(path, limit=max_bytes) as handle:
             info = os.fstat(handle.fileno())
             raw = handle.read(max_bytes + 1)
         if len(raw) > max_bytes:
-            raise SourceReadLimitError("approved overview input exceeds its bounded read")
+            raise SourceReadLimitError(f"approved {self.SECTION} input exceeds its bounded read")
         return raw, {"path": str(path), "role": role, "sha256": hashlib.sha256(raw).hexdigest(),
-                     "bytes": len(raw), "status": "independently authorized overview input",
+                     "bytes": len(raw), "status": f"independently authorized {self.SECTION} input",
                      "file_utc": datetime.fromtimestamp(info.st_mtime, timezone.utc).isoformat().replace("+00:00", "Z")}
+
+
+class AtlasReads(OverviewReads):
+    """Authorize the harness atlas's private projection reads: the policy's "atlas" roles.
+
+    Every OverviewReads check applies unchanged under the "atlas" section: exact
+    {root, path} records only, no atlas_families key, no glob, and no atlas role
+    may grant final-stack.json. The daily token projection's two files are read
+    with their own bounds; the atlas reads every repository record through the
+    existing Architecture and overview grants.
+    """
+
+    SECTION = "atlas"
+    PREFIX = "atlas_"
+    BOUNDS = {"atlas_token_rate_latest": 1024 * 1024, "atlas_token_rate_history": 4 * 1024 * 1024}
 
 
 @contextmanager
