@@ -1,0 +1,21 @@
+{
+  "evidence_class": "source_review",
+  "read_at": "2026-10-15T14:42:37Z",
+  "repository": "https://github.com/python-jsonschema/jsonschema",
+  "pin": "a7277432b0f7bcd0551f6e589d30457017125df4",
+  "path": "jsonschema/_format.py",
+  "file_sha256": "96bb3553b892076657f59d846a5b113987909b577d91e7f0d822e8d3c1bc3f8b",
+  "excerpt": [
+    {"line": 307, "text": "        from rfc3986_validator import validate_rfc3986"},
+    {"line": 309, "text": "        @_checks_drafts(name=\"uri\")"},
+    {"line": 313, "text": "            return validate_rfc3986(instance, rule=\"URI\")"},
+    {"line": 396, "text": "    from rfc3339_validator import validate_rfc3339"}
+  ],
+  "uv_reference": {
+    "repository": "https://github.com/astral-sh/uv",
+    "tag": "0.12.22",
+    "pin": "70fe1196a546e49148a73b1c592b2f74c33af80e",
+    "primary_mechanism": "Installed uv 0.12.22: uv pip compile --help and native constrained compilation. The official tag resolves directly to this commit."
+  },
+  "limits": "Fresh pinned package-source read and installed CLI mechanism. This does not reconstruct or authenticate historical vendor responses or candidate execution."
+}

@@ -1501,6 +1501,7 @@ def main(argv=None) -> int:
         if missing_rows:
             raise SystemExit(f"--append-rows names {catalog} rows absent from its ledger: {', '.join(missing_rows)}")
         for row in document.get("layers", []):
+            refuse_final(row)
             if append_rows and (catalog, row["layer_id"]) not in append_rows:
                 continue
             sealed_writes.extend(process_row(

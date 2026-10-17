@@ -142,26 +142,40 @@ entry points refuse every FINAL claim with `admission under redesign`; see
 The separate evidence-qualification work does not authorize admission. These
 historical predicates must not be used as a current acceptance policy.
 
+FINAL admission is disabled. Every production claim is refused with
+`admission under redesign`, including catalog markers, angle-record markers
+and the verdict alias. A positive evidence-qualification result cannot lift
+that refusal. Activation requires a separate reviewed change after these
+checks merge, a qualification receipt on current main passes its positive
+and negative controls, and independent reviews from two model families finish.
+
 The existing component-matrix `current` and `converged` statuses remain
 distinct from the protocol's `FINAL`. A landscape row or its angle record
 can explicitly carry `terminal_state: FINAL`; a landscape `verdict_status:
-FINAL` is also recognized. An explicit marker cannot bypass verification.
+FINAL` is also recognized and refused. Retained FINAL snapshots cannot count
+as current qualification: definitive queries return the refusal reason,
+flag readers refuse them, and matrix projection leaves the alias unreported.
 
 Explicit terminal-state claims are reconciled before enforcement; conflicting
-claims are refused. Ordinary matrix staleness remains date-based; an explicit
-FINAL layer reopens only when a covering sweep names retained change evidence.
-A later no-change sweep leaves FINAL intact. Its cumulative unresolved survivor
-set needs retained substantive refutation or explicit retained verdict
-dispositions; age, later omission and missing returns do not settle candidates.
+claims are refused. Ordinary matrix staleness remains date-based. Separate
+history qualification first applies the native ledger integrity checker to
+all retained evidence. It then anchors to the sweep consumed by the verdict
+wave and checks every covering ledger index after it. Only completed sweeps
+with unchanged scope hashes, retained discovery, no reopen, no retained failure
+and no material pending candidate qualify. Missing or inconsistent native V2
+projections and raw returns refuse before replay. Cumulative survivors need
+retained substantive refutation or a retained disposition naming the same or
+a later sweep index; age, omission and missing returns do not settle them.
 The landscape validator, matrix generator, review gate, architecture views,
 verdict narrative and final-stack generator share recorded-verdict
 semantics for the FINAL alias, including sealed winner binding, matrix winner
-factors and dated review metadata. The alias still needs every FINAL condition.
+factors and dated review metadata. Production admission stays refused even
+when separate qualification evaluates every evidence condition successfully.
 Entitlement and licence receipt references are read and hash-bound through the
 same source reader as angle receipts. Licence metadata still never participates
 in scoring, rejection or arm selection.
 
-For every FINAL winner the generator requires:
+The separate evidence qualifier evaluates these conditions for every winner:
 
 1. A recorded verdict, evidence class, retained and hash-bound verdict wave,
    and `next_review`.
@@ -179,6 +193,10 @@ matching repository/pin, pinned upstream source citations, and successful
 `install` and `test` command phases. The invocation JSON receipt must have
 `kind: invocation`, native evidence at the matching repository/pin, positive
 integer `calls`, and ordered `window_start`/`window_end` timestamps.
+Invocation windows retain the explicit UTC-`Z` input contract; equivalent
+offset spellings must be normalized by the producer before qualification.
+Every E2E repository URI also passes the direct supported URI validator,
+including additional citations beyond the one that binds the winner.
 
 FINAL pin matching uses the complete identity recorded in `runs[]`. Each
 winner, candidate, binding, execution receipt and source citation must retain
@@ -236,7 +254,8 @@ check, the privacy scans and independent review.
   (v3.13.16), `fromisoformat` and its value-bearing errors; the check wraps
   them with constant diagnostics. [Lib/urllib/parse.py:472](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/urllib/parse.py#L472),
   `urlsplit` and hostname/port properties. JSON Schema's optional format
-  registration is at jsonschema's pinned `_format.py:307` and `:396`.
+  optional imports are at jsonschema's pinned `_format.py:307` and `:396`;
+  the URI function calls the supported validator at `:313`.
 - [JSON Schema draft 2020-12 validation](https://json-schema.org/draft/2020-12/json-schema-validation),
   read at 2026-10-12T21:34:46Z; object constraints and format validation.
 - [ossf/scorecard@c395761df6afe1a69e476bc60a013a94bcbc153f:README.md:188](https://github.com/ossf/scorecard/blob/c395761df6afe1a69e476bc60a013a94bcbc153f/README.md#L188),

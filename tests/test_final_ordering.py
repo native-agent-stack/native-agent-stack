@@ -4,48 +4,21 @@ The structural control describes the retained, inactive helpers. It does not
 qualify admission or its deferred redesign.
 """
 
-import ast
 import json
 import unittest
 
 from scripts import final_stack as fs
 from tests.test_angle_records_fix3 import FinalIntegrityTests
 from tests.test_final_admission import FinalAdmissionTests
-from tests.test_final_stack import FixtureTestCase, REPO_ROOT, _write_json
+from tests.test_final_stack import FixtureTestCase, _write_json
 from tests.test_record_verdicts import record_verdicts
+from tests.test_final_history_ordering import event_date_violations, source_trees
 
 
 class FinalLedgerIndexStructureTests(unittest.TestCase):
     def test_final_admission_ordering_never_compares_date_or_day(self):
-        tree = ast.parse((REPO_ROOT / "scripts/final_stack.py").read_text())
-        failures = []
-        for function in tree.body:
-            if not isinstance(function, ast.FunctionDef):
-                continue
-            if function.name.startswith("final_") or function.name == "enforce_final":
-                scopes = [function]
-            elif function.name == "build_document":
-                scopes = [node for node in ast.walk(function) if isinstance(node, ast.If)
-                          and isinstance(node.test, ast.Compare)
-                          and isinstance(node.test.left, ast.Name)
-                          and node.test.left.id == "resolved_terminal"
-                          and any(isinstance(value, ast.Constant) and value.value == "FINAL"
-                                  for value in node.test.comparators)]
-            else:
-                continue
-            for compare in (node for scope in scopes for node in ast.walk(scope)
-                            if isinstance(node, ast.Compare)):
-                names = []
-                for node in ast.walk(compare):
-                    if isinstance(node, ast.Name):
-                        names.append(node.id)
-                    elif isinstance(node, ast.Attribute):
-                        names.append(node.attr)
-                    elif isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant):
-                        names.append(str(node.slice.value))
-                if any(set(name.split("_")) & {"date", "day"} for name in names):
-                    failures.append((function.name, compare.lineno))
-        self.assertEqual(failures, [], "FINAL event admission must use the shared ledger index")
+        self.assertEqual(event_date_violations(source_trees()), [],
+                         "FINAL history qualification must use the shared ledger index")
 
 
 class FinalLedgerIndexTests(FixtureTestCase):

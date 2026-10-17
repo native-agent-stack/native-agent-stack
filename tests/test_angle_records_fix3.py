@@ -267,13 +267,18 @@ class FinalIntegrityTests(FixtureTestCase):
             candidate[field] = {"spdx_id": "MIT", "source": source,
                 "read_at": candidate["angles"]["A1"]["read_at"], "note": "Synthetic compliance metadata."}
 
-    def test_metadata_receipts_must_exist_before_final(self):
+    def test_missing_metadata_refuses_ordinary_records_after_final_policy(self):
         for field in ("entitlement", "licence_note"):
             with self.subTest(field=field):
                 root, path, record = self.measured()
                 receipt = "evidence/artifacts/fixture/metadata.json"
                 self.metadata(record, field, receipt)
                 _write_json(path, record)
+                self.assert_final_disabled(root)
+                catalog_path = root / "catalogs/landscape/foundation.json"
+                catalog = json.loads(catalog_path.read_bytes())
+                catalog["layers"][0].pop("terminal_state", None)
+                _write_json(catalog_path, catalog)
                 self.fresh_reject(root, receipt + " is missing")
 
     def test_metadata_receipts_are_hashed_and_edits_invalidate_check(self):

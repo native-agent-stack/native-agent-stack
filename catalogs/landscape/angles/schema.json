@@ -182,7 +182,7 @@
               "pattern": "^[0-9a-f]{40}$"
             },
             "path": {
-              "$ref": "#/$defs/path"
+              "$ref": "#/$defs/source_file"
             },
             "line": {
               "type": "integer",

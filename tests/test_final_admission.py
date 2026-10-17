@@ -21,7 +21,10 @@ class FinalAdmissionTests(FixtureTestCase):
 
     def write_result(self, root):
         try:
-            return self.run_main(root, "--write")
+            code, output = self.run_main(root, "--write")
+            if code == 1:
+                self.assertIn(fs.FINAL_ADMISSION_REFUSAL, output)
+            return code, output
         except SystemExit as error:
             self.assertIsInstance(error.code, str)
             self.assertIn("component_matrix: catalogs/saturation/ledger.json", error.code)
@@ -101,6 +104,7 @@ class FinalAdmissionTests(FixtureTestCase):
         self.matrix(root)
         code, output = self.run_main(root, "--write")
         self.assertEqual(code, 1, output)
+        self.assertIn(fs.FINAL_ADMISSION_REFUSAL, output)
 
     def test_retained_failure_refuses_with_unchanged_scope(self):
         root, _, _ = self.measured()
@@ -210,11 +214,8 @@ class FinalAdmissionTests(FixtureTestCase):
             for status in ("completed", "stopped"):
                 with self.subTest(field=field, status=status):
                     root = self.native_cutoff_fixture(field, status)
-                    code, output = self.run_main(root, "--write")
-                    self.assertEqual(code, 1, output)
+                    self.assert_final_disabled(root)
                     self.assertFalse((root / fs.OUTPUT).exists())
-                    code, output = self.run_main(root, "--check")
-                    self.assertEqual(code, 1, output)
 
 
 del FinalIntegrityTests

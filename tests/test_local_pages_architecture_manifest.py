@@ -151,14 +151,21 @@ class ManifestProjectionTests(ManifestFixture):
                          ["built", "planned", "planned", "planned", "unreported"])
         self.assertEqual([MANIFEST.plan_status(value) for value in (True, False, None)], ["adopted", "planned", "unreported"])
 
-    def test_final_alias_preserves_adopted_matrix_and_desk_projection(self):
+    def test_final_alias_is_unreported_without_current_admission(self):
         before = self.build()
         self.records["matrix"]["rows"][1]["verdict_status"] = "FINAL"
         self.write_records(self.records)
         after = self.build()
-        self.assertEqual(MANIFEST.layer_status("FINAL"), "adopted")
-        self.assertEqual(after["views"]["matrix"]["rows"][1]["status"], "adopted")
-        self.assertEqual(after["views"]["desk"], before["views"]["desk"])
+        self.assertEqual(MANIFEST.layer_status("FINAL"), "unreported")
+        self.assertEqual(after["views"]["matrix"]["rows"][1]["status"], "unreported")
+        self.assertEqual(after["views"]["matrix"]["rows"][0], before["views"]["matrix"]["rows"][0])
+        self.assertTrue(all(winner["status"] == "unreported"
+                            for winner in after["views"]["matrix"]["rows"][1]["winners"]))
+        items = [item for stage in after["views"]["desk"]["stages"] for item in stage["items"]
+                 if item["layer"] == "market-data-reference"]
+        self.assertTrue(any(item["kind"] == "verdict FINAL" and item["status"] == "unreported"
+                            for item in items))
+        self.assertTrue(all(item["status"] == "unreported" for item in items if item["kind"] == "winner"))
 
     def test_absent_records_leave_views_unreported_without_reading(self):
         for relative in PATHS.values():

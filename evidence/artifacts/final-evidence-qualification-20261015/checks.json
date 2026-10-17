@@ -1,0 +1,125 @@
+{
+  "evidence_class": "synthetic",
+  "base": "e1b5288051292cfdb19e2ca64349e4da35ba0970",
+  "admission_enabled": false,
+  "round3_parent": "f33b1cb40d1479baeaa4edc6c8973ddfa3e303e9",
+  "round3_fail_first": {
+    "methods": 6,
+    "assertion_failures": 10,
+    "errors": 1,
+    "exit": 1,
+    "boundary": "Exact f33b1cb4 qualification source, with the native-builder wave fixture and current regression methods. The sole error is the reproduced TypeError from native-valid null V2 baseline reopening metadata; no setup errors are counted.",
+    "controls": [
+      "test_qualification_rejects_duplicate_current_rows_before_following_the_pointer",
+      "test_qualification_uses_current_verdict_metadata_instead_of_packet_fields",
+      "test_hash_correct_registered_wave_must_contain_this_layer_and_winner",
+      "test_v2_null_anchor_reopen_refuses_with_a_domain_error",
+      "test_missing_file_shaped_reopening_reference_is_not_symbolic",
+      "test_whitespace_anchor_reopening_reference_refuses_even_if_file_exists"
+    ]
+  },
+  "round3_focused_run": {
+    "command": "python3 -m unittest tests.test_final_admission_checks.NativeHistoryQualificationTests tests.test_final_history_ordering tests.test_final_stack_dependencies",
+    "tests": 35,
+    "exit": 0,
+    "seconds": 10.847,
+    "limits": "Synthetic native qualification only. The complete-wave path/hash tuple control strengthens boundary diagnostics; incomplete tuples already refused later before this correction."
+  },
+  "round3_affected_run": {
+    "command": "python3 -m unittest tests.test_final_admission_checks tests.test_final_stack_dependencies tests.test_final_history_ordering tests.test_final_ordering tests.test_final_admission tests.test_angle_records tests.test_angle_records_fix1 tests.test_angle_records_fix3 tests.test_final_stack tests.test_component_matrix tests.test_landscape tests.test_saturation_ledger tests.test_record_verdicts tests.test_layer_verdicts tests.test_registration_rules tests.test_verdict_review_gate tests.test_local_pages_architecture_manifest tests.test_local_pages_architecture_cache tests.test_resolution_protocol_docs tests.test_evidence_manifest tests.test_osv_lockfile_coverage",
+    "tests": 907,
+    "exit": 0,
+    "seconds": 572.658,
+    "idle_class": true,
+    "limits": "Complete bounded affected-module run, not a repository-wide suite; no skipped cases. Admission remains disabled."
+  },
+  "fold_parent": "425c4367a4db640b0bc4074f48e3990663416bee",
+  "fold_fail_first": {
+    "methods": 9,
+    "assertion_failures": 11,
+    "errors": 2,
+    "exit": 1,
+    "boundary": "Frozen-head native qualification implementation, schema and presentation/oracle code; the two errors are native-valid symbolic identifiers wrongly treated as repository file paths after the ledger checker accepted them.",
+    "controls": [
+      "test_symbolic_reopening_identifier_is_not_a_file_dependency",
+      "test_unrepaired_consumed_discovery_failure_refuses_qualification",
+      "test_current_run_with_another_repository_cannot_qualify_a_retained_winner",
+      "test_reused_reader_cannot_hide_changed_current_qualification_inputs",
+      "test_reused_history_reader_cannot_hide_a_changed_ledger_and_recovers",
+      "test_unrelated_layer_symbolic_reference_does_not_block_qualified_history",
+      "test_post_anchor_symbolic_reopening_refuses_by_native_history_semantics",
+      "test_oracle_rejects_list_sort_by_event_date",
+      "test_final_alias_is_unreported_without_current_admission"
+    ]
+  },
+  "fold_additional_native_coverage": {
+    "disposition_cases": 10,
+    "refutation_mutations": 6,
+    "tests": [
+      "test_native_v1_dispositions_bind_same_or_later_covering_ledger_events",
+      "test_native_v2_refutation_mutations_refuse_direct_history_qualification",
+      "test_current_run_without_a_repository_retains_the_native_id_join"
+    ],
+    "limits": "Evidence-only qualification. No activation, candidate capability or provider comparison is inferred. Direct native settlement/refutation cases are additional coverage rather than claimed fail-first implementation defects.",
+    "initial_disposition_result": "Two unknown-pointer cases refused with the correct retained-evidence diagnostic; the initial test expected an unresolved-survivor diagnostic. The expectation was corrected without changing production refusal."
+  },
+  "prior_affected_run_head": "425c4367a4db640b0bc4074f48e3990663416bee",
+  "fold_focused_run": {
+    "command": "python3 -m unittest tests.test_local_pages_architecture_manifest.ManifestProjectionTests tests.test_final_admission_checks.NativeHistoryQualificationTests tests.test_final_history_ordering tests.test_final_stack_dependencies",
+    "tests": 37,
+    "exit": 0
+  },
+  "fold_affected_run": {
+    "command": "python3 -m unittest tests.test_final_admission_checks tests.test_final_stack_dependencies tests.test_final_history_ordering tests.test_final_ordering tests.test_final_admission tests.test_angle_records tests.test_angle_records_fix1 tests.test_angle_records_fix3 tests.test_final_stack tests.test_component_matrix tests.test_landscape tests.test_saturation_ledger tests.test_record_verdicts tests.test_layer_verdicts tests.test_registration_rules tests.test_verdict_review_gate tests.test_local_pages_architecture_manifest tests.test_local_pages_architecture_cache tests.test_resolution_protocol_docs tests.test_evidence_manifest tests.test_osv_lockfile_coverage",
+    "tests": 900,
+    "exit": 0,
+    "seconds": 489.304,
+    "idle_class": true,
+    "limits": "Complete bounded affected-module run, not a repository-wide suite. Qualified fixture results still have admission_enabled false."
+  },
+  "limits": "Synthetic native-pipeline qualification and structural checks; no current candidate or provider capability qualification. Production FINAL remains refused.",
+  "fail_first": [
+    {"control": "read-only imports and missing generation dependencies", "base_tests": 2, "base_failures": 2, "errors": 0},
+    {"control": "non-FINAL repository directory citations", "base_tests": 2, "base_failures": 4, "errors": 0},
+    {"control": "empty V1 post-anchor row without retained discovery", "base_tests": 1, "base_failures": 3, "errors": 0},
+    {"control": "unnamed FINAL row during native append", "base_tests": 1, "base_failures": 1, "errors": 0},
+    {"control": "restored FINAL definitive query", "base_tests": 1, "base_failures": 1, "errors": 0},
+    {"control": "base ordering oracle calendar mutants", "base_tests": 1, "base_failures": 4, "errors": 0},
+    {"control": "E2E extra repository URI before direct URI check", "local_positive_and_negative_tests": 2, "failures_before_guard": 1, "errors": 0},
+    {"control": "qualification packet versus current recorded winner", "local_tests": 1, "failures_before_binding": 1, "errors": 0},
+    {"control": "qualification packet versus current run/angle inputs", "local_tests": 1, "failures_before_binding": 2, "errors": 0}
+  ],
+  "base_replay_limits": "The restored-snapshot and append controls used the landed base source; the final-stack source blob is identical at 51279d4f and this base. Oracle replay executes the exact base structural method against four current-source calendar mutants. New qualification interfaces are qualified directly; disabled production admission is never bypassed.",
+  "native_schema_compile": {
+    "tool": "uv 0.12.22",
+    "input": ".github/requirements-ci-schema.in",
+    "constraint": ".github/requirements-ci.txt",
+    "python": "3.12",
+    "platform": "x86_64-unknown-linux-gnu",
+    "exit": 0,
+    "packages": 7,
+    "selected_versions_and_hash_sets_match_existing_lock": true
+  },
+  "pre_generation_modules": {
+    "tests": 232,
+    "exit": 0,
+    "limits": "Bounded affected modules before final registration and generated-source refresh. Final validation is reported separately."
+  },
+  "final_affected_run": {
+    "command": "python3 -m unittest tests.test_final_admission_checks tests.test_final_stack_dependencies tests.test_final_history_ordering tests.test_final_ordering tests.test_final_admission tests.test_angle_records tests.test_angle_records_fix1 tests.test_angle_records_fix3 tests.test_final_stack tests.test_component_matrix tests.test_landscape tests.test_saturation_ledger tests.test_record_verdicts tests.test_layer_verdicts tests.test_registration_rules tests.test_verdict_review_gate tests.test_local_pages_architecture_manifest tests.test_local_pages_architecture_cache tests.test_resolution_protocol_docs tests.test_evidence_manifest tests.test_osv_lockfile_coverage",
+    "tests": 889,
+    "exit": 0,
+    "idle_class": true,
+    "limits": "Bounded named modules, including all prior nonpassing methods; not a repository-wide suite."
+  },
+  "initial_affected_run": {
+    "tests": 888,
+    "exit": 1,
+    "failures": 7,
+    "dispositions": [
+      "Two metadata subtests required separating ordinary-record receipt diagnostics from the unconditional FINAL refusal.",
+      "The new compile input required its explicit OSV scan-target registration.",
+      "Two unchanged native converter tests reported four scanner-unavailable subtest failures; both passed a serial native recheck without scanner bypass."
+    ]
+  }
+}

@@ -112,7 +112,7 @@ Primary correction sources, read at 2026-10-13T04:08:24Z:
   documents the final-newline behavior of `$`;
   [Doc/library/urllib.parse.rst:416](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/library/urllib.parse.rst#L416)
   states that the URL parsers do not validate inputs.
-- Pinned jsonschema's [jsonschema/_format.py:307](https://github.com/python-jsonschema/jsonschema/blob/a7277432b0f7bcd0551f6e589d30457017125df4/jsonschema/_format.py#L307)
+- Pinned jsonschema's [jsonschema/_format.py:313](https://github.com/python-jsonschema/jsonschema/blob/a7277432b0f7bcd0551f6e589d30457017125df4/jsonschema/_format.py#L313)
   calls `validate_rfc3986(..., rule="URI")`; its
   [pyproject.toml:64](https://github.com/python-jsonschema/jsonschema/blob/a7277432b0f7bcd0551f6e589d30457017125df4/pyproject.toml#L64)
   names the supported dependency.

@@ -35,12 +35,11 @@ import tempfile
 import tomllib
 
 try:
-    from . import angle_records, component_matrix, host_receipts, host_name_scan, saturation_ledger
+    from . import component_matrix, host_receipts, host_name_scan, saturation_ledger
     from .catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
     from .landscape import FINAL_ADMISSION_REFUSAL, refuse_final
     from .sweep_policy import DEFAULT_SWEEP_CADENCE_DAYS
 except ImportError:  # running as a plain script, not a package
-    import angle_records
     import component_matrix
     import host_receipts
     import host_name_scan
@@ -54,21 +53,23 @@ TOOL_DIR = ROOT / "tools" / "sota-convergence"
 if str(TOOL_DIR) not in sys.path:
     sys.path.insert(0, str(TOOL_DIR))
 # The verdict tools own the wave rule (a row's lanes.sealed_base, else the 2026-09-22 wave) and the registry path.
-from build_verdicts import WAVE_REGISTRY, row_run_id  # noqa: E402
+from build_verdicts import WAVE_REGISTRY, check_frozen_rows, row_run_id  # noqa: E402
 
 
-# The date the scope and the JSON schema below were last checked (the W4 design, 2026-10-11). It is never a build
+# The date the scope and qualification contract were last checked (2026-10-15). It is never a build
 # date: the generator reads no clock, and only --check --today evaluates staleness.
-CHECKED_AT = "2026-10-11"
+CHECKED_AT = "2026-10-15"
 SCHEMA_VERSION = 1
 SCOPE = (
     "One row per layer of the final stack: the landscape verdict rows and the planned layers, each with its status, "
     "verdict wave and next review, winners with their verdict and run pins, alternates, unadjudicated sweep "
     "survivors, open gaps, research state, saturation and the found-to-adopted funnel; the run pins; the intake; and "
-    "a repository and component index; sourced angle summaries and explicit FINAL checks. A read-only join of "
+    "a repository and component index; sourced angle summaries. FINAL admission is disabled with admission "
+    "under redesign; evidence qualification is a separate read-only check. A read-only join of "
     "evidence recorded elsewhere; it selects nothing."
 )
 OUTPUT = "catalogs/landscape/final-stack.json"
+ANGLE_DIRECTORY = "catalogs/landscape/angles"
 LANDSCAPE_MANIFEST = "catalogs/landscape/manifest.json"
 PLANNED_LAYERS = "catalogs/landscape/planned-layers.json"
 PLANNED_SOURCE_REVIEW = "docs/decisions/2026-10-11-planned-layers-source-review.json"
@@ -92,7 +93,7 @@ RUN_REASONS = ("unpinned", "held", "external", "unresolved")
 ROLES = ("winner", "alternate", "survivor", "candidate")
 PIN_DRIFT_VALUES = ("same", "differs", "unknown")
 # Reason codes of is_definitive, closest to definitive first.
-NOT_DEFINITIVE_REASONS = ("stale", "reopened", "no-winner", "unswept", "not-winner", "untracked")
+NOT_DEFINITIVE_REASONS = (FINAL_ADMISSION_REFUSAL, "stale", "reopened", "no-winner", "unswept", "not-winner", "untracked")
 # A verdict that was recorded (a winner set or an explicit no selection) is reviewed; pending lanes have none yet.
 REVIEWED_VERDICTS = ("recorded", "no_selection", "FINAL")
 # Landscape rows that count as trialled until W5's comparison ledger exists: measured_comparison evidence
@@ -138,8 +139,9 @@ DEFINITIONS = (
      "no-winner (the verdict is pending_lanes or no_selection, or there are no winners); reopened (a completed sweep "
      "covering the layer is dated after the verdict's checked_at, component_matrix layer_state recorded_reopened); "
      "converged (layer_state confirmed_current and the matrix converged count equals its in_use count, which is "
-     "above 0); current (otherwise). For an explicit FINAL claim, a later sweep reopens only with a named, "
-     "retained change reference; a date-only matrix reopening does not revoke FINAL."),
+     "above 0); current (otherwise). FINAL admission remains disabled. Separate evidence qualification "
+     "uses the consumed sweep and every covering ledger index, after native retained-record integrity; "
+     "ordinary date-based matrix projections cannot qualify FINAL."),
     ("verdict.next_review",
      "The verdict's checked_at plus policy.review_days, for a recorded or no_selection verdict; null for pending "
      "lanes and planned layers. It is a date, never a staleness: --check --today D flags a layer when D is past it."),
@@ -174,7 +176,7 @@ DEFINITIONS = (
      "verdict; trialled: landscape rows "
      "with measured_comparison evidence or a measured_tradeoff disposition; adopted: winners with a run pin."),
     ("survivors", "The unresolved repositories of the funnel, with their latest survival or the missing-vote-only sweep and date that opened or reopened them. "
-     "For explicit FINAL claims, replay the cumulative set without a verdict-date filter: only retained substantive "
+     "Separate FINAL evidence qualification replays the cumulative set without a verdict-date filter: only retained substantive "
      "refutation or an explicit retained verdict disposition settles a survivor, never age or omission."),
     ("index",
      "by_repository (normalized) and by_component_id (winners) map to every layer and role (winner, alternate, "
@@ -184,6 +186,18 @@ DEFINITIONS = (
 
 class FinalStackError(ValueError):
     """An input that cannot be joined one-to-one, or a document that is internally inconsistent."""
+
+
+def angle_validator():
+    """Read-only consumers do not import generation-only validation packages."""
+    try:
+        if __package__:
+            from . import angle_records
+        else:
+            import angle_records
+    except ImportError:
+        raise FinalStackError("angle validation dependencies are unavailable") from None
+    return angle_records
 
 
 # --------------------------------------------------------------------------- loading
@@ -662,6 +676,8 @@ def final_reopened_by(sources: Sources, key: tuple[str, str], later: list[dict],
                          if (row["catalog"], row["layer_id"]) == key), {}) if baseline else {}
     fields = ("requirement_sha256", "platform_profiles_sha256")
     if (baseline is None or baseline["record"].get("status") != "completed"
+        or len([row for row in baseline["record"]["layers"]
+                if (row["catalog"], row["layer_id"]) == key]) != 1
         or not all(isinstance(baseline_row.get(field), str)
                    and saturation_ledger.HEX64.fullmatch(baseline_row[field]) for field in fields)):
         raise FinalStackError("FINAL baseline requires retained complete scope hashes")
@@ -677,14 +693,15 @@ def final_reopened_by(sources: Sources, key: tuple[str, str], later: list[dict],
             if not isinstance(markers, list):
                 raise FinalStackError("FINAL reopening requires retained change evidence")
             for marker in markers:
-                if not isinstance(marker, dict) or marker.get("trigger") not in saturation_ledger.REOPEN_TRIGGERS:
+                if (not isinstance(marker, dict) or marker.get("trigger") not in saturation_ledger.REOPEN_TRIGGERS
+                    or not isinstance(marker.get("ref"), str) or not marker["ref"].strip()):
                     raise FinalStackError("FINAL reopening requires retained change evidence")
-                retained_final_reference(sources, marker.get("ref"),
-                                         "FINAL reopening requires retained change evidence")
             admitted = admitted and all(isinstance(row.get(field), str)
                 and saturation_ledger.HEX64.fullmatch(row[field])
                 and row[field] == baseline_row[field] for field in fields)
             admitted = admitted and not markers and not saturation_ledger.material_pending(row)
+            admitted = (admitted and row.get("votes") == "retained"
+                        and isinstance(row.get("discovery_ref"), str) and bool(row["discovery_ref"]))
         if not admitted:
             reopened.append({"sweep_id": sweep["sweep_id"], "date": sweep["date"]})
     return reopened
@@ -708,6 +725,72 @@ def final_covering_sweeps(ledger: dict, key: tuple[str, str]) -> list[dict]:
             covering.append({"ledger_index": ledger_index, "sweep_id": sweep_id, "date": record.get("date"),
                              "manifest_ref": record.get("manifest_ref"), "record": record})
     return covering
+
+
+def qualify_final_history(sources: Sources, key: tuple[str, str], consumed_manifest: str,
+                          row: dict) -> dict:
+    """Qualify evidence only. The production admission refusal remains unconditional.
+
+    Native integrity precedes interpretation of any projected field. Every
+    covering ledger event participates; dates are retained only as metadata.
+    """
+    supplied_sources = sources
+    sources = Sources(supplied_sources.root)
+    ledger = sources.json(LEDGER)
+    try:
+        problems = saturation_ledger.check_ledger(sources.root, ledger)
+    except (OSError, TypeError, ValueError, KeyError):
+        raise FinalStackError("FINAL native ledger integrity is incomplete or inconsistent") from None
+    if problems:
+        raise FinalStackError("FINAL native ledger integrity is incomplete or inconsistent")
+    sources.read_bytes(saturation_ledger.EVIDENCE)
+
+    def retain(value):
+        if isinstance(value, dict):
+            for name, child in value.items():
+                if isinstance(child, str) and (name.endswith("_ref") or name in ("ref", "source_review")):
+                    if name == "ref" and value.get("trigger") in saturation_ledger.REOPEN_TRIGGERS:
+                        # Only the native producer's opaque namespaces are
+                        # symbolic. A file-shaped reference must still exist
+                        # and satisfy the ordinary confinement contract.
+                        if child.startswith(("receipt_staleness:", "catalog-freshness:")):
+                            continue
+                    sources.read_bytes(child.partition("#")[0])
+                retain(child)
+        elif isinstance(value, list):
+            for child in value:
+                retain(child)
+
+    retain(ledger)
+    covering = final_covering_sweeps(ledger, key)
+    anchors = [sweep for sweep in covering if isinstance(consumed_manifest, str) and consumed_manifest
+               and sweep["manifest_ref"] == consumed_manifest]
+    if len(anchors) != 1:
+        raise FinalStackError("FINAL baseline requires one retained consumed covering sweep")
+    baseline = anchors[0]
+    baseline_rows = [entry for entry in baseline["record"]["layers"]
+                     if (entry["catalog"], entry["layer_id"]) == key]
+    if (len(baseline_rows) != 1 or baseline_rows[0].get("votes") != "retained"
+        or not baseline_rows[0].get("discovery_ref")):
+        raise FinalStackError("FINAL baseline requires retained discovery evidence")
+    later = [sweep for sweep in covering if sweep["ledger_index"] > baseline["ledger_index"]]
+    if final_reopened_by(sources, key, later, baseline):
+        raise FinalStackError("FINAL history contains an incomplete, changed or pending covering sweep")
+    baseline_reopen = baseline_rows[0].get("reopen")
+    if (not isinstance(baseline_reopen, list)
+        or any(not isinstance(marker, dict) or marker.get("trigger") not in saturation_ledger.REOPEN_TRIGGERS
+               or not isinstance(marker.get("ref"), str) or not marker["ref"].strip()
+               for marker in baseline_reopen)):
+        raise FinalStackError("FINAL baseline requires retained reopening evidence")
+    if not later and any(marker.get("trigger") == "retained_failure" for marker in baseline_reopen):
+        raise FinalStackError("FINAL baseline has unresolved retained discovery failures")
+    survivors = final_unresolved_survivors(sources, {**row, "catalog": key[0]}, covering)
+    if survivors:
+        raise FinalStackError("FINAL history has cumulative unresolved survivors")
+    supplied_sources.hashes.update(sources.hashes)
+    return {"status": "qualified", "admission_enabled": False,
+            "baseline_sweep": baseline["sweep_id"],
+            "checked_sweeps": [sweep["sweep_id"] for sweep in covering], "survivors": survivors}
 
 
 def final_v2_refutes_on_merit(sources: Sources, entry: dict, layer: dict) -> bool:
@@ -914,6 +997,7 @@ def final_evidence_receipt(sources: Sources, evidence: dict, field: str, conditi
 def check_condition_3(sources: Sources, evidence: dict, repository: str | None, run: dict) -> None:
     """Condition 3: the bound e2e_receipt is a schema-valid, successful upstream install and test at the run pin, with
     pinned upstream citations. Raises FinalStackError."""
+    angle_records = angle_validator()
     e2e = final_evidence_receipt(sources, evidence, "e2e_receipt", 3, repository, run)
     schema = sources.json(angle_records.SCHEMA)
     contract = {"$schema": schema["$schema"], "$defs": schema["$defs"],
@@ -921,6 +1005,13 @@ def check_condition_3(sources: Sources, evidence: dict, repository: str | None, 
     validator = angle_records.Draft202012Validator(contract)
     if next(validator.iter_errors(e2e), None) is not None:
         raise FinalStackError("condition 3 receipt has invalid commands or citations")
+    for citation in e2e["upstream_sources"]:
+        for field in ("url", "repository"):
+            if field in citation:
+                try:
+                    angle_records.validate_https_url(citation[field])
+                except angle_records.AngleRecordError:
+                    raise FinalStackError("condition 3 receipt has invalid source URI")
     phases = {c.get("phase") for c in _dicts(e2e.get("commands"))
               if c.get("command") and type(c.get("exit_code")) is int and c["exit_code"] == 0}
     cited = e2e.get("upstream_sources") or []
@@ -937,6 +1028,7 @@ def check_condition_4(sources: Sources, evidence: dict, repository: str | None, 
     """Condition 4: the bound invoke_receipt counts positive calls in a measured window, or the binding records a
     non-invocation reason. Raises FinalStackError."""
     if evidence.get("invoke_receipt"):
+        angle_records = angle_validator()
         invoke = final_evidence_receipt(sources, evidence, "invoke_receipt", 4, repository, run)
         try:
             start, end = (angle_records.timestamp(invoke[k]) for k in ("window_start", "window_end"))
@@ -959,7 +1051,28 @@ def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_
     # Keep the enforcement entry point fail-closed for direct callers too.
     for layer in layers:
         refuse_final(layer, error_type=FinalStackError)
+    qualify_final_requirements(sources, layers, runs, angle_inputs)
+
+
+def qualify_final_requirements(sources: Sources, layers: list[dict], runs: list[dict], angle_inputs: dict) -> list[dict]:
+    """Evaluate native evidence without authorizing or publishing FINAL admission."""
+    if not any(layer.get("terminal_state") == "FINAL" for layer in layers):
+        return []
+    supplied_sources = sources
+    sources = Sources(supplied_sources.root)
+    angle_records = angle_validator()
+    try:
+        current_angles = angle_records.load_records(sources)
+    except angle_records.AngleRecordError:
+        raise FinalStackError("FINAL requires complete current angle evidence") from None
+    if current_angles != angle_inputs:
+        raise FinalStackError("FINAL requires current angle evidence, not a retained qualification packet")
+    if build_runs(run_records(sources)) != runs:
+        raise FinalStackError("FINAL requires current run pins, not a retained qualification packet")
+    current_rows = landscape_rows(sources)
     by_run = {run["id"]: run for run in runs}
+    by_repository = {run["repository"]: run for run in runs if run["repository"]}
+    qualified = []
     for layer in layers:
         if layer["terminal_state"] != "FINAL":
             continue
@@ -968,18 +1081,55 @@ def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_
         def fail(reason):
             raise FinalStackError(f"FINAL {layer_key(*key)}: {reason}")
 
-        if layer["status"] not in DEFINITIVE_STATUSES:
-            fail("reopened sweep delta must be adjudicated before FINAL"
-                 if layer["status"] == "reopened"
-                 else f"non-definitive status {layer['status']} cannot be FINAL")
-        if layer["survivors"]:
-            fail("cumulative unresolved survivors require retained dispositions before FINAL")
         entry = angle_inputs.get(key)
         if entry is None or not layer["winners"]:
             fail("requires winners and a CONVERGED angle record")
         verdict = layer["verdict"] or {}
         wave = verdict.get("wave_doc") or {}
-        if not all(verdict.get(k) for k in ("date", "wave", "next_review")) or not wave.get("path"):
+        registered = wave_registry(sources).get(verdict.get("wave")) or {}
+        if (not isinstance(registered.get("path"), str) or not registered["path"]
+            or not isinstance(registered.get("sha256"), str)
+            or not saturation_ledger.HEX64.fullmatch(registered["sha256"])
+            or (wave.get("path"), wave.get("sha256")) != (registered.get("path"), registered.get("sha256"))):
+            fail("condition 1 requires the current registered verdict wave")
+        current_row = current_rows.get(key)
+        if current_row is None:
+            fail("requires one current recorded layer")
+        if layer.get("source") != current_row["source"]:
+            fail("requires the current catalog source for this layer")
+        raw_row = current_row["row"]
+        actual = [(winner.get("component_id"), winner.get("repository"), winner.get("pin"))
+                  for winner in _dicts(raw_row.get("winners"))]
+        projected = [(winner.get("component_id"), winner.get("repository"), winner.get("verdict_pin"))
+                     for winner in layer["winners"]]
+        if raw_row.get("verdict_status") not in ("recorded", "FINAL") or actual != projected:
+            fail("requires the current recorded winners")
+        held = (isinstance(raw_row.get("current_adoption_status"), str)
+                and raw_row["current_adoption_status"].startswith("held"))
+        for raw_winner, winner in zip(_dicts(raw_row.get("winners")), layer["winners"]):
+            current = build_winner(raw_winner, {}, by_repository, by_run, held)
+            if not current.get("evidence_class") or winner.get("evidence_class") != current["evidence_class"]:
+                fail("condition 1 requires current winner metadata")
+            if (winner.get("run"), winner.get("pin_drift")) != (current["run"], current["pin_drift"]):
+                fail("condition 2 requires the current winner-to-run association")
+        if any(value not in (None, "FINAL") for value in
+               (raw_row.get("terminal_state"), entry["record"].get("terminal_state"))):
+            fail("conflicting terminal-state claims")
+        identity_row = {**raw_row}
+        identity_row.pop("terminal_state", None)
+        if identity_row.get("verdict_status") == "FINAL":
+            identity_row["verdict_status"] = "recorded"
+        try:
+            expected_wave = row_run_id(identity_row, root=sources.root)
+        except (ValueError, SystemExit, KeyError, TypeError):
+            fail("condition 1 requires the current recorded wave identity")
+        if expected_wave != verdict.get("wave"):
+            fail("condition 1 requires the current recorded wave identity")
+        current_verdict = build_verdict(identity_row, {}, wave_registry(sources), [], root=sources.root)
+        if any(verdict.get(field) != current_verdict.get(field) for field in ("date", "wave", "next_review")):
+            fail("condition 1 requires current recorded verdict metadata")
+        history = qualify_final_history(sources, key, registered.get("manifest"), raw_row)
+        if not all(current_verdict.get(k) for k in ("date", "wave", "next_review")) or not wave.get("path"):
             fail("condition 1 requires a recorded verdict, wave and next_review")
         try:
             raw = sources.read_bytes(wave["path"])
@@ -987,6 +1137,13 @@ def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_
             fail("condition 1 verdict wave is not retained")
         if hashlib.sha256(raw).hexdigest() != wave.get("sha256"):
             fail("condition 1 verdict wave hash does not match")
+        try:
+            wave_problems = check_frozen_rows(sources.root, expected_wave, registered,
+                                              [(key[0], identity_row)], raw.decode("utf-8"))
+        except (OSError, TypeError, ValueError, SystemExit):
+            fail("condition 1 requires a registered frozen wave binding this current row")
+        if wave_problems:
+            fail("condition 1 requires a registered frozen wave binding this current row")
         record = entry["record"]
         bound = {e["candidate_id"]: e for e in record["final_evidence"]}
         for winner in layer["winners"]:
@@ -1010,10 +1167,33 @@ def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_
                 check_condition_4(sources, evidence, repository, run)
             except FinalStackError as error:
                 fail(str(error))
+        qualified.append({"catalog": key[0], "layer_id": key[1], **history})
+    supplied_sources.hashes.update(sources.hashes)
+    return qualified
+
+
+def refuse_final_claims(sources: Sources) -> None:
+    """The disabled admission policy precedes schema/dependency diagnostics."""
+    directory = sources.path(ANGLE_DIRECTORY)
+    if directory.is_dir():
+        for path in sorted(directory.glob("*.json")):
+            if path.name != "schema.json":
+                document = sources.json(ANGLE_DIRECTORY + "/" + path.name)
+                if isinstance(document, dict):
+                    refuse_final(document, error_type=FinalStackError)
+    manifest = sources.json(LANDSCAPE_MANIFEST)
+    catalogs = manifest.get("catalogs") if isinstance(manifest, dict) else None
+    if isinstance(catalogs, dict):
+        for relative in catalogs.values():
+            document = sources.json(relative)
+            for row in _dicts(document.get("layers") if isinstance(document, dict) else []):
+                refuse_final(row, error_type=FinalStackError)
 
 
 def build_document(root: Path) -> dict:
     sources = Sources(root)
+    refuse_final_claims(sources)
+    angle_records = angle_validator()
     try:
         angle_inputs = angle_records.load_records(sources)
     except angle_records.AngleRecordError as error:
@@ -1061,7 +1241,13 @@ def build_document(root: Path) -> dict:
         covering = [sweep for sweep in sweeps if key in sweep["covers"]]
         verdict_day = component_matrix.parse_iso_date(row.get("checked_at")) if is_landscape else None
         state, reopened_by = None, []
-        if is_landscape:
+        history = None
+        if is_landscape and resolved_terminal == "FINAL":
+            consumed = (registry.get(row_run_id(row, root=root)) or {}).get("manifest")
+            history = qualify_final_history(sources, key, consumed, row)
+            covering = final_covering_sweeps(ledger, key)
+            state = "confirmed_current"
+        elif is_landscape:
             # component_matrix.build_layer_convergence's rule: a sweep on the verdict's own date is not after it.
             later = [sweep for sweep in covering if verdict_day is None or sweep["day"] > verdict_day]
             state = component_matrix.classify_layer_state(row, later)
@@ -1072,33 +1258,17 @@ def build_document(root: Path) -> dict:
                 raise FinalStackError(f"{MATRIX} is stale for {layer_key(*key)}: layer_state {recorded[0]!r}, "
                                       f"reopened by {recorded[1]!r}; the ledger gives {state!r}, {reopened_by!r}. "
                                       "Run python3 scripts/component_matrix.py --write first")
-            if resolved_terminal == "FINAL":
-                # Preserve the matrix's ordinary dated metric, then apply the
-                # protocol's consumed-sweep anchor in retained append-only order.
-                covering = final_covering_sweeps(ledger, key)
-                consumed = (registry.get(row_run_id(row)) or {}).get("manifest")
-                matches = [sweep for sweep in covering if isinstance(consumed, str) and consumed
-                           and sweep["manifest_ref"] == consumed]
-                if len(matches) != 1:
-                    raise FinalStackError("FINAL baseline requires one retained consumed covering sweep")
-                sources.read_bytes(consumed)
-                baseline = matches[0]
-                later = [sweep for sweep in covering if sweep["ledger_index"] > baseline["ledger_index"]]
-                reopened_by = final_reopened_by(sources, key, later, baseline)
-                if reopened_by:
-                    state = "recorded_reopened"
-                elif state == "recorded_reopened":
-                    state = "confirmed_current"
         held = isinstance(row.get("current_adoption_status"), str) and row["current_adoption_status"].startswith("held")
         winners = [build_winner(winner, matrix_row, runs_by_repository, runs_by_id, held)
                    for winner in _dicts(row.get("winners"))] if is_landscape else []
         layer_outcomes = outcomes.get(key, {"proposed": set(), "latest": {}})
-        survivors = sorted(({"repository": repository, "sweep_id": sweep_id, "date": day}
-                            for repository, (outcome, sweep_id, day) in layer_outcomes["latest"].items()
-                            if outcome == "survived" and (verdict_day is None or date.fromisoformat(day) > verdict_day)),
-                           key=lambda survivor: survivor["repository"])
-        if resolved_terminal == "FINAL":
-            survivors = final_unresolved_survivors(sources, {**row, "catalog": catalog}, covering)
+        if history is not None:
+            survivors = history["survivors"]
+        else:
+            survivors = sorted(({"repository": repository, "sweep_id": sweep_id, "date": day}
+                                for repository, (outcome, sweep_id, day) in layer_outcomes["latest"].items()
+                                if outcome == "survived" and (verdict_day is None or date.fromisoformat(day) > verdict_day)),
+                               key=lambda survivor: survivor["repository"])
         recorded_repositories = {host_receipts.normalize_repository(item.get("repository"))
                                  for role in ("winners", "alternatives", "candidates") for item in _dicts(row.get(role))}
         layers.append({
@@ -1332,7 +1502,9 @@ def is_definitive(document: dict, ident: str, today, *, layer: str | None = None
     for key in winner_keys:
         row = layers[key]
         next_review = (row.get("verdict") or {}).get("next_review")
-        if row["status"] not in DEFINITIVE_STATUSES:
+        if "FINAL" in (row.get("terminal_state"), row.get("verdict_status"), (row.get("verdict") or {}).get("status")):
+            reasons.setdefault(FINAL_ADMISSION_REFUSAL, []).append(layer_key(*key))
+        elif row["status"] not in DEFINITIVE_STATUSES:
             reasons.setdefault(row["status"], []).append(layer_key(*key))
         elif next_review is None or today > date.fromisoformat(next_review):
             reasons.setdefault("stale", []).append(layer_key(*key))
@@ -1364,6 +1536,9 @@ def run_pin(document: dict, ident: str) -> dict | None:
 def flags(document: dict, today: date | None) -> dict:
     """The v1 report-only findings: winners without a run pin, pin drift and (with ``today``) verdicts past
     next_review."""
+    for layer in document["layers"]:
+        refuse_final(layer, error_type=FinalStackError)
+        refuse_final({"verdict_status": (layer.get("verdict") or {}).get("status")}, error_type=FinalStackError)
     winners = [(layer_key(layer["catalog"], layer["layer_id"]), winner)
                for layer in document["layers"] for winner in layer["winners"]]
     stale = None
