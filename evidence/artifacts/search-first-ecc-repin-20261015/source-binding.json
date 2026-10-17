@@ -1,0 +1,54 @@
+{
+  "kind": "upstream_skill_source_binding",
+  "evidence_class": "source_review",
+  "repository": "https://github.com/affaan-m/ECC",
+  "selected_pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+  "selected_tree": "89e0ce14188958a85fbfc7ae0bdc30a0dc9681e1",
+  "previous_pin": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f",
+  "previous_tree": "3ac0daf42ee5c7d0cbe28c399f02ff057283b889",
+  "upstream_head_checked": "b92f181b3b748d1abbc2afd94af6aa7d8c8fca29",
+  "commands": [
+    "git clone --bare --filter=blob:none https://github.com/affaan-m/ECC.git <scratch>/ecc.git",
+    "git --git-dir=<scratch>/ecc.git rev-parse <ref>:skills/<skill>",
+    "git --git-dir=<scratch>/ecc.git show <ref>:skills/<skill>/SKILL.md",
+    "git --git-dir=<scratch>/ecc.git diff dd6ee538aee0f548d4a6b520118f875431fd749e c70874fae9eb0e5ad0365beb7e2955899fd1d30f -- skills/search-first/SKILL.md"
+  ],
+  "selected_source": {
+    "path": "sources/search-first-selected.md",
+    "sha256": "d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733",
+    "bytes": 8021,
+    "description_chars": 141
+  },
+  "previous_source": {
+    "path": "sources/search-first-previous.md",
+    "sha256": "76835db48dd910061d2e4271b1151793d2fddbabeb2d2866eed068b3580c55d5",
+    "bytes": 8210,
+    "description_chars": 328
+  },
+  "body_difference": "Only the frontmatter description differs; the Markdown body is byte-identical.",
+  "iterative_retrieval": {
+    "path": "sources/iterative-retrieval.md",
+    "tree_sha": "1f1e8d67cf41d72acf2315dc7e6edeac0fc231a6",
+    "sha256": "b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725",
+    "bytes": 6786,
+    "identical_refs": [
+      "dd6ee538aee0f548d4a6b520118f875431fd749e",
+      "2b6e839771e53096d8451a213d40dc64ec8acac0",
+      "c70874fae9eb0e5ad0365beb7e2955899fd1d30f",
+      "b92f181b3b748d1abbc2afd94af6aa7d8c8fca29"
+    ],
+    "manifest_changed": false
+  },
+  "native_positive_payload_check": {
+    "evidence_class": "local_integration",
+    "isolated_project_base_in_native_skill_result": true,
+    "complete_selected_body_in_native_skill_result": true,
+    "project_file_matches_selected_public_sha256": true,
+    "private_transcript_published": false
+  },
+  "host_install_performed": false,
+  "limitations": [
+    "Source equality is not activation evidence; native trigger cases are recorded separately.",
+    "Historical audit fields are unchanged and do not represent a fresh security review."
+  ]
+}

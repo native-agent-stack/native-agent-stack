@@ -1,0 +1,39 @@
+{
+  "kind": "fail_first_pin_regression",
+  "evidence_class": "local_integration",
+  "base": "ec15c903751cf2f6ed906a6ad10df8c61f04f1c7",
+  "command": "python3 -m unittest tests.test_search_first_ecc_pin -v",
+  "before": {
+    "tests": 1,
+    "failures": 1,
+    "errors": 0,
+    "exit_code": 1,
+    "expected_stack_ref": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+    "actual_skill_ref": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f"
+  },
+  "after": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "exit_code": 0
+  },
+  "targeted_checks": {
+    "command": "python3 -m unittest tests.test_search_first_ecc_pin tests.test_skills_manifest tests.test_runtime_worker_skills tests.test_install_skills.ReuseRefGateTests -v",
+    "tests": 66,
+    "failures": 0,
+    "errors": 0,
+    "exit_code": 0
+  },
+  "installer_plan": {
+    "command": "python3 tools/adoption/install_skills.py --only search-first --dry-run --json",
+    "exit_code": 0,
+    "summary": {
+      "dry_run": true,
+      "ok": true,
+      "skills": {
+        "search-first": "planned"
+      }
+    },
+    "host_install_performed": false
+  }
+}

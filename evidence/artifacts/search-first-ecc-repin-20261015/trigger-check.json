@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "kind": "skill_repin_trigger_measurement",
+  "evidence_class": "native_proven",
+  "repository": "https://github.com/affaan-m/ECC",
+  "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+  "tree_sha": "89e0ce14188958a85fbfc7ae0bdc30a0dc9681e1",
+  "skill_md_sha256": "d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733",
+  "cases": [
+    {
+      "case": "positive",
+      "client": "claude-code",
+      "client_version": "2.1.300 (Claude Code)",
+      "elapsed_seconds": 13.253,
+      "evidence_class": "native_proven",
+      "exit_code": 0,
+      "kind": "native_skill_trigger_check",
+      "limits": [
+        "One prompt per case; no quality-parity or broad trigger-reliability claim.",
+        "The model may solve a task without loading the skill; a negative result is retained.",
+        "This isolated trigger measurement is not a production invocation receipt or host install acceptance."
+      ],
+      "measurement_scope": "Fresh native project-scoped skill fixture; no host skill install or stored user configuration change. Read-only tools; no external searches or delegated agents permitted.",
+      "model": "claude-sonnet-5-5",
+      "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+      "result_is_error": false,
+      "result_subtype": "success",
+      "search_first_skill_tool_calls": 1,
+      "skill_discovered": true,
+      "source": "https://github.com/affaan-m/ECC",
+      "tool_calls": [
+        {
+          "skill": "search-first",
+          "tool": "Skill"
+        },
+        {
+          "skill": null,
+          "tool": "Glob"
+        },
+        {
+          "skill": null,
+          "tool": "Grep"
+        }
+      ],
+      "tree_sha": "89e0ce14188958a85fbfc7ae0bdc30a0dc9681e1",
+      "usage": {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 8336,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 8336,
+        "cache_read_input_tokens": 40533,
+        "fallback_credit": null,
+        "inference_geo": "global",
+        "input_tokens": 6,
+        "iterations": [
+          {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 568,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 568,
+            "cache_read_input_tokens": 17049,
+            "input_tokens": 2,
+            "output_tokens": 755,
+            "type": "message"
+          }
+        ],
+        "output_tokens": 1115,
+        "output_tokens_details": {
+          "thinking_tokens": 147
+        },
+        "server_tool_use": {
+          "web_fetch_requests": 0,
+          "web_search_requests": 0
+        },
+        "service_tier": "standard",
+        "speed": "standard"
+      },
+      "window_end": "2026-10-15T06:40:08.951132Z",
+      "window_start": "2026-10-15T06:39:55.699222Z"
+    },
+    {
+      "case": "negative",
+      "client": "claude-code",
+      "client_version": "2.1.300 (Claude Code)",
+      "elapsed_seconds": 2.725,
+      "evidence_class": "native_proven",
+      "exit_code": 0,
+      "kind": "native_skill_trigger_check",
+      "limits": [
+        "One prompt per case; no quality-parity or broad trigger-reliability claim.",
+        "The model may solve a task without loading the skill; a negative result is retained.",
+        "This isolated trigger measurement is not a production invocation receipt or host install acceptance."
+      ],
+      "measurement_scope": "Fresh native project-scoped skill fixture; no host skill install or stored user configuration change. Read-only tools; no external searches or delegated agents permitted.",
+      "model": "claude-sonnet-5-5",
+      "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+      "result_is_error": false,
+      "result_subtype": "success",
+      "search_first_skill_tool_calls": 0,
+      "skill_discovered": true,
+      "source": "https://github.com/affaan-m/ECC",
+      "tool_calls": [],
+      "tree_sha": "89e0ce14188958a85fbfc7ae0bdc30a0dc9681e1",
+      "usage": {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 4862,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 4862,
+        "cache_read_input_tokens": 9281,
+        "fallback_credit": null,
+        "inference_geo": "global",
+        "input_tokens": 2,
+        "iterations": [
+          {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 4862,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 4862,
+            "cache_read_input_tokens": 9281,
+            "input_tokens": 2,
+            "output_tokens": 3,
+            "type": "message"
+          }
+        ],
+        "output_tokens": 3,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_fetch_requests": 0,
+          "web_search_requests": 0
+        },
+        "service_tier": "standard",
+        "speed": "standard"
+      },
+      "window_end": "2026-10-15T06:40:14.988551Z",
+      "window_start": "2026-10-15T06:40:12.263588Z"
+    }
+  ],
+  "commands": {
+    "fixture": "git archive dd6ee538aee0f548d4a6b520118f875431fd749e skills/search-first; export unchanged tree to independent scratch project .claude/skills/search-first",
+    "native": "claude -p <frozen case prompt> --output-format stream-json --verbose --effort medium --max-turns 4 --no-session-persistence --setting-sources project --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --allowedTools Read,Grep,Glob,Skill --disallowedTools Edit,Write,Bash,NotebookEdit,Agent,WebSearch,WebFetch",
+    "positive_prompt": "I need to add exponential-backoff retry logic to an HTTP client used in this project. Before writing any custom code, search for existing tools, libraries and patterns already available for this, then summarize what you found in 3 bullet points. Do not edit any files.",
+    "negative_prompt": "What is the sum of 17 and 25? Answer with only the number."
+  },
+  "result": "Target-tree trigger observed once on the close-paraphrase task; no Skill call on arithmetic control. Both native cases exited0. No host install.",
+  "accounting": {
+    "production_window_start": null,
+    "reason": "Re-pin has not landed or been installed; probe timestamps are not the production activation cutoff.",
+    "claude_f2_pr": 1137,
+    "owner": "cc-native-practice",
+    "failed_pin": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f",
+    "follow_up": "After landing/install, record actual install timestamp and failed-pin window before re-including search-first activations."
+  },
+  "limitations": [
+    "N=1 per case; no comparative model-quality or general trigger-reliability inference.",
+    "Earlier historical native trigger receipt used a different client/model; it is retained and not silently superseded as a same-model comparison.",
+    "Isolated project skill scope is native mechanism measurement, not a global installation or production invocation receipt.",
+    "No transcripts, local session identifiers, private raw-output hashes or credential-bearing data published."
+  ]
+}
