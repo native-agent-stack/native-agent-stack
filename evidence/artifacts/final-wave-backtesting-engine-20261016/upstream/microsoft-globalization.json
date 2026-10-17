@@ -1,0 +1,8 @@
+{
+  "url": "https://learn.microsoft.com/en-us/dotnet/core/runtime-config/globalization",
+  "retrieved_date": "2026-10-16",
+  "section": "Invariant mode",
+  "extract": "Invariant mode Determines whether a .NET Core app runs in globalization-invariant mode without access to culture-specific data and behavior. If you omit this setting, the app runs with access to cultural data. This is equivalent to setting the value to false . For more information, see .NET Core globalization invariant mode . Setting name Values runtimeconfig.json System.Globalization.Invariant false - access to cultural data true - run in invariant mode MSBuild property InvariantGlobalization false - access to cultural data true - run in invariant mode Environment variable DOTNET_SYSTEM_GLOBALIZATION_INVARIANT 0 - access to cultural data 1 - run in invariant mode Examples runtimeconfig.json file: { \"runtimeOptions\": { \"configProperties\": { \"System.Globalization.Invariant\": true } } } runtimeconfig.template.json file: { \"configProperties\": { \"System.Globalization.Invariant\": true } } Project file: <Project Sdk=\"Microsoft.NET.Sdk\"> <PropertyGroup> <InvariantGlobalization>true</InvariantGlobalization> </PropertyGroup> </Project>",
+  "citation_scope": "Microsoft page as served on retrieval date; runtime flag changes culture behavior, not a LEAN pin change",
+  "source_pin": "served-page-2026-10-16 (dated observation, not a Git revision)"
+}

@@ -1,0 +1,18 @@
+Script started on 2026-10-16 01:45:59-04:00 [COMMAND="cd [RECAPTURE]/before && PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_final_backtesting_capture_mask.py -k test_publication_contains_the_masking_rule -v" <not executed on terminal>]
+test_publication_contains_the_masking_rule (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_publication_contains_the_masking_rule) ... FAIL
+
+======================================================================
+FAIL: test_publication_contains_the_masking_rule (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_publication_contains_the_masking_rule)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "[RECAPTURE]/before/tests/test_final_backtesting_capture_mask.py", line 25, in test_publication_contains_the_masking_rule
+    self.assertTrue(RULE.is_file(), "Published native derivatives require the reproducible rule")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Published native derivatives require the reproducible rule
+
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+FAILED (failures=1)
+
+Script done on 2026-10-16 01:45:59-04:00 [COMMAND_EXIT_CODE="1"]

@@ -1,0 +1,13 @@
+Using Python 3.12.3 environment at: [SCRATCH]/nautilus-venv
+Resolved 14 packages in 190ms
+Prepared 1 package in 29ms
+Installed 9 packages in 199ms
+ + fsspec==2026.9.0
+ + msgspec==0.22.0
+ + numpy==2.5.4
+ + pandas==3.0.6
+ + pyarrow==25.0.1
+ + pytest-asyncio==1.4.0
+ + python-dateutil==2.9.0.post0
+ + six==1.17.0
+ + typing-extensions==4.16.0

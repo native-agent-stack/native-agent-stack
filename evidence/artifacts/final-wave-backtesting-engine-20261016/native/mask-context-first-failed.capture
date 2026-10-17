@@ -1,0 +1,148 @@
+Script started on 2026-10-16 04:30:13-04:00 [COMMAND="cd [WORKTREE] && PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_final_backtesting_capture_mask.py -v" <not executed on terminal>]
+test_cli_hashes_only_deterministic_published_bytes_and_keeps_raw (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_cli_hashes_only_deterministic_published_bytes_and_keeps_raw) ... [WORKTREE]/scripts/host_receipts.py:36: ImportWarning: can't resolve package from __spec__ or __package__, falling back on __name__ and __path__
+  from .validate import PRIVATE_CONTENT
+ERROR
+test_declared_host_spec_fields_are_masked_without_losing_results (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_declared_host_spec_fields_are_masked_without_losing_results) ... [WORKTREE]/scripts/host_receipts.py:36: ImportWarning: can't resolve package from __spec__ or __package__, falling back on __name__ and __path__
+  from .validate import PRIVATE_CONTENT
+ERROR
+test_empty_mapping_refuses (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_empty_mapping_refuses) ... ok
+test_hostname_is_required_instead_of_implicit_host_discovery (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_hostname_is_required_instead_of_implicit_host_discovery) ... ok
+test_masks_only_declared_identity_fields_preserving_observation (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_masks_only_declared_identity_fields_preserving_observation) ... [WORKTREE]/scripts/host_receipts.py:36: ImportWarning: can't resolve package from __spec__ or __package__, falling back on __name__ and __path__
+  from .validate import PRIVATE_CONTENT
+ERROR
+test_native_xml_counter_capture_stays_parseable_after_identity_mask (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_native_xml_counter_capture_stays_parseable_after_identity_mask) ... [WORKTREE]/scripts/host_receipts.py:36: ImportWarning: can't resolve package from __spec__ or __package__, falling back on __name__ and __path__
+  from .validate import PRIVATE_CONTENT
+ERROR
+test_publication_contains_the_masking_rule (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_publication_contains_the_masking_rule) ... ok
+test_published_native_bytes_survive_git_eol_filters (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_published_native_bytes_survive_git_eol_filters) ... ok
+test_sanitizer_rejects_bytes_that_differ_from_the_cited_pin (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_sanitizer_rejects_bytes_that_differ_from_the_cited_pin) ... ok
+test_untouched_native_bytes_are_not_summarized_or_truncated (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_untouched_native_bytes_are_not_summarized_or_truncated) ... [WORKTREE]/scripts/host_receipts.py:36: ImportWarning: can't resolve package from __spec__ or __package__, falling back on __name__ and __path__
+  from .validate import PRIVATE_CONTENT
+ERROR
+
+======================================================================
+ERROR: test_cli_hashes_only_deterministic_published_bytes_and_keeps_raw (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_cli_hashes_only_deterministic_published_bytes_and_keeps_raw)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "[WORKTREE]/scripts/host_receipts.py", line 36, in <module>
+    from .validate import PRIVATE_CONTENT
+ImportError: attempted relative import with no known parent package
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "[WORKTREE]/tests/test_final_backtesting_capture_mask.py", line 114, in test_cli_hashes_only_deterministic_published_bytes_and_keeps_raw
+    load_mask().main(args)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "[WORKTREE]/evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py", line 86, in main
+    masked = mask_bytes(args.raw.read_bytes(), args.replace, **context)
+  File "[WORKTREE]/evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py", line 65, in mask_bytes
+    text = load_sanitizer(home=home, username=username)(text)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[WORKTREE]/evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py", line 34, in load_sanitizer
+    exec(compile(source, str(source_path), "exec"), namespace)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[WORKTREE]/scripts/host_receipts.py", line 39, in <module>
+    from validate import PRIVATE_CONTENT
+ModuleNotFoundError: No module named 'validate'
+
+======================================================================
+ERROR: test_declared_host_spec_fields_are_masked_without_losing_results (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_declared_host_spec_fields_are_masked_without_losing_results)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "[WORKTREE]/scripts/host_receipts.py", line 36, in <module>
+    from .validate import PRIVATE_CONTENT
+ImportError: attempted relative import with no known parent package
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "[WORKTREE]/tests/test_final_backtesting_capture_mask.py", line 31, in test_declared_host_spec_fields_are_masked_without_losing_results
+    masked = load_mask().mask_bytes(raw, hostname='fixture-host')
+  File "[WORKTREE]/evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py", line 65, in mask_bytes
+    text = load_sanitizer(home=home, username=username)(text)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[WORKTREE]/evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py", line 34, in load_sanitizer
+    exec(compile(source, str(source_path), "exec"), namespace)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[WORKTREE]/scripts/host_receipts.py", line 39, in <module>
+    from validate import PRIVATE_CONTENT
+ModuleNotFoundError: No module named 'validate'
+
+======================================================================
+ERROR: test_masks_only_declared_identity_fields_preserving_observation (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_masks_only_declared_identity_fields_preserving_observation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "[WORKTREE]/scripts/host_receipts.py", line 36, in <module>
+    from .validate import PRIVATE_CONTENT
+ImportError: attempted relative import with no known parent package
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "[WORKTREE]/tests/test_final_backtesting_capture_mask.py", line 62, in test_masks_only_declared_identity_fields_preserving_observation
+    result = load_mask().mask_bytes(raw, [("/private/fixture", "<PREFIX>")],
+                             hostname="fixture-host")
+  File "[WORKTREE]/evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py", line 65, in mask_bytes
+    text = load_sanitizer(home=home, username=username)(text)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[WORKTREE]/evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py", line 34, in load_sanitizer
+    exec(compile(source, str(source_path), "exec"), namespace)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[WORKTREE]/scripts/host_receipts.py", line 39, in <module>
+    from validate import PRIVATE_CONTENT
+ModuleNotFoundError: No module named 'validate'
+
+======================================================================
+ERROR: test_native_xml_counter_capture_stays_parseable_after_identity_mask (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_native_xml_counter_capture_stays_parseable_after_identity_mask)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "[WORKTREE]/scripts/host_receipts.py", line 36, in <module>
+    from .validate import PRIVATE_CONTENT
+ImportError: attempted relative import with no known parent package
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "[WORKTREE]/tests/test_final_backtesting_capture_mask.py", line 82, in test_native_xml_counter_capture_stays_parseable_after_identity_mask
+    masked = load_mask().mask_bytes(raw, hostname="fixture-host")
+  File "[WORKTREE]/evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py", line 65, in mask_bytes
+    text = load_sanitizer(home=home, username=username)(text)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[WORKTREE]/evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py", line 34, in load_sanitizer
+    exec(compile(source, str(source_path), "exec"), namespace)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[WORKTREE]/scripts/host_receipts.py", line 39, in <module>
+    from validate import PRIVATE_CONTENT
+ModuleNotFoundError: No module named 'validate'
+
+======================================================================
+ERROR: test_untouched_native_bytes_are_not_summarized_or_truncated (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_untouched_native_bytes_are_not_summarized_or_truncated)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "[WORKTREE]/scripts/host_receipts.py", line 36, in <module>
+    from .validate import PRIVATE_CONTENT
+ImportError: attempted relative import with no known parent package
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "[WORKTREE]/tests/test_final_backtesting_capture_mask.py", line 74, in test_untouched_native_bytes_are_not_summarized_or_truncated
+    self.assertEqual(raw, load_mask().mask_bytes(raw, hostname="fixture-host"))
+                          ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[WORKTREE]/evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py", line 65, in mask_bytes
+    text = load_sanitizer(home=home, username=username)(text)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[WORKTREE]/evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py", line 34, in load_sanitizer
+    exec(compile(source, str(source_path), "exec"), namespace)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[WORKTREE]/scripts/host_receipts.py", line 39, in <module>
+    from validate import PRIVATE_CONTENT
+ModuleNotFoundError: No module named 'validate'
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.186s
+
+FAILED (errors=5)
+
+Script done on 2026-10-16 04:30:13-04:00 [COMMAND_EXIT_CODE="1"]

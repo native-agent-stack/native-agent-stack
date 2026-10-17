@@ -1,0 +1,15 @@
+Script started on 2026-10-16 02:23:54-04:00 [COMMAND="cd [WORKTREE] && PYTHONDONTWRITEBYTECODE=1 TMPDIR=/var/tmp python3 -m unittest tests.test_final_backtesting_capture_mask -v" <not executed on terminal>]
+test_cli_hashes_only_deterministic_published_bytes_and_keeps_raw (tests.test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_cli_hashes_only_deterministic_published_bytes_and_keeps_raw) ... ok
+test_empty_mapping_refuses (tests.test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_empty_mapping_refuses) ... ok
+test_masks_only_declared_identity_fields_preserving_observation (tests.test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_masks_only_declared_identity_fields_preserving_observation) ... ok
+test_native_xml_counter_capture_stays_parseable_after_identity_mask (tests.test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_native_xml_counter_capture_stays_parseable_after_identity_mask) ... ok
+test_publication_contains_the_masking_rule (tests.test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_publication_contains_the_masking_rule) ... ok
+test_published_native_bytes_survive_git_eol_filters (tests.test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_published_native_bytes_survive_git_eol_filters) ... ok
+test_untouched_native_bytes_are_not_summarized_or_truncated (tests.test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_untouched_native_bytes_are_not_summarized_or_truncated) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.060s
+
+OK
+
+Script done on 2026-10-16 02:23:54-04:00 [COMMAND_EXIT_CODE="0"]

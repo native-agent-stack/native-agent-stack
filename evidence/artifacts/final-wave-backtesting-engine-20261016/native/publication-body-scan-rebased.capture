@@ -1,0 +1,5 @@
+Script started on 2026-10-16 10:08:51-04:00 [COMMAND="cd [LANDING] && gitleaks stdin --redact --no-banner --exit-code 1 < [RECAPTURE]/pr-body-fold.md" <not executed on terminal>]
+10:08AM INF scanned ~8633 bytes (8.63 KB) in 148ms
+10:08AM INF no leaks found
+
+Script done on 2026-10-16 10:08:52-04:00 [COMMAND_EXIT_CODE="0"]

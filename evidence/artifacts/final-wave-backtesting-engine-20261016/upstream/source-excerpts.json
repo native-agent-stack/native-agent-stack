@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "scope": "Exact source-evidence excerpts from official commit archives; no runtime fork or source change",
+  "snippets": [
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "docs/getting_started/installation.md",
+      "start_line": 45,
+      "end_line": 63,
+      "text": ":::warning[Install the 2.x wheel for these docs]\nThis documentation covers NautilusTrader 2.x. PyPI still resolves a plain\n`uv pip install nautilus_trader` to the 1.x line, whose Python API differs, so the code on these\npages fails with `ImportError` and `TypeError` against a 1.x install. Pass `--pre` until `2.0.0`\nis released, and confirm that\n`python -c \"import nautilus_trader; print(nautilus_trader.__version__)\"` reports a `2.` version.\n:::\n\nNautilusTrader publishes 2.x release-candidate wheels to PyPI using `2.0.0rcN` versions while final\nvalidation is in progress. To install the latest\n[nautilus_trader](https://pypi.org/project/nautilus_trader/) binary wheel (or sdist package):\n\n```bash\nuv pip install --pre nautilus_trader\n```\n\nThe `--pre` flag is required because these wheels are pre-release builds. The installed import name\nis still `nautilus_trader`.\n",
+      "source_url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/installation.md#L45",
+      "source_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "CONTRIBUTING.md",
+      "start_line": 90,
+      "end_line": 99,
+      "text": "Include tests that cover changed behavior or logic. Running the relevant target locally first saves\na round trip:\n\n- `make cargo-test` runs the Rust tests.\n- `make pytest` runs the Python tests, building the extension and stubs first.\n\nRust tests use `#[rstest]` rather than `#[test]`, including non-parameterized ones, and pre-commit\nenforces this (`#[tokio::test]` is fine for async tests). See\n[Testing](docs/developer_guide/testing.md) for the wider conventions.\n",
+      "source_url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/CONTRIBUTING.md#L90",
+      "source_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "Makefile",
+      "start_line": 1369,
+      "end_line": 1374,
+      "text": ".PHONY: pytest\npytest: build-debug  #-- Run Python tests\n\t$(info $(M) Running Python tests...)\n\t$Q cd python && $(PYTHON_TEST_ENV) VIRTUAL_ENV= uv run --no-sync pytest -qq -rfE tests/ --ignore=tests/unit/test_live_node.py\n\t$Q cd python && $(PYTHON_TEST_ENV) VIRTUAL_ENV= uv run --no-sync pytest -qq -rfE tests/unit/test_live_node.py\n",
+      "source_url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/Makefile#L1369",
+      "source_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "python/pyproject.toml",
+      "start_line": 144,
+      "end_line": 162,
+      "text": "  \"urllib3\",\n  \"uvicorn\",\n  \"uvloop\",\n]\n\n[dependency-groups]\ndev = [\"maturin==1.15.0\", \"ruff>=0.16.7\", \"ty>=0.0.78\"]\ntest = [\n  \"pytest>=9.1.1\",\n  \"pytest-asyncio>=1.4.0\",\n  \"pytest-cov>=7.1.0\",\n  \"pytest-memray>=1.10.0; sys_platform == 'darwin' or sys_platform == 'linux'\",\n  \"pytest-xdist[psutil]>=3.8.0\",\n  \"uvicorn>=0.52.4\",\n  \"uvloop>=0.22.1; sys_platform != 'win32'\",\n]\ndocs = [\n  \"furo==2025.12.19\",\n  \"linkify-it-py>=2.1.0,<3.0.0\",",
+      "source_url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/pyproject.toml#L144",
+      "source_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
+    },
+    {
+      "repository": "QuantConnect/Lean",
+      "commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "path": "readme.md",
+      "start_line": 160,
+      "end_line": 173,
+      "text": "### Linux (Debian, Ubuntu)\n\n- Install [dotnet 10](https://docs.microsoft.com/en-us/dotnet/core/install/linux):\n- Compile Lean Solution:\n```\ndotnet build QuantConnect.Lean.sln\n```\n- Run Lean:\n```\ncd Launcher/bin/Debug\ndotnet QuantConnect.Lean.Launcher.dll\n```\n\n### Windows",
+      "source_url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/readme.md#L160",
+      "source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f"
+    },
+    {
+      "repository": "QuantConnect/Lean",
+      "commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "path": "Tests/QuantConnect.Tests.csproj",
+      "start_line": 1,
+      "end_line": 12,
+      "text": "<Project Sdk=\"Microsoft.NET.Sdk\">\n  <PropertyGroup>\n    <Configuration Condition=\" '$(Configuration)' == '' \">Debug</Configuration>\n    <Platform Condition=\" '$(Platform)' == '' \">AnyCPU</Platform>\n    <RootNamespace>QuantConnect.Tests</RootNamespace>\n    <AssemblyName>QuantConnect.Tests</AssemblyName>\n    <TargetFramework>net10.0</TargetFramework>\n    <SolutionDir Condition=\"$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'\">..\\</SolutionDir>\n    <AnalysisMode>AllEnabledByDefault</AnalysisMode>\n    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>\n    <OutputPath>bin\\$(Configuration)\\</OutputPath>\n    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>",
+      "source_url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Tests/QuantConnect.Tests.csproj#L1",
+      "source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f"
+    },
+    {
+      "repository": "QuantConnect/Lean",
+      "commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "path": "Common/Python/PythonInitializer.cs",
+      "start_line": 185,
+      "end_line": 195,
+      "text": "\n        /// <summary>\n        /// \"Activate\" a virtual Python environment by prepending its library storage to Pythons\n        /// path. This allows the libraries in this venv to be selected prior to our base install.\n        /// Requires PYTHONNET_PYDLL to be set to base install.\n        /// </summary>\n        /// <remarks>If a module is already loaded, Python will use its cached version first\n        /// these modules must be reloaded by reload() from importlib library</remarks>\n        public static bool ActivatePythonVirtualEnvironment(string pathToVirtualEnv)\n        {\n            if (string.IsNullOrEmpty(pathToVirtualEnv))",
+      "source_url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Python/PythonInitializer.cs#L185",
+      "source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f"
+    }
+  ]
+}

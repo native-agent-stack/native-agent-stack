@@ -1,0 +1,3 @@
+Script started on 2026-10-16 01:55:07-04:00 [COMMAND="curl --fail --location --silent --show-error https://api.github.com/repos/QuantConnect/Lean/tarball/985ef30ad3ac774218c5ac516b4cb0aa2655730f --output [RECAPTURE]/lean-source.tar.gz" <not executed on terminal>]
+
+Script done on 2026-10-16 01:55:17-04:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,3 @@
+Script started on 2026-10-16 02:07:04-04:00 [COMMAND="cmp [RECAPTURE]/upstream-lean/Tests/Common/Brokerages/AlpacaBrokerageModelTests.cs [SCRATCH]/lean-source/Tests/Common/Brokerages/AlpacaBrokerageModelTests.cs && cmp [RECAPTURE]/upstream-lean/Tests/QuantConnect.Tests.csproj [SCRATCH]/lean-source/Tests/QuantConnect.Tests.csproj && cmp [RECAPTURE]/upstream-lean/Common/Python/PythonInitializer.cs [SCRATCH]/lean-source/Common/Python/PythonInitializer.cs" <not executed on terminal>]
+
+Script done on 2026-10-16 02:07:04-04:00 [COMMAND_EXIT_CODE="0"]

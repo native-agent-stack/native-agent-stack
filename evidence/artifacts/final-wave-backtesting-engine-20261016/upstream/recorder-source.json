@@ -1,0 +1,29 @@
+{
+  "representation": "source_review_excerpt_not_run_receipt",
+  "repository": "util-linux/util-linux",
+  "pin": "v2.41.3",
+  "path": "term-utils/script.1.adoc",
+  "snippets": [
+    {
+      "start_line": 54,
+      "end_line": 58,
+      "text": "*script* makes a typescript of everything on your terminal session. The terminal data are stored in raw form to the log file and information about timing to another (optional) structured log file. The timing log file is necessary to replay the session later by *scriptreplay*(1) and to store additional information about the session.\n\nSince version 2.35, *script* supports multiple streams and allows the logging of input and output to separate files or all the one file. This version also supports a new timing file which records additional information. The command *scriptreplay --summary* then provides all the information.\n\nIf the argument _file_ or option *--log-out* _file_ is given, *script* saves the dialogue in this _file_. If no filename is given, the dialogue is saved in the file _typescript_.",
+      "source_url": "https://github.com/util-linux/util-linux/blob/v2.41.3/term-utils/script.1.adoc#L54",
+      "source_pin": "v2.41.3"
+    },
+    {
+      "start_line": 69,
+      "end_line": 70,
+      "text": "*-c*, *--command* _command_::\nRun the _command_ rather than an interactive shell. This makes it easy for a script to capture the output of a program that behaves differently when its stdout is not a tty.",
+      "source_url": "https://github.com/util-linux/util-linux/blob/v2.41.3/term-utils/script.1.adoc#L69",
+      "source_pin": "v2.41.3"
+    },
+    {
+      "start_line": 79,
+      "end_line": 80,
+      "text": "*-e*, *--return*::\nReturn the exit status of the child process. Uses the same format as bash termination on signal termination (i.e., exit status is 128 {plus} the signal number). The exit status of the child process is always stored in the type script file too.",
+      "source_url": "https://github.com/util-linux/util-linux/blob/v2.41.3/term-utils/script.1.adoc#L79",
+      "source_pin": "v2.41.3"
+    }
+  ]
+}

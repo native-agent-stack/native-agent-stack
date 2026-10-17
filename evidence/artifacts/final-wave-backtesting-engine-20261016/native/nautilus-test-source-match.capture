@@ -1,0 +1,3 @@
+Script started on 2026-10-16 01:46:37-04:00 [COMMAND="cmp [RECAPTURE]/upstream-nautilus/python/tests/unit/backtest/test_backtest_engine_statistics.py [SCRATCH]/nautilus-source/python/tests/unit/backtest/test_backtest_engine_statistics.py && cmp [RECAPTURE]/upstream-nautilus/python/tests/unit/backtest/test_backtest_configs.py [SCRATCH]/nautilus-source/python/tests/unit/backtest/test_backtest_configs.py && cmp [RECAPTURE]/upstream-nautilus/python/tests/unit/backtest/test_backtest_engine_default_ids.py [SCRATCH]/nautilus-source/python/tests/unit/backtest/test_backtest_engine_default_ids.py" <not executed on terminal>]
+
+Script done on 2026-10-16 01:46:37-04:00 [COMMAND_EXIT_CODE="0"]

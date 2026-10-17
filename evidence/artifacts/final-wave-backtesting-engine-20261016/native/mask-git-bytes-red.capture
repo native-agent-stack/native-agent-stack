@@ -1,0 +1,18 @@
+Script started on 2026-10-16 02:23:39-04:00 [COMMAND="cd [WORKTREE] && PYTHONDONTWRITEBYTECODE=1 TMPDIR=/var/tmp python3 -m unittest tests.test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_published_native_bytes_survive_git_eol_filters -v" <not executed on terminal>]
+test_published_native_bytes_survive_git_eol_filters (tests.test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_published_native_bytes_survive_git_eol_filters) ... FAIL
+
+======================================================================
+FAIL: test_published_native_bytes_survive_git_eol_filters (tests.test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_published_native_bytes_survive_git_eol_filters)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "[WORKTREE]/tests/test_final_backtesting_capture_mask.py", line 74, in test_published_native_bytes_survive_git_eol_filters
+    self.assertEqual(native, git('show', ':fixture.capture'))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'47 passed\r\nCOMMAND_EXIT_CODE="0"\r\n' != b'47 passed\nCOMMAND_EXIT_CODE="0"\n'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.028s
+
+FAILED (failures=1)
+
+Script done on 2026-10-16 02:23:39-04:00 [COMMAND_EXIT_CODE="1"]

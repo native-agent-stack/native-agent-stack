@@ -1,0 +1,5 @@
+Script started on 2026-10-16 02:21:53-04:00 [COMMAND="cd [WORKTREE] && PYTHONDONTWRITEBYTECODE=1 TMPDIR=/var/tmp python3 scripts/validate.py" <not executed on terminal>]
+{"components": 71, "hashed_files": 12271, "profiles": 4, "receipts": 240, "status": "passed"}
+Integrity and scope checks only; no live provider or GPU execution.
+
+Script done on 2026-10-16 02:22:52-04:00 [COMMAND_EXIT_CODE="0"]

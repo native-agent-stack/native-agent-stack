@@ -19452,6 +19452,11 @@
       "bytes": 9884
     },
     {
+      "path": "docs/decisions/2026-10-16-backtesting-engine-final-preparation.md",
+      "sha256": "109a26116cf3f9b0b207c06814a0f487b43003ceaf6f4d1386bd8283e0c065e2",
+      "bytes": 12441
+    },
+    {
       "path": "docs/decisions/2026-10-16-nautilus-rc5-run-source-pin.md",
       "sha256": "a2ceae122b37a9df4c9fb53a53f3bf4a1eb188cc51a60a4c564cf857d4a25014",
       "bytes": 6261
@@ -23190,6 +23195,491 @@
       "path": "evidence/artifacts/final-durable-memory-20261016/validation-outputs/default-weights-stated.txt",
       "sha256": "5a4b3cc42145d69f54793707c66da52d176af6c3a98cce481d851fff595ff152",
       "bytes": 167
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/execution-receipt.json",
+      "sha256": "6e53ee452bc142924f63b1436d7ef79f78c97ca64d17eaea4cf5eac37da6492f",
+      "bytes": 9751
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/latest-sweep-candidates.json",
+      "sha256": "7361c54a31552c4c390a0af6677b72552d6249c514b468cc4f07271ee4d3d22a",
+      "bytes": 8524
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/layer-packet.json",
+      "sha256": "bf6552e6e210ae6478ae11da82310f423ab95bb140728e0465e73385d1107cdc",
+      "bytes": 23564
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/lean-failure-summary.json",
+      "sha256": "d0e8f3d51991554798b7c7ef7ad8e1f7579a2e7320a64ed347c08871a000f4e3",
+      "bytes": 3138
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/.gitattributes",
+      "sha256": "d36b95ced24f230ceec469fd02f3d553d2de4e05d264e65e2c93980edfdc8e1d",
+      "bytes": 277
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/bwrap-version.stdout.log",
+      "sha256": "3982b5c6efde838f903123b493520814ab1b56dfb7f35ac96af62ef443eb6acc",
+      "bytes": 18
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/dotnet-version-invariant.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/dotnet-version-invariant.stdout.log",
+      "sha256": "93c11b5221b72e0032ab2d9f93d28c2c9b7a0bb2557effffcdfef45ab739a0da",
+      "bytes": 9
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/dotnet-version.stderr.log",
+      "sha256": "5720ca4b46a6e6a56891b98551154a52d5b26a58d6175d4df9b68fb412b3a860",
+      "bytes": 1243
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/dotnet-version.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/final-validate-attributes.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/final-validate-attributes.stdout.log",
+      "sha256": "eb531c0d61b705684b62396fe72ae6a43ef97f774f89d035b1621a7dde6bdb7b",
+      "bytes": 162
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/final-validate-corrected.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/final-validate-corrected.stdout.log",
+      "sha256": "04b3b5248c0964e437522115467e4c1af95d07c309c5f0dad7de87bd47318304",
+      "bytes": 162
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/final-validate.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/final-validate.stdout.log",
+      "sha256": "6d87c9260ea69345b0a01279a9998f4e26b493c5a0f830ebe38077911475a3a6",
+      "bytes": 165
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/installed-runtime-version.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/installed-runtime-version.stdout.log",
+      "sha256": "07ca6367b5d8d1c1cb97ca7747feb6283d5c39e03497d828d680062d95b0cf5e",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/lean-restore-invariant.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/lean-restore-invariant.stdout.log",
+      "sha256": "3652e912540e0126b119118c8ee1f4920842ec60d5f30508f59e559a33b299ca",
+      "bytes": 17587
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/lean-restore.stderr.log",
+      "sha256": "5720ca4b46a6e6a56891b98551154a52d5b26a58d6175d4df9b68fb412b3a860",
+      "bytes": 1243
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/lean-restore.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/lean-tests-invariant.stderr.log",
+      "sha256": "187358bdc71a93344482b67421eaee01c2e456a25eccaf1207f86fcf9ff0895d",
+      "bytes": 466
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-bounded.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-bounded.stdout.log",
+      "sha256": "27c7837e1002aef6c5958d7cdbb7b9a610b60120b8613aa763e73d2dc75b9a32",
+      "bytes": 99
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-freeze.stderr.log",
+      "sha256": "7abed00d8242744dc24477f092b64488507e0cd1dc1ffc2a35d714194e7d1978",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-freeze.stdout.log",
+      "sha256": "5d58ce6f3700200cf7072b7c9e2c57f5120bf82c8cf57e35f45d9be26159404c",
+      "bytes": 269
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-install-corrected.stderr.log",
+      "sha256": "d48aa8986cadbc4974a4f592fed09a0bc4fc16cd9cd93945dd9458bff51f7048",
+      "bytes": 240
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-install-corrected.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-install.stderr.log",
+      "sha256": "474ba49987a2857c2fb949ad17e4b1a42615715754ca56b28fa370483b2ed80a",
+      "bytes": 152
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-install.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-invoke.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-invoke.stdout.log",
+      "sha256": "a0e657a19754701c94094127a6211b8f831b2ebe3fe22f3875b273c7e050d7aa",
+      "bytes": 40692
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-statistics-corrected.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-statistics-corrected.stdout.log",
+      "sha256": "4ebae0342e485c764b9428f69b6f0535e7506cc353926f4c51e028fd1052d0d3",
+      "bytes": 98
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-statistics.stderr.log",
+      "sha256": "35fbdfd7139ac2d8bd3e305bd21f1ef6b18a698f7480e70ddf930a38987fe7fd",
+      "bytes": 255
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-statistics.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-testdeps.stderr.log",
+      "sha256": "05dbb91ddc198ac66cc40785a03c64938a0f60684c7b06cd6ddf45662d9efd55",
+      "bytes": 339
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-testdeps.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-venv-corrected.stderr.log",
+      "sha256": "da4aa0317417f86e91946baa67f600ca9bfef2d94c50a4e2f006e43c7b241a14",
+      "bytes": 187
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-venv-corrected.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-venv.stderr.log",
+      "sha256": "6bf05eb2d87a72070a72a39473d3ca0ef370c49182f50072d8934c44bbc7f850",
+      "bytes": 58
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/nautilus-venv.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/python-version.stdout.log",
+      "sha256": "5b3e43dc38ca01e3f5a7854ba50d4330864b0c1e0f646650b2c78cf072acc366",
+      "bytes": 14
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/logs/uv-version.stdout.log",
+      "sha256": "dcccc14d410dab345544375b730933845d90c3222a4a8a0c08ed6c412ca336a4",
+      "bytes": 38
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py",
+      "sha256": "c475e1fe2afce0620bc220e40a690e2aa63c221193bbebb7f4dc44b22af9a9e8",
+      "bytes": 5361
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/masked-capture-metadata.records",
+      "sha256": "72b9d908e9ad5ad920f7bf893077ef1d2f857cb335008d744f9e3c2c395af4a1",
+      "bytes": 31651
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/multi-angle-draft.json",
+      "sha256": "9feaaeb9c473b7a724c2c9541456c65fc75f0a0fce2ad6ad4dfc2b36209265e9",
+      "bytes": 41796
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/.gitattributes",
+      "sha256": "1fca04079f77c666caa3bd5e26dbe69b0bc7db58631228a2c02aa39e1a223924",
+      "bytes": 357
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/README.md",
+      "sha256": "dbd4b7a0c41e1168d7480dc494007af43a027569124d8804c670567863614276",
+      "bytes": 3168
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/adoption-entry-lookup.capture",
+      "sha256": "3116a2773f43beaee654e4ad0c618070f771ba89ef33c2528abc7cd88b27a51f",
+      "bytes": 271
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/dotnet-invariant-version.capture",
+      "sha256": "69e020a5d5483e0c19081fd2478d941c5220d939b032efc12ad25ac492040035",
+      "bytes": 392
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/dotnet-normal-missing-icu.capture",
+      "sha256": "a271082ccf2ac58d863d3bd52322be05cea2e20c455cc220a660dec8c472cdfb",
+      "bytes": 1550
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/landing-current-main-green.capture",
+      "sha256": "5457ab0260d183b1c38920bc12d2d2449758731679e01ad6808a648649832a68",
+      "bytes": 2898
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/landing-regressions-red.capture",
+      "sha256": "0ec270684050a564fd09a6d43dd540048694fdbb519598e7abd991b17cfa7975",
+      "bytes": 2891
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/lane-packets-oct13.capture",
+      "sha256": "b76140a4ac75960c0913583146d9ef4e9e7895ed51a6ff472fa2f9d5080809df",
+      "bytes": 625
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/lane-packets.capture",
+      "sha256": "0c090ccad7f28321c123fa548540fa0491ac2c0f527a57a8cc2c7d517f67162b",
+      "bytes": 609
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/lean-host-failure.capture",
+      "sha256": "6c8c37782990610bbdcb111ce5f6206f69d23f24a72bab11233640e2506165cb",
+      "bytes": 1341
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/lean-initial-host-abort.trx",
+      "sha256": "94a8cac1c677d1b0cef09ac32d81ba57354f0310c7b6bb984708718a74e20d46",
+      "bytes": 2421
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/lean-invariant-restore.capture",
+      "sha256": "dcf704cd3c2ce977619bf8b11900feeccdfd5a4776f76ff21d20e546cdaea1df",
+      "bytes": 16292
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/lean-selected-source-match.capture",
+      "sha256": "c8ef59935947ed8654858bc91f4fb3672fe08d3e3ea52a7403142d62a23aae79",
+      "bytes": 551
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/lean-source-download.capture",
+      "sha256": "c16cc93d3f05fb1890f25af23dbfd5acf0809e899f775a55c36a37b805d042cd",
+      "bytes": 330
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/lean-source-extract.capture",
+      "sha256": "2e468fc0c7e8d1b2422667209400a5cb0d011bf03cd03e0045aa5a29a01e23cb",
+      "bytes": 277
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/mask-context-first-failed.capture",
+      "sha256": "19eb0c553dfa6a366c1484958a76a1808654eec02c6d8631053a39480e5cbf34",
+      "bytes": 11141
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/mask-explicit-context-green.capture",
+      "sha256": "337c600fa4353e8b41cd5ff92a757942ea67bb2d9683f96af967c415b799ffed",
+      "bytes": 2199
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/mask-final-seven-green.capture",
+      "sha256": "8485acb0c8d1947e09bf37e32e286ea96d0ac7314c77adfcf5d73e7eca936de8",
+      "bytes": 1659
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/mask-final-six-green.capture",
+      "sha256": "935e9834402f07acb7915c11beda57b48f04ddfcc7c091f382e1252561cf0a67",
+      "bytes": 1480
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/mask-git-bytes-red.capture",
+      "sha256": "4585bdec6da53f75b042b87731c132795b9503416717af47b22803c0f861d524",
+      "bytes": 1365
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/mask-rule-green.capture",
+      "sha256": "a8844b99e2f597a62621e512796bca95ea32f3933092454bb868a111ae8a0691",
+      "bytes": 1269
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/mask-rule-held-head-red.capture",
+      "sha256": "2dadc878e76bed0b54d6a07e0fbb4029ca67e8d719f24ed6970ed09a42a1857f",
+      "bytes": 1365
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/mask-rule-red.capture",
+      "sha256": "662d7e203d8127d25a995d99aefd8c78346323842232c77df63d05f1cabf49fe",
+      "bytes": 1365
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/mask-six-green.capture",
+      "sha256": "23fcb0d329e28f150eccd76230f970fb8f531d71bd43d25c28b8e289f5062258",
+      "bytes": 1480
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/mask-xml-red.capture",
+      "sha256": "89587ac8c740369e8144450f7c2c44d50708d2bb6f2427fdc97c3dbb8cb49b48",
+      "bytes": 1508
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/nautilus-bounded-smoke.capture",
+      "sha256": "ac24874e9178ce7aff7b710a73abd7ba4a62ef8b15257413e889531dcd0e6ff8",
+      "bytes": 1305
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/nautilus-fresh-smoke.capture",
+      "sha256": "ae33afe02f3319ec382d7ae226207bf5116242f0c40cd3a54b942f714b5b12b2",
+      "bytes": 1316
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/nautilus-native-simulation-invoke.capture",
+      "sha256": "726448815f94957acaac6fb035bed4d8ff1356638f254dbfbb932b41bc59a627",
+      "bytes": 41430
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/nautilus-source-download.capture",
+      "sha256": "70fd31c10784ee0bd9068de2f0cf56a13e187b7c0f352391383c8cba2cd1644d",
+      "bytes": 347
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/nautilus-source-extract.capture",
+      "sha256": "17e24443ec533e17d82715a6fa92e668a5c599353ef66a775d0c381a999bd499",
+      "bytes": 289
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/nautilus-tag.capture",
+      "sha256": "a0e0d77d6a417a4c97d9938b75715bc6fb144249d84f9405d01f5276fec6096b",
+      "bytes": 387
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/nautilus-test-source-match.capture",
+      "sha256": "86be5abc562d2a4bc0f577412091adfd144a9fbd9bf1e2f1546b71af244614b3",
+      "bytes": 689
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/nautilus-venv-install.capture",
+      "sha256": "4f5949cece51d8754cae9af615340e1706910b500db79aef3a1fd54170cf224a",
+      "bytes": 384
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/nautilus-wheel-install.capture",
+      "sha256": "ec59a8a7f0284589e5977a855c10f319e0120aa35d95a6084ee0b3672d1b41e3",
+      "bytes": 1078
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/publication-body-scan-rebased.capture",
+      "sha256": "e93b29fbb80dbc64f77b86cc483bf0fd41043b6ab631a8e882238c30f782478a",
+      "bytes": 325
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/publication-body-scan-ruled.capture",
+      "sha256": "4ce1e6e266a8b1a1dd7c789bcca92aa579998867ad4e21bd70b91c2a7f9332c5",
+      "bytes": 324
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/publication-body-scan.capture",
+      "sha256": "dbdefe454aa59421461ef095e1ffd50db1fa961a40a4dd1318f865c3b3672bdd",
+      "bytes": 324
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/publication-text-scan-rebased.capture",
+      "sha256": "bcf64e7a3c1f35e41b09fbb045aba0464c22d2a577231a2a09009fae95f3e096",
+      "bytes": 356
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/publication-text-scan-ruled.capture",
+      "sha256": "aa4a35567850ef3a32141e0a71f380a514d2d9f89584b70639551a1cbbd518fb",
+      "bytes": 355
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/publication-text-scan.capture",
+      "sha256": "b824be04dda1c9fa668ef2b776a206a12cc858610e9a8c66aee779e6d5e13b57",
+      "bytes": 353
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/publication-validator-failed-1.capture",
+      "sha256": "2757a3444535c1f7a1dc54c567e7e50eb2c24d9076435eacdcc01c9faee726f8",
+      "bytes": 645
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/publication-validator-final-byte-check.capture",
+      "sha256": "4867363cbc5b030e49564cd43c7e6888137268b72a270b21a7e691cb94f96837",
+      "bytes": 400
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/publication-validator.capture",
+      "sha256": "6358060a3ffff6b0c524cf390c0b75ca1df1a364644e4f56a5523ccce527dcd6",
+      "bytes": 400
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/recorder-version.capture",
+      "sha256": "30f18e027cd59212789f3343d41a27d56adbcd46aa8f33fef18706c3d06d5a93",
+      "bytes": 197
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/native/ruled-regressions-green.capture",
+      "sha256": "138c3f207c80046f3188f596c12d8093f9f5010e14be9cd8d52179ff43642247",
+      "bytes": 2569
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/source-pins.json",
+      "sha256": "eb768674c383e9f3c546e6b5aaee8e58311e53824a4918f92a26c591ed775605",
+      "bytes": 3517
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/upstream/microsoft-globalization.json",
+      "sha256": "695ec2a360be5aa7881e9b8106ced06920f5a376f68d1d900ffea1fd4057d29d",
+      "bytes": 1436
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/upstream/recorder-source.json",
+      "sha256": "4ba02eb52851e391e05a3ef347d2c4c6ade68364e83363e2274598709a1a7cb1",
+      "bytes": 2099
+    },
+    {
+      "path": "evidence/artifacts/final-wave-backtesting-engine-20261016/upstream/source-excerpts.json",
+      "sha256": "9cf406c364e84748ae97bdfc183d16e4768bf375608f121e35f26a891b3597aa",
+      "bytes": 7013
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
@@ -64335,6 +64825,16 @@
       "path": "tests/test_final_admission.py",
       "sha256": "1389108c9c5ac99e74eb490a52650689a4a601f30e4f754a74aa710b9ef6a2ca",
       "bytes": 11325
+    },
+    {
+      "path": "tests/test_final_backtesting_capture_mask.py",
+      "sha256": "fa6987fac8462838a6ea18ff1d71f9a5bbc3b090b2cd657f077ade61b2d06eab",
+      "bytes": 7893
+    },
+    {
+      "path": "tests/test_final_backtesting_publication.py",
+      "sha256": "9588bc0207ae9ee33a5ee1c7815431917d559799432215ad03cecea52d9e1113",
+      "bytes": 1289
     },
     {
       "path": "tests/test_final_disabled.py",

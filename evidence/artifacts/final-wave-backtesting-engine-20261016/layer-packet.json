@@ -1,0 +1,408 @@
+{
+ "candidate_source": "sota_manifest_layer_entries",
+ "candidates": [
+  {
+   "adopted": true,
+   "card_limitations": [
+    "At 4.6.11 LICENSE/setup.py both declare GPLv3. The 4.5.91 conflict is historical, not a current 4.6.11 blocker.",
+    "Current agent examples can invoke paid LLMs and submit orders; those paths are outside this deterministic workflow.",
+    "Yahoo example data and one backtest are not point-in-time universe or execution-quality validation.",
+    "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance.",
+    "Latest GitHub release/PyPI4.6.11 agree; newer4.6.15 tag observed separately with version-specific PyPI404. No acceptance at that tag."
+   ],
+   "component_id": "lumibot",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/Lumiwealth/lumibot/blob/862504052407df2586122b752a645f88ce87afa1/README.md"
+   ],
+   "key": "c1",
+   "name": "Lumibot",
+   "pin": "4.6.11; source 862504052407df2586122b752a645f88ce87afa1",
+   "pin_behind_upstream": true,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/Lumiwealth/lumibot",
+   "review_status": null,
+   "role": "Python strategy lifecycle with built-in Alpaca broker",
+   "upstream": {
+    "archived": false,
+    "latest": "v4.6.18",
+    "license": "GPL-3.0",
+    "prerelease": false,
+    "pushed_at": "2026-10-13",
+    "released_at": "2026-10-10",
+    "renamed_to": null,
+    "stars": 2119
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Forward-aligned return convention differs from many reports; misalignment can leak future information.",
+    "When cash returns are absent, simulator may download risk-free data; explicit final cash column avoids that path.",
+    "Research simulator is not an order gateway, and optimizer feasibility is not execution feasibility.",
+    "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+   ],
+   "component_id": "cvxportfolio",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst"
+   ],
+   "key": "c2",
+   "name": "cvxportfolio",
+   "pin": "1.5.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/cvxgrp/cvxportfolio",
+   "review_status": null,
+   "role": "Multi-period portfolio policies with transaction/holding cost models",
+   "upstream": {
+    "archived": false,
+    "latest": "1.5.1",
+    "license": "GPL-3.0",
+    "prerelease": false,
+    "pushed_at": "2026-04-27",
+    "released_at": "2025-07-06",
+    "renamed_to": null,
+    "stars": 1300
+   }
+  },
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c3",
+   "name": "cli/cli",
+   "newcomer": true,
+   "note": "The winner's release provenance was never verified (gpt6 records 'Artifact verification was not performed'), and the stack installs from PyPI. This lane identified the generator and the upstream's own verifier. At v2.0.0rc6, .github/workflows/build.yml runs 'Attest wheel provenance' through ./.github/actions/attest-build-provenance-retry, which cites https://github.com/actions/attest-build-provenance, with subject-path dist/nautilus_trader-*.whl. A 'Prepare wheel attestation siblings' step then builds the .whl.sigstore and .whl.intoto.jsonl assets from that step's bundle-path. 'Verify wheel attestations' runs scripts/ci/verify-gh-attestations.bash, which calls `gh attestation verify \"$subject\" --repo ... --cert-identity ... --cert-oidc-issuer ...`. The identity is ${server_url}/${workflow_ref} and the issuer is https://token.actions.githubusercontent.com. So the generator's supported verifier is the GitHub CLI's attestation verify, not slsa-github-generator tooling. Measured from primary sources: the release-asset digests equal the PyPI sha256 values in the decision record. rc5 is eab45fafd2312deda1236554c49a9798bfc76bc8465af864878e2f70189ebebe at 69,963,442 bytes; rc6 is 9b4002a7bf5e6399c51073039b740ccf3ca7a1e2584ff72c7d479f03eaa9658d at 69,828,675 bytes. The attestations API queried by the rc6 manylinux digest returns two Sigstore bundle v0.3 attestations, one user-initiated with a Rekor tlog entry and one GitHub-initiated. PyPI's integrity API for that exact file returns a PEP 740 attestation with publisher kind GitHub, repository nautechsystems/nautilus_trader, workflow build.yml, environment release. GHSA lists no pip advisories for nautilus_trader. An actual cryptographic verification run has not been done. cli/cli is maintained (commit 54a671d9a8f8c7a785c132d6f6a25375dc96acc1, 2026-10-12; v2.102.0).",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/cli/cli",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c4",
+   "name": "slsa-framework/slsa-verifier",
+   "newcomer": true,
+   "note": "The winner needs verified artifact provenance, but the inspected Nautilus rc6 build workflow already identifies a GitHub build-provenance action wrapper, prepares per-wheel attestation siblings from its output and invokes scripts/ci/verify-gh-attestations.bash. No evidence established a need to add this separate verifier or its compatibility with those particular bundles. The decision is to follow and qualify Nautilus's supported verification path first; it is not a claim that slsa-verifier is generally incompatible or stale.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/slsa-framework/slsa-verifier",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Proof: Completed, 3,943 bundled data points, 3 simulated orders; no broker connection or strategy validation.",
+    "Native restore reported 7 advisory pairs across 5 runtime packages, including high/critical classifications; exploitability was not assessed and historical advisories were later resolved in the linked local patch.",
+    "GitHub latest release v2.4.0.1 is from 2017; this is a 2026 source pin, not that old release.",
+    "LEAN CLI is a separate paid-organization/Docker workflow; the accepted source build required neither.",
+    "Follow-up: pinned local dependency patches and source-integrated Alpaca compilation passed native runtime graph audits. This does not initialize the adapter; QuantConnect product347 entitlement and separately authorized paper access are still required."
+   ],
+   "component_id": "lean",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/engine/receipt.json",
+    "blueprints/us-equities/engine/README.md",
+    "blueprints/us-equities/engine/resolution-receipt.json"
+   ],
+   "key": "c5",
+   "name": "LEAN",
+   "pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+   "pin_behind_upstream": null,
+   "recipe_ref": "blueprints/us-equities/engine/README.md",
+   "registered_receipts": [
+    {
+     "id": "native-paired-adoption-20260919",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "adoption/paired/receipt.json"
+    },
+    {
+     "id": "native-alpaca-historical-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/us-equities/authenticated-data/native-receipt.json"
+    },
+    {
+     "id": "native-corporate-actions-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/us-equities/corporate-action-readiness/receipt.json"
+    },
+    {
+     "id": "native-lean-execution-sensitivity-20260919",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/us-equities/execution-realism/receipt.json"
+    },
+    {
+     "id": "native-historical-leverage-stress-20260919",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/us-equities/historical-simulation/receipt.json"
+    },
+    {
+     "id": "native-chronological-controls-20260919",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/us-equities/research-evaluation/receipt.json"
+    },
+    {
+     "id": "native-research-runtime-20260919",
+     "kind": "native_model_e2e",
+     "matched_by": "component_id",
+     "path": "blueprints/us-equities/research-runtime/receipt.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "token-practice-coverage-20260920",
+     "kind": "historical_inventory",
+     "matched_by": "component_id",
+     "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    }
+   ],
+   "repository": "https://github.com/QuantConnect/Lean",
+   "review_status": null,
+   "role": "frozen historical comparator (oracle), not the runtime",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.4.0.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-10-12",
+    "released_at": "2017-08-08",
+    "renamed_to": null,
+    "stars": 21976
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Prerelease: 2.0.0 final has not shipped; GitHub's latest non-prerelease is still v1.231.0.",
+    "SPY/LEAN parity gate G-a (retained-equity-replay): established 2026-09-23 for the one_zero case by blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json (PASS, 136 checks, 0 failed; gate spy-lean-parity in gates-20260922.json), and runtime-target.json next_acceptance now records spy_lean_parity_passed_one_zero_case. Before that it recorded reported_execution_blocked_review_incomplete: the retained comparison summary (evidence/artifacts/comparison-progress-20260922/summary.json) records a completed BLOCKED replay of the historical one_zero case with four failed checks, all attributed to the unsupported distributions_and_cash and market_on_open_proxy mappings. A completed blocked comparison is not parity acceptance; the per-check verdict is retained in blueprints/us-equities/engine-nautilus/spy-parity/verdict.json.",
+    "The v1 blockers were closed by the v2 preregistration: native SimulationModule dividend cash and a native OCO open-fill proxy (gate dividend-sim-module, established 2026-09-23); the proxy is not a general market-on-open equivalent when the open equals the prior close, and parity covers one case only.",
+    "No local simulation, broker session or latency benchmark beyond the synthetic FX quickstart and the September21 AAPL diagnostic was performed.",
+    "Event semantics shared by backtest/live still require a calibrated data/fill model and recovery tests."
+   ],
+   "component_id": "nautilustrader",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-nautilus-v2-20260920.json",
+    "catalogs/us-equities/runtime-target.json"
+   ],
+   "key": "c6",
+   "name": "NautilusTrader",
+   "pin": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+   "pin_behind_upstream": true,
+   "recipe_ref": "evidence/receipts/native-nautilus-v2-20260920.json",
+   "registered_receipts": [
+    {
+     "id": "adaptive-paper-practice-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/adaptive-paper-practice-20260921.json"
+    },
+    {
+     "id": "claude-repository-evidence-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+     "id": "claude-upstream-checks-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
+     "id": "env-freshness-wsl-ubuntu-main-20260924",
+     "kind": "artifact_measurement",
+     "matched_by": "alias",
+     "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json"
+    },
+    {
+     "id": "native-nautilus-ci-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/native-nautilus-ci-20260920.json"
+    },
+    {
+     "id": "native-nautilus-v2-20260920",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/native-nautilus-v2-20260920.json"
+    },
+    {
+     "id": "native-trading-runtime-2604-20261004",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/native-trading-runtime-2604-20261004.json"
+    },
+    {
+     "id": "native-trading-runtime-2604-rerun-d02c0827-20261005",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/native-trading-runtime-2604-rerun-20261005.json"
+    },
+    {
+     "id": "nautilus-equity-replay-20260921",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/nautilus-equity-replay-20260921.json"
+    },
+    {
+     "id": "runtime-final-lock-binding-20261008",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/runtime-final-lock-binding-20261008.json"
+    },
+    {
+     "id": "runtime-final-native-24-acceptance-20261008",
+     "kind": "native_cli_e2e",
+     "matched_by": "alias",
+     "path": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json"
+    }
+   ],
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "review_status": null,
+   "role": "selected destination runtime (runtime-target.json)",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.0.0rc6",
+    "license": "LGPL-3.0",
+    "prerelease": true,
+    "pushed_at": "2026-10-13",
+    "released_at": "2026-10-05",
+    "renamed_to": null,
+    "stars": 29901
+   }
+  },
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c7",
+   "name": "shopify/toxiproxy",
+   "newcomer": true,
+   "note": "next_action requires native in-flight failure and reconciliation to be qualified separately for IBKR and Alpaca. open_gaps[3] records 'Native in-flight broker fault behavior is also unqualified', and no fault-injection harness had been surveyed. The rc6 live docs state that 'A disconnect by itself does not reject, cancel, or resolve an in-flight command; stream updates, queries, or reconciliation provide that evidence'. Qualification therefore needs reproducible socket faults while commands are in flight. Toxiproxy describes itself as 'A TCP proxy to simulate network and system conditions for chaos and resiliency testing'. Its README documents a reset_peer toxic ('Simulate TCP RESET (Connection reset by peer) on the connections by closing the stub Input immediately or after a timeout') and latency toxics added with toxiproxy-cli (e.g. `toxic add -t latency -a latency=1000`). It is maintained: default-branch commit 94adfebb88bb6db251dea8aea4b23513e6aad084 (2026-10-08). The latest tag, v2.12.0 (2025-03-18), is old but sits on an active branch, so it is not stale. Using it for the IBKR leg rests on an operator design assumption, to confirm at trial time: the assumption is that the TWS/IB Gateway API session is a plain TCP socket that a TCP proxy can sit in front of. Alpaca HTTPS/WSS needs a TLS-aware proxy (see mitmproxy); no IBKR or Alpaca document was read for this. Precondition: an IBKR paper login and IB Gateway. runtime-target.json records local_broker_acceptance not_established, so the trial becomes feasible only once paper access is established under the paper-lane policy. macOS binaries are unverified.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "registered_receipts": [],
+   "repository": "https://github.com/shopify/toxiproxy",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  }
+ ],
+ "catalog": "us-equities",
+ "checked_at": "2026-10-16",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+ "gap_receipts": [
+  "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/0-spy-lean-parity-peer.json",
+  "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/1-nautilus-alpaca-bars-corporate-actions.json",
+  "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/2-nautilus-latest-stable-release.json",
+  "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/4-lean-oracle-alpaca-brokerage-model.json",
+  "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/6-comparator-modes-and-review-count.json",
+  "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/7-one-zero-distributions-fill-rule-peer.json",
+  "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/8-aapl-action-window-replay.json",
+  "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/9-stress-margin-adaptive-parity-peer.json"
+ ],
+ "gap_receipts_note": "gap_receipts lists receipts from the gap-resolution waves for this layer: checks run against the layer's previous winner, recorded after its previous verdict. They are not blind: many repeat the previous gap text and some name the previous winner, in their content or file name. Open and judge them like evidence_refs; a receipt's content, not its presence, decides what it establishes. A blind wave never carries this list.",
+ "group": "engines-strategies",
+ "layer_id": "backtesting-engine",
+ "layer_scope_terms": [
+  "backtesting",
+  "execution-engine",
+  "legacy-engine",
+  "portfolio-backtesting",
+  "cost-aware-simulation",
+  "execution-experiment"
+ ],
+ "limitations": [
+  "Nautilus 2.0.0rc5 is a prerelease. The old September 19 Nautilus alternative and LEAN default cards remain historical; runtime-target.json governs the current destination.",
+  "The retained AAPL replay has 15 bars and five roundtrips per baseline/stress scenario with reconciled cash; it excludes known action dates and uses retrospective synthetic close fills with unlimited modeled depth.",
+  "SPY/LEAN dividend/cash parity is still planned. LEAN's known-crash fixtures are engineering stresses, not untouched holdout results or calibrated broker execution.",
+  "The Alpaca trial observed two actual writes, a -0.08 USD cash-matched gross result, flat/idle reconciliation and completed-trial recovery with zero additional writes. In-flight native failure cases, IBKR, live operation and continuous paper operation remain open.",
+  "No accepted point-in-time universe, extreme-mover/catalyst strategy, financing-inclusive performance or deployable profitability follows from these receipts.",
+  "Independent source review found two bare matches! expressions that do not assert denial-event variants in Nautilus risk tests, also present in v2.0.0rc5 source. Other tests assert denial and reasons. This narrow test defect is not an observed runtime failure; see docs/blind-catalog-source-adjudication-20260921.md."
+ ],
+ "registered_receipts_note": "registered_receipts lists the receipts manifests/evidence.json registers for a candidate's component: matched_by component_id when the receipt names its id, alias when it names the same component under its manifests/stack.json spelling, repository when the receipt names the only registered component with its repository and no other manifest component shares that repository. A receipt may name several components, and its kind is the registrant's label, not a checked evidence class: open it and judge what it actually ran for this component, as for evidence_refs.",
+ "requirement": "Use the selected NautilusTrader destination with broker-specific execution boundaries, deterministic numeric risk and reproducible equity accounting; preserve the prior LEAN oracle and qualify any strategy with causal data, costs and independent reconciliation.",
+ "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories. Read only the packet and files under the repository root: no memory stores, code indexes, MCP tools, web search, git history, or other checkouts or work directories, which can carry the verdict you must reach.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. Adoption, incumbency, installation, retained-control status, receipt count, packet position, license, stars and popularity are not evidence of fit; choose among adopted candidates on what their evidence shows was run. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Backtesting engine",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].card_rationale",
+  "candidates[].card_decision",
+  "candidates[].review_status"
+ ]
+}
