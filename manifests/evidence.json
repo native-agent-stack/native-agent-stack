@@ -19363,8 +19363,8 @@
     },
     {
       "path": "docs/decisions/2026-10-17-zero-tolerance-currency.md",
-      "sha256": "ef9b964e470f95c7112f90065b4bfd891febf349f5c3ae0d68e55b50c2808063",
-      "bytes": 17490
+      "sha256": "ef0518f3a70ad24185d7e90ece57836441d0ca09e47735183b3bcde700786819",
+      "bytes": 18202
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",

@@ -2,8 +2,12 @@
 
 **Status:** proposed for the command center's (CC) review, on the owner's directions, each dated by the day it was
 given (paraphrased, not quoted). It changes no CI check, unit template, catalog row, model setting or host file.
-The [CC's 2026-10-17 review rulings](https://github.com/native-agent-stack/native-agent-stack/pull/1237#issuecomment-6228929765) are cited below as "CC ruling N".
-**Base:** `origin/main` at `90471d63f20918efa3a63ef949caffd8c012656c`; every `path:line` below is at that commit.
+The CC's 2026-10-17 review rulings are cited below as "CC ruling N": rulings 1 to 7 at
+[issuecomment-6228929765](https://github.com/native-agent-stack/native-agent-stack/pull/1237#issuecomment-6228929765),
+ruling 8 at [issuecomment-6229313250](https://github.com/native-agent-stack/native-agent-stack/pull/1237#issuecomment-6229313250),
+and the correction to ruling 6 at [issuecomment-6229421934](https://github.com/native-agent-stack/native-agent-stack/pull/1237#issuecomment-6229421934).
+**Base:** `origin/main` at `90471d63f20918efa3a63ef949caffd8c012656c`; every `path:line` of this repository below is at
+that commit, except the PR #1201 citations, which are at its head `459bf4fd4dd0f90f76eb5af2bbce7e3d82a72a50`.
 **Supersession:** only the parts listed under "Superseded". The earlier records stay unchanged as dated history; this
 file amends them.
 
@@ -54,10 +58,10 @@ file amends them.
 
 ## The existing date-compared failures
 
-The 2026-10-15 direction covers every date-compared failure inside the required check: shard 0 of the validate
-matrix (`.github/workflows/validate.yml:20-21,173-178`), aggregated as `validate` (`:451-454`;
-`docs/github-automation.md:34-36`). Two are known. Enforcement stays with the daily runs, the CC's review and
-immediate replacement work.
+The 2026-10-15 direction covers every date-compared failure inside the required `validate` check, which needs every
+shard of the validate matrix, 0 to 7, to succeed (`.github/workflows/validate.yml:26,454,476-480`;
+`docs/github-automation.md:34-36`). Two are known in `scripts/validate.py`, which shard 0 runs (`:173-178`), and the
+modules it imports. Enforcement stays with the daily runs, the CC's review and immediate replacement work.
 
 - **The model-currency age failure.** The age check compares release and landscape-check dates with the current UTC
   date (`scripts/validate.py:73-75,246-248`). For a release more than 42 days old, a `landscape_check` that turns
@@ -65,15 +69,16 @@ immediate replacement work.
   "nine October 7 landscape exceptions became eight days old at UTC rollover", and the current-date
   `model_currency_problems(document)` check "reproduces nine errors on the base inventory" (2026-10-15 record
   `:4,48-49`). This record endorses [PR #1201](https://github.com/native-agent-stack/native-agent-stack/pull/1201),
-  which turns the age failure into a notice (Sources). Until #1201 lands, the check stays as it is and the daily runs
-  keep each `landscape_check` fresh. CC ruling 6.
+  which turns the age failure into a notice (Sources). Until #1201 lands, the check stays as it is, and each
+  `landscape_check` is renewed by its lane's refresh, which the daily run prompts on day five
+  (`docs/model-currency.md:108-112`). CC ruling 6, as corrected.
 - **The public-star pending age.** The same validator runs `validate_pending_age` (`scripts/validate.py:698-701`),
   which fails once a PENDING public-star entry is more than seven days past its first observation, read against the
   current UTC time (`scripts/public_starred.py:62-68,139-155`). It needs the same conversion to a notice, in a
-  follow-up PR owned by the public-starred maintainers. Until that lands, the starred refresh keeps PENDING entries
-  inside their window: each is dispositioned within seven days of its first observation, because "Refresh time
-  cannot replace a row's retained first observation" (`:142`). A later CC ruling of 2026-10-17, on this PR's note
-  about the check, adds this instance.
+  follow-up PR owned by the public-starred maintainers. Until that lands, each PENDING entry is dispositioned within
+  seven days of its first observation; a refresh alone cannot keep it inside the window, because the refresh keeps
+  each row's first observation (`:142`). The refresh carries the canonical review onto each row (`:254-259`), and its
+  queue "requires a sourced disposition PR; canonical review decisions clear it" (`:319`). CC ruling 8.
 
 ## Kept
 
