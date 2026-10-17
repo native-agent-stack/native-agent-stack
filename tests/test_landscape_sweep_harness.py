@@ -1455,9 +1455,10 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
             self.assertIn(f"[mcp_servers.{server}]", config)
         self.assertNotIn("supports_websockets = true", config)
         self.assertNotIn("http_headers", config)  # the 21128 default sends no provider headers
-        # The key never reaches a shell snapshot file, and GPT-6 Astra's search is Codex's standalone web.run.
-        for line in ("[features]", "shell_snapshot = false", "standalone_web_search = true",
-                     "supports_standalone_web_search = true"):
+        # The key never reaches a shell snapshot file. Standalone web.run is held out through 21128 (2026-10-15: the running
+        # build has no api/v1/alpha route, the co-op's parity record omniroute-web-search-parity-20261015.md), matching the client-config map.
+        for line in ("[features]", "shell_snapshot = false", "standalone_web_search = false",
+                     "supports_standalone_web_search = false"):
             self.assertIn(line, config)
         self.assertNotIn("[projects.", config)
         self.assertNotIn("[hooks.state", config)
@@ -1470,8 +1471,8 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         if tomllib is not None:
             parsed = tomllib.loads(config)
             self.assertEqual(parsed["model_providers"]["omniroute"]["env_key"], "OMNIROUTE_API_KEY")
-            self.assertIs(parsed["model_providers"]["omniroute"]["supports_standalone_web_search"], True)
-            self.assertEqual(parsed["features"], {"shell_snapshot": False, "standalone_web_search": True})
+            self.assertIs(parsed["model_providers"]["omniroute"]["supports_standalone_web_search"], False)
+            self.assertEqual(parsed["features"], {"shell_snapshot": False, "standalone_web_search": False})
             # Codex 0.157.1 leaves its default *KEY* excludes off, so the key variable is excluded by name.
             self.assertEqual(parsed["shell_environment_policy"], {"filters": {"OMNIROUTE_API_KEY": "exclude"}})
             self.assertEqual(sorted(parsed["mcp_servers"]), sorted(TOKEN_MCP_SERVERS))

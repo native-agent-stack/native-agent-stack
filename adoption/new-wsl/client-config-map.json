@@ -763,7 +763,7 @@
       "owner": "OmniRoute",
       "override": "cx/gpt-6.1-sol-max",
       "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/0fb32ee583589f1a0809b20d18dff40ce2f65a1c/docs/decisions/2026-10-05-omniroute-gateway-composition.md#L31; https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts#L11",
-      "note": "J-744 source parity: supplied 3.8.51 + PR15167 + cited affinity composition, build 5f4b3d577, explicitly requests Sol/max on 21128. Native Codex/openai retains Sol/max too. PR13788 is absent, so standalone search stays held out. Revised recipe and native-profile qualification remain UNRUN; canonical Claude route is owner-pending and active host profiles stay owner-owned."
+      "note": "J-744 source parity: supplied 3.8.51 + PR15167 + cited affinity composition, build 5f4b3d577, explicitly requests Sol/max on 21128. Native Codex/openai retains Sol/max too. PR13788 is absent, so standalone search stays held out. Revised recipe and native-profile qualification remain UNRUN; canonical Claude route is owner-pending and active host profiles stay owner-owned. Superseded 2026-10-15 for the running build: the 21128 listener runs build 2a41147b7 (3.8.51 + affinity + PR15167 + drain), read from its process (pid 492, ~/.local/share/omniroute-builds/omniroute-3.8.51-2a41147b7-affinity-pr15167-drain, package.json 3.8.51) at 2026-10-15T05:44Z; 5f4b3d577 is the earlier composition, still installed beside it."
     },
     {
       "match": [
@@ -773,7 +773,7 @@
       "owner": "OmniRoute",
       "override": "max",
       "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/0fb32ee583589f1a0809b20d18dff40ce2f65a1c/docs/decisions/2026-10-05-omniroute-gateway-composition.md#L31; https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts#L11",
-      "note": "J-744 source parity: supplied 3.8.51 + PR15167 + cited affinity composition, build 5f4b3d577, explicitly requests Sol/max on 21128. Native Codex/openai retains Sol/max too. PR13788 is absent, so standalone search stays held out. Revised recipe and native-profile qualification remain UNRUN; canonical Claude route is owner-pending and active host profiles stay owner-owned."
+      "note": "J-744 source parity: supplied 3.8.51 + PR15167 + cited affinity composition, build 5f4b3d577, explicitly requests Sol/max on 21128. Native Codex/openai retains Sol/max too. PR13788 is absent, so standalone search stays held out. Revised recipe and native-profile qualification remain UNRUN; canonical Claude route is owner-pending and active host profiles stay owner-owned. Superseded 2026-10-15 for the running build: the 21128 listener runs build 2a41147b7 (3.8.51 + affinity + PR15167 + drain), read from its process (pid 492, ~/.local/share/omniroute-builds/omniroute-3.8.51-2a41147b7-affinity-pr15167-drain, package.json 3.8.51) at 2026-10-15T05:44Z; 5f4b3d577 is the earlier composition, still installed beside it."
     },
     {
       "match": [
