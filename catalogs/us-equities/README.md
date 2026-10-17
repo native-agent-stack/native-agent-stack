@@ -5,6 +5,12 @@ workers, skills, memory, retrieval, efficiency and operations are maintained in
 the separate [foundation catalog](../foundation/README.md). Trading work reuses
 that foundation and adds data, strategy, risk and broker-specific requirements.
 
+The [EdgarTools 5.62.0 layer screen](edgartools-562-screen-20261015.md) registers
+retained vendor offline-test and public-fixture parser evidence at its exact pin.
+It is a SCREEN result; default selection still requires multi-angle convergence.
+The record preserves failed launcher attempts, overlapping test counts and the
+separate live-availability and historical-provenance limits.
+
 The [October 9 scoped catalog refresh](catalog-refresh-20261009.md) reconciles
 current runtime versus isolated-recipe pins, the final-lock acceptance,
 held/excluded adoption decisions, both TradingView repositories and the distinct
