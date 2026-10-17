@@ -1,0 +1,23 @@
+[
+  "systemd-run",
+  "--user",
+  "--scope",
+  "-p",
+  "CPUWeight=idle",
+  "--quiet",
+  "--",
+  "env",
+  "-i",
+  "HOME=<FOLD_SCRATCH>/home",
+  "PATH=/usr/local/bin:/usr/bin:/bin",
+  "TMPDIR=<FOLD_SCRATCH>/tmp",
+  "unshare",
+  "--user",
+  "--map-current-user",
+  "--net",
+  "--",
+  "<FOLD_SCRATCH>/envs/ibflex-corrected/bin/python",
+  "-m",
+  "pytest",
+  "-q"
+]

@@ -12,3 +12,8 @@ evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/codex-clien
 # evidence/artifacts/runtime-sdk-20261003/retained-records.json binds their sha256 with no sanitization.
 evidence/artifacts/runtime-sdk-20261003/exec-help-0.159.3.txt whitespace=-blank-at-eol
 evidence/artifacts/runtime-sdk-20261003/exec-help-0.160.0.txt whitespace=-blank-at-eol
+# Preserve the failed native venv setup's final blank line as captured.
+evidence/artifacts/execution-broker-recapture-20261016/masked/fold1/ibflex-venv/stdout.txt whitespace=-blank-at-eof
+# Preserve unittest's native subtest progress-line trailing space in mutation controls.
+evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-forward-mutant-red/stderr.txt whitespace=-blank-at-eol
+evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-reverse-mutant-red/stderr.txt whitespace=-blank-at-eol

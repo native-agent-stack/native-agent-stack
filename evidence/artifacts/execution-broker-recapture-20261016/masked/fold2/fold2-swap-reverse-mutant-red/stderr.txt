@@ -1,0 +1,30 @@
+test_literal_engine_swaps_original_keys_in_either_mapping_order (mask_tests.CaptureMask.test_literal_engine_swaps_original_keys_in_either_mapping_order) ... 
+  test_literal_engine_swaps_original_keys_in_either_mapping_order (mask_tests.CaptureMask.test_literal_engine_swaps_original_keys_in_either_mapping_order) (order=[b'/a', b'/b']) ... FAIL
+  test_literal_engine_swaps_original_keys_in_either_mapping_order (mask_tests.CaptureMask.test_literal_engine_swaps_original_keys_in_either_mapping_order) (order=[b'/b', b'/a']) ... FAIL
+
+======================================================================
+FAIL: test_literal_engine_swaps_original_keys_in_either_mapping_order (mask_tests.CaptureMask.test_literal_engine_swaps_original_keys_in_either_mapping_order) (order=[b'/a', b'/b'])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_execution_broker_capture_mask.py", line 56, in test_literal_engine_swaps_original_keys_in_either_mapping_order
+    self.assertEqual(module.replace_literals(b'/a /b untouched', values),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     b'/b /a untouched')
+                     ^^^^^^^^^^^^^^^^^^^
+AssertionError: b'/b /b untouched' != b'/b /a untouched'
+
+======================================================================
+FAIL: test_literal_engine_swaps_original_keys_in_either_mapping_order (mask_tests.CaptureMask.test_literal_engine_swaps_original_keys_in_either_mapping_order) (order=[b'/b', b'/a'])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_execution_broker_capture_mask.py", line 56, in test_literal_engine_swaps_original_keys_in_either_mapping_order
+    self.assertEqual(module.replace_literals(b'/a /b untouched', values),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     b'/b /a untouched')
+                     ^^^^^^^^^^^^^^^^^^^
+AssertionError: b'/a /a untouched' != b'/b /a untouched'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+FAILED (failures=2)

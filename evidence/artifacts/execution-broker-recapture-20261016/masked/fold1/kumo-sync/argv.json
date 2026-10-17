@@ -1,0 +1,20 @@
+[
+  "systemd-run",
+  "--user",
+  "--scope",
+  "-p",
+  "CPUWeight=idle",
+  "--quiet",
+  "--",
+  "env",
+  "-i",
+  "HOME=<FOLD_SCRATCH>/home",
+  "PATH=/usr/local/bin:/usr/bin:/bin",
+  "TMPDIR=<FOLD_SCRATCH>/tmp",
+  "UV_CACHE_DIR=<FOLD_SCRATCH>/cache",
+  "UV_PROJECT_ENVIRONMENT=<FOLD_SCRATCH>/envs/kumo",
+  "<UNAVAILABLE_UV_PATH>",
+  "sync",
+  "--locked",
+  "--all-extras"
+]

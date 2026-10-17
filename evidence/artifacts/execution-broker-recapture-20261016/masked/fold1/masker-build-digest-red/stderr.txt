@@ -1,0 +1,20 @@
+test_cli_preserves_bytes_except_exact_private_path_substitutions (tests.test_execution_broker_capture_mask.CaptureMask.test_cli_preserves_bytes_except_exact_private_path_substitutions) ... ok
+test_declared_unpublished_build_digest_is_masked_without_summarizing_stream (tests.test_execution_broker_capture_mask.CaptureMask.test_declared_unpublished_build_digest_is_masked_without_summarizing_stream) ... ERROR
+test_invalid_map_refuses_without_emitting_derivative (tests.test_execution_broker_capture_mask.CaptureMask.test_invalid_map_refuses_without_emitting_derivative) ... ok
+test_literal_engine_does_not_rescan_inserted_replacement_bytes (tests.test_execution_broker_capture_mask.CaptureMask.test_literal_engine_does_not_rescan_inserted_replacement_bytes) ... ok
+
+======================================================================
+ERROR: test_declared_unpublished_build_digest_is_masked_without_summarizing_stream (tests.test_execution_broker_capture_mask.CaptureMask.test_declared_unpublished_build_digest_is_masked_without_summarizing_stream)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_execution_broker_capture_mask.py", line 55, in test_declared_unpublished_build_digest_is_masked_without_summarizing_stream
+    self.assertEqual(module.mask_bytes(raw, {digest: '<UNPUBLISHED_BUILD_SHA256>'}),
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKTREE>/tools/sota-convergence/mask_execution_broker_capture.py", line 35, in mask_bytes
+    raise ValueError('map requires literal absolute paths and marked placeholders')
+ValueError: map requires literal absolute paths and marked placeholders
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.083s
+
+FAILED (errors=1)
