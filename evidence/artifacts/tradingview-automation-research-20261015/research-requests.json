@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "scope": "Explicit public-source requests reconstructed from this native session; automatic search-engine crawling is not counted.",
+  "count_policy": "web_search counts valid search query objects; web_fetch counts explicit public document/raw-source GETs (including repeat reads); gh_api counts public unauthenticated api.github.com requests, including HTTP 404. No credential-bearing service calls.",
+  "totals": {
+    "web_search": 12,
+    "web_fetch": 57,
+    "gh_api": 40
+  },
+  "failed_tool_requests": [
+    {
+      "tool": "web search",
+      "detail": "One malformed request used an unsupported parameter name and returned isError with no search result; excluded from valid search-query count."
+    }
+  ],
+  "search_queries": [
+    "site.tradingview.com support automated trading strategy webhook",
+    "site.alpaca.markets TradingView webhook official",
+    "site.interactivebrokers.com TradingView automatic strategies alerts",
+    "site.github.com TradingView MCP automation Pine strategy",
+    "site.alpaca.markets/learn TradingView webhook alpaca",
+    "site.github.com/alpacahq TradingView webhook",
+    "site.interactivebrokers.com/campus TradingView webhook automated",
+    "site.tradingview.com/pine-script-docs machine learning fine tuning optimization",
+    "site.tradingview.com Pine strategy templates built in source code",
+    "site.tradingview.com Pine fine tuning model training terms",
+    "site.github.com/pinecoders/pine-utils strategy templates",
+    "site.tradingview.com charting library Pine Script not supported"
+  ],
+  "gh_api_groups": [
+    {
+      "requests": 9,
+      "operation": "repository metadata",
+      "repositories": [
+        "atilaahmettaner/tradingview-mcp",
+        "tradesdontlie/tradingview-mcp",
+        "Mathieu2301/TradingView-API",
+        "shner-elmo/TradingView-Screener",
+        "alpacahq/alpaca-py",
+        "alpacahq/alpaca-mcp-server",
+        "alpacahq/tradingview-webhook",
+        "tradingview/pine_script_docs",
+        "tradingview/lightweight-charts"
+      ],
+      "failures": [
+        "alpacahq/tradingview-webhook:404",
+        "tradingview/pine_script_docs:404"
+      ]
+    },
+    {
+      "requests": 14,
+      "operation": "default-branch commits?per_page=1 and releases/latest",
+      "repositories": [
+        "atilaahmettaner/tradingview-mcp",
+        "tradesdontlie/tradingview-mcp",
+        "Mathieu2301/TradingView-API",
+        "shner-elmo/TradingView-Screener",
+        "alpacahq/alpaca-py",
+        "alpacahq/alpaca-mcp-server",
+        "tradingview/lightweight-charts"
+      ],
+      "failures": [
+        "atilaahmettaner/tradingview-mcp releases/latest:404",
+        "tradesdontlie/tradingview-mcp releases/latest:404"
+      ]
+    },
+    {
+      "requests": 4,
+      "operation": "git/trees/<review pin>?recursive=1",
+      "repositories": [
+        "atilaahmettaner/tradingview-mcp",
+        "tradesdontlie/tradingview-mcp",
+        "Mathieu2301/TradingView-API",
+        "shner-elmo/TradingView-Screener"
+      ]
+    },
+    {
+      "requests": 7,
+      "operation": "metadata and default-branch head where metadata succeeds",
+      "repositories": [
+        "allisonbit/tradingview-mcp",
+        "JostQQ/tradingview-mcp",
+        "tradingview/charting_library",
+        "tradingview/charting-library-examples"
+      ],
+      "failures": [
+        "tradingview/charting_library:404; no head request"
+      ]
+    },
+    {
+      "requests": 6,
+      "operation": "metadata, default-branch head, releases/latest",
+      "repositories": [
+        "folknor/pine-oracle",
+        "pinecoders/pine-utils"
+      ],
+      "failures": [
+        "both releases/latest:404"
+      ]
+    }
+  ],
+  "document_fetch_groups": [
+    {
+      "requests": 3,
+      "description": "Initial vendor pages",
+      "sources": [
+        "TradingView policies",
+        "Pine concepts strategies",
+        "Pine concepts alerts"
+      ]
+    },
+    {
+      "requests": 4,
+      "description": "Four carried TradingView README files indexed at reviewed commits"
+    },
+    {
+      "requests": 8,
+      "description": "Vendor pages",
+      "sources": [
+        "official MCP support",
+        "MCP docs",
+        "webhook configuration",
+        "webhook credentials",
+        "Pine strategies FAQ",
+        "Alpaca TradingView integration",
+        "IBKR TradingView introduction",
+        "TradingView broker API program"
+      ]
+    },
+    {
+      "requests": 5,
+      "description": "Four carried TradingView README files reread for line locators plus tradesdontlie LICENSE"
+    },
+    {
+      "requests": 7,
+      "description": "Seven carried Pine README files at original retained pins"
+    },
+    {
+      "requests": 5,
+      "description": "Vendor/reference pages",
+      "sources": [
+        "Alpaca low-code Zapier tutorial",
+        "Advanced Charts old FAQ URL",
+        "IBKR TWS API docs entry",
+        "Alpaca paper trading docs",
+        "official Alpaca MCP pinned README"
+      ]
+    },
+    {
+      "requests": 6,
+      "description": "Pinned README files",
+      "sources": [
+        "allisonbit MCP",
+        "JostQQ MCP",
+        "charting-library-examples",
+        "alpaca-py v0.44.0",
+        "alpaca-mcp v2.4.0",
+        "lightweight-charts v5.2.1"
+      ]
+    },
+    {
+      "requests": 6,
+      "description": "Pinned selected files",
+      "sources": [
+        "pine-oracle current README",
+        "pine-oracle current LICENSE",
+        "pine-utils README",
+        "PineForge LICENSE",
+        "TradingView-API package.json",
+        "Alpaca MCP toolsets.py"
+      ]
+    },
+    {
+      "requests": 1,
+      "description": "TradingView policies reread for response SHA256 and targeted terms extraction"
+    },
+    {
+      "requests": 3,
+      "description": "Vendor pages",
+      "sources": [
+        "interactivebrokers.github.io root",
+        "built-in script source support",
+        "Advanced Charts current FAQ URL"
+      ]
+    },
+    {
+      "requests": 7,
+      "description": "Pinned LICENSE files",
+      "sources": [
+        "PineTS",
+        "pynecore",
+        "pynescript",
+        "pinescript-langium",
+        "backtest_engine",
+        "JostQQ MCP",
+        "allisonbit MCP"
+      ]
+    },
+    {
+      "requests": 2,
+      "description": "Pinned implementation files",
+      "sources": [
+        "tradesdontlie src/core/pine.js",
+        "atilaahmettaner src/tradingview_mcp/core/services/backtest_service.py"
+      ]
+    }
+  ],
+  "interpretation": "These counters describe the direct combined research session, not separate role workers or a Workflow run. The role schemas were reused; the workflow's per-role page-fetch budget was not used or claimed.",
+  "search_leads_not_promoted": [
+    "ranjan98/tradingview-mcp",
+    "Weebapp003/tradingview-mcp",
+    "Spoofkapoof/TradingViewMCPServer",
+    "vinodsilva/tradingview-binance-notion-mcp",
+    "jaipreet15/tradingview-mcp",
+    "hackingthemarkets/tradingview-webhooks",
+    "hasnocool/tradingview-pine-scripts"
+  ],
+  "lead_boundary": "These were search snippets only, not source-reviewed candidates. No identity/pin/maintenance/license/fit claim or adoption follows; discovery is bounded, not exhaustive."
+}

@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-10-15",
+  "sources": [
+    {
+      "id": "tv-terms",
+      "url": "https://www.tradingview.com/policies/",
+      "observed_on": "2026-10-15",
+      "locator": "Terms of Use section 3; section 26",
+      "finding": "Display-only restriction includes alerts/webhooks and excludes non-display automated orders, decision systems and risk use. Software/document copying needs applicable permission. AI Features are for personal non-automated platform use.",
+      "response_sha256": "a5a3807c1bcf0bee0b2140cd0d4346880de9dc469755438b5fe1a5765b3ebc47",
+      "hash_scope": "HTML response observed during review; no stability claim for later fetches"
+    },
+    {
+      "id": "pine-strategies",
+      "url": "https://www.tradingview.com/pine-script-docs/concepts/strategies/",
+      "observed_on": "2026-10-15",
+      "locator": "v6: Introduction, Broker emulator, Risk management, Notes on testing strategies",
+      "finding": "Native Pine strategies simulate trades. Risk commands act on emulator state; commission, slippage, lookahead and out-of-sample controls matter."
+    },
+    {
+      "id": "pine-alerts",
+      "url": "https://www.tradingview.com/pine-script-docs/concepts/alerts/",
+      "observed_on": "2026-10-15",
+      "locator": "v6: Introduction; Order fill events",
+      "finding": "Alerts use server-side snapshots. A script alert describes emulator fills; the documentation illustrates possible third-party execution messages but does not override the Terms."
+    },
+    {
+      "id": "pine-faq",
+      "url": "https://www.tradingview.com/pine-script-docs/faq/strategies/",
+      "observed_on": "2026-10-15",
+      "locator": "Advanced features and integration; Can I connect my strategies to my paper trading account?",
+      "finding": "Pine cannot place orders through Trading Panel brokers or TradingView's built-in paper account. Emulator positions and broker positions are different authorities."
+    },
+    {
+      "id": "official-mcp",
+      "url": "https://www.tradingview.com/support/solutions/43000795699-mcp-server-connect-your-ai-assistant-to-tradingview/",
+      "observed_on": "2026-10-15",
+      "locator": "Who can use it; Beta limitations; Permitted use",
+      "finding": "Official personal interactive beta requires Essential or higher (trial plans excluded), returns delayed data, and excludes Pine/backtesting/chart screenshots, webhook-alert creation and unattended automated decision use."
+    },
+    {
+      "id": "official-mcp-tools",
+      "url": "https://www.tradingview.com/mcp/docs",
+      "observed_on": "2026-10-15",
+      "locator": "Tools: watchlists, market data, symbol search, screener, news, fundamentals, documents, calendars, alerts",
+      "finding": "Published tool inventory has read and write tools. No published broker-position or positions-manifest authority. A future observer trial must allowlist reads; no server connection occurred."
+    },
+    {
+      "id": "webhooks",
+      "url": "https://www.tradingview.com/support/solutions/43000529348-how-to-configure-webhook-alerts/",
+      "observed_on": "2026-10-15",
+      "locator": "How to configure webhook alerts",
+      "finding": "HTTP notifications, JSON content-type when valid JSON, ports 80/443, three-second processing timeout, 2FA requirement, and delivery failures; not a durable order protocol."
+    },
+    {
+      "id": "webhook-credentials",
+      "url": "https://www.tradingview.com/support/solutions/43000722015-using-credentials-for-webhooks/",
+      "observed_on": "2026-10-15",
+      "locator": "Using credentials for webhooks",
+      "finding": "Vendor says alerts are not designed for automated trading and advises against putting sensitive credentials in webhook URLs/messages."
+    },
+    {
+      "id": "broker-program",
+      "url": "https://www.tradingview.com/broker-api-docs/",
+      "observed_on": "2026-10-15",
+      "locator": "TradingView REST API for brokers",
+      "finding": "Broker integration is a broker-facing program, not a supported retail Pine order API."
+    },
+    {
+      "id": "alpaca-tradingview",
+      "url": "https://alpaca.markets/tradingview",
+      "observed_on": "2026-10-15",
+      "locator": "TradingView brokerage integration",
+      "finding": "Official chart/trading-panel integration is distinct from webhook strategy automation."
+    },
+    {
+      "id": "alpaca-tutorial",
+      "url": "https://alpaca.markets/learn/low-code-algorithimic-trading-on-alpaca-using-tradingview",
+      "observed_on": "2026-10-15",
+      "locator": "Setting Webhook Alerts; Takeaways",
+      "finding": "Vendor-hosted older tutorial routes TradingView alerts through Zapier to Alpaca. It does not establish current TradingView permission, a maintained broker-owned bridge, manifest binding or the required deterministic governor."
+    },
+    {
+      "id": "alpaca-paper",
+      "url": "https://docs.alpaca.markets/docs/paper-trading",
+      "observed_on": "2026-10-15",
+      "locator": "Paper trading",
+      "finding": "Broker paper is simulation with limitations and separate credentials/endpoints. It cannot be equated to Pine's broker emulator."
+    },
+    {
+      "id": "ibkr-tradingview",
+      "url": "https://www.interactivebrokers.com/docs/third-party-integrations/trading-view/intro",
+      "observed_on": "2026-10-15",
+      "locator": "Introduction",
+      "finding": "IBKR documents TradingView as a third-party charting connection; no webhook receiver is established by this page."
+    },
+    {
+      "id": "ibkr-api",
+      "url": "https://interactivebrokers.github.io/tws-api/",
+      "observed_on": "2026-10-15",
+      "locator": "Official TWS API documentation entry point",
+      "finding": "Vendor TWS API source is the permitted broker interface family; this source review does not select a new release or qualify a TradingView bridge."
+    },
+    {
+      "id": "charting-faq",
+      "url": "https://www.tradingview.com/charting-library-docs/latest/resources/Frequently-Asked-Questions/",
+      "observed_on": "2026-10-15",
+      "locator": "Pine Script support and unsupported features",
+      "finding": "Advanced Charts and Trading Platform do not support Pine Script. Libraries and tradingview.com are separate products."
+    },
+    {
+      "id": "builtin-source",
+      "url": "https://www.tradingview.com/support/solutions/43000481659-i-want-to-see-the-source-code-of-a-built-in-script/",
+      "observed_on": "2026-10-15",
+      "locator": "Built-in script source",
+      "finding": "Some native built-ins expose their Pine source. A visible source is a starting reference, not evidence of trading efficacy or unrestricted training rights."
+    }
+  ]
+}

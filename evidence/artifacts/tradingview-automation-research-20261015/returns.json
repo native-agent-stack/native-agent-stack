@@ -1,0 +1,920 @@
+{
+  "sweep_id": "tradingview-automation-research-20261015",
+  "label": "SINGLE-FAMILY (GPT) research sweep",
+  "status": "OPEN; source-review proposal; not a completed saturation sweep",
+  "eligible_for_ledger": false,
+  "workflow_run": null,
+  "execution_provenance": {
+    "mode": "native Codex research session; one agent authored discovery and fit",
+    "declared_model": "gpt-6-astra",
+    "declared_effort": "max",
+    "declared_service_tier": "default",
+    "verification_boundary": "Launch configuration is supplied by the routing task; no provider billing or hidden runtime configuration was inspected.",
+    "independent_families": 1,
+    "independent_gpt_roles": false,
+    "prompts_sha256": "7f318ae69b591a72eadafe1689371c3c57c0e3ef565b435d279a2ac1e7d71f7b",
+    "prompt_record": "research-brief.md (reconstruction, not original prompt bytes)",
+    "child_usage": null,
+    "usage_gap": "No Workflow/child-usage invocation was run; no usage or model-call telemetry is fabricated.",
+    "candidate_invocations": 0,
+    "model_api_probes": 0
+  },
+  "discovery": {
+    "tradingview-automation-gap": {
+      "catalog": "us-equities",
+      "layer_id": "tradingview-automation-gap",
+      "catalog_layer_exists": false,
+      "proposed": [
+        "https://www.tradingview.com/pine-script-docs/concepts/strategies/",
+        "https://www.tradingview.com/mcp/docs",
+        "https://github.com/tradesdontlie/tradingview-mcp",
+        "https://github.com/folknor/pine-oracle",
+        "https://alpaca.markets/learn/low-code-algorithimic-trading-on-alpaca-using-tradingview",
+        "https://interactivebrokers.github.io/tws-api/"
+      ],
+      "requirement_sha256": "c0b499427faebbaa0953950dd9bf69033d7e64caba16a9d7f26a81be9e2df5ea",
+      "platform_profiles_sha256": "fb2426f28e79954a8ddfc4959f6aefb22b275ced3dce118d1dcf736e6cffbb51",
+      "families": {
+        "https://www.tradingview.com/pine-script-docs/concepts/strategies/": [
+          "gpt6"
+        ],
+        "https://www.tradingview.com/mcp/docs": [
+          "gpt6"
+        ],
+        "https://github.com/tradesdontlie/tradingview-mcp": [
+          "gpt6"
+        ],
+        "https://github.com/folknor/pine-oracle": [
+          "gpt6"
+        ],
+        "https://alpaca.markets/learn/low-code-algorithimic-trading-on-alpaca-using-tradingview": [
+          "gpt6"
+        ],
+        "https://interactivebrokers.github.io/tws-api/": [
+          "gpt6"
+        ]
+      },
+      "families_returned": {
+        "first": [
+          "gpt6"
+        ],
+        "followup": []
+      },
+      "raw_ref": "evidence/artifacts/tradingview-automation-research-20261015/gpt6-discover.json"
+    }
+  },
+  "votes": {
+    "tradingview-automation-gap": [
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://www.tradingview.com/pine-script-docs/concepts/strategies/",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://www.tradingview.com/pine-script-docs/concepts/strategies/",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://www.tradingview.com/pine-script-docs/concepts/strategies/",
+            "refuted": false,
+            "confidence": 0.97,
+            "reasoning": "Not refuted only for the narrow attended observer role; broader automation remains a GAP. Survives only for attended in-app research and emulator observation. No brokerage or TradingView Paper Trading connection; no SOTA-return claim.",
+            "refs": [
+              "https://www.tradingview.com/pine-script-docs/concepts/strategies/#broker-emulator (observed 2026-10-15)",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/0"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://www.tradingview.com/mcp/docs",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://www.tradingview.com/mcp/docs",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://www.tradingview.com/mcp/docs",
+            "refuted": false,
+            "confidence": 0.97,
+            "reasoning": "Not refuted only for the narrow attended observer role; broader automation remains a GAP. Survives only for a read-allowlisted attended research observer. Does not provide requested Pine/chart control or manifest binding.",
+            "refs": [
+              "https://www.tradingview.com/support/solutions/43000795699-mcp-server-connect-your-ai-assistant-to-tradingview/ (observed 2026-10-15, Beta limitations; Permitted use)",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/1"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Does not satisfy app/Pine control; its backtests are not the native Pine runtime. Historical market-data WATCH remains untouched.",
+            "refs": [
+              "https://github.com/atilaahmettaner/tradingview-mcp/blob/90470ee22cc997b1fabb5046ea8ed2af87f5368f/README.md#L50",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/2"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/tradesdontlie/tradingview-mcp",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/tradesdontlie/tradingview-mcp",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/tradesdontlie/tradingview-mcp",
+            "refuted": true,
+            "confidence": 0.9,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Technical app-control fit, but vendor support/permission and enforced manifest/risk boundaries are unestablished. Desktop-internal API breakage is acknowledged by upstream; do not trial as an automated trading path.",
+            "refs": [
+              "https://github.com/tradesdontlie/tradingview-mcp/blob/c05b8f5755ed8e64ea242de88ddbf46aa24d56a4/src/core/pine.js#L266",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/3"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/Mathieu2301/TradingView-API",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/Mathieu2301/TradingView-API",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/Mathieu2301/TradingView-API",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Neither an official app-control MCP nor an entitled deterministic broker bridge. Report retrieval is not order authority.",
+            "refs": [
+              "https://github.com/Mathieu2301/TradingView-API/blob/6a4f8ff9a2b332d0a59dbd27c75201eb84663045/README.md#L96",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/4"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/shner-elmo/TradingView-Screener",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/shner-elmo/TradingView-Screener",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/shner-elmo/TradingView-Screener",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Data acquisition does not supply Pine app automation, authoritative positions or a broker governor. Reconfirms only this role's exclusion.",
+            "refs": [
+              "https://github.com/shner-elmo/TradingView-Screener/blob/5422d9012752353c59a31d13f54ceba55c265d9d/README.md#L275",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/5"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/allisonbit/tradingview-mcp",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/allisonbit/tradingview-mcp",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/allisonbit/tradingview-mcp",
+            "refuted": true,
+            "confidence": 0.9,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Same unsupported internal-control and service-rights gap; claimed private strategy showcase supplies no reproducible US-equities efficacy evidence.",
+            "refs": [
+              "https://github.com/allisonbit/tradingview-mcp/blob/cd7c43c4bbdebdfaeab60fd693d7f5b376f2016d/README.md#L8",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/6"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/JostQQ/tradingview-mcp",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/JostQQ/tradingview-mcp",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/JostQQ/tradingview-mcp",
+            "refuted": true,
+            "confidence": 0.9,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Requires Windows Desktop per README:32; target-host fit and permissions are not established. A protected-script registry is not a positions/risk governor.",
+            "refs": [
+              "https://github.com/JostQQ/tradingview-mcp/blob/4d9b440935d5e8b862ab61a72812adf801684564/README.md#L19",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/7"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/LuxAlgo/PineTS",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/LuxAlgo/PineTS",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/LuxAlgo/PineTS",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Role-only exclusion: an external runtime/parser does not automate native TradingView. The prior backtesting-engine survivor remains UNRESOLVED; no global refutation or measurement.",
+            "refs": [
+              "https://github.com/LuxAlgo/PineTS/blob/c5e6b0efee7e42d78b42d96f14173f38be082551/README.md#L34",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/8"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/pineforge-4pass/pineforge-codegen-oss",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/pineforge-4pass/pineforge-codegen-oss",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/pineforge-4pass/pineforge-codegen-oss",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Role-only exclusion: an external runtime/parser does not automate native TradingView. The prior backtesting-engine survivor remains UNRESOLVED; no global refutation or measurement.",
+            "refs": [
+              "https://github.com/pineforge-4pass/pineforge-codegen-oss/blob/15294ebb3a03035876674c476d81b3dd2ba73d81/README.md#L3",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/9"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/PyneSys/pynecore",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/PyneSys/pynecore",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/PyneSys/pynecore",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Role-only exclusion: an external runtime/parser does not automate native TradingView. The prior backtesting-engine survivor remains UNRESOLVED; no global refutation or measurement.",
+            "refs": [
+              "https://github.com/PyneSys/pynecore/blob/cab1266911a31245e885dc06789f900717be9e98/README.md#L16",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/10"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/elbakramer/pynescript",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/elbakramer/pynescript",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/elbakramer/pynescript",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Role-only exclusion: an external runtime/parser does not automate native TradingView. The prior backtesting-engine survivor remains UNRESOLVED; no global refutation or measurement.",
+            "refs": [
+              "https://github.com/elbakramer/pynescript/blob/0b9b4d0b0cd40d7d98c939830ccd06527a90c4d5/README.md#L17",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/11"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/s7cret/backtest_engine",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/s7cret/backtest_engine",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/s7cret/backtest_engine",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Role-only exclusion: an external runtime/parser does not automate native TradingView. The prior backtesting-engine survivor remains UNRESOLVED; no global refutation or measurement.",
+            "refs": [
+              "https://github.com/s7cret/backtest_engine/blob/0a8a6a62e3556e9c3ef4cd0b5bcd048ce3cd62a0/README.md#L14",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/12"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/arose26/pinescript-langium",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/arose26/pinescript-langium",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/arose26/pinescript-langium",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Role-only exclusion: an external runtime/parser does not automate native TradingView. The prior backtesting-engine survivor remains UNRESOLVED; no global refutation or measurement.",
+            "refs": [
+              "https://github.com/arose26/pinescript-langium/blob/152d3e8a5fa31c68c27499ece17c1d8216640a0e/README.md#L3",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/13"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/folknor/pine-oracle",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/folknor/pine-oracle",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/folknor/pine-oracle",
+            "refuted": true,
+            "confidence": 0.9,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Useful template/semantic reference, but no strategy efficacy or broker authority. Its install bundles vendor-derived docs (README:27–46); permission and exact recipe test provenance remain unresolved. Authored-recipe source review can continue without installing the bundled CLI.",
+            "refs": [
+              "https://github.com/folknor/pine-oracle/blob/f4a1e25edf9c0176bcf1cd9cbc1f229c2bb5ef37/README.md#L3",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/14"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/pinecoders/pine-utils",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/pinecoders/pine-utils",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/pinecoders/pine-utils",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Default-branch last commit 2019-08-22; does not supply current maintained v6/SOTA template or efficacy evidence.",
+            "refs": [
+              "https://github.com/pinecoders/pine-utils/blob/659deb224d2ddee8031db82798fed0830fbbd712/README.md#L3",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/15"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/tradingview/lightweight-charts",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/tradingview/lightweight-charts",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/tradingview/lightweight-charts",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Embedding a chart library does not execute Pine strategies in TradingView or create an automation bridge.",
+            "refs": [
+              "https://github.com/tradingview/lightweight-charts/blob/v5.2.1/README.md#L22",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/16"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/tradingview/charting-library-examples",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/tradingview/charting-library-examples",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/tradingview/charting-library-examples",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Vendor FAQ says Advanced Charts/Trading Platform do not support Pine. Public charting_library metadata returned 404, not proof the private library does not exist.",
+            "refs": [
+              "https://github.com/tradingview/charting-library-examples/blob/dfec6fca5e60e854258c9fed51143ca611404cbb/README.md#L5",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/17"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://www.tradingview.com/support/solutions/43000529348-how-to-configure-webhook-alerts/",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://www.tradingview.com/support/solutions/43000529348-how-to-configure-webhook-alerts/",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://www.tradingview.com/support/solutions/43000529348-how-to-configure-webhook-alerts/",
+            "refuted": true,
+            "confidence": 0.9,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Three-second timeout and failure possibilities need durable/idempotent handling, but current service/data terms already prevent qualifying the requested automated order use.",
+            "refs": [
+              "https://www.tradingview.com/support/solutions/43000529348-how-to-configure-webhook-alerts/ (observed 2026-10-15)",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/18"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://alpaca.markets/learn/low-code-algorithimic-trading-on-alpaca-using-tradingview",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://alpaca.markets/learn/low-code-algorithimic-trading-on-alpaca-using-tradingview",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://alpaca.markets/learn/low-code-algorithimic-trading-on-alpaca-using-tradingview",
+            "refuted": true,
+            "confidence": 0.9,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Conflicts with current TradingView non-display terms and does not establish a vendor-maintained bridge with a manifest governor. No SaaS subscription or bridge implementation proposed.",
+            "refs": [
+              "https://alpaca.markets/learn/low-code-algorithimic-trading-on-alpaca-using-tradingview (observed 2026-10-15, Setting Webhook Alerts; Takeaways)",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/19"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/alpacahq/alpaca-py",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/alpacahq/alpaca-py",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/alpacahq/alpaca-py",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Retain broker lane's official SDK path. An SDK alone is not a TradingView webhook bridge or a positions-manifest governor.",
+            "refs": [
+              "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/README.md#L29",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/20"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://github.com/alpacahq/alpaca-mcp-server",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://github.com/alpacahq/alpaca-mcp-server",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://github.com/alpacahq/alpaca-mcp-server",
+            "refuted": true,
+            "confidence": 0.97,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. Does not control TradingView. A model-facing broker trading toolset violates this task's hot-path boundary; a future observer needs proven read-only isolation, not a prompt promise.",
+            "refs": [
+              "https://github.com/alpacahq/alpaca-mcp-server/blob/2a973a046607c42742bf141184b71f1990fa1809/src/alpaca_mcp_server/toolsets.py#L32",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/21"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      },
+      {
+        "facts": {
+          "role": "facts",
+          "repository": "https://interactivebrokers.github.io/tws-api/",
+          "missing": true,
+          "refuted": true,
+          "note": "No independent facts-family vote was run. Source review is retained, but is not a substitute for this return."
+        },
+        "fit": {
+          "role": "fit",
+          "repository": "https://interactivebrokers.github.io/tws-api/",
+          "refuted": true,
+          "rule": "Missing Claude vote prevents two-family survival, regardless of the GPT vote.",
+          "claude": {
+            "missing": true,
+            "refuted": true
+          },
+          "gpt6": {
+            "repository": "https://interactivebrokers.github.io/tws-api/",
+            "refuted": true,
+            "confidence": 0.9,
+            "reasoning": "Refuted for admission to this TradingView automation TRIAL; this does not globally refute its prior layer. No current broker-maintained TradingView webhook receiver or positions-manifest integration was established. Bounded absence in reviewed docs, not a universal nonexistence claim.",
+            "refs": [
+              "https://www.interactivebrokers.com/docs/third-party-integrations/trading-view/intro (observed 2026-10-15)",
+              "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+              "evidence/artifacts/tradingview-automation-research-20261015/proposed-rows.json#/candidates/22"
+            ],
+            "model": "gpt-6-astra",
+            "effort": "max",
+            "family": "openai",
+            "round": "first"
+          }
+        }
+      }
+    ]
+  },
+  "raw": {
+    "gpt6-discover:tradingview-automation-gap": {
+      "status": "retained",
+      "ref": "evidence/artifacts/tradingview-automation-research-20261015/gpt6-discover.json"
+    },
+    "gpt6-refute-fit:tradingview-automation-gap": {
+      "status": "retained",
+      "ref": "evidence/artifacts/tradingview-automation-research-20261015/gpt6-refute-fit.json"
+    }
+  },
+  "provisional_gpt_candidates": [
+    "native-pine-v6",
+    "official-tradingview-mcp"
+  ],
+  "two_family_survivors": [],
+  "not_adjudicated_by_complete_harness": [
+    "https://www.tradingview.com/pine-script-docs/concepts/strategies/",
+    "https://www.tradingview.com/mcp/docs",
+    "https://github.com/atilaahmettaner/tradingview-mcp",
+    "https://github.com/tradesdontlie/tradingview-mcp",
+    "https://github.com/Mathieu2301/TradingView-API",
+    "https://github.com/shner-elmo/TradingView-Screener",
+    "https://github.com/allisonbit/tradingview-mcp",
+    "https://github.com/JostQQ/tradingview-mcp",
+    "https://github.com/LuxAlgo/PineTS",
+    "https://github.com/pineforge-4pass/pineforge-codegen-oss",
+    "https://github.com/PyneSys/pynecore",
+    "https://github.com/elbakramer/pynescript",
+    "https://github.com/s7cret/backtest_engine",
+    "https://github.com/arose26/pinescript-langium",
+    "https://github.com/folknor/pine-oracle",
+    "https://github.com/pinecoders/pine-utils",
+    "https://github.com/tradingview/lightweight-charts",
+    "https://github.com/tradingview/charting-library-examples",
+    "https://www.tradingview.com/support/solutions/43000529348-how-to-configure-webhook-alerts/",
+    "https://alpaca.markets/learn/low-code-algorithimic-trading-on-alpaca-using-tradingview",
+    "https://github.com/alpacahq/alpaca-py",
+    "https://github.com/alpacahq/alpaca-mcp-server",
+    "https://interactivebrokers.github.io/tws-api/"
+  ],
+  "failure_or_missing_returns": [
+    {
+      "role": "refute-facts",
+      "family": "Claude",
+      "missing": true
+    },
+    {
+      "role": "refute-fit",
+      "family": "Claude",
+      "missing": true
+    },
+    {
+      "role": "discover",
+      "family": "Claude",
+      "missing": true
+    }
+  ],
+  "prior_survivors_preserved": {
+    "backtesting_engine": 7,
+    "research_factors_ml": 5,
+    "statement": "This role-only evidence does not change prior catalog, ledger or final-stack state."
+  },
+  "proposed_comparison": {
+    "id": "TV-AUTO-OBSERVER-PAIR-20261015-01",
+    "preregistration_sha256": "56a14b9e96b43ed0f0aa4bf39505bae2aa8720966e6f9e05dfb654f857da73ab",
+    "status": "NOT_RUN",
+    "ref": "evidence/artifacts/tradingview-automation-research-20261015/trial-plan.json"
+  }
+}

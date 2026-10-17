@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "scope": "Evidence/schema/integrity checks only; no candidate install, service authentication, provider/GPU execution or trial.",
+  "observed_on": "2026-10-15",
+  "checks": [
+    {
+      "name": "Harness GPT discovery schema",
+      "command": "jsonschema.validate(gpt6-discover.json, tools/sota-convergence/landscape-sweep/schemas/discover.json)",
+      "status": "passed"
+    },
+    {
+      "name": "Harness GPT fit schema",
+      "command": "jsonschema.validate(gpt6-refute-fit.json, tools/sota-convergence/landscape-sweep/schemas/votes.json)",
+      "status": "passed"
+    },
+    {
+      "name": "Candidate contracts and prior survivor correction",
+      "status": "passed",
+      "details": "23 unique rows, every requested per-candidate field, 23 corresponding GPT fit votes, two provisional candidates, no two-family survivor; LightGBM cumulative carry-forward present at base."
+    },
+    {
+      "name": "Frozen inputs and proposal hashes",
+      "status": "passed",
+      "details": "24 base input hashes and 15 initial artifact hashes reproduced; requirement and platform profile hashes match returns.json; paired proposal byte hash matches preregistration reference."
+    },
+    {
+      "name": "Repository validator",
+      "command": "python3 scripts/validate.py",
+      "started_after_utc": "2026-10-15T20:21:12Z",
+      "status": "passed",
+      "summary": {
+        "components": 71,
+        "hashed_files": 12155,
+        "profiles": 4,
+        "receipts": 240
+      }
+    },
+    {
+      "name": "Whitespace check",
+      "command": "git diff --check",
+      "status": "passed"
+    },
+    {
+      "name": "Commit identity preflight",
+      "status": "passed",
+      "details": "Configured email matches GitHub users.noreply domain; value not printed and no per-command identity override used."
+    }
+  ],
+  "registration": {
+    "method": "host_receipts.register_file(Path('.'), path) for every new artifact; manifests/evidence.json is the required registration-only mutation.",
+    "note": "The publication run re-registers new/changed artifacts and re-runs scripts/validate.py before commit."
+  },
+  "unsuccessful_attempts": [
+    {
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 scripts/validate.py",
+      "exit_code": 1,
+      "stage": "scope setup; validator did not start",
+      "reason": "User scope bus unavailable in this session",
+      "resolution": "UTC clock read 20:21:12 (16:21 ET), outside the 04:00–16:00 ET protected period; normal required validation ran and passed."
+    }
+  ],
+  "not_run": [
+    "candidate native install/test commands",
+    "paired observer comparison",
+    "paper broker operation",
+    "live operation",
+    "independent Claude-family research"
+  ],
+  "no_strategy_results": true
+}
