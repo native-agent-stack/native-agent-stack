@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-15",
+  "evidence_class": "synthetic",
+  "baseline_commit": "93f34f01057a9eb68dc07d098a8c3755670959a0",
+  "scope": "Separate current exit pricing from durable strength; re-arm only outside-session refusals on a validated open window; guard name-only review citations",
+  "review_inputs": [
+    {"name": "MICRO-full-93f34f01.md"},
+    {"name": "ruling-cc-20261015T1717Z-pr1170-pricing-basis.md"},
+    {"name": "GPT-VERDICT-93f34f010.md"}
+  ],
+  "adjudication": "CC FULL requests P1/P2 changes; GPT full1 ACK with three P3 follow-ups; the CC pricing-basis ruling governs. One fold on the reviewed parent after both verdicts were relayed.",
+  "red_before_implementation": [
+    {"output": "red-pricing-and-strategy.txt", "return_code": 1, "tests": 5, "assertion_failures": 23, "errors": 0, "skips": 0},
+    {"output": "red-residual-and-replay.txt", "return_code": 1, "tests": 2, "assertion_failures": 4, "errors": 0, "skips": 0},
+    {"output": "red-next-session-recovery.txt", "return_code": 1, "tests": 2, "assertion_failures": 2, "errors": 0, "skips": 0}
+  ],
+  "red_production_source": "Baseline 93f34f01 remained unchanged while the new test cases were run. The final RED reproduction uses a detached worktree at that exact parent with only the two named test modules overlaid.",
+  "red_final_parent_replay": {"output": "red-final-parent-replay.txt", "return_code": 1, "tests": 9, "assertion_failures": 29, "errors": 0, "skips": 0},
+  "test_overlay_paths": [
+    "tests/test_adaptive_paper_exit_priority.py",
+    "tests/test_adaptive_paper_recovery.py"
+  ],
+  "green_focused": {"output": "green-focused.txt", "return_code": 0, "tests": 16, "failures": 0, "errors": 0, "skips": 0},
+  "runtime_regressions": {"output": "runtime-tests.json", "return_code": 0, "tests": 585, "failures": 0, "errors": 0, "skips": 0, "existing_resource_warnings": 14},
+  "covered_sequences": [
+    "quote_stale -> take_profit at 100.50 -> stop_loss at 99.70, tolerances 0 and 100",
+    "risk_off/gap_risk_stop/corporate_action_flatten -> take_profit -> stop_loss or trailing_stop, tolerances 0 and 100",
+    "stop_loss -> trailing_stop under the shipped volatility preset, tolerances 0 and 100",
+    "weaker partial take_profit changes the pricing basis while the full-stop target and strength remain, tolerances 0 and 100",
+    "second basis change while cancellation is pending: one cancel, no second sell before acknowledgement, final 40-share fill leaves a 60-share replacement, tolerances 0 and 100",
+    "target strengthens during pending cancellation: re-read 100-share residual instead of stale staged 50, tolerances 0 and 100",
+    "no new exit after journal reopen retains the last pricing basis, tolerances 0 and 100",
+    "a close-boundary refusal blocks the closed window and strategy sells at the next open",
+    "next-session recovery sells after a close refusal, including a reopened legacy definitive-refusal record, without manual reconcile"
+  ],
+  "custody_regression": "tests/test_shared_runner_review_citations.py checks all four name-only review-reference collections and the helper citation, with synthetic forbidden-field and disguised-digest negative controls; no unpublished bytes or values are used in fixtures",
+  "boundaries": [
+    "Captured native order factory and broker acknowledgements are synthetic; the real policy and durable Ledger execute",
+    "Risk/guard and volatility observations are explicitly controlled inputs",
+    "Session re-arming requires the validated controller window; no calendar is guessed by the Ledger",
+    "Existing quote/session/ownership/refusal/replacement-attempt bounds remain operative",
+    "No live paper unit, host runtime lock, credential store, broker call or live guard file is used"
+  ],
+  "output_sanitization": "Checkout/runtime prefixes replaced by named placeholders; line-end whitespace normalized; assertion text and counts retained",
+  "followups": "Adjacent rejection/accounting/mover diagnostics, old source comments and historical host-local capture portability remain separate and are listed in the PR body"
+}

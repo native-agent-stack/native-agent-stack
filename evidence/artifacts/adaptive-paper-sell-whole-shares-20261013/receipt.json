@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "evidence_class": "synthetic",
+  "scope": "Real installed rc5 LiveNode risk and native order/fill events, with synthetic quotes and broker transport only; no broker operation or paper acceptance.",
+  "implementation_parent": "17c49649040cf98abc872bbc32b9cf37a0dd93c6",
+  "authorship": "Reve's implementation remains in the parent; currency owns one forward precision correction.",
+  "runtime": {
+    "distribution": "nautilus_trader",
+    "version": "2.0.0rc5",
+    "risk_bypass": false
+  },
+  "primary_source": {
+    "repository": "https://github.com/nautechsystems/nautilus_trader",
+    "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "path": "crates/risk/src/engine/mod.rs",
+    "first_line": 2148,
+    "last_line": 2154,
+    "claim": "Quantity precision greater than instrument size precision is denied before position-exit bounds exemptions.",
+    "boundary": "Pinned source review; no claim that the mirror commit produced the installed runtime."
+  },
+  "fixed_mode_fail_first": {
+    "test": "tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_fixed_quantity_exit_reduces_position_through_native_risk",
+    "source_commit": "17c49649040cf98abc872bbc32b9cf37a0dd93c6",
+    "rc": 1,
+    "reason": "QUANTITY_PRECISION_EXCEEDS_MAXIMUM",
+    "owned_shares": "100",
+    "order_cap_usd": "10000",
+    "actual_sell_limit": "109.98",
+    "denied_quantity": "90.925622840",
+    "quantity_precision": 9,
+    "instrument_precision": 0,
+    "remaining_shares": "100"
+  },
+  "above_cap_fail_first": {
+    "test": "tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_above_cap_take_profit_splits_across_ticks_without_native_refusal",
+    "frozen_strategy_commit": "04f64a056cade587f804da60f6a94f7852f7624d",
+    "scope": "Frozen native_strategy.py loaded into current surrounding fixture and real rc5 node; not a full old-tree run.",
+    "rc": 1,
+    "reason": "order_size_cap_exceeded"
+  },
+  "green_sell_module": {
+    "test_module": "tests.test_adaptive_paper_sell_chunks",
+    "tests": 10,
+    "rc": 0,
+    "first_exit_shares": "90",
+    "remaining_after_first_tick": "10",
+    "second_exit_shares": "10",
+    "sell_precision": 0,
+    "native_refusals": 0,
+    "native_fills": 3,
+    "durable_positions": "flat",
+    "unresolved_intents": 0
+  },
+  "broader_verification": {
+    "targeted_modules": [
+      "tests.test_adaptive_paper_sell_chunks",
+      "tests.test_adaptive_paper_exits",
+      "tests.test_adaptive_paper_extended_exits",
+      "tests.test_adaptive_paper_corporate_actions",
+      "tests.test_adaptive_paper_native",
+      "tests.test_adaptive_paper_safety",
+      "tests.test_adaptive_paper_recovery",
+      "tests.test_adaptive_paper_adaptive_sell_age"
+    ],
+    "targeted_tests": 407,
+    "targeted_rc": 0,
+    "runner_tests": 192,
+    "runner_rc": 1,
+    "runner_failures": ["AchievedLeverageReceiptIntegrationTests.test_2x_rung_next_lower_ceiling_is_the_1x_rung"],
+    "runner_failure": "The two-second synthetic achieved-leverage fixture did not exceed 1x. Initial peak was 0.3440220145992393069951029889; isolated current retries also failed.",
+    "baseline_probe": "Frozen parent 17c49649 native_strategy.py in the same current fixture passed once, then failed with peak 0, no fills and no rejections. Failure therefore also reproduces without this correction; cause not established here.",
+    "boundary": "No all-green runner or full-495-suite claim; leverage code and existing test thresholds remain unchanged."
+  },
+  "limits": [
+    "Quotes, price appreciation and fills are synthetic; no live broker, credential, market-data or model call.",
+    "No operating unit, account state or activation gate changed.",
+    "Whole-share Equity scope; unrepresentable remainders retain the existing attention guard.",
+    "Initial fixture startup and zero-minimum-hold failures are setup errors, not fail-first evidence.",
+    "The short achieved-leverage runner fixture remains an explicit validation limitation, reproduced with the parent strategy as well."
+  ]
+}

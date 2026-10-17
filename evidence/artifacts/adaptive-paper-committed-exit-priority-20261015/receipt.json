@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-15",
+  "evidence_class": "synthetic",
+  "purpose": "Preserve committed sell targets independently of stronger exit reasons, including cancel acknowledgement",
+  "base_commit": "9cf1225581ffca6ea42e30076ddd7ac9074f828f",
+  "carried_parked_head": "7511c8ae350f4e1b868b097fb163284a4822ff12",
+  "carried_paths": 40,
+  "carry_conflicts": [],
+  "carry_main_overlap": ["manifests/evidence.json"],
+  "baseline_production_equals_parked_source": true,
+  "review_inputs": [
+    {"name": "pr1091-7511c8ae/review_output.json"},
+    {"name": "ruling-cc-20261015T1553Z-pr1091-park-exit-reason.md"}
+  ],
+  "test_module": "tests/test_adaptive_paper_exit_priority.py",
+  "focused_command": "unshare -rn -- env ADAPTIVE_SOURCE_ROOT=<checkout> nice -n 19 <pinned-runtime>/bin/python -m unittest -v tests.test_adaptive_paper_exit_priority.CommittedExitPriority",
+  "red": {"return_code": 1, "tests": 7, "failures": 6, "errors": 0, "skips": 0, "output": "red-tests.txt"},
+  "green": {"return_code": 0, "tests": 7, "failures": 0, "errors": 0, "skips": 0, "output": "green-tests.txt"},
+  "bare_main_controls": {
+    "return_code": 0,
+    "tests": 2,
+    "output": "main-controls.txt",
+    "methods": [
+      "test_unfinished_full_take_profit_promotes_stop_at_zero_tolerance",
+      "test_unfinished_full_take_profit_promotes_stop_inside_price_tolerance"
+    ],
+    "command": "unshare -rn -- env ADAPTIVE_SOURCE_ROOT=<main-control> nice -n 19 <pinned-runtime>/bin/python -m unittest -v tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_unfinished_full_take_profit_promotes_stop_at_zero_tolerance tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_unfinished_full_take_profit_promotes_stop_inside_price_tolerance",
+    "overlay": "Test module plus parked sell-chunk fixture only; production source unchanged"
+  },
+  "bare_main_pending_cancel_failure": "main-cancel-ack-red.json",
+  "full_runtime_tests": "runtime-tests.json",
+  "isolation": {
+    "network": "unshare -rn",
+    "scheduler": "nice -n 19",
+    "ledger_and_guards": "private temporary fixtures",
+    "live_latch_access": "blocked before stat/open by the fixture module guard",
+    "host_runtime_locks": "none",
+    "broker_calls": "none"
+  },
+  "output_sanitization": "Checkout and Python runtime path prefixes replaced with named placeholders; assertion text and result counts retained",
+  "limits": [
+    "Synthetic order factory and broker acknowledgement boundary",
+    "Guard outcomes and partial target/reason cross-cases use explicit synthetic inputs",
+    "No operating qualification, profitability or broker-fill claim",
+    "Fourteen pre-existing temporary-directory ResourceWarnings in the broader core run"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "evidence_class": "synthetic",
+  "source_commit": "9cf1225581ffca6ea42e30076ddd7ac9074f828f",
+  "test_overlay": [
+    "tests/test_adaptive_paper_sell_chunks.py from parked PR",
+    "tests/test_adaptive_paper_exit_priority.py from this PR"
+  ],
+  "command": "unshare -rn -- env ADAPTIVE_SOURCE_ROOT=<main-control> nice -n 19 <pinned-runtime>/bin/python -m unittest -v tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_stop_arriving_during_cancel_promotes_replacement_at_ack",
+  "rc": 1,
+  "tests": 1,
+  "failures": 1,
+  "output_excerpt": "AssertionError: 'reason=stop_loss' not found in ['strategy=take_profit', 'reason=take_profit', 'price_rule=take_profit']",
+  "duration_seconds": 0.424
+}

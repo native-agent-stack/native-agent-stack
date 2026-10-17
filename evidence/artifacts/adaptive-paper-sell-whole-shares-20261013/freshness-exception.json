@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "evidence_class": "synthetic",
+  "parent": "16db3b36b974a73a6913ba7fdda38649d3cdd4e7",
+  "scope": "CC-authorized P1 exception only: classify the real quote_not_fresh pre-wire refusal as transient with quote_stale. Existing retry bounds and P2 follow-ups unchanged.",
+  "primary_source": {
+    "repository": "https://github.com/native-agent-stack/native-agent-stack",
+    "commit": "16db3b36b974a73a6913ba7fdda38649d3cdd4e7",
+    "guard": "blueprints/us-equities/adaptive-paper/safety.py:834-846",
+    "controller": "blueprints/us-equities/adaptive-paper/runner.py:970-989",
+    "adapter": "blueprints/us-equities/adaptive-paper/native_adapter.py:793-802"
+  },
+  "regression": {
+    "test": "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_controller_quote_not_fresh_refusal_retries_after_fresh_quotes",
+    "actual_seam": "Real Controller.before_submit -> Ledger._check_quote -> NativeOrderRejected, adapter-equivalent native rejection callback, then real durable reservation/fills on fresh synthetic quotes.",
+    "fail_before_rc": 1,
+    "fail_before_rejections": 1,
+    "fail_before_held_shares": "100",
+    "fail_before_reason": "quote_not_fresh",
+    "expected_after_rejections": 1,
+    "expected_after_submitted_quantities": ["90", "90", "10"],
+    "expected_after_filled_exit_quantities": ["90", "10"],
+    "expected_after_held_shares": "0",
+    "retry_interval_seconds": 5,
+    "maximum_automatic_retries": 2
+  },
+  "verification": {
+    "regression_after_rc": 0,
+    "bounded_modules": ["tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions", "tests.test_adaptive_paper_safety", "tests.test_adaptive_paper_recovery"],
+    "bounded_tests": 142,
+    "bounded_rc": 0,
+    "closed_session_native_cases": "The three NativeSellRisk cases retain the separately recorded P2 wall-clock limitation and are not changed or claimed newly passed in this exception."
+  },
+  "limits": [
+    "Synthetic quote/broker boundary; real controller and durable risk guard. No live broker, new node, credential or activation operation.",
+    "The three P2 findings are follow-ups and are not claimed fixed.",
+    "Model-currency incident #1101 is a separate PR; no incident catalog changes are copied into this narrow branch."
+  ]
+}

@@ -1,0 +1,138 @@
+diff --git a/blueprints/us-equities/adaptive-paper/runner.py b/blueprints/us-equities/adaptive-paper/runner.py
+index cf5a80b87..8ee895041 100644
+--- a/blueprints/us-equities/adaptive-paper/runner.py
++++ b/blueprints/us-equities/adaptive-paper/runner.py
+@@ -1733,0 +1734,30 @@ def _final_corporate_action_guard_summary(strategy, held_symbols, now):
++async def _wait_for_integrity_cancellations(controller, strategy, requested, native_task, timeout_seconds):
++    """Keep native dispatch alive until requested cancels have terminal evidence.
++
++    cancel_requested only means queued. Require both the native terminal callback
++    (pending removed) and the durable terminal observation (not unresolved).
++    A racing fill/expiry is terminal too; a DELETE acknowledgement alone is not.
++    """
++    deadline = time.monotonic() + timeout_seconds
++    while True:
++        unresolved = {intent.client_id for intent in controller.ledger.unresolved()}
++        unconfirmed = requested.intersection(set(strategy.pending) | unresolved)
++        if not unconfirmed:
++            status = "confirmed"
++            break
++        remaining = deadline - time.monotonic()
++        if remaining <= 0:
++            status = "deadline_expired"
++            break
++        if native_task.done():
++            status = "native_session_ended"
++            break
++        # Yield through the owner loop so both native command queues and
++        # terminal events can run. The configured order timeout bounds the
++        # entire wait, including a busy dispatcher or transport operation lock.
++        await asyncio.sleep(min(.1, remaining))
++    return {"status": status, "requested_count": len(requested),
++            "confirmed_count": len(requested) - len(unconfirmed),
++            "unconfirmed_count": len(unconfirmed), "timeout_seconds": timeout_seconds}
++
++
+@@ -1809,0 +1840 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
++    integrity_loss_cancellations = None
+@@ -1876,2 +1907,5 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
+-                # This observation session cannot prove an owned reduction.
+-                # Hand off before another forced exit spends a submit slot.
++                # Unknown order/position state cannot authorize another sell.
++                # Stop rebalancing now; main's owned-residual path uses a
++                # fresh transport and durable recovery rather than retrying
++                # refused exits until duration+cleanup (and spending slots).
++                strategy.enabled = False
+@@ -1878,0 +1913,3 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
++                # Native cancel_order queues work; do not disconnect its
++                # dispatcher until terminal confirmation or the bounded wait.
++                pending_before_cancel = dict(strategy.pending)
+@@ -1879,0 +1917,6 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
++                requested = {cid for cid, info in pending_before_cancel.items()
++                             if info.get("cancel_requested")}
++                integrity_loss_cancellations = await _wait_for_integrity_cancellations(
++                    controller, strategy, requested, task, config["order_timeout_seconds"])
++                if integrity_loss_cancellations["unconfirmed_count"]:
++                    session.errors.append("integrity_loss_cancellation_unconfirmed")
+@@ -1951,0 +1995 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
++                    strategy.enabled = False
+@@ -1952,0 +1997,3 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
++                    # Loss discovered during this tick needs the same terminal
++                    # cancellation proof as loss observed at the first check.
++                    pending_before_cancel = dict(strategy.pending)
+@@ -1953,0 +2001,6 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
++                    requested = {cid for cid, info in pending_before_cancel.items()
++                                 if info.get("cancel_requested")}
++                    integrity_loss_cancellations = await _wait_for_integrity_cancellations(
++                        controller, strategy, requested, task, config["order_timeout_seconds"])
++                    if integrity_loss_cancellations["unconfirmed_count"]:
++                        session.errors.append("integrity_loss_cancellation_unconfirmed")
+@@ -2068,0 +2122,2 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
++    if integrity_loss_cancellations is not None:
++        outcome["integrity_loss_cancellations"] = integrity_loss_cancellations
+diff --git a/blueprints/us-equities/adaptive-paper/transport.py b/blueprints/us-equities/adaptive-paper/transport.py
+index 27e660b7a..e77b6b168 100644
+--- a/blueprints/us-equities/adaptive-paper/transport.py
++++ b/blueprints/us-equities/adaptive-paper/transport.py
+@@ -994 +994,8 @@ class GuardedSession:
+-                    raise SubmissionNotSent("submission prevented before HTTP request", refusal_code=code,
++                    # Retain the fixed local diagnoses as well as typed provenance;
++                    # arbitrary caller/provider messages still cross no boundary.
++                    message = str(error) if isinstance(error, SubmissionNotSent) else ""
++                    if message not in ("recovery_observation_integrity_lost",
++                                       "quote or stream readiness changed before submission",
++                                       "submission budget deferred"):
++                        message = "submission prevented before HTTP request"
++                    raise SubmissionNotSent(message, refusal_code=code,
+@@ -1297,0 +1305,8 @@ def _stream_classes(data_ws):
++class _QueuedStreamEvent(tuple):
++    """The existing (kind, raw) FIFO item with local monotonic timing only."""
++    def __new__(cls, kind, raw, received_at, enqueued_at):
++        item = super().__new__(cls, (kind, raw))
++        item.received_at, item.enqueued_at = received_at, enqueued_at
++        return item
++
++
+@@ -1362,0 +1378,3 @@ class AlpacaPaperTransport:
++        self._order_updates_dequeued = 0
++        self._order_queue_latency_max = None
++        self._order_callback_latency_max = None
+@@ -1451 +1469,4 @@ class AlpacaPaperTransport:
+-                    "quotes_reconnects": self._quotes_reconnects}
++                    "quotes_reconnects": self._quotes_reconnects,
++                    "order_updates_dequeued": self._order_updates_dequeued,
++                    "order_update_queue_latency_seconds_max": self._order_queue_latency_max,
++                    "order_update_callback_to_consumer_seconds_max": self._order_callback_latency_max}
+@@ -1600 +1621,12 @@ class AlpacaPaperTransport:
+-        deadline = time.monotonic() + min(self.start_timeout, WEBSOCKET_PING_TIMEOUT_SECONDS - 2)
++        # Once observation integrity is lost, there is no useful bounded
++        # admission left on this stream. Ask the SDK to stop through its
++        # supported awaited surface; remaining events in this received batch
++        # return promptly rather than each starting a fresh eight-second wait.
++        with self._state_lock:
++            lost = bool(self._reasons & OBSERVATION_INTEGRITY_LOSS_REASONS)
++        if lost:
++            stream = self._orders_stream if kind == "order" else self._quotes_stream
++            await self._invoke(stream.stop_ws)
++            return
++        received_at = time.monotonic()
++        deadline = received_at + min(self.start_timeout, WEBSOCKET_PING_TIMEOUT_SECONDS - 2)
+@@ -1605 +1637 @@ class AlpacaPaperTransport:
+-                    self._events.put_nowait((kind, raw))
++                    self._events.put_nowait(_QueuedStreamEvent(kind, raw, received_at, time.monotonic()))
+@@ -1614,0 +1647,2 @@ class AlpacaPaperTransport:
++                        stream = self._orders_stream if kind == "order" else self._quotes_stream
++                        await self._invoke(stream.stop_ws)
+@@ -1656 +1690,2 @@ class AlpacaPaperTransport:
+-                kind, raw = self._events.get_nowait()
++                event = self._events.get_nowait()
++                kind, raw = event
+@@ -1660,0 +1696,8 @@ class AlpacaPaperTransport:
++                if kind == "order" and isinstance(event, _QueuedStreamEvent):
++                    now = time.monotonic()
++                    queue_latency = max(0.0, now - event.enqueued_at)
++                    callback_latency = max(0.0, now - event.received_at)
++                    with self._state_lock:
++                        self._order_updates_dequeued += 1
++                        self._order_queue_latency_max = max(self._order_queue_latency_max or 0.0, queue_latency)
++                        self._order_callback_latency_max = max(self._order_callback_latency_max or 0.0, callback_latency)

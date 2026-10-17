@@ -87,6 +87,37 @@ REASON_PRICE_RULE = {
 }
 
 
+# Priority of an UNFINISHED durable commitment, independently of quantity.
+# This does not reorder DEFAULT_RULES for a new decision: once an exit is
+# committed, risk/expiry and forced liquidation can strengthen profit-taking
+# even when both target zero. Force exits precede the corporate-action and gap
+# guards (corporate_actions.py); neither a weaker signal nor a tighter quantity
+# target may downgrade that protection. Unknown reasons rank below known ones.
+# This order never selects an order label or price_rule; the strategy tracks
+# the current pricing basis separately from this durable strength reason.
+EXIT_REASON_STRENGTH = {
+    "rebalance": 0,
+    "portfolio_rotation": 1,
+    "take_profit": 2,
+    "time_exit": 3,
+    "trailing_stop": 4,
+    "stop_loss": 5,
+    "quote_stale": 6,
+    "risk_off": 7,
+    "gap_risk_stop": 8,
+    "corporate_action_flatten": 9,
+    "rotation_flatten": 10,
+    "trial_end": 11,
+}
+
+
+def stronger_exit_reason(committed: str, proposed: str) -> str:
+    """Promote only; equal or unknown priorities keep the existing reason."""
+    if EXIT_REASON_STRENGTH.get(proposed, -1) > EXIT_REASON_STRENGTH.get(committed, -1):
+        return proposed
+    return committed
+
+
 def _clamp(value, lo, hi):
     return min(hi, max(lo, value))
 
