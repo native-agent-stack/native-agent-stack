@@ -1,0 +1,10 @@
+{
+  "ref": "refs/tags/v0.0.79",
+  "node_id": "REF_kwDOQFjJqLFyZWZzL3RhZ3MvdjAuMC43OQ",
+  "url": "https://api.github.com/repos/anthropics/sandbox-runtime/git/refs/tags/v0.0.79",
+  "object": {
+    "sha": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+    "type": "commit",
+    "url": "https://api.github.com/repos/anthropics/sandbox-runtime/git/commits/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e"
+  }
+}

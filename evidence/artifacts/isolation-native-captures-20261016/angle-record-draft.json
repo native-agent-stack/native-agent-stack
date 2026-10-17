@@ -1,0 +1,480 @@
+{
+  "schema_version": 1,
+  "kind": "authored_unscored_six_angle_draft",
+  "catalog": "foundation",
+  "layer_id": "isolation",
+  "status": "preparation_only_pending_two_family_adjudication",
+  "not_a_receipt": "No scores, rankings, measurements or FINAL eligibility are synthesized here. Native evidence is linked to labeled masked captures; sources and gaps are distinct.",
+  "candidate_scope": "Existing winner pair and the two carried survivors only; no new survey or challenger installation.",
+  "candidates": [
+    {
+      "component": "worktrunk",
+      "source_pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "role": "existing edit-ownership winner",
+      "pin_source": {
+        "path": "manifests/stack.json",
+        "line": 1095,
+        "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+      },
+      "angles": {
+        "A1": {
+          "dimension": "capability at the pin",
+          "classification": "bounded_native_smoke",
+          "analysis": "The official scratch installer and documented create/list/remove commands execute successfully in an owned synthetic Git fixture. This is real execution on synthetic inputs; it is not a simulation or a complete isolation qualification.",
+          "sources": [
+            {
+              "repository": "https://github.com/max-sixty/worktrunk",
+              "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+              "path": "README.md",
+              "line": 159,
+              "accessed": "2026-10-16"
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/worktrunk-install.json",
+              "line": 47
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/worktrunk-create.json",
+              "line": 51
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/worktrunk-created.stdout.txt",
+              "line": 47
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/worktrunk-remove.json",
+              "line": 48
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/worktrunk-after.stdout.txt",
+              "line": 12
+            }
+          ],
+          "disputed": "Whether this bounded evidence suffices for the selected workload; broader enforcement, teardown and platform gaps stay open."
+        },
+        "A2": {
+          "dimension": "upstream engineering quality",
+          "classification": "not_adjudicated",
+          "gap": "This preparation does not provide an independent engineering assessment, complete upstream test run or carried advisory/cleanup closure. Supported installation and documented capability are not substitutes.",
+          "context": [
+            {
+              "repository": "https://github.com/max-sixty/worktrunk",
+              "pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+              "path": "README.md",
+              "line": 159,
+              "accessed": "2026-10-16"
+            }
+          ]
+        },
+        "A3": {
+          "dimension": "community consensus",
+          "classification": "not_gathered_in_this_delta",
+          "gap": "No independent role/pin-specific community evidence is added. Internal two-family agreement and survivor votes are historical resolution inputs, not community consensus.",
+          "context": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 6238,
+              "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+            }
+          ]
+        },
+        "A4": {
+          "dimension": "net usage",
+          "classification": "invoke_window_only",
+          "gap": "No ecosystem net-usage dataset or sustained operational usage measurement is added. The winner pair's native F2 commands demonstrate this window only.",
+          "context": [
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/worktrunk-create.json",
+              "line": 51
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/worktrunk-created.stdout.txt",
+              "line": 47
+            }
+          ]
+        },
+        "A5": {
+          "dimension": "published evaluations",
+          "classification": "not_gathered_in_this_delta",
+          "gap": "No independent matched evaluation is supplied. This records an evidence gap, not a claim that no published evaluations exist. Vendor capability/performance descriptions are not independent comparison results."
+        },
+        "A6": {
+          "dimension": "our measured comparisons",
+          "classification": "not_run",
+          "gap": "No matched comparison was executed. Install/CLI smoke and synthetic one-file controls are A1/F2 evidence, not comparative A6. Both VM arms await an authorized eligible isolated host.",
+          "context": [
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/worktrunk-install.json",
+              "line": 47
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/worktrunk-create.json",
+              "line": 51
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/worktrunk-created.stdout.txt",
+              "line": 47
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/worktrunk-remove.json",
+              "line": 48
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/worktrunk-after.stdout.txt",
+              "line": 12
+            }
+          ]
+        }
+      },
+      "proposed_disposition": "Keep unresolved for the co-op's two-family review. No adoption, retirement or FINAL claim.",
+      "next_input": "Review exact pin/capture bindings and decide the remaining owned dirty-state/crash/shell cases."
+    },
+    {
+      "component": "sandbox-runtime",
+      "source_pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "role": "existing conditional OS-restriction winner",
+      "pin_source": {
+        "path": "manifests/stack.json",
+        "line": 888,
+        "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+      },
+      "angles": {
+        "A1": {
+          "dimension": "capability at the pin",
+          "classification": "bounded_native_smoke",
+          "analysis": "The vendor npm install and README echo execute at 0.0.79. The one-file allowed/denied write controls use the real CLI but remain synthetic policy fixtures, separate from upstream smoke and from broad filesystem/network qualification.",
+          "sources": [
+            {
+              "repository": "https://github.com/anthropics/sandbox-runtime",
+              "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+              "path": "README.md",
+              "line": 168,
+              "accessed": "2026-10-16"
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/srt-install.json",
+              "line": 54
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/srt-version.stdout.txt",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/srt-echo.stdout.txt",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/srt-deny-write.stderr.txt",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/srt-deny-write.json",
+              "line": 50
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/denied-file-absent.json",
+              "line": 47
+            }
+          ],
+          "disputed": "Whether this bounded evidence suffices for the selected workload; broader enforcement, teardown and platform gaps stay open."
+        },
+        "A2": {
+          "dimension": "upstream engineering quality",
+          "classification": "not_adjudicated",
+          "gap": "This preparation does not provide an independent engineering assessment, complete upstream test run or carried advisory/cleanup closure. Supported installation and documented capability are not substitutes.",
+          "context": [
+            {
+              "repository": "https://github.com/anthropics/sandbox-runtime",
+              "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+              "path": "README.md",
+              "line": 168,
+              "accessed": "2026-10-16"
+            }
+          ]
+        },
+        "A3": {
+          "dimension": "community consensus",
+          "classification": "not_gathered_in_this_delta",
+          "gap": "No independent role/pin-specific community evidence is added. Internal two-family agreement and survivor votes are historical resolution inputs, not community consensus.",
+          "context": [
+            {
+              "path": "catalogs/landscape/final-stack.json",
+              "line": 6238,
+              "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+            }
+          ]
+        },
+        "A4": {
+          "dimension": "net usage",
+          "classification": "invoke_window_only",
+          "gap": "No ecosystem net-usage dataset or sustained operational usage measurement is added. The winner pair's native F2 commands demonstrate this window only.",
+          "context": [
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/srt-echo.json",
+              "line": 49
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/srt-echo.stdout.txt",
+              "line": 1
+            }
+          ]
+        },
+        "A5": {
+          "dimension": "published evaluations",
+          "classification": "not_gathered_in_this_delta",
+          "gap": "No independent matched evaluation is supplied. This records an evidence gap, not a claim that no published evaluations exist. Vendor capability/performance descriptions are not independent comparison results."
+        },
+        "A6": {
+          "dimension": "our measured comparisons",
+          "classification": "not_run",
+          "gap": "No matched comparison was executed. Install/CLI smoke and synthetic one-file controls are A1/F2 evidence, not comparative A6. Both VM arms await an authorized eligible isolated host.",
+          "context": [
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/srt-install.json",
+              "line": 54
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/srt-version.stdout.txt",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/srt-echo.stdout.txt",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/srt-deny-write.stderr.txt",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/srt-deny-write.json",
+              "line": 50
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/denied-file-absent.json",
+              "line": 47
+            }
+          ]
+        }
+      },
+      "proposed_disposition": "Keep unresolved for the co-op's two-family review. No adoption, retirement or FINAL claim.",
+      "next_input": "Review the version-specific capture bindings; qualify filesystem/network policies for the selected workload in isolated scratch."
+    },
+    {
+      "component": "boxlite",
+      "source_pin": "91655df3f172812c56465f96a9dac79f9b193f9f",
+      "repository": "https://github.com/boxlite-ai/boxlite",
+      "role": "carried targeted survivor; unexecuted",
+      "pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260929/boxlite-ai-boxlite.json",
+        "line": 7,
+        "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+      },
+      "angles": {
+        "A1": {
+          "dimension": "capability at the pin",
+          "classification": "source_review_and_failed_host_precondition",
+          "analysis": "Pinned README:167 describes VM/OS sandbox/resource/egress capabilities; :242 requires Linux KVM access. The local precondition capture returns False. No native screen or comparative result is supplied.",
+          "sources": [
+            {
+              "repository": "https://github.com/boxlite-ai/boxlite",
+              "pin": "91655df3f172812c56465f96a9dac79f9b193f9f",
+              "path": "README.md",
+              "line": 167,
+              "accessed": "2026-10-16"
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/kvm-precondition.stdout.txt",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/kvm-precondition.json",
+              "line": 46
+            },
+            {
+              "path": "catalogs/saturation/ledger.json",
+              "line": 8200,
+              "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+            }
+          ],
+          "disputed": "Whether this bounded evidence suffices for the selected workload; broader enforcement, teardown and platform gaps stay open."
+        },
+        "A2": {
+          "dimension": "upstream engineering quality",
+          "classification": "not_adjudicated",
+          "gap": "This preparation does not provide an independent engineering assessment, complete upstream test run or carried advisory/cleanup closure. Supported installation and documented capability are not substitutes.",
+          "context": [
+            {
+              "repository": "https://github.com/boxlite-ai/boxlite",
+              "pin": "91655df3f172812c56465f96a9dac79f9b193f9f",
+              "path": "README.md",
+              "line": 167,
+              "accessed": "2026-10-16"
+            }
+          ]
+        },
+        "A3": {
+          "dimension": "community consensus",
+          "classification": "not_gathered_in_this_delta",
+          "gap": "No independent role/pin-specific community evidence is added. Internal two-family agreement and survivor votes are historical resolution inputs, not community consensus.",
+          "context": [
+            {
+              "path": "catalogs/saturation/ledger.json",
+              "line": 8206,
+              "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+            }
+          ]
+        },
+        "A4": {
+          "dimension": "net usage",
+          "classification": "unexecuted",
+          "gap": "No ecosystem net-usage dataset or sustained operational usage measurement is added. The winner pair's native F2 commands demonstrate this window only.",
+          "context": [
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/kvm-precondition.stdout.txt",
+              "line": 1
+            }
+          ]
+        },
+        "A5": {
+          "dimension": "published evaluations",
+          "classification": "not_gathered_in_this_delta",
+          "gap": "No independent matched evaluation is supplied. This records an evidence gap, not a claim that no published evaluations exist. Vendor capability/performance descriptions are not independent comparison results."
+        },
+        "A6": {
+          "dimension": "our measured comparisons",
+          "classification": "not_run",
+          "gap": "No matched comparison was executed. Install/CLI smoke and synthetic one-file controls are A1/F2 evidence, not comparative A6. Both VM arms await an authorized eligible isolated host.",
+          "context": [
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/kvm-precondition.stdout.txt",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/kvm-precondition.json",
+              "line": 46
+            },
+            {
+              "path": "catalogs/saturation/ledger.json",
+              "line": 8200,
+              "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+            }
+          ]
+        }
+      },
+      "proposed_disposition": "Keep unresolved for the co-op's two-family review. No adoption, retirement or FINAL claim.",
+      "next_input": "Authorize an eligible isolated KVM host and reconcile the carried source commit with the exact trial artifact before enforcement/resource/cleanup comparisons."
+    },
+    {
+      "component": "microsandbox",
+      "source_pin": "2110af1e5cc965c57539815a432d6b055ba6a023",
+      "repository": "https://github.com/superradcompany/microsandbox",
+      "role": "carried keep-but-compare survivor; unexecuted",
+      "pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260929/superradcompany-microsandbox.json",
+        "line": 7,
+        "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+      },
+      "angles": {
+        "A1": {
+          "dimension": "capability at the pin",
+          "classification": "source_review_and_failed_host_precondition",
+          "analysis": "Pinned README:110 requires Linux KVM; :177-178 shows a network allowlist and :235-236 CPU/memory settings. The local precondition capture returns False. A missing README host label is not a measured incompatibility.",
+          "sources": [
+            {
+              "repository": "https://github.com/superradcompany/microsandbox",
+              "pin": "2110af1e5cc965c57539815a432d6b055ba6a023",
+              "path": "README.md",
+              "line": 110,
+              "accessed": "2026-10-16"
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/kvm-precondition.stdout.txt",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/kvm-precondition.json",
+              "line": 46
+            },
+            {
+              "path": "catalogs/saturation/ledger.json",
+              "line": 8212,
+              "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+            }
+          ],
+          "disputed": "Whether this bounded evidence suffices for the selected workload; broader enforcement, teardown and platform gaps stay open."
+        },
+        "A2": {
+          "dimension": "upstream engineering quality",
+          "classification": "not_adjudicated",
+          "gap": "This preparation does not provide an independent engineering assessment, complete upstream test run or carried advisory/cleanup closure. Supported installation and documented capability are not substitutes.",
+          "context": [
+            {
+              "repository": "https://github.com/superradcompany/microsandbox",
+              "pin": "2110af1e5cc965c57539815a432d6b055ba6a023",
+              "path": "README.md",
+              "line": 110,
+              "accessed": "2026-10-16"
+            }
+          ]
+        },
+        "A3": {
+          "dimension": "community consensus",
+          "classification": "not_gathered_in_this_delta",
+          "gap": "No independent role/pin-specific community evidence is added. Internal two-family agreement and survivor votes are historical resolution inputs, not community consensus.",
+          "context": [
+            {
+              "path": "catalogs/saturation/ledger.json",
+              "line": 8218,
+              "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+            }
+          ]
+        },
+        "A4": {
+          "dimension": "net usage",
+          "classification": "unexecuted",
+          "gap": "No ecosystem net-usage dataset or sustained operational usage measurement is added. The winner pair's native F2 commands demonstrate this window only.",
+          "context": [
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/kvm-precondition.stdout.txt",
+              "line": 1
+            }
+          ]
+        },
+        "A5": {
+          "dimension": "published evaluations",
+          "classification": "not_gathered_in_this_delta",
+          "gap": "No independent matched evaluation is supplied. This records an evidence gap, not a claim that no published evaluations exist. Vendor capability/performance descriptions are not independent comparison results."
+        },
+        "A6": {
+          "dimension": "our measured comparisons",
+          "classification": "not_run",
+          "gap": "No matched comparison was executed. Install/CLI smoke and synthetic one-file controls are A1/F2 evidence, not comparative A6. Both VM arms await an authorized eligible isolated host.",
+          "context": [
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/kvm-precondition.stdout.txt",
+              "line": 1
+            },
+            {
+              "path": "evidence/artifacts/isolation-native-captures-20261016/masked/kvm-precondition.json",
+              "line": 46
+            },
+            {
+              "path": "catalogs/saturation/ledger.json",
+              "line": 8212,
+              "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+            }
+          ]
+        }
+      },
+      "proposed_disposition": "Keep unresolved for the co-op's two-family review. No adoption, retirement or FINAL claim.",
+      "next_input": "Authorize an eligible isolated KVM host and reconcile the carried source commit with the exact trial artifact before enforcement/resource/cleanup comparisons."
+    }
+  ],
+  "gates": [
+    "The co-op must privately reproduce the masked derivatives before the new PR opens.",
+    "The co-op owns independent two-family adjudication.",
+    "FINAL admission, operational catalog updates, host provisioning and default changes remain outside this PR."
+  ]
+}
