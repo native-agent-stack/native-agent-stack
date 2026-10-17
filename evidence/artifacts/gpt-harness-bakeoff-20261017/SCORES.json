@@ -462,7 +462,7 @@
   "notes": [
     "Strict scoring per the stated rule: T2 replies of changed_line 141 are counted incorrect even where the file and unittest pass (state_and_tests_ok).",
     "goose T1 rep 1 exited 1 with a Responses stream-decode error and reported no usage, so its 0 tokens are unmeasured; the median includes it as recorded.",
-    "tokens_in_plus_out mixes cache accounting across runtimes (codex-exec tokens_in includes cached input; others report uncached input separately), so it is not a like-for-like cost measure.",
+    "tokens_in_plus_out mixes cache accounting: codex-exec, deerflow, goose and OpenHands include cached input; pi, OpenCode, Kilo and oh-my-pi report uncached input. Token ranks are indicative only; see the decision and T2-USAGE.json for cache-normalized medians.",
     "pi T2 rep 2 tokens_cached is 69504 per the sender's correction; it is not part of the in+out total."
   ]
 }

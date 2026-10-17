@@ -33,20 +33,20 @@ Note: the 0/2 and 1/2 rows did the work correctly (file and tests ok); they lost
 
 ## 2. Harnesses that failed to run
 - None failed outright; every harness produced exit 0 runs except goose T1 rep 1 (exit 1, Responses stream-decode error, no usage reported).
-- pi first attempt hung 900 s (stdin inherited); fixed with stdin=/dev/null, not counted. pi needed reasoning:true plus thinkingLevelMap in its agent-dir models.json, else max effort was clamped.
+- The original record excludes a 900 s pi hang and a rerun with null stdin; cause and duration were not independently recovered. The max-effort configuration effect after reasoning:true plus thinkingLevelMap is host-observed only (diag-max.out versus diag-max2.out), not an established upstream clamp mechanism.
 - codex-exec: benign ai-memory MCP AuthRequired stderr; no effect on jobs.
-- Token counts are not like-for-like (codex-exec in includes cached input; others report uncached separately), so token ranks are indicative only.
+- tokens_in_plus_out mixes cache accounting: codex-exec, deerflow, goose and OpenHands include cached input; pi, OpenCode, Kilo and oh-my-pi report uncached input. Token ranks are indicative only; see the decision and T2-USAGE.json for cache-normalized medians.
 
 ## 3. Routing proposal for the GPT lane
 A harness replaces codex-exec only where it is at least as correct and faster or cheaper.
-- Code reading: pi (2/2, 4.4 s vs 59 s, 2.2k vs 31k tokens) beats the baseline. oh-my-pi, deerflow, openhands also tie on correctness and are faster, but pi dominates them; keep them as untested alternates.
+- Code reading: pi leads the reported wall-time and in+out columns (2/2, 4.4 s vs 59 s, 2.2k vs 31k reported tokens). oh-my-pi, deerflow and openhands also tie on correctness and are faster than the baseline; opencode and kilo tie but are slower. Cache accounting limits the token comparison; keep the alternatives untested.
 - Edit and test: pi (2/2, 46 s vs 93 s, 17.9k vs 272k) beats the baseline. goose ties on correctness and is faster (55 s) but its T1 stream-decode failure disqualifies it for now.
 - Keep codex-exec (codex_call.sh) for: sandbox-governed read-only jobs, output-schema strictness, anything needing its MCP/skills layers (pi ran with --no-extensions --no-mcp --no-skills --no-context-files), and as the fallback.
-- No harness other than pi qualifies. Pi's trade: it ran without MCP, skills, and context files, so it lacks the full harness layers the repo's policy requires for a default; adopt it first as a measured fast path for bounded read and edit jobs, pending a layer screen (MCP, skills, telemetry, isolation, receipts) at its pin (v1.3.0).
+- Pi is a measured fast-path proposal only: its runs omitted MCP, skills and context files, and its fit remains refuted in the latest covering sweep. Require an evidence-bound reopen and a layer screen (MCP, skills, telemetry, isolation, receipts) at v1.3.0 before any adoption; no default changes here.
 
 ## 4. Limits of this measurement
 - n=2 per task per harness, two tasks (one line-count read, one single-line edit with tests); no confidence interval is meaningful.
-- One model (cx/gpt-6.1-sol) at one effort; harness effects are confounded with prompt/tool-schema differences and cache state (codex-exec T1 rep 1 103 s vs rep 2 15 s is cold-cache).
+- One model (cx/gpt-6.1-sol) at one requested effort; harness effects are confounded with prompt/tool-schema differences and cache state. codex-exec T1 times of 103 s and 15 s are score-record inputs only: T1 baseline logs are not retained and cold-cache attribution is unconfirmed.
 - Strict reply scoring penalises reply-value misses that left correct state.
 - Pi's config was adjusted (thinking map) and its run omitted MCP/skills/context; codex-exec T2 was run directly rather than through codex_call.sh (recorded departure).
 - Token totals mix cache accounting; wall times are single-machine with a memory gate and varying load.
