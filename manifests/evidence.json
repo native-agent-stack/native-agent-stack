@@ -17703,7 +17703,7 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "95fc744c271f0a6188bf345e56aa186d9ba54c0cb170176fc72950691079e51f",
+      "sha256": "a57bbfb8eead3b6f265f84e4bec7c12aa73ae4fa1fe181bdc16d5fb484f47998",
       "bytes": 339603
     },
     {
@@ -62478,8 +62478,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "75a8d01edce7db61a97e8e1749719fdc5b092beff4c9a55c97187ee76ce6bd17",
-      "bytes": 132704
+      "sha256": "c1fd9040497b77900d7f18340f8d94919685ceb98cb666754f9c634a69ac6529",
+      "bytes": 132711
     },
     {
       "path": "notes/muse-file-fence-20261014/fix-round-1.json",
@@ -64723,8 +64723,8 @@
     },
     {
       "path": "tests/test_model_currency.py",
-      "sha256": "7b8c74680f5496486786be061b52eec9edb10e71b743fc733fe9e11d1eb43e4e",
-      "bytes": 20828
+      "sha256": "2431b73ae534d7937ddbc5a2c194a3a82dbed6eb12f8da706730ff766a7d1bf2",
+      "bytes": 21161
     },
     {
       "path": "tests/test_model_currency_propose.py",

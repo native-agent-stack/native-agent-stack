@@ -97,6 +97,9 @@ class ModelCurrencyTests(unittest.TestCase):
                            model["currency_status"]) for model in entries],
                          [(row["model_id"], row["revision"], row["release_date"], row["release_source"], row["status"])])
         self.assertEqual(entries[0]["overturn"], row["overturn"].split(" Gateway exception:")[0])
+        # The id and revision are the pinned canonical model ID; the moving alias is `haiku`, so the entry
+        # must not call itself an alias (anthropics/claude-code docs model-config: aliases move, full names pin).
+        self.assertEqual(entries[0]["distribution"], "Hosted canonical model ID; no local weights or CI calls")
         doc = " ".join((root / "docs/model-currency.md").read_text().split())
         self.assertNotIn("retains Haiku 4.5", doc)
         self.assertIn("follows Haiku 5.5", doc)

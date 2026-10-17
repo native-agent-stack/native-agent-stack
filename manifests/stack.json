@@ -2479,7 +2479,7 @@
       "overturn": "A Claude Code release after 2.1.302 moves the background slot off Haiku 5.5, or Anthropic marks Haiku 5.5 legacy or retired.",
       "selection_scope": "Claude Code 2.1.302 client default (anthropics/claude-code CHANGELOG.md:642, 2.1.293) with no ANTHROPIC_DEFAULT_HAIKU_MODEL override on this host; corrects the 2026-10-07 Haiku 4.5 selection by docs/decisions/2026-10-17-background-haiku-currency-correction.md; no host configuration changed.",
       "route": "Native Claude account",
-      "distribution": "Hosted model alias; no local weights or CI calls"
+      "distribution": "Hosted canonical model ID; no local weights or CI calls"
     },
     {
       "id": "unsloth/Qwen3.8-27B-GGUF",
