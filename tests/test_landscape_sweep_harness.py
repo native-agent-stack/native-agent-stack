@@ -1455,10 +1455,12 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
             self.assertIn(f"[mcp_servers.{server}]", config)
         self.assertNotIn("supports_websockets = true", config)
         self.assertNotIn("http_headers", config)  # the 21128 default sends no provider headers
-        # The key never reaches a shell snapshot file, and GPT-6 Astra's search is Codex's standalone web.run.
-        for line in ("[features]", "shell_snapshot = false", "standalone_web_search = true",
-                     "supports_standalone_web_search = true"):
+        # The key never reaches a shell snapshot file, and both standalone web search switches are off by default:
+        # an OmniRoute release without /v1/alpha/search answers Codex's web.run POST with 404.
+        for line in ("[features]", "shell_snapshot = false", "standalone_web_search = false",
+                     "supports_standalone_web_search = false"):
             self.assertIn(line, config)
+        self.assertNotIn("standalone_web_search = true", config)
         self.assertNotIn("[projects.", config)
         self.assertNotIn("[hooks.state", config)
         self.assertNotIn("${", config)  # every template placeholder rendered
@@ -1470,8 +1472,8 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         if tomllib is not None:
             parsed = tomllib.loads(config)
             self.assertEqual(parsed["model_providers"]["omniroute"]["env_key"], "OMNIROUTE_API_KEY")
-            self.assertIs(parsed["model_providers"]["omniroute"]["supports_standalone_web_search"], True)
-            self.assertEqual(parsed["features"], {"shell_snapshot": False, "standalone_web_search": True})
+            self.assertIs(parsed["model_providers"]["omniroute"]["supports_standalone_web_search"], False)
+            self.assertEqual(parsed["features"], {"shell_snapshot": False, "standalone_web_search": False})
             # Codex 0.157.1 leaves its default *KEY* excludes off, so the key variable is excluded by name.
             self.assertEqual(parsed["shell_environment_policy"], {"filters": {"OMNIROUTE_API_KEY": "exclude"}})
             self.assertEqual(sorted(parsed["mcp_servers"]), sorted(TOKEN_MCP_SERVERS))
@@ -1484,10 +1486,66 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         self.assertEqual(codex["api_key_placeholder"], "local-loopback")  # keyless loopback gateway by default
         self.assertNotIn("local-loopback", config)  # the placeholder is runtime-only, never in the lane config
         self.assertEqual(codex["http_headers"], {})
+        self.assertNotIn("standalone_web_search", codex)  # the opt-in key is absent unless its option was given
         # The staged runner reads the same settings back.
         lane = codex_job.settings(work)
+        self.assertIs(lane["standalone_web_search"], False)
         self.assertEqual((lane["provider"], lane["codex_home"], lane["profile"], lane["http_headers"]),
                          ("omniroute", work / "codex-home", "stack-worker", {}))
+
+    def test_standalone_web_search_is_an_opt_in_that_switches_both_keys_together(self):
+        # openai/codex rust-v0.163.0 (83086188): the provider flag (model-provider-info/src/lib.rs:200-202) and the
+        # feature (features/src/lib.rs:1250-1255) both default false, and web.run POSTs <base_url>/alpha/search
+        # (codex-api/src/endpoint/search.rs:14-15), which an OmniRoute without that route answers with 404.
+        work, profile, done = self.stage_lane("--standalone-web-search")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        config = (work / "codex-home" / "config.toml").read_text(encoding="utf-8")
+        self.assertIn("standalone_web_search = true", config)
+        self.assertIn("supports_standalone_web_search = true", config)
+        self.assertNotIn("standalone_web_search = false", config)
+        try:
+            import tomllib
+        except ImportError:
+            tomllib = None
+        if tomllib is not None:
+            parsed = tomllib.loads(config)
+            self.assertIs(parsed["model_providers"]["omniroute"]["supports_standalone_web_search"], True)
+            self.assertEqual(parsed["features"], {"shell_snapshot": False, "standalone_web_search": True})
+        staged = json.loads((work / "staged.json").read_text())["codex"]
+        self.assertIs(staged["standalone_web_search"], True)
+        self.assertIs(codex_job.settings(work)["standalone_web_search"], True)
+        # The native lane has no provider block to switch, and the failover provider is the other place it applies.
+        native = build(stage_work(self), "--standalone-web-search")
+        self.assertEqual(native.returncode, 2)
+        self.assertIn("--standalone-web-search needs", native.stderr)
+        failover = build(stage_work(self), "--gpt6-fallback", "omniroute", "--standalone-web-search")
+        self.assertEqual(failover.returncode, 0, failover.stderr)
+
+    def test_lane_home_qmd_url_follows_the_hosts_qmd_url(self):
+        # The qmd MCP url comes from the host value QMD_URL (127.0.0.1:21851 when the host sets none), so a lane on a
+        # host whose service moved does not wait out Codex's 30 s startup timeout on a dead port.
+        profile = temp_dir(self) / "stack-worker.config.toml"
+        profile.write_text(STACK_WORKER_FIXTURE, encoding="utf-8")
+        example = json.loads((ROOT / "adoption" / "hosts" / "example.json").read_text(encoding="utf-8"))
+        try:
+            import tomllib
+        except ImportError:
+            tomllib = None
+        for qmd_url, expected in (("127.0.0.1:23851", "http://127.0.0.1:23851/mcp"), (None, "http://127.0.0.1:21851/mcp")):
+            with self.subTest(qmd_url=qmd_url):
+                host = temp_dir(self) / "qmdhost.json"
+                values = {key: value for key, value in example.items() if key != "QMD_URL"}
+                host.write_text(json.dumps({**values, **({"QMD_URL": qmd_url} if qmd_url else {})}), encoding="utf-8")
+                work = stage_work(self)
+                done = build(work, "--gpt6-provider", "omniroute", "--codex-host", host,
+                             "--stack-worker-profile", profile)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                config = (work / "codex-home" / "config.toml").read_text(encoding="utf-8")
+                self.assertNotIn("${", config)
+                if tomllib is not None:
+                    self.assertEqual(tomllib.loads(config)["mcp_servers"]["qmd"]["url"], expected)
+                else:
+                    self.assertIn(f'url = "{expected}"', config)
 
     def test_builder_and_runner_keep_the_name_patterns_equal(self):
         # build_args.py checks what it stages and codex_job.py what it runs; the two copies must never drift.
@@ -2370,7 +2428,7 @@ class OmniRouteFallbackRunnerTests(RunnerCase):
         self.assertEqual(result["route"], {"provider": "omniroute", "fallback_from": "native", "reason": LIMIT_TEXT,
                          "native_model": "gpt-6.1-sol", "gateway_model": "cx/gpt-6.1-sol-max", "native_attempt": 1,
                          "base_url": "http://127.0.0.1:20128/v1", "gateway_effort": "max",
-                         "search_backend": "omniroute:/alpha/search"})
+                         "search_backend": "none"})
         self.assertEqual(result["attempts"][0]["exit"], 3)
         self.assertIsNone(result["attempts"][0]["route"])
         self.assertEqual((kept / "events.jsonl").read_text(), "".join(json.dumps(e) + "\n" for e in native_events))
@@ -2395,15 +2453,36 @@ class OmniRouteFallbackRunnerTests(RunnerCase):
         self.assertFalse(native["api_key_present"])
         self.assertTrue(gateway["api_key_present"])
         configs = [gateway["argv"][i + 1] for i, arg in enumerate(gateway["argv"]) if arg == "-c"]
-        for config in ('model_provider="omniroute"', "features.standalone_web_search=true",
+        for config in ('model_provider="omniroute"', "features.standalone_web_search=false",
                        "features.shell_snapshot=false", 'shell_environment_policy.filters.OMNIROUTE_API_KEY="exclude"'):
             self.assertIn(config, configs)
+        self.assertNotIn("features.standalone_web_search=true", configs)
         block = next(c for c in configs if c.startswith("model_providers.omniroute="))
         for value in ('base_url = "http://127.0.0.1:20128/v1"', 'env_key = "OMNIROUTE_API_KEY"',
-                      'wire_api = "responses"', "requires_openai_auth = false", "supports_standalone_web_search = true"):
+                      'wire_api = "responses"', "requires_openai_auth = false", "supports_standalone_web_search = false"):
             self.assertIn(value, block)
         again = self.call("start", "gpt6-fallback", self.prompt, self.schema)
         self.assertEqual((again.returncode, again.stdout.strip()), (0, "already done: gpt6-fallback"))
+
+    def test_staged_standalone_web_search_switches_the_failover_provider_on(self):
+        # The opt-in (build_args.py --standalone-web-search, staged as codex.standalone_web_search) turns on both
+        # switches of the failover provider and records the /alpha/search backend in the route receipt.
+        self.settings({"model": "gpt-6.1-sol", "timeout_s": 400, "standalone_web_search": True, "fallback": {
+            "provider": "omniroute", "base_url": "http://127.0.0.1:20128/v1"}})
+        gateway_record = self.bin / "gateway-search.json"
+        result = self.job("gpt6-fallback-search", attempts=[
+            {"exit": 1, "events": [{"type": "error", "message": LIMIT_TEXT}], "stderr": "ERROR: " + LIMIT_TEXT + "\n"},
+            {"exit": 0, "events": [COMPLETED], "last": LAST, "record": str(gateway_record), "stderr": ""}])
+        self.assertEqual(result["route"]["search_backend"], "omniroute:/alpha/search")
+        gateway = json.loads(gateway_record.read_text())
+        configs = [gateway["argv"][i + 1] for i, arg in enumerate(gateway["argv"]) if arg == "-c"]
+        self.assertIn("features.standalone_web_search=true", configs)
+        self.assertNotIn("features.standalone_web_search=false", configs)
+        block = next(c for c in configs if c.startswith("model_providers.omniroute="))
+        self.assertIn("supports_standalone_web_search = true", block)
+        self.settings({"model": "gpt-6.1-sol", "standalone_web_search": "yes"})
+        with self.assertRaisesRegex(codex_job.UsageError, "standalone_web_search must be true or false"):
+            codex_job.settings(self.work)
 
     def test_native_limit_then_gateway_429_stops_the_lane(self):
         result = self.job("gpt6-exhausted", attempts=[

@@ -130,8 +130,9 @@ DO_NOT_TRACK = "1"
 command = "${ECO_ROOT}/bin/codebase-memory-mcp"
 
 [mcp_servers.qmd]
-# Shared native QMD lifecycle, pilot and inverse: docs/decisions/2026-10-08-qmd-shared-mcp.md.
-url = "http://127.0.0.1:21851/mcp"
+# Shared native QMD lifecycle, pilot and inverse: docs/decisions/2026-10-08-qmd-shared-mcp.md. QMD_URL is an optional
+# host value (loopback host:port); tools/adoption/render_config.py defaults it to that record's 127.0.0.1:21851.
+url = "http://${QMD_URL}/mcp"
 
 # context-mode's plugin server (.codex-plugin/mcp.json: `node ./start.mjs`, cwd ".") starts in the plugin
 # root, because Codex joins a plugin server's relative cwd to that root. Upstream start.mjs then sets no

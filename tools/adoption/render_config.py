@@ -39,6 +39,11 @@ an explicit spawn model retain the active parent step's ``model_info.slug``,
 including its routed alias, with ``[agents] default_subagent_reasoning_effort = "max"``.
 Explicit spawn model selections and role configuration retain their native precedence.
 
+``QMD_URL`` is an optional host selector for the shared QMD HTTP service the Codex template's ``qmd`` server
+reaches (``url = "http://${QMD_URL}/mcp"``). It is ``host:port`` on loopback, like ``AI_MEMORY_URL``, and defaults to
+``127.0.0.1:21851``, the bind of docs/decisions/2026-10-08-qmd-shared-mcp.md, so a host whose service moved sets it in
+its value file or with ``--set QMD_URL=127.0.0.1:<port>`` and every other host renders what it always did.
+
 One placeholder is an explicit opt-in instead of a host value:
 ``AI_MEMORY_CAPTURE_ASSISTANT`` renders nothing unless the host value file or
 ``--set`` sets it to ``true``, which appends ai-memory's ``--capture-assistant``
@@ -133,6 +138,9 @@ def parse_set_values(pairs: list[str]) -> dict[str, str]:
 
 
 CAPTURE_ASSISTANT = "AI_MEMORY_CAPTURE_ASSISTANT"
+QMD_URL = "QMD_URL"
+QMD_URL_DEFAULT = "127.0.0.1:21851"
+QMD_URL_PATTERN = re.compile(r"(?:127\.0\.0\.1|localhost):[0-9]{1,5}")
 AI_MEMORY_BIN = "AI_MEMORY_BIN"
 SOCRATICODE_VERSION = "SOCRATICODE_VERSION"
 CODEX_MODEL = "CODEX_MODEL"
@@ -191,6 +199,17 @@ def resolve_socraticode_version(values: dict[str, str], platform_id: str | None 
     return {**values, SOCRATICODE_VERSION: version}
 
 
+def resolve_qmd_url(values: dict[str, str]) -> dict[str, str]:
+    """Supply QMD_URL, the repository's default bind, when the caller did not; a given value must be loopback host:port."""
+    value = values.get(QMD_URL)
+    if not value:
+        return {**values, QMD_URL: QMD_URL_DEFAULT}
+    match = QMD_URL_PATTERN.fullmatch(value)
+    if match is None or not 1 <= int(value.rpartition(":")[2]) <= 65535:
+        raise RenderError(f"{QMD_URL} must be 127.0.0.1:PORT or localhost:PORT (1-65535), got {value!r}")
+    return values
+
+
 def codex_model_for(version: str) -> str:
     """The model CODEX_MODEL names for a Codex client of this version (the rule at CODEX_MODEL_SINCE)."""
     match = re.fullmatch(r"([0-9]+)\.([0-9]+)\.([0-9]+)", version)
@@ -238,6 +257,8 @@ def render_one(template_path: Path, values: dict[str, str], platform_id: str | N
         values = resolve_socraticode_version(values, platform_id)
     if "${" + CODEX_MODEL + "}" in text:
         values = resolve_codex_model(values, platform_id)
+    if "${" + QMD_URL + "}" in text:
+        values = resolve_qmd_url(values)
     resolved = resolve_opt_ins(values)
     try:
         return string.Template(text).substitute(resolved)

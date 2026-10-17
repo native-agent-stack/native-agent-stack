@@ -695,8 +695,9 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
     skills_run = bool(rounds_by_layer) and all(rounds[0]["catalog"] == SKILLS_CATALOG
                                                for rounds in rounds_by_layer.values())
     route_limits = (["GPT-6 transport-only native-to-OmniRoute failover is recorded per job in raw gpt6_routes; "
-                     "bound native inputs stay unchanged. Gateway standalone web search uses OmniRoute's /alpha/search "
-                     "backend; native search recall and outbound max-effort parity are unqualified."]
+                     "bound native inputs stay unchanged. Gateway standalone web search is off unless "
+                     "staged (codex.standalone_web_search), then it uses OmniRoute's /alpha/search backend; native "
+                     "search recall and outbound max-effort parity are unqualified."]
                     if any(r.get("gpt6_routes") for layer in returns["raw"].values() for r in layer.values()) else [])
     lanes = {"lanes": [{"lane": lane, "result": {"layers": lane_layers, "calls": calls_total,
                                                  "limits": [*method_limits(models, gpt6_model_text, skills_run),

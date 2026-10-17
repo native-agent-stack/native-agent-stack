@@ -53,10 +53,12 @@ on PATH.
 Opt-in native failover (staged.json codex.fallback, build_args.py --gpt6-fallback omniroute): a native limit or
 quota gate archives the native attempt unchanged, writes LIMIT-native with its reason and reported reset time,
 and reruns the same prompt/schema at the same effort in the held slot and total deadline. The transport-only inline
-provider keeps --ignore-user-config and the caller's CODEX_HOME/AGENTS.md, enables standalone web search, disables
-shell snapshots, excludes OMNIROUTE_API_KEY from model-run shells, and uses cx/<native model>-<request effort>
-where the pinned gateway supports that reasoning alias. inputs.json stays
-byte-identical; route.json and result.route describe the actual route and OmniRoute's /alpha/search backend.
+provider keeps --ignore-user-config and the caller's CODEX_HOME/AGENTS.md, disables shell snapshots, excludes
+OMNIROUTE_API_KEY from model-run shells, and uses cx/<native model>-<request effort> where the pinned gateway supports
+that reasoning alias. It leaves both standalone web search switches off unless staged.json codex.standalone_web_search
+is true (build_args.py --standalone-web-search): the switch makes Codex POST <base_url>/alpha/search, which a gateway
+release without that route answers 404. inputs.json stays byte-identical; route.json and result.route describe the
+actual route and its search_backend (OmniRoute's /alpha/search with the switch, "none" without it).
 While LIMIT-native exists, a no-model account/rateLimits/read probe precedes each new job: only explicit
 ordinaryUsageAllowed true removes that marker; otherwise the job goes directly to the gateway. No reset credit is
 consumed. Gateway 429s count only in error/turn.failed events and write LIMIT with reason "gateway pool 429".
@@ -260,7 +262,11 @@ HEADER_VALUE = re.compile(r"[!#-\[\]-~](?:[ !#-\[\]-~]{0,126}[!#-\[\]-~])?")
 PROVIDERS = ("native", "omniroute")
 LOOPBACK_V1_URL = re.compile(r"http://(?:127\.0\.0\.1|localhost):([0-9]{1,5})/v1")
 FALLBACK_KEY_ENV = "OMNIROUTE_API_KEY"
+# Standalone web search is opt-in (codex.standalone_web_search). With it on, Codex's web.run POSTs <base_url>/alpha/search
+# (openai/codex rust-v0.163.0 at 83086188ae0614bd882818ff1aa23f3194962012, codex-rs/codex-api/src/endpoint/search.rs:14-15
+# and 41-44), a route an OmniRoute release without upstream PR #13788 answers with 404 unknown_route.
 FALLBACK_SEARCH_BACKEND = "omniroute:/alpha/search"
+FALLBACK_NO_SEARCH_BACKEND = "none"
 # HouMinXi/OmniRoute@0585aba5589d5a1f49243a13a8db249558e7c9e3,
 # open-sse/executors/codex/reasoningSuffix.ts:11-19,35-62. Low through xhigh aliases strip any base;
 # max strips only these exact models. Ultra is resolved by the native client before choosing the suffix.
@@ -429,6 +435,10 @@ def settings(base: Path) -> dict:
     if rollout is not None and not isinstance(rollout, bool):
         raise UsageError("codex.rollout_usage must be true or false (or absent)")
     out["rollout_usage"] = bool(rollout)
+    standalone = staged.get("standalone_web_search")
+    if standalone is not None and not isinstance(standalone, bool):
+        raise UsageError("codex.standalone_web_search must be true or false (or absent)")
+    out["standalone_web_search"] = bool(standalone)
     out["ai_memory_token_env"] = ai_memory_settings(base, staged, out)
     return out
 
@@ -1079,11 +1089,16 @@ def codex_argv(codex: str, directory: Path, model: str, prompt: str, lane: dict 
     if lane is not None and lane.get("transport_only"):
         # Supported inline provider overrides (openai/codex rust-v0.159.3 model-provider-info/src/lib.rs).
         # Keep the native CODEX_HOME/AGENTS.md and --ignore-user-config; no lane home or MCP profile loads.
+        # Both standalone web search switches follow codex.standalone_web_search (default off): a gateway without
+        # /v1/alpha/search answers the standalone route with 404 (rust-v0.163.0 codex-api/src/endpoint/search.rs:14-15).
+        standalone = bool(lane.get("standalone_web_search"))
         provider = {"name": "OmniRoute", "base_url": lane["base_url"], "env_key": FALLBACK_KEY_ENV,
-                    "wire_api": "responses", "requires_openai_auth": False, "supports_standalone_web_search": True}
+                    "wire_api": "responses", "requires_openai_auth": False,
+                    "supports_standalone_web_search": standalone}
         block = "{ " + ", ".join(f"{key} = {json.dumps(value)}" for key, value in provider.items()) + " }"
         head.extend(["-c", 'model_provider="omniroute"', "-c", f"model_providers.omniroute={block}",
-                     "-c", "features.standalone_web_search=true", "-c", "features.shell_snapshot=false",
+                     "-c", f"features.standalone_web_search={json.dumps(standalone)}",
+                     "-c", "features.shell_snapshot=false",
                      "-c", f'shell_environment_policy.filters.{FALLBACK_KEY_ENV}="exclude"'])
     # Keep the built-in provider defaults (rust-v0.159.2, codex-rs/model-provider-info/src/lib.rs:492-510).
     # Codex rides out an outage shorter than idle_timeout_s; a longer one is stopped by the watchdog and
@@ -1350,7 +1365,8 @@ def fallback_route(base: Path, config: dict, *, reason: str | None = None,
              "reason": reason or marker.get("reason") or "LIMIT-native marker present",
              "native_model": model, "gateway_model": gateway_model, "native_attempt": native_attempt,
              "base_url": config["fallback"]["base_url"], "gateway_effort": config["request_effort"],
-             "search_backend": FALLBACK_SEARCH_BACKEND}
+             "search_backend": FALLBACK_SEARCH_BACKEND if config["standalone_web_search"]
+             else FALLBACK_NO_SEARCH_BACKEND}
     return {**config, **config["fallback"], "model": gateway_model, "transport_only": True,
             "api_key_env": FALLBACK_KEY_ENV, "api_key_placeholder": "local-loopback", "quota_stop_percent": None,
             "route": route}

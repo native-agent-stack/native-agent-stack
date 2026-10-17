@@ -5482,8 +5482,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "aa82f6f3a9df2c3c96c3154752a2b5de145498fb0d045af08fa0da7079a09c37",
-      "bytes": 74974
+      "sha256": "dbe6d7294d3ca43f298ca0494bbd8016dbf2ccf19652e39064e443d3cfc79f9c",
+      "bytes": 75432
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5567,8 +5567,8 @@
     },
     {
       "path": "adoption/hosts/example.json",
-      "sha256": "e373877423278ad2c2cbe0d8cf8fbf4086066365b90d2fb711492479ba1d3c9c",
-      "bytes": 1162
+      "sha256": "29ac523d2a1a272eb0a9369d09cb209a0af0d345be19acd0099c3983f6766e52",
+      "bytes": 1194
     },
     {
       "path": "adoption/hosts/macos-example.json",
@@ -5632,8 +5632,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "2ade836cc0fef1aab6adc1c1acc436036bcdd59f692142d86f30ccc8373cd56c",
-      "bytes": 57780
+      "sha256": "c46f7c67efb43dd40861a55af107384400407d19931f968560ebbc67ab6f35d4",
+      "bytes": 58231
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5887,13 +5887,13 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "9c7f810ad4874c6447a582787d58b5095cb8602ea61acb7557864eeccf315330",
-      "bytes": 19105
+      "sha256": "469d5714536cb5b2dd7d3e07c548215ec50ce65d6ee0c828e3a8ed3a3bf0eb7c",
+      "bytes": 19236
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
-      "sha256": "d7bceccbade707b4293e3157dd5929e9c2173c5c88436c0c99e3ac981686e958",
-      "bytes": 5562
+      "sha256": "864a866203a8366a858be9fc58c880ed19730dbcb3990a7ee2c50b059ee48616",
+      "bytes": 6533
     },
     {
       "path": "adoption/templates/codex.stack-worker.config.toml",
@@ -64238,8 +64238,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "a048170ec42e185e44cd3f6de8c3b7500a00437ef6914e27669b70d9593fa171",
-      "bytes": 196757
+      "sha256": "dd68b5b1f5b52ba0bd6f6dbb20b1d56294b5d1e8a0c01c00aa35afbdd8c81820",
+      "bytes": 197116
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -64603,8 +64603,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "69ee39d4d1007934ae0ee45d0d51e189ec3792da6c5c88bb90a4a7d98fbdefba",
-      "bytes": 392428
+      "sha256": "d18c4997372383f923825db8e6e7e4e5d1c0628e85c17719a6b1912e5b5c6242",
+      "bytes": 398010
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
@@ -64888,8 +64888,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "4f66cc1318f1b00cc589f7cff24b2e4c234ddbc6e1295ba20bdc6b269322555d",
-      "bytes": 345889
+      "sha256": "7bcf1444e97f63abd40033481efb29d21e471dba2f286f6e78cdf01a66f39385",
+      "bytes": 347265
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -65113,8 +65113,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "03d31001eef58ba1d6cf1498d9a7e9c6d6fe391d5ff9a4d02a9174bdc89dc136",
-      "bytes": 47826
+      "sha256": "8d83f841521bf97d4ee682f7ca60c2f3b860b4b9f592117156d5ba05ea7866c2",
+      "bytes": 50707
     },
     {
       "path": "tests/test_research_convergence_practice.py",
@@ -65563,8 +65563,8 @@
     },
     {
       "path": "tests/test_wsl_new_distro_recipe.py",
-      "sha256": "244cd5b910c53f5e79b125e890a84359acdf9b20907c5184ef302ba20cb39b1c",
-      "bytes": 240334
+      "sha256": "d0501b30d040817e81fd676df8a6d2f1937b6a4bcb99571111491482220a6a82",
+      "bytes": 240534
     },
     {
       "path": "tests/test_wsl_restore.py",
@@ -65643,8 +65643,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "f10bcc847295aa29a2a7f2829753f390d2b5928a17af4662020e77b786b1af1f",
-      "bytes": 167892
+      "sha256": "38addb6eba0259b2143ed6e495305f55f3840e1fe554e6b631b5154ecb2a6e2f",
+      "bytes": 168008
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
@@ -65653,8 +65653,8 @@
     },
     {
       "path": "tools/adoption/render_config.py",
-      "sha256": "40156162b38c04fd55e16e297d47327fc8dc452f43f57e634d5dac07b739a1ef",
-      "bytes": 19970
+      "sha256": "3ef2f41e901389915ab982ebf3b0437a277c5a9125af083eb554132d3b7eb9c8",
+      "bytes": 21162
     },
     {
       "path": "tools/adoption/render_launchd.py",
@@ -66088,13 +66088,13 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "e91507bc7d6c17267fb451ea4c45f08d3155d05c3153693340a96fe185c9a83e",
-      "bytes": 123184
+      "sha256": "c024ea5a9b0a9c89ec1c46023b740a42a5dab7128855bc1c04805ea676b4c0cc",
+      "bytes": 124385
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
-      "sha256": "cda5289351a8648579734cbb229fa593d89e428d7c069e51282a4ea447bd0056",
-      "bytes": 62100
+      "sha256": "416684b2a70d42caedf2b46e374a2f628a2eb0139ad60bc824b96d7ad2719a81",
+      "bytes": 63878
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
@@ -66108,13 +66108,13 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
-      "sha256": "8086d3c02f3bb0015ff61037471c518455cae4b9622eeabbf4fa83a492db7ffc",
-      "bytes": 109265
+      "sha256": "dec954bdc40b7e3de9f81f60d162ecc2efca9803b2ed129344090401a12138c5",
+      "bytes": 110628
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
-      "sha256": "ad5a99e41cebb40df9568b66cedd0f754dc271581934d6f523b9ed203d872eab",
-      "bytes": 60145
+      "sha256": "70d7b5781d699e0df289cdcccc261ff6b932e28080a818a41510474afa2b382c",
+      "bytes": 60229
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/make_prompt.py",
