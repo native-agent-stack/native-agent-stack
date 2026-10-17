@@ -29,7 +29,7 @@ from urllib.parse import urlencode
 
 ACTIONS_TTL_SECONDS = 540
 PRODUCER_TIMEOUT_SECONDS = 90
-REPO = "seathatflowsinourveins/native-agent-stack"
+REPO = "native-agent-stack/native-agent-stack"
 MAX_SOURCE_BYTES = 2_000_000
 RUN_FIELDS = "workflowName,status,conclusion,databaseId,startedAt,updatedAt,url"
 # Linux UAPI include/uapi/linux/fcntl.h F_ADD_SEALS/F_GET_SEALS and seal bits:

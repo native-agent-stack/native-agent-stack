@@ -12,7 +12,7 @@
       "rules_files": ["AGENTS.md", "REVIEW.md"]
     },
     {
-      "repo": "seathatflowsinourveins/native-agent-stack",
+      "repo": "native-agent-stack/native-agent-stack",
       "alias": "nas",
       "visibility": "public",
       "every_pr": false,

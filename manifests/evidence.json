@@ -5287,8 +5287,8 @@
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
-      "sha256": "edfec4da5226ef7d7dd614542c551a9060df55308c2a171dfc294fd16d388493",
-      "bytes": 20825
+      "sha256": "47c84a2cf7aaaed3d9d8ba6ed83bc48467327ee398132a990aa8c8ff340ef7fe",
+      "bytes": 20817
     },
     {
       "path": ".github/workflows/receipt-staleness.yml",
@@ -5737,8 +5737,8 @@
     },
     {
       "path": "adoption/scaffold/.github/workflows/sota-sources.yml.template",
-      "sha256": "9d6f5dbd746e9c0589ad26aa103ced6f2b1f1290a39a6beee7711efc3495db3c",
-      "bytes": 1107
+      "sha256": "bcfe5ea866c3af74bd48c8ad6081063c6861ebd2119fb8125840cc72fb850cba",
+      "bytes": 1099
     },
     {
       "path": "adoption/scaffold/AGENTS.md",
@@ -62893,8 +62893,8 @@
     },
     {
       "path": "observability/claude-usage/claude-usage.service",
-      "sha256": "51de4e7b6f32b656156ae416cf0dbd98ca4b812b1ee8acd39cb895be28fc8cc3",
-      "bytes": 962
+      "sha256": "f4ee6903759cb84353f3b22e2ea72e9567951cb7ce3de0f2c6b0a0a094da8173",
+      "bytes": 958
     },
     {
       "path": "observability/claude-usage/claude-usage.timer",
@@ -64173,8 +64173,8 @@
     },
     {
       "path": "tests/test_claude_review_worker.py",
-      "sha256": "364005528d757e82d87dc5bb70e24104ef0033c78fe54db18ec2c361e707419c",
-      "bytes": 151108
+      "sha256": "19e7e375706f793c55fd8f61dc65f695b1305dc7669cc9e06fe2fc6d216c6a36",
+      "bytes": 155399
     },
     {
       "path": "tests/test_claude_spend_scan.py",
@@ -64663,8 +64663,8 @@
     },
     {
       "path": "tests/test_local_pages_fleet_data.py",
-      "sha256": "b3a17d47fdbf49ecce6bad308f3eab1979ca558843b7a03025c5fadff516865c",
-      "bytes": 34060
+      "sha256": "8fa4971277e88c634d9555a2ef6fe5dd3e9e5b5dceacac276d8ae38636ffd173",
+      "bytes": 34861
     },
     {
       "path": "tests/test_local_pages_fleet_regressions.py",
@@ -65338,8 +65338,8 @@
     },
     {
       "path": "tests/test_sota_sources_gate.py",
-      "sha256": "869038ea7c6261e335e942934b335789e9f3e883ee172835a1c0828ea4afa870",
-      "bytes": 16230
+      "sha256": "98b3b1744885ea7147b37f3d57951b8c62c2753e4db49215e3a0f0336407f06b",
+      "bytes": 16226
     },
     {
       "path": "tests/test_spy_parity.py",
@@ -65753,8 +65753,8 @@
     },
     {
       "path": "tools/claude-review-worker/essential-paths.json",
-      "sha256": "68c9ea2f3f50d996da35491ff3a0d1892bb217b67006ca2fd07eae094030a9f3",
-      "bytes": 4190
+      "sha256": "3e6f92f8c4b9870b48ee92c1cf64be7b9914792ea54c2115a044345a292652ff",
+      "bytes": 4186
     },
     {
       "path": "tools/claude-review-worker/probes.py",
@@ -65763,8 +65763,8 @@
     },
     {
       "path": "tools/claude-review-worker/systemd/claude-review-worker.service",
-      "sha256": "b6b5268e4a4a0cdb91ce351cf2c8554a02fe2c466fe2740d7bad15d33207be18",
-      "bytes": 2680
+      "sha256": "a43e54cfb782c2ad4b33a03be45e081886555dc94b0c61407512762abbe48a23",
+      "bytes": 2676
     },
     {
       "path": "tools/claude-review-worker/systemd/claude-review-worker.timer",
@@ -65773,8 +65773,8 @@
     },
     {
       "path": "tools/claude-review-worker/worker.py",
-      "sha256": "f4f218b8921cc2ed79de894c059e1d1a217775b5b24b49e16de74fa1db0aac99",
-      "bytes": 141302
+      "sha256": "31e48ad392f1b1cfd5e62205fe4cc66a818272b572cc068893674dd5bbe5f85a",
+      "bytes": 143786
     },
     {
       "path": "tools/credentials/anthropic_key_health.py",
@@ -65828,8 +65828,8 @@
     },
     {
       "path": "tools/invocation-monitoring/claude_counter.py",
-      "sha256": "f869e2dd4a35e5f1b43550a27144c424a77b148cecf90dcfad15adb1cb4979ec",
-      "bytes": 35365
+      "sha256": "192ff7e6e0b5bb499092ab337855868abcd7f6051bfaf01a5bdf897551a716b3",
+      "bytes": 35361
     },
     {
       "path": "tools/invocation-monitoring/codex_counter.py",
@@ -65898,8 +65898,8 @@
     },
     {
       "path": "tools/local-pages/fleet_data.py",
-      "sha256": "4eb64c8766e3a5de0aa9aca5ca3272c415435d2d14f1d0db9569b80dbcd98e32",
-      "bytes": 62686
+      "sha256": "9627c4437db06d7992e55a385f2f5f2e92c87dd4cf22c19f1813ea47193ffb0e",
+      "bytes": 62682
     },
     {
       "path": "tools/local-pages/fleet_view.py",
@@ -66478,8 +66478,8 @@
     },
     {
       "path": "tools/token-report/token_manifest.full.html.in",
-      "sha256": "c9807a2c4996fa5ec1942eb950259feec38891574c5ff2e3e7f7b4fab33de516",
-      "bytes": 40182
+      "sha256": "8d13af20d780ba4096e9cf46b7f212630cb2427616dc006614063e0f1732fd08",
+      "bytes": 40178
     },
     {
       "path": "tools/token-report/token_manifest.html.in",

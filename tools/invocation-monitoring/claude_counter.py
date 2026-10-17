@@ -541,7 +541,7 @@ def main():
     report = {
         "kind": "claude_native_session_counter", "schema_version": 3,
         "observed_at": datetime.now(timezone.utc).isoformat(),
-        "source": {"repository": "seathatflowsinourveins/native-agent-stack", "pin": SOURCE_PIN, "integration_reference": "examples/claude-native/workflows/child-usage.mjs:2854,3197"},
+        "source": {"repository": "native-agent-stack/native-agent-stack", "pin": SOURCE_PIN, "integration_reference": "examples/claude-native/workflows/child-usage.mjs:2854,3197"},
         "counter_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "overlap_warning": "Windows overlap; their counts must never be added together",
         "contract": {

@@ -13,7 +13,7 @@
 # convention (codex-broker-reaper.service).
 [Unit]
 Description=Poll GitHub host requests for the workstation role (read-only)
-Documentation=https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/recipes/host-request-lane.md
+Documentation=https://github.com/native-agent-stack/native-agent-stack/blob/main/recipes/host-request-lane.md
 
 [Service]
 Type=oneshot

@@ -1082,7 +1082,16 @@ def assistant_texts(records: list) -> list:
 
 
 TOKEN_FIELDS = ("input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")
-REPO_SHORT = {"seathatflowsinourveins/native-agent-stack": "nas", "seathatflowsinourveins/us-equities-trading": "uet"}
+REPO_SHORT = {"native-agent-stack/native-agent-stack": "nas", "seathatflowsinourveins/us-equities-trading": "uet"}
+# A ledger row written before the repository moved to its organization names the old owner; the repository name alone
+# still tells which short name it had. GitHub compares owner and name without case, so the lookups below do too.
+REPO_SHORT_BY_NAME = {"native-agent-stack": "nas", "us-equities-trading": "uet"}
+
+
+def same_repository(full_name, canonical: str) -> bool:
+    """Whether the API's full_name (a pull request's head or base repository) names the canonical repository.
+    GitHub treats owner and name case-insensitively; a missing or non-string name is never the repository."""
+    return isinstance(full_name, str) and full_name.casefold() == canonical.casefold()
 
 
 def use_case_of(detail: dict) -> str:
@@ -1091,7 +1100,8 @@ def use_case_of(detail: dict) -> str:
     if detail.get("probe"):
         return f"review-worker probe ({safe_name(detail['probe'])})"
     repo = detail.get("repo") if isinstance(detail.get("repo"), str) else ""
-    short = REPO_SHORT.get(repo, repo.split("/")[-1] or "?")
+    basename = repo.split("/")[-1]
+    short = (REPO_SHORT.get(repo.casefold()) or REPO_SHORT_BY_NAME.get(basename.casefold()) or basename or "?")
     return f"PR review {short}#{detail.get('pr')}"
 
 
@@ -1697,6 +1707,7 @@ class Worker:
         self.ledger = Ledger(settings.ledger) if settings.ledger else None
         self.attempts = Attempts(self.state)
         self.visibility: dict = {}
+        self.canonical: dict = {}  # configured repository name -> the API's canonical full_name, read once
         self.binary: dict = {}
         self.preflight_detail = ""
         self.login: str | None = None  # the gh login that posts, read once a tick when a retry must be reconciled
@@ -1857,9 +1868,16 @@ class Worker:
                 if summary is not None:
                     summary["repos"][repo.name] = note
                 continue
+            canonical = self.canonical_name(repo, info)
+            if canonical is None:
+                note["error"] = "the API named no canonical full_name"
+                self.log(f"{repo.name}: the API returned no usable full_name; skipped this tick")
+                if summary is not None:
+                    summary["repos"][repo.name] = note
+                continue
             note["open"] = len(pulls)
             for pull in pulls:
-                head = self.head_of(repo, pull)
+                head = self.head_of(repo, pull, canonical)
                 if head is not None:
                     heads.append(head)
                     note["kept"] += 1
@@ -1868,17 +1886,35 @@ class Worker:
         heads.sort(key=lambda h: h.updated_at, reverse=True)
         return heads
 
+    def canonical_name(self, repo: Repo, info) -> str | None:
+        """The repository's canonical owner/name: the full_name that GET repos/<configured name> returns (REST follows
+        the redirect a rename or transfer leaves, and answers with the current name). It is read once per process and
+        kept, so a later rename or transfer cannot make every same-repository head read as foreign without a trace:
+        a canonical name that differs from the configured one is logged as a warning. None (fail closed) when the
+        answer holds no usable full_name."""
+        known = self.canonical.get(repo.name)
+        if known is not None:
+            return known
+        full_name = info.get("full_name") if isinstance(info, dict) else None
+        if not (isinstance(full_name, str) and REPO_NAME.fullmatch(full_name)):
+            return None
+        self.canonical[repo.name] = full_name
+        if full_name.casefold() != repo.name.casefold():
+            self.log(f"<4>WARNING {repo.name} is now {full_name}; update the configuration (the redirect answers "
+                     f"until a repository is created at the old name)")
+        return full_name
+
     @staticmethod
-    def head_of(repo: Repo, pull) -> Candidate | None:
+    def head_of(repo: Repo, pull, canonical: str) -> Candidate | None:
         if not isinstance(pull, dict):
             return None
         head, base, user = pull.get("head") or {}, pull.get("base") or {}, pull.get("user") or {}
         number, sha = pull.get("number"), head.get("sha")
         if not (is_count(number) and number > 0 and isinstance(sha, str) and SHA.fullmatch(sha)):
             return None
-        if (head.get("repo") or {}).get("full_name") != repo.name:
+        if not same_repository((head.get("repo") or {}).get("full_name"), canonical):
             return None  # a fork's head: never reviewed here
-        if (base.get("repo") or {}).get("full_name") != repo.name or base.get("ref") != repo.base:
+        if not same_repository((base.get("repo") or {}).get("full_name"), canonical) or base.get("ref") != repo.base:
             return None
         login = user.get("login") if isinstance(user.get("login"), str) else ""
         if user.get("type") == "Bot" or login.endswith("[bot]"):
