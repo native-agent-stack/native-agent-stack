@@ -2106,6 +2106,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/loopback_census.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/native_token_ci.py"
     },
     {
