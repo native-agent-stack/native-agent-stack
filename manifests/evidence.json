@@ -18563,8 +18563,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-key-management.md",
-      "sha256": "fc1c1b65144f9c014f711c16b9650ce38e1b07125bad86284b7c9ce7e5794c60",
-      "bytes": 99808
+      "sha256": "b9205bb0ceb4643c1471696a73c1b5d1e516adda78e47c49e3f051d94e53664a",
+      "bytes": 104961
     },
     {
       "path": "docs/decisions/2026-09-29-max-default-effort.md",
@@ -65868,8 +65868,8 @@
     },
     {
       "path": "tools/credentials/canary_scan_worker.py",
-      "sha256": "ff6eb5cdc6cc1e5e3682f8dbaf249fe88478c90a1dd77ebd524b97dc77e22f9a",
-      "bytes": 108353
+      "sha256": "7dc771d580bf98b2fbee93751f5a1ee1a311de545319b7b406bc008921e99227",
+      "bytes": 109517
     },
     {
       "path": "tools/credentials/canary_workflow.js",

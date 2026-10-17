@@ -1310,3 +1310,80 @@ documented ai-memory runs do not, so the canary exclusions cover the value
 exported to the proof itself instead of relying on the flag. A value exported
 only in the writer's shell is not caught: binding it at prepare is a recorded
 follow-up.
+
+### Fold 9 (2026-10-17): descriptor-path provenance (NC-1240-1)
+
+The canonical-exclusion mechanism above uses the kernel's descriptor path,
+including its ambiguous deletion suffix. This closes the missing provenance
+in `tools/credentials/canary_scan_worker.py:418-427` at `ac01e51b`; the
+ai-memory configuration sources establish data-directory resolution only.
+
+- The host reports `6.18.54.1-microsoft-standard-WSL2` from `uname -r`.
+  The supplied read-only Git checkout resolves
+  **microsoft/WSL2-Linux-Kernel@linux-msft-wsl-6.18.54.1 (d504d40a)**,
+  full commit `d504d40ab83839cb61942a812a99d183c42227b9`.
+  [`fs/proc/fd.c:174-189,211-214`](https://github.com/microsoft/WSL2-Linux-Kernel/blob/d504d40ab83839cb61942a812a99d183c42227b9/fs/proc/fd.c#L174)
+  binds descriptor links to the open file's path and the proc link operations;
+  [`fs/proc/base.c:1823,1838-1854`](https://github.com/microsoft/WSL2-Linux-Kernel/blob/d504d40ab83839cb61942a812a99d183c42227b9/fs/proc/base.c#L1823)
+  passes that path through `d_path` for `readlink`.
+  **microsoft/WSL2-Linux-Kernel@linux-msft-wsl-6.18.54.1 (d504d40a):fs/d_path.c:255-256**
+  explicitly calls the appended ` (deleted)` ambiguous;
+  [`fs/d_path.c:287-288`](https://github.com/microsoft/WSL2-Linux-Kernel/blob/d504d40ab83839cb61942a812a99d183c42227b9/fs/d_path.c#L287)
+  appends it for an unlinked dentry. `fs/d_path.c:318-325` also shows
+  `simple_dname` prepending that suffix at line 322.
+- The supplied man-pages Git checkout resolves
+  **kernel.org/pub/scm/docs/man-pages/man-pages@man-pages-6.19 (adb436b2)**,
+  full commit `adb436b2e4471218021d86f188fb58dec3946eb8`.
+  [`man/man5/proc_pid_fd.5:13-23`](https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git/tree/man/man5/proc_pid_fd.5?h=man-pages-6.19#n13)
+  documents descriptor entries as symbolic links to the actual file and
+  reading links with `readlink`. That page does **not** document the deletion
+  suffix at this release. The exact suffix documentation is
+  **kernel.org/pub/scm/docs/man-pages/man-pages@man-pages-6.19 (adb436b2):man/man5/proc_pid_exe.5:23-25**
+  for executable links and `man/man5/proc_pid_maps.5:151-153` for mappings,
+  which also states the ambiguity. These pages describe those interfaces;
+  the pinned kernel call chain above establishes descriptor-link behavior.
+
+`fd_path` already refuses every target ending in ` (deleted)` by returning
+`None`. It cannot distinguish an unlinked entry from a live file or directory
+whose actual name ends in that suffix, and it rejects both. It never strips
+the suffix or attempts to validate it with another path lookup. Its production
+callers use directory descriptors: a suffixed directory root, or a suffixed
+parent of a file root, therefore ends the walk as `walk_error` and makes the
+sink incomplete. A file root's own basename is joined to its accepted parent's
+path separately and preserved verbatim; a live file whose basename alone ends
+in the suffix is scanned under that full name. This is the existing fail-closed
+policy, with a conservative refusal for ambiguous directory-descriptor paths.
+
+This fold changes comments, this addendum and the retained PR body, plus their
+evidence rows.
+No executable behavior or test changes are needed. The existing
+`tests/test_canary_proof.py:967-997` checks missing canonical paths for both root
+forms and the real, removed and non-path descriptor cases. Its rerun is
+synthetic local verification; the kernel and manual citations are
+`source_review`, not an executed full proof or a new platform qualification.
+
+Verification for this fold (CI virtual environment on `PATH`):
+
+- `python3 -m unittest tests.test_canary_proof.UnitTests.test_ai_memory_root_without_a_canonical_path_is_incomplete`:
+  exit 0, one existing test passed.
+- Comparing the worker's parsed AST with `ac01e51b` after removing docstrings:
+  exit 0, executable ASTs identical. No test file changed, so the verdict's
+  conditional fail-first requirement does not apply.
+- `git diff --exit-code` against each supplied upstream tag for all cited
+  kernel and man-page files: exit 0 for both repositories.
+- `python3 scripts/validate.py`: exit 0, 12,308 hashed files, 71 components,
+  four profiles and 243 manifest receipts. This checks integrity and scope.
+- `python3 scripts/evidence_manifest.py --check`: exit 0, 12,308 file rows.
+- `python3 scripts/host_receipts.py validate`: exit 0, 183 host receipts.
+
+Resolution boundary: `catalogs/landscape/foundation.json` still records the
+`secrets-credentials` verdict, with wave
+`catalogs/sota-convergence/layer-verdicts-20260922.json` indexed by
+`catalogs/sota-convergence/layer-verdict-waves.json`. The latest covering ledger
+row is `landscape-sweep-20260929` in `catalogs/saturation/ledger.json`, with
+`catalogs/sota-convergence/manifest-20260929.json` and retained
+`evidence/artifacts/landscape-sweep-20260929/returns.json`. Its Betterleaks,
+Noseyparker and ggshield survivor rows, earlier unresolved adjudications and
+the layer's existing gaps retain their status. The bounded action here is
+NC-1240-1's missing descriptor-path provenance; no candidate comparison or
+default selection is reopened.

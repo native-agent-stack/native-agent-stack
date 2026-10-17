@@ -417,9 +417,19 @@ def verify_scope() -> None:
 
 def fd_path(fd: int):
     """The canonical path of an open directory descriptor, as the kernel records it (/proc/self/fd/<fd>; the proof runs on Linux
-    only, canary_proof.py platform_check), or None when unavailable or the directory was removed. A walked entry's real location
+    only, canary_proof.py platform_check), or None when unavailable or the spelling is ambiguous. A walked entry's real location
     is this path plus "/" plus its relative path, because every directory below a root is opened O_NOFOLLOW relative to its parent
     (A2 finding G8-A02: exclusions match on literal or canonical spellings)."""
+    # NC-1240-1: microsoft/WSL2-Linux-Kernel@linux-msft-wsl-6.18.54.1 (d504d40a):fs/d_path.c:255-256,287-288,318-325
+    # documents the ambiguous suffix and appends it. At that same pin, fs/proc/fd.c:174-189,211-214 wires descriptor links
+    # to fs/proc/base.c:1823,1838-1854, which renders their targets with d_path.
+    # kernel.org/pub/scm/docs/man-pages/man-pages@man-pages-6.19 (adb436b2):man/man5/proc_pid_fd.5:13-23 documents
+    # descriptor symlinks/readlink, but not the suffix; man/man5/proc_pid_exe.5:23-25 documents it for executable links,
+    # and man/man5/proc_pid_maps.5:151-153 notes the same ambiguity for mappings. The kernel establishes the fd behavior.
+    # Reject every suffixed target, including a live file or directory whose actual name ends in " (deleted)"; never strip
+    # the suffix or try to distinguish it by another path lookup. None makes Walk.traverse fail closed with walk_error
+    # for a directory root or a file root's parent, so the sink is incomplete. A file root's own basename is preserved
+    # separately; a literal suffix on that basename alone does not pass through fd_path and is scanned under its full name.
     try:
         target = os.readlink(b"/proc/self/fd/%d" % fd)
     except OSError:
