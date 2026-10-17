@@ -253,27 +253,18 @@ def override_value(name: str, env) -> str | None:
     return value or None
 
 
-def override_paths(entry: dict, env, roots=()) -> list[str]:
-    """The entry's store file under each of its override variables' absolute, non-blank values, in every spelling an exact-byte
-    matcher may meet: the template with the variable's directory (OVERRIDE_DEFAULTS) replaced by the value as written, its normpath,
-    its realpath (ai-memory canonicalises its data directory: v2.4.1 config.rs:1366, v2.3.2 :1145, v3.1.0 :2357), and that realpath
-    re-anchored on each of `roots` whose realpath contains it (the canary worker builds children from each root's own string). A
-    relative or blank value adds nothing here (canary_proof.py refuses it at prepare). These paths only add key exclusions; no root
-    follows them."""
-    template, found = entry["store"]["path_template"], set()
+def override_paths(entry: dict, env) -> list[str]:
+    """The entry's store file under each of its override variables' absolute, non-blank values, as written: the template with the
+    variable's directory (OVERRIDE_DEFAULTS) replaced by the value. ai-memory canonicalises its data directory (v2.4.1
+    config.rs:1366, v2.3.2 :1145, v3.1.0 :2357); the canary proof adds each exclusion's canonical form beside this literal one
+    (canary_proof.py canonical_exclusion) and its worker matches either. A relative or blank value adds nothing here (the proof
+    refuses it at prepare). These paths only add key exclusions; no root follows them."""
+    template, found = entry["store"]["path_template"], []
     for name in entry.get("override_variables", []):
         value, default = override_value(name, env), OVERRIDE_DEFAULTS.get(name, "")
-        if not (value and os.path.isabs(value) and default and template.startswith(default + "/")):
-            continue
-        literal = str(Path(value) / template[len(default) + 1:])
-        real = os.path.realpath(literal)
-        found.update({literal, os.path.normpath(literal), real})
-        for root in roots:
-            anchor = os.path.realpath(root)
-            if real.startswith(anchor.rstrip("/") + "/"):
-                found.add(root.rstrip("/") + real[len(anchor.rstrip("/")):])
-    found.discard(os.path.normpath(str(expand_template(template, env))))
-    return sorted(found)
+        if value and os.path.isabs(value) and default and template.startswith(default + "/"):
+            found.append(str(Path(value) / template[len(default) + 1:]))
+    return found
 
 
 def native_store_overrides(entries, env) -> list[str]:

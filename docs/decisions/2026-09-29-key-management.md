@@ -1267,9 +1267,22 @@ An inventory row may now carry an optional `override_variables` list, beside
     the default, empty and blank included.
   - **The canary proof** refuses at prepare, with
     `override_variable_not_absolute`, an empty, blank or relative value. For
-    an absolute value it also excludes the row's file as key paths: as
-    written, normalised, resolved through symlinks, and re-anchored on each
-    scan root's own path. No scan root moves.
+    an absolute value it also excludes the row's file, as written, as a key
+    path. No scan root moves.
+  - **Exclusions match on canonical forms on both sides** (fold 7; this
+    covers every exclusion, not only these rows):
+    - Prepare adds, beside each literal exact exclusion and each glob
+      exclusion's directory, the form `realpath(dirname) + "/" + basename`.
+      The final component is never resolved, so a symlink planted at a token
+      name excludes only itself.
+    - The scan worker takes each walked root's canonical path from the
+      directory descriptor it opened (`/proc/self/fd/<fd>`; the proof runs on
+      Linux only). It excludes an entry when either its literal spelling or
+      `canonical_root + "/" + rel` matches, and for a glob rule, its parent
+      either way.
+    - The same code serves `dir`, `glob`, `git` and `tasks` roots. The tests
+      exercise `dir` and `glob` roots through the worker's own walk; the
+      `tasks` root is not separately tested.
   - **The runner** leaves the variable in a child's environment.
 
 The settings template's hooks pass `--data-dir` with the default. Other

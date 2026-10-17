@@ -682,9 +682,7 @@ def exclusions(home: str, codex: list, env, transcripts: str, group: str, pointe
     inventory = json.loads((ROOT / cs.INVENTORY).read_text(encoding="utf-8"))
     exact += [(str(cs.expand_template(entry["store"]["path_template"], env)), "key")
               for entry in inventory["entries"] if entry["store"]["kind"] in cs.LOCAL_KINDS]
-    walked = [path for recipes in sink_roots(h, os.getuid(), codex, "").values() for kind, path in recipes
-              if kind in ("dir", "file", "git") and os.path.isabs(path)]  # each root's own string, as the worker joins children
-    exact += [(path, "key") for entry in inventory["entries"] for path in cs.override_paths(entry, env, walked)]  # no root moves
+    exact += [(path, "key") for entry in inventory["entries"] for path in cs.override_paths(entry, env)]  # no root moves
     glob = [(f"{h}/.claude/sessions", "*.key", "key")]
     for path in codex:
         exact.append((f"{path}/auth.json", "key"))
@@ -700,7 +698,21 @@ def exclusions(home: str, codex: list, env, transcripts: str, group: str, pointe
         glob.append((f"{h}/.claude", "settings.json.*", "user"))
     if transcripts == "exclude":
         exact.append((f"{h}/.claude/projects", "declined"))
+    # Each exclusion also in its canonical form, which the worker matches against canonical_root + "/" + rel (canary_scan_worker.py
+    # Walk.canonical_of): the literal spelling stays beside it (A2 finding G8-A02).
+    exact += [(canonical_exclusion(path), klass) for path, klass in exact]
+    glob += [(canonical_exclusion(directory), pattern, klass) for directory, pattern, klass in glob]
     return sorted(set(exact)), sorted(set(glob))
+
+
+def canonical_exclusion(path: str) -> str:
+    """realpath(dirname) + "/" + basename, trailing slashes dropped first; the final component is never resolved, so a symlink
+    planted at an excluded name excludes only itself, never its target. A relative path is returned unchanged."""
+    if not os.path.isabs(path):
+        return path
+    trimmed = path.rstrip("/") or "/"
+    parent, name = os.path.split(trimmed)
+    return trimmed if not name else os.path.join(os.path.realpath(parent), name)
 
 
 def resolve_executables() -> dict:
