@@ -2717,5 +2717,44 @@ class McpStartupTimeoutTemplateTests(unittest.TestCase):
         self.assertEqual(env.get("MCP_TIMEOUT"), "120000")
 
 
+class RtkSpellingSkillsCliDenyTests(unittest.TestCase):
+    """rtk 0.51.0 rewrites every npx command to `rtk npx` (rtk-ai/rtk@v0.51.0 src/discover/rules.rs:120). A model can
+    type that spelling itself, and rtk's own deny check matches the raw segment without stripping a leading assignment
+    (src/hooks/permissions.rs:84-90) while its rewrite strips and keeps one (src/discover/registry.rs:64-74,
+    :1635-1653): `X=1 npx skills add ...` reaches Claude Code as `X=1 rtk npx skills add ...`, and since 2.1.290 the
+    deny rules apply to that rewritten input (anthropics/claude-code CHANGELOG.md@v2.1.302 L916). So each npx form of
+    the skills CLI denies is denied in its rtk spelling too, as the push denies are
+    (ProfileTemplateSettingsTests.test_the_push_denies_also_match_the_rtk_rewrite)."""
+
+    BLOCKED = ("npx skills add owner/repo@skill -g -y", "npx skills add vercel-labs/agent-skills@react-best-practices",
+               "npx skills update", "npx skills remove name -g -y", "npx -y skills@1.7.0 add owner/repo@skill -g -y",
+               "npx --yes skills@latest install owner/repo", "npx skills@1.7.0 remove name -g -y", "npx skills check",
+               "npx -y skills@1.7.0 update", "npx skills experimental_install")
+    ALLOWED = ("npx skills find react performance", "npx skills find", "npx skills find pr review --owner vercel-labs",
+               "npx -y skills@1.7.0 find changelog", "npx skills init my-xyz-skill")
+
+    def test_every_npx_skills_cli_deny_also_denies_the_rtk_spelling(self):
+        profile = ProfileTemplateSettingsTests()
+        deny = profile.settings()["permissions"]["deny"]
+        for rule in (r for r in profile.skills_cli_rules() if r.startswith("Bash(npx ")):
+            with self.subTest(twin=rule):
+                self.assertIn("Bash(rtk " + rule[len("Bash("):], deny)
+        rules = [rule for rule in deny if rule.startswith("Bash(")]
+
+        def denied(command: str) -> bool:
+            # Deny rules match past any leading variable assignment (permissions page, "Wrappers").
+            command = re.sub(r"^(?:[A-Za-z_][A-Za-z0-9_]*=\S*\s+)+", "", command)
+            return any(profile.bash_rule_matches(rule, command) for rule in rules)
+
+        for command in self.BLOCKED:
+            for spelling in ("rtk " + command, "DISABLE_TELEMETRY=1 rtk " + command):
+                with self.subTest(denied=spelling):
+                    self.assertTrue(denied(spelling))
+        for command in self.ALLOWED:
+            for spelling in (command, "rtk " + command):
+                with self.subTest(allowed=spelling):
+                    self.assertFalse(denied(spelling))
+
+
 if __name__ == "__main__":
     unittest.main()

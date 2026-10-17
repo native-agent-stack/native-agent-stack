@@ -1358,3 +1358,16 @@ go to the command center as a host diff. No piece is unwired and no sentence of 
 All earlier projections remain historical observations.
 
 Today: 404 pieces, 364 wired (211 practice, 153 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces
+
+## Addendum 2026-10-17: the rtk spelling of the skills CLI denies
+
+The template's `permissions.deny` gains an `rtk npx` twin right after each of its 19 `npx *skills` rules. rtk 0.51.0
+rewrites every npx command to `rtk npx` (rtk-ai/rtk@v0.51.0 src/discover/rules.rs:120), and since 2.1.290 Claude
+Code applies its deny rules to the input a PreToolUse hook rewrote (anthropics/claude-code CHANGELOG.md@v2.1.302
+L916). The twins deny that spelling, as the `rtk git push` twins already do for the force-push rules. Their 19
+pieces `claude/settings/permission/deny/Bash(rtk npx ...)` are wired through the `command-output` slot, whose map
+entry matches `claude/settings/permission/deny/Bash(rtk *` (adoption/new-wsl/client-config-map.json:265-275). No
+piece is unwired and no sentence of the instruction blocks changes. All earlier projections remain historical
+observations.
+
+Today: 423 pieces, 383 wired (211 practice, 172 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces

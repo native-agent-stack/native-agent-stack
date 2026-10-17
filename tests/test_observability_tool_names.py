@@ -182,6 +182,32 @@ class CollectorProfileTests(unittest.TestCase):
         self.assertEqual(otel["trace_exporter"], "none")
 
 
+class NewClaudeEventFieldTests(unittest.TestCase):
+    """Claude Code event fields added in 2.1.300 and 2.1.301 (anthropics/claude-code CHANGELOG.md@v2.1.302 L75, L76
+    and L126), checked in the repository profile and in the 2604 profile that the host renders."""
+
+    PROFILES = (COLLECTOR, ROOT / "evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml")
+
+    def test_new_fields_are_allowlisted_guarded_and_kept_off_receipts(self):
+        for profile in self.PROFILES:
+            text = profile.read_text(encoding="utf-8")
+            with self.subTest(profile=str(profile.relative_to(ROOT))):
+                allow = re.findall(r'"([^"]+)"', re.search(r'keep_keys\(attributes, \[("receipt_id"[^\]]*)\]\)', text).group(1))
+                usage = re.search(r'delete_matching_keys\(attributes, "\^\((usage\|[^)]*)\)\$"\)', text).group(1).split("|")
+                names = re.search(r'delete_matching_keys\(attributes, "\^\((mcp_server[^)]*)\)\$"\)', text).group(1).split("|")
+                for key in ("cache_creation_5m_tokens", "cache_creation_1h_tokens"):
+                    self.assertIn(key, allow)
+                    self.assertIn(f'delete_key(attributes, "{key}") where attributes["{key}"] != nil'
+                                  f' and not IsInt(attributes["{key}"])', text)
+                    self.assertIn(key, usage)  # SDK receipts export no numeric usage
+                for key in ("classifier_verdict", "classifier_category", "permission_mode"):
+                    self.assertIn(key, allow[allow.index("tool_family"):])
+                    self.assertIn(f'set(attributes["{key}"], "other") where attributes["{key}"] != nil and (not IsMatch('
+                                  f'attributes["{key}"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{{0,63}}$") or IsMatch('
+                                  f'attributes["{key}"], "[A-Za-z0-9]{{24}}"))', text)
+                    self.assertIn(key, names)  # a receipt file must not add Claude-only names
+
+
 class DashboardTests(unittest.TestCase):
     def setUp(self):
         self.panels = {p["id"]: p for p in json.loads(DASHBOARD.read_text())["panels"]}

@@ -91,7 +91,9 @@
     },
     {
       "path": "otel.yaml",
-      "sha256": "4b103f0bcdc6a57f8be7316bd56c951d1fb40acc84a5154d8957d7b3bfd8d5fb"
+      "sha256": "cb0ea2791001199f6aabb671d5f68e84cba67a80e0a8d7ad0293fa2ed151401a",
+      "superseded_sha256": "4b103f0bcdc6a57f8be7316bd56c951d1fb40acc84a5154d8957d7b3bfd8d5fb",
+      "superseded_reason": "Claude Code 2.1.300 to 2.1.302 event fields allowlisted, shape-guarded and kept off SDK receipts in transform/privacy (anthropics/claude-code CHANGELOG.md@v2.1.302 L126, L75, L76, L18) change the source; the default render differs from the superseded one only in those lines, and every rendered port is unchanged."
     },
     {
       "path": "prometheus-alerts.test.yaml",

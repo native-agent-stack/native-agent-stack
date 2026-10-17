@@ -5877,8 +5877,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "dd39aee7815e52aed292ee3c0e9c6c0e232e6be3c5aef943bb78237b6e81cb99",
-      "bytes": 13903
+      "sha256": "a2ee127f3d1165971aaf4e976a8bd5088add7219584d7f5a7a359b4c17aae864",
+      "bytes": 14658
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -18678,8 +18678,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "43cc2ff82481dbf509418b036aabbe868b52812c78870c587eeaadfc64c23490",
-      "bytes": 150626
+      "sha256": "c54fb0c2d9687da3d4fe299c5d93c0aa9963bb8e017ac3c1cba9c2f6c3342cc6",
+      "bytes": 151670
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -45138,8 +45138,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml",
-      "sha256": "18aeef6ca553e93f4409b6a13f7e27a21a7e64529fd4e30e18cd8f2e5ad753e6",
-      "bytes": 53588
+      "sha256": "e51d8cbf27b34b6df08d89584d1ac950d803fefa10c2168704919b43c9588f2b",
+      "bytes": 55263
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus-alerts.test.yaml",
@@ -62923,8 +62923,8 @@
     },
     {
       "path": "observability/collector/README.md",
-      "sha256": "b6e15fabde242bf7e16c9a67e12e78dc5463bbe978aed5fb6ac8eec8c5df22bf",
-      "bytes": 46135
+      "sha256": "77a2e348883f7ba493ff53ad4b2b50d10204f8de485a458f0fc07e2bdbf9ea9a",
+      "bytes": 46730
     },
     {
       "path": "observability/collector/claude-settings.json.example",
@@ -62943,8 +62943,8 @@
     },
     {
       "path": "observability/collector/collector.yaml",
-      "sha256": "d46d57617085cc4cba494d27e4c33df4a02648d82cd31c33103d373a0c201bf7",
-      "bytes": 52875
+      "sha256": "5e9e9ac2ab4f30e7ebf93a7ba23b6e64dbe5198b65a7da736525be8b05b46036",
+      "bytes": 54550
     },
     {
       "path": "observability/collector/ecosystem-otelcol.service.example",
@@ -64523,8 +64523,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "dd3256ecc09f7fb0d451fe74b0630cde59dd2acd6de04e78f38dc5f37e44febc",
-      "bytes": 172637
+      "sha256": "8e8f5055b5cc5c39e6d6bb681cb83dd3b608f895130d326dfc94f6feb8a6c1af",
+      "bytes": 175283
     },
     {
       "path": "tests/test_install_skills.py",
@@ -64923,8 +64923,8 @@
     },
     {
       "path": "tests/test_observability_tool_names.py",
-      "sha256": "ed7e6db7559dfb09c79be5d5a6150ec57710278b096293e73373b5681a2d5724",
-      "bytes": 25971
+      "sha256": "265a1d3d60e96cc99ed3ac2740ce541c803d5f22d38a8bd6471d2b7f978cddd0",
+      "bytes": 27948
     },
     {
       "path": "tests/test_observability_writer_identity.py",
