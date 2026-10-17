@@ -983,7 +983,9 @@ class Controller:
                 return
             if kind == "submit":
                 self.defer_until = max(self.defer_until, self.clock() + wait)
-                raise SafetyError("submission_rate_deferred")
+                error = SafetyError("submission_rate_deferred")
+                error.retry_after = wait
+                raise error
             await asyncio.sleep(min(wait + .002, 1))
         raise SafetyError("request_budget_wait_exceeded")
 
@@ -1987,6 +1989,22 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                             p.symbol for p in controller.ledger.positions().values() if p.qty}
                         await _schedule_corporate_action_refresh(
                             strategy.corporate_action_guard, ca_watch, ca_start, ca_end, now, ca_refresh_state)
+                # Snapshot/refresh awaits above can expose a new integrity loss.
+                if OBSERVATION_INTEGRITY_LOSS_REASONS.intersection(
+                        getattr(port, "health", {}).get("reasons", ())):
+                    strategy.enabled = False
+                    controller.stop = True
+                    # Loss discovered during this tick needs the same terminal
+                    # cancellation proof as loss observed at the first check.
+                    pending_before_cancel = dict(strategy.pending)
+                    strategy.cancel_expired(now, config["order_timeout_seconds"], all_entries=True)
+                    requested = {cid for cid, info in pending_before_cancel.items()
+                                 if info.get("cancel_requested")}
+                    integrity_loss_cancellations = await _wait_for_integrity_cancellations(
+                        controller, strategy, requested, task, config["order_timeout_seconds"])
+                    if integrity_loss_cancellations["unconfirmed_count"]:
+                        session.errors.append("integrity_loss_cancellation_unconfirmed")
+                    break
                 strategy.cancel_expired(now, config["order_timeout_seconds"], all_entries=force_exit)
                 tick_decision = strategy.rebalance(now, force_exit=force_exit)
                 if leverage_policy is not None:
@@ -2037,7 +2055,9 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
         strategy.enabled = False
         controller.stop = True
         # Native lifecycle has to settle before a read-only final comparison.
-        if not controller.ledger.unresolved() and not strategy.pending:
+        if (not OBSERVATION_INTEGRITY_LOSS_REASONS.intersection(
+                getattr(port, "health", {}).get("reasons", ()))
+                and not controller.ledger.unresolved() and not strategy.pending):
             snap = await port.snapshot()
             reconciliation = reconcile(controller.ledger, snap, baseline_cash)
     finally:

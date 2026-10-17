@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "evidence_class": "synthetic",
+  "parent": "c126aa6cfa3ac37a2bb759c4b2ff3c81913cde33",
+  "scope": "Final structural exit-only pre-wire provenance correction, incorporating the CC's amended ownership-bounded entry-cap exemption. One forward commit; no rebase.",
+  "primary_sources": [
+    {"repository": "https://github.com/native-agent-stack/native-agent-stack", "commit": "c126aa6cfa3ac37a2bb759c4b2ff3c81913cde33", "path": "blueprints/us-equities/adaptive-paper/transport.py", "lines": "952-967", "claim": "Actual final HTTP guard and privacy-safe SubmissionNotSent boundary"},
+    {"repository": "https://github.com/native-agent-stack/native-agent-stack", "commit": "c126aa6cfa3ac37a2bb759c4b2ff3c81913cde33", "path": "blueprints/us-equities/adaptive-paper/runner.py", "lines": "936-968", "claim": "Controller final reservation and request-budget admission"},
+    {"repository": "https://github.com/nautechsystems/nautilus_trader", "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e", "path": "crates/model/src/events/order/rejected.rs", "lines": "59-60", "claim": "Supported native rejection string reason field"}
+  ],
+  "real_guard_regressions": {
+    "tests": ["test_final_http_guard_stale_after_reservation_resumes_full_exit", "test_final_http_guard_budget_deferral_resumes_full_exit"],
+    "test_class": "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions",
+    "seam": "Actual Controller, GuardedSession.request, AlpacaExecutionClient._submit_order method; HTTP/fills simulated only.",
+    "fail_before_rc": 1,
+    "fail_before_failures": 2,
+    "fail_before_owned_shares": "100",
+    "fail_before_http_calls": 0,
+    "after_owned_shares": "0",
+    "after_filled_quantities": ["90", "10"],
+    "after_http_calls": 2,
+    "after_native_rejections": 1
+  },
+  "amended_policy": {
+    "pre_wire": "Any proven not_sent exit refusal is transient unless a named permanent policy applies or the existing retry bound is exhausted.",
+    "permanent_local_reasons": ["global_stop_latched", "outside_allowed_session"],
+    "entry_size_caps": "Owned reductions are exempt; ownership net of pending sells remains mandatory and over-entry-cap reductions are logged.",
+    "chunking": "Existing deterministic adaptive/recovery sizing references retained, minimum one whole owned share; no invented venue limit.",
+    "retry_interval_seconds": 5,
+    "maximum_automatic_retries": 2,
+    "entry_behavior": "Unchanged reasons and dropped-entry/no-exit-retry state."
+  },
+  "exit_probe": {
+    "origin": "#1095 reviewer exit_probe core sizing boundary",
+    "entry_price": "999.99",
+    "entry_order_cap": "1000",
+    "exit_price": "1000.10",
+    "one_share_before": "Already accepted by c126 minimum-share exception; not claimed as failing before.",
+    "two_owned_shares_before": "Two one-share entries are accepted; their combined owned reduction fails c126 admission with order_size_cap_exceeded.",
+    "after": "Both one-share and two-share owned reduce-only admissions accepted; no falsely booked fill.",
+    "boundary": "Actual controller/ledger sizing tests; separate unmerged overnight arming is not imported or qualified."
+  },
+  "follow_ups": ["Flat commitments before entry filtering", "Completed partial targets versus scale-ins", "Cleanup-budget expiry charged to durable refusal state", "Wall-clock session isolation of NativeSellRisk cases"],
+  "finality": "After this commit, any P1 goes to the CC for a land-or-park decision; no further implementation round.",
+  "verification": {
+    "modules": ["tests.test_adaptive_paper_transport", "tests.test_adaptive_paper_native", "tests.test_adaptive_paper_recovery", "tests.test_adaptive_paper_safety", "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions"],
+    "tests": 337,
+    "rc": 0,
+    "execution": "Pinned runtime, idle scope, TMPDIR=/var/tmp; all amended source changes loaded before this run.",
+    "earlier_setup_failure": "A provisional notional-cap test used the allowed minimum-one-share exception. Corrected to a true multi-share notional excess before the amended rule superseded permanent caps; earlier results are not counted as a production failure."
+  },
+  "limits": ["Synthetic/local integration, no broker operation or credential access", "Prior evidence and known limitations remain historical", "Model-currency incident integration remains separate; no catalog copy or rebase"]
+}

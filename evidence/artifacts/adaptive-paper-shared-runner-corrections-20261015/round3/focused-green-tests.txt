@@ -1,0 +1,30 @@
+{
+  "command": [
+    "unshare",
+    "-rn",
+    "--",
+    "nice",
+    "-n",
+    "19",
+    "<pinned-runtime-python>",
+    "-B",
+    "-m",
+    "unittest",
+    "-v",
+    "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_scale_in_rearms_completed_partial_take_profit",
+    "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_scale_in_after_reconciled_partial_fill_rearms_across_restart",
+    "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_unfilled_scale_in_does_not_rearm_partial_take_profit",
+    "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_scale_in_preserves_an_unfinished_partial_target",
+    "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_stop_loss_still_sells_after_partial_take_profit_and_scale_in",
+    "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_time_exit_still_sells_after_partial_take_profit_and_scale_in",
+    "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_final_wire_integrity_refusal_requires_a_fresh_recovery_session",
+    "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_controller_quote_not_fresh_refusal_retries_after_fresh_quotes",
+    "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_final_http_guard_stale_after_reservation_resumes_full_exit",
+    "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_1095_one_share_appreciated_exit_probe_is_accepted"
+  ],
+  "timestamp": "2026-10-15T11:51:36.849581+00:00",
+  "return_code": 0,
+  "wall_seconds": 5.901,
+  "stdout": "",
+  "stderr": "test_scale_in_rearms_completed_partial_take_profit (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_scale_in_rearms_completed_partial_take_profit) ... ok\ntest_scale_in_after_reconciled_partial_fill_rearms_across_restart (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_scale_in_after_reconciled_partial_fill_rearms_across_restart) ... ok\ntest_unfilled_scale_in_does_not_rearm_partial_take_profit (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_unfilled_scale_in_does_not_rearm_partial_take_profit) ... ok\ntest_scale_in_preserves_an_unfinished_partial_target (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_scale_in_preserves_an_unfinished_partial_target) ... ok\ntest_stop_loss_still_sells_after_partial_take_profit_and_scale_in (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_stop_loss_still_sells_after_partial_take_profit_and_scale_in) ... ok\ntest_time_exit_still_sells_after_partial_take_profit_and_scale_in (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_time_exit_still_sells_after_partial_take_profit_and_scale_in) ... ok\ntest_final_wire_integrity_refusal_requires_a_fresh_recovery_session (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_final_wire_integrity_refusal_requires_a_fresh_recovery_session) ... ok\ntest_controller_quote_not_fresh_refusal_retries_after_fresh_quotes (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_controller_quote_not_fresh_refusal_retries_after_fresh_quotes)\nLocal reviewer reproduction: quote ages between tick and pre-wire guard. ... ok\ntest_final_http_guard_stale_after_reservation_resumes_full_exit (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_final_http_guard_stale_after_reservation_resumes_full_exit) ... ok\ntest_1095_one_share_appreciated_exit_probe_is_accepted (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_1095_one_share_appreciated_exit_probe_is_accepted) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 4.753s\n\nOK\n"
+}

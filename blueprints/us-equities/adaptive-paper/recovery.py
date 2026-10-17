@@ -129,7 +129,9 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             operation.close()  # Do not start a broker operation after the deadline.
-            raise SafetyError("recovery_deadline_reached")
+            error = SafetyError("recovery_deadline_reached")
+            error.not_sent = True  # The coroutine has never been awaited.
+            raise error
         timeout = asyncio.timeout(remaining)
         try:
             async with timeout:
@@ -177,6 +179,12 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
             configured_age = config["quote_max_age_seconds"]
         return value is not None and -0.25 <= controller.clock() - value.timestamp <= min(
             float(configured_age), ledger.limits.effective_exit_quote_max_age_seconds)
+
+    def retry_delay(symbol):
+        refusal = ledger.exit_state(symbol).get("refusal", {})
+        if refusal.get("classification") == "transient":
+            return max(0.0, refusal["retry_at"] - controller.clock())
+        return 0.0  # Definitive refusals still reach the fail-closed gate below.
 
     def guard_observation_integrity():
         nonlocal integrity_error
@@ -236,6 +244,19 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
             await observe_snapshot()
         if ledger.unresolved():
             raise SafetyError("unresolved_orders_block_exit")
+        guard_observation_integrity()
+        # Only a fresh, healthy reconciled recovery can release a no-HTTP
+        # integrity refusal from the previous observation session.
+        reconciled_intents = {i.client_id: i for i in ledger.intents()}
+        for symbol in dict.fromkeys((*ledger.positions(), *(i.symbol for i in reconciled_intents.values()))):
+            state = ledger.exit_state(symbol)
+            refusal = state.get("refusal", {})
+            uncertain = reconciled_intents.get(refusal.get("client_id"))
+            if (refusal.get("classification") == "integrity_lost"
+                    or (refusal.get("classification") == "transient_with_reconcile"
+                        and (uncertain is None or (uncertain.symbol == symbol and uncertain.terminal)))):
+                state.pop("refusal")
+                ledger.record_exit_state(symbol, state, transition="fresh_recovery_reconciled")
         # Sequential closes prevent overselling and leave capacity for cancels and
         # reconciliation. A terminal partial cancel must be snapshotted again. Each exit
         # takes the alphabetically first held symbol whose own quote is fresh at that turn,
@@ -253,8 +274,10 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                 raise SafetyError("outside_allowed_session")
             # Wait for a quote only while a whole exit still fits before the deadline.
             patience = deadline - time.monotonic() - whole_exit
-            await wait_for(lambda: any(fresh(s) for s in held),
-                           max(0.0, min(float(config["quote_max_age_seconds"]), patience)))
+            delays = [delay for s in held if fresh(s) and (delay := retry_delay(s)) > 0]
+            await wait_for(lambda: any(fresh(s) and retry_delay(s) == 0 for s in held),
+                           max(0.0, min(float(config["quote_max_age_seconds"]), patience,
+                                        min(delays, default=float("inf")))))
             quoted = [s for s in held if fresh(s)]
             unquoted = [s for s in held if s not in quoted]
             stale.difference_update(quoted)
@@ -265,21 +288,27 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
             # symbol still unquoted this ends recovery as recovery_quote_not_fresh (named in
             # stale_symbols), and otherwise as recovery_deadline_reached.
             guard_exit_budget()
-            if not quoted:
+            ready = [s for s in quoted if retry_delay(s) == 0]
+            if not ready:
                 continue
-            symbol = quoted[0]
+            symbol = ready[0]
             position = ledger.positions()[symbol]
             bid = controller.quotes[symbol].bid
             price = (bid - Decimal("0.02")).quantize(Decimal("0.01"), rounding=ROUND_DOWN)
             if price <= 0:
                 raise SafetyError("recovery_price_not_positive")
-            capacity = (ledger.limits.max_order_notional_usd / price).quantize(
-                Decimal("0.000000001"), rounding=ROUND_DOWN)
-            # The share cap reserve_intent applies to this sell at this bid. In "fixed" mode it
-            # is max_order_qty, exactly as before; in "notional" mode it is
-            # min(max_order_qty, floor(max_order_notional_usd / bid), 100), whole shares at or
-            # below the capacity, so an appreciated position exits in chunks the ledger admits.
-            quantity = min(position.qty, ledger.limits.effective_max_order_qty(price, quote_price=bid), capacity)
+            # An explicit cleanup invocation supersedes a partial strategy target
+            # with flat, visibly, without erasing any refusal budget or ambiguity.
+            exit_state = ledger.exit_state(symbol)
+            if exit_state.get("target") != "0" or exit_state.get("reason") != "owned_residual_exit":
+                exit_state.update(target="0", reason="owned_residual_exit", completed=False)
+                ledger.record_exit_state(symbol, exit_state, transition="explicit_recovery_full_exit")
+            # Shared whole-share rule: only a one-share owned reduction can exceed
+            # the notional cap, and reserve_intent logs that exception durably.
+            if not ledger.exit_retry_allowed(symbol, controller.clock()):
+                refusal = ledger.exit_state(symbol)["refusal"]
+                raise SafetyError("recovery_exit_refused:" + refusal["classification"] + ":" + refusal["reason"])
+            quantity = ledger.owned_exit_quantity(position.qty, position.qty, price, bid)
             if quantity <= 0 or quantity.as_tuple().exponent < -9:
                 raise SafetyError("recovery_quantity_not_representable")
             sequence += 1
@@ -290,15 +319,28 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                        "qty": format(quantity, "f"), "limit_price": format(price, "f"),
                        "type": "limit", "time_in_force": "day", "extended_hours": exit_extended_hours,
                        "strategy": "recovery", "reason": "owned_residual_exit"}
+            submission_started = False
             try:
                 guard_observation_integrity()
                 # Position reads and payload preparation may consume the budget
                 # checked above. Recheck at the submission boundary.
                 guard_exit_budget()
+                submission_started = True
                 submitted.append(client_id)
                 confirmation = await bounded(port.submit(payload))
                 order(confirmation)
             except Exception as exc:
+                from transport import SubmissionNotSent, exit_not_sent_reason
+                # Invocation guards ran before the port was called: no HTTP is
+                # possible, and a fresh bounded recovery must remain eligible.
+                if not submission_started or (getattr(exc, "not_sent", False) is True
+                                               and (integrity_error is not None or budget_error is not None)):
+                    refusal = exit_not_sent_reason(SubmissionNotSent("recovery_guard_before_submit"))
+                else:
+                    refusal = (exit_not_sent_reason(exc) if getattr(exc, "not_sent", False) is True
+                               else type(exc).__name__)
+                ledger.record_exit_refusal(symbol, refusal, controller.clock(),
+                                           reconcile_client_id=client_id)
                 # A broker HTTP refusal is still an attempted request. Only an
                 # explicit pre-wire guarantee permits the not_sent transition.
                 # The controller records broker_refused via its distinct contract.
@@ -319,6 +361,13 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                 if not await wait_for(lambda: terminal({client_id}), float(config["order_timeout_seconds"])):
                     raise SafetyError("exit_cancellation_not_confirmed")
             intent = next(i for i in ledger.intents() if i.client_id == client_id)
+            if intent.filled_qty:
+                exit_state = ledger.exit_state(symbol)
+                if exit_state.get("refusal", {}).get("classification") == "transient":
+                    exit_state.pop("refusal")
+                if symbol not in ledger.positions():
+                    exit_state["completed"] = True
+                ledger.record_exit_state(symbol, exit_state, transition="confirmed_recovery_fill")
             if intent.status != "filled":
                 await observe_snapshot()
                 if not intent.filled_qty:

@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "evidence_class": "synthetic",
+  "parent_commit": "83df1bc6ad9a264b8ea034c76c6b55f969af9284",
+  "scope": "One forward commit for the same-wave CC FULL, GPT FULL, local v4 findings and CC addendum-02. No loop stop within this wave.",
+  "review_records": [
+    "MICRO-full-83df1bc6.md",
+    "GPT-VERDICT-83df1bc6a.md",
+    "review_output.json (local v4 at 83df1bc6)",
+    "adjudication-pr1091-e2755161-20261014.addendum-02.md"
+  ],
+  "review_capture_boundary": "Full hashes were checked and retained in the coordination lane. This receipt does not add public hash bindings for unpublished review/helper preimages; the earlier capture/publication gap remains a listed P3.",
+  "runtime": {
+    "python": "3.12.3",
+    "nautilus_trader": "2.0.0rc5",
+    "priority": "nice -n 19"
+  },
+  "tested_source_sha256": {
+    "blueprints/us-equities/adaptive-paper/native_strategy.py": "90f5a7789ff1433a30f206956395c3474896d95a90a88bb0100a119587285089",
+    "blueprints/us-equities/adaptive-paper/recovery.py": "43f8176a01a321e976e527e10d2b29b82258e718de85a3239bd37430a40fecbc",
+    "blueprints/us-equities/adaptive-paper/runner.py": "f0cc95c79f9bca4d6044a4081451a7fc3c4a1ace76eb368b9cfe7ee2733144b1",
+    "blueprints/us-equities/adaptive-paper/safety.py": "0182ab1f0806cc0a193e9c4ac0f9087284c8b98fbb30701596aa7963a2229b57",
+    "tests/test_adaptive_paper_sell_chunks.py": "c34ec7b51349a33d59a1eb197287fae4643ed13e5aaf1704fc576df87f5e5dae",
+    "tests/test_adaptive_paper_recovery.py": "7a65e2f879f3e68aa63c31d62d5311169eff6c9f226a67be194a1404881a9e7b",
+    "tests/fixtures/native-denial-reasons-1b0a49d2.json": "0af5c3b9ba1a627acae35cfd098c62b993f2e9e963c3b59885aed4437fe3bc70"
+  },
+  "source_refs": [
+    "https://github.com/native-agent-stack/native-agent-stack/blob/83df1bc6ad9a264b8ea034c76c6b55f969af9284/blueprints/us-equities/adaptive-paper/recovery.py#L125-L365",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/83df1bc6ad9a264b8ea034c76c6b55f969af9284/blueprints/us-equities/adaptive-paper/safety.py#L1055-L1110",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/83df1bc6ad9a264b8ea034c76c6b55f969af9284/blueprints/us-equities/adaptive-paper/native_strategy.py#L271-L427",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/83df1bc6ad9a264b8ea034c76c6b55f969af9284/blueprints/us-equities/adaptive-paper/runner.py#L1873-L2025",
+    "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/events/order/denied_reason.rs",
+    "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/risk/src/engine/mod.rs#L234-L252",
+    "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/risk/tests/risk_engine.rs#L5587-L5597",
+    "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/trading/client.py#L157-L174",
+    "https://github.com/python/cpython/blob/v3.12.3/Lib/asyncio/timeouts.py"
+  ],
+  "denial_table": "evidence/artifacts/adaptive-paper-shared-runner-corrections-20261015/round2/native-denial-policy.json",
+  "denial_coverage": {
+    "enum_members": 46,
+    "definitive_contract_codes": 15,
+    "transient_with_reconcile_codes": 31,
+    "unknown_fallback_tested": true
+  },
+  "fail_first": {
+    "production_commit": "83df1bc6ad9a264b8ea034c76c6b55f969af9284",
+    "production_modified": false,
+    "test_overlay": "New regressions and pinned enum capture only. The original 83df sizing helper is retained to test its STOP defect under an outer private substituted latch.",
+    "tests": [
+      "tests.test_adaptive_paper_recovery.RecoveryTests.test_ambiguous_exit_reconciles_cancelled_id_before_retry",
+      "tests.test_adaptive_paper_recovery.RecoveryTests.test_post_submit_deadline_reconciles_cancelled_id_before_retry",
+      "tests.test_adaptive_paper_recovery.RecoveryTests.test_ambiguous_unfilled_exit_is_cancelled_before_retry",
+      "tests.test_adaptive_paper_recovery.RecoveryTests.test_shared_journal_ambiguous_exit_allows_mover_recovery",
+      "tests.test_adaptive_paper_recovery.RecoveryTests.test_transport_ambiguous_submission_reconciles_before_retry",
+      "tests.test_adaptive_paper_recovery.RecoveryTests.test_ambiguous_fill_reconciled_flat_does_not_poison_later_exits",
+      "tests.test_adaptive_paper_recovery.RecoveryTests.test_foreign_exception_text_is_absent_from_refusal_journal_and_next_receipt",
+      "tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_integrity_handoff_requests_entry_cancellation_before_node_stop",
+      "tests.test_adaptive_paper_recovery.RecoveryTests.test_ambiguous_exit_missing_from_snapshot_cannot_retry",
+      "tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_native_sizing_fixture_isolates_every_stop_binding",
+      "tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_native_rate_limit_expiry_retries_the_owned_exit",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback"
+    ],
+    "command": "nice -n 19 <pinned-runtime-python> -m unittest -v <tests listed here>",
+    "timestamp": "2026-10-15T10:49:35.330900+00:00",
+    "return_code": 1,
+    "tests_run": 12,
+    "failing_test_methods": 11,
+    "assertion_failures": 58,
+    "errors": 0,
+    "skipped": 0,
+    "passing_control": "test_ambiguous_exit_missing_from_snapshot_cannot_retry",
+    "wall_seconds": 15.023,
+    "output": "evidence/artifacts/adaptive-paper-shared-runner-corrections-20261015/round2/red-tests.txt"
+  },
+  "acceptance": {
+    "command": "nice -n 19 <pinned-runtime-python> -m unittest -v tests.test_adaptive_paper_sell_chunks tests.test_adaptive_paper_recovery tests.test_adaptive_paper_safety",
+    "timestamp": "2026-10-15T10:50:37.984095+00:00",
+    "return_code": 0,
+    "tests_run": 195,
+    "original_tests": 183,
+    "new_tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "wall_seconds": 45.612,
+    "output": "evidence/artifacts/adaptive-paper-shared-runner-corrections-20261015/round2/green-tests.txt"
+  },
+  "adjacent_integration": {
+    "command": "nice -n 19 <pinned-runtime-python> -m unittest -v tests.test_adaptive_paper_runner.IntegratedRunner.test_native_adaptive_policy_reaches_ledger_and_flat_reconciliation tests.test_adaptive_paper_stream_backpressure",
+    "return_code": 0,
+    "tests_run": 24,
+    "skipped": 0,
+    "wall_seconds": 4.271,
+    "output": "evidence/artifacts/adaptive-paper-shared-runner-corrections-20261015/round2/integration-tests.txt"
+  },
+  "observations": {
+    "native_rate": {
+      "base": {
+        "native_reason": "RATE_LIMIT_EXCEEDED",
+        "retry_at_120s": false,
+        "held_after_expiry": {
+          "AAPL": "1"
+        }
+      },
+      "corrected": {
+        "native_reason": "RATE_LIMIT_EXCEEDED",
+        "retry_at_120s": true,
+        "held_after_expiry": {}
+      }
+    },
+    "entry_cancel": {
+      "base": [
+        "node_stop"
+      ],
+      "corrected": [
+        "cancel_requested",
+        "node_stop"
+      ],
+      "corrected_handoff_seconds": 0.322,
+      "recovery_submit_wait": 0,
+      "recovery_status": "passed"
+    },
+    "stop_isolation": {
+      "base": "admissions_not_ready from a private substituted active runner latch",
+      "corrected": "all native sizing fixture defaults resolve under the private helper root; only fixture paths are resolved, the host latch is a lexical comparison value"
+    },
+    "privacy": {
+      "base": "fixture foreign message appears in durable refusal and later error_details",
+      "corrected": "exception type only, no fixture message in journal/refusal or subsequent receipt"
+    }
+  },
+  "boundaries": [
+    "No live STOP, broker credential, paper unit, ISSUER-HOLD or host runtime lock was read or modified by these corrected fixtures.",
+    "Native risk, order factory, strategy, controller, ledger and recovery run locally; quotes, fills and broker responses are simulated.",
+    "Unknown/ambiguous requests do not retry merely because time passes. A complete healthy reconciliation is required; missing attempted client IDs remain blocked.",
+    "The zero post-loss native submit count is confined to the run-loop fixture. An already-entered final-wire path may consume a submit slot before its integrity guard; that remains a P3 measurement follow-up.",
+    "The earlier native sizing fixture did not isolate runner.DEFAULT_STOP. Its earlier isolation assurance is superseded by the private-active-latch regression, not silently reused.",
+    "Fourteen existing temporary-directory ResourceWarnings remain visible; warning-free execution is not claimed."
+  ],
+  "follow_ups": [
+    "Fractional take-profit after a completed target and later scale-in.",
+    "Mover unsellable-share receipt label.",
+    "In-flight integrity refusal with nearly exhausted submit budget.",
+    "Published preimages for earlier private review/helper digest bindings.",
+    "Stale unpinned prose line locators."
+  ]
+}
