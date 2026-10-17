@@ -1,0 +1,3 @@
+✗ Cannot remove worktree: owned-worker has uncommitted changes
+  ?? owned.txt
+↳ Commit or stash changes first, or to lose uncommitted changes, run wt remove --force owned-worker

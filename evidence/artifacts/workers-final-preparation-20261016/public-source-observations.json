@@ -1,0 +1,292 @@
+{
+  "schema_version": 1,
+  "kind": "public-source-observations",
+  "evidence_class": "source_review",
+  "records": [
+    {
+      "component": "claude-code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "read_at": "2026-10-16T05:11:04.370643+00:00",
+      "observations": [
+        {
+          "url": "https://api.github.com/repos/anthropics/claude-code",
+          "exit_code": 0,
+          "data": {
+            "archived": false,
+            "default_branch": "main",
+            "open_issues_count": 15083,
+            "pushed_at": "2026-10-15T19:22:05Z"
+          }
+        },
+        {
+          "url": "https://api.github.com/repos/anthropics/claude-code/actions/runs?head_sha=03b5892ee77de289bcd5dfa39f541525ade74aff&per_page=5",
+          "exit_code": 0,
+          "data": [
+            {
+              "id": 38854181054,
+              "name": "Claude Code",
+              "head_sha": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+              "event": "issues",
+              "status": "completed",
+              "conclusion": "skipped",
+              "html_url": "https://github.com/anthropics/claude-code/actions/runs/38854181054"
+            },
+            {
+              "id": 38854181001,
+              "name": "Claude Issue Dedupe",
+              "head_sha": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+              "event": "issues",
+              "status": "in_progress",
+              "conclusion": null,
+              "html_url": "https://github.com/anthropics/claude-code/actions/runs/38854181001"
+            },
+            {
+              "id": 38854181005,
+              "name": "Issue Opened Dispatch",
+              "head_sha": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+              "event": "issues",
+              "status": "completed",
+              "conclusion": "success",
+              "html_url": "https://github.com/anthropics/claude-code/actions/runs/38854181005"
+            },
+            {
+              "id": 38854181143,
+              "name": "Log Issue Events to Statsig",
+              "head_sha": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+              "event": "issues",
+              "status": "completed",
+              "conclusion": "success",
+              "html_url": "https://github.com/anthropics/claude-code/actions/runs/38854181143"
+            },
+            {
+              "id": 38854181073,
+              "name": "Claude Issue Triage",
+              "head_sha": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+              "event": "issues",
+              "status": "completed",
+              "conclusion": "success",
+              "html_url": "https://github.com/anthropics/claude-code/actions/runs/38854181073"
+            }
+          ]
+        },
+        {
+          "url": "https://api.github.com/repos/anthropics/claude-code/issues?state=open&per_page=3&sort=updated",
+          "exit_code": 0,
+          "data": [
+            {
+              "number": 102646,
+              "title": "[MODEL] Ran git through gates and --help seven times against a standing ban on running git, read-only included",
+              "html_url": "https://github.com/anthropics/claude-code/issues/102646",
+              "created_at": "2026-10-16T05:07:55Z",
+              "updated_at": "2026-10-16T05:09:22Z"
+            },
+            {
+              "number": 102290,
+              "title": "[BUG] Desktop (Windows): scheduled tasks list missing",
+              "html_url": "https://github.com/anthropics/claude-code/issues/102290",
+              "created_at": "2026-10-15T05:54:34Z",
+              "updated_at": "2026-10-16T04:58:28Z"
+            },
+            {
+              "number": 101685,
+              "title": "[BUG] Interactive sessions write the 5-minute prompt cache despite requesting 1h: `cache-keepalive-2026-09-03` beta (2.1.296\u20132.1.300, Team and Max; `claude -p` unaffected)",
+              "html_url": "https://github.com/anthropics/claude-code/issues/101685",
+              "created_at": "2026-10-13T05:30:19Z",
+              "updated_at": "2026-10-16T04:54:57Z"
+            }
+          ]
+        },
+        {
+          "url": "https://api.npmjs.org/downloads/point/last-week/@anthropic-ai/claude-code",
+          "read_at": "2026-10-16T05:11:06.047701+00:00",
+          "status": 200,
+          "data": {
+            "downloads": 11913420,
+            "start": "2026-10-06",
+            "end": "2026-10-12",
+            "package": "@anthropic-ai/claude-code"
+          },
+          "boundary": "Registry downloads, not unique users, native-installer usage, completed tasks or causal quality evidence."
+        }
+      ]
+    },
+    {
+      "component": "worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "read_at": "2026-10-16T05:11:04.371609+00:00",
+      "observations": [
+        {
+          "url": "https://api.github.com/repos/max-sixty/worktrunk",
+          "exit_code": 0,
+          "data": {
+            "archived": false,
+            "default_branch": "main",
+            "open_issues_count": 56,
+            "pushed_at": "2026-10-16T03:34:34Z"
+          }
+        },
+        {
+          "url": "https://api.github.com/repos/max-sixty/worktrunk/actions/runs?head_sha=b49ca7eea9b03145791a5b94eccaf9c59412ed37&per_page=5",
+          "exit_code": 0,
+          "data": [
+            {
+              "id": 36375811740,
+              "name": "benchmarks",
+              "head_sha": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+              "event": "schedule",
+              "status": "completed",
+              "conclusion": "success",
+              "html_url": "https://github.com/max-sixty/worktrunk/actions/runs/36375811740"
+            },
+            {
+              "id": 36375657506,
+              "name": "tend-notifications",
+              "head_sha": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+              "event": "schedule",
+              "status": "completed",
+              "conclusion": "success",
+              "html_url": "https://github.com/max-sixty/worktrunk/actions/runs/36375657506"
+            },
+            {
+              "id": 36375635526,
+              "name": "tend-mention",
+              "head_sha": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+              "event": "repository_dispatch",
+              "status": "completed",
+              "conclusion": "success",
+              "html_url": "https://github.com/max-sixty/worktrunk/actions/runs/36375635526"
+            },
+            {
+              "id": 36375629794,
+              "name": "tend-mention",
+              "head_sha": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+              "event": "repository_dispatch",
+              "status": "completed",
+              "conclusion": "success",
+              "html_url": "https://github.com/max-sixty/worktrunk/actions/runs/36375629794"
+            },
+            {
+              "id": 36375236545,
+              "name": "tend-mention",
+              "head_sha": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+              "event": "repository_dispatch",
+              "status": "completed",
+              "conclusion": "success",
+              "html_url": "https://github.com/max-sixty/worktrunk/actions/runs/36375236545"
+            }
+          ]
+        },
+        {
+          "url": "https://api.github.com/repos/max-sixty/worktrunk/issues?state=open&per_page=3&sort=updated",
+          "exit_code": 0,
+          "data": [
+            {
+              "number": 4346,
+              "title": "Clarify recovery hints and safely publish ignored files",
+              "html_url": "https://github.com/max-sixty/worktrunk/pull/4346",
+              "created_at": "2026-10-02T10:31:23Z",
+              "updated_at": "2026-10-15T21:24:16Z"
+            },
+            {
+              "number": 4469,
+              "title": "Reclaim temp indexes orphaned by a killed process",
+              "html_url": "https://github.com/max-sixty/worktrunk/pull/4469",
+              "created_at": "2026-10-13T16:53:12Z",
+              "updated_at": "2026-10-15T21:20:12Z"
+            },
+            {
+              "number": 4330,
+              "title": "review-runs-tracking: 2026-10",
+              "html_url": "https://github.com/max-sixty/worktrunk/issues/4330",
+              "created_at": "2026-10-01T07:56:47Z",
+              "updated_at": "2026-10-15T08:01:00Z"
+            }
+          ]
+        },
+        {
+          "url": "https://crates.io/api/v1/crates/worktrunk/0.80.0",
+          "read_at": "2026-10-16T05:11:05.851128+00:00",
+          "status": 200,
+          "data": {
+            "num": "0.80.0",
+            "downloads": 936,
+            "created_at": "2026-09-27T21:20:39.143651Z",
+            "checksum": "791bad41010e92d2ecafa5bebc62da66a65f3580c4da47073759b66ab5b531f8"
+          },
+          "boundary": "Registry downloads, not unique users, native-installer usage, completed tasks or causal quality evidence."
+        }
+      ]
+    },
+    {
+      "component": "codex",
+      "repository": "https://github.com/openai/codex",
+      "read_at": "2026-10-16T05:11:04.381720+00:00",
+      "observations": [
+        {
+          "url": "https://api.github.com/repos/openai/codex",
+          "exit_code": 0,
+          "data": {
+            "archived": false,
+            "default_branch": "main",
+            "open_issues_count": 22844,
+            "pushed_at": "2026-10-16T04:42:55Z"
+          }
+        },
+        {
+          "url": "https://api.github.com/repos/openai/codex/actions/runs?head_sha=a956835d020762cb2b570053af06f643a11c0ecc&per_page=5",
+          "exit_code": 0,
+          "data": [
+            {
+              "id": 36897822835,
+              "name": "rust-release",
+              "head_sha": "a956835d020762cb2b570053af06f643a11c0ecc",
+              "event": "push",
+              "status": "completed",
+              "conclusion": "success",
+              "html_url": "https://github.com/openai/codex/actions/runs/36897822835"
+            }
+          ]
+        },
+        {
+          "url": "https://api.github.com/repos/openai/codex/issues?state=open&per_page=3&sort=updated",
+          "exit_code": 0,
+          "data": [
+            {
+              "number": 53489,
+              "title": "Answered question cards still appear pending on Windows desktop after phone reply",
+              "html_url": "https://github.com/openai/codex/issues/53489",
+              "created_at": "2026-10-12T22:26:37Z",
+              "updated_at": "2026-10-16T05:09:56Z"
+            },
+            {
+              "number": 54506,
+              "title": "[Windows][Auth UX] Remembered Gmail sign-in silently selects Free account instead of existing Plus; banked resets appear missing",
+              "html_url": "https://github.com/openai/codex/issues/54506",
+              "created_at": "2026-10-16T04:53:34Z",
+              "updated_at": "2026-10-16T05:07:32Z"
+            },
+            {
+              "number": 54507,
+              "title": "Site deployment blocked",
+              "html_url": "https://github.com/openai/codex/issues/54507",
+              "created_at": "2026-10-16T05:03:33Z",
+              "updated_at": "2026-10-16T05:04:44Z"
+            }
+          ]
+        },
+        {
+          "url": "https://api.npmjs.org/downloads/point/last-week/@openai/codex",
+          "read_at": "2026-10-16T05:11:06.055379+00:00",
+          "status": 200,
+          "data": {
+            "downloads": 24385552,
+            "start": "2026-10-06",
+            "end": "2026-10-12",
+            "package": "@openai/codex"
+          },
+          "boundary": "Registry downloads, not unique users, native-installer usage, completed tasks or causal quality evidence."
+        }
+      ]
+    }
+  ]
+}
