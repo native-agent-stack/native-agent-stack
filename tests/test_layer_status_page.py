@@ -4,7 +4,11 @@ trading-critical layers come first, and the checked-in page is fresh."""
 
 from __future__ import annotations
 
+import contextlib
+import io
+import json
 import re
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -391,11 +395,79 @@ class TierInventoryTests(unittest.TestCase):
         self.assertEqual(page.unknown_tier_layers({**stack, "layers": renamed}), {"us-equities/portfolio-risk"})
 
 
+SKILLS_STACK = {
+    **WAVE_STACK,
+    "coverage": {"skills": [
+        {"layer_id": "skills-debug", "lifecycle_task": "debug", "swept": False, "saturation": None},
+        {"layer_id": "skills-agent-docs", "lifecycle_task": "agent-docs", "swept": False, "saturation": None},
+        {"layer_id": "skills-review", "lifecycle_task": "review", "swept": True, "saturation": None},
+    ]},
+}
+
+
+class SkillsCoverageTests(unittest.TestCase):
+    """The 13 skills layers of final-stack.json's coverage.skills[] (docs/decisions/2026-10-15-new-wsl-clean-install-plan.md:165-168
+    and :182: each a GAP whose next action is an initial sweep scoped to its lifecycle task; T3, after every other layer)."""
+
+    def test_skills_layers_are_gap_rows_in_t3_after_every_other_layer(self):
+        rows = page.build_rows(SKILLS_STACK)
+        self.assertEqual([r["layer"] for r in rows[-3:]],
+                         ["skills/skills-agent-docs", "skills/skills-debug", "skills/skills-review"])
+        self.assertEqual(rows[-4]["layer"], "us-equities/judgment-features")
+        debug = rows[-2]
+        self.assertEqual((debug["tier"], debug["status"], debug["state"], debug["winners"], debug["missing"]),
+                         ("T3", "unswept", "GAP", [], ["no completed sweep"]))
+        self.assertEqual(debug["next_action"], "initial sweep scoped to the debug lifecycle task")
+
+    def test_a_swept_skills_layer_stays_gap_until_its_verdict(self):
+        review = page.build_rows(SKILLS_STACK)[-1]
+        self.assertEqual((review["status"], review["state"], review["missing"]), ("swept", "GAP", ["verdict"]))
+
+    def test_the_page_counts_every_layer_and_every_skills_layer(self):
+        stack = page.load(ROOT / page.SOURCE)
+        rows = page.build_rows(stack, page.angle_records(stack, ROOT), ROOT)
+        skills = stack["coverage"]["skills"]
+        self.assertEqual(len(rows), len(stack["layers"]) + len(skills))
+        keys = {r["layer"] for r in rows}
+        self.assertTrue({f'skills/{task["layer_id"]}' for task in skills} <= keys)
+        built = page.render(stack, page.angle_records(stack, ROOT), ROOT)
+        counts = {state: sum(r["state"] == state for r in rows) for state in ("FINAL", "TRIAL", "GAP")}
+        self.assertIn(f"**{len(rows)} layers:** {counts['FINAL']} FINAL, {counts['TRIAL']} TRIAL, {counts['GAP']} GAP.",
+                      built)
+
+
 class FreshnessTests(unittest.TestCase):
     def test_checked_in_page_matches_final_stack(self):
         stack = page.load(ROOT / page.SOURCE)
         built = page.render(stack, page.angle_records(stack, ROOT), ROOT)
         self.assertEqual((ROOT / page.OUTPUT).read_text(encoding="utf-8"), built)
+
+    def _root(self, tmp: str) -> Path:
+        root = Path(tmp)
+        (root / page.SOURCE).parent.mkdir(parents=True)
+        (root / page.SOURCE).write_text(json.dumps(STACK), encoding="utf-8")
+        (root / page.OUTPUT).parent.mkdir(parents=True)
+        return root
+
+    def test_check_compares_bytes_so_a_crlf_only_change_is_stale(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._root(tmp)
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(page.main(["--root", str(root), "--write"]), 0)
+                self.assertEqual(page.main(["--root", str(root), "--check"]), 0)
+            output = root / page.OUTPUT
+            output.write_bytes(output.read_bytes().replace(b"\n", b"\r\n"))
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(page.main(["--root", str(root), "--check"]), 1)
+
+    def test_write_replaces_the_page_whole_and_leaves_no_temporary_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._root(tmp)
+            (root / page.OUTPUT).write_text("stale\n" * 1000, encoding="utf-8")
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(page.main(["--root", str(root), "--write"]), 0)
+                self.assertEqual(page.main(["--root", str(root), "--check"]), 0)
+            self.assertEqual(sorted(p.name for p in (root / page.OUTPUT).parent.iterdir()), [Path(page.OUTPUT).name])
 
 
 if __name__ == "__main__":
