@@ -37637,6 +37637,101 @@
       "bytes": 3826
     },
     {
+      "path": "evidence/artifacts/harness-screens-20261015/README-context.md",
+      "sha256": "e6cd8a10ab0110ad73bf6e244ffcb3a2d51cc453ae6ed5ccfc3c81664b714177",
+      "bytes": 57386
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/code-navigation.anthropic.json",
+      "sha256": "d35c8d3cc620d9f9b4f7b41521c9a5b6a6679fe746bf25d0e257b6027e19e2b1",
+      "bytes": 128835
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/code-navigation.anthropic.md",
+      "sha256": "ca8f05ee173a95672f14af10e5d036c9c189bd633c84b0c31676f9533be040b3",
+      "bytes": 51654
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/code-navigation.openai.json",
+      "sha256": "bfdb028bb4222d17c734c6362b51d0b1c1a2340365fea5d01cc60894358f201f",
+      "bytes": 127230
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/code-navigation.openai.md",
+      "sha256": "c54efd6e43254b8edac35668564fe48038cf3e3e192423e0a1ab6e838ed1edaf",
+      "bytes": 51142
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/code-navigation.research.json",
+      "sha256": "179521d5b393aec757fb65f9b035fe19245624cfc2106dd9bf730cfbf1fba1a4",
+      "bytes": 146393
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/code-navigation.research.md",
+      "sha256": "bf8ebcccda0ca77ba382a146302c4d9a058ce65d3751cd80e62e4b90a259840a",
+      "bytes": 53188
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/durable-memory.anthropic.json",
+      "sha256": "886a5bd72dc7698047e0ea9a83d88edc530fdbe0e3a0b6c9e40fb3f0e3308599",
+      "bytes": 276369
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/durable-memory.anthropic.md",
+      "sha256": "8819dd39cd9409e3fa39cc7bcac3ab5f490673d8c42afd02e2ab573d7ae092b3",
+      "bytes": 110554
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/durable-memory.openai.json",
+      "sha256": "77e1f5926d9574c7bd9abfa17543ce2f856af6c2ec50bf008bcc918ba267e218",
+      "bytes": 275974
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/durable-memory.openai.md",
+      "sha256": "7591f79abd2c35d79a3b894160ec5809ad93935b808123e3e055c6876a704de5",
+      "bytes": 111023
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/durable-memory.research.json",
+      "sha256": "55aebf1bf62c20b520e66f0e604d8bfc9b8727dfed692c4cb684abe03d3d21a3",
+      "bytes": 311834
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/durable-memory.research.md",
+      "sha256": "da94f783639b2142f89868a754060d6436ae26ea5716571957e57265984fbfd5",
+      "bytes": 113362
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/token-efficiency.anthropic.json",
+      "sha256": "b940564601f67ff177b05afe94f1d3058f7413086e7dba53ac3a6fc4bfcaba22",
+      "bytes": 179736
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/token-efficiency.anthropic.md",
+      "sha256": "6a985d2c32aabd5c1b0d40d7c1686b906d3e0e152d6bd603b79b78b346850e7f",
+      "bytes": 72530
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/token-efficiency.openai.json",
+      "sha256": "9ea493d6cf0788b8b847c6d36fc2cf8e18acce17df1d4d3e281e5d79ec44ba1c",
+      "bytes": 180128
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/token-efficiency.openai.md",
+      "sha256": "0b1e437c34e4be497f8714360988babd5d9de1059e7af8cbef99cc4807ef5d8e",
+      "bytes": 72828
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/token-efficiency.research.json",
+      "sha256": "1bca6ba5538a01f0563384b22621c232cc0e1c59f2ed5c00039a92bf5ba8cf3e",
+      "bytes": 206890
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/token-efficiency.research.md",
+      "sha256": "e21dc66326bead0eac76e6338031c4d7ecfc98a89c70c0729cce8ee05a649752",
+      "bytes": 74739
+    },
+    {
       "path": "evidence/artifacts/hcom-relaxation-20261006/README.md",
       "sha256": "f86c374341947023e1778c2a52f25371cc2c8189c9fec17db668805d8d744cc6",
       "bytes": 3341
