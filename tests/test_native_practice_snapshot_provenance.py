@@ -3,7 +3,8 @@
 claude-native-slot-manifest.json was built from reference/slots.json as merged in #923, before the follow-up extended it,
 and primary-source-reading.json cites the skill's reference pages by page and line as the readers saw them. Both are
 baseline records: each names the revision (and, for the manifest, the hash) it describes, and the manifest names the
-current decision source and the fields in which that source now differs. The label checks read repository files only.
+current decision source and the fields in which that source now differs: the exported fields slot by slot, and in its
+note the other fields by name. The label checks read repository files only.
 The checks that read the baseline revision from Git skip where the history lacks it (an archive without .git); CI checks
 out the full history.
 """
@@ -79,6 +80,23 @@ def slot_fields(slot: dict) -> dict:
             "overturn_when": slot.get("overturn_when"), "evidence": slot.get("evidence")}
 
 
+def listing(items: list) -> str:
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
+
+
+def unexported_difference_sentence(baseline: dict, current: dict) -> str:
+    """The note's sentence on what differs outside the exported fields: the slot fields by name (no per-slot list, so an
+    edit to one more slot's notes keeps it true) and the top-level keys."""
+    then = {slot["id"]: slot for slot in baseline["slots"]}
+    exported = {"id", *slot_fields({"status": None, "default": None})}  # the keys the manifest rows carry
+    fields = sorted({key for slot in current["slots"] for key in set(slot) | set(then.get(slot["id"], {}))
+                     if key not in exported and slot.get(key) != then.get(slot["id"], {}).get(key)})
+    retired = [slot["id"] for slot in current["slots"] if slot.get("retired") != then.get(slot["id"], {}).get("retired")]
+    named = [field for field in fields if field != "retired"] + [f"{slot_id}'s retired block" for slot_id in retired]
+    top = sorted(key for key in set(baseline) | set(current) if key != "slots" and baseline.get(key) != current.get(key))
+    return f"Slot fields this export does not carry also differ ({listing(named)}), and so do the top-level {listing(top)}."
+
+
 class SnapshotLabelTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -148,6 +166,16 @@ class BaselineHistoryTests(unittest.TestCase):
         for row in self.manifest["slots"]:
             with self.subTest(slot=row["slot"]):
                 self.assertEqual(manifest_fields(row), slot_fields(baseline[row["slot"]]))
+
+    def test_the_note_names_what_differs_beyond_the_exported_fields(self):
+        # The CC's read of #1234 at 1af2052c (P3): the note listed six slots whose notes differ from this snapshot when 21
+        # did, and three of the five top-level keys that differ. It now names the fields instead of the slots; a field or
+        # top-level key that starts or stops differing fails here, with the sentence to write.
+        baseline = json.loads(git_show(BASELINE_REVISION, SLOTS_REL))
+        current = json.loads((ROOT / SLOTS_REL).read_text(encoding="utf-8"))
+        expected = unexported_difference_sentence(baseline, current)
+        note = self.manifest["snapshot"]["current_decision_source"]["note"]
+        self.assertIn(expected, note, f"set the note's sentence to: {expected}")
 
     def test_quoted_locators_resolve_at_the_bound_revision(self):
         found = [match.groups() for text in strings_of(self.reading["sources"]) for match in QUOTED_LOCATOR.finditer(text)]

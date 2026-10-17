@@ -6,7 +6,10 @@
                 [--stars PATH | --no-stars] [--gpt6-model gpt-6-astra] [--slots 3] [--lock-dir DIR]
                 [--quota-stop-percent PERCENT] [--skills-checked-at YYYY-MM-DD] [--no-embed] [--force]
                 [--gpt6-provider omniroute --codex-host HOST [--omniroute-base-url URL]
-                 [--omniroute-header NAME=VALUE ...] [--stack-worker-profile PATH] [--omniroute-require-key]]
+                 [--omniroute-header NAME=VALUE ...] [--stack-worker-profile PATH] [--omniroute-require-key]
+                 [--ai-memory-bearer-env [NAME]]]
+                [--codex-hook rtk|secret_guard ...] [--codex-disable-feature apps ...] [--web-search MODE]
+                [--codex-otel-endpoint HOST:PORT [--codex-otel-lane NAME]] [--rollout-usage]
 
 Needs <work-dir>/layers.json and <work-dir>/inputs/ from build_inputs.py. Writes into the work dir:
   templates.json         the repository templates with <<DATE>>, <<LAYER_COUNT>> and <<SKILLS_CHECKED_AT>> filled
@@ -31,6 +34,16 @@ Needs <work-dir>/layers.json and <work-dir>/inputs/ from build_inputs.py. Writes
                          Workflow({scriptPath: "<work-dir>/sweep.embedded.js"}) with no args, so the ~12 KB of
                          templates and schemas never pass through the coordinator's context and a resume needs
                          only the scriptPath (--no-embed skips it)
+The opt-in lane hardening options (docs/decisions/2026-10-17-codex-job-lane-hooks-mcp-memory.md) each write one staged
+codex key that codex_job.py reads, and no option writes nothing: --codex-hook (hooks: per-job trust of the rtk hook and
+the Bash-only secret-path guard; a gateway lane gets its hooks.json from upstream's own `rtk init -g --codex` run with
+CODEX_HOME at the lane home, and secret_guard stages a byte-for-byte copy of scripts/hooks/secret_path_guard.py beside
+codex_job.py with its sha256 under harness.files), --codex-disable-feature and --web-search (reviewer jobs: disable and
+web_search), --codex-otel-endpoint and --codex-otel-lane (otel), --rollout-usage (rollout_usage) and, for a gateway
+lane, --ai-memory-bearer-env (the lane's ai-memory MCP entry reads its token from the named environment variable,
+default AI_MEMORY_AUTH_TOKEN, which the lane config also filters out of the model's shells; the token itself is never
+written). A restage rewrites staged.json, so repeat the options. No option runs the real rtk in a test: the stager takes
+the binary from PATH only when --codex-hook rtk is given with a gateway lane.
 Refuses a work dir inside a git repository, templates naming a skill the pinned skills manifest lacks, a selection
 that mixes repository and skills-* layers, and restaging a work dir whose gpt6/ already holds jobs (an earlier run's
 "already done" jobs would be reused) unless --force.
@@ -57,6 +70,12 @@ from sweep_common import REPO_ROOT, load_json, prompts_sha256, sha256_bytes, wor
 
 RUNTIME = ("codex_call.sh", "codex_job.py", "make_prompt.py")
 QUOTA_PROBE = REPO_ROOT / "scripts" / "codex_quota.py"  # staged beside codex_job.py as codex_quota.py
+# The Bash guard the secret_guard hook runs, staged beside codex_job.py as secret_path_guard.py (codex_job.GUARD_FILE).
+GUARD_SOURCE = REPO_ROOT / "scripts" / "hooks" / "secret_path_guard.py"
+AI_MEMORY_SERVER = "ai-memory"
+# The variable the host's own ~/.codex/config.toml ai-memory entry names in bearer_token_env_var.
+AI_MEMORY_BEARER_ENV = "AI_MEMORY_AUTH_TOKEN"
+AI_MEMORY_HEADER = re.compile(r"^\[mcp_servers\.ai-memory\]\s*(?:#.*)?$")
 SCHEMAS = ("discover", "discover-skills", "votes", "critic", "probe")
 # The skills modality (skills-* layers, build_inputs.py --modality skills) and its discovery return schema; a
 # layers.json row without "modality" is a repository layer.
@@ -295,13 +314,63 @@ def omniroute_headers(specs) -> dict[str, str]:
     return dict(sorted(headers.items()))
 
 
+def with_ai_memory_bearer(servers_text: str, name: str) -> str:
+    """The lane's [mcp_servers.*] tables with bearer_token_env_var = "<name>" added to the ai-memory entry, the form the
+    host's own ~/.codex/config.toml uses: Codex reads the token from the named variable of its own environment, so no
+    token is ever written to a file or an argument (`ai-memory install-mcp --apply` would write it into config.toml as a
+    literal Authorization header, ai-memory 3.1.0). The result is read back with tomllib: the ai-memory table must equal
+    the rendered one plus that key, and every other server must be unchanged."""
+    if not codex_job.ENV_NAME.fullmatch(name):
+        raise ValueError("--ai-memory-bearer-env must name an environment variable")
+    lines = servers_text.split("\n")
+    headers = [number for number, line in enumerate(lines) if AI_MEMORY_HEADER.match(line)]
+    if len(headers) != 1:
+        raise ValueError(f"the rendered {CODEX_TEMPLATE} must define exactly one [mcp_servers.{AI_MEMORY_SERVER}] table "
+                         "for --ai-memory-bearer-env")
+    import tomllib  # mcp_sections has already required it (Python 3.11+)
+    before = tomllib.loads(servers_text)["mcp_servers"]
+    entry = before[AI_MEMORY_SERVER]
+    if "url" not in entry or any(key in entry for key in ("bearer_token_env_var", "bearer_token", "http_headers")):
+        raise ValueError(f"[mcp_servers.{AI_MEMORY_SERVER}] must be a url server without a credential field to take "
+                         "--ai-memory-bearer-env")
+    lines.insert(headers[0] + 1, f'bearer_token_env_var = "{name}"')
+    text = "\n".join(lines)
+    after = tomllib.loads(text)["mcp_servers"]
+    if after != {**before, AI_MEMORY_SERVER: {**entry, "bearer_token_env_var": name}}:
+        raise ValueError("adding bearer_token_env_var changed more than the ai-memory entry")
+    return text
+
+
+def run_rtk_init(home: Path, work: Path, rtk: str | None = None) -> None:
+    """Upstream's own `rtk init -g --codex` with CODEX_HOME at the lane home (rtk 1.0.1): it writes RTK.md, appends the
+    @RTK.md pointer to the home's AGENTS.md and registers `rtk hook codex` in the home's hooks.json (a second run
+    changes nothing). --hook-only, --auto-patch and --no-patch are refused with --codex. The result must hold exactly one
+    `rtk hook codex` PreToolUse handler, which codex_job.py trusts per job."""
+    binary = rtk or shutil.which("rtk")
+    if not binary:
+        raise ValueError("--codex-hook rtk with a gateway lane needs the rtk binary on PATH (rtk init -g --codex)")
+    done = subprocess.run([binary, "init", "-g", "--codex"], cwd=str(work), stdin=subprocess.DEVNULL,
+                          capture_output=True, text=True, timeout=120, check=False,
+                          env={**os.environ, "CODEX_HOME": str(home), "RTK_TELEMETRY_DISABLED": "1"})
+    if done.returncode != 0:
+        raise ValueError(f"`rtk init -g --codex` failed with exit {done.returncode}: "
+                         f"{(done.stderr or done.stdout).strip()[-300:]}")
+    try:
+        codex_job.rtk_hook_entry(home / "hooks.json")
+    except codex_job.UsageError as error:
+        raise ValueError(str(error)) from None
+
+
 def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile: Path, repo_root: Path,
-                    require_key: bool = False, http_headers: dict | None = None) -> dict:
+                    require_key: bool = False, http_headers: dict | None = None, bearer_env: str | None = None,
+                    rtk_init: bool = False, rtk_binary: str | None = None) -> dict:
     """Write <work>/codex-home: config.toml (the OmniRoute provider block, with http_headers only when given, plus the
     rendered token MCP servers), stack-worker.config.toml (the worker profile, verbatim) and AGENTS.md (the host's
     Codex user instructions: the philosophy core and RTK's, as codex_user_instructions reads them), and
     <work>/empty/.claude/settings.json (context-mode read access to each pinned skill file by its exact path). Return
-    what staged.json records about them. http_headers must come from omniroute_headers."""
+    what staged.json records about them. http_headers must come from omniroute_headers. Both opt-in steps leave the
+    default bytes alone and run no subprocess unless asked: bearer_env names the variable the ai-memory entry reads its
+    token from (and the shell filter excludes), rtk_init runs upstream's `rtk init -g --codex` against the home."""
     http_headers = dict(sorted((http_headers or {}).items()))
     header_lines = []
     if http_headers:
@@ -322,6 +391,10 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
     servers_text, servers = mcp_sections(rendered)
     if not servers:
         raise ValueError(f"{CODEX_TEMPLATE} rendered for {host!r} has no [mcp_servers.*] table")
+    filter_lines = [f'{OMNIROUTE_KEY_ENV} = "exclude"']
+    if bearer_env:
+        servers_text = with_ai_memory_bearer(servers_text, bearer_env)
+        filter_lines.append(f'{bearer_env} = "exclude"')
     profile_bytes = Path(profile).read_bytes()
     unbased = profile_servers_without_base(profile_bytes, servers)
     if unbased:
@@ -356,7 +429,7 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
         "standalone_web_search = true",
         "",
         "[shell_environment_policy.filters]",
-        f'{OMNIROUTE_KEY_ENV} = "exclude"',
+        *filter_lines,
         "",
         "[model_providers.omniroute]",
         'name = "OmniRoute"',
@@ -386,13 +459,22 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
     provider = tomllib.loads((home / "config.toml").read_text(encoding="utf-8"))["model_providers"]["omniroute"]
     if provider.get("http_headers", {}) != http_headers:
         raise ValueError(f"{LANE_HOME}/config.toml does not parse back to the requested provider headers")
+    if bearer_env:  # read back as Codex will: the entry names the variable, and the shell filter excludes it
+        parsed = tomllib.loads((home / "config.toml").read_text(encoding="utf-8"))
+        if parsed["mcp_servers"][AI_MEMORY_SERVER].get("bearer_token_env_var") != bearer_env or \
+                parsed["shell_environment_policy"]["filters"].get(bearer_env) != "exclude":
+            raise ValueError(f"{LANE_HOME}/config.toml does not parse back to the requested ai-memory bearer variable")
+    if rtk_init:
+        run_rtk_init(home, work, rtk_binary)
+        agents_text = (home / "AGENTS.md").read_text(encoding="utf-8")  # rtk init appended its @RTK.md pointer
     settings = work / LANE_CONTEXT_SETTINGS
     settings.parent.mkdir(parents=True, exist_ok=True)
     skill_rules = lane_skill_read_rules(Path.home())
     write_json(settings, {"permissions": {"allow": skill_rules}})
     keyless = {} if require_key else {"api_key_placeholder": OMNIROUTE_KEYLESS_PLACEHOLDER}
+    token = {"ai_memory_token_env": bearer_env} if bearer_env else {}
     return {"provider": "omniroute", "codex_home": LANE_HOME, "profile": LANE_PROFILE,
-            "api_key_env": OMNIROUTE_KEY_ENV, **keyless, "base_url": base_url,
+            "api_key_env": OMNIROUTE_KEY_ENV, **keyless, **token, "base_url": base_url,
             "http_headers": http_headers,  # names and values; omniroute_headers admits only OmniRoute's switches
             "lane_home": {"host": host_label,
                           "template": str(CODEX_TEMPLATE), "template_sha256": template_sha,
@@ -516,7 +598,7 @@ def git_state(repo_root: Path) -> dict:
 def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: bool, stars, gpt6_model: str,
           slots: int, lock_dir, skills_checked_at: str | None, embed_script: bool, force: bool,
           repo_root: Path = REPO_ROOT, quota_stop_percent: float | None = None, lane: dict | None = None,
-          fallback: dict | None = None) -> dict:
+          fallback: dict | None = None, codex_extra: dict | None = None) -> dict:
     if fallback is not None:
         if lane is not None or "/" in gpt6_model:
             raise UsageError("codex.fallback needs the native provider and a model without a provider segment")
@@ -561,6 +643,11 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
     for name in RUNTIME:
         shutil.copy2(HERE / name, work / name)
     shutil.copy2(QUOTA_PROBE, work / QUOTA_PROBE.name)
+    guard = bool((codex_extra or {}).get("hooks", {}).get("secret_guard"))
+    if guard:  # the secret_guard hook runs this frozen copy, which codex_job.py checks against harness.files
+        shutil.copy2(GUARD_SOURCE, work / codex_job.GUARD_FILE)
+    else:
+        (work / codex_job.GUARD_FILE).unlink(missing_ok=True)
     write_json(work / "templates.json", frozen)
     for name, schema in schemas.items():
         write_json(work / "schemas" / f"{name}.json", schema)
@@ -591,13 +678,18 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
         codex.update(stage_lane_home(work, model=gpt6_model, base_url=lane["base_url"], host=lane["host"],
                                      profile=lane["profile"], repo_root=repo_root,
                                      require_key=lane.get("require_key", False),
-                                     http_headers=lane.get("http_headers")))
+                                     http_headers=lane.get("http_headers"), bearer_env=lane.get("bearer_env"),
+                                     rtk_init=lane.get("rtk_init", False), rtk_binary=lane.get("rtk_binary")))
+    codex.update(codex_extra or {})  # the opt-in keys, each present only when its option was given
     harness_files = sorted([*RUNTIME, "sweep.js", "templates.json", *(f"schemas/{name}.json" for name in SCHEMAS)])
+    staged_files = {name: sha256_bytes((HERE / name).read_bytes()) for name in harness_files}
+    if guard:
+        staged_files[codex_job.GUARD_FILE] = sha256_bytes((work / codex_job.GUARD_FILE).read_bytes())
     staged = {"schema_version": 1, "kind": "landscape_sweep_staging", "sweep_id": sweep_id, "date": run_date,
               "test": test, "modality": modality, "layers": [layer["layer_id"] for layer in selected],
               "prompts_sha256": digest,
               "harness": {"path": "tools/sota-convergence/landscape-sweep", **git_state(repo_root),
-                          "files": {name: sha256_bytes((HERE / name).read_bytes()) for name in harness_files},
+                          "files": dict(sorted(staged_files.items())),
                           "quota_probe": {"path": "scripts/codex_quota.py",
                                           "sha256": sha256_bytes(QUOTA_PROBE.read_bytes())}},
               "skills": {"manifest": SKILLS_MANIFEST, "checked_at": manifest.get("checked_at"),
@@ -655,6 +747,24 @@ def main(argv=None) -> int:
     parser.add_argument("--omniroute-require-key", action="store_true",
                         help=f"the gateway requires an API key: stage no {OMNIROUTE_KEYLESS_PLACEHOLDER!r} placeholder, "
                              f"so a job without ${OMNIROUTE_KEY_ENV} ends before codex starts")
+    parser.add_argument("--ai-memory-bearer-env", nargs="?", const=AI_MEMORY_BEARER_ENV, metavar="NAME",
+                        help="gateway lane only: the lane's ai-memory MCP entry gets bearer_token_env_var = NAME "
+                             f"(default {AI_MEMORY_BEARER_ENV}), the lane config filters NAME out of the model's shells "
+                             "and the runner refuses a start while NAME is unset; the token is never written")
+    parser.add_argument("--codex-hook", action="append", choices=codex_job.HOOK_NAMES, default=[],
+                        help="opt in to per-job Codex hook trust (repeatable): rtk (upstream's hook, "
+                             "rtk init -g --codex for a gateway lane, RTK_TELEMETRY_DISABLED=1) or secret_guard "
+                             "(scripts/hooks/secret_path_guard.py, Bash only, staged beside codex_job.py)")
+    parser.add_argument("--codex-disable-feature", action="append", choices=codex_job.DISABLE_FEATURES, default=[],
+                        help="pass `codex exec --disable FEATURE` (repeatable), for example apps on a web-free reviewer")
+    parser.add_argument("--web-search", choices=codex_job.WEB_SEARCH_MODES,
+                        help="stage codex.web_search (the harness default is live); reviewers use disabled")
+    parser.add_argument("--codex-otel-endpoint", metavar="HOST:PORT",
+                        help="export each job's logs and metrics to this loopback OTLP collector (127.0.0.1:PORT)")
+    parser.add_argument("--codex-otel-lane", metavar="NAME",
+                        help="prefix of the otel.environment tag, <NAME>-<job id>; needs --codex-otel-endpoint")
+    parser.add_argument("--rollout-usage", action="store_true",
+                        help="record a failed attempt's usage from its Codex rollout as rollout_usage")
     parser.add_argument("--slots", type=int, default=3, help="concurrent codex jobs per lock dir (default 3)")
     parser.add_argument("--lock-dir", help="semaphore directory; share one across sweeps that run at the same time")
     parser.add_argument("--quota-stop-percent", type=float, metavar="PERCENT",
@@ -688,6 +798,26 @@ def main(argv=None) -> int:
             raise ValueError("--gpt6-model is not a model name")
         if args.omniroute_header and args.gpt6_provider != "omniroute":
             raise ValueError("--omniroute-header needs --gpt6-provider omniroute: the native lane has no provider block")
+        if args.ai_memory_bearer_env and args.gpt6_provider != "omniroute":
+            raise ValueError("--ai-memory-bearer-env needs --gpt6-provider omniroute: the native lane has no lane home")
+        if args.codex_otel_lane and not args.codex_otel_endpoint:
+            raise ValueError("--codex-otel-lane needs --codex-otel-endpoint")
+        codex_extra = {}
+        try:  # the runner's own validators, so a staged key is one codex_job.py accepts
+            if args.codex_hook:
+                codex_extra["hooks"] = codex_job.hook_settings({name: True for name in args.codex_hook})
+            if args.codex_disable_feature:
+                codex_extra["disable"] = list(codex_job.disable_settings(args.codex_disable_feature))
+            if args.web_search:
+                codex_extra["web_search"] = args.web_search
+            if args.codex_otel_endpoint:
+                codex_extra["otel"] = codex_job.otel_settings(
+                    {"endpoint": args.codex_otel_endpoint, **({"lane": args.codex_otel_lane}
+                                                              if args.codex_otel_lane else {})})
+        except codex_job.UsageError as error:
+            raise ValueError(str(error)) from None
+        if args.rollout_usage:
+            codex_extra["rollout_usage"] = True
         fallback = None
         if args.fallback_codex_host and not args.gpt6_fallback:
             raise ValueError("--fallback-codex-host needs --gpt6-fallback omniroute")
@@ -721,7 +851,8 @@ def main(argv=None) -> int:
                                  "checkout has it, pass --stack-worker-profile PATH")
             lane = {"host": args.codex_host, "base_url": args.omniroute_base_url, "profile": Path(profile).resolve(),
                     "require_key": args.omniroute_require_key,
-                    "http_headers": omniroute_headers(args.omniroute_header)}
+                    "http_headers": omniroute_headers(args.omniroute_header),
+                    "bearer_env": args.ai_memory_bearer_env, "rtk_init": "rtk" in args.codex_hook}
         if args.skills_checked_at:
             date.fromisoformat(args.skills_checked_at)
         layers = load_json(work / "layers.json")
@@ -737,7 +868,7 @@ def main(argv=None) -> int:
                         stars=stars_path, gpt6_model=gpt6_model, slots=args.slots, lock_dir=args.lock_dir,
                         skills_checked_at=args.skills_checked_at, embed_script=not args.no_embed, force=args.force,
                         repo_root=args.repo_root.resolve(), quota_stop_percent=args.quota_stop_percent, lane=lane,
-                        fallback=fallback)
+                        fallback=fallback, codex_extra=codex_extra)
     except (ValueError, OSError, KeyError) as error:
         print(f"build_args.py: {error}", file=sys.stderr)
         return 2

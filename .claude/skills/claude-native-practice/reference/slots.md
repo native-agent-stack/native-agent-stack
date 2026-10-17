@@ -1,6 +1,6 @@
 # Claude Code native practice: current defaults
 
-Client version: **2.1.295**. Checked: 2026-10-09. Record: [docs/decisions/2026-10-09-claude-code-native-practice.md](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/decisions/2026-10-09-claude-code-native-practice.md).
+Client version: **2.1.302**. Checked: 2026-10-16 (CHANGELOG 2.1.296 to 2.1.302; the fetched file, sha256 prefix 57fde96b3318543c, has no 2.1.297 or 2.1.298 section). Record: [docs/decisions/2026-10-09-claude-code-native-practice.md](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/decisions/2026-10-09-claude-code-native-practice.md).
 
 Selection rule: One default per role slot; overlaps become ranked alternatives or rejections. A native Claude Code feature that covers the slot is the default unless a measured gap exists. Repository quality selects (maintenance, releases, tests, docs, upstream adoption); popularity and invoke counts never do. A token or cost saving becomes a default only with quality parity measured on paired same-task runs (promptfoo 0.124.0 or the skill-creator benchmark, blind judge plus exact checks); otherwise it stays an alternative marked pending. A retired slot is the exception: it has no default, and its row says what replaced the route.
 

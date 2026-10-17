@@ -4912,6 +4912,101 @@
         "The smoke trial's four named phases sum to 184.51 s of its 204.17 s; the other 19.66 s is measured in three windows (data.smoke.trial) and attributed from source to log sync, trajectory conversion, artifact collection and environment teardown, without timing those sub-steps."
       ],
       "path": "evidence/receipts/harbor-smoke-20261012.json"
+    },
+    {
+      "id": "wsl-new-distro-stage1-nativestack2604-20261002",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "systemd"
+      ],
+      "claim": "W2 printed one hash, 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104, as computed, published and listed for https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl, with length 418495746, and ended '[W2 completed without throw]'; W3's user-data starts '#cloud-config', names <WSL_USER> and has sha256 6eebab9fe9892c48931e4eccb1935411203ee27286edb7d6a6b535864f104e7e. W4's list ended [list exit=0]; in W5, cloud-init status --long ended [exit=2] and cloud-init schema --system [exit=0]; and in W7 the terminate of NativeStack2604, the probe's creation, its stat and its removal each ended [exit=0] or [ok=True].",
+      "limitations": [
+        "One run on one Windows host, recorded only by its stage-1 PowerShell transcript (Start-Transcript, adoption/platforms/linux-wsl2-new-distro.md:68). The P1 to P3 pre-checks, the Linux-shell baseline and paired-isolation commands, R1's comparison probes and the F outputs are not in the transcript.",
+        "Most native command output is missing from the transcript. Those steps record an exit value only where the transcript labels one, and otherwise say what the transcript shows.",
+        "steps[] holds the 212 recipe commands of the template (adoption/templates/wsl/stage1-receipt.example.json) in order. Rows the transcript records have <Name> and <RELEASE> filled; every other row keeps the template's text, as adoption/platforms/linux-wsl2-new-distro.md:1269-1270 directs, so no operation the transcript does not show is listed against a named distribution. This run's own step scripts (source_transcript.step_scripts) are not in the repository, so a row counts as recorded only where the transcript's label or output names that operation. All 29 R1 rows keep <Name>: R1 runs on a separate throwaway name, never the real <Name> (adoption/platforms/linux-wsl2-new-distro.md:167-168, :172).",
+        "Sanitized per adoption/platforms/linux-wsl2-new-distro.md:1248-1250, plus <win-host> for the computer name (docs/decisions/2026-10-09-host-name-scan.md:160-161). In values copied from the transcript this receipt uses <WSL_USER> for the Linux user name, %USERPROFILE% for the Windows profile path and ~ for the Linux home. The recipe commands in steps[] keep the template's own placeholders, such as <WSL_USER>, <checkout>, <Survivor> and ~. The Windows user name appears in transcript body paths (profile paths, user-data name lines and the wsl.localhost home path), in the Host Application header (copied only as the sanitized run-from path at deviations[0]) and in the Username and RunAs User headers; the listed replacements (%USERPROFILE%, <WSL_USER> and ~) remove it, so <win-user> does not appear. The computer name appears only in the Username, RunAs User and Machine headers, which this receipt does not copy, so <win-host> does not appear. The transcript holds no GUID. The raw transcript stays private on Z:; source_transcript gives its path, size and sha256.",
+        "Exit values come only from the transcript's own markers ([New-Item ok=True], [ReadAllText ok=True], [WriteAllText ok=True], [exit=0], [exit=1], [exit=2], [list exit=0], [ok=False], [ok=True]), with a marker ending ok=True read as 0 and ok=False as 1, and 0 for W2's hash line, hash check and image length, whose block ends '[W2 completed without throw]'. The unlabeled '0' lines in the W4 and W5 blocks are not read as exit values. Elsewhere steps[].exit is null.",
+        "Each null field is named below with its reason. Null means the transcript records nothing for that field, not that the item was absent.",
+        "Null (the transcript shows the source command but not the output this field records): host.wsl_version, host.default_distribution_before, host.default_distribution_after.",
+        "Null (the transcript has no line for the source command): first_launch.windows_region, first_launch.user_prompt_marker, first_launch.oobe_failed_marker, first_launch.systemd_user_session_warning.",
+        "Null (the P1 and P2 pre-checks run in the workstation shell, outside the PowerShell transcript): pre_checks.signed_sums, pre_checks.user_data_schema.",
+        "Null (P3's and W5's storage-error reads run in a Linux shell, outside the PowerShell transcript): storage_errors.baseline, storage_errors.newest_line_time, storage_errors.swap, storage_errors.second_count, storage_errors.new_lines.",
+        "Null (W1's workstation baseline and W5's paired reads run in a Linux shell, outside the PowerShell transcript): host.workstation_baseline.uid, host.workstation_baseline.system_state, host.workstation_baseline.failed_units, host.workstation_baseline.user_manager, host.workstation_baseline.cgroup_namespace, first_launch.cgroup_isolation, paired_isolation.recorded_with, paired_isolation.workstation.uid, paired_isolation.workstation.system_state, paired_isolation.workstation.failed_units, paired_isolation.workstation.user_manager, paired_isolation.workstation.cgroup_namespace, paired_isolation.new_distribution.uid, paired_isolation.new_distribution.system_state, paired_isolation.new_distribution.failed_units, paired_isolation.new_distribution.user_manager, paired_isolation.new_distribution.cgroup_namespace.",
+        "Null (the F outputs (F2, F3, F5, F7, F9) are kept separately from the transcript (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input): recipe.catalog_revision, idle_observation, subordinate_ids, authorization_settings, rootless_container.",
+        "Null (path B's W6 export: the transcript has no W6 block): failed_attempt_export.file, failed_attempt_export.sha256, failed_attempt_export.bytes.",
+        "Null (W5's failure export: the W5 block shows no removal or export): w5_failure_export.file, w5_failure_export.sha256, w5_failure_export.bytes, w5_failure_export.cause.",
+        "Null (this transcript shows no unregister): interop_after_unregister.",
+        "Null (no rehearsal transcript for NativeStack2604 was among the harvested logs; see the last limitation): rehearsal.name, rehearsal.result, rehearsal.creation_path, rehearsal.schema_system, rehearsal.ownership_probe, rehearsal.idle_observation, rehearsal.storage_readings, rehearsal.export.file, rehearsal.export.sha256, rehearsal.export.bytes.",
+        "Null (R1's comparison probes are not in this transcript): comparison_arms.26.04.1.name, comparison_arms.26.04.1.first_boot, comparison_arms.26.04.1.systemd_user_from_second_instance, comparison_arms.26.04.1.wsl_gpu, comparison_arms.26.04.1.uv_cpython_3_13, comparison_arms.26.04.1.node_24, comparison_arms.24.04.5.name, comparison_arms.24.04.5.first_boot, comparison_arms.24.04.5.systemd_user_from_second_instance, comparison_arms.24.04.5.wsl_gpu, comparison_arms.24.04.5.uv_cpython_3_13, comparison_arms.24.04.5.node_24.",
+        "cloud-init status --long exited 2 and its output is not in the transcript, so its reason is not recorded here.",
+        "Transcript times (source_transcript.*_local) are Windows local time, EDT (UTC-4).",
+        "jcodemunch_registration is skipped: F11 is not in the stage-1 transcript.",
+        "No rehearsal transcript for NativeStack2604 was among the harvested logs, so the rehearsal block's fields are null. The 2026-10-02 rehearsal records in evidence/artifacts/new-wsl-rehearsal-20261002/ name StackRehearsal2604, StackRehearsal2604e1, StackRehearsal2604r2, StackRehearsal2604r3; none names NativeStack2604."
+      ],
+      "path": "evidence/receipts/wsl-new-distro-stage1-nativestack2604-20261002.json"
+    },
+    {
+      "id": "wsl-new-distro-stage1-nativehorizonny-20261015",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "systemd"
+      ],
+      "claim": "W2 printed 'image already present with the expected hash; not downloaded again' and one hash, 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104, as computed, published and listed for https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl, with 'length 418495746'; W3 printed '#cloud-config', the '- name:' and 'default=' lines for <WSL_USER>, 'user-data sha256 11f92916bad4607c19cee3452eb07bb80f4590e9f16ec295370cd1d416744502' and 'placeholders left: 0'. The run printed 'install exit 0', 'launch exit 0', 'status exit 2', 'schema exit 0' and 'windows_region US', and W7 printed 'running after terminate: [NativeStack2604]', 'owner 1000:1000' and 'removed'.",
+      "limitations": [
+        "One run on one Windows host, recorded only by its stage-1 PowerShell transcript (Start-Transcript, adoption/platforms/linux-wsl2-new-distro.md:68). The P1 to P3 pre-checks, the Linux-shell baseline and paired-isolation commands, R1's comparison probes and the F outputs are not in the transcript.",
+        "Most native command output is missing from the transcript. Those steps record an exit value only where the transcript labels one, and otherwise say what the transcript shows.",
+        "steps[] holds the 212 recipe commands of the template (adoption/templates/wsl/stage1-receipt.example.json) in order. Rows the transcript records have <Name> and <RELEASE> filled; every other row keeps the template's text, as adoption/platforms/linux-wsl2-new-distro.md:1269-1270 directs, so no operation the transcript does not show is listed against a named distribution. This run's own step scripts (source_transcript.step_scripts) are not in the repository, so a row counts as recorded only where the transcript's label or output names that operation. All 29 R1 rows keep <Name>: R1 runs on a separate throwaway name, never the real <Name> (adoption/platforms/linux-wsl2-new-distro.md:167-168, :172).",
+        "Sanitized per adoption/platforms/linux-wsl2-new-distro.md:1248-1250, plus <win-host> for the computer name (docs/decisions/2026-10-09-host-name-scan.md:160-161). In values copied from the transcript this receipt uses <WSL_USER> for the Linux user name. The recipe commands in steps[] keep the template's own placeholders, such as <WSL_USER>, <checkout>, <Survivor> and ~. The Windows user name appears in two transcript body lines, the user-data name line and the default= line, which this receipt renders as <WSL_USER>, and in the Username and RunAs User headers, which this receipt does not copy, so <win-user> does not appear. The computer name appears only in the Username, RunAs User and Machine headers, which this receipt does not copy, so <win-host> does not appear. The Host Application header carries neither name, and deviations[1] copies its run-from directory as it stands. The transcript holds no GUID. The raw transcript stays private on Z:; source_transcript gives its path, size and sha256.",
+        "This transcript prints labeled summaries ('test-path location: False', '== id', 'install exit 0') instead of commands, and has no [exit=N] markers. Exit values come only from the lines 'install exit 0', 'launch exit 0', 'schema exit 0', 'status exit 2'; elsewhere steps[].exit is null.",
+        "Each null field is named below with its reason. Null means the transcript records nothing for that field, not that the item was absent.",
+        "Null (the transcript shows the source command but not the output this field records): host.default_distribution_after, first_launch.user_prompt_marker, first_launch.oobe_failed_marker, first_launch.cloud_init_version, first_launch.systemd_user_session_warning, first_launch.getty_mask.is_enabled, first_launch.getty_mask.load_state, first_launch.getty_mask.active_state, first_launch.getty_mask.n_restarts.",
+        "Null (the transcript has no line for the source command): host.wsl_version, host.default_distribution_before.",
+        "Null (the P1 and P2 pre-checks run in the workstation shell, outside the PowerShell transcript): pre_checks.signed_sums, pre_checks.user_data_schema.",
+        "Null (P3's and W5's storage-error reads run in a Linux shell, outside the PowerShell transcript): storage_errors.baseline, storage_errors.newest_line_time, storage_errors.swap, storage_errors.second_count, storage_errors.new_lines.",
+        "Null (W1's workstation baseline and W5's paired reads run in a Linux shell, outside the PowerShell transcript): host.workstation_baseline.uid, host.workstation_baseline.system_state, host.workstation_baseline.failed_units, host.workstation_baseline.user_manager, host.workstation_baseline.cgroup_namespace, first_launch.cgroup_isolation, paired_isolation.recorded_with, paired_isolation.workstation.uid, paired_isolation.workstation.system_state, paired_isolation.workstation.failed_units, paired_isolation.workstation.user_manager, paired_isolation.workstation.cgroup_namespace, paired_isolation.new_distribution.uid, paired_isolation.new_distribution.system_state, paired_isolation.new_distribution.failed_units, paired_isolation.new_distribution.user_manager, paired_isolation.new_distribution.cgroup_namespace.",
+        "Null (the F outputs (F2, F3, F5, F7, F9) are kept separately from the transcript (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input): recipe.catalog_revision, idle_observation, subordinate_ids, authorization_settings, rootless_container.",
+        "Null (path B's W6 export: the transcript has no W6 block): failed_attempt_export.file, failed_attempt_export.sha256, failed_attempt_export.bytes.",
+        "Null (W5's failure export: the W5 block shows no removal or export): w5_failure_export.file, w5_failure_export.sha256, w5_failure_export.bytes, w5_failure_export.cause.",
+        "Null (this transcript shows no unregister): interop_after_unregister.",
+        "Null (this transcript has no R1 block; see the last limitation): rehearsal.name, rehearsal.result, rehearsal.creation_path, rehearsal.schema_system, rehearsal.ownership_probe, rehearsal.idle_observation, rehearsal.storage_readings, rehearsal.export.file, rehearsal.export.sha256, rehearsal.export.bytes.",
+        "Null (R1's comparison probes are not in this transcript): comparison_arms.26.04.1.name, comparison_arms.26.04.1.first_boot, comparison_arms.26.04.1.systemd_user_from_second_instance, comparison_arms.26.04.1.wsl_gpu, comparison_arms.26.04.1.uv_cpython_3_13, comparison_arms.26.04.1.node_24, comparison_arms.24.04.5.name, comparison_arms.24.04.5.first_boot, comparison_arms.24.04.5.systemd_user_from_second_instance, comparison_arms.24.04.5.wsl_gpu, comparison_arms.24.04.5.uv_cpython_3_13, comparison_arms.24.04.5.node_24.",
+        "cloud-init status --long exited 2 and its output is not in the transcript, so its reason is not recorded here.",
+        "Transcript times (source_transcript.*_local) are Windows local time, EDT (UTC-4).",
+        "jcodemunch_registration is skipped: F11 is not in the stage-1 transcript.",
+        "This transcript has no R1 block. Receipt wsl-new-distro-stage1-nativehorizonny-r1-20261015 is taken as this run's R1 rehearsal, on the grounds in its rehearsal.basis; that identity rests on that transcript and docs/decisions/2026-10-15-new-wsl-clean-install-plan.md:914-915, not on this one."
+      ],
+      "path": "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-20261015.json"
+    },
+    {
+      "id": "wsl-new-distro-stage1-nativehorizonny-r1-20261015",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "systemd"
+      ],
+      "claim": "W2 printed 'image already present with the expected hash; not downloaded again' and one hash, 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104, as computed, published and listed for https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl, with 'length 418495746'; W3 printed '#cloud-config', the '- name:' and 'default=' lines for <WSL_USER>, 'user-data sha256 11f92916bad4607c19cee3452eb07bb80f4590e9f16ec295370cd1d416744502' and 'placeholders left: 0'. The run printed 'install exit 0', 'launch exit 0', 'status exit 2', 'schema exit 0' and 'windows_region US', and W7 printed 'running after terminate: [NativeStack2604]', 'owner 1000:1000' and 'removed'. Its last block, r1-remove.ps1, then printed 'quiet before: NativeStack2604,NativeHorizonNY-r1', 'unregister exit 0', 'interop ok' and 'folder left: False'.",
+      "limitations": [
+        "One run on one Windows host, recorded only by its stage-1 PowerShell transcript (Start-Transcript, adoption/platforms/linux-wsl2-new-distro.md:68). The P1 to P3 pre-checks, the Linux-shell baseline and paired-isolation commands, R1's comparison probes and the F outputs are not in the transcript.",
+        "Most native command output is missing from the transcript. Those steps record an exit value only where the transcript labels one, and otherwise say what the transcript shows.",
+        "steps[] holds the 212 recipe commands of the template (adoption/templates/wsl/stage1-receipt.example.json) in order. Rows the transcript records have <Name> and <RELEASE> filled; every other row keeps the template's text, as adoption/platforms/linux-wsl2-new-distro.md:1269-1270 directs, so no operation the transcript does not show is listed against a named distribution. This run's own step scripts (source_transcript.step_scripts) are not in the repository, so a row counts as recorded only where the transcript's label or output names that operation. R1's recorded rows use this distribution's own name, because this run is taken as the R1 rehearsal (rehearsal.basis).",
+        "Sanitized per adoption/platforms/linux-wsl2-new-distro.md:1248-1250, plus <win-host> for the computer name (docs/decisions/2026-10-09-host-name-scan.md:160-161). In values copied from the transcript this receipt uses <WSL_USER> for the Linux user name. The recipe commands in steps[] keep the template's own placeholders, such as <WSL_USER>, <checkout>, <Survivor> and ~. The Windows user name appears in two transcript body lines, the user-data name line and the default= line, which this receipt renders as <WSL_USER>, and in the Username and RunAs User headers, which this receipt does not copy, so <win-user> does not appear. The computer name appears only in the Username, RunAs User and Machine headers, which this receipt does not copy, so <win-host> does not appear. The Host Application header carries neither name, and deviations[1] copies its run-from directory as it stands. The transcript holds no GUID. The raw transcript stays private on Z:; source_transcript gives its path, size and sha256.",
+        "This transcript prints labeled summaries ('test-path location: False', '== id', 'install exit 0') instead of commands, and has no [exit=N] markers. Exit values come only from the lines 'install exit 0', 'launch exit 0', 'schema exit 0', 'status exit 2', 'unregister exit 0'; elsewhere steps[].exit is null.",
+        "Each null field is named below with its reason. Null means the transcript records nothing for that field, not that the item was absent.",
+        "Null (the transcript shows the source command but not the output this field records): host.default_distribution_after, first_launch.user_prompt_marker, first_launch.oobe_failed_marker, first_launch.cloud_init_version, first_launch.systemd_user_session_warning, first_launch.getty_mask.is_enabled, first_launch.getty_mask.load_state, first_launch.getty_mask.active_state, first_launch.getty_mask.n_restarts.",
+        "Null (the transcript has no line for the source command): host.wsl_version, host.default_distribution_before.",
+        "Null (the P1 and P2 pre-checks run in the workstation shell, outside the PowerShell transcript): pre_checks.signed_sums, pre_checks.user_data_schema.",
+        "Null (P3's and W5's storage-error reads run in a Linux shell, outside the PowerShell transcript): storage_errors.baseline, storage_errors.newest_line_time, storage_errors.swap, storage_errors.second_count, storage_errors.new_lines.",
+        "Null (W1's workstation baseline and W5's paired reads run in a Linux shell, outside the PowerShell transcript): host.workstation_baseline.uid, host.workstation_baseline.system_state, host.workstation_baseline.failed_units, host.workstation_baseline.user_manager, host.workstation_baseline.cgroup_namespace, first_launch.cgroup_isolation, paired_isolation.recorded_with, paired_isolation.workstation.uid, paired_isolation.workstation.system_state, paired_isolation.workstation.failed_units, paired_isolation.workstation.user_manager, paired_isolation.workstation.cgroup_namespace, paired_isolation.new_distribution.uid, paired_isolation.new_distribution.system_state, paired_isolation.new_distribution.failed_units, paired_isolation.new_distribution.user_manager, paired_isolation.new_distribution.cgroup_namespace.",
+        "Null (the F outputs (F2, F3, F5, F7, F9) are kept separately from the transcript (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input): recipe.catalog_revision, idle_observation, subordinate_ids, authorization_settings, rootless_container.",
+        "Null (path B's W6 export: the transcript has no W6 block): failed_attempt_export.file, failed_attempt_export.sha256, failed_attempt_export.bytes.",
+        "Null (W5's failure export: the W5 block shows no removal or export): w5_failure_export.file, w5_failure_export.sha256, w5_failure_export.bytes, w5_failure_export.cause.",
+        "Null (this transcript holds the rehearsal's stage-1 blocks and its removal only: no F2 idle observation, storage reading or export): rehearsal.idle_observation, rehearsal.storage_readings, rehearsal.export.file, rehearsal.export.sha256, rehearsal.export.bytes.",
+        "Null (R1's comparison probes are not in this transcript): comparison_arms.26.04.1.name, comparison_arms.26.04.1.first_boot, comparison_arms.26.04.1.systemd_user_from_second_instance, comparison_arms.26.04.1.wsl_gpu, comparison_arms.26.04.1.uv_cpython_3_13, comparison_arms.26.04.1.node_24, comparison_arms.24.04.5.name, comparison_arms.24.04.5.first_boot, comparison_arms.24.04.5.systemd_user_from_second_instance, comparison_arms.24.04.5.wsl_gpu, comparison_arms.24.04.5.uv_cpython_3_13, comparison_arms.24.04.5.node_24.",
+        "cloud-init status --long exited 2 and its output is not in the transcript, so its reason is not recorded here.",
+        "Transcript times (source_transcript.*_local) are Windows local time, EDT (UTC-4).",
+        "jcodemunch_registration is skipped: F11 is not in the stage-1 transcript.",
+        "Taken as NativeHorizonNY's R1 rehearsal on the basis given in rehearsal.basis. R1's comparison probes and its F1 to F3 outputs are not in the transcript."
+      ],
+      "path": "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-r1-20261015.json"
     }
   ],
   "files": [
@@ -4967,12 +5062,12 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/agent-sdks.md",
-      "sha256": "2e0543b97fafec67fed7ef1ff3b1bc4719e64f255f8faf33680683aa1de9cf4c",
-      "bytes": 2948
+      "sha256": "1866604496c27aea2a7d81ab3f4256839896f702f55b04161d777f9a03ece5a6",
+      "bytes": 3714
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/ci-supply-chain.md",
-      "sha256": "87f2ddcf4ad2ae534b864d20bf43d8335661f9892bc71a174a30a387d2d85b8e",
+      "sha256": "58516eca0c91316b3d92284956e8db16ced9e369317bacfbee5da72d4de70a48",
       "bytes": 1863
     },
     {
@@ -4982,58 +5077,58 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/git-github-automation.md",
-      "sha256": "495540f87a624fee894038b0c508310cf5345b1356a0172a2038a3bdc991794c",
+      "sha256": "571bc79516677f58195819dc5c5146266ca9546a78782b601039489b270b3d0a",
       "bytes": 9314
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/instructions-skills.md",
-      "sha256": "7fa69465f85dff3136ebf925924152bafe97bc6cde941ad09f408aa848a15f17",
+      "sha256": "e80b18e16b48a504442203cc44302f796fb2918176d3a6fe3ff43a555850aa7f",
       "bytes": 10415
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/isolation.md",
-      "sha256": "75c6b3fc6869840bdfe2b417d1ab10a1f91286448711e66ee3a3ca06632283d4",
-      "bytes": 3017
+      "sha256": "0255109aeb86b9a0434891c5bb54d6c4557c44c61b92702b01ed8ea2983bb497",
+      "bytes": 3587
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/mcp-surfaces.md",
-      "sha256": "332975a55dee041b776ead041403f4e420dbff67ae3f94be8b1ebe2323b6fb43",
-      "bytes": 5374
+      "sha256": "34d2cca61edddaed717b4138be0633c068038bebe2169e429c324c3e3f3be178",
+      "bytes": 6644
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/native-clients.md",
-      "sha256": "ccb3988ae63a38b5344e9fe17a3258fe7fdede0a186d357e10c308c55515ccd7",
-      "bytes": 19192
+      "sha256": "913cd8932e9c267700fb9c11292c467e5d56af6848114d324707e2cd6fdf65c6",
+      "bytes": 21187
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/observation-inference.md",
-      "sha256": "bc27287c938f7edd1a7e8ed85758821bfd2f775010574e2e94be5ae8cf0d54af",
-      "bytes": 5892
+      "sha256": "f3c5367b9da4b8b8678c38a47b73414c24e91041da81c73246d87d9573f42ab8",
+      "bytes": 7327
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/scheduling-supervision.md",
-      "sha256": "fb474f58722acec5aed64380d46c299d2396e387750a0ee3e089745851565d2f",
+      "sha256": "43b21a1f7412e6ffd58d8ea214b63a2756cb947751696c87f23b301e60ecfa7f",
       "bytes": 3527
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "42ab98129d3b86c1dda4ce5a23e4e7b3aacf0ede5a3b03e76bb492f43b1c5f06",
-      "bytes": 159469
+      "sha256": "f186a40d8752fcbbfa64a173982aae131ac4541dd25b775fc7866f19085a0dda",
+      "bytes": 169733
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
-      "sha256": "947a33617736dc0a66c8802a98019639d1d71e1aca2f84ed705e9c71db5800c2",
-      "bytes": 12648
+      "sha256": "44985a4c0e48813e33b551999bbe85d6bbc6c94121c18c46e8cc7a2218aae49c",
+      "bytes": 12764
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/token-efficiency.md",
-      "sha256": "7a428d92ecf5a09db424d16ff61b55eff6abe627c038f85c83ef242429befe79",
-      "bytes": 13398
+      "sha256": "193051d03b2f9531d01241b906832f9cb1f05d85ca4eb15b12866df40244f8a2",
+      "bytes": 15670
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/workers.md",
-      "sha256": "e0b242b888d993db5643dafca4292be0e114caba37abe38e9dc66725ed7215aa",
-      "bytes": 28055
+      "sha256": "d102113fde8e8a4a8626a5e81c5448a822dc4eebf08544025fa620adeff32f56",
+      "bytes": 29795
     },
     {
       "path": ".claude/skills/native-skill-routing/SKILL.md",
@@ -5112,8 +5207,8 @@
     },
     {
       "path": ".github/requirements-ci.txt",
-      "sha256": "70284e31eff0b705be1fd2c2770bcce068fa8c787d02a700f50fe77f76aa150a",
-      "bytes": 13346
+      "sha256": "6210d2535f4625ff4a91589b1a5b0dee61a388fd67a96e60e53c29bba6aa9171",
+      "bytes": 14726
     },
     {
       "path": ".github/requirements-validation.txt",
@@ -5407,7 +5502,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "7aa895f61aabb397816c1eac82b83440e6e8e7a0bf8f17dd941427dcf9b7abd6",
+      "sha256": "2876ba828b398dc893ee5c4b05646e4b9ecf1914e2bd176cd038371e59ef605e",
       "bytes": 1229
     },
     {
@@ -5537,8 +5632,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "c395763f94d5bb335584d22ca4903dc977544d0e50fc6027f36e0fa64ee3a2af",
-      "bytes": 57789
+      "sha256": "2ade836cc0fef1aab6adc1c1acc436036bcdd59f692142d86f30ccc8373cd56c",
+      "bytes": 57780
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -17548,7 +17643,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "d5fd7bacdb28191027aa2305d875434bf1915b0ae607baea970d27d46615504d",
+      "sha256": "6b6f24739e6a2dcfcb271f8cd7a975b1d5eb7c0e5c35c1554fb2101d0d8cc6c3",
       "bytes": 193410
     },
     {
@@ -19072,6 +19167,11 @@
       "bytes": 8327
     },
     {
+      "path": "docs/decisions/2026-10-09-claude-code-gap-resolution.md",
+      "sha256": "a36476e614fee6e5669299f64c0da4461050275b79924590e47058a7494ea19f",
+      "bytes": 15899
+    },
+    {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
       "sha256": "98947f11f2a3eb693c9c31b3fff6e58e1f20d476411aa49f42f66888d43c6d47",
       "bytes": 54090
@@ -19360,6 +19460,16 @@
       "path": "docs/decisions/2026-10-16-new-wsl-host-allocation-addendum.md",
       "sha256": "daa915db643a84c35f2ec44b04cade50ca610e8c90a9b5ec5d5de20aa351951e",
       "bytes": 6429
+    },
+    {
+      "path": "docs/decisions/2026-10-17-codex-job-lane-hooks-mcp-memory.md",
+      "sha256": "ccbc1bf0857979e470ad788ea3acf6000f63a8916c047b6340a08615fdaf73d3",
+      "bytes": 17710
+    },
+    {
+      "path": "docs/decisions/2026-10-17-zero-tolerance-currency.md",
+      "sha256": "00eb7228052fb3b1afeb1e92b81e2108412d4f74f544aab042dda14a7c1eee1c",
+      "bytes": 18602
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -19768,8 +19878,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "eda2dc9c294d07b2b0ae6ddf38b2bebe9c7f4338846a116501f04d07d7e20507",
-      "bytes": 208585
+      "sha256": "548fcfabe87adaa376bfcd6c3d73e1d033db70ab7e238be784c6bb28f2f0f701",
+      "bytes": 211334
     },
     {
       "path": "docs/stack.md",
@@ -21803,8 +21913,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "188b04230fab2abcc3d473b11d28069a8150666ff077c8482d01c856364fbbec",
-      "bytes": 238162
+      "sha256": "fe4e9cebcb0926e26da46bee2e1bf555f30cc4e39ea98fd71aa5a0712e2e54b8",
+      "bytes": 238736
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json",
@@ -61812,6 +61922,21 @@
       "bytes": 891
     },
     {
+      "path": "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-20261015.json",
+      "sha256": "c9d9944311c7b70e0010df8e6b986fb218f87ff94606345bbb7412345116c5ff",
+      "bytes": 69226
+    },
+    {
+      "path": "evidence/receipts/wsl-new-distro-stage1-nativehorizonny-r1-20261015.json",
+      "sha256": "603525a7295316f7e552d67b1d955454b7672656e3f9cde4eb9fefb284c7cb9b",
+      "bytes": 67725
+    },
+    {
+      "path": "evidence/receipts/wsl-new-distro-stage1-nativestack2604-20261002.json",
+      "sha256": "7605e4b5589c80d1be74cd34e0c9ea5b76b236e6e795b558038c45224d68f717",
+      "bytes": 66772
+    },
+    {
       "path": "evidence/receipts/wsl-retrieval-20260920.json",
       "sha256": "02fc96b030e8e8d48c977809a80f1a5d0409523cffb12a79aa0c9f4a9de8a56c",
       "bytes": 2455
@@ -63163,8 +63288,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "924ab13d5ab891eb3b69ef694c8220c8ac5c36b2504cacc48c80c23ed78a7735",
-      "bytes": 302239
+      "sha256": "7ff01a7f1aee953486bdc05268c9d7e62307172c0644defada9b1a722f81300c",
+      "bytes": 312301
     },
     {
       "path": "scripts/host_name_scan.py",
@@ -64048,8 +64173,8 @@
     },
     {
       "path": "tests/test_claude_review_worker.py",
-      "sha256": "68f6c0b2cdc2b7f10cbc50d2f67d3c4928ada9472177ed34c58ad433a0929231",
-      "bytes": 131444
+      "sha256": "364005528d757e82d87dc5bb70e24104ef0033c78fe54db18ec2c361e707419c",
+      "bytes": 151108
     },
     {
       "path": "tests/test_claude_spend_scan.py",
@@ -64092,6 +64217,11 @@
       "bytes": 65996
     },
     {
+      "path": "tests/test_codex_job_lane_hardening.py",
+      "sha256": "9fd6becf42a1713461db75d7f980fa244fba55b732fa1c2fbabc6e647bc36385",
+      "bytes": 54669
+    },
+    {
       "path": "tests/test_codex_lane.py",
       "sha256": "2d07203ef7bc255098b667afa13d29407b1afecbf810aba07208b8423eee77eb",
       "bytes": 120738
@@ -64108,8 +64238,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "53027f4c1225da5a4061b16594c77f9e277c5bf874d6fb94ebdb5f6a6f115cb1",
-      "bytes": 193549
+      "sha256": "a048170ec42e185e44cd3f6de8c3b7500a00437ef6914e27669b70d9593fa171",
+      "bytes": 196757
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -64548,8 +64678,8 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "cb7f60e625f4746ddc5b03a3839ecf4b55050c1d07c79e06ad1ea2f2ed52c142",
-      "bytes": 28161
+      "sha256": "5d4000c22c6c0daa28e6ae149d153eab8da515b3fcfdbb9b2e0df94f687af878",
+      "bytes": 29280
     },
     {
       "path": "tests/test_managed_block.py",
@@ -64707,14 +64837,19 @@
       "bytes": 9198
     },
     {
+      "path": "tests/test_native_practice_owed_check_corrections.py",
+      "sha256": "4d00a173e8c420dea994ceca608a1207d29c3e5824a8e79f34dd0815c6a08ca4",
+      "bytes": 10593
+    },
+    {
       "path": "tests/test_native_practice_retired_routes.py",
       "sha256": "e4c775e9388eba391dfa58ae751b5b2927b6e4c3c5c290e0708446ea490c29a6",
       "bytes": 68258
     },
     {
       "path": "tests/test_native_practice_snapshot_provenance.py",
-      "sha256": "519686053443eb767abca0dd8067886bde1271e9aecbb12ef55b42424620abd7",
-      "bytes": 8762
+      "sha256": "f3afaf9449c5a7cfb132a51a371ca9528c90da82c0aa37335f8ba541394bde0f",
+      "bytes": 10885
     },
     {
       "path": "tests/test_native_recovery.py",
@@ -65108,8 +65243,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "f35c599338dd8618892d11bc089fa96f75f4d118f33f19d7ae0fdb911b869e99",
-      "bytes": 406989
+      "sha256": "9e4f0d838cc2fc3e5709968521e4b0f2747ab1d25092b5a9ec2b27040e87afac",
+      "bytes": 425069
     },
     {
       "path": "tests/test_secret_scan_metrics.py",
@@ -65183,8 +65318,8 @@
     },
     {
       "path": "tests/test_skill_usage_daily.py",
-      "sha256": "04719068560e1e4daa32ed6b3363646c29e1e6e73f3eb9b75f22d074f0e3993f",
-      "bytes": 17439
+      "sha256": "7dcc3f903bf40d31d5687f207a4408490be437dd682517c00ea1bb5bb3180d06",
+      "bytes": 19915
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -65323,8 +65458,8 @@
     },
     {
       "path": "tests/test_upstream_surface_watch.py",
-      "sha256": "a87fccebd1ebbc31b02c665e640d7945211ff9f4a48422a95dbfb8e40ee61cff",
-      "bytes": 128671
+      "sha256": "bc465b566484c19a1c69760ebcd1771dbe3bb11fb5a1632769dcc2545a315fe8",
+      "bytes": 130059
     },
     {
       "path": "tests/test_us_equities_hosting.py",
@@ -65613,8 +65748,8 @@
     },
     {
       "path": "tools/claude-review-worker/README.md",
-      "sha256": "469642c03517f3aa602accdf15b0d7caa3d89dcb4e83f24512e385eb70bd6a0d",
-      "bytes": 13903
+      "sha256": "eb2de4fec93283cddf41e20acc14d5ecbf3cc4ecd50ce2d8dc25575246b7c55c",
+      "bytes": 16126
     },
     {
       "path": "tools/claude-review-worker/essential-paths.json",
@@ -65638,8 +65773,8 @@
     },
     {
       "path": "tools/claude-review-worker/worker.py",
-      "sha256": "9945985d788eed58f80d89bde37ebc5985d0ff439689192a92a03877cf1f45ea",
-      "bytes": 130449
+      "sha256": "f4f218b8921cc2ed79de894c059e1d1a217775b5b24b49e16de74fa1db0aac99",
+      "bytes": 141302
     },
     {
       "path": "tools/credentials/anthropic_key_health.py",
@@ -65743,8 +65878,8 @@
     },
     {
       "path": "tools/local-pages/README.md",
-      "sha256": "14d294af1400d6a0e646f4bcc5c149982b70b2ac8d1fc754b25f19621739d3b2",
-      "bytes": 37540
+      "sha256": "404f28ec41edb9fd31638dcb5e7a5861506081a0959eb2b2394e786e2b772bcd",
+      "bytes": 41169
     },
     {
       "path": "tools/local-pages/architecture_manifest.py",
@@ -65773,8 +65908,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "63cdac3d500229b69c9a1177242871fd6b891ad637028e4208f9a4706a5d8bd7",
-      "bytes": 764878
+      "sha256": "ddf8b2d0c2724063847c9c91067bf3ef43c2cb66b6a3bf460bd3dd54aafd6f79",
+      "bytes": 765601
     },
     {
       "path": "tools/muse_file_fence.py",
@@ -65853,13 +65988,13 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "4a603c06bef574515481b8794c1ae264dd2e5bff1911e96e2adb2ec1b97e3277",
-      "bytes": 57941
+      "sha256": "6700fb0b65beb2778ba1b63576d8ab39c67f7517ed802dcd142042e7e433b35b",
+      "bytes": 62589
     },
     {
       "path": "tools/skill-usage/daily_skill_usage.py",
-      "sha256": "1936dc7c54fc098431017eb769b4caf8914616698435a53b4146ed76b44b9d07",
-      "bytes": 11118
+      "sha256": "d36672ba78f2896ddf642c8a80c23fbc52d3e95ea6de2e5ab356318d609c3a2a",
+      "bytes": 12192
     },
     {
       "path": "tools/skill-usage/runtime_usage.py",
@@ -65953,13 +66088,13 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "6da163f65c353dc8485ac880b919dca8d027c23a6f0a0458a70aad54e925eeaf",
-      "bytes": 118259
+      "sha256": "e91507bc7d6c17267fb451ea4c45f08d3155d05c3153693340a96fe185c9a83e",
+      "bytes": 123184
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
-      "sha256": "87d149928fd44e3193cb97c7b0e3dec3e692a93f35652cac625cf9475eb52c85",
-      "bytes": 51739
+      "sha256": "cda5289351a8648579734cbb229fa593d89e428d7c069e51282a4ea447bd0056",
+      "bytes": 62100
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
@@ -65973,8 +66108,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
-      "sha256": "beae25c90f40f9ccaed90f940507dfb63ca4737bcba3e8681540373a767cde32",
-      "bytes": 81310
+      "sha256": "8086d3c02f3bb0015ff61037471c518455cae4b9622eeabbf4fa83a492db7ffc",
+      "bytes": 109265
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
@@ -65990,6 +66125,11 @@
       "path": "tools/sota-convergence/landscape-sweep/make_result.py",
       "sha256": "cf8c71a62663672c37b01c84f655c1d83a2b1c301f9bbd881791b32d0b4f2d7a",
       "bytes": 32674
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/paired_probe.py",
+      "sha256": "e13702fe1187020da6b5a75f6a4a55a7fec72dbd95c0a47396530d06e223eda9",
+      "bytes": 9757
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/schemas/critic.json",

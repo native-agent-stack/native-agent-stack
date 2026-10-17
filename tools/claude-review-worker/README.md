@@ -18,7 +18,7 @@ measurements and its open boundaries is
 2. Checks it can run at all, before any key is read: the ledger is named, the pinned binary exists, bubblewrap starts
    the binary in the sandbox, node, srt and socat are the pinned ones, and a keyless check through srt and bubblewrap
    shows the network boundary closed (only `lo`, the API reachable through srt's proxy, `example.com` refused, no
-   direct route, and nothing reaching a listener on the host's loopback).
+   direct route, nothing reaching a listener on the host's loopback, and `socket(AF_VSOCK)` refused with `EPERM`).
 3. Settles anything a stopped tick left open: an open `CRW` debit becomes an unknown settle at 11 USD, an attempt
    still marked `started` becomes `interrupted` (counted, not final), and the stopped run's leftover scratch (its
    CLAUDE_CONFIG_DIR, an archive) is deleted.
@@ -48,9 +48,14 @@ for a paths-limited review, and the attempt is final.
 The review process is started as `env … node <srt>/dist/cli.js --settings <run>/srt.json -- env … credential_run.py
 <key> -- bwrap … /opt/claude-review/claude -p …`. srt starts without the key. The runner, srt's command, reads the key
 store and passes the key in the environment of bwrap and the client only, never in argv, so srt's node process, shells
-and bridges never hold it. srt (Anthropic's sandbox runtime, `@anthropic-ai/sandbox-runtime` 0.0.79) is the network
-boundary: its own bubblewrap layer gives the run a network namespace with only `lo`, and its proxy on the host,
-reached through a bound unix socket, passes `api.anthropic.com` and refuses everything else. srt gets a private
+and bridges never hold it. srt (Anthropic's sandbox runtime, `@anthropic-ai/sandbox-runtime` 0.0.80) is the network
+boundary: its own bubblewrap layer gives the run a network namespace with only `lo`, so IP traffic has no route but
+srt's proxy on the host, reached through a bound unix socket, which passes `api.anthropic.com` and refuses every other
+host. A network namespace does not fence VM sockets (on WSL2 a vsock connection reaches the host past the proxy), so
+srt's seccomp filter refuses the command `socket(AF_VSOCK)`, and new `AF_UNIX` sockets, with `EPERM`. The settings set
+`allowNestedUserNamespaces`, without which srt 0.0.80 refuses the inner bubblewrap its user namespace; its price is
+that srt's own write denies do not hold against a command that makes one, a limit 0.0.79 did not have either (the
+comment at `SRT_VERSION` in `worker.py` gives the sources and the measurement). srt gets a private
 directory per run under `$XDG_RUNTIME_DIR/claude-review-worker/` (its settings, TMPDIR, HOME and an empty working
 directory), deleted after the run. The inner bubblewrap is the filesystem fence. It has a new root:
 `/usr` and `/etc` read-only, `/proc`, `/dev`, an empty `/tmp`, an empty home at `/review/home`, the main worktree at
@@ -58,7 +63,8 @@ directory), deleted after the run. The inner bubblewrap is the filesystem fence.
 `/review/config` (writable, deleted after the run) and the pinned binary. There is no `/home`, so the gh login, the key
 store and every other host file are absent. No CLAUDE.md memory of any kind is loaded: every session runs with
 `CLAUDE_CODE_DISABLE_CLAUDE_MDS=1` (the instruction fence). The flags and settings are listed in `claude_flags()` and
-`review_settings()` in `worker.py`, each checked against `claude --help` of 2.1.299 (byte-identical to 2.1.296's).
+`review_settings()` in `worker.py`, each checked against `claude --help` of 2.1.299 (byte-identical to 2.1.296's), of
+2.1.300 and of 2.1.302 (byte-identical to 2.1.300's).
 
 A trading head (every `us-equities-trading` head, and a `native-agent-stack` head that changes one of its
 `trading_paths`) gets the upstream-alignment rule in its prompt. Every claim or fix about external behaviour must cite
@@ -72,13 +78,13 @@ prompt says the check covers citation presence only.
 ## Install (command center)
 
 0. Install srt from its pinned npm tarball (sha256
-   `5a730e4367c264ccc4b592af01dab038a6c39db7c184efbd132841688fa854f1`), without its install scripts, and check that
+   `7da66e1a5161bbcb57cf8a6f7ba7d85f1e6bb7897040b295885dc74c1a255f95`), without its install scripts, and check that
    socat is installed. Node is the host's mise install (`~/.local/share/mise/installs/node/24.21.0/bin/node`, at least
    22.12). The worker checks the version and npm's recorded integrity of the install on every tick.
 
    ```sh
-   npm pack @anthropic-ai/sandbox-runtime@0.0.79   # then compare sha256sum of the .tgz with the value above
-   npm install --prefix ~/.local/share/claude-review-worker/srt --ignore-scripts ./anthropic-ai-sandbox-runtime-0.0.79.tgz
+   npm pack @anthropic-ai/sandbox-runtime@0.0.80   # then compare sha256sum of the .tgz with the value above
+   npm install --prefix ~/.local/share/claude-review-worker/srt --ignore-scripts ./anthropic-ai-sandbox-runtime-0.0.80.tgz
    ```
 1. Run the offline probes, then the live probes.
    - The offline checks cover the sandbox, the client's start, main's project settings, the run's config directory
@@ -107,7 +113,13 @@ prompt says the check covers citation presence only.
    # CLAUDE_REVIEW_KEYS=anthropic-api-4,anthropic-api-3,anthropic-api-2,anthropic-api-5,anthropic-api,...
    #   fill-first: the next key only when one is out of credit or revoked; a switch is a ledger row and a warning;
    #   anthropic-api-3 is second (its CI-review purpose ended with #981) and anthropic-api-2 third (owner, 2026-10-11)
-   # CLAUDE_BIN=~/.local/share/claude/versions/2.1.299                  # the pinned native binary
+   # CLAUDE_BIN=~/.local/share/claude-retained/2.1.302/claude          # the pinned native binary, a retained copy outside
+   #   versions/ (the native installer's cleanup keeps only the launcher's, running and two newest versions there)
+   # CLAUDE_BIN_SHA256=60d7eb7f12fbb28a52533fe8be5884097403562aa02dc73991a021c7067e29a5   # checked at every tick; the
+   #   default binary's digest is built in (the signed 2.1.302 manifest's linux-x64 checksum); a CLAUDE_BIN naming
+   #   another path needs this line too, or the worker stops at its settings (exit 2); every path must be absolute.
+   #   The check is by path: the file is hashed at the tick and again before each key's launch, then bubblewrap binds
+   #   it by path, so a writer with the worker's own uid could swap it in between; that uid can already edit worker.py
    # CLAUDE_REVIEW_STATE=~/.local/state/native-agent-stack/claude-review-worker
    # CLAUDE_REVIEW_TIMEOUT_SECONDS=2700
    # CLAUDE_REVIEW_UPSTREAM=~/code/upstream   # the local upstream mirrors, read as git objects only
@@ -144,6 +156,14 @@ prompt says the check covers citation presence only.
 - Review a head again: move its attempt marker out of `attempts/`; the next tick treats the head as new.
 - A head refused for its diff size or its own size needs a paths-limited review by other means; the worker has no
   paths option. (The `paths` input of `claude-pr-review.yml` was one such means until #981 removed that workflow.)
+- Roll the client back to the previous retained release: in `~/.config/claude-review-worker.env`, set the pair
+  `CLAUDE_BIN=~/.local/share/claude-retained/2.1.300/claude` and
+  `CLAUDE_BIN_SHA256=674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453` (the linux-x64 checksum in the
+  signed 2.1.300 release manifest, size 266972344). Check it first with `sha256sum` on that path and `<path> --version`, then run
+  `probes.py offline` with the same two variables set, and enable nothing while a check fails. The next tick checks
+  the pair before any key is read. Undo by removing both lines. Nothing under `claude-retained/` is touched by the
+  native installer's cleanup; the rule that moves this pin to each new release after a function check of the exact
+  invocation is the floor record's addendum (#1128).
 
 ## Posting
 

@@ -1,7 +1,7 @@
 {
  "schema": "claude-native-practice-slots/1",
- "client_version": "2.1.295",
- "checked_at": "2026-10-09",
+ "client_version": "2.1.302",
+ "checked_at": "2026-10-16",
  "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
  "selection_rule": "One default per role slot; overlaps become ranked alternatives or rejections. A native Claude Code feature that covers the slot is the default unless a measured gap exists. Repository quality selects (maintenance, releases, tests, docs, upstream adoption); popularity and invoke counts never do. A token or cost saving becomes a default only with quality parity measured on paired same-task runs (promptfoo 0.124.0 or the skill-creator benchmark, blind judge plus exact checks); otherwise it stays an alternative marked pending. A retired slot is the exception: it has no default, and its row says what replaced the route.",
  "status_values": {
@@ -183,9 +183,12 @@
     "settings.md precedence",
     "permissions.md deny-first evaluation",
     "permission-modes.md",
-    "settings-permissions-O7, O15, O16"
+    "settings-permissions-O7, O15, O16",
+    "CHANGELOG@v2.1.302 L373 (2.1.299, MCP allow rules reach only the named server)",
+    "L280 and L270 (2.1.299 fixes)",
+    "L245 (2.1.299, rm prompts on shell `-c` scripts)"
    ],
-   "notes": "Under bypass, writes to `.claude` and `.git` are auto-approved and no deny rule covers the guard's own files; any non-interactive run skips the trust dialog. The docs limit bypass to isolated containers or VMs; the recipe records bypass as an open owner decision (recipes/claude-native-profile.md:367). The Artifact tool, which publishes session output as a private web page on claude.ai, is off on NativeStack2604: its user settings hold `enableArtifact: false` (exact-key read, 2026-10-15), the key `/config` writes when its Artifacts row is turned off. Any settings file can turn the tool off and none can turn it back on, and the deprecated `disableArtifact: true` means the same (settings-reference.md:5427-5443, :5354-5360, client 2.1.300). It is recorded as this host's choice, not a template default: the `claude:setting:enableArtifact` row of catalogs/foundation/upstream-surface-dispositions.json (enabled, scope NativeStack2604); re-applying the template keeps it, because keys the template does not mention are kept from the live file (tools/adoption/apply_claude_settings.py:323-329; gap ledger A3-0031, 2026-10-15).",
+   "notes": "Under bypass, writes to `.claude` and `.git` are auto-approved and no deny rule covers the guard's own files; any non-interactive run skips the trust dialog. The docs limit bypass to isolated containers or VMs; the recipe records bypass as an open owner decision (recipes/claude-native-profile.md:367). The Artifact tool, which publishes session output as a private web page on claude.ai, is off on NativeStack2604: its user settings hold `enableArtifact: false` (exact-key read, 2026-10-15), the key `/config` writes when its Artifacts row is turned off. Any settings file can turn the tool off and none can turn it back on, and the deprecated `disableArtifact: true` means the same (settings-reference.md:5427-5443, :5354-5360, client 2.1.300). It is recorded as this host's choice, not a template default: the `claude:setting:enableArtifact` row of catalogs/foundation/upstream-surface-dispositions.json (enabled, scope NativeStack2604); re-applying the template keeps it, because keys the template does not mention are kept from the live file (tools/adoption/apply_claude_settings.py:323-329; gap ledger A3-0031, 2026-10-15). Rule evaluation changed in 2.1.299 (CHANGELOG@v2.1.302 L373 and L280): an MCP allow rule reaches only the server it names, so `mcp__a` no longer allows a server named `a__b` or `a_`, and an allow rule for a server is written `mcp__<server>__*` with the server's whole normalized name; and deny and ask rules now apply to a server whose normalized name contains `__`. The same release changed a built-in prompt, not rule evaluation (L245): an rm built at run time in a script Claude Code cannot read no longer prompts unless `CLAUDE_CODE_STRICT_INLINE_SHELL_RM_PROMPT=1`. The overturn fired (2.1.299 changed rule evaluation: CHANGELOG@v2.1.302 L373); precedence and deny-first evaluation are unchanged, so the default stands. Audited 2026-10-17 at client 2.1.302: the only `mcp__` allow rules are `mcp__semble__search` and `mcp__semble__find_related` in the user settings, each a whole tool name; no user or project settings file holds an `mcp__` deny or ask rule or sets `enabledMcpjsonServers` or `disabledMcpjsonServers`, and no local settings file exists; and no configured server's normalized name contains `__`. No rule relied on prefix matching, so none changes.",
    "overturn_when": "The owner reopens the permission mode, a release changes precedence or rule evaluation, or an incident shows a deny or hook gap.",
    "supersedes": [
     "M46 evidence sentence (auto start mode, 2.1.285)",
@@ -336,9 +339,10 @@
    "evidence": [
     "checkpointing.md",
     "claude-directory.md retention (cleanupPeriodDays default 30)",
-    "checkpoints-rewind-O6, O7, O8"
+    "checkpoints-rewind-O6, O7, O8",
+    "CHANGELOG@v2.1.302 L186 (2.1.300: transcripts record each request's system prompt, tools and parameters)"
    ],
-   "notes": "`cleanupPeriodDays: 3650` keeps plaintext transcripts and pre-edit snapshots for about ten years: an exposure window for any secret a tool read. Retention is the owner's choice; the record gives the trade-off and a recommended value.",
+   "notes": "`cleanupPeriodDays: 3650` keeps plaintext transcripts and pre-edit snapshots for about ten years: an exposure window for any secret a tool read. Retention is the owner's choice; the record gives the trade-off and a recommended value. Since 2.1.300 each local transcript also records every API request's system prompt, tools and parameters (CHANGELOG@v2.1.302 L186), so the retained footprint and its exposure grew; the footprint is to be re-measured on 2.1.302 before the owner's retention decision.",
    "overturn_when": "A measured footprint or an owner retention decision, or a release changes what checkpoints restore.",
    "supersedes": [],
    "primary_sources": [
@@ -386,9 +390,11 @@
    ],
    "evidence": [
     "sandboxing.md",
-    "sandbox-environments.md (bypass sessions belong in a container, VM or the sandbox runtime)"
+    "sandbox-environments.md (bypass sessions belong in a container, VM or the sandbox runtime)",
+    "CHANGELOG@v2.1.302 L249, L242, L254, L322 and L323 (2.1.299 sandbox fixes)",
+    "L190 (2.1.300, `claude remote-control --sandbox` and `--no-sandbox` removed)"
    ],
-   "notes": "The native sandbox bounds shell commands only; file tools, MCP servers, hooks and the status line stay outside it. Bypass is not reopened.",
+   "notes": "The native sandbox bounds shell commands only; file tools, MCP servers, hooks and the status line stay outside it. Bypass is not reopened. M1 is to run on 2.1.302, which carries the WSL2 fix for sandboxed commands failing with `bwrap: Can't mkdir` when the sandbox can write to the Windows drive (CHANGELOG@v2.1.302 L249) and no longer accepts `claude remote-control --sandbox` or `--no-sandbox` (L190; `sandbox.enabled` in settings sandboxes sessions).",
    "overturn_when": "M1's arms pass on this host and the owner opts in, or a worker is seen taking a harmful action.",
    "supersedes": [
     "M1 refined"
@@ -417,7 +423,7 @@
    "supersedes": [
     "M49 refined"
    ],
-   "notes": "Adjudicated: the current practice stands (refuter pending at writing). Owed: the M49 probe on 2.1.295 for the WorktreeCreate and pre-create paths.",
+   "notes": "Adjudicated: the current practice stands (refuter pending at writing). Owed: the M49 probe on 2.1.302 for the WorktreeCreate and pre-create paths, taking in the 2.1.299 to 2.1.301 worktree fixes (CHANGELOG@v2.1.302 L153, L148, L77, L324 and L157).",
    "primary_sources": [
     {
      "title": "Harness engineering: leveraging Codex in an agent-first world",
@@ -439,7 +445,7 @@
    "layer_id": "native-clients",
    "status": "recommendation",
    "default": "Native per-role model and effort: subagent and skill frontmatter, the Agent tool's `model` and `effort` (2.1.292+), per-model `modelSettings`, and `--model`/`--effort` on headless jobs",
-   "route": "Opus 5.5 for judgment and build; Sonnet 5.5 or Haiku 5.5 only for a task class with a frozen paired A/B at parity; keep `CLAUDE_CODE_EFFORT_LEVEL` and `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` unset, because they override frontmatter and per-call effort; Codex lanes through the gateway for fan-out research",
+   "route": "Opus 5.5 for judgment and build; Sonnet 5.5 or Haiku 5.5 only for a task class with a frozen paired A/B at parity; keep `CLAUDE_CODE_EFFORT_LEVEL`, `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` and `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` unset, because the first two override frontmatter and per-call effort and the third (2.1.296) runs every workflow agent on one model, against per-role routing; Codex lanes through the gateway for fan-out research",
    "alternatives": [
     "Re-run failed attempts at a higher effort",
     "Native advisor pairing",
@@ -456,7 +462,10 @@
     "sub-agents.md model resolution order",
     "model-effort-O3, O5, O7",
     "Measured here: promptfoo three-model extraction A/B, 60/60 each (one fixture class); #840 Haiku trial",
-    "Designed, not measured: J4 tiering (Opus census, Haiku sample, sealed 5% Opus re-read)"
+    "Designed, not measured: J4 tiering (Opus census, Haiku sample, sealed 5% Opus re-read)",
+    "CHANGELOG@v2.1.302 L411 (2.1.296, `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL`)",
+    "L224 (2.1.299, /effort and /fast in agent view)",
+    "L371 (2.1.299, WebFetch effort)"
    ],
    "notes": "Model choices are the owner's; this row is a recommendation. The M7 effort sweep (high, xhigh, max on our tasks) is owed.",
    "overturn_when": "The M7 sweep shows a lower effort at quality parity for a task class, or max scoring below xhigh; or a newer model release.",
@@ -546,7 +555,7 @@
    "layer_id": "token-efficiency",
    "status": "default",
    "default": "Native auto-compaction at the model's default window, with `/compact <focus>` at natural breaks, `/clear` between unrelated tasks and a Compact Instructions section in CLAUDE.md",
-   "route": "Manual levers apply to top-level interactive sessions; `-p` workers, Workflow children and subagents compact automatically; re-inject must-keep state with a SessionStart hook matching `compact`",
+   "route": "Manual levers apply to top-level interactive sessions; `-p` workers, Workflow children and subagents compact automatically; re-inject must-keep state with a SessionStart hook matching `compact`; idle compaction (2.1.299, terminal only, about 54 idle minutes at 200K+ tokens) stays at its default, and the `/config` Idle compaction row (2.1.302) turns it off or back on; subagent `autoCompactWindow` (2.1.296) stays unset",
    "alternatives": [
     "SessionStart(compact) hook",
     "Per-model `/autocompact` window behind a 200K gateway"
@@ -559,9 +568,13 @@
    "evidence": [
     "context-window.md what survives compaction",
     "context-token-O3, O15, O16",
-    "Measured upstream: compaction pays only on long runs (Anthropic, optimizing-for-cost-and-intelligence)"
+    "Measured upstream: compaction pays only on long runs (Anthropic, optimizing-for-cost-and-intelligence)",
+    "CHANGELOG@v2.1.302 L217-L218 (2.1.299, idle compaction)",
+    "L6 (2.1.302, the /config Idle compaction row)",
+    "L410 (2.1.296, subagent `autoCompactWindow`)",
+    "L110 (2.1.301, a switch to a smaller-window model summarizes first)"
    ],
-   "notes": "No quality loss measured or claimed: this is the native default; no override is set on the host or template. Compacting before an idle gap is native since 2.1.299: idle compaction compacts an interactive terminal conversation on the one-hour cache TTL whose context has reached the 200,000-token threshold, about 54 minutes after its last request and shortly before the cache expires, so the next message sends a summary instead of the whole conversation (CHANGELOG.md:97-98 at anthropics/claude-code@94506ff0d3bd9185f1752da36e968775021fb48f; settings-reference.md:2964-2983 at client 2.1.300: default `true`, and Claude Code must be able to fetch feature flags). Keep it on: `idleCompaction` stays unset on the host and in the template (the command center's ruling of 2026-10-14 on its 2.1.299 screen); only the settings of a session that must keep its exact context across a wait longer than 54 minutes set it to `false`, and `DISABLE_AUTO_COMPACT` turns it off with auto-compaction. Hooks see it as an automatic compaction: PreCompact and PostCompact match it as `auto`, and the route's SessionStart `compact` hook fires on any automatic compaction (hooks.md:3251, :3283, :1214). `-p` workers are not interactive, so it does not reach them (gap ledger C3-0006, 2026-10-15).",
+   "notes": "No quality loss measured or claimed: this is the native default; no override is set on the host or template. Compacting before an idle gap is native since 2.1.299: idle compaction compacts an interactive terminal conversation on the one-hour cache TTL whose context has reached the 200,000-token threshold, about 54 minutes after its last request and shortly before the cache expires, so the next message sends a summary instead of the whole conversation (CHANGELOG.md:97-98 at anthropics/claude-code@94506ff0d3bd9185f1752da36e968775021fb48f; settings-reference.md:2964-2983 at client 2.1.300: default `true`, and Claude Code must be able to fetch feature flags). Keep it on: `idleCompaction` stays unset on the host and in the template (the command center's ruling of 2026-10-14 on its 2.1.299 screen); only the settings of a session that must keep its exact context across a wait longer than 54 minutes set it to `false`, and `DISABLE_AUTO_COMPACT` turns it off with auto-compaction. Hooks see it as an automatic compaction: PreCompact and PostCompact match it as `auto`, and the route's SessionStart `compact` hook fires on any automatic compaction (hooks.md:3251, :3283, :1214). `-p` workers are not interactive, so it does not reach them (gap ledger C3-0006, 2026-10-15). The overturn fired (2.1.296 to 2.1.302 changed compaction: CHANGELOG@v2.1.302 L217-L218, L6, L410 and L110) and the default stands. Unverified: whether idle compaction follows the Compact Instructions section of CLAUDE.md.",
    "overturn_when": "A paired same-task run shows an earlier window keeps quality at lower cost, or a release changes compaction.",
    "supersedes": [
     "topic: auto-compact threshold (window now saved per model)",
@@ -763,9 +776,13 @@
    ],
    "evidence": [
     "env-vars.md and settings-reference output limits",
-    "Measured usage: rtk 13.9% of 1,243.1M input tokens saved (rtk gain, all time); context-mode 32,484 Codex calls in 24 h and 743 MB kept out of context over 5 days; headroom 0 compressions (not in the request path)"
+    "Measured usage: rtk 13.9% of 1,243.1M input tokens saved (rtk gain, all time); context-mode 32,484 Codex calls in 24 h and 743 MB kept out of context over 5 days; headroom 0 compressions (not in the request path)",
+    "CHANGELOG@v2.1.302 L414 (2.1.296, Read `allow_large`)",
+    "L216 (2.1.299, `CLAUDE_CODE_DISABLE_FILE_MENTIONS`)",
+    "L189 (2.1.300, hook `updatedInput` validation)",
+    "L916 (2.1.290, permission rules apply after a PreToolUse hook rewrites the input)"
    ],
-   "notes": "Token reductions are measured and quality parity is not, so no tool is the default. Usage observed on 2026-10-09 (information, not a selector): rtk 13.9% of 1,243.1M input tokens (rtk gain), context-mode 32,484 Codex calls in 24 h, headroom 0 compressions because it is not in the request path. Adjudicated: native default with headroom ranked first on its published fidelity evals; the refuter upheld it. Owed: a paired quality-parity run per mechanism (a J7 class).",
+   "notes": "Token reductions are measured and quality parity is not, so no tool is the default. Usage observed on 2026-10-09 (information, not a selector): rtk 13.9% of 1,243.1M input tokens (rtk gain), context-mode 32,484 Codex calls in 24 h, headroom 0 compressions because it is not in the request path. Adjudicated: native default with headroom ranked first on its published fidelity evals; the refuter upheld it. Owed: a paired quality-parity run per mechanism (a J7 class). The caps are unchanged through 2.1.302; the new levers, Read's `allow_large` (CHANGELOG@v2.1.302 L414) and `CLAUDE_CODE_DISABLE_FILE_MENTIONS` (L216), stay at their defaults pending a paired run. Checked 2026-10-17 at client 2.1.302: `rtk hook claude` (rtk 0.51.0) returns Claude's own `tool_input` with only `command` replaced (rtk-ai/rtk@v0.51.0 src/hooks/hook_cmd.rs:648-651), so the `updatedInput` validation of 2.1.300 (L189: unknown keys are dropped, and input the tool rejects denies the call) has no key to drop. Since 2.1.290 permission rules apply to the rewritten command (L916); of the git subcommands rtk rewrites (src/discover/rules.rs:61) only `git push` meets a deny rule, and the user settings also deny the `rtk git push` form of each of the six force-push rules. An npx command that no deny rule matches is rewritten too (src/discover/rules.rs:120); one that a deny rule matches as written is left unrewritten, so Claude Code's own deny applies (src/hooks/permissions.rs:84-90, src/hooks/hook_cmd.rs:688-691). None of the 19 `npx *skills` deny rules in the user settings has an `rtk npx` twin (exact-key read, 2026-10-17), so no deny rule there matches the skills CLI in the `rtk npx` spelling, which rtk's own deny check does not cover; PR #1238 adds the 19 twins, which cover that spelling, to the template the user settings are applied from.",
    "overturn_when": "A paired same-task run shows a tool at quality parity with a measured saving; it then becomes the default for the mechanism it covers.",
    "supersedes": [
     "M35 (pin and proxy facts moved)"
@@ -1124,9 +1141,12 @@
    ],
    "evidence": [
     "sub-agents.md frontmatter and priority",
-    "subagents-teams-O2, O3, O15"
+    "subagents-teams-O2, O3, O15",
+    "CHANGELOG@v2.1.302 L374 (2.1.299, agent `tools:` lists)",
+    "L410 (2.1.296, `autoCompactWindow` in subagent frontmatter)",
+    "L35 and L36 (2.1.302, fork subagents on by default and nested Agent calls in the foreground)"
    ],
-   "notes": "Four host copies differ from adoption/agents/claude and four host-only definitions exist (G6b). Portability: the user-scope copies run in other projects, where 4 are stale and 4 of 11 bodies point at native-agent-stack-only paths; the north star needs repository-neutral bodies before relying on them.",
+   "notes": "The host copies match adoption/agents/claude: ~/.claude/agents and .claude/agents hold the same 11 definitions byte for byte and no host-only one (`diff -rq`, exit 0, 2026-10-17), which settles the stale note recorded in docs/decisions/2026-10-13-claude-agent-drift-check.md:188. Portability: the user-scope copies run in other projects, where 4 of 11 bodies point at native-agent-stack-only paths; the north star needs repository-neutral bodies before relying on them. Since 2.1.299 a `tools:` list takes only the named MCP server's tools, and a server whose name contains `__` is listed as `mcp__<whole name>__*` (CHANGELOG@v2.1.302 L374); audited 2026-10-17 at client 2.1.302: the 11 definitions grant 25 distinct MCP tools, each by whole name `mcp__<server>__<tool>`, from six servers, none of whose normalized names contains `__`, so no list changes. Since 2.1.302 fork subagents are on by default in `claude -p` and the Agent SDK (L35), and a subagent's own Agent calls there run in the foreground by default (L36).",
    "overturn_when": "A release changes definition scope or priority, or a measured role-quality gap.",
    "supersedes": [],
    "primary_sources": [
@@ -1239,7 +1259,7 @@
    "layer_id": "workers",
    "status": "default-scoped",
    "default": "Dynamic Workflows (Workflow tool; saved workflows in `.claude/workflows` or `~/.claude/workflows`)",
-   "route": "Runs resume from their journal after a pause or a usage limit (observed 2026-10-09); background sessions under the native supervisor for long single tasks. Scoped to headless `claude -p` runs fenced with `--setting-sources local`: launch a saved Workflow by `scriptPath` (its name was not found in 6 of 6 runs of paired run 1, arm B) and expect `claude -p` to stop waiting for a long verifier at its background-wait ceiling (10 minutes by default; the runner of paired run 1 set it to 45 minutes with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS`, and the verifier returned in 2 of 6 runs and was cut in 3)",
+   "route": "Runs resume from their journal after a pause or a usage limit (observed 2026-10-09); background sessions under the native supervisor for long single tasks. Scoped to headless `claude -p` runs fenced with `--setting-sources local`: launch a saved Workflow by `scriptPath` (its name was not found in 6 of 6 runs of paired run 1, arm B) and expect `claude -p` to stop waiting for a long verifier at its background-wait ceiling (10 minutes by default; the runner of paired run 1 set it to 45 minutes with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS`, and the verifier returned in 2 of 6 runs and was cut in 3); since 2.1.300 a background session resumes a carried workflow through the Workflow tool's approval instead of from the handoff file (CHANGELOG@v2.1.302 L185), to be re-observed",
    "alternatives": [
     "`claude --bg` sessions",
     "Background subagents",
@@ -1251,9 +1271,13 @@
    "evidence": [
     "workflows.md resume and limits",
     "background-workflows-O8, O9, O10",
-    "Paired run 1, 2026-10-10 (evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json; RESULT.md sha256 e87b9cabd8c2, score.json 72dc84ef76b0): six bounded north-star fixes, one trial per arm; every mode passed 6 of 6, the single session cost $5.87 on average, the verify Workflow 1.6x and the agent team 3.0x (estimates), and the blind judges preferred the single session's diff to the Workflow's on 5 of 6 fixtures and to the team's on 3 of the 5 where the team's diff was captured"
+    "Paired run 1, 2026-10-10 (evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json; RESULT.md sha256 e87b9cabd8c2, score.json 72dc84ef76b0): six bounded north-star fixes, one trial per arm; every mode passed 6 of 6, the single session cost $5.87 on average, the verify Workflow 1.6x and the agent team 3.0x (estimates), and the blind judges preferred the single session's diff to the Workflow's on 5 of 6 fixtures and to the team's on 3 of the 5 where the team's diff was captured",
+    "CHANGELOG@v2.1.302 L185 (2.1.300, background resume through the Workflow tool's approval)",
+    "L365 (2.1.299, workflow script nesting limit)",
+    "L81 (2.1.301, workflow agents skipping their step while the run reported success)",
+    "L411 (2.1.296, `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL`)"
    ],
-   "notes": "Saved workflows are not yet at a native discovery location, and the adopt step names an agents/ directory that does not exist. Verified: a `-p` launch of a saved Workflow needs a launch-scoped `--allowedTools 'Workflow(<name>)'`; on WSL2 background carry-over relies on the on-demand supervisor. Measured 2026-10-10 (paired run 1, arm B): under `--setting-sources local` a saved Workflow in the repository's `.claude/workflows` was not found by name in 6 of 6 headless runs (the available list held only `deep-research`) and was launched by `scriptPath` instead; the verifier returned in 2 of 6 runs (0 refuted), was cut by the background-wait ceiling of `claude -p` in 3 (45 minutes as the runner set it with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=2700000`; the client's default is 10 minutes: env-vars.md and headless.md of the pinned documentation), and in 1 the implementer itself ran to that ceiling.",
+   "notes": "Saved workflows are not yet at a native discovery location, and the adopt step names an agents/ directory that does not exist. Verified: a `-p` launch of a saved Workflow needs a launch-scoped `--allowedTools 'Workflow(<name>)'`; on WSL2 background carry-over relies on the on-demand supervisor. Measured 2026-10-10 (paired run 1, arm B): under `--setting-sources local` a saved Workflow in the repository's `.claude/workflows` was not found by name in 6 of 6 headless runs (the available list held only `deep-research`) and was launched by `scriptPath` instead; the verifier returned in 2 of 6 runs (0 refuted), was cut by the background-wait ceiling of `claude -p` in 3 (45 minutes as the runner set it with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=2700000`; the client's default is 10 minutes: env-vars.md and headless.md of the pinned documentation), and in 1 the implementer itself ran to that ceiling. The overturn fired (2.1.299 and 2.1.300 changed Workflow limits and resume: CHANGELOG@v2.1.302 L365 and L185); the default stands, with the route's resume clause to be re-observed. The 2.1.301 fix (L81: workflow agents sometimes skipped their step and the run still reported success) closes a silent-success failure that paired run 1 could not rule out.",
    "overturn_when": "A release changes Workflow resume or limits, or a measured failure mode on our runs beyond the two that paired run 1, arm B measured in fenced headless runs (the name lookup, which `scriptPath` avoids, and the verifier's wait ceiling, which the route above tells a session to expect).",
    "supersedes": [
     "R52 Ultracode clause"
@@ -1670,9 +1694,14 @@
    ],
    "evidence": [
     "mcp.md tool search and output limits",
-    "mcp-O2, O3, O4, O5, O6, O7"
+    "mcp-O2, O3, O4, O5, O6, O7",
+    "CHANGELOG@v2.1.302 L469 (2.1.296, up-front description and instruction limit 4,096 characters)",
+    "L377 (2.1.299, first-party server descriptions reach Claude in full)",
+    "L142 (2.1.300, automatic tool search no longer turns off mid-conversation)",
+    "L602 (2.1.295, descriptions loaded through tool search cut at 16,384 characters)",
+    "L1926 (2.1.280, `CLAUDE_CODE_MAX_MCP_DESCRIPTION_LENGTH`)"
    ],
-   "notes": "Registrations drift between host and template (qmd stdio versus HTTP, ports, a server key): G6b. Verified: on user-scope registrations `alwaysLoad: true` loads every tool of that server upfront (the per-tool opt-out works only for --mcp-config, SDK and plugin servers); image results stay under MAX_MCP_OUTPUT_TOKENS; the upfront fallback behind a non-first-party base URL dates from 2.1.70.",
+   "notes": "Registrations drift between host and template (qmd stdio versus HTTP, ports, a server key): G6b. Verified: on user-scope registrations `alwaysLoad: true` loads every tool of that server upfront (the per-tool opt-out works only for --mcp-config, SDK and plugin servers); image results stay under MAX_MCP_OUTPUT_TOKENS; the upfront fallback behind a non-first-party base URL dates from 2.1.70. Since 2.1.296 the default limit on MCP tool descriptions sent up front and on server instructions is 4,096 characters, up from 2,048 (CHANGELOG@v2.1.302 L469). Measured 2026-10-17 at client 2.1.302 (each server's `initialize` and `tools/list`): 11 of the 12 servers send no tool description or instructions over 4,096 characters, the longest being context-mode's `ctx_search` description at 3,351. ai-memory 3.1.0 sends 19,478 characters of instructions and is cut inside its per-tool routing; upstream keeps the core before its `--- Detailed tool routing follows. ---` marker within 2,048 characters so that the cut spares it (akitaonrails/ai-memory@v3.1.0 crates/ai-memory-mcp/src/server.rs:169-171, tested at :9118-9126; issue #1035), and its managed Agent Skills carry the per-tool routing, so the default limit stays and `CLAUDE_CODE_MAX_MCP_DESCRIPTION_LENGTH` (L1926) is not set.",
    "overturn_when": "A measured context or quality gap from deferral, or a release changes tool-search defaults.",
    "supersedes": [
     "topic: MCP tool loading (native deferral converged)"
@@ -1781,7 +1810,7 @@
    "layer_id": "agent-sdks",
    "status": "default-scoped",
    "default": "`claude -p` with every fence on the command line",
-   "route": "An explicit `--permission-mode dontAsk` with an explicit `--allowedTools` list for unattended workers (never inherit: an inheriting `-p` run on this host starts in bypassPermissions); `--strict-mcp-config` with `--mcp-config`; `--setting-sources` or `--restricted` (then carry the deny list and guard hooks through `--settings`, or keep code-running tools out of `--tools`); `--tools`, `--max-turns` (documented in cli-reference, absent from `--help`), `--max-budget-usd`, `--json-schema`; bound the post-final-turn wait with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS`; `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB` for child processes; the Claude Agent SDK (Python) as the measured reader and extraction worker",
+   "route": "An explicit `--permission-mode dontAsk` with an explicit `--allowedTools` list for unattended workers (never inherit: an inheriting `-p` run on this host starts in bypassPermissions); `--strict-mcp-config` with `--mcp-config`; `--setting-sources` or `--restricted` (then carry the deny list and guard hooks through `--settings`, or keep code-running tools out of `--tools`); `--tools`, `--max-turns` (documented in cli-reference, absent from `--help`), `--max-budget-usd`, `--json-schema`; bound the post-final-turn wait with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS`; `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB` for child processes; the Claude Agent SDK (Python) as the measured reader and extraction worker; since 2.1.302 a `-p` run with no permission mode starts in `default` on third-party providers, with telemetry off or on a fresh install (CHANGELOG@v2.1.302 L34), so the explicit mode stays; fork subagents are on by default in `-p` and the SDK (L35), so a worker that must not fan out keeps Agent out of `--tools`; `CLAUDE_CODE_FORK_SUBAGENT=0` turns off fork subagents only (L35), not named subagents",
    "alternatives": [
     "claude-agent-sdk-python for hosted workers",
     "claude-agent-sdk-typescript"
@@ -1794,9 +1823,12 @@
    "evidence": [
     "headless.md",
     "headless-sdk-O2, O3, O4, O5, O12",
-    "Measured: --bare leaves only Read of Read/Glob/Grep (client-behaviour-2.1.295 record)"
+    "Measured: --bare leaves only Read of Read/Glob/Grep (client-behaviour-2.1.295 record)",
+    "CHANGELOG@v2.1.302 L34 (2.1.302, `-p` start mode on third-party providers)",
+    "L35 and L36 (2.1.302, fork subagents on by default and nested Agent calls in the foreground)",
+    "L291 (2.1.299, `-p` reports a settings file that fails validation on stderr)"
    ],
-   "notes": "HOST-07 required `--bare` outside trusted checkouts; on this OAuth host the documented fence is `--restricted` with `--permission-prompts none` and `--strict-mcp-config`. Two call sites lack fences (skill_usage.py).",
+   "notes": "HOST-07 required `--bare` outside trusted checkouts; on this OAuth host the documented fence is `--restricted` with `--permission-prompts none` and `--strict-mcp-config`. Two call sites lack fences (skill_usage.py). The overturn fired (2.1.302 changed `-p` defaults: CHANGELOG@v2.1.302 L34 and L35); the route records both changes.",
    "overturn_when": "A release changes `-p` defaults or `--bare` authentication, or a measured fence gap.",
    "supersedes": [
     "M6 (the fence for non-bare lanes)",
@@ -2064,11 +2096,15 @@
     "monitoring-usage.md",
     "cost-usage-O5, O7, O8",
     "Observed: eight claude_code_* metric names in Prometheus with current samples",
-    "Metered 2026-10-11 over two 24-hour windows (evidence/artifacts/claude-native-practice-20261009/meter-windows-20261011.json)"
+    "Metered 2026-10-11 over two 24-hour windows (evidence/artifacts/claude-native-practice-20261009/meter-windows-20261011.json)",
+    "CHANGELOG@v2.1.302 L126 and L130 (2.1.300, `cache_creation_5m_tokens`, `cache_creation_1h_tokens` and `gen_ai.*` span attributes)",
+    "L75, L76 and L18 (2.1.301 and 2.1.302, `classifier_verdict`, `permission_mode` and `classifier_category` on `tool_decision`)",
+    "L467 (2.1.296, Sonnet 5.5 cache-read price in the cost figures)",
+    "L186 (2.1.300, transcripts record each request)"
    ],
    "overturn_when": "A measured gap the native path cannot close (for example per-lane cost attribution the counters lack).",
    "supersedes": [],
-   "notes": "Adjudicated mixed: native default, with ccusage and agentsview ranked first among alternatives; the refuter upheld it. Owed: a fixed-window same-task reconciliation of native counters against ccusage. Scope verified: not covered are Actions under WIF (retired 2026-10-10; read the Console organisation's usage if it is ever re-enabled), ultrareview cloud runs (usage credits) and `--bare` workers; under the subscription `claude_code_cost_usage` is API-list-price value, not spend; the series carry effort, query_source, model, type and ecosystem_lane. Integrity preconditions: the prompt and response content gates stay off (OTEL_LOG_ASSISTANT_RESPONSES explicitly false); because the template sets OTEL_LOG_TOOL_DETAILS=1, the collector's tool-name and privacy allowlists are required; backends stay on loopback and no log or event export with values goes into the public repository. Metered on this host over two fixed 24-hour windows ending 2026-10-11T01:10:00Z and 2026-10-11T08:00:00Z (evidence/artifacts/claude-native-practice-20261009/meter-windows-20261011.json, aggregate figures by model from the local Prometheus and Loki): on claude-fable-5-1 the cost counter equals the token counters at the pricing page's rates (sha256 67904e280b59) to within a cent in both windows; the `api_request` events' `cost_usd` equals the counter on none of the three main models (events over counter in the first and second window: Opus 5.5 2.56 and 1.64, Sonnet 5.5 1.46 and 1.29, Fable 5.1 0.08 and 0.05), so the events are not a spend meter, and the advisor run's Stage 0 found one cause: the events book the advisor's dollars under the executor's model (private working paper, sha256 2377eb9ce915); Fable 5.1, the model the advisor runs on here, was 23% in both windows of the counter's list-equivalent total. Paired run 4, which was to weigh that share against what the advisor buys, was stopped on 2026-10-11 at the owner's priority after 2 of 8 pairs and has no verdict (private working paper, sha256 6fdeb8916960). Entrypoint label (gap ledger A3-0090, 2026-10-15): the template and the collector example set `OTEL_METRICS_INCLUDE_ENTRYPOINT=true` (off by default; env-vars.md:510, sha256 54351937e4d1, and monitoring-usage.md:156, sha256 72374067fb00, both fetched 2026-10-15T10:33:04Z at client 2.1.300), so each metric carries `app.entrypoint` (`cli`, `sdk-cli`, `sdk-ts`, `sdk-py` and others, monitoring-usage.md:584) to split interactive, `-p` and SDK runs, a launch kind the god view does not label (docs/decisions/2026-10-13-command-center-god-view.md:43-44). The label reaches Prometheus only once transform/privacy keeps it: the Claude metric allowlists of observability/collector/collector.yaml and of the 2604 profile the live collector runs (evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml) do not list `app.entrypoint`, so the collector sums it away. The 2604 user settings lack the key (exact-key read, 2026-10-15T10:46:06Z); both host steps are proposed to the command center as a host diff. Session transcripts on this host record `cli` for tab and `--bg` sessions alike, so expect the label not to separate them. Plan limits (gap ledger B2-0005, 2026-10-15): signed in with the plan, `claude -p`, Agent SDK and third-party app runs draw the plan's usage limits, which interactive sessions share (support article 15036540: its 2026-06-15 update paused the announced change to SDK usage, and its 2026-10-07 update keeps these runs on the subscription limits; fetched 2026-10-15T10:33:04Z, sha256 8712a0cd32c2). The Max and Team monthly API credits go to a linked Console organization and cover its API-key usage (the API, the Agent SDK and `claude -p` with its key, Managed Agents), not interactive Claude Code, and leave the plan's limits unchanged (support article 17154008, fetched 2026-10-15T10:37:03Z, sha256 17185d5773b0; an owner item, docs/decisions/2026-10-09-claude-code-gap-resolution.md:179-181).",
+   "notes": "Adjudicated mixed: native default, with ccusage and agentsview ranked first among alternatives; the refuter upheld it. Owed: a fixed-window same-task reconciliation of native counters against ccusage. Scope verified: not covered are Actions under WIF (retired 2026-10-10; read the Console organisation's usage if it is ever re-enabled), ultrareview cloud runs (usage credits) and `--bare` workers; under the subscription `claude_code_cost_usage` is API-list-price value, not spend; the series carry effort, query_source, model, type and ecosystem_lane. Integrity preconditions: the prompt and response content gates stay off (OTEL_LOG_ASSISTANT_RESPONSES explicitly false); because the template sets OTEL_LOG_TOOL_DETAILS=1, the collector's tool-name and privacy allowlists are required; backends stay on loopback and no log or event export with values goes into the public repository. Metered on this host over two fixed 24-hour windows ending 2026-10-11T01:10:00Z and 2026-10-11T08:00:00Z (evidence/artifacts/claude-native-practice-20261009/meter-windows-20261011.json, aggregate figures by model from the local Prometheus and Loki): on claude-fable-5-1 the cost counter equals the token counters at the pricing page's rates (sha256 67904e280b59) to within a cent in both windows; the `api_request` events' `cost_usd` equals the counter on none of the three main models (events over counter in the first and second window: Opus 5.5 2.56 and 1.64, Sonnet 5.5 1.46 and 1.29, Fable 5.1 0.08 and 0.05), so the events are not a spend meter, and the advisor run's Stage 0 found one cause: the events book the advisor's dollars under the executor's model (private working paper, sha256 2377eb9ce915); Fable 5.1, the model the advisor runs on here, was 23% in both windows of the counter's list-equivalent total. Paired run 4, which was to weigh that share against what the advisor buys, was stopped on 2026-10-11 at the owner's priority after 2 of 8 pairs and has no verdict (private working paper, sha256 6fdeb8916960). Entrypoint label (gap ledger A3-0090, 2026-10-15): the template and the collector example set `OTEL_METRICS_INCLUDE_ENTRYPOINT=true` (off by default; env-vars.md:510, sha256 54351937e4d1, and monitoring-usage.md:156, sha256 72374067fb00, both fetched 2026-10-15T10:33:04Z at client 2.1.300), so each metric carries `app.entrypoint` (`cli`, `sdk-cli`, `sdk-ts`, `sdk-py` and others, monitoring-usage.md:584) to split interactive, `-p` and SDK runs, a launch kind the god view does not label (docs/decisions/2026-10-13-command-center-god-view.md:43-44). The label reaches Prometheus only once transform/privacy keeps it: the Claude metric allowlists of observability/collector/collector.yaml and of the 2604 profile the live collector runs (evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml) do not list `app.entrypoint`, so the collector sums it away. The 2604 user settings lack the key (exact-key read, 2026-10-15T10:46:06Z); both host steps are proposed to the command center as a host diff. Session transcripts on this host record `cli` for tab and `--bg` sessions alike, so expect the label not to separate them. Plan limits (gap ledger B2-0005, 2026-10-15): signed in with the plan, `claude -p`, Agent SDK and third-party app runs draw the plan's usage limits, which interactive sessions share (support article 15036540: its 2026-06-15 update paused the announced change to SDK usage, and its 2026-10-07 update keeps these runs on the subscription limits; fetched 2026-10-15T10:33:04Z, sha256 8712a0cd32c2). The Max and Team monthly API credits go to a linked Console organization and cover its API-key usage (the API, the Agent SDK and `claude -p` with its key, Managed Agents), not interactive Claude Code, and leave the plan's limits unchanged (support article 17154008, fetched 2026-10-15T10:37:03Z, sha256 17185d5773b0; an owner item, docs/decisions/2026-10-09-claude-code-gap-resolution.md:179-181). New OpenTelemetry fields through 2.1.302: `cache_creation_5m_tokens` and `cache_creation_1h_tokens` on `api_request` (CHANGELOG@v2.1.302 L126), GenAI semantic-convention span attributes such as `gen_ai.conversation.id` and `gen_ai.tool.name` (L130), and `classifier_verdict`, `permission_mode` and `classifier_category` on `tool_decision` (L75, L76, L18); neither collector profile keeps the five event fields yet: the transform/privacy allowlists of observability/collector/collector.yaml and the 2604 profile drop them (none appears in the 2.1.302 events exported 2026-10-17), and adding them, shape-checked and kept off SDK receipts, is proposed to the command center as a host diff. The span attributes need no allowlist entry: the templates export no Claude traces (`OTEL_TRACES_EXPORTER=none`, asserted at tests/test_observability_tool_names.py:178), and the traces pipeline feeds only span metrics, where `gen_ai.conversation.id` must not become a dimension. To be tested, with Claude traces on: whether `gen_ai.conversation.id` closes the attribution gap.",
    "primary_sources": [
     {
      "title": "The advisor strategy: Give agents an intelligence boost",

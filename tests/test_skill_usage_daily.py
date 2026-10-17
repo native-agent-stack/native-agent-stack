@@ -235,6 +235,39 @@ class DailyProjectionTests(unittest.TestCase):
             self.assertIn("OnCalendar=daily", timer)
             self.assertNotIn("@REPOSITORY@", service)
 
+    def test_lane_commands_build_both_lane_reports_for_an_explicit_window(self):
+        daily = daily_module()
+        commands = daily.lane_commands([Path("/fixture/codex")], [Path("/fixture/claude")], since="2026-10-16T00:00:00Z",
+                                       until="2026-10-17T00:00:00Z", now="2026-10-17T00:00:00Z", node="/fixture/bin/node")
+        self.assertEqual(len(commands), 2)
+        codex, claude = commands
+        self.assertEqual(codex[codex.index("--lanes") + 1:], ["--codex-root", "/fixture/codex", "--since", "2026-10-16T00:00:00Z",
+                                                               "--until", "2026-10-17T00:00:00Z", "--now", "2026-10-17T00:00:00Z", "--json"])
+        self.assertEqual(claude[0], "/fixture/bin/node")
+        self.assertEqual(claude[claude.index("--lanes-sweep") + 1:], ["--root", "/fixture/claude", "--since", "2026-10-16T00:00:00Z", "--until", "2026-10-17T00:00:00Z"])
+        self.assertFalse(any("--run-skill-doctor" in command for command in commands))
+
+    def test_publish_makes_the_directory_private_whether_new_or_already_looser(self):
+        """Review B6: daily_skill_usage.publish tightens an existing looser destination directory to 0700; the file is 0600."""
+        daily = daily_module()
+        with tempfile.TemporaryDirectory(prefix="skill-publish-test-") as temp:
+            for name, existing in (("new", None), ("loose", 0o755), ("open", 0o777)):
+                directory = Path(temp) / name / "state"
+                if existing is not None:
+                    directory.mkdir(parents=True)
+                    directory.chmod(existing)
+                daily.publish(directory / "report.json", {"k": 1})
+                self.assertEqual(oct(directory.stat().st_mode & 0o777), "0o700", name)
+                self.assertEqual(oct((directory / "report.json").stat().st_mode & 0o777), "0o600", name)
+
+    def test_render_units_renders_any_named_template(self):
+        daily = daily_module()
+        with tempfile.TemporaryDirectory() as temp:
+            dest = Path(temp)
+            daily.render_units(dest, Path("/fixture/live clone"), Path(sys.executable), Path("/fixture/bin/node"), names=("token-rate.service", "token-rate.timer"))
+            self.assertEqual(sorted(path.name for path in dest.iterdir()), ["token-rate.service", "token-rate.timer"])
+            self.assertIn('"/fixture/live clone/tools/skill-usage/daily_token_usage.py"', (dest / "token-rate.service").read_text())
+
     @unittest.skipUnless(shutil.which("systemd-analyze"), "native systemd verifier unavailable")
     def test_native_user_unit_verification_needs_no_session_or_install(self):
         daily = daily_module()

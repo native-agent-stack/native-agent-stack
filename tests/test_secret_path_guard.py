@@ -18,6 +18,7 @@ from pathlib import Path
 import random
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -2004,9 +2005,9 @@ ORACLE_STAY_ALLOWED = [
 ]
 
 
-def run_hook(payload):
-    return subprocess.run([sys.executable, "-B", str(HOOK)], input=json.dumps(payload),
-                          capture_output=True, text=True, timeout=30)
+def run_hook(payload, env=None, hook=HOOK):
+    return subprocess.run([sys.executable, "-B", str(hook)], input=json.dumps(payload),
+                          capture_output=True, text=True, timeout=30, env=env)
 
 
 def fenced_lines(path):
@@ -5795,6 +5796,267 @@ class K4GuardTests(unittest.TestCase):
                     self.assertIn(word, hint)
                 self.assertNotIn("/api/settings/", hint)
                 self.assertNotIn("$", hint)
+
+
+# The host gateway allocation (#1180). A host file moves the gateway off the fixed ports: this host's
+# adoption/hosts/<host>.json (gitignored, .gitignore `adoption/hosts/*.json`) sets NS_PORT_GATEWAY=23128,
+# NS_PORT_GATEWAY_WS=23129 and NS_PORT_GATEWAY_EMBED_WS=23131. Before the fix the guard covered only
+# 20128, 20129, 21128 and 21129, so management requests to 23128 passed. The fixtures are copies of the
+# committed template adoption/hosts/example.json with the gateway keys replaced; no request is sent.
+# The module imports the guard in-process with the runner's environment (`guard` above), so its import state holds the runner's
+# allocation (on a host with a moved gateway, more covered ports). That never changes a fixed port's rows, so the frozen matrix
+# above holds on any runner; test_import_state_is_the_runners_allocation pins it, and every test here that depends on the port
+# set uses configured() or a hook process with an isolated environment (isolated_environ()).
+GATEWAY_ALLOCATION_PORT_TOOLING = ROOT / "evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py"
+GATEWAY_FIXED_PORTS = ("20128", "20129", "21128", "21129")  # the frozen policy's ports (K4_GATEWAY_PORTS above)
+GATEWAY_ALLOCATION_REFUSED = "curl -s http://127.0.0.1:{port}/api/providers/client"
+GATEWAY_ALLOCATION_CONTROL = "curl -s http://127.0.0.1:{port}/api/settings/compression"
+
+
+def gateway_host_values(**ports):
+    values = json.loads((ROOT / "adoption/hosts/example.json").read_text(encoding="utf-8"))
+    values.update({"NS_PORT_" + name: str(port) for name, port in ports.items()})
+    return values
+
+
+class GatewayAllocationTests(unittest.TestCase):
+    def setUp(self):
+        self.scratch = Path(tempfile.mkdtemp(prefix="guard-gateway-"))
+        self.addCleanup(shutil.rmtree, self.scratch, True)
+        self.config = self.scratch / "xdg"
+        self.config.mkdir()
+
+    def project(self, name, files):
+        root = self.scratch / name
+        hosts = root / "adoption" / "hosts"
+        hosts.mkdir(parents=True)
+        for file_name, text in files.items():
+            (hosts / file_name).write_text(text if isinstance(text, str) else json.dumps(text, indent=2) + "\n", encoding="utf-8")
+        return root
+
+    def environ(self, root=None, **extra):
+        env = {key: value for key, value in os.environ.items()
+               if key not in {"CLAUDE_PROJECT_DIR", "NS2604_HOST_FILE", "XDG_CONFIG_HOME"}}
+        env["XDG_CONFIG_HOME"] = str(self.config)  # never the host's installed allocation
+        if root is not None:
+            env["CLAUDE_PROJECT_DIR"] = str(root)
+        env.update(extra)
+        return env
+
+    def isolated_environ(self, **extra):
+        """An environment with no allocation source but the ones extra names: no project root, no NS2604_HOST_FILE, an empty
+        config root and a HOME without .config. A value of None removes the variable."""
+        home = self.scratch / "home"
+        home.mkdir(exist_ok=True)
+        env = {key: value for key, value in os.environ.items()
+               if key not in {"CLAUDE_PROJECT_DIR", "NS2604_HOST_FILE", "XDG_CONFIG_HOME", "HOME"}}
+        env.update(HOME=str(home), XDG_CONFIG_HOME=str(self.config))
+        env.update(extra)
+        return {key: value for key, value in env.items() if value is not None}
+
+    def hook(self, command, env, hook=HOOK):
+        return run_hook({"tool_name": "Bash", "tool_input": {"command": command}}, env=env, hook=hook)
+
+    def assertRefused(self, command, env, hook=HOOK):
+        result = self.hook(command, env, hook)
+        self.assertEqual(result.returncode, 2, command)
+        self.assertIn("blocked (gateway_credential_route)", result.stderr)
+
+    def assertPasses(self, command, env, hook=HOOK):
+        result = self.hook(command, env, hook)
+        self.assertEqual((result.returncode, result.stderr), (0, ""), command)
+
+    def configured(self, api, other):
+        names = ("K4_GW_PORTS", "K4_GW_HEAD", "K4_GW_FIND", "K4_GW_ROWS", "K4_GW_ID_PORTS", "K4_ANCHOR",
+                 "K4_GATEWAY_PORT_ANCHORS", "K4_GATEWAY_ANCHORS")
+        saved = {name: getattr(guard, name) for name in names}
+        self.addCleanup(lambda: [setattr(guard, name, value) for name, value in saved.items()])
+        guard.gateway_allocation_configure(api, other)
+
+    def test_allocated_gateway_ports_refuse_as_21128(self):
+        root = self.project("host", {"host.json": gateway_host_values(GATEWAY=23128, GATEWAY_WS=23129, GATEWAY_EMBED_WS=23131)})
+        env = self.environ(root)
+        for port in (21128, 23128, 23129, 23131):
+            with self.subTest(port=port):
+                self.assertRefused(GATEWAY_ALLOCATION_REFUSED.format(port=port), env)
+        # The allowlisted control passes on the allocated gateway port, as on 21128; the WebSocket ports serve no row.
+        self.assertPasses(GATEWAY_ALLOCATION_CONTROL.format(port=23128), env)
+        self.assertPasses(GATEWAY_ALLOCATION_CONTROL.format(port=21128), env)
+        self.assertRefused(GATEWAY_ALLOCATION_CONTROL.format(port=23129), env)
+        self.assertRefused("curl -X POST http://127.0.0.1:23128/api/compression/preview -d '{}'", env)  # 20129-only
+        self.assertPasses("curl -X POST http://127.0.0.1:23128/api/usage/provider-limits", env)  # 21128's row
+        self.assertRefused("python3 - <<'PY'\nurl = 'http://127.0.0.1:23128/api/providers/client'\nPY", env)
+        self.assertRefused("curl -s 'http://127.0.0.1:2312[8-9]/api/health'", env)
+
+    def test_each_allocation_source_covers_its_port(self):
+        # One host file per source, each with its own port and its own config root. Each source is shown alone, with every other
+        # source's port uncovered, and then removed, with its own port uncovered: no hardcoded allocation, no shared fixture.
+        def values(port):
+            return gateway_host_values(GATEWAY=port, GATEWAY_WS=port + 1, GATEWAY_EMBED_WS=port + 3)
+
+        project = self.project("project", {"host.json": values(24601)})
+        checkout = self.project("checkout", {"host.json": values(24611)})
+        (checkout / "scripts" / "hooks").mkdir(parents=True)
+        copy = checkout / "scripts" / "hooks" / "secret_path_guard.py"
+        shutil.copyfile(HOOK, copy)
+        pointer = self.scratch / "pointed.json"
+        pointer.write_text(json.dumps(values(24621)), encoding="utf-8")
+        xdg = self.scratch / "xdg-installed"
+        (xdg / "new-wsl-native-stack").mkdir(parents=True)
+        (xdg / "new-wsl-native-stack" / ".service-ports.json").write_text(json.dumps(values(24631)), encoding="utf-8")
+        home = self.scratch / "home-installed"
+        (home / ".config" / "new-wsl-native-stack").mkdir(parents=True)
+        (home / ".config" / "new-wsl-native-stack" / ".service-ports.json").write_text(json.dumps(values(24641)), encoding="utf-8")
+        sources = {
+            # source: (port, hook, environment with the source, hook and environment without it)
+            "CLAUDE_PROJECT_DIR": (24601, HOOK, self.isolated_environ(CLAUDE_PROJECT_DIR=str(project)),
+                                   (HOOK, self.isolated_environ())),
+            "guard checkout": (24611, copy, self.isolated_environ(), (HOOK, self.isolated_environ())),
+            "NS2604_HOST_FILE": (24621, HOOK, self.isolated_environ(NS2604_HOST_FILE=str(pointer)), (HOOK, self.isolated_environ())),
+            "XDG_CONFIG_HOME": (24631, HOOK, self.isolated_environ(XDG_CONFIG_HOME=str(xdg)), (HOOK, self.isolated_environ())),
+            "HOME/.config": (24641, HOOK, self.isolated_environ(XDG_CONFIG_HOME=None, HOME=str(home)),
+                             (HOOK, self.isolated_environ(XDG_CONFIG_HOME=None))),
+        }
+        ports = [entry[0] for entry in sources.values()]
+        for source, (port, hook, env, (bare_hook, bare_env)) in sources.items():
+            with self.subTest(source=source):
+                self.assertRefused(GATEWAY_ALLOCATION_REFUSED.format(port=port), env, hook)
+                self.assertRefused(GATEWAY_ALLOCATION_REFUSED.format(port=port + 1), env, hook)  # NS_PORT_GATEWAY_WS
+                self.assertPasses(GATEWAY_ALLOCATION_CONTROL.format(port=port), env, hook)
+                for elsewhere in ports:
+                    if elsewhere != port:
+                        self.assertPasses(GATEWAY_ALLOCATION_REFUSED.format(port=elsewhere), env, hook)
+                self.assertPasses(GATEWAY_ALLOCATION_REFUSED.format(port=port), bare_env, bare_hook)
+
+    def test_allocated_gateway_port_has_exactly_21128s_rows(self):
+        # Against the frozen policy rows above (K4_GATEWAY_ROWS, independent of the production allowlist): an allocated
+        # NS_PORT_GATEWAY port passes a row exactly when the row names 21128.
+        self.configured({24555}, frozenset())
+        for method, path, ports, query, body_free in K4_GATEWAY_ROWS:
+            target = "http://127.0.0.1:24555" + path + ("?" + query if query else "")
+            with self.subTest(method=method, path=path):
+                self.assertEqual(guard.check(f"curl -X {method} {shlex.quote(target)}"),
+                                 None if 21128 in ports else "gateway_credential_route")
+                if body_free:
+                    self.assertEqual(guard.check(f"curl -X {method} {shlex.quote(target)} -d ''"), "gateway_credential_route")
+        self.assertEqual(guard.check("curl -X POST http://127.0.0.1:24555/api/compression/preview -d '{}'"),
+                         "gateway_credential_route")  # 20129-only
+        self.assertIsNone(guard.check("curl -s http://127.0.0.1:24555/api/usage/call-logs/fixture-1"))
+        self.assertIsNone(guard.check("curl -s http://127.0.0.1:24555/api/usage/provider-limits"))
+        self.assertIsNone(guard.check("curl -X POST http://127.0.0.1:24555/api/usage/provider-limits"))
+
+    def test_a_failing_source_drops_no_later_source(self):
+        root = self.project("two", {"a.json": gateway_host_values(GATEWAY=24701), "b.json": gateway_host_values(GATEWAY=24702)})
+        original = guard.gateway_allocation_ports
+
+        def flaky(path):
+            if path.endswith("a.json"):
+                raise RuntimeError("synthetic source failure")
+            return original(path)
+
+        environ = {"CLAUDE_PROJECT_DIR": str(root), "XDG_CONFIG_HOME": str(self.config), "HOME": str(self.scratch)}
+        with mock.patch.object(guard, "gateway_allocation_ports", flaky):
+            api, _other = guard.gateway_allocation(environ, str(root / "scripts/hooks/secret_path_guard.py"))
+        self.assertEqual(api, frozenset({24702}))
+
+    def test_read_caps_are_the_documented_ones(self):
+        # docs/secret-storage.md states both caps: the first 64 *.json of a directory in sorted name order, and the first 1 MiB of
+        # a file. What lies past a cap covers nothing (the fixed ports stay covered regardless).
+        self.assertEqual((guard.K4_GW_HOST_FILES, guard.K4_GW_HOST_FILE_BYTES), (64, 1 << 20))
+        root = self.project("many", {f"{index:02d}.json": {"NS_PORT_GATEWAY": str(25000 + index)} for index in range(65)})
+        long_file = self.scratch / "long.json"
+        long_file.write_text('{"NS_PORT_GATEWAY_WS": "25101", "pad": "' + "x" * (1 << 20)
+                             + '", "NS_PORT_GATEWAY_EMBED_WS": "25102"}', encoding="utf-8")
+        environ = {"CLAUDE_PROJECT_DIR": str(root), "NS2604_HOST_FILE": str(long_file), "XDG_CONFIG_HOME": str(self.config),
+                   "HOME": str(self.scratch)}
+        api, other = guard.gateway_allocation(environ, str(root / "scripts/hooks/secret_path_guard.py"))
+        self.assertEqual(api, frozenset(range(25000, 25064)))
+        self.assertEqual(other, frozenset({25101}))
+
+    def test_import_state_is_the_runners_allocation(self):
+        # The real import, in a process with no project root, no NS2604_HOST_FILE, an empty config root and an empty HOME: the
+        # guard's own checkout is the only source, and its committed adoption/hosts/example.json covers that template's ports on
+        # every checkout, CI included (21128 and 21129 are fixed; its NS_PORT_GATEWAY_EMBED_WS 21131 is added and serves no row).
+        probe = ("import importlib.util, json, sys\n"
+                 "spec = importlib.util.spec_from_file_location('guard_import_probe', sys.argv[1])\n"
+                 "module = importlib.util.module_from_spec(spec)\n"
+                 "spec.loader.exec_module(module)\n"
+                 "print(json.dumps([module.K4_GW_PORTS, module.K4_GW_ROWS[('GET', '/api/health')][0]]))\n")
+        result = subprocess.run([sys.executable, "-B", "-c", probe, str(HOOK)], env=self.isolated_environ(),
+                                capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        ports, health = json.loads(result.stdout)
+        expected = set(GATEWAY_FIXED_PORTS)
+        for path in sorted((ROOT / "adoption" / "hosts").glob("*.json"))[:64]:
+            values = json.loads(path.read_text(encoding="utf-8"))
+            expected |= {str(int(value)) for key, value in values.items() if key.startswith("NS_PORT_GATEWAY")}
+        self.assertIn("21131", ports)
+        self.assertEqual(set(ports), expected)
+        self.assertNotIn(21131, health)
+        self.assertNotIn(21129, health)
+        # This process's own import state is the allocation of the runner's environment (the module-level `guard` import).
+        api, other = guard.gateway_allocation()
+        self.assertEqual(guard.K4_GW_PORTS,
+                         tuple(str(port) for port in sorted({int(port) for port in GATEWAY_FIXED_PORTS} | api | other)))
+
+    def test_absent_host_file_keeps_fixed_ports(self):
+        root = self.scratch / "bare"
+        root.mkdir()
+        env = self.environ(root)
+        for port in GATEWAY_FIXED_PORTS:
+            with self.subTest(port=port):
+                self.assertRefused(GATEWAY_ALLOCATION_REFUSED.format(port=port), env)
+        environ = {"CLAUDE_PROJECT_DIR": str(root), "XDG_CONFIG_HOME": str(self.config), "HOME": str(root)}
+        self.assertEqual(guard.gateway_allocation(environ, str(root / "scripts/hooks/secret_path_guard.py")),
+                         (frozenset(), frozenset()))
+        self.configured(frozenset(), frozenset())
+        self.assertEqual(guard.K4_GW_PORTS, GATEWAY_FIXED_PORTS)
+        self.assertEqual(guard.K4_GW_ROWS, guard.K4_GW_FIXED_ROWS)
+
+    def test_malformed_or_unreadable_host_file_fails_closed(self):
+        whole = json.dumps(gateway_host_values(GATEWAY=24555), indent=2)
+        truncated = whole[:whole.index('"NS_PORT_GATEWAY_WS"')]  # ends after `"NS_PORT_GATEWAY": "24555",`: not valid JSON
+        root = self.project("broken", {"a.json": truncated, "b.json": "{not json", "c.json": "[]",
+                                       "d.json": {"NS_PORT_GATEWAY": "0", "NS_PORT_GATEWAY_WS": "abc", "NS_PORT_GATEWAY_X": True}})
+        (root / "adoption/hosts/dir.json").mkdir()
+        os.mkfifo(root / "adoption/hosts/fifo.json")  # never waited on
+        environ = {"CLAUDE_PROJECT_DIR": str(root), "XDG_CONFIG_HOME": str(self.config), "HOME": str(root)}
+        started = time.monotonic()
+        api, other = guard.gateway_allocation(environ, str(root / "scripts/hooks/secret_path_guard.py"))
+        self.assertLess(time.monotonic() - started, 5)
+        self.assertEqual(api, frozenset({24555}))  # the readable pair of a file that is not valid JSON still covers its port
+        self.assertEqual(other, frozenset())  # "0", "abc" and true name no port
+        self.configured(api, other)
+        for port in GATEWAY_FIXED_PORTS + ("24555",):
+            with self.subTest(port=port):
+                self.assertEqual(guard.check(GATEWAY_ALLOCATION_REFUSED.format(port=port)), "gateway_credential_route")
+        self.assertIsNone(guard.check(GATEWAY_ALLOCATION_CONTROL.format(port=24555)))
+        # A port allocated both as the gateway and as another gateway key serves no row; a fixed port keeps being covered.
+        self.configured({24555, 20128}, {24555, 20128})
+        for port in ("20128", "24555"):
+            self.assertEqual(guard.check(GATEWAY_ALLOCATION_CONTROL.format(port=port)), "gateway_credential_route")
+        self.assertIsNone(guard.check(GATEWAY_ALLOCATION_CONTROL.format(port=21128)))
+        # A host file never adds a row to a fixed port: NS_PORT_GATEWAY=20129 leaves 20129 without the provider-limits rows of 21128.
+        self.configured({20129}, frozenset())
+        self.assertEqual(guard.check("curl -s http://127.0.0.1:20129/api/usage/provider-limits"), "gateway_credential_route")
+        self.assertIsNone(guard.check("curl -X POST http://127.0.0.1:20129/api/compression/preview -d '{}'"))
+        self.assertIsNone(guard.check("curl -s http://127.0.0.1:21128/api/usage/provider-limits"))
+        # The hook itself starts and refuses with only unreadable host files.
+        env = self.environ(self.project("unreadable", {"b.json": "{not json"}))
+        self.assertRefused(GATEWAY_ALLOCATION_REFUSED.format(port=21128), env)
+
+    def test_gateway_keys_are_the_port_toolings(self):
+        spec = importlib.util.spec_from_file_location("gateway_port_tooling", GATEWAY_ALLOCATION_PORT_TOOLING)
+        tooling = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(tooling)
+        keys = {"NS_PORT_" + name for name, (slot, _default) in tooling.SERVICE_PORTS.items() if slot == "gpt-gateway"}
+        self.assertEqual(keys, {"NS_PORT_GATEWAY", "NS_PORT_GATEWAY_WS", "NS_PORT_GATEWAY_EMBED_WS"})
+        self.assertTrue(all(key.startswith(guard.K4_GW_HOST_KEY_PREFIX) for key in keys))
+        self.assertIn(guard.K4_GW_HOST_API_KEY, keys)
+        others = {"NS_PORT_" + name for name, (slot, _default) in tooling.SERVICE_PORTS.items() if slot != "gpt-gateway"}
+        self.assertFalse(any(key.startswith(guard.K4_GW_HOST_KEY_PREFIX) for key in others))
+        # The tooling's default gateway port is the fixed port whose rows an allocated gateway port takes.
+        self.assertEqual(tooling.SERVICE_PORTS["GATEWAY"][1], 21128)
 
 
 if __name__ == "__main__":

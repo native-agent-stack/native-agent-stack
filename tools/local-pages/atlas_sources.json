@@ -1,0 +1,199 @@
+{
+  "schema": "local-atlas-sources/1",
+  "about": "Every source the harness atlas reads, with the source_policy.json role that grants it, its root, one exact path, what is read and the trigger that makes it present. Repository records reuse the existing Architecture and overview grants; the two private projections use the atlas grants only. tools/local-pages/atlas_data.py checks each declaration against its exact grant before any open.",
+  "sources": {
+    "final_stack": {
+      "section": "layers",
+      "role": "architecture_final_stack",
+      "root": "repo",
+      "path": "catalogs/landscape/final-stack.json",
+      "reads": "layers[] (catalog, layer_id, title, status, winners, survivors), runs[] (id, pin) and index.by_repository; layer states and the FINAL count follow tools/local-pages/architecture_manifest.py layer_manifest()",
+      "trigger": "scripts/final_stack.py writes the file at a merged commit"
+    },
+    "foundation_catalog": {
+      "section": "layers",
+      "role": "architecture_catalog",
+      "root": "repo",
+      "path": "catalogs/landscape/foundation.json",
+      "reads": "layers[] order, titles and requirement text of the foundation catalog",
+      "trigger": "the foundation landscape catalog is committed"
+    },
+    "trading_catalog": {
+      "section": "layers",
+      "role": "architecture_catalog",
+      "root": "repo",
+      "path": "catalogs/landscape/us-equities.json",
+      "reads": "layers[] order and titles of the trading catalog, for the layer states",
+      "trigger": "the trading landscape catalog is committed"
+    },
+    "evidence_matrix": {
+      "section": "layers",
+      "role": "architecture_static",
+      "root": "repo",
+      "path": "catalogs/landscape/component-evidence-matrix.json",
+      "reads": "the per-layer convergence conditions layer_manifest() needs for each state",
+      "trigger": "scripts/component_matrix.py writes the matrix at a merged commit"
+    },
+    "cc_slots": {
+      "section": "layers",
+      "role": "overview_cc_slots",
+      "root": "repo",
+      "path": ".claude/skills/claude-native-practice/reference/slots.json",
+      "reads": "slots[] (id, status, default cut to its first clause) for the Claude cells and the stacks",
+      "default_chars": 80,
+      "trigger": "the claude-native-practice skill commits its slot table"
+    },
+    "skill_manifest": {
+      "section": "skills",
+      "role": "architecture_skill_manifest",
+      "root": "repo",
+      "path": "adoption/skills/manifest.json",
+      "reads": "skills[] rows (name, source, ref, tree_sha, skill_md_sha256, status) of the skills the atlas names",
+      "trigger": "the pinned skill manifest is committed"
+    },
+    "agent_claude_blind_adjudicator": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/claude/blind-adjudicator.md",
+      "reads": "the frontmatter model: and effort: lines only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_claude_blind_judge": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/claude/blind-judge.md",
+      "reads": "the frontmatter model: and effort: lines only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_claude_blind_lane_reviewer": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/claude/blind-lane-reviewer.md",
+      "reads": "the frontmatter model: and effort: lines only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_claude_evidence_reviewer": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/claude/evidence-reviewer.md",
+      "reads": "the frontmatter model: and effort: lines only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_claude_isolated_builder": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/claude/isolated-builder.md",
+      "reads": "the frontmatter model: and effort: lines only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_claude_landscape_sweep_worker": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/claude/landscape-sweep-worker.md",
+      "reads": "the frontmatter model: and effort: lines only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_claude_security_reviewer": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/claude/security-reviewer.md",
+      "reads": "the frontmatter model: and effort: lines only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_claude_semantic_evidence_reviewer": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/claude/semantic-evidence-reviewer.md",
+      "reads": "the frontmatter model: and effort: lines only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_claude_source_scout": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/claude/source-scout.md",
+      "reads": "the frontmatter model: and effort: lines only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_claude_stack_researcher": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/claude/stack-researcher.md",
+      "reads": "the frontmatter model: and effort: lines only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_claude_stack_verifier": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/claude/stack-verifier.md",
+      "reads": "the frontmatter model: and effort: lines only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_codex_stack_researcher": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/codex/stack-researcher.toml",
+      "reads": "the top-level model and model_reasoning_effort keys only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_codex_stack_verifier": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/codex/stack-verifier.toml",
+      "reads": "the top-level model and model_reasoning_effort keys only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_codex_worker_evidence_reviewer": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/codex/workers/evidence-reviewer.toml",
+      "reads": "the top-level model and model_reasoning_effort keys only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_codex_worker_isolated_builder": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/codex/workers/isolated-builder.toml",
+      "reads": "the top-level model and model_reasoning_effort keys only",
+      "trigger": "the agent definition is committed"
+    },
+    "agent_codex_worker_semantic_evidence_reviewer": {
+      "section": "routing",
+      "role": "architecture_inventory",
+      "root": "repo",
+      "path": "adoption/agents/codex/workers/semantic-evidence-reviewer.toml",
+      "reads": "the top-level model and model_reasoning_effort keys only",
+      "trigger": "the agent definition is committed"
+    },
+    "token_rate_latest": {
+      "section": "measured",
+      "role": "atlas_token_rate_latest",
+      "root": "state",
+      "path": "coordination/command-center/skills/token-rate-latest.json",
+      "reads": "token-rate-daily/1: the closed-day rollup and today so far per lane, the listed servers and coverage; counts and token numerators only",
+      "trigger": "the CC installs token-rate.timer (tools/skill-usage/README.md) and its first run publishes the projection"
+    },
+    "token_rate_history": {
+      "section": "measured",
+      "role": "atlas_token_rate_history",
+      "root": "state",
+      "path": "coordination/command-center/skills/token-rate-history.json",
+      "reads": "token-rate-history/1: one row per closed UTC day per lane; counts and token numerators only",
+      "trigger": "the CC installs token-rate.timer (tools/skill-usage/README.md) and its first run closes a day"
+    }
+  }
+}
