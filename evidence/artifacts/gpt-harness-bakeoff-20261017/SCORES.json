@@ -1,0 +1,468 @@
+{
+  "rule": {
+    "T1": "reply cited 76 and actual 77",
+    "T2": "reply changed_line 77 and tests_ok true, plus atlas_map.json line 141 holds line 77 and unittest exits 0"
+  },
+  "census": {
+    "file": "<private census state file>",
+    "at": "2026-10-17T21:08:18Z",
+    "listeners": 72,
+    "violations": 0
+  },
+  "harnesses": {
+    "codex-exec": {
+      "T1": {
+        "correct": 2,
+        "of": 2,
+        "median_wall_s": 59.0,
+        "median_tokens_in_plus_out": 31484.5,
+        "t2_file_and_tests_ok": null,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 103,
+            "tokens_in": 30963,
+            "tokens_out": 266,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 15,
+            "tokens_in": 31565,
+            "tokens_out": 175,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          }
+        ]
+      },
+      "T2": {
+        "correct": 2,
+        "of": 2,
+        "median_wall_s": 93.0,
+        "median_tokens_in_plus_out": 271893.0,
+        "t2_file_and_tests_ok": 2,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 118,
+            "tokens_in": 265951,
+            "tokens_out": 2481,
+            "reply_correct": true,
+            "state_and_tests_ok": true
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 68,
+            "tokens_in": 273208,
+            "tokens_out": 2146,
+            "reply_correct": true,
+            "state_and_tests_ok": true
+          }
+        ]
+      }
+    },
+    "pi": {
+      "T1": {
+        "correct": 2,
+        "of": 2,
+        "median_wall_s": 4.4,
+        "median_tokens_in_plus_out": 2167.5,
+        "t2_file_and_tests_ok": null,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 4.7,
+            "tokens_in": 2037,
+            "tokens_out": 85,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 4.1,
+            "tokens_in": 2132,
+            "tokens_out": 81,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          }
+        ]
+      },
+      "T2": {
+        "correct": 2,
+        "of": 2,
+        "median_wall_s": 46.0,
+        "median_tokens_in_plus_out": 17855.5,
+        "t2_file_and_tests_ok": 2,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 42,
+            "tokens_in": 15873,
+            "tokens_out": 602,
+            "reply_correct": true,
+            "state_and_tests_ok": true
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 50,
+            "tokens_in": 18484,
+            "tokens_out": 752,
+            "reply_correct": true,
+            "state_and_tests_ok": true
+          }
+        ]
+      }
+    },
+    "opencode": {
+      "T1": {
+        "correct": 2,
+        "of": 2,
+        "median_wall_s": 65.87,
+        "median_tokens_in_plus_out": 5075.0,
+        "t2_file_and_tests_ok": null,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 108.73,
+            "tokens_in": 6722,
+            "tokens_out": 126,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 23.01,
+            "tokens_in": 3164,
+            "tokens_out": 138,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          }
+        ]
+      },
+      "T2": {
+        "correct": 1,
+        "of": 2,
+        "median_wall_s": 100.11,
+        "median_tokens_in_plus_out": 26052.5,
+        "t2_file_and_tests_ok": 2,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 123.41,
+            "tokens_in": 22633,
+            "tokens_out": 1070,
+            "reply_correct": true,
+            "state_and_tests_ok": true
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 76.82,
+            "tokens_in": 27266,
+            "tokens_out": 1136,
+            "reply_correct": false,
+            "state_and_tests_ok": true
+          }
+        ]
+      }
+    },
+    "kilo": {
+      "T1": {
+        "correct": 2,
+        "of": 2,
+        "median_wall_s": 94.75,
+        "median_tokens_in_plus_out": 6250.0,
+        "t2_file_and_tests_ok": null,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 125.97,
+            "tokens_in": 5882,
+            "tokens_out": 134,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 63.53,
+            "tokens_in": 6341,
+            "tokens_out": 143,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          }
+        ]
+      },
+      "T2": {
+        "correct": 0,
+        "of": 2,
+        "median_wall_s": 57.8,
+        "median_tokens_in_plus_out": 15624.0,
+        "t2_file_and_tests_ok": 2,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 60.29,
+            "tokens_in": 15099,
+            "tokens_out": 639,
+            "reply_correct": false,
+            "state_and_tests_ok": true
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 55.32,
+            "tokens_in": 14908,
+            "tokens_out": 602,
+            "reply_correct": false,
+            "state_and_tests_ok": true
+          }
+        ]
+      }
+    },
+    "oh-my-pi": {
+      "T1": {
+        "correct": 2,
+        "of": 2,
+        "median_wall_s": 8.63,
+        "median_tokens_in_plus_out": 9977.0,
+        "t2_file_and_tests_ok": null,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 8.24,
+            "tokens_in": 9004,
+            "tokens_out": 108,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 9.02,
+            "tokens_in": 10732,
+            "tokens_out": 110,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          }
+        ]
+      },
+      "T2": {
+        "correct": 0,
+        "of": 2,
+        "median_wall_s": 58.99,
+        "median_tokens_in_plus_out": 33128.0,
+        "t2_file_and_tests_ok": 2,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 57.91,
+            "tokens_in": 23123,
+            "tokens_out": 1690,
+            "reply_correct": false,
+            "state_and_tests_ok": true
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 60.07,
+            "tokens_in": 39820,
+            "tokens_out": 1623,
+            "reply_correct": false,
+            "state_and_tests_ok": true
+          }
+        ]
+      }
+    },
+    "goose": {
+      "T1": {
+        "correct": 1,
+        "of": 2,
+        "median_wall_s": 10.02,
+        "median_tokens_in_plus_out": 5027.5,
+        "t2_file_and_tests_ok": null,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 1,
+            "wall_s": 12.91,
+            "tokens_in": 0,
+            "tokens_out": 0,
+            "reply_correct": false,
+            "state_and_tests_ok": null
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 7.12,
+            "tokens_in": 9960,
+            "tokens_out": 95,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          }
+        ]
+      },
+      "T2": {
+        "correct": 2,
+        "of": 2,
+        "median_wall_s": 55.38,
+        "median_tokens_in_plus_out": 82867.5,
+        "t2_file_and_tests_ok": 2,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 48.41,
+            "tokens_in": 67956,
+            "tokens_out": 934,
+            "reply_correct": true,
+            "state_and_tests_ok": true
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 62.35,
+            "tokens_in": 95488,
+            "tokens_out": 1357,
+            "reply_correct": true,
+            "state_and_tests_ok": true
+          }
+        ]
+      }
+    },
+    "openhands": {
+      "T1": {
+        "correct": 2,
+        "of": 2,
+        "median_wall_s": 31.09,
+        "median_tokens_in_plus_out": 13124.0,
+        "t2_file_and_tests_ok": null,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 43.99,
+            "tokens_in": 12824,
+            "tokens_out": 211,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 18.19,
+            "tokens_in": 12949,
+            "tokens_out": 264,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          }
+        ]
+      },
+      "T2": {
+        "correct": 1,
+        "of": 2,
+        "median_wall_s": 61.03,
+        "median_tokens_in_plus_out": 128452.5,
+        "t2_file_and_tests_ok": 2,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 59.09,
+            "tokens_in": 102034,
+            "tokens_out": 1099,
+            "reply_correct": true,
+            "state_and_tests_ok": true
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 62.98,
+            "tokens_in": 152547,
+            "tokens_out": 1225,
+            "reply_correct": false,
+            "state_and_tests_ok": true
+          }
+        ]
+      }
+    },
+    "deerflow": {
+      "T1": {
+        "correct": 2,
+        "of": 2,
+        "median_wall_s": 11.04,
+        "median_tokens_in_plus_out": 26590.0,
+        "t2_file_and_tests_ok": null,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 11.08,
+            "tokens_in": 26588,
+            "tokens_out": 106,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 11,
+            "tokens_in": 26383,
+            "tokens_out": 103,
+            "reply_correct": true,
+            "state_and_tests_ok": null
+          }
+        ]
+      },
+      "T2": {
+        "correct": 0,
+        "of": 2,
+        "median_wall_s": 50.91,
+        "median_tokens_in_plus_out": 104265.5,
+        "t2_file_and_tests_ok": 2,
+        "per_run": [
+          {
+            "rep": 1,
+            "exit": 0,
+            "wall_s": 57.34,
+            "tokens_in": 118671,
+            "tokens_out": 468,
+            "reply_correct": false,
+            "state_and_tests_ok": true
+          },
+          {
+            "rep": 2,
+            "exit": 0,
+            "wall_s": 44.48,
+            "tokens_in": 88926,
+            "tokens_out": 466,
+            "reply_correct": false,
+            "state_and_tests_ok": true
+          }
+        ]
+      }
+    }
+  },
+  "notes": [
+    "Strict scoring per the stated rule: T2 replies of changed_line 141 are counted incorrect even where the file and unittest pass (state_and_tests_ok).",
+    "goose T1 rep 1 exited 1 with a Responses stream-decode error and reported no usage, so its 0 tokens are unmeasured; the median includes it as recorded.",
+    "tokens_in_plus_out mixes cache accounting across runtimes (codex-exec tokens_in includes cached input; others report uncached input separately), so it is not a like-for-like cost measure.",
+    "pi T2 rep 2 tokens_cached is 69504 per the sender's correction; it is not part of the in+out total."
+  ]
+}
