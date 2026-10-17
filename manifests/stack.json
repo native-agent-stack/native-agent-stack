@@ -2466,20 +2466,20 @@
       "runtime": "codebase-memory-mcp"
     },
     {
-      "id": "claude-haiku-4-5-20251001",
-      "revision": "claude-haiku-4-5-20251001",
-      "release_date": "2025-10-15",
-      "release_source": "https://www.anthropic.com/news/claude-haiku-4-5",
-      "release_date_basis": "Vendor public release date; the identifier suffix is its earlier snapshot date.",
+      "id": "claude-haiku-5-5",
+      "revision": "claude-haiku-5-5",
+      "release_date": "2026-10-07",
+      "release_source": "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
+      "release_date_basis": "Vendor model overview page for claude-haiku-5-5.",
       "role": "Simple Claude Code background tasks",
-      "consumer_limit": "Titles, safety checks and quick summaries; latest Haiku line retained as the owner's dated exception, without heavier-line promotion for currency.",
+      "consumer_limit": "Titles, safety checks and quick summaries; the latest Haiku line, without heavier-line promotion for currency.",
       "currency_status": "in_use",
       "currency_rows": ["background-haiku"],
-      "landscape_checked_at": "2026-10-07",
-      "overturn": "An Anthropic Haiku 5.x model ID becomes available.",
-      "selection_scope": "Owner ruling and reported application at 2026-10-07T04:15Z; no new configuration read-back or model run by this wave.",
+      "landscape_checked_at": "2026-10-17",
+      "overturn": "A Claude Code release after 2.1.302 moves the background slot off Haiku 5.5, or Anthropic marks Haiku 5.5 legacy or retired.",
+      "selection_scope": "Claude Code 2.1.302 client default (anthropics/claude-code CHANGELOG.md:642, 2.1.293) with no ANTHROPIC_DEFAULT_HAIKU_MODEL override on this host; corrects the 2026-10-07 Haiku 4.5 selection by docs/decisions/2026-10-17-background-haiku-currency-correction.md; no host configuration changed.",
       "route": "Native Claude account",
-      "distribution": "Hosted dated snapshot ID; no local weights or CI calls"
+      "distribution": "Hosted model alias; no local weights or CI calls"
     },
     {
       "id": "unsloth/Qwen3.8-27B-GGUF",
