@@ -19072,6 +19072,11 @@
       "bytes": 8327
     },
     {
+      "path": "docs/decisions/2026-10-09-claude-code-gap-resolution.md",
+      "sha256": "44bdbac9305ea2e741b255e3a077f9fb6b5677bb0c920943df0bcec3e3407fbd",
+      "bytes": 15938
+    },
+    {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
       "sha256": "98947f11f2a3eb693c9c31b3fff6e58e1f20d476411aa49f42f66888d43c6d47",
       "bytes": 54090
@@ -64705,6 +64710,11 @@
       "path": "tests/test_native_practice_meter_windows.py",
       "sha256": "05c3dcaaa7eb0e5afebb730423c3abb883ef21fd9c695affcc77dc3e857e1ded",
       "bytes": 9198
+    },
+    {
+      "path": "tests/test_native_practice_owed_check_corrections.py",
+      "sha256": "7af69cb8b63af81d0419579c93c75f9096ffc7b64c73e7a87e55e5268d3eb61e",
+      "bytes": 5776
     },
     {
       "path": "tests/test_native_practice_retired_routes.py",

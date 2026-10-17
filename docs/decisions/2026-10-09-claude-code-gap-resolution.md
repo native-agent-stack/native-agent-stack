@@ -171,7 +171,7 @@ which it installs after #943 lands, and it reviews that service's daily report.
   Control, channels and agent view. An exact-case search of the skill's pages at
   `8c95a50d` on 2026-10-11 finds no slot for Projects, Managed Agents, Remote
   Control, channels or agent view; routines appear only as the ranked alternative
-  "Cloud routines" of the `scheduled-tasks` slot (`reference/slots.json:1625`).
+  "Cloud routines" of the `scheduled-tasks` slot (`reference/slots.json:1625` at `8c95a50d`; current locator `:1649`).
 - **grand-catalog candidates:** Claude Code Projects as WATCH (public beta, Pro and
   Max, hosted only, no CLI surface); Managed Agents dynamic workflows
   (`managed-agents-2026-04-01`, beta since 2026-10-09) as TRIAL, conditional on the
