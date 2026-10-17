@@ -14,10 +14,13 @@ For each complete batch (SHA256SUMS present) under the staging root, oldest firs
      hashing while copying so the bytes renamed into place are the bytes SHA256SUMS lists;
   4. write <batch>.ingested beside the batch: the sha256 of its SHA256SUMS and the UTC time (nami then deletes both).
 A refusal writes <batch>.refused (reported and alerted once over hcom, to the CC and the fallback holder) and STOPS the run: later batches wait until
-the refused one is resolved and its marker removed. A failure part-way through a batch (for example ENOSPC while copying, or bytes that
-changed after SHA256SUMS was written) writes no marker: it is logged FAILED, alerted once, and stops the run; files already copied stay, and
-the next run retries the batch and completes it once the fault clears. A batch directory that is itself a symlink is skipped. One summary line
-per batch on stdout and in coordination/.sync-ingest.log.
+the refused one is resolved and its marker removed; a refusal writes nothing in the run that refuses, though files copied by an earlier run stay.
+A failure part-way through a batch (for example ENOSPC while copying, or bytes that changed after SHA256SUMS was written) writes no ingested or
+refused marker: it is logged FAILED and stops the run, with a <batch>.failed flag (the SHA256SUMS sha256 and the error) so the same fault is
+alerted only once while it lasts; the flag is removed when the batch ingests. Files already copied stay. The next run retries the batch: it
+completes once a copy fault clears, but a staged file that still does not match SHA256SUMS is then refused in verification, so that case is
+resolved like a refusal. A batch directory that is itself a symlink, and a batch that vanishes before its SHA256SUMS is hashed, are skipped.
+One summary line per batch on stdout and in coordination/.sync-ingest.log.
 Exit 0 when every pending batch ingests (or none is pending), 2 when a batch is refused or fails part-way, 3 when COORD_SYNC_STAGING is unset,
 empty, relative or contains '@', or when the staging root is unreadable.
 """
@@ -80,6 +83,49 @@ def alert(text):
             log(f'ALERT send failed rc={r.returncode}')
     except (OSError, subprocess.SubprocessError) as e:
         log(f'ALERT send failed ({type(e).__name__})')
+
+
+def failed_flag(name):
+    return STAGING / f'{name}.failed'
+
+
+def failed_seen(name, sums_sha, err):
+    """True when this exact fault (same SHA256SUMS, same error) was already reported."""
+    try:
+        parts = failed_flag(name).read_text().split(None, 2)
+    except OSError:
+        return False
+    return len(parts) == 3 and parts[0] == (sums_sha or '-') and parts[2].strip() == err
+
+
+def clear_failed(name):
+    try:
+        failed_flag(name).unlink()
+    except OSError:
+        pass
+
+
+def report_failed(name, sums_sha, e):
+    err = f'{type(e).__name__}: {e}'
+    if failed_seen(name, sums_sha, err):
+        return 2  # already alerted for this fault; reruns retry silently until it clears or changes
+    try:
+        alert(f'coord-sync FAILED batch {name}: {err}. No ingested marker was written and later batches wait. '
+              f'Files already copied stay in the mirror. The next run retries this batch: it completes if the fault '
+              f'has cleared, or refuses the batch if a staged file still does not match SHA256SUMS.')
+    except OSError:
+        pass  # alert() reports a failed send through log(); a failing log must not lose the exit code
+    line = (f'FAILED batch {name}: {err}; no ingested marker written; later batches wait; '
+            f'the next run retries this batch')
+    try:
+        log(line)
+    except OSError:
+        print(line)  # the journal still gets the line when the log file cannot be written
+    try:
+        failed_flag(name).write_text(f'{sums_sha or "-"} {utc()} {err}\n')
+    except OSError:
+        pass  # the alert already went out; without the flag the next run may alert again
+    return 2
 
 
 def plan(batch_dir):
@@ -153,10 +199,15 @@ def place(src, dst, expected):
 
 def ingest(batch_dir):
     name = batch_dir.name
+    sums_sha = None
     try:
-        sums_sha = sha256(batch_dir / 'SHA256SUMS')
+        try:
+            sums_sha = sha256(batch_dir / 'SHA256SUMS')
+        except FileNotFoundError:
+            return 0  # the batch vanished after main()'s is_file check; skipped like an incomplete batch
         marker = STAGING / f'{name}.ingested'
         if marker.exists() and marker.read_text().split()[:1] == [sums_sha]:
+            clear_failed(name)
             return 0
         refused = STAGING / f'{name}.refused'  # reported once; blocks later batches until resolved and removed
         if refused.exists() and refused.read_text().split()[:1] == [sums_sha]:
@@ -164,9 +215,10 @@ def ingest(batch_dir):
         actions, err = plan(batch_dir)
         if err:
             refused.write_text(f'{sums_sha} {utc()} {err}\n')
-            log(f'REFUSED batch {name} (SHA256SUMS {sums_sha[:16]}): {err}; nothing written; later batches wait')
-            alert(f'coord-sync REFUSED batch {name} (SHA256SUMS {sums_sha[:16]}): {err}. Nothing from it was written and '
-                  f'later batches wait. Resolve, then remove {name}.refused in the staging root.')
+            log(f'REFUSED batch {name} (SHA256SUMS {sums_sha[:16]}): {err}; nothing written in this run; later batches wait')
+            alert(f'coord-sync REFUSED batch {name} (SHA256SUMS {sums_sha[:16]}): {err}. Nothing was written in this run '
+                  f'(files copied by an earlier run stay in the mirror) and later batches wait. Resolve, then remove '
+                  f'{name}.refused in the staging root.')
             return 2
         counts = {'new': 0, 'same': 0}
         for rel, src, dst, kind, digest in actions:
@@ -174,15 +226,12 @@ def ingest(batch_dir):
             if kind == 'new':
                 place(src, dst, digest)
         marker.write_text(f'{sums_sha} {utc()}\n')
+        clear_failed(name)
         log(f'INGESTED batch {name} (SHA256SUMS {sums_sha[:16]}): {len(actions)} files, '
             f'{counts["new"]} new, {counts["same"]} identical')
         return 0
     except Exception as e:
-        log(f'FAILED batch {name}: {type(e).__name__}: {e}; no ingested marker written; later batches wait; '
-            f'the next run retries this batch')
-        alert(f'coord-sync FAILED batch {name}: {type(e).__name__}: {e}. No ingested marker was written and later '
-              f'batches wait. The next run retries this batch and completes it once the fault clears.')
-        return 2
+        return report_failed(name, sums_sha, e)
 
 
 def main():

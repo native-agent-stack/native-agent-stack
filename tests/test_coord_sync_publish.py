@@ -5,6 +5,7 @@ import hashlib
 import importlib.util
 import io
 import os
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -77,6 +78,36 @@ class PublishTests(unittest.TestCase):
         self.assertEqual(self.m.main(), 2)
         self.assertEqual(self.m.main(), 2)
         self.assertEqual(len(self.batches()), 1)  # nothing staged by the refused runs
+        self.assertEqual(len(self.alerts), 1)
+
+    def test_staging_failure_alerts_once_removes_incomplete_batch_and_retries(self):
+        put(self.src / 'uet131-micro/CC-FULL-6d5c8c00.md', 'VERDICT: PASS at 6d5c8c00\n')
+        put(self.src / 'uet131-micro/MICRO-full-6d5c8c00.md', 'micro\n')
+        orig_copy2 = self.m.shutil.copy2
+        calls = []
+
+        def failing_copy2(src, dst, *args, **kwargs):
+            calls.append(src)
+            if len(calls) == 1:
+                return orig_copy2(src, dst, *args, **kwargs)
+            raise OSError('injected staging failure')
+
+        self.m.shutil.copy2 = failing_copy2
+        try:
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                self.assertEqual(self.m.main(), 2)
+                self.assertEqual(self.m.main(), 2)
+        finally:
+            self.m.shutil.copy2 = orig_copy2
+        self.assertIn('FAILED', out.getvalue())
+        self.assertEqual(len(self.alerts), 1)
+        self.assertEqual(self.batches(), [])  # the incomplete batch was removed
+        self.assertFalse(self.ledger.exists())
+        self.assertEqual(self.m.main(), 0)
+        self.assertEqual(len(self.batches()), 1)
+        self.assertEqual(len(self.ledger.read_text().splitlines()), 2)
+        self.assertFalse((self.staging / '.publisher-failed').exists())
         self.assertEqual(len(self.alerts), 1)
 
     def test_cleanup_removes_only_batches_with_a_matching_marker(self):
@@ -176,6 +207,33 @@ class MissingStagingTests(unittest.TestCase):
                     os.environ[k] = v
 
 
+    def test_missing_staging_parent_exits_3_and_creates_nothing(self):
+        saved = {k: os.environ.get(k) for k in ('CC_VERDICT_SRC', 'REVERSE_SYNC_STAGING', 'REVERSE_SYNC_LEDGER', 'REVERSE_SYNC_NO_ALERT')}
+        try:
+            with self.subTest(label='missing-parent'), tempfile.TemporaryDirectory() as t:
+                root = Path(t)
+                src, ledger = root / 'src', root / 'ledger.tsv'
+                sealed = src / 'a-micro/CC-DELTA-11111111.md'
+                put(sealed, 'one\n')
+                staging = root / 'missing-parent' / 'staging'  # absolute and '@'-free, under a missing parent
+                before = sorted(str(p.relative_to(root)) for p in root.rglob('*'))
+                mod = load(src, staging, ledger)
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    rc = mod.main()
+                self.assertEqual(rc, 3)
+                self.assertFalse((root / 'missing-parent').exists())
+                self.assertFalse(ledger.exists())
+                self.assertEqual(sorted(str(p.relative_to(root)) for p in root.rglob('*')), before)
+                os.chmod(sealed, 0o600)
+        finally:
+            for k, v in saved.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
+
+
 class DocstringTemplateAndReadmeTests(unittest.TestCase):
     def test_docstring_documents_invalid_staging_exit_3(self):
         with tempfile.TemporaryDirectory() as t:
@@ -192,6 +250,33 @@ class DocstringTemplateAndReadmeTests(unittest.TestCase):
         text = (ROOT / 'tools/coord-sync/README.md').read_text()
         self.assertNotIn('s#@WINDOWS_TEMP@#$WINDOWS_TEMP', text)
         self.assertIn('python3 -I', text)
+
+    def test_readme_pins_systemd_and_sed_citations(self):
+        text = (ROOT / 'tools/coord-sync/README.md').read_text()
+        self.assertIn('`systemd.exec(5)` at systemd 259', text)
+        self.assertIn('systemd.unit(5)', text)
+        self.assertIn('GNU sed 4.9', text)
+
+    def test_readme_renderer_escapes_percent_and_preserves_repository_specifier(self):
+        text = (ROOT / 'tools/coord-sync/README.md').read_text()
+        render_line = next(l for l in text.splitlines() if l.startswith('render()'))
+        cases = (('nhny-coord-sync-ingest.service', 'COORD_SYNC_STAGING', 'nhny-coord-sync'),
+                 ('nhny-cc-verdict-publish.service', 'REVERSE_SYNC_STAGING', 'nhny-to-2604-sync'))
+        with tempfile.TemporaryDirectory() as t:
+            root = Path(t)
+            script = root / 'render.sh'
+            script.write_text(render_line + '\nrender "$1" "$2"\n')
+            env = dict(os.environ, WINDOWS_TEMP='/tmp/Temp %dir')
+            for template, var, suffix in cases:
+                with self.subTest(template=template):
+                    out = root / (template + '.rendered')
+                    subprocess.run(['bash', str(script), str(ROOT / 'adoption/templates/systemd' / template), str(out)],
+                                   check=True, env=env, capture_output=True, text=True)
+                    rendered = out.read_text()
+                    self.assertIn(f'Environment="{var}=/tmp/Temp %%dir/{suffix}"', rendered)
+                    self.assertIn('ExecStart=/usr/bin/python3 -I %h/code/native-agent-stack-live/tools/coord-sync/', rendered)
+                    self.assertIn('Environment=PATH=%h/.local/bin:', rendered)
+                    self.assertNotIn('@WINDOWS_TEMP@', rendered)
 
 
 class AlertTests(unittest.TestCase):

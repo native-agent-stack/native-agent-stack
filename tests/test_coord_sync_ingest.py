@@ -5,6 +5,7 @@ import hashlib
 import importlib.util
 import io
 import os
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -163,22 +164,100 @@ class IngestTests(unittest.TestCase):
         self.assertTrue((self.staging / '20261016T205433Z.ingested').exists())
         self.assertEqual(len(self.alerts), 1)
 
+    def test_persistent_mid_batch_failure_alerts_once_until_success_clears_flag(self):
+        batch(self.staging, '20261016T205433Z', {GPT: 'g\n', TCC: 't\n', CCV: 'c\n'})
+        orig_place = self.m.place
+        calls = []
+
+        def failing_place(src, dst, *args):
+            calls.append(src)
+            if len(calls) == 1:
+                return orig_place(src, dst, *args)
+            raise OSError('injected persistent failure')
+
+        self.m.place = failing_place
+        self.assertEqual(self.m.main(), 2)
+        self.assertEqual(self.m.main(), 2)
+        self.assertEqual(len(self.alerts), 1)
+        failed = [l for l in (self.coord / '.sync-ingest.log').read_text().splitlines() if 'FAILED' in l]
+        self.assertEqual(len(failed), 1)
+        self.assertTrue((self.staging / '20261016T205433Z.failed').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.refused').exists())
+        self.m.place = orig_place
+        self.assertEqual(self.m.main(), 0)
+        self.assertEqual(self.written(), sorted([GPT, TCC, CCV]))
+        self.assertTrue((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.failed').exists())
+        self.assertEqual(len(self.alerts), 1)
+
+    def test_failed_alert_and_exit_2_survive_log_failure(self):
+        batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+
+        def failing_place(src, dst, *args):
+            raise OSError('injected copy failure')
+
+        def failing_log(line):
+            raise OSError('injected log failure')
+
+        self.m.place = failing_place
+        self.m.log = failing_log
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rc = self.m.main()
+        self.assertEqual(rc, 2)
+        self.assertEqual(len(self.alerts), 1)
+        self.assertIn('FAILED', out.getvalue())
+
     def test_file_changed_between_verify_and_copy_is_not_installed(self):
-        batch(self.staging, '20261016T205433Z', {GPT: 'good\n'})
+        batch(self.staging, '20261016T205433Z', {GPT: 'good\n', CCV: 'first\n'})
         orig_place = self.m.place
 
         def tampering_place(src, dst, *args):
-            Path(src).write_text('evil\n')  # changed after SHA256SUMS was written and verified
+            if Path(src).name == Path(GPT).name:
+                Path(src).write_text('evil\n')  # changed after SHA256SUMS was written and verified
             return orig_place(src, dst, *args)
 
         self.m.place = tampering_place
         self.assertEqual(self.m.main(), 2)
-        self.assertEqual(self.written(), [])
+        self.assertEqual(self.written(), [CCV])
         self.assertFalse((self.coord / GPT).exists())
         self.assertFalse((self.staging / '20261016T205433Z.ingested').exists())
         self.assertEqual(len(self.alerts), 1)
+        self.assertNotIn('completes it once the fault clears', self.alerts[0])
         leftovers = list(self.coord.rglob('.ingest-*')) if self.coord.exists() else []
         self.assertEqual(leftovers, [])
+        self.m.place = orig_place
+        self.assertEqual(self.m.main(), 2)  # the changed staged file now refuses in plan()
+        self.assertEqual(self.written(), [CCV])  # the file copied by the earlier run stays
+        self.assertFalse((self.coord / GPT).exists())
+        self.assertTrue((self.staging / '20261016T205433Z.refused').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertEqual(len(self.alerts), 2)
+        self.assertNotIn('Nothing from it was written', self.alerts[1])
+        self.assertIn('in this run', self.alerts[1])
+        log_text = (self.coord / '.sync-ingest.log').read_text()
+        self.assertIn('nothing written in this run', log_text)
+
+    def test_batch_vanishing_before_hash_is_skipped(self):
+        b = batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+        batch(self.staging, '20261016T210000Z', {TCC: 'later\n'})
+        orig_sha256 = self.m.sha256
+
+        def vanishing_sha256(path):
+            if Path(path) == b / 'SHA256SUMS' and b.exists():
+                shutil.rmtree(b)  # the 2604 side deleted the batch after main()'s is_file check
+            return orig_sha256(path)
+
+        self.m.sha256 = vanishing_sha256
+        self.assertEqual(self.m.main(), 0)
+        self.assertEqual(self.written(), [TCC])
+        self.assertEqual(self.alerts, [])
+        self.assertTrue((self.staging / '20261016T210000Z.ingested').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.failed').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.refused').exists())
+        log_text = (self.coord / '.sync-ingest.log').read_text() if (self.coord / '.sync-ingest.log').exists() else ''
+        self.assertNotIn('FAILED', log_text)
 
     def test_symlinked_batch_directory_is_skipped(self):
         target_root = Path(self.tmp.name) / 'elsewhere'

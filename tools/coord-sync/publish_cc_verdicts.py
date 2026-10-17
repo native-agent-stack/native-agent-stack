@@ -11,8 +11,10 @@ One run:
   3. a file already in the ledger with the same sha256 is done; with a different sha256 it is a same-path change to a published
      record: the run is REFUSED (nothing staged) and the CC and the fallback holder are alerted once (corrections ship under a new name);
   4. new sealed files go into ONE batch STAGING/<UTC>/cc-cc-work/<pr>-micro/<file> (mtime kept), with SHA256SUMS written LAST
-     by rename; the ledger records each file only after the batch is complete.
-Exit 0 (nothing to do, or a batch staged), 2 (refused), 3 (REVERSE_SYNC_STAGING unset, empty, relative or contains '@', or a root unreadable).
+     by rename; the ledger records each file only after the batch is complete. If staging fails part-way (for example ENOSPC
+     while copying), a batch without its SHA256SUMS is removed, the failure is printed FAILED and alerted once per distinct
+     error (a .publisher-failed flag in the staging root, removed by the next successful stage), and the next run retries.
+Exit 0 (nothing to do, or a batch staged), 2 (refused, or staging failed), 3 (REVERSE_SYNC_STAGING unset, empty, relative or contains '@', or a root unreadable).
 """
 import hashlib
 import os
@@ -111,17 +113,24 @@ def stage(new):
     name = utc('%Y%m%dT%H%M%SZ')
     b = STAGING / name
     b.mkdir(parents=True)
-    for rel, src, _ in new:
-        dst = b / rel
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dst)
-    tmp = b / 'SHA256SUMS.tmp'
-    tmp.write_text(''.join(f'{digest}  {rel}\n' for rel, _, digest in new))
-    os.replace(tmp, b / 'SHA256SUMS')
-    LEDGER.parent.mkdir(parents=True, exist_ok=True)
-    with open(LEDGER, 'a') as f:
-        for rel, _, digest in new:
-            f.write(f'{rel}\t{digest}\t{name}\t{utc()}\n')
+    complete = False
+    try:
+        for rel, src, _ in new:
+            dst = b / rel
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+        tmp = b / 'SHA256SUMS.tmp'
+        tmp.write_text(''.join(f'{digest}  {rel}\n' for rel, _, digest in new))
+        os.replace(tmp, b / 'SHA256SUMS')
+        complete = True  # SHA256SUMS is in place: the batch itself is whole from here on
+        LEDGER.parent.mkdir(parents=True, exist_ok=True)
+        with open(LEDGER, 'a') as f:
+            for rel, _, digest in new:
+                f.write(f'{rel}\t{digest}\t{name}\t{utc()}\n')
+    except BaseException:
+        if not complete:
+            shutil.rmtree(b, ignore_errors=True)  # no SHA256SUMS: cleanup() could never retire this batch
+        raise
     return name
 
 
@@ -149,7 +158,27 @@ def main():
     if not new:
         print(f'nothing new ({removed} ingested batches cleaned)')
         return 0
-    name = stage(new)
+    try:
+        name = stage(new)
+    except OSError as e:
+        err = f'staging failed: {type(e).__name__}: {e}'
+        flag = STAGING / '.publisher-failed'
+        try:
+            seen = flag.read_text().strip() == err
+        except OSError:
+            seen = False
+        if not seen:
+            alert(f'cc-reverse-sync FAILED: {err}. The next run retries.')
+            try:
+                flag.write_text(err + '\n')
+            except OSError:
+                pass  # the alert already went out; without the flag the next run may alert again
+        print(f'FAILED: {err}')
+        return 2
+    try:
+        (STAGING / '.publisher-failed').unlink()
+    except OSError:
+        pass
     print(f'STAGED batch {name}: {len(new)} files ({removed} ingested batches cleaned)')
     return 0
 
