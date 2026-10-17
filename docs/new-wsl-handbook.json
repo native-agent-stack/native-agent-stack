@@ -126,11 +126,21 @@
         "meaning": "the wave-5 batch of 2026-10-04: decide round 2 under the owner's repository-quality rule, as its Opus verification left it: four rows added and owner defaults on two split rows whose decided default installs nothing; selection records only: no comparison named here has run"
       },
       "consensus_wave6": {
-        "acknowledgements": [],
-        "acknowledgements_owed": [
-          "claude",
-          "gpt"
+        "acknowledgements": [
+          {
+            "at": "2026-10-17T17:54:58Z",
+            "covers": "the Claude family's acknowledgement (the command center, which sealed the Claude-family reads of every #1242 fold) of the wave-6 batch: the memory-owner interim's move from ai-memory 2.5.2 to 3.1.0 at the memory-owner 3.1.0 run pin (tag v3.1.0, its tag object and commit as the run pin records them; the release archive and install script verified against their sidecars), its decision and configuration (loopback on the host allocation's memory port, the user unit with the plan's drop-in, the Codex tool approval as ai-memory's setup writes it), its five open acceptance gates and its sources; no objections",
+            "family": "claude",
+            "url": "https://github.com/native-agent-stack/native-agent-stack/pull/1242#issuecomment-6238095492"
+          },
+          {
+            "at": "2026-10-17T18:00:54Z",
+            "covers": "the GPT family's acknowledgement (cx/gpt-6-astra at max effort through the repository's Codex job lane, job d8-wave6-ack-20261017) of the wave-6 batch at PR #1242 head 4379b855: amendment 3's direct-consensus move of the memory-owner interim from ai-memory 2.5.2 to 3.1.0, its run pin and checksum receipts, the decision and configuration, five open acceptance gates, sources and file-only authority citations, with the memory head-to-head still deciding; no objections, with two conditions: record it beside the Claude family's acknowledgement before merge, and keep the five acceptance gates open until receipts settle them",
+            "family": "gpt",
+            "url": "https://github.com/native-agent-stack/native-agent-stack/pull/1242#issuecomment-6238196832"
+          }
         ],
+        "acknowledgements_owed": [],
         "date_utc": "2026-10-17",
         "meaning": "the wave-6 batch of 2026-10-17: one interim amendment by direct consensus of both model families, under amendment 3's direct-consensus authority: the memory-owner interim moves from ai-memory 2.5.2 to 3.1.0, the version the memory-owner 3.1.0 run pin receipts (tag v3.1.0 at 11ca7c5b), so the install plan and the new WSL distribution install the same verified release; the interim stays an interim, and the memory head-to-head still decides"
       },
@@ -219,7 +229,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "437c98171d6843ee215b7c94e7a808c6346a1ae5d999ad6c2f86a4a47f157e88"
+          "sha256": "5998e1c078a81df8f7522aa0e12477a65fdbe008fc949912bfdf04fc0041b1db"
         },
         "convergence": {
           "file": "convergence.json",
@@ -8055,7 +8065,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "e7478ef16794eedfd4d3bd33a1ccf3b6ba526bad9b28b3da126db0ac3c8ecaca"
+      "sha256": "901689246478e767b5213961e4956ce7a60fc2b0606a802a9d7c2bc5c9dd346b"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -8079,7 +8089,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "437c98171d6843ee215b7c94e7a808c6346a1ae5d999ad6c2f86a4a47f157e88"
+      "sha256": "5998e1c078a81df8f7522aa0e12477a65fdbe008fc949912bfdf04fc0041b1db"
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",

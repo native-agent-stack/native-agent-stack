@@ -19748,12 +19748,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "9193818a41e0fa99b20019225408e88aeeff1df13ce1744d9e626e59fc86fbb2",
-      "bytes": 705097
+      "sha256": "3e4d43906740299b560595aec2f56274ed25a1f3bafb1ee9e2a9982d38f24450",
+      "bytes": 706765
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "af33aac0b7fdd6264b2a8e8a8527a31612e9c683a9d32d3c109ef8429f1bd4f8",
+      "sha256": "57e03127ffee78c956390ad2ce3aea4e0c99a9955d445c196c54fe297c3ac23c",
       "bytes": 372104
     },
     {
@@ -43998,8 +43998,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "e7478ef16794eedfd4d3bd33a1ccf3b6ba526bad9b28b3da126db0ac3c8ecaca",
-      "bytes": 240917
+      "sha256": "901689246478e767b5213961e4956ce7a60fc2b0606a802a9d7c2bc5c9dd346b",
+      "bytes": 242507
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -44753,8 +44753,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "13b3d7a967cb0e2cba0c40bc6b12300291d5f54047140029e0ec4945ca1412fb",
-      "bytes": 85204
+      "sha256": "1e60c01764f5155c9d185287c6b0b6191335b22955bfbb077f84edb70e0e6316",
+      "bytes": 85358
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -45403,8 +45403,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "437c98171d6843ee215b7c94e7a808c6346a1ae5d999ad6c2f86a4a47f157e88",
-      "bytes": 151735
+      "sha256": "5998e1c078a81df8f7522aa0e12477a65fdbe008fc949912bfdf04fc0041b1db",
+      "bytes": 153325
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/copy-notes.json",

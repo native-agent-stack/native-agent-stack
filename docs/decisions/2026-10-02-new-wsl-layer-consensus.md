@@ -601,7 +601,7 @@ words verbatim, and this repository publishes no owner quote.
 
 `tests/test_consensus_interim_amendment.py` covers the path and its refusals.
 
-### Acknowledgements owed
+### Acknowledgements
 
 As for wave 2, the gate on the acknowledgements is held where installing happens, not in the assembler. While `wave6`
 names a family in `acknowledgements_owed`, install.sh's `interim_acknowledged` refuses every interim install: memory-owner's
@@ -610,6 +610,17 @@ and code-search's alike. The client configuration's `--apply` gate (`owed_acknow
 `wave6` owed both families; it now reads every wave batch the way `interim_acknowledged` does and refuses the same
 unreadable inputs. The batch lands only with both families' pull-request acknowledgements recorded under
 `acknowledgements`: a test requires every direct-consensus batch to owe none.
+
+Both acknowledgements are recorded, and `acknowledgements_owed` is empty, so `interim_acknowledged` admits the
+interim installs:
+- **Claude family:** the command center, which sealed the Claude-family reads of every #1242 fold, in #1242's comment
+  6238095492 at 2026-10-17T17:54:58Z.
+- **GPT family:** cx/gpt-6-astra at max effort through the repository's Codex job lane (job d8-wave6-ack-20261017), in
+  #1242's comment 6238196832 at 2026-10-17T18:00:54Z.
+- Neither family objects.
+- The GPT family's two conditions are met here or stay recorded:
+  - the two acknowledgements are recorded together before the merge;
+  - the five acceptance gates stay open until receipts settle them.
 
 ### Not established by this batch
 

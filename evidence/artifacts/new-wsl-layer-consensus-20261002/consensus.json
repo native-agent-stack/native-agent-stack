@@ -1703,11 +1703,21 @@
     "sha256": "a0e3d35f6402554912572b4d59d223771e9f23766fd8f7eda8957a7441384f8c"
    }
   },
-  "acknowledgements": [],
-  "acknowledgements_owed": [
-   "claude",
-   "gpt"
+  "acknowledgements": [
+   {
+    "family": "claude",
+    "url": "https://github.com/native-agent-stack/native-agent-stack/pull/1242#issuecomment-6238095492",
+    "at": "2026-10-17T17:54:58Z",
+    "covers": "the Claude family's acknowledgement (the command center, which sealed the Claude-family reads of every #1242 fold) of the wave-6 batch: the memory-owner interim's move from ai-memory 2.5.2 to 3.1.0 at the memory-owner 3.1.0 run pin (tag v3.1.0, its tag object and commit as the run pin records them; the release archive and install script verified against their sidecars), its decision and configuration (loopback on the host allocation's memory port, the user unit with the plan's drop-in, the Codex tool approval as ai-memory's setup writes it), its five open acceptance gates and its sources; no objections"
+   },
+   {
+    "family": "gpt",
+    "url": "https://github.com/native-agent-stack/native-agent-stack/pull/1242#issuecomment-6238196832",
+    "at": "2026-10-17T18:00:54Z",
+    "covers": "the GPT family's acknowledgement (cx/gpt-6-astra at max effort through the repository's Codex job lane, job d8-wave6-ack-20261017) of the wave-6 batch at PR #1242 head 4379b855: amendment 3's direct-consensus move of the memory-owner interim from ai-memory 2.5.2 to 3.1.0, its run pin and checksum receipts, the decision and configuration, five open acceptance gates, sources and file-only authority citations, with the memory head-to-head still deciding; no objections, with two conditions: record it beside the Claude family's acknowledgement before merge, and keep the five acceptance gates open until receipts settle them"
+   }
   ],
+  "acknowledgements_owed": [],
   "add_rows": [],
   "amend_rows": [
    {
