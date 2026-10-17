@@ -1,0 +1,21 @@
+The 16 mutants of tools/adoption/mcp_instructions_length.py of review round 1 (one change each; a mutant is killed when tests.test_mcp_instruction_cap fails), run on the final tests; the anchors that the event-stream
+change moved were moved with it.
+
+killed   the cap is compared with the whole text even when there is a marker
+killed   a core of exactly the cap does not fit
+killed   the output carries the text
+killed   an event stream is not read
+killed   bytes are counted as characters
+killed   the hash is the whole digest
+killed   an unreadable endpoint exits 1
+killed   the request carries a credential
+killed   the request is not an initialize
+killed   a server error echoes the reply
+killed   UTF-16 units are the character count
+killed   characters outside the BMP are not counted
+killed   the bullet the cap cuts through is not told from the ones before it
+killed   bullets are counted from the whole text, not the detail
+killed   the protocol version is not reported
+killed   a missing instructions field is an error
+
+16 mutants, 16 killed, survivors: none
