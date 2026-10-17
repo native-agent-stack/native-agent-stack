@@ -1,0 +1,3220 @@
+[
+  {
+    "candidate": {
+      "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+      "ids": [
+        "compound-engineering@compound-engineering-plugin"
+      ]
+    },
+    "pin": {
+      "commit": "50532b00de523980010d97fe950965b35382a3b7",
+      "tag": "compound-engineering-v3.30.5",
+      "read_at": "2026-10-15T20:21:25.741150+00:00"
+    },
+    "family": "anthropic",
+    "layer": "orchestration-frameworks",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-frameworks.json#/candidates/EveryInc~1compound-engineering-plugin",
+    "requirements_result": [
+      {
+        "id": "layer-capability",
+        "result": "PASS",
+        "reason": "Bounded implementation, local verification and explicit shipping/review handoff; return-to-caller mode preserves canonical integration authority and failed state.",
+        "citations": [
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "skills/ce-work/SKILL.md",
+            "lines": [
+              11,
+              14
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/skills/ce-work/SKILL.md#L11"
+          },
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "skills/ce-work/SKILL.md",
+            "lines": [
+              51,
+              62
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/skills/ce-work/SKILL.md#L51"
+          },
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "skills/ce-code-review/SKILL.md",
+            "lines": [
+              10,
+              32
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/skills/ce-code-review/SKILL.md#L10"
+          }
+        ]
+      },
+      {
+        "id": "bounded-delegation-owned-edits-failed-results",
+        "result": "PASS",
+        "reason": "Source describes bounded work/review or the native coordination path. Host permissions and actual failure retention still require the installer-stage smoke; no measured quality claim.",
+        "citations": [
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "skills/ce-work/SKILL.md",
+            "lines": [
+              11,
+              14
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/skills/ce-work/SKILL.md#L11"
+          },
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "skills/ce-work/SKILL.md",
+            "lines": [
+              51,
+              62
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/skills/ce-work/SKILL.md#L51"
+          },
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "skills/ce-code-review/SKILL.md",
+            "lines": [
+              10,
+              32
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/skills/ce-code-review/SKILL.md#L10"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "Native Claude/portable Bash/Node route. OMC named autopilot profiles require Linux/flock; only the classic route is under consideration.",
+        "citations": [
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "README.md",
+            "lines": [
+              23,
+              30
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L23"
+          },
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "README.md",
+            "lines": [
+              76,
+              105
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L76"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/setup",
+            "read_at": "2026-10-15",
+            "section": "Linux/WSL x64 and macOS ARM64"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "Native host/portable plugin route; OMC named Linux-only workflow profiles are explicitly excluded.",
+        "citations": [
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "README.md",
+            "lines": [
+              23,
+              30
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L23"
+          },
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "README.md",
+            "lines": [
+              76,
+              105
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L76"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/setup",
+            "read_at": "2026-10-15",
+            "section": "Linux/WSL x64 and macOS ARM64"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "Native headless host can consume the selected skill/agent surface. OMC documents deterministic CLI/SDK commands; interactive slash-command automation is not assumed.",
+        "citations": [
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "skills/ce-work/SKILL.md",
+            "lines": [
+              11,
+              14
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/skills/ce-work/SKILL.md#L11"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/headless",
+            "read_at": "2026-10-15",
+            "section": "headless CLI and Agent SDK"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scope",
+        "result": "PASS",
+        "reason": "Claude local/project plugin; Codex non-default home explicitly documented. Native skills remain on-demand. Pi package and OpenCode project plugin exist, but Pi delegation requires separately screened pi-subagents.",
+        "citations": [
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "README.md",
+            "lines": [
+              96,
+              105
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L96"
+          },
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "README.md",
+            "lines": [
+              321,
+              350
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L321"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/plugins/cli-reference",
+            "read_at": "2026-10-15",
+            "section": "session/local/project scope and inverse"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "Claude Code/Codex are the admitted plugin routes. Pi and OpenCode have separate documented package routes; Pi subagent companion is a dependency candidate, not inherited approval. No Muse or research-stack native route documented here.",
+        "citations": [
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "README.md",
+            "lines": [
+              23,
+              30
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L23"
+          },
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "README.md",
+            "lines": [
+              76,
+              105
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L76"
+          }
+        ]
+      },
+      {
+        "id": "immutable-install-binding",
+        "result": "PASS",
+        "reason": "Use the screened commit/release and retain resolved source identity before enabling. Floating marketplace/cask updates are not evidence at this pin.",
+        "citations": [
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "README.md",
+            "lines": [
+              23,
+              30
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L23"
+          },
+          {
+            "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+            "commit": "50532b00de523980010d97fe950965b35382a3b7",
+            "path": "README.md",
+            "lines": [
+              76,
+              105
+            ],
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L76"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; supplied primary-source facts retain a recent default-branch commit. Popularity is not used.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/EveryInc/compound-engineering-plugin",
+            "read_at": "2026-10-15"
+          },
+          {
+            "url": "https://github.com/EveryInc/compound-engineering-plugin/commit/fac349c0c31a543d497fd4825af9b44bdb7e7dfe",
+            "read_at": "2026-10-15"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "claude plugin marketplace add EveryInc/compound-engineering-plugin#50532b00de523980010d97fe950965b35382a3b7 --scope local",
+        "claude plugin install compound-engineering@compound-engineering-plugin --scope local"
+      ],
+      "scope": "Claude local/project plugin; Codex non-default home explicitly documented. Native skills remain on-demand. Pi package and OpenCode project plugin exist, but Pi delegation requires separately screened pi-subagents.",
+      "citations": [
+        {
+          "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+          "commit": "50532b00de523980010d97fe950965b35382a3b7",
+          "path": "README.md",
+          "lines": [
+            23,
+            30
+          ],
+          "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L23"
+        },
+        {
+          "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+          "commit": "50532b00de523980010d97fe950965b35382a3b7",
+          "path": "README.md",
+          "lines": [
+            76,
+            105
+          ],
+          "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L76"
+        }
+      ]
+    },
+    "inverse": {
+      "commands": [],
+      "finding": "Claude scoped plugin disable/uninstall; Codex /plugins disable/remove or project enabled=false. OpenCode removes its project plugin entry. No pack-specific Claude/Codex cleanup command was found in the read install guide; generated plans/solutions are retained project artifacts.",
+      "citations": [
+        {
+          "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+          "commit": "50532b00de523980010d97fe950965b35382a3b7",
+          "path": "README.md",
+          "lines": [
+            76,
+            105
+          ],
+          "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L76"
+        },
+        {
+          "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+          "commit": "50532b00de523980010d97fe950965b35382a3b7",
+          "path": "README.md",
+          "lines": [
+            321,
+            330
+          ],
+          "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L321"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/plugins/cli-reference",
+          "read_at": "2026-10-15",
+          "section": "session/local/project scope and inverse"
+        }
+      ]
+    },
+    "conflicts": {
+      "summary": "Skill names and planning/review workflows overlap native composition and other frameworks. Selected Codex manifest declares skills only. CE writes plans/solutions and can invoke cross-model review when that skill's configured policy permits it; keep cross-model routes off unless separately authorized/screened. Pi/OpenCode extensions add their own behavior and must not inherit the Claude/Codex context estimate.",
+      "citations": [
+        {
+          "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+          "commit": "50532b00de523980010d97fe950965b35382a3b7",
+          "path": ".codex-plugin/plugin.json",
+          "lines": [
+            20,
+            21
+          ],
+          "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/.codex-plugin/plugin.json#L20"
+        },
+        {
+          "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+          "commit": "50532b00de523980010d97fe950965b35382a3b7",
+          "path": "README.md",
+          "lines": [
+            147,
+            151
+          ],
+          "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/README.md#L147"
+        },
+        {
+          "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+          "commit": "50532b00de523980010d97fe950965b35382a3b7",
+          "path": "skills/ce-code-review/SKILL.md",
+          "lines": [
+            26,
+            32
+          ],
+          "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/skills/ce-code-review/SKILL.md#L26"
+        },
+        {
+          "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+          "commit": "50532b00de523980010d97fe950965b35382a3b7",
+          "path": "package.json",
+          "lines": [
+            8,
+            15
+          ],
+          "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/package.json#L8"
+        }
+      ],
+      "protected_sessions": "Never enable in fenced trading, judge or review sessions."
+    },
+    "suited_roles": {
+      "status": "Candidate role recommendations; not converged practice or an enablement decision",
+      "candidate_role_recommendations": [
+        "builder: ce-work return-to-caller for a bounded approved plan",
+        "reviewer/auditor outside fenced sessions: explicit report-only ce-code-review",
+        "researcher: selected research/explain procedure",
+        "CC/co-op: planning and integration handoff; role assignment remains a candidate"
+      ],
+      "conditional_roles": [
+        "builder: ce-work return-to-caller for a bounded approved plan",
+        "reviewer/auditor outside fenced sessions: explicit report-only ce-code-review",
+        "researcher: selected research/explain procedure",
+        "CC/co-op: planning and integration handoff; role assignment remains a candidate"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review",
+        "Muse outside the accepted fence"
+      ],
+      "reason": "Roles follow upstream task descriptions. They remain proposals pending multi-angle convergence and measured runs; the screen does not adopt a role matrix.",
+      "citations": [
+        {
+          "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+          "commit": "50532b00de523980010d97fe950965b35382a3b7",
+          "path": "skills/ce-work/SKILL.md",
+          "lines": [
+            11,
+            14
+          ],
+          "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/skills/ce-work/SKILL.md#L11"
+        },
+        {
+          "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+          "commit": "50532b00de523980010d97fe950965b35382a3b7",
+          "path": "skills/ce-work/SKILL.md",
+          "lines": [
+            51,
+            62
+          ],
+          "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/skills/ce-work/SKILL.md#L51"
+        },
+        {
+          "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+          "commit": "50532b00de523980010d97fe950965b35382a3b7",
+          "path": "skills/ce-code-review/SKILL.md",
+          "lines": [
+            10,
+            32
+          ],
+          "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/skills/ce-code-review/SKILL.md#L10"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": 1622,
+      "known_component_estimate_tokens": 1622,
+      "summary": "1622 tokens in counted source components; this is not a measured session.",
+      "scope": "Claude/Codex native skills-only plugin; no startup hook or bundled MCP schema selected. Pi/OpenCode extension costs are separate and unmeasured.",
+      "method": "Sum ceil(UTF-8 bytes/4) for pinned name/description metadata and actual literal injected text. Full source-code byte sizes are never substituted for output text. Claude manual-only descriptions omitted.",
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+          "commit": "50532b00de523980010d97fe950965b35382a3b7",
+          "path": "skills/ce-work/SKILL.md",
+          "lines": [
+            11,
+            14
+          ],
+          "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/skills/ce-work/SKILL.md#L11"
+        },
+        {
+          "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+          "commit": "50532b00de523980010d97fe950965b35382a3b7",
+          "path": "skills/ce-work/SKILL.md",
+          "lines": [
+            51,
+            62
+          ],
+          "url": "https://github.com/EveryInc/compound-engineering-plugin/blob/50532b00de523980010d97fe950965b35382a3b7/skills/ce-work/SKILL.md#L51"
+        }
+      ],
+      "counted_ranges_ref": "facts-frameworks.json#/candidates/EveryInc~1compound-engineering-plugin/startup_metadata_inventory/anthropic",
+      "unknown_components": [],
+      "unmeasured": "Renderer wrappers, host budgets, per-worker full-body preloads and actual session-start tokens.",
+      "per_client_limits": "Claude Code/Codex are the admitted plugin routes. Pi and OpenCode have separate documented package routes; Pi subagent companion is a dependency candidate, not inherited approval. No Muse or research-stack native route documented here."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "meaning": "TRIAL-eligible only; no default promotion",
+      "reason": "Documented scoped orchestration contribution; trial only, with the stated native host and dependency limits.",
+      "cheapest_check": "NativeHorizonNY: verify exact installed bytes, host discovery/inverse, role limits and actual startup components. Measure bounded work/failure/review behavior before any default selection."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions.",
+    "service_status": "served by vendor route; eligibility is separately stated"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+      "ids": [
+        "superclaude (local --plugin-dir route)"
+      ],
+      "documented_marketplace_id": "superclaude@SuperClaude-Org/SuperClaude_Framework is shown in plugin README, but root .claude-plugin/marketplace.json returns 404 at the screened pin."
+    },
+    "pin": {
+      "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+      "tag": null,
+      "read_at": "2026-10-15T20:21:30.708911+00:00"
+    },
+    "family": "anthropic",
+    "layer": "orchestration-frameworks",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-frameworks.json#/candidates/SuperClaude-Org~1SuperClaude_Framework",
+    "requirements_result": [
+      {
+        "id": "layer-capability",
+        "result": "UNKNOWN",
+        "reason": "Native Claude plugin of task/workflow prompts, agents, skills and lifecycle hooks. Commands decompose tasks and apply validation gates, but the examined task contract does not specify ownership or preservation of actual failed results.",
+        "citations": [
+          {
+            "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+            "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "path": "plugins/superclaude/commands/task.md",
+            "lines": [
+              23,
+              34
+            ],
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/commands/task.md#L23"
+          },
+          {
+            "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+            "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "path": "plugins/superclaude/commands/task.md",
+            "lines": [
+              80,
+              90
+            ],
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/commands/task.md#L80"
+          },
+          {
+            "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+            "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "path": "plugins/superclaude/commands/workflow.md",
+            "lines": [
+              23,
+              48
+            ],
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/commands/workflow.md#L23"
+          }
+        ]
+      },
+      {
+        "id": "bounded-delegation-owned-edits-failed-results",
+        "result": "UNKNOWN",
+        "reason": "Task decomposition/quality gates exist; explicit ownership and failed-result preservation remain unestablished.",
+        "citations": [
+          {
+            "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+            "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "path": "plugins/superclaude/commands/task.md",
+            "lines": [
+              23,
+              34
+            ],
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/commands/task.md#L23"
+          },
+          {
+            "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+            "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "path": "plugins/superclaude/commands/task.md",
+            "lines": [
+              80,
+              90
+            ],
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/commands/task.md#L80"
+          },
+          {
+            "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+            "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "path": "plugins/superclaude/commands/workflow.md",
+            "lines": [
+              23,
+              48
+            ],
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/commands/workflow.md#L23"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "Native Claude/portable Bash/Node route. OMC named autopilot profiles require Linux/flock; only the classic route is under consideration.",
+        "citations": [
+          {
+            "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+            "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "path": "plugins/superclaude/README.md",
+            "lines": [
+              5,
+              18
+            ],
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/README.md#L5"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/setup",
+            "read_at": "2026-10-15",
+            "section": "Linux/WSL x64 and macOS ARM64"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "Native host/portable plugin route; OMC named Linux-only workflow profiles are explicitly excluded.",
+        "citations": [
+          {
+            "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+            "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "path": "plugins/superclaude/README.md",
+            "lines": [
+              5,
+              18
+            ],
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/README.md#L5"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/setup",
+            "read_at": "2026-10-15",
+            "section": "Linux/WSL x64 and macOS ARM64"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "Native headless host can consume the selected skill/agent surface. OMC documents deterministic CLI/SDK commands; interactive slash-command automation is not assumed.",
+        "citations": [
+          {
+            "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+            "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "path": "plugins/superclaude/commands/task.md",
+            "lines": [
+              23,
+              34
+            ],
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/commands/task.md#L23"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/headless",
+            "read_at": "2026-10-15",
+            "section": "headless CLI and Agent SDK"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scope",
+        "result": "PASS",
+        "reason": "Native --plugin-dir is session-local and avoids importing the old global installer. Its plugin still bundles hooks and MCP configuration.",
+        "citations": [
+          {
+            "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+            "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "path": "plugins/superclaude/README.md",
+            "lines": [
+              14,
+              18
+            ],
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/README.md#L14"
+          },
+          {
+            "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+            "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "path": "plugins/superclaude/.claude-plugin/plugin.json",
+            "lines": [
+              24,
+              28
+            ],
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/.claude-plugin/plugin.json#L24"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/plugins/cli-reference",
+            "read_at": "2026-10-15",
+            "section": "session/local/project scope and inverse"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "Claude Code native plugin only. No reviewed native Codex/Pi/OpenCode/Muse/research-stack route from this repository. Related SuperGemini/SuperQwen projects are separate candidates, not this row.",
+        "citations": [
+          {
+            "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+            "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "path": "plugins/superclaude/README.md",
+            "lines": [
+              5,
+              18
+            ],
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/README.md#L5"
+          }
+        ]
+      },
+      {
+        "id": "immutable-install-binding",
+        "result": "PASS",
+        "reason": "Use the screened commit/release and retain resolved source identity before enabling. Floating marketplace/cask updates are not evidence at this pin.",
+        "citations": [
+          {
+            "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+            "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "path": "plugins/superclaude/README.md",
+            "lines": [
+              5,
+              18
+            ],
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/README.md#L5"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; supplied primary-source facts retain a recent default-branch commit. Popularity is not used.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/SuperClaude-Org/SuperClaude_Framework",
+            "read_at": "2026-10-15"
+          },
+          {
+            "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/commit/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+            "read_at": "2026-10-15"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "claude --plugin-dir <pinned-checkout>/plugins/superclaude"
+      ],
+      "scope": "Native --plugin-dir is session-local and avoids importing the old global installer. Its plugin still bundles hooks and MCP configuration.",
+      "citations": [
+        {
+          "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+          "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+          "path": "plugins/superclaude/README.md",
+          "lines": [
+            5,
+            18
+          ],
+          "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/README.md#L5"
+        }
+      ]
+    },
+    "inverse": {
+      "commands": [],
+      "finding": "For session-only --plugin-dir, omit the flag on the next session. For marketplace installs use Claude scoped disable/uninstall. Legacy Python/global installation is a distinct path and not part of this trial profile.",
+      "citations": [
+        {
+          "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+          "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+          "path": "plugins/superclaude/README.md",
+          "lines": [
+            5,
+            18
+          ],
+          "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/README.md#L5"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/plugins/cli-reference",
+          "read_at": "2026-10-15",
+          "section": "session/local/project scope and inverse"
+        }
+      ]
+    },
+    "conflicts": {
+      "summary": "SessionStart prints Git/service status; Stop and PostToolUse inject prompts. Bundled MCP names context7 and sequential-thinking can collide, with mutable dependency selectors. Command docs also name optional MCP servers and old Task/TodoWrite tool names; they explicitly allow graceful native fallbacks. Old PLUGIN_INSTALL.md describes a different pm-agent route; use the selected modern plugin source, not both. The marketplace id in plugin README is not validated by a root marketplace manifest at this pin (public raw URL returned 404); the selected local --plugin-dir route is explicit.",
+      "citations": [
+        {
+          "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+          "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+          "path": "plugins/superclaude/hooks/hooks.json",
+          "lines": [
+            1,
+            36
+          ],
+          "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/hooks/hooks.json#L1"
+        },
+        {
+          "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+          "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+          "path": "plugins/superclaude/.mcp.json",
+          "lines": [
+            1,
+            12
+          ],
+          "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/.mcp.json#L1"
+        },
+        {
+          "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+          "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+          "path": "plugins/superclaude/commands/task.md",
+          "lines": [
+            36,
+            48
+          ],
+          "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/commands/task.md#L36"
+        },
+        {
+          "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+          "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+          "path": "PLUGIN_INSTALL.md",
+          "lines": [
+            23,
+            35
+          ],
+          "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/PLUGIN_INSTALL.md#L23"
+        }
+      ],
+      "protected_sessions": "Never enable in fenced trading, judge or review sessions."
+    },
+    "suited_roles": {
+      "status": "Candidate role recommendations; not converged practice or an enablement decision",
+      "candidate_role_recommendations": [],
+      "conditional_roles": [
+        "builder: task planning/coordination candidate",
+        "researcher: explicit deep-research procedure candidate",
+        "CC/co-op: planning candidate only"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review",
+        "Muse outside the accepted fence"
+      ],
+      "reason": "Roles follow upstream task descriptions. They remain proposals pending multi-angle convergence and measured runs; the screen does not adopt a role matrix.",
+      "citations": [
+        {
+          "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+          "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+          "path": "plugins/superclaude/commands/task.md",
+          "lines": [
+            23,
+            34
+          ],
+          "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/commands/task.md#L23"
+        },
+        {
+          "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+          "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+          "path": "plugins/superclaude/commands/task.md",
+          "lines": [
+            80,
+            90
+          ],
+          "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/commands/task.md#L80"
+        },
+        {
+          "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+          "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+          "path": "plugins/superclaude/commands/workflow.md",
+          "lines": [
+            23,
+            48
+          ],
+          "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/commands/workflow.md#L23"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": null,
+      "known_component_estimate_tokens": 1628,
+      "summary": "1628 tokens in counted source components; total UNKNOWN because listed dynamic/schema components remain; this is not a measured session.",
+      "scope": "Pinned metadata before host rendering; no execution.",
+      "method": "Sum ceil(UTF-8 bytes/4) for pinned name/description metadata and actual literal injected text. Full source-code byte sizes are never substituted for output text. Claude manual-only descriptions omitted.",
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+          "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+          "path": "plugins/superclaude/commands/task.md",
+          "lines": [
+            23,
+            34
+          ],
+          "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/commands/task.md#L23"
+        },
+        {
+          "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+          "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+          "path": "plugins/superclaude/commands/task.md",
+          "lines": [
+            80,
+            90
+          ],
+          "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/commands/task.md#L80"
+        },
+        {
+          "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+          "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+          "path": "plugins/superclaude/scripts/session-init.sh",
+          "lines": [
+            8,
+            28
+          ],
+          "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/scripts/session-init.sh#L8"
+        },
+        {
+          "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+          "commit": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+          "path": "plugins/superclaude/.mcp.json",
+          "lines": [
+            1,
+            12
+          ],
+          "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2/plugins/superclaude/.mcp.json#L1"
+        }
+      ],
+      "counted_ranges_ref": "facts-frameworks.json#/candidates/SuperClaude-Org~1SuperClaude_Framework/startup_metadata_inventory/anthropic",
+      "unknown_components": [
+        "Bundled context7 and sequential-thinking MCP tool schemas; these package selectors are not immutable in .mcp.json.",
+        "Dirty Git status changes one startup line."
+      ],
+      "unmeasured": "Renderer wrappers, host budgets, per-worker full-body preloads and actual session-start tokens.",
+      "per_client_limits": "Claude Code native plugin only. No reviewed native Codex/Pi/OpenCode/Muse/research-stack route from this repository. Related SuperGemini/SuperQwen projects are separate candidates, not this row."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "meaning": "Not TRIAL-eligible until cheapest check closes the gap",
+      "reason": "The retained worker requirement includes preserving owned edits and actual failed results. The inspected task/workflow instructions provide decomposition and quality gates but do not establish that complete contract; bundled MCP startup schemas are also unresolved.",
+      "cheapest_check": "Locate a pinned upstream ownership/failure-return contract in the task/agent path and bind a native profile with only separately screened MCP surfaces. If absent, record missing required capability rather than inventing a replacement harness."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions.",
+    "service_status": "served by vendor route; eligibility is separately stated"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/Chachamaru127/claude-code-harness",
+      "ids": [
+        "harness@claude-code-harness-marketplace"
+      ]
+    },
+    "pin": {
+      "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+      "tag": "v5.16.0",
+      "read_at": "2026-10-15T20:21:24.496305+00:00"
+    },
+    "family": "anthropic",
+    "layer": "orchestration-frameworks",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-frameworks.json#/candidates/Chachamaru127~1claude-code-harness",
+    "requirements_result": [
+      {
+        "id": "layer-capability",
+        "result": "PASS",
+        "reason": "Plan/work/review workflow with project-scoped guardrails and explicit permission limits; the vendor warns that a reviewer role is not read-only isolation.",
+        "citations": [
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "README.md",
+            "lines": [
+              74,
+              76
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/README.md#L74"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "README.md",
+            "lines": [
+              139,
+              164
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/README.md#L139"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "docs/onboarding/install.md",
+            "lines": [
+              73,
+              88
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/docs/onboarding/install.md#L73"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "codex/AGENTS.md",
+            "lines": [
+              29,
+              35
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/codex/AGENTS.md#L29"
+          }
+        ]
+      },
+      {
+        "id": "bounded-delegation-owned-edits-failed-results",
+        "result": "PASS",
+        "reason": "Source describes bounded work/review or the native coordination path. Host permissions and actual failure retention still require the installer-stage smoke; no measured quality claim.",
+        "citations": [
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "README.md",
+            "lines": [
+              74,
+              76
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/README.md#L74"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "README.md",
+            "lines": [
+              139,
+              164
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/README.md#L139"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "docs/onboarding/install.md",
+            "lines": [
+              73,
+              88
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/docs/onboarding/install.md#L73"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "codex/AGENTS.md",
+            "lines": [
+              29,
+              35
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/codex/AGENTS.md#L29"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "Pinned archive contains executable Linux amd64 ELF; bin/harness selects linux/amd64. Header/source evidence only.",
+        "citations": [
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "docs/onboarding/install.md",
+            "lines": [
+              23,
+              50
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/docs/onboarding/install.md#L23"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "codex/README.md",
+            "lines": [
+              60,
+              77
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/codex/README.md#L60"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "scripts/setup-codex.sh",
+            "lines": [
+              38,
+              44
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/setup-codex.sh#L38"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "bin/harness",
+            "lines": [
+              39,
+              61
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/bin/harness#L39"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "Pinned archive contains executable darwin arm64 Mach-O; shim maps Darwin/arm64. No execution.",
+        "citations": [
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "docs/onboarding/install.md",
+            "lines": [
+              23,
+              50
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/docs/onboarding/install.md#L23"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "codex/README.md",
+            "lines": [
+              60,
+              77
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/codex/README.md#L60"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "scripts/setup-codex.sh",
+            "lines": [
+              38,
+              44
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/setup-codex.sh#L38"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "bin/harness",
+            "lines": [
+              39,
+              61
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/bin/harness#L39"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "Native headless host can consume the selected skill/agent surface. OMC documents deterministic CLI/SDK commands; interactive slash-command automation is not assumed.",
+        "citations": [
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "README.md",
+            "lines": [
+              74,
+              76
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/README.md#L74"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/headless",
+            "read_at": "2026-10-15",
+            "section": "headless CLI and Agent SDK"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scope",
+        "result": "PASS",
+        "reason": "Claude local plugin; Codex --project or a dedicated user home. Do not run project setup against canonical AGENTS.md without reviewing the vendor's generated diff in a disposable trial project.",
+        "citations": [
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "codex/README.md",
+            "lines": [
+              60,
+              77
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/codex/README.md#L60"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "scripts/setup-codex.sh",
+            "lines": [
+              38,
+              44
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/setup-codex.sh#L38"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "scripts/setup-codex.sh",
+            "lines": [
+              342,
+              359
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/setup-codex.sh#L342"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/plugins/cli-reference",
+            "read_at": "2026-10-15",
+            "section": "session/local/project scope and inverse"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "Claude Code plugin and Codex CLI setup are documented. Codex app remains candidate; OpenCode is internal-compatible only. Pi/Muse/research-stack routes are not established.",
+        "citations": [
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "docs/onboarding/install.md",
+            "lines": [
+              23,
+              50
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/docs/onboarding/install.md#L23"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "codex/README.md",
+            "lines": [
+              60,
+              77
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/codex/README.md#L60"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "scripts/setup-codex.sh",
+            "lines": [
+              38,
+              44
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/setup-codex.sh#L38"
+          }
+        ]
+      },
+      {
+        "id": "immutable-install-binding",
+        "result": "PASS",
+        "reason": "Use the screened commit/release and retain resolved source identity before enabling. Floating marketplace/cask updates are not evidence at this pin.",
+        "citations": [
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "scripts/setup-codex.sh",
+            "lines": [
+              20,
+              21
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/setup-codex.sh#L20"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "scripts/setup-codex.sh",
+            "lines": [
+              80,
+              86
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/setup-codex.sh#L80"
+          },
+          {
+            "repository": "https://github.com/Chachamaru127/claude-code-harness",
+            "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+            "path": "codex/README.md",
+            "lines": [
+              110,
+              155
+            ],
+            "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/codex/README.md#L110"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; supplied primary-source facts retain a recent default-branch commit. Popularity is not used.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/Chachamaru127/claude-code-harness",
+            "read_at": "2026-10-15"
+          },
+          {
+            "url": "https://github.com/Chachamaru127/claude-code-harness/commit/c2304c325d4432f51d632e0586d886767b0f41ea",
+            "read_at": "2026-10-15"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "claude plugin marketplace add Chachamaru127/claude-code-harness#c2304c325d4432f51d632e0586d886767b0f41ea --scope local",
+        "claude plugin install harness@claude-code-harness-marketplace --scope local"
+      ],
+      "scope": "Claude local plugin; Codex --project or a dedicated user home. Do not run project setup against canonical AGENTS.md without reviewing the vendor's generated diff in a disposable trial project.",
+      "citations": [
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "docs/onboarding/install.md",
+          "lines": [
+            23,
+            50
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/docs/onboarding/install.md#L23"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "codex/README.md",
+          "lines": [
+            60,
+            77
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/codex/README.md#L60"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "scripts/setup-codex.sh",
+          "lines": [
+            38,
+            44
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/setup-codex.sh#L38"
+        }
+      ]
+    },
+    "inverse": {
+      "commands": [],
+      "finding": "Claude /plugin uninstall harness. Codex onboarding documents moving named Harness skills into backups, but explicitly leaves config, project files and harness-mem state. Project --project writes AGENTS.md; restoring its backup is a separate retained operator action. This is not a complete rollback claim.",
+      "citations": [
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "docs/onboarding/install.md",
+          "lines": [
+            45,
+            50
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/docs/onboarding/install.md#L45"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "docs/onboarding/install.md",
+          "lines": [
+            106,
+            117
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/docs/onboarding/install.md#L106"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "scripts/setup-codex.sh",
+          "lines": [
+            342,
+            359
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/setup-codex.sh#L342"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/plugins/cli-reference",
+          "read_at": "2026-10-15",
+          "section": "session/local/project scope and inverse"
+        }
+      ]
+    },
+    "conflicts": {
+      "summary": "Many startup/tool/stop hooks, a bundled Go guardrail engine, project CLAUDE/AGENTS/plans and optional harness-mem state. Codex setup merges rules and managed worker/reviewer profiles, with partial uninstall. SessionStart imports dynamic plans, handoff and memory; a static legend is only a lower-bound payload. OpenCode is internal-compatible, not claimed equivalent. The linux-amd64 ELF and darwin-arm64 Mach-O executables are present at the pin with executable archive modes; headers were read, never run.",
+      "citations": [
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "hooks/hooks.json",
+          "lines": [
+            114,
+            144
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/hooks/hooks.json#L114"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "README.md",
+          "lines": [
+            139,
+            164
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/README.md#L139"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "README.md",
+          "lines": [
+            189,
+            208
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/README.md#L189"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "scripts/session-init.sh",
+          "lines": [
+            627,
+            694
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/session-init.sh#L627"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "scripts/setup-codex.sh",
+          "lines": [
+            20,
+            21
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/setup-codex.sh#L20"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "scripts/setup-codex.sh",
+          "lines": [
+            80,
+            86
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/setup-codex.sh#L80"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "bin/harness",
+          "lines": [
+            39,
+            61
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/bin/harness#L39"
+        }
+      ],
+      "protected_sessions": "Never enable in fenced trading, judge or review sessions."
+    },
+    "suited_roles": {
+      "status": "Candidate role recommendations; not converged practice or an enablement decision",
+      "candidate_role_recommendations": [
+        "builder: approved plan/work flow in a disposable scoped profile",
+        "reviewer outside fenced sessions: explicit review route with host permissions",
+        "CC/co-op: plan/sync coordination candidate"
+      ],
+      "conditional_roles": [
+        "builder: approved plan/work flow in a disposable scoped profile",
+        "reviewer outside fenced sessions: explicit review route with host permissions",
+        "CC/co-op: plan/sync coordination candidate"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review",
+        "Muse outside the accepted fence"
+      ],
+      "reason": "Roles follow upstream task descriptions. They remain proposals pending multi-angle convergence and measured runs; the screen does not adopt a role matrix.",
+      "citations": [
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "README.md",
+          "lines": [
+            74,
+            76
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/README.md#L74"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "README.md",
+          "lines": [
+            139,
+            164
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/README.md#L139"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "docs/onboarding/install.md",
+          "lines": [
+            73,
+            88
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/docs/onboarding/install.md#L73"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "codex/AGENTS.md",
+          "lines": [
+            29,
+            35
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/codex/AGENTS.md#L29"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": null,
+      "known_component_estimate_tokens": 2195,
+      "summary": "2195 tokens in counted source components; total UNKNOWN because listed dynamic/schema components remain; this is not a measured session.",
+      "scope": "Pinned metadata before host rendering; no execution.",
+      "method": "Sum ceil(UTF-8 bytes/4) for pinned name/description metadata and actual literal injected text. Full source-code byte sizes are never substituted for output text. Claude manual-only descriptions omitted.",
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "README.md",
+          "lines": [
+            74,
+            76
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/README.md#L74"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "README.md",
+          "lines": [
+            139,
+            164
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/README.md#L139"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "scripts/session-init.sh",
+          "lines": [
+            627,
+            674
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/session-init.sh#L627"
+        },
+        {
+          "repository": "https://github.com/Chachamaru127/claude-code-harness",
+          "commit": "c2304c325d4432f51d632e0586d886767b0f41ea",
+          "path": "scripts/setup-codex.sh",
+          "lines": [
+            20,
+            21
+          ],
+          "url": "https://github.com/Chachamaru127/claude-code-harness/blob/c2304c325d4432f51d632e0586d886767b0f41ea/scripts/setup-codex.sh#L20"
+        }
+      ],
+      "counted_ranges_ref": "facts-frameworks.json#/candidates/Chachamaru127~1claude-code-harness/startup_metadata_inventory/anthropic",
+      "unknown_components": [
+        "SessionStart dynamically combines plans, snapshots, skill/template status, handoff and memory; other registered hooks also contribute.",
+        "Codex setup references codex/.codex assets absent from the pinned source archive listing. No Codex total is inferred from Claude metadata."
+      ],
+      "unmeasured": "Renderer wrappers, host budgets, per-worker full-body preloads and actual session-start tokens.",
+      "per_client_limits": "Claude Code plugin and Codex CLI setup are documented. Codex app remains candidate; OpenCode is internal-compatible only. Pi/Muse/research-stack routes are not established."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "meaning": "TRIAL-eligible only; no default promotion",
+      "reason": "Documented scoped orchestration contribution; trial only, with the stated native host and dependency limits.",
+      "cheapest_check": "For Claude: NativeHorizonNY verifies the two retained platform binaries, scoped discovery, backups/inverse and actual dynamic startup cost. For Codex: bind the documented fresh-surface manual route's exact assets; never run the mutable-main setup script as proof of this pin."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions.",
+    "service_status": "served by vendor route; eligibility is separately stated"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+      "ids": [
+        "oh-my-claudecode@omc",
+        "oh-my-claude-sisyphus@5.7.3"
+      ]
+    },
+    "pin": {
+      "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+      "tag": "v5.7.3",
+      "read_at": "2026-10-15T20:21:33.864000+00:00"
+    },
+    "family": "anthropic",
+    "layer": "orchestration-frameworks",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-frameworks.json#/candidates/Yeachan-Heo~1oh-my-claudecode",
+    "requirements_result": [
+      {
+        "id": "layer-capability",
+        "result": "PASS",
+        "reason": "Claude-native multi-agent orchestration plus deterministic CLI/SDK entry points. The classic route is separate from newer Linux-only named autopilot profiles.",
+        "citations": [
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "README.md",
+            "lines": [
+              129,
+              157
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L129"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "src/cli/ask.ts",
+            "lines": [
+              228,
+              267
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/src/cli/ask.ts#L228"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "skills/omc-setup/SKILL.md",
+            "lines": [
+              26,
+              60
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/skills/omc-setup/SKILL.md#L26"
+          }
+        ]
+      },
+      {
+        "id": "bounded-delegation-owned-edits-failed-results",
+        "result": "PASS",
+        "reason": "Source describes bounded work/review or the native coordination path. Host permissions and actual failure retention still require the installer-stage smoke; no measured quality claim.",
+        "citations": [
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "README.md",
+            "lines": [
+              129,
+              157
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L129"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "src/cli/ask.ts",
+            "lines": [
+              228,
+              267
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/src/cli/ask.ts#L228"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "skills/omc-setup/SKILL.md",
+            "lines": [
+              26,
+              60
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/skills/omc-setup/SKILL.md#L26"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "Native Claude/portable Bash/Node route. OMC named autopilot profiles require Linux/flock; only the classic route is under consideration.",
+        "citations": [
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "README.md",
+            "lines": [
+              55,
+              93
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L55"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "README.md",
+            "lines": [
+              146,
+              157
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L146"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "src/cli/ask.ts",
+            "lines": [
+              9,
+              19
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/src/cli/ask.ts#L9"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/setup",
+            "read_at": "2026-10-15",
+            "section": "Linux/WSL x64 and macOS ARM64"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "Native host/portable plugin route; OMC named Linux-only workflow profiles are explicitly excluded.",
+        "citations": [
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "README.md",
+            "lines": [
+              55,
+              93
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L55"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "README.md",
+            "lines": [
+              146,
+              157
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L146"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "src/cli/ask.ts",
+            "lines": [
+              9,
+              19
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/src/cli/ask.ts#L9"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/setup",
+            "read_at": "2026-10-15",
+            "section": "Linux/WSL x64 and macOS ARM64"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "Native headless host can consume the selected skill/agent surface. OMC documents deterministic CLI/SDK commands; interactive slash-command automation is not assumed.",
+        "citations": [
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "README.md",
+            "lines": [
+              129,
+              157
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L129"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/headless",
+            "read_at": "2026-10-15",
+            "section": "headless CLI and Agent SDK"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scope",
+        "result": "PASS",
+        "reason": "Use local setup only. Keep the generic CLI advisor path separate from the full Claude plugin profile. Named --workflow autopilot profiles explicitly require Linux/flock and are excluded from the two-platform route.",
+        "citations": [
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "skills/omc-setup/SKILL.md",
+            "lines": [
+              26,
+              60
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/skills/omc-setup/SKILL.md#L26"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "README.md",
+            "lines": [
+              129,
+              157
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L129"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "src/cli/ask.ts",
+            "lines": [
+              64,
+              81
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/src/cli/ask.ts#L64"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/plugins/cli-reference",
+            "read_at": "2026-10-15",
+            "section": "session/local/project scope and inverse"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "Claude Code/Agent SDK and terminal CLI routes are explicit. OpenAI has an explicit Codex advisor route, but it still needs the advisor leaf's route/prompt/receipt screen before being accepted as this family's orchestration layer. Muse direct launch is incompatible with the required fence. Pi/OpenCode are not native hosts for the Claude plugin.",
+        "citations": [
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "README.md",
+            "lines": [
+              55,
+              93
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L55"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "README.md",
+            "lines": [
+              146,
+              157
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L146"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "src/cli/ask.ts",
+            "lines": [
+              9,
+              19
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/src/cli/ask.ts#L9"
+          }
+        ]
+      },
+      {
+        "id": "immutable-install-binding",
+        "result": "PASS",
+        "reason": "Use the screened commit/release and retain resolved source identity before enabling. Floating marketplace/cask updates are not evidence at this pin.",
+        "citations": [
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "README.md",
+            "lines": [
+              55,
+              93
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L55"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "README.md",
+            "lines": [
+              146,
+              157
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L146"
+          },
+          {
+            "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+            "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+            "path": "src/cli/ask.ts",
+            "lines": [
+              9,
+              19
+            ],
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/src/cli/ask.ts#L9"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; supplied primary-source facts retain a recent default-branch commit. Popularity is not used.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/Yeachan-Heo/oh-my-claudecode",
+            "read_at": "2026-10-15"
+          },
+          {
+            "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/commit/44c27308912cc4e95cc5f5d13543b64845ece432",
+            "read_at": "2026-10-15"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "claude plugin marketplace add Yeachan-Heo/oh-my-claudecode#d14d91c93af23a2d0347f800ba604eb8f45ff830 --scope local",
+        "claude plugin install oh-my-claudecode --scope local",
+        "/oh-my-claudecode:omc-setup --local"
+      ],
+      "scope": "Use local setup only. Keep the generic CLI advisor path separate from the full Claude plugin profile. Named --workflow autopilot profiles explicitly require Linux/flock and are excluded from the two-platform route.",
+      "citations": [
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "README.md",
+          "lines": [
+            55,
+            93
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L55"
+        },
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "README.md",
+          "lines": [
+            146,
+            157
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L146"
+        },
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "src/cli/ask.ts",
+          "lines": [
+            9,
+            19
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/src/cli/ask.ts#L9"
+        }
+      ]
+    },
+    "inverse": {
+      "commands": [],
+      "finding": "Claude native local disable/uninstall; use the plugin-local setup coordinator's backups for generated CLAUDE content. scripts/uninstall.sh exists but is interactive and removes named global components, so it is not a safe project-only inverse. npm removal does not itself restore generated instructions/state.",
+      "citations": [
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "skills/omc-setup/phases/01-install-claude-md.md",
+          "lines": [
+            12,
+            39
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/skills/omc-setup/phases/01-install-claude-md.md#L12"
+        },
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "scripts/uninstall.sh",
+          "lines": [
+            19,
+            50
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/scripts/uninstall.sh#L19"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/plugins/cli-reference",
+          "read_at": "2026-10-15",
+          "section": "session/local/project scope and inverse"
+        }
+      ]
+    },
+    "conflicts": {
+      "summary": "Local/global CLAUDE mutations and optional overwrite behavior; SessionStart restores project memory/wiki/state, prompt and tool hooks alter behavior, and MCP server t can clash. The CLI ask flow can launch Codex or Muse; a direct Muse launch bypasses the required fence and must never be used here. Agent-prompt prepending is optional; full Claude configuration must not be imposed on a GPT-only profile.",
+      "citations": [
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "hooks/hooks.json",
+          "lines": [
+            4,
+            47
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/hooks/hooks.json#L4"
+        },
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": ".mcp.json",
+          "lines": [
+            1,
+            8
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/.mcp.json#L1"
+        },
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "docs/CLAUDE.md",
+          "lines": [
+            1,
+            20
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/docs/CLAUDE.md#L1"
+        },
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "skills/omc-setup/phases/01-install-claude-md.md",
+          "lines": [
+            12,
+            39
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/skills/omc-setup/phases/01-install-claude-md.md#L12"
+        },
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "src/cli/ask.ts",
+          "lines": [
+            228,
+            267
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/src/cli/ask.ts#L228"
+        }
+      ],
+      "protected_sessions": "Never enable in fenced trading, judge or review sessions."
+    },
+    "suited_roles": {
+      "status": "Candidate role recommendations; not converged practice or an enablement decision",
+      "candidate_role_recommendations": [
+        "builder: classic Claude execution workflow candidate",
+        "reviewer/auditor outside fenced sessions: explicit review or advisor flow",
+        "researcher: selected document-specialist workflow",
+        "CC/co-op: orchestration candidate in a dedicated profile"
+      ],
+      "conditional_roles": [
+        "builder: classic Claude execution workflow candidate",
+        "reviewer/auditor outside fenced sessions: explicit review or advisor flow",
+        "researcher: selected document-specialist workflow",
+        "CC/co-op: orchestration candidate in a dedicated profile"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review",
+        "Muse outside the accepted fence"
+      ],
+      "reason": "Roles follow upstream task descriptions. They remain proposals pending multi-angle convergence and measured runs; the screen does not adopt a role matrix.",
+      "citations": [
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "README.md",
+          "lines": [
+            129,
+            157
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L129"
+        },
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "src/cli/ask.ts",
+          "lines": [
+            228,
+            267
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/src/cli/ask.ts#L228"
+        },
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "skills/omc-setup/SKILL.md",
+          "lines": [
+            26,
+            60
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/skills/omc-setup/SKILL.md#L26"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": null,
+      "known_component_estimate_tokens": 3362,
+      "summary": "3362 tokens in counted source components; total UNKNOWN because listed dynamic/schema components remain; this is not a measured session.",
+      "scope": "Pinned metadata before host rendering; no execution.",
+      "method": "Sum ceil(UTF-8 bytes/4) for pinned name/description metadata and actual literal injected text. Full source-code byte sizes are never substituted for output text. Claude manual-only descriptions omitted.",
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "README.md",
+          "lines": [
+            129,
+            157
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/README.md#L129"
+        },
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "src/cli/ask.ts",
+          "lines": [
+            228,
+            267
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/src/cli/ask.ts#L228"
+        },
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "docs/CLAUDE.md",
+          "lines": [
+            1,
+            73
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/docs/CLAUDE.md#L1"
+        },
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "scripts/session-start.mjs",
+          "lines": [
+            792,
+            803
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/scripts/session-start.mjs#L792"
+        },
+        {
+          "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+          "commit": "d14d91c93af23a2d0347f800ba604eb8f45ff830",
+          "path": "src/mcp/omc-tools-server.ts",
+          "lines": [
+            37,
+            81
+          ],
+          "url": "https://github.com/Yeachan-Heo/oh-my-claudecode/blob/d14d91c93af23a2d0347f800ba604eb8f45ff830/src/mcp/omc-tools-server.ts#L37"
+        }
+      ],
+      "counted_ranges_ref": "facts-frameworks.json#/candidates/Yeachan-Heo~1oh-my-claudecode/startup_metadata_inventory/anthropic",
+      "unknown_components": [
+        "Dynamic SessionStart history/project/wiki text (source's main handler defaults to a 6000-character budget; other hooks are separate).",
+        "MCP t schemas depend on enabled tool categories and SDK serialization; not fabricated from TypeScript source byte counts.",
+        "OpenAI advisor without --agent-prompt forwards user prompt at ask.ts:230-238, but the advisor leaf may add its own instructions; total unresolved."
+      ],
+      "unmeasured": "Renderer wrappers, host budgets, per-worker full-body preloads and actual session-start tokens.",
+      "per_client_limits": "Claude Code/Agent SDK and terminal CLI routes are explicit. OpenAI has an explicit Codex advisor route, but it still needs the advisor leaf's route/prompt/receipt screen before being accepted as this family's orchestration layer. Muse direct launch is incompatible with the required fence. Pi/OpenCode are not native hosts for the Claude plugin."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "meaning": "TRIAL-eligible only; no default promotion",
+      "reason": "Documented scoped orchestration contribution; trial only, with the stated native host and dependency limits.",
+      "cheapest_check": "NativeHorizonNY: verify exact installed bytes, host discovery/inverse, role limits and actual startup components. Measure bounded work/failure/review behavior before any default selection."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions.",
+    "service_status": "served by vendor route; eligibility is separately stated"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+      "ids": [
+        "Orchestrator desktop v0.14.2",
+        "ao"
+      ]
+    },
+    "pin": {
+      "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+      "tag": "v0.14.2",
+      "read_at": "2026-10-15T20:21:29.646471+00:00"
+    },
+    "family": "anthropic",
+    "layer": "orchestration-frameworks",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-frameworks.json#/candidates/OrchestratorInc~1agent-orchestrator",
+    "requirements_result": [
+      {
+        "id": "layer-capability",
+        "result": "PASS",
+        "reason": "Project orchestrator, isolated workers and dedicated reviewers, with native Claude/Codex/Pi/OpenCode/Muse adapters; it supplies role-specific system prompts.",
+        "citations": [
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "frontend/src/docs/content/guides/per-role-agents.mdx",
+            "lines": [
+              6,
+              22
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/guides/per-role-agents.mdx#L6"
+          },
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "frontend/src/docs/content/guides/per-role-agents.mdx",
+            "lines": [
+              60,
+              88
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/guides/per-role-agents.mdx#L60"
+          },
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "README.md",
+            "lines": [
+              90,
+              96
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/README.md#L90"
+          }
+        ]
+      },
+      {
+        "id": "bounded-delegation-owned-edits-failed-results",
+        "result": "PASS",
+        "reason": "Source describes bounded work/review or the native coordination path. Host permissions and actual failure retention still require the installer-stage smoke; no measured quality claim.",
+        "citations": [
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "frontend/src/docs/content/guides/per-role-agents.mdx",
+            "lines": [
+              6,
+              22
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/guides/per-role-agents.mdx#L6"
+          },
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "frontend/src/docs/content/guides/per-role-agents.mdx",
+            "lines": [
+              60,
+              88
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/guides/per-role-agents.mdx#L60"
+          },
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "README.md",
+            "lines": [
+              90,
+              96
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/README.md#L90"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "UNKNOWN",
+        "reason": "Linux x64 desktop assets exist, but a supported headless WSL2 bootstrap was not established.",
+        "citations": [
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "README.md",
+            "lines": [
+              39,
+              53
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/README.md#L39"
+          },
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "frontend/src/docs/content/installation.mdx",
+            "lines": [
+              11,
+              27
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/installation.mdx#L11"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/setup",
+            "read_at": "2026-10-15",
+            "section": "Linux/WSL x64 and macOS ARM64"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "Vendor ships macOS Apple Silicon desktop asset; this does not establish headless startup.",
+        "citations": [
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "README.md",
+            "lines": [
+              39,
+              53
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/README.md#L39"
+          },
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "frontend/src/docs/content/installation.mdx",
+            "lines": [
+              11,
+              27
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/installation.mdx#L11"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/setup",
+            "read_at": "2026-10-15",
+            "section": "Linux/WSL x64 and macOS ARM64"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "UNKNOWN",
+        "reason": "Current CLI is a thin desktop-daemon client; documented start opens/downloads the desktop app and hides internal daemon commands.",
+        "citations": [
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "frontend/src/docs/content/cli.mdx",
+            "lines": [
+              6,
+              47
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/cli.mdx#L6"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scope",
+        "result": "PASS",
+        "reason": "Project-scoped role/rule configuration and worktrees; AO_DATA_DIR/AO_RUN_FILE override daemon state/discovery paths. Native CLI auth remains the selected provider's own route.",
+        "citations": [
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "frontend/src/docs/content/guides/per-role-agents.mdx",
+            "lines": [
+              16,
+              22
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/guides/per-role-agents.mdx#L16"
+          },
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "frontend/src/docs/content/guides/per-role-agents.mdx",
+            "lines": [
+              82,
+              88
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/guides/per-role-agents.mdx#L82"
+          },
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "frontend/src/docs/content/cli.mdx",
+            "lines": [
+              240,
+              252
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/cli.mdx#L240"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/plugins/cli-reference",
+            "read_at": "2026-10-15",
+            "section": "session/local/project scope and inverse"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "Vendor lists Claude Code, Codex, Pi, OpenCode and Muse; current canonical install is desktop-centric. No native DeerFlow/GPT Researcher adapter established.",
+        "citations": [
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "README.md",
+            "lines": [
+              39,
+              53
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/README.md#L39"
+          },
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "frontend/src/docs/content/installation.mdx",
+            "lines": [
+              11,
+              27
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/installation.mdx#L11"
+          }
+        ]
+      },
+      {
+        "id": "immutable-install-binding",
+        "result": "PASS",
+        "reason": "Use the screened commit/release and retain resolved source identity before enabling. Floating marketplace/cask updates are not evidence at this pin.",
+        "citations": [
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "README.md",
+            "lines": [
+              39,
+              53
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/README.md#L39"
+          },
+          {
+            "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+            "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+            "path": "frontend/src/docs/content/installation.mdx",
+            "lines": [
+              11,
+              27
+            ],
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/installation.mdx#L11"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; supplied primary-source facts retain a recent default-branch commit. Popularity is not used.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/OrchestratorInc/agent-orchestrator",
+            "read_at": "2026-10-15"
+          },
+          {
+            "url": "https://github.com/OrchestratorInc/agent-orchestrator/commit/2f30cef5bff6489bcd918bb0b3fd51cb1218eee3",
+            "read_at": "2026-10-15"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "Vendor release asset: install the v0.14.2 desktop package for Linux x64 or macOS arm64",
+        "brew install --cask agentwrapper/tap/agent-orchestrator"
+      ],
+      "scope": "Project-scoped role/rule configuration and worktrees; AO_DATA_DIR/AO_RUN_FILE override daemon state/discovery paths. Native CLI auth remains the selected provider's own route.",
+      "citations": [
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "README.md",
+          "lines": [
+            39,
+            53
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/README.md#L39"
+        },
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "frontend/src/docs/content/installation.mdx",
+          "lines": [
+            11,
+            27
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/installation.mdx#L11"
+        }
+      ]
+    },
+    "inverse": {
+      "commands": [],
+      "finding": "ao stop stops the daemon. Vendor FAQ says remove the desktop app through the OS; deleting ~/.ao additionally destroys history/state and is not the default inverse. Legacy npm uninstall applies only to the frozen old CLI package.",
+      "citations": [
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "frontend/src/docs/content/cli.mdx",
+          "lines": [
+            49,
+            56
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/cli.mdx#L49"
+        },
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "frontend/src/docs/content/faq.mdx",
+          "lines": [
+            59,
+            60
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/faq.mdx#L59"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/plugins/cli-reference",
+          "read_at": "2026-10-15",
+          "section": "session/local/project scope and inverse"
+        }
+      ]
+    },
+    "conflicts": {
+      "summary": "Desktop-owned shared daemon at loopback port 3001 and ~/.ao state; generated worktrees share Git config. Role prompts and project rules are injected for launched sessions. The current ao start opens/downloads a desktop app; the npm CLI is frozen at 0.10.0. Native Muse adapter would be outside the accepted fence unless separately integrated.",
+      "citations": [
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "frontend/src/docs/content/cli.mdx",
+          "lines": [
+            6,
+            47
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/cli.mdx#L6"
+        },
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "frontend/src/docs/content/cli.mdx",
+          "lines": [
+            240,
+            252
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/cli.mdx#L240"
+        },
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "backend/internal/session_manager/prompt.go",
+          "lines": [
+            73,
+            108
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/backend/internal/session_manager/prompt.go#L73"
+        },
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "backend/internal/session_manager/prompt.go",
+          "lines": [
+            131,
+            144
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/backend/internal/session_manager/prompt.go#L131"
+        }
+      ],
+      "protected_sessions": "Never enable in fenced trading, judge or review sessions."
+    },
+    "suited_roles": {
+      "status": "Candidate role recommendations; not converged practice or an enablement decision",
+      "candidate_role_recommendations": [],
+      "conditional_roles": [
+        "CC/co-op: project orchestration candidate",
+        "builder: isolated worker candidate",
+        "reviewer outside fenced sessions: dedicated reviewer candidate"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review",
+        "Muse outside the accepted fence"
+      ],
+      "reason": "Roles follow upstream task descriptions. They remain proposals pending multi-angle convergence and measured runs; the screen does not adopt a role matrix.",
+      "citations": [
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "frontend/src/docs/content/guides/per-role-agents.mdx",
+          "lines": [
+            6,
+            22
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/guides/per-role-agents.mdx#L6"
+        },
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "frontend/src/docs/content/guides/per-role-agents.mdx",
+          "lines": [
+            60,
+            88
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/frontend/src/docs/content/guides/per-role-agents.mdx#L60"
+        },
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "README.md",
+          "lines": [
+            90,
+            96
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/README.md#L90"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": null,
+      "known_component_estimate_tokens": 580,
+      "summary": "580 tokens in counted source components; total UNKNOWN because listed dynamic/schema components remain; this is not a measured session.",
+      "scope": "Pinned metadata before host rendering; no execution.",
+      "method": "Sum ceil(UTF-8 bytes/4) for pinned name/description metadata and actual literal injected text. Full source-code byte sizes are never substituted for output text. Claude manual-only descriptions omitted.",
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "backend/internal/session_manager/prompt.go",
+          "lines": [
+            114,
+            119
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/backend/internal/session_manager/prompt.go#L114"
+        },
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "backend/internal/session_manager/prompt.go",
+          "lines": [
+            140,
+            144
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/backend/internal/session_manager/prompt.go#L140"
+        },
+        {
+          "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+          "commit": "55b2962a5f7478fa7570777aad92f3bef3c99ccd",
+          "path": "backend/internal/session_manager/prompt.go",
+          "lines": [
+            73,
+            108
+          ],
+          "url": "https://github.com/OrchestratorInc/agent-orchestrator/blob/55b2962a5f7478fa7570777aad92f3bef3c99ccd/backend/internal/session_manager/prompt.go#L73"
+        }
+      ],
+      "counted_ranges_ref": "facts-frameworks.json#/candidates/OrchestratorInc~1agent-orchestrator/startup_metadata_inventory/anthropic",
+      "unknown_components": [
+        "Mandatory role template, project rules, role-specific config and task/issue context vary. The 580-token estimate counts only two always-appended constant sections.",
+        "Native provider's own skill/tool schemas are not counted as zero."
+      ],
+      "unmeasured": "Renderer wrappers, host budgets, per-worker full-body preloads and actual session-start tokens.",
+      "per_client_limits": "Vendor lists Claude Code, Codex, Pi, OpenCode and Muse; current canonical install is desktop-centric. No native DeerFlow/GPT Researcher adapter established."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "meaning": "Not TRIAL-eligible until cheapest check closes the gap",
+      "reason": "Supported current CLI requires the desktop app and daemon to be running; its headless bootstrap is not established by the documented install path. Do not reuse the old npm/headless assumptions at this new pin.",
+      "cheapest_check": "Retain a vendor-supported headless daemon/install contract at v0.14.2 for WSL2 and macOS, rather than running an explicitly internal daemon command or the frozen legacy npm launcher."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions.",
+    "service_status": "served by vendor route; eligibility is separately stated"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/anthropics/claude-code",
+      "ids": [
+        "native:composition"
+      ],
+      "inventory_key": "native:composition",
+      "name": "Native Claude composition"
+    },
+    "pin": {
+      "commit": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+      "tag": "v2.1.301",
+      "read_at": "2026-10-15T20:59:06.349Z",
+      "vendor_version": "2.1.301",
+      "date": "2026-10-15"
+    },
+    "family": "anthropic",
+    "layer": "orchestration-frameworks",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-frameworks.json#/native/claude_2_1_301",
+    "requirements_result": [
+      {
+        "id": "layer-capability",
+        "result": "PASS",
+        "reason": "Native Claude subagents/workflows/teams coordinate bounded work with host-owned permission and review controls.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/sub-agents",
+            "read_at": "2026-10-15",
+            "section": "Scoped agents, tools, worktree isolation and inherited context"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/workflows",
+            "read_at": "2026-10-15",
+            "section": "Headless/Agent SDK availability and disable controls"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/agent-teams",
+            "read_at": "2026-10-15",
+            "section": "Native team coordination and opt-in"
+          }
+        ]
+      },
+      {
+        "id": "bounded-delegation-owned-edits-failed-results",
+        "result": "PASS",
+        "reason": "Native role definitions, isolated worktrees and workflow failure reporting are the documented mechanisms; caller sets explicit owned outcomes and integration review.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/sub-agents",
+            "read_at": "2026-10-15",
+            "section": "Scoped agents, tools, worktree isolation and inherited context"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/workflows",
+            "read_at": "2026-10-15",
+            "section": "Headless/Agent SDK availability and disable controls"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/agent-teams",
+            "read_at": "2026-10-15",
+            "section": "Native team coordination and opt-in"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "Native Claude binary supports Linux/WSL x64; source/docs check only.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/setup",
+            "read_at": "2026-10-15",
+            "section": "Linux/WSL x64 and macOS ARM64"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "Native Claude supports macOS ARM64; no session launched.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/setup",
+            "read_at": "2026-10-15",
+            "section": "Linux/WSL x64 and macOS ARM64"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "Workflow docs explicitly include claude -p and Agent SDK. Interactive-only UI capabilities are not required for this route.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/headless",
+            "read_at": "2026-10-15",
+            "section": "headless CLI and Agent SDK"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/sub-agents",
+            "read_at": "2026-10-15",
+            "section": "Scoped agents, tools, worktree isolation and inherited context"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/workflows",
+            "read_at": "2026-10-15",
+            "section": "Headless/Agent SDK availability and disable controls"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/agent-teams",
+            "read_at": "2026-10-15",
+            "section": "Native team coordination and opt-in"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scope",
+        "result": "PASS",
+        "reason": "Session agents/project definitions and native workflow/team settings scope the composition.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/sub-agents",
+            "read_at": "2026-10-15",
+            "section": "Scoped agents, tools, worktree isolation and inherited context"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/workflows",
+            "read_at": "2026-10-15",
+            "section": "Headless/Agent SDK availability and disable controls"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/agent-teams",
+            "read_at": "2026-10-15",
+            "section": "Native team coordination and opt-in"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "This inventory slot is Claude-native composition. Bare API calls do not supply the harness.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/sub-agents",
+            "read_at": "2026-10-15",
+            "section": "Scoped agents, tools, worktree isolation and inherited context"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/workflows",
+            "read_at": "2026-10-15",
+            "section": "Headless/Agent SDK availability and disable controls"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/agent-teams",
+            "read_at": "2026-10-15",
+            "section": "Native team coordination and opt-in"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Claude Code v2.1.301 release/current default-branch source is retained; installed symlink/binary metadata matches that version without executing the client.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-code",
+            "commit": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+            "path": "CHANGELOG.md",
+            "lines": [
+              1,
+              8
+            ],
+            "url": "https://github.com/anthropics/claude-code/blob/03b5892ee77de289bcd5dfa39f541525ade74aff/CHANGELOG.md#L1"
+          },
+          {
+            "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.301",
+            "read_at": "2026-10-15"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "claude -p <bounded-task>"
+      ],
+      "scope": "Bundled native capability; no framework package install. Use existing approved native client profile.",
+      "citations": [
+        {
+          "url": "https://code.claude.com/docs/en/sub-agents",
+          "read_at": "2026-10-15",
+          "section": "Scoped agents, tools, worktree isolation and inherited context"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/workflows",
+          "read_at": "2026-10-15",
+          "section": "Headless/Agent SDK availability and disable controls"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/agent-teams",
+          "read_at": "2026-10-15",
+          "section": "Native team coordination and opt-in"
+        }
+      ]
+    },
+    "inverse": {
+      "commands": [],
+      "finding": "Remove selected project/session agent definitions, disableWorkflows or CLAUDE_CODE_DISABLE_WORKFLOWS=1, and leave experimental teams off when not selected.",
+      "citations": [
+        {
+          "url": "https://code.claude.com/docs/en/sub-agents",
+          "read_at": "2026-10-15",
+          "section": "Scoped agents, tools, worktree isolation and inherited context"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/workflows",
+          "read_at": "2026-10-15",
+          "section": "Headless/Agent SDK availability and disable controls"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/agent-teams",
+          "read_at": "2026-10-15",
+          "section": "Native team coordination and opt-in"
+        }
+      ]
+    },
+    "conflicts": {
+      "summary": "Subagents inherit project instructions and host permissions; a reviewer name is not a read-only sandbox. Shared-file ownership still belongs in each bounded delegation.",
+      "citations": [
+        {
+          "url": "https://code.claude.com/docs/en/sub-agents",
+          "read_at": "2026-10-15",
+          "section": "Scoped agents, tools, worktree isolation and inherited context"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/workflows",
+          "read_at": "2026-10-15",
+          "section": "Headless/Agent SDK availability and disable controls"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/agent-teams",
+          "read_at": "2026-10-15",
+          "section": "Native team coordination and opt-in"
+        }
+      ]
+    },
+    "suited_roles": {
+      "status": "Candidate role recommendations; not converged practice or an enablement decision",
+      "candidate_role_recommendations": [
+        "builder: bounded native workers",
+        "reviewer/auditor outside fenced sessions: scoped native review agents",
+        "researcher: bounded side research",
+        "CC/co-op: native coordination when the task warrants it"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review"
+      ],
+      "reason": "Source-based task fit only; existing practice-slot default is not promoted or overturned by this A1 row.",
+      "citations": [
+        {
+          "url": "https://code.claude.com/docs/en/sub-agents",
+          "read_at": "2026-10-15",
+          "section": "Scoped agents, tools, worktree isolation and inherited context"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/workflows",
+          "read_at": "2026-10-15",
+          "section": "Headless/Agent SDK availability and disable controls"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/agent-teams",
+          "read_at": "2026-10-15",
+          "section": "Native team coordination and opt-in"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": 0,
+      "summary": "0 additional framework-package startup text over the same native Claude baseline. Built-in Agent/Workflow/team tool schema costs are part of that baseline and remain unknown; zero is not a claim that native orchestration is token-free.",
+      "method": "No extra framework files or hook payload selected. Empty added package payload = 0 bytes / 4. Native base prompt/tool schemas are not counted as zero.",
+      "counted_ranges": [
+        {
+          "url": "https://code.claude.com/docs/en/sub-agents",
+          "read_at": "2026-10-15",
+          "section": "Scoped agents, tools, worktree isolation and inherited context"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/workflows",
+          "read_at": "2026-10-15",
+          "section": "Headless/Agent SDK availability and disable controls"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/agent-teams",
+          "read_at": "2026-10-15",
+          "section": "Native team coordination and opt-in"
+        }
+      ],
+      "unmeasured": "Native baseline tool schemas, role prompts, dynamic project instructions and actual session-start count."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "meaning": "TRIAL-eligible only; no default promotion",
+      "reason": "TRIAL-eligible native capability at vendor version 2.1.301; prior practice decisions remain unchanged.",
+      "cheapest_check": "NativeHorizonNY: retain actual startup, bounded work/failure and cleanup receipts in the selected profile; no screen execution was performed."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions.",
+    "service_status": "served: native Claude capability"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/anthropics/claude-code",
+      "ids": [
+        "native:/batch"
+      ],
+      "inventory_key": "native:/batch",
+      "name": "/batch (bundled Claude Code skill)"
+    },
+    "pin": {
+      "commit": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+      "tag": "v2.1.301",
+      "read_at": "2026-10-15T20:59:06.349Z",
+      "vendor_version": "2.1.301",
+      "date": "2026-10-15"
+    },
+    "family": "anthropic",
+    "layer": "orchestration-frameworks",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-frameworks.json#/native/claude_2_1_301",
+    "requirements_result": [
+      {
+        "id": "layer-capability",
+        "result": "PASS",
+        "reason": "Bundled change decomposition across isolated worktree agents; each unit can open a PR.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/commands",
+            "read_at": "2026-10-15",
+            "section": "/batch independent worktree units"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/skills",
+            "read_at": "2026-10-15",
+            "section": "Bundled skills, manual-only invocation and skillOverrides"
+          }
+        ]
+      },
+      {
+        "id": "bounded-delegation-owned-edits-failed-results",
+        "result": "PASS",
+        "reason": "Independent Git worktrees preserve edit ownership; native tasks report results. Restrict task/shipping authority in the request.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/commands",
+            "read_at": "2026-10-15",
+            "section": "/batch independent worktree units"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/skills",
+            "read_at": "2026-10-15",
+            "section": "Bundled skills, manual-only invocation and skillOverrides"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "Native Claude binary supports Linux/WSL x64; source/docs check only.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/setup",
+            "read_at": "2026-10-15",
+            "section": "Linux/WSL x64 and macOS ARM64"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "Native Claude supports macOS ARM64; no session launched.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/setup",
+            "read_at": "2026-10-15",
+            "section": "Linux/WSL x64 and macOS ARM64"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "Source registration has no interactive-only guard; it resolves a Git context and returns its prompt. Native print mode is the host route. This is a source inference, not a completed batch run.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/headless",
+            "read_at": "2026-10-15",
+            "section": "headless CLI and Agent SDK"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/commands",
+            "read_at": "2026-10-15",
+            "section": "/batch independent worktree units"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/skills",
+            "read_at": "2026-10-15",
+            "section": "Bundled skills, manual-only invocation and skillOverrides"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scope",
+        "result": "PASS",
+        "reason": "Use only when invoked; skillOverrides can set batch off in a profile.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/commands",
+            "read_at": "2026-10-15",
+            "section": "/batch independent worktree units"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/skills",
+            "read_at": "2026-10-15",
+            "section": "Bundled skills, manual-only invocation and skillOverrides"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "This inventory slot is Claude-native composition. Bare API calls do not supply the harness.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/commands",
+            "read_at": "2026-10-15",
+            "section": "/batch independent worktree units"
+          },
+          {
+            "url": "https://code.claude.com/docs/en/skills",
+            "read_at": "2026-10-15",
+            "section": "Bundled skills, manual-only invocation and skillOverrides"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Claude Code v2.1.301 release/current default-branch source is retained; installed symlink/binary metadata matches that version without executing the client.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-code",
+            "commit": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+            "path": "CHANGELOG.md",
+            "lines": [
+              1,
+              8
+            ],
+            "url": "https://github.com/anthropics/claude-code/blob/03b5892ee77de289bcd5dfa39f541525ade74aff/CHANGELOG.md#L1"
+          },
+          {
+            "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.301",
+            "read_at": "2026-10-15"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "/batch <bounded-change>"
+      ],
+      "scope": "Bundled native capability; no framework package install. Use existing approved native client profile.",
+      "citations": [
+        {
+          "url": "https://code.claude.com/docs/en/commands",
+          "read_at": "2026-10-15",
+          "section": "/batch independent worktree units"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/skills",
+          "read_at": "2026-10-15",
+          "section": "Bundled skills, manual-only invocation and skillOverrides"
+        }
+      ]
+    },
+    "inverse": {
+      "commands": [],
+      "finding": "Set skillOverrides.batch=off (or disableBundledSkills for all bundled skills); no package to uninstall.",
+      "citations": [
+        {
+          "url": "https://code.claude.com/docs/en/commands",
+          "read_at": "2026-10-15",
+          "section": "/batch independent worktree units"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/skills",
+          "read_at": "2026-10-15",
+          "section": "Bundled skills, manual-only invocation and skillOverrides"
+        }
+      ]
+    },
+    "conflicts": {
+      "summary": "Uses worktrees and PR-oriented worker prompts; do not issue it from fenced sessions or on a task without shipping authority.",
+      "citations": [
+        {
+          "url": "https://code.claude.com/docs/en/commands",
+          "read_at": "2026-10-15",
+          "section": "/batch independent worktree units"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/skills",
+          "read_at": "2026-10-15",
+          "section": "Bundled skills, manual-only invocation and skillOverrides"
+        }
+      ]
+    },
+    "suited_roles": {
+      "status": "Candidate role recommendations; not converged practice or an enablement decision",
+      "candidate_role_recommendations": [
+        "builder: mechanical migrations/refactors with independent units",
+        "CC/co-op: explicitly selected large-change delegation"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review"
+      ],
+      "reason": "Source-based task fit only; existing practice-slot default is not promoted or overturned by this A1 row.",
+      "citations": [
+        {
+          "url": "https://code.claude.com/docs/en/commands",
+          "read_at": "2026-10-15",
+          "section": "/batch independent worktree units"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/skills",
+          "read_at": "2026-10-15",
+          "section": "Bundled skills, manual-only invocation and skillOverrides"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": 0,
+      "summary": "0 automatic descriptor/body tokens: installed 2.1.301 registration has disableModelInvocation:true. Its name+description+whenToUse source payload would be 77 tokens if listed; it is manual-only. Invocation and workers are separate costs.",
+      "method": "Read binary registration at byte offset 234992298; JSON-decode fields, 307 UTF-8 bytes => ceil(307/4)=77, then apply the documented manual-only visibility rule. No execution.",
+      "counted_ranges": [
+        {
+          "url": "https://code.claude.com/docs/en/commands",
+          "read_at": "2026-10-15",
+          "section": "/batch independent worktree units"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/skills",
+          "read_at": "2026-10-15",
+          "section": "Bundled skills, manual-only invocation and skillOverrides"
+        }
+      ],
+      "source_read_ref": "facts-frameworks.json#/native/claude_2_1_301_batch",
+      "unmeasured": "Actual native renderer and on-invocation prompt/worker cost."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "meaning": "TRIAL-eligible only; no default promotion",
+      "reason": "TRIAL-eligible native capability at vendor version 2.1.301; prior practice decisions remain unchanged.",
+      "cheapest_check": "NativeHorizonNY: retain actual startup, bounded work/failure and cleanup receipts in the selected profile; no screen execution was performed."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions.",
+    "service_status": "served: native Claude capability"
+  }
+]
