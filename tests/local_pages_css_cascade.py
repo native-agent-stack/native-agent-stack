@@ -12,12 +12,14 @@ atlas page, 756 selectors compiled and 9,905 element-by-setting pairs gave the s
 specificity as the stdlib helper this replaced (design-plan.md "CSS cascade helper").
 
 What neither package ships stays here, and each part is small:
-- The tree. cssselect2 matches ElementTree-like trees and reads each node's tag, attributes, children, text and
-  tail (:empty tests children and text). html.parser builds that tree, with the text before an element's first
-  child as its text and the text after a child as that child's tail, and the helper's own Element keeps classes,
+- The tree. cssselect2 matches ElementTree-like trees and reads each node's tag, attributes, children and text
+  (:empty tests children and text; it does not read tail). html.parser builds that tree, with the text before an
+  element's first child as its text and the text after a child as that child's tail, which is set only so the tree
+  matches what ElementTree would hold. The helper's own Element keeps classes,
   parent, element children and the text of its whole subtree. A pseudo-class that needs state or data a static page
-  lacks (:hover, :focus, :target and the like) never matches, as cssselect2 compiles it. A page whose tree a browser would build differently (a block start tag
-  inside an open <p>, a row directly in a <table>) or that carries a style attribute raises ValueError.
+  lacks (:hover, :focus, :target and the like) never matches, as cssselect2 compiles it. A page whose tree a
+  browser would build differently (a block start tag inside an open <p>, a row directly in a <table>) or that
+  carries a style attribute raises ValueError.
 - @media and @container. Neither package evaluates a media query. @media is evaluated against one environment: a
   medium, a viewport width in rem, the light scheme and no reduced motion. An @container rule that reaches an element
   raises, since no query container is evaluated. Any other at-rule raises.

@@ -135,14 +135,13 @@ class CascadeRecordTests(unittest.TestCase):
             self.assertNotRegex(text, r"checks (each|every) (atlas )?declaration")
 
     def test_the_plan_says_which_identifiers_the_page_sets_in_monospace(self):
-        """B9: atlas_view renders <code> for more than pins, paths and record names, and the Type line says so."""
+        """B9: atlas_view renders <code> for more than pins, paths and record names; the Type line states the rule, not a closed list."""
         plan = (HERE / "design-plan.md").read_text()
         self.assertNotIn("monospace only for pins, paths and record names", plan)
         start = plan.index("**Tokens.** The palette above is unchanged and the atlas")
         type_line = " ".join(plan[start:plan.index("**Layout.**", start)].split())
-        for named in ("pins", "paths", "record", "catalog layer ids", "slot keys", "model ids", "effort values", "route text", "MCP server names",
-                      "agent roles", "monitoring commands", "ccusage command", "change kinds"):
-            self.assertIn(named, type_line)
+        self.assertIn("quotes verbatim from its records or commands", type_line)
+        self.assertNotIn("agent roles", type_line)
         view = (HERE / "atlas_view.py").read_text()
         self.assertGreater(view.count("<code>"), 10)
 
@@ -182,6 +181,11 @@ class CascadeTests(ViewCase):
         setting = ("screen", 50.0)
         found = {element.attrs["class"]: page.winner(element, "color", setting) is not None for element in page.elements if element.tag == "p"}
         self.assertEqual(found, {"none": True, "text": False, "child": False, "tail": False, "space": False})
+        # The text after <i> is the <p>'s content (the <i>'s tail), so the <i> itself is empty.
+        probe = Cascade(html, [("probe.css", "i:empty { color: red }")])
+        inner = [element for element in probe.elements if element.tag == "i" and element.parent.attrs["class"] == "tail"]
+        self.assertEqual(len(inner), 1)
+        self.assertIsNotNone(probe.winner(inner[0], "color", setting))
 
     def test_every_atlas_override_of_a_shared_rule_wins_by_specificity(self):
         """Rule 15 and FD:55: where atlas.css and a shared sheet set one property of one element to different values at

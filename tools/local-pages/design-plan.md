@@ -253,10 +253,9 @@ reserved status pair Measured `#246d55`/`#86d4b4` and Pending
 `#996421`/`#f4cc8f` (FD:48; DP:7-14). `assets/atlas.css` uses `var(--…)`
 only. Type: the shared sans for reading text and section headings, the
 overview's display serif for the title and the matrix row headers only, and
-monospace (`<code>`) for the identifiers and commands the page quotes: pins,
-paths and record names, catalog layer ids, slot keys, model ids and declared
-effort values, route text, MCP server names, agent roles, monitoring commands,
-the ccusage command and change kinds (FD:19; DP:16, DP:175-176).
+monospace (`<code>`) for text the page quotes verbatim from its records or
+commands, not for prose; `atlas_view.py` marks each such value, so the code is
+the list (FD:19; DP:16, DP:175-176).
 Unlike the overview, whose section headings take the serif (DP:175-176), the
 atlas keeps them in the sans, so the row headers stay the body's one serif
 element (rule 11). Defining the serif token would otherwise reach every section
@@ -415,5 +414,5 @@ matching and specificity, and the stdlib selector engine is removed.
   expansion; and the importance, specificity and order rank across sheets.
 - **Cost.** Three hash-pinned entries in `.github/requirements-ci.txt`, which
   every workflow that installs the CI analyzer already reads. The packages are
-  imported when a `Cascade` is built, so a missing package fails the four
-  `CascadeTests` and no other test.
+  imported when a `Cascade` is built, so a missing package fails the
+  `CascadeTests` that build a page cascade and no other test.

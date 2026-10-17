@@ -65868,8 +65868,8 @@
     },
     {
       "path": "tools/local-pages/README.md",
-      "sha256": "865dc04a8c3cdca5e724ede6425562d67b601ba9d539331c8dd45851423454e3",
-      "bytes": 41158
+      "sha256": "404f28ec41edb9fd31638dcb5e7a5861506081a0959eb2b2394e786e2b772bcd",
+      "bytes": 41169
     },
     {
       "path": "tools/local-pages/architecture_manifest.py",

@@ -573,7 +573,7 @@ nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p t
 
 The fixtures use the repository's real native builder and local temporary
 receipts. They need no external network, shared service or credentials, and
-no third-party package except that the four stylesheet cascade tests in
+no third-party package except that the `CascadeTests` that build a page cascade in
 `test_local_pages_atlas_view.py` import tinycss2 and cssselect2 from the
 hash-pinned `.github/requirements-ci.txt` (install it with
 `python3 -m pip install --only-binary=:all: --require-hashes -r .github/requirements-ci.txt`);
