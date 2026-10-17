@@ -253,9 +253,10 @@ reserved status pair Measured `#246d55`/`#86d4b4` and Pending
 `#996421`/`#f4cc8f` (FD:48; DP:7-14). `assets/atlas.css` uses `var(--…)`
 only. Type: the shared sans for reading text and section headings, the
 overview's display serif for the title and the matrix row headers only, and
-monospace (`<code>`) for the identifiers the page quotes: pins, paths and record
-names, and also slot keys, model ids, MCP server names, agent roles and change
-kinds (FD:19; DP:16, DP:175-176).
+monospace (`<code>`) for the identifiers and commands the page quotes: pins,
+paths and record names, catalog layer ids, slot keys, model ids and declared
+effort values, route text, MCP server names, agent roles, monitoring commands,
+the ccusage command and change kinds (FD:19; DP:16, DP:175-176).
 Unlike the overview, whose section headings take the serif (DP:175-176), the
 atlas keeps them in the sans, so the row headers stay the body's one serif
 element (rule 11). Defining the serif token would otherwise reach every section
@@ -309,7 +310,7 @@ the next session needs, the measured section is tables.
 | 12 | Motion | None; `prefers-reduced-motion` is already honored | FD:32; DP:31 |
 | 13 | Quality floor | 320px layouts, a visible 3px focus, 44px controls (each disclosure summary too, sized as `assets/site.css:322` sizes `.pool-note summary`), light print | FD:59; DP:31, DP:68 |
 | 14 | State never by color alone | Glyph plus label; pending blocks add the left rule and the word | DP:80-84, DP:173-175 |
-| 15 | Watch selector specificity | Rules sit under `body[data-page="atlas"]` or `.atlas-*`; a shared rule is restyled only inside that scope and at a higher specificity, never by stylesheet order (for example, `.atlas-matrix.ov-table table` outranks `.ov-table table`). `CascadeTests` in `tests/test_local_pages_atlas_view.py` compares each atlas declaration with the same-named property of the shared rules on the same element, at the same importance; the helper expands only margin, padding, border and gap to longhands, so a pair such as `background` and `background-color` is not compared | FD:55 |
+| 15 | Watch selector specificity | Rules sit under `body[data-page="atlas"]` or `.atlas-*`; a shared rule is restyled only inside that scope and at a higher specificity, never by stylesheet order (for example, `.atlas-matrix.ov-table table` outranks `.ov-table table`). `CascadeTests` in `tests/test_local_pages_atlas_view.py` compares the winning atlas declaration of each property with the same-named property of each shared declaration on the same element, at the same importance; the helper expands only margin, padding, border and gap to longhands, so a pair such as `background` and `background-color` is not compared | FD:55 |
 | 16 | Copy: plain verbs, active voice; failures say what is missing and how to fix it | Pending blocks name their trigger; the ledger refusal says the file is kept for inspection | FD:61-71 |
 | 17 | Long identifiers wrap; tables scroll in a labelled region | `.table-wrap` with `role="region"`, `tabindex="0"` and `aria-label` | DP:31; `assets/site.css:268` |
 | 18 | Captions that repeat a visible heading are for screen readers | `_table(..., hide_caption=True)` | DP:210-211 |
@@ -393,9 +394,10 @@ matching and specificity, and the stdlib selector engine is removed.
   `.github/requirements-ci.txt`). tinycss2's `parse_stylesheet`,
   `parse_rule_list` and `parse_blocks_contents` return rules, at-rules and
   declarations with their `important` flag; cssselect2's `compile_selector_list`
-  compiles a selector with its specificity, and `Matcher.match` returns the
-  payloads of the matching selectors ordered by specificity, then by order of
-  addition (cssselect2 `__init__.py` at the pin; the API reference at
+  compiles a selector with its specificity, and `Matcher.match` returns
+  sorted `(specificity, order, pseudo, payload)` tuples for the matching
+  selectors, so by specificity, then by order of addition (cssselect2
+  `__init__.py` at the pin; the API reference at
   https://doc.courtbouillon.org/cssselect2/stable/api_reference.html).
 - **Measured on the built atlas page,** from a scratch environment installed
   from the hash-pinned entries: all 756 selectors of the four sheets compile;
@@ -405,8 +407,10 @@ matching and specificity, and the stdlib selector engine is removed.
   as (property, value, importance, sheet, selector, specificity, order), for
   all 76,717 declarations at the five settings of `CascadeTests`.
 - **Still ours, because neither package ships it:** the ElementTree that
-  cssselect2 matches against (built with `html.parser`, guarded against the
-  shapes a browser would build differently); `@media` and `@container`
+  cssselect2 matches against (built with `html.parser`, with each node's text
+  and tail set because cssselect2 compiles `:empty` as a test of the node's
+  children and text, and guarded against the shapes a browser would build
+  differently); `@media` and `@container`
   evaluation, since neither package evaluates a media query; the shorthand
   expansion; and the importance, specificity and order rank across sheets.
 - **Cost.** Three hash-pinned entries in `.github/requirements-ci.txt`, which

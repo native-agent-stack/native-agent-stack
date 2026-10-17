@@ -4,16 +4,19 @@ The style tests of the harness atlas use it to check what the stylesheets actual
 not only how the selectors are spelled. It is test-only. The browser stays the measured check.
 
 Parsing and selector matching are upstream's. tinycss2 1.5.1 parses the stylesheets into rules and declarations and
-cssselect2 0.10.1 compiles each selector and matches it with its specificity (Matcher.match returns the payloads of
-the matching selectors ordered by specificity, then by order of addition); both are hash-pinned in
+cssselect2 0.10.1 compiles each selector and matches it with its specificity (Matcher.match returns sorted
+(specificity, order, pseudo, payload) tuples: by specificity, then by order of addition); both are hash-pinned in
 .github/requirements-ci.txt. They are imported when a Cascade is built, so a missing package fails the style tests
 alone. Screened 2026-10-17 from PyPI metadata, each package's documentation and its source at the pin: on the built
 atlas page, 756 selectors compiled and 9,905 element-by-setting pairs gave the same matching rules and the same
 specificity as the stdlib helper this replaced (design-plan.md "CSS cascade helper").
 
 What neither package ships stays here, and each part is small:
-- The tree. cssselect2 matches ElementTree-like trees. html.parser builds one with each element's tag, attributes,
-  classes, parent, element children and text. A page whose tree a browser would build differently (a block start tag
+- The tree. cssselect2 matches ElementTree-like trees and reads each node's tag, attributes, children, text and
+  tail (:empty tests children and text). html.parser builds that tree, with the text before an element's first
+  child as its text and the text after a child as that child's tail, and the helper's own Element keeps classes,
+  parent, element children and the text of its whole subtree. A pseudo-class that needs state or data a static page
+  lacks (:hover, :focus, :target and the like) never matches, as cssselect2 compiles it. A page whose tree a browser would build differently (a block start tag
   inside an open <p>, a row directly in a <table>) or that carries a style attribute raises ValueError.
 - @media and @container. Neither package evaluates a media query. @media is evaluated against one environment: a
   medium, a viewport width in rem, the light scheme and no reduced motion. An @container rule that reaches an element
@@ -95,6 +98,13 @@ class _Tree(HTMLParser):
     def handle_data(self, data):
         for element in self.open[1:]:
             element.text.append(data)
+        node = self.open[-1].etree
+        if node is not None:
+            # ElementTree keeps text before the first child in .text and later text in the previous child's .tail.
+            if len(node):
+                node[-1].tail = (node[-1].tail or "") + data
+            else:
+                node.text = (node.text or "") + data
 
 
 def _split(text: str, separator: str) -> list[str]:

@@ -118,9 +118,17 @@ class CascadeRecordTests(unittest.TestCase):
         for named in ("cssselect2 0.10.1", "tinycss2 1.5.1", "9,905", "76,717"):
             self.assertIn(named, " ".join(plan.split()))
 
+    def test_the_plan_and_the_helper_describe_what_matcher_match_returns(self):
+        """Fold 3 review B5: at the pin Matcher.match returns sorted (specificity, order, pseudo, payload) tuples, not the payloads."""
+        tuples = "(specificity, order, pseudo, payload)"
+        self.assertIn(tuples, " ".join((HERE / "design-plan.md").read_text().split()))
+        self.assertIn(tuples, " ".join((self.ROOT / "tests/local_pages_css_cascade.py").read_text().split()))
+        self.assertNotIn("returns the payloads", (self.ROOT / "tests/local_pages_css_cascade.py").read_text())
+
     def test_the_plan_and_the_stylesheet_say_same_named_properties(self):
         """B8: the helper compares only same-named properties at one importance, so no text claims to check each or every declaration."""
         plan, css = (HERE / "design-plan.md").read_text(), (HERE / "assets/atlas.css").read_text()
+        self.assertIn("winning atlas declaration of each property", " ".join(plan.split()))
         self.assertIn("same-named property", " ".join(plan.split()))
         self.assertIn("compares same-named properties", css)
         for text in (plan, css):
@@ -132,7 +140,8 @@ class CascadeRecordTests(unittest.TestCase):
         self.assertNotIn("monospace only for pins, paths and record names", plan)
         start = plan.index("**Tokens.** The palette above is unchanged and the atlas")
         type_line = " ".join(plan[start:plan.index("**Layout.**", start)].split())
-        for named in ("pins", "paths", "record", "slot keys", "model ids", "MCP server names", "agent roles", "change kinds"):
+        for named in ("pins", "paths", "record", "catalog layer ids", "slot keys", "model ids", "effort values", "route text", "MCP server names",
+                      "agent roles", "monitoring commands", "ccusage command", "change kinds"):
             self.assertIn(named, type_line)
         view = (HERE / "atlas_view.py").read_text()
         self.assertGreater(view.count("<code>"), 10)
@@ -164,6 +173,15 @@ class CascadeTests(ViewCase):
                 self.assertGreaterEqual(_pixels(floor.value), 44, label)
                 for cap in ("height", "max-height"):
                     self.assertIsNone(page.winner(summary, cap, setting), label)
+
+    def test_empty_is_evaluated_against_the_real_text_and_children(self):
+        """Review B1 (fold 3): cssselect2 tests :empty on the ElementTree node's children and text, so the helper's tree must carry both."""
+        html = ('<html><body><p class="none"></p><p class="text">words</p><p class="child"><i></i></p>'
+                '<p class="tail"><i></i>after</p><p class="space"> </p></body></html>')
+        page = Cascade(html, [("probe.css", "p:empty { color: red }")])
+        setting = ("screen", 50.0)
+        found = {element.attrs["class"]: page.winner(element, "color", setting) is not None for element in page.elements if element.tag == "p"}
+        self.assertEqual(found, {"none": True, "text": False, "child": False, "tail": False, "space": False})
 
     def test_every_atlas_override_of_a_shared_rule_wins_by_specificity(self):
         """Rule 15 and FD:55: where atlas.css and a shared sheet set one property of one element to different values at
@@ -310,7 +328,8 @@ class UnknownAndCopyTests(ViewCase):
         self.assertNotIn("Advisor sub-inference", self.section(self.page(Fixture(self.base / "plain")), "atlas-measured"))
 
     def test_an_unknown_advisor_field_renders_as_unknown_never_zero_or_a_partial_sum(self):
-        """Review B4: {"input": 5, "output": null} is 5 input and unknown output, and a lane that leaves a field unknown makes the total unknown."""
+        """Review B4: {"input": 5, "output": null} is 5 input and unknown output; a lane with any known field takes part, and an
+        unknown field in it makes that total unknown; a lane whose fields are all unknown is ignored."""
         def note(**advisors):
             fixture = Fixture(self.base / "-".join(advisors))
             projection = latest()

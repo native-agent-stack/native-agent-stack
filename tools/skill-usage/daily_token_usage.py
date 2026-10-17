@@ -350,6 +350,9 @@ def _check_row_shape(row: dict) -> None:
     """A verified digest says the row is unchanged, not that its shape is one the readers can walk: the date is a real
     YYYY-MM-DD, collectors is an object and lanes is an object of lane objects (or null) whose nested fields are objects."""
     try:
+        # fromisoformat alone also accepts YYYYMMDD and ISO week dates (Python 3.11 and later); a row is keyed by this exact text.
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", row["date"]):
+            raise ValueError
         Date.fromisoformat(row["date"])
     except ValueError:
         raise ValueError("token-rate history row date is not a calendar date") from None

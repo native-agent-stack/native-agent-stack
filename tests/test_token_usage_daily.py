@@ -367,6 +367,8 @@ class MalformedShapeTests(TokenCase):
     def test_a_malformed_history_row_with_a_valid_digest_ends_as_the_fixed_line(self):
         shapes = {"lanes list": lambda row: row.update(lanes=[]), "collectors list": lambda row: row.update(collectors=[]),
                   "impossible date": lambda row: row.update(date="2026-13-45"),
+                  "compact date": lambda row: row.update(date="20261015"),
+                  "ISO week date": lambda row: row.update(date="2026-W42-4"),
                   "lane models list": lambda row: row["lanes"]["claude:main"].update(models=["x"]),
                   "lane not an object": lambda row: row["lanes"].update({"claude:main": 7})}
         for name, mutate in shapes.items():
