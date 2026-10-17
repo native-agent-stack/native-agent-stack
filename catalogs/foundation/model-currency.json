@@ -626,40 +626,18 @@
     {
       "id": "background-haiku",
       "role": "Simple Claude Code background tasks: titles, safety checks and quick summaries",
-      "consumer": "Claude Code 2.1.292 background slot",
-      "model_id": "claude-haiku-4-5-20251001",
-      "revision": "claude-haiku-4-5-20251001",
-      "release_date": "2025-10-15",
-      "release_source": "https://www.anthropic.com/news/claude-haiku-4-5",
-      "checked_at": "2026-10-15",
+      "consumer": "Claude Code 2.1.302 background slot (follows the haiku alias; ANTHROPIC_DEFAULT_HAIKU_MODEL unset on this host)",
+      "model_id": "claude-haiku-5-5",
+      "revision": "claude-haiku-5-5",
+      "release_date": "2026-10-07",
+      "release_source": "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
+      "checked_at": "2026-10-17",
       "status": "in_use",
       "release_line": {
         "kind": "vendor_page",
-        "url": "https://platform.claude.com/docs/en/models/haiku-4-5/overview"
+        "url": "https://platform.claude.com/docs/en/models/haiku-5-5/overview"
       },
-      "landscape_check": {
-        "date": "2026-10-15",
-        "sources": [
-          "https://platform.claude.com/docs/en/about-claude/models/overview",
-          "https://platform.claude.com/docs/en/models/haiku-4-5/overview",
-          "https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions",
-          "https://www.anthropic.com/news/claude-haiku-4-5",
-          "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
-          "https://platform.claude.com/docs/en/release-notes/overview",
-          "https://platform.claude.com/docs/en/about-claude/model-deprecations",
-          "https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide"
-        ],
-        "newer_candidates": [
-          {
-            "model_id": "claude-haiku-5-5",
-            "revision": "claude-haiku-5-5",
-            "source": "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
-            "reason": "Official specification lists this successor as Active (latest), released 2026-10-07. The availability overturn condition is met; queue background-slot migration/quality-cost review and authorized application rather than silently changing the pin."
-          }
-        ],
-        "reason": "Read 2026-10-15: Anthropic now lists Claude Haiku 5.5 as Active (latest), released 2026-10-07, with API ID claude-haiku-5-5 for latency-sensitive classification/extraction/routing. This supersedes the October 7 no-newer-Haiku claim and triggers the recorded Haiku-line overturn condition. Record the successor for normal background-slot migration/quality-cost review and authorized application. Haiku 4.5 remains pinned pending that review; it is not represented as the leading Haiku. No model call or silent configuration switch occurs. The cited Haiku 4.5 page NOW labels it Active (legacy), gives retirement as not sooner than 2026-10-15, and directs migration to Haiku 5.5. Anthropic promises at least 60 days' notice before retirement of publicly released models; the floor is not a dated retirement announcement. Keeping the current pin is temporary migration staging, not an untriggered exception."
-      },
-      "overturn": "Triggered by the 2026-10-15 source review: Haiku 5.5 is available. Migration-review owner: command center (CC), which reviews and applies. Paired Haiku 4.5/5.5 check: api-actions runs Claude API slots through Claude Code headless using the routing-run paired-run practice and full harness on same-task background-role workloads; never a bare API call from a Codex lane. Tracking record: docs/decisions/2026-10-15-model-currency-landscape-check.md#haiku-background-migration-review. Readiness trigger: paired quality parity measured on the same tasks, plus cost and latency, plus CC review, before any authorized application. The October 7 newest-Haiku rule requires this review now; no silent pin switch."
+      "overturn": "A Claude Code release after 2.1.302 moves the background slot off Haiku 5.5, or Anthropic marks Haiku 5.5 legacy or retired. Gateway exception: Claude Code 2.1.295 sends background requests behind a Claude apps gateway to Haiku 4.5; that does not apply on this host (direct Anthropic API), but re-check if the host ever uses a gateway. Correction record: docs/decisions/2026-10-17-background-haiku-currency-correction.md (supersedes the 2026-10-15 Haiku 4.5 row and its landscape check)."
     }
   ]
 }

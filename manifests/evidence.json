@@ -17608,8 +17608,8 @@
     },
     {
       "path": "catalogs/foundation/model-currency.json",
-      "sha256": "3c5a2d3665aefab02aef36770de4dd0f7f191e534b2c83535405894a62d2932a",
-      "bytes": 41958
+      "sha256": "30cdad347404a4d167fc7da5cf59b05c4342938d90c433a4311b7cfc39d182e6",
+      "bytes": 39664
     },
     {
       "path": "catalogs/foundation/model-currency.schema.json",
@@ -17703,7 +17703,7 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "edb5035818fef0363236e198e68844bae1e4a21ef3dd084aaf7ecd05df9ba04e",
+      "sha256": "1b315cd80224e823c8746e95227cf003af753fad87f1f701be25db52892ea779",
       "bytes": 339603
     },
     {
@@ -18233,8 +18233,8 @@
     },
     {
       "path": "docs/active-model-currency.md",
-      "sha256": "8649c77be086124b4afe0f742158d78b4c736fa50b87aa7111d574ddb2bb86a5",
-      "bytes": 17195
+      "sha256": "8755168063f4a75d1119680fcb8f6eed34a9e9e49d710e308a8d46e44ef091f3",
+      "bytes": 17290
     },
     {
       "path": "docs/automation-upgrade-evidence.json",
@@ -19467,6 +19467,11 @@
       "bytes": 10782
     },
     {
+      "path": "docs/decisions/2026-10-17-background-haiku-currency-correction.md",
+      "sha256": "8193733f1cb55b1ad8532f1275065085607a538a995678705ee500fd92f4b8cc",
+      "bytes": 8828
+    },
+    {
       "path": "docs/decisions/2026-10-17-codex-job-lane-hooks-mcp-memory.md",
       "sha256": "ccbc1bf0857979e470ad788ea3acf6000f63a8916c047b6340a08615fdaf73d3",
       "bytes": 17710
@@ -19778,8 +19783,8 @@
     },
     {
       "path": "docs/model-currency.md",
-      "sha256": "76e7aa43d641b89ffeea1fbfbaceb803d800e5ea384e613863e5bd767c023f01",
-      "bytes": 9777
+      "sha256": "4858342bec212ce5a7d4cf7c999382344133667451a9f50b070c6b2a3d1897d2",
+      "bytes": 10030
     },
     {
       "path": "docs/native-dashboard-data.md",
@@ -62633,8 +62638,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "2bfa2d4784a73ecdbc9b3c7d5deea7a422a81abd083d071c22fe5414c28be178",
-      "bytes": 132533
+      "sha256": "c1fd9040497b77900d7f18340f8d94919685ceb98cb666754f9c634a69ac6529",
+      "bytes": 132711
     },
     {
       "path": "notes/muse-file-fence-20261014/fix-round-1.json",
@@ -64888,8 +64893,8 @@
     },
     {
       "path": "tests/test_model_currency.py",
-      "sha256": "0d5b98a3894c1d5f39484e0f6be87f8cc48452be3b831501e6b42e4d43651b54",
-      "bytes": 18945
+      "sha256": "2431b73ae534d7937ddbc5a2c194a3a82dbed6eb12f8da706730ff766a7d1bf2",
+      "bytes": 21161
     },
     {
       "path": "tests/test_model_currency_propose.py",

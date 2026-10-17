@@ -11444,7 +11444,7 @@
     "evidence/artifacts/landscape-sweep-20260926/returns.json": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600",
     "evidence/artifacts/landscape-sweep-20260929/returns.json": "2f93067652c0f1e8e4f3d726895d2017eafef018412e47e9bc9b48e7ef931a9c",
     "evidence/artifacts/landscape-sweep-20261009-pine/returns.json": "8b91d1acc81d71d8a911916cd1869a4d0a5742f95bb529c76d321c9793e2f961",
-    "manifests/stack.json": "2bfa2d4784a73ecdbc9b3c7d5deea7a422a81abd083d071c22fe5414c28be178",
+    "manifests/stack.json": "c1fd9040497b77900d7f18340f8d94919685ceb98cb666754f9c634a69ac6529",
     "tools/sota-convergence/landscape-sweep/seeds-20260926.json": "bf564498e96b7d926543a4957f4eec3e81e3aa723299a5752bf7d01efde9c91c"
   },
   "summary": {
