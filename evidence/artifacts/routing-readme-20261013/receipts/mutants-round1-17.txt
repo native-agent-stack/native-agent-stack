@@ -1,0 +1,20 @@
+The 17 mutants of CPA-V-12 after round 1 (Astra's first read of a1a9c4d56, the P1): the 14 of the first head and three that hold the label of the quoted counts (the README names the baseline file without the BEFORE snapshot; the sentence that quotes the counts no longer says BEFORE runs; the baseline file no longer labels its runs BEFORE). Each is one exact change of one file (restored after each run) and the run is tests.test_routing_readme; a mutant is killed when the run fails; the unmutated tree passes first. The first of the three is the escape of the finding: against the first head's test module (the method compared the values only) the mutated README passes (Ran 5, OK); against this head's it is killed.
+
+killed   (failed) the README calls the AFTER measurement outstanding again
+killed   (failed) the README says no baseline demand again
+killed   (failed) the README drops the absence-of-demand caveat
+killed   (failed) the README quotes another turn-one count
+killed   (failed) the README quotes another listed count
+killed   (failed) the README drops the sessions and arms
+killed   (failed) the README quotes another p value
+killed   (failed) the README drops the optional re-run heading
+killed   (failed) the README drops the staging command
+killed   (failed) the README's link names a heading that is not there
+killed   (failed) the README quotes another baseline count
+killed   (failed) the record's table changes a count the README quotes
+killed   (failed) the record drops its sessions sentence
+killed   (failed) the baseline file changes its count
+killed   (failed) the README names the baseline file without the BEFORE snapshot (the escape of the first head)
+killed   (failed) the sentence that quotes the counts no longer says BEFORE runs
+killed   (failed) the baseline file no longer labels its runs BEFORE
+17 mutants, 17 killed, survivors: none
