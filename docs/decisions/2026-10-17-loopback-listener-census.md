@@ -38,19 +38,26 @@
     and UDP listening sockets, numerically, with the owning process and no header.
   - It parses each local address, including a `%scope` before or after an IPv6 bracket, and the `*` wildcard.
   - Exit 0 means clean. Exit 1 means a breach.
-  - Exit 2 means a census error: ss is missing, exits non-zero or hangs; ss lists no listener; or a line does not
-    parse. A real host always has listeners, so an empty enumeration is never a clean pass.
-  - It prints one JSON line: `check`, `at`, `listeners` and `violations`, or `error`.
-  - With `--state-dir` it replaces `last.json`. It keeps each new set of violations as `breaches/<UTC stamp>.json`,
-    which no later run overwrites.
-  - Its one stderr line names that record, or states the error.
+  - Exit 2 means a census error:
+    - ss is missing, cannot start, exits non-zero or hangs;
+    - ss lists no listener, or a line does not parse;
+    - or the state directory cannot be written.
+    A real host always has listeners, so an empty enumeration is never a clean pass.
+  - It prints one JSON line: `check`, `at`, `listeners` and `violations`, or `error`. An error report also carries
+    the `violations` found in the other lines, so a parse error never hides a breach.
+  - With `--state-dir`:
+    - It keeps a run's violations as `breaches/<UTC stamp>.json`, which no later run overwrites.
+    - A run whose violations equal the previous run's names that run's record instead of writing another.
+    - It then replaces `last.json`, which names the record.
+  - Its stderr states the breach count or the error before any state is written. Then it names the breach record, or
+    says why the state was not kept and adds the report itself.
   - Process names come from ss's users field when ss can see them. argv is never read.
 - **`adoption/templates/systemd/loopback-census.service`:**
   - A timer-triggered oneshot with `TimeoutStartSec=60`, so a hung run fails the unit instead of blocking later runs.
   - It runs the script with `--state-dir %S/loopback-census` (`StateDirectory=`), discards stdout, and sends stderr to
     the journal.
   - Either failure starts `OnFailure=stack-alert@%n.service`. That handler sends the command center one named hcom
-    message whose journal pointer leads to the stderr line, and so to the breach record.
+    message whose journal pointer leads to the stderr lines, and so to the breach record.
   - Its header ships the install, check, cutover and activation steps:
     - the `stack-alert@` LoadState check;
     - `systemctl --user daemon-reload`;
@@ -66,8 +73,16 @@ NativeHorizonNY has run a shell precursor every 5 minutes since 2026-10-17 04:14
 - the units `nhny-loopback-census.service` and `nhny-loopback-census.timer`;
 - the script `~/.local/share/native-agent-stack/loopback-census/loopback_census.sh`.
 
-It applies the same rule, except that:
+It applies the same rule, with six differences.
+
+How they were found: on 2026-10-17 the precursor ran unmodified, with a fake `ss` first on PATH, over every fixture line
+in `tests/test_loopback_census.py` plus the failure cases. 9 of 29 rows differ from this census.
 - **v4-mapped loopback:** it flags a `::ffff:127.x` listener, which this census allows.
+- **Device-bound ::1:** it flags a `::1` listener bound to a device, and this census allows it.
+  - ss 6.19.0 prints that listener as `[::1]%lo:<port>`, sampled on this host.
+  - The precursor's loopback patterns are only `127.*`, `[::1]:*` and `::1:*`.
+- **Lines that do not parse:** it classifies them by their text. An address without a port, such as `127.0.0.1`,
+  passes; every other shape is flagged. This census exits 2 on them.
 - **Failures:** it counts an ss failure or an empty listing as clean. ss's errors go to /dev/null, and an empty
   violation list exits 0.
 - **Breaches:** it keeps only `last.json`, so the next clean run overwrites a breach's detail.
@@ -91,7 +106,9 @@ It applies the same rule, except that:
   - Each service's own bind setting stays the first control.
 - **Repeat alerts.**
   - While a breach persists, every tick fails and alerts again.
-  - The breach record is written once per distinct set of violations.
+  - A run writes a new breach record when its violations differ from the previous run's. A clean run, or an error
+    run that found none, has no violations, so the next breach gets a new record.
+  - Records are never pruned.
   - The handler throttles only its Windows toast, to one per hour per unit.
 - **User manager.** This is a user timer, so no census runs while the user manager is down.
 - **The exception is address-based.** 10.255.255.254:53 is allowed for UDP and TCP, by address and port, not by process.

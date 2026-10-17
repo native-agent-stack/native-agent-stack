@@ -5,8 +5,10 @@ at 10.255.255.254:53 is the one exception.
 
 The script:
 - runs SS_ARGV (`ss -H -l -t -u -n -p`) with a timeout;
-- exits 0 clean, 1 on a breach, and 2 on a census error;
-- with --state-dir, keeps last.json and a dated record of each new breach, and names that record on stderr.
+- exits 0 clean, 1 on a breach, and 2 on a census error. The tests assert those literal codes, never the script's own
+  constants, so a swapped constant fails them;
+- with --state-dir, keeps last.json and a breach record that holds exactly its run's violations, and names that record
+  on stderr.
 
 The unit runs it with StandardError=journal, so the alert's journal pointer leads to the record.
 """
@@ -30,6 +32,7 @@ spec = importlib.util.spec_from_file_location("loopback_census", SCRIPT)
 census = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(census)
 
+# [::1]%lo:632 is the shape ss 6.19.0 printed for a ::1 listener bound to device lo, sampled on 2026-10-17.
 LOOPBACK_ONLY = """\
 udp UNCONN 0 0 10.255.255.254:53 0.0.0.0:*
 tcp LISTEN 0 1000 10.255.255.254:53 0.0.0.0:*
@@ -53,13 +56,15 @@ udp UNCONN 0 0 [fe80::1]%eth0:546 [::]:*
 """
 BREACH_SET = {("tcp", "0.0.0.0:8080"), ("tcp", "[::]:9090"), ("udp", "*:5353"), ("tcp", "192.168.1.20:8000"),
               ("udp", "10.255.255.254:5353"), ("tcp", "[::ffff:192.168.1.20]:8001"), ("udp", "[fe80::1]%eth0:546")}
+NON_UTF8 = b'tcp LISTEN 0 4096 0.0.0.0:8080 0.0.0.0:* users:(("py\xffthon",pid=9,fd=3))\n'
 # The fake ss runs with PATH holding only its own directory (so the real ss stays unreachable), so its tools are absolute.
 CAT, SLEEP = shutil.which("cat"), shutil.which("sleep")
 
 
 def run(text, *extra, env=None):
-    with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False, encoding="utf-8") as stream:
-        stream.write(text)
+    data = text if isinstance(text, bytes) else text.encode("utf-8")
+    with tempfile.NamedTemporaryFile("wb", suffix=".txt", delete=False) as stream:
+        stream.write(data)
     try:
         result = subprocess.run([sys.executable, str(SCRIPT), "--ss-output", stream.name, *extra], capture_output=True,
                                 text=True, env=env)
@@ -82,6 +87,10 @@ def run_with_path(directory, *extra):
     return result.returncode, json.loads(result.stdout), result.stderr
 
 
+def records_in(state):
+    return sorted((Path(state) / "breaches").glob("*.json"))
+
+
 class RuleTests(unittest.TestCase):
     def test_loopback_listeners_and_the_wsl_dns_tunnel_pass(self):
         code, report, _ = run(LOOPBACK_ONLY)
@@ -89,9 +98,9 @@ class RuleTests(unittest.TestCase):
 
     def test_every_non_loopback_listener_is_reported_and_fails_the_run(self):
         code, report, stderr = run(LOOPBACK_ONLY + BREACHES)
-        self.assertEqual(code, census.BREACH)
+        self.assertEqual(code, 1)
         self.assertEqual({(v["proto"], v["address"]) for v in report["violations"]}, BREACH_SET)
-        self.assertIn("7 non-loopback listener(s)", stderr)
+        self.assertEqual(stderr.splitlines(), ["loopback census: 7 non-loopback listener(s)"])
 
     def test_the_owning_process_is_named_by_name_and_pid_only(self):
         _code, report, _ = run(BREACHES)
@@ -100,7 +109,11 @@ class RuleTests(unittest.TestCase):
         self.assertEqual(processes["[::]:9090"], "unknown")
 
     def test_the_dns_tunnel_exception_is_its_address_and_port_only(self):
-        self.assertEqual(run("udp UNCONN 0 0 10.255.255.254:5353 0.0.0.0:*\n")[0], census.BREACH)
+        for line in ("udp UNCONN 0 0 10.255.255.254:5353 0.0.0.0:*", "udp UNCONN 0 0 *:53 *:*",
+                     "tcp LISTEN 0 4096 0.0.0.0:53 0.0.0.0:*", "udp UNCONN 0 0 192.168.1.20:53 0.0.0.0:*",
+                     "udp UNCONN 0 0 10.255.255.253:53 0.0.0.0:*"):
+            with self.subTest(line=line):
+                self.assertEqual(run(line + "\n")[0], 1)
         self.assertEqual(run("tcp LISTEN 0 1000 10.255.255.254:53 0.0.0.0:*\n")[0], 0)
 
     def test_a_listener_listed_twice_is_reported_once(self):
@@ -119,19 +132,48 @@ class RuleTests(unittest.TestCase):
             with self.subTest(address=address):
                 self.assertEqual(census.parse_address(address), expected)
 
+    def test_a_non_utf8_listing_is_read_with_replacement_characters(self):
+        code, report, _ = run(NON_UTF8)
+        self.assertEqual((code, report["violations"][0]["process"]), (1, "py�thon pid=9"))
+
 
 class CensusErrorTests(unittest.TestCase):
     def test_an_empty_listing_is_an_error_not_a_clean_pass(self):
         for text in ("", "\n\n", "   \n"):
             with self.subTest(text=repr(text)):
                 code, report, stderr = run(text)
-                self.assertEqual((code, report["error"]), (census.ERROR, "ss listed no listener"))
-                self.assertIn("loopback census error", stderr)
+                self.assertEqual((code, report["error"]), (2, "ss listed no listener"))
+                self.assertEqual(stderr.splitlines(), ["loopback census error: ss listed no listener"])
 
     def test_a_short_or_unparseable_line_is_an_error(self):
         for line in ("tcp LISTEN 0 4096", "tcp LISTEN 0 4096 127.0.0.1 0.0.0.0:*", "raw UNCONN 0 0 0.0.0.0:255 0.0.0.0:*"):
             with self.subTest(line=line):
-                self.assertEqual(run(LOOPBACK_ONLY + line + "\n")[0], census.ERROR)
+                self.assertEqual(run(LOOPBACK_ONLY + line + "\n")[0], 2)
+
+    def test_a_listing_of_only_bad_lines_reports_the_parse_error(self):
+        code, report, _ = run("tcp LISTEN 0 4096\nraw UNCONN 0 0 0.0.0.0:255 0.0.0.0:*\n")
+        self.assertEqual((code, report["error"]), (2, "unparseable ss line 'tcp LISTEN 0 4096' and 1 more"))
+
+    def test_a_parse_error_still_reports_and_keeps_the_breaches_in_the_other_lines(self):
+        breach, bad = BREACHES.splitlines()[0], "tcp LISTEN 0 4096 garbage 0.0.0.0:*"
+        for text in (f"{breach}\n{bad}\n", f"{bad}\n{breach}\n"):
+            with self.subTest(text=text), tempfile.TemporaryDirectory() as directory:
+                code, report, stderr = run(text, "--state-dir", directory)
+                records = records_in(directory)
+                self.assertEqual((code, report["error"]), (2, "unparseable local address 'garbage'"))
+                self.assertEqual([v["address"] for v in report["violations"]], ["0.0.0.0:8080"])
+                self.assertEqual(len(records), 1)
+                self.assertEqual(json.loads(records[0].read_text())["violations"], report["violations"])
+                self.assertEqual(stderr.splitlines(), [
+                    "loopback census error: unparseable local address 'garbage'; 1 non-loopback listener(s) in the other lines",
+                    f"loopback census: breach record {records[0]}"])
+
+    def test_an_unreadable_saved_listing_is_an_error(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run([sys.executable, str(SCRIPT), "--ss-output", str(Path(directory) / "missing")],
+                                    capture_output=True, text=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertTrue(json.loads(result.stdout)["error"].startswith("cannot read "))
 
 
 class RealInvocationTests(unittest.TestCase):
@@ -147,16 +189,26 @@ class RealInvocationTests(unittest.TestCase):
         self.assertEqual((code, report["listeners"]), (0, 10))
         self.assertEqual([Path(recorded[0]).name, *recorded[1:]], list(census.SS_ARGV))
 
-    def test_a_failing_missing_or_hung_ss_is_an_error(self):
+    def test_a_failing_missing_unstartable_or_hung_ss_is_an_error(self):
+        for body, mode, extra, error in (("exit 3\n", None, (), "ss exited 3"),
+                                         (None, None, (), "ss is not installed"),
+                                         ("exit 0\n", 0o644, (), "ss could not start: Permission denied"),
+                                         (f'exec "{SLEEP}" 10\n', None, ("--ss-timeout", "1"), "ss did not finish within 1 s")):
+            with self.subTest(error=error), tempfile.TemporaryDirectory() as directory:
+                if body is not None:
+                    path = fake_ss(directory, body)
+                    if mode is not None:
+                        path.chmod(mode)
+                code, report, _ = run_with_path(directory, *extra)
+                self.assertEqual((code, report["error"]), (2, error))
+
+    def test_a_non_utf8_ss_output_is_read_with_replacement_characters(self):
         with tempfile.TemporaryDirectory() as directory:
-            fake_ss(directory, "exit 3\n")
-            self.assertEqual(run_with_path(directory)[1]["error"], "ss exited 3")
-        with tempfile.TemporaryDirectory() as directory:
-            self.assertEqual(run_with_path(directory)[1]["error"], "ss is not installed")
-        with tempfile.TemporaryDirectory() as directory:
-            fake_ss(directory, f'exec "{SLEEP}" 10\n')
-            code, report, _ = run_with_path(directory, "--ss-timeout", "1")
-            self.assertEqual((code, report["error"]), (census.ERROR, "ss did not finish within 1 s"))
+            fixture = Path(directory) / "fixture"
+            fixture.write_bytes(NON_UTF8)
+            fake_ss(directory, f'"{CAT}" "{fixture}"\n')
+            code, report, _ = run_with_path(directory)
+        self.assertEqual((code, report["violations"][0]["process"]), (1, "py�thon pid=9"))
 
 
 class StateTests(unittest.TestCase):
@@ -164,23 +216,64 @@ class StateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             state = Path(directory)
             code, report, stderr = run(BREACHES, "--state-dir", str(state))
-            records = sorted((state / "breaches").glob("*.json"))
-            self.assertEqual((code, len(records)), (census.BREACH, 1))
-            self.assertIn(f"record {records[0]}", stderr)
+            records = records_in(state)
+            self.assertEqual((code, len(records)), (1, 1))
+            self.assertEqual(stderr.splitlines(), ["loopback census: 7 non-loopback listener(s)",
+                                                   f"loopback census: breach record {records[0]}"])
             self.assertEqual(json.loads(records[0].read_text())["violations"], report["violations"])
-            self.assertEqual(json.loads((state / "last.json").read_text()), report)
+            self.assertEqual(json.loads((state / "last.json").read_text()), dict(report, record=records[0].name))
             # The same breach again keeps the record and names it; a clean run replaces last.json and keeps the record.
             _code, _report, stderr = run(BREACHES, "--state-dir", str(state))
-            self.assertEqual(sorted((state / "breaches").glob("*.json")), records)
-            self.assertIn(f"record {records[0]}", stderr)
+            self.assertEqual(records_in(state), records)
+            self.assertIn(f"breach record {records[0]}", stderr)
             self.assertEqual(run(LOOPBACK_ONLY, "--state-dir", str(state))[0], 0)
-            self.assertEqual(json.loads((state / "last.json").read_text())["violations"], [])
-            self.assertEqual(sorted((state / "breaches").glob("*.json")), records)
+            self.assertNotIn("record", json.loads((state / "last.json").read_text()))
+            self.assertEqual(records_in(state), records)
+
+    def test_a_different_set_of_violations_gets_its_own_record_and_stderr_names_it(self):
+        with tempfile.TemporaryDirectory() as directory:
+            run(BREACHES, "--state-dir", directory)
+            first = records_in(directory)
+            code, _report, stderr = run(BREACHES + "tcp LISTEN 0 4096 0.0.0.0:7070 0.0.0.0:*\n", "--state-dir", directory)
+            records = records_in(directory)
+            self.assertEqual((code, len(first), len(records)), (1, 1, 2))
+            (new,) = set(records) - set(first)
+            self.assertIn("0.0.0.0:7070", [v["address"] for v in json.loads(new.read_text())["violations"]])
+            self.assertIn(f"breach record {new}", stderr)
+
+    def test_the_named_record_holds_its_runs_violations_when_two_sets_share_a_stamp(self):
+        # Two sets kept within one second are named <stamp>.json and <stamp>-2.json, and "-2" sorts first, so the record
+        # to reuse cannot be found by sorting names.
+        first = [{"proto": "tcp", "address": "0.0.0.0:8080", "process": "unknown"}]
+        second = [{"proto": "tcp", "address": "0.0.0.0:9090", "process": "unknown"}]
+        with tempfile.TemporaryDirectory() as directory:
+            for step, violations in enumerate((first, second, second, first)):
+                report = {"check": "loopback-census", "at": "2026-10-17T18:00:00Z", "listeners": 1, "violations": violations}
+                record = census.keep(Path(directory), report)
+                with self.subTest(step=step):
+                    self.assertEqual(json.loads(record.read_text())["violations"], violations)
+            self.assertEqual(len(records_in(directory)), 3)
 
     def test_an_error_is_written_to_last_json(self):
         with tempfile.TemporaryDirectory() as directory:
-            self.assertEqual(run("", "--state-dir", directory)[0], census.ERROR)
+            self.assertEqual(run("", "--state-dir", directory)[0], 2)
             self.assertEqual(json.loads((Path(directory) / "last.json").read_text())["error"], "ss listed no listener")
+
+    def test_a_state_dir_that_cannot_be_written_is_an_error_and_the_report_reaches_stderr(self):
+        with tempfile.TemporaryDirectory() as directory:
+            blocker = Path(directory) / "file"
+            blocker.write_text("", encoding="utf-8")
+            state = str(blocker / "state")
+            code, _report, stderr = run(BREACHES, "--state-dir", state)
+            self.assertEqual(code, 2)
+            count, kept = stderr.splitlines()
+            self.assertEqual(count, "loopback census: 7 non-loopback listener(s)")
+            self.assertTrue(kept.startswith(f"loopback census error: state not kept in {state}: Not a directory; report "))
+            self.assertIn('"0.0.0.0:8080"', kept)
+            code, _report, stderr = run("", "--state-dir", state)
+            self.assertEqual(code, 2)
+            self.assertEqual(stderr.splitlines()[0], "loopback census error: ss listed no listener")
+            self.assertIn("state not kept", stderr.splitlines()[1])
 
 
 def unit(path):

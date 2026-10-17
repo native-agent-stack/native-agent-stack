@@ -11,20 +11,26 @@ It runs SS_ARGV, `ss -H -l -t -u -n -p` (iproute2 ss(8)), with a timeout:
 - -l listening sockets, -t TCP, -u UDP;
 - -n numeric addresses, -p the owning process, -H no header line.
 
-Exit codes. A systemd OnFailure= handler fires on 1 and 2, and the stderr line says which happened:
+Exit codes. A systemd OnFailure= handler fires on 1 and 2, and stderr says which happened:
 - 0: every listener binds loopback, or is the one exception;
 - 1: a breach, where at least one listener breaks the rule;
-- 2: a census error. ss is missing, exits non-zero or times out; its output lists no listener; or a line does not parse.
+- 2: a census error:
+  - ss is missing, cannot start, exits non-zero or times out, or the saved listing cannot be read;
+  - the listing names no listener, or a line does not parse;
+  - or --state-dir cannot be written.
   A real host always has listeners (WSL's DNS tunnel at least), so an empty enumeration is an error, never a clean pass.
 
 Output:
 - stdout: one JSON line {"check", "at", "listeners", "violations"}, or {"check", "at", "error"} on exit 2.
-- With --state-dir DIR, two more outputs:
-  - The same line replaces DIR/last.json.
-  - A set of violations that differs from the previous run's is also kept as DIR/breaches/<UTC stamp>.json, which no
-    later run overwrites.
-- One stderr line names the breach record, or states the error. The unit's journal, which the alert points to, then
-  says where to look.
+  - An error report also carries "violations" when the other lines held a breach, so a parse error never hides one.
+- stderr: first the breach count or the error, before any state is written. Then, with --state-dir, the breach record's
+  path, or why the state was not kept, followed by the report itself.
+- With --state-dir DIR:
+  - A run with violations keeps them as DIR/breaches/<UTC stamp>.json, which no later run overwrites.
+  - A run whose violations equal those in the record that last.json names reuses that record instead. So the record a
+    run names always holds exactly that run's violations.
+  - The JSON line then replaces DIR/last.json, with "record" naming the breach record when there is one.
+- The unit's journal, which the alert points to, holds the stderr lines.
 
 The one allowed exception is WSL's DNS tunnel at 10.255.255.254:53, the nameserver that resolv.conf names on a mirrored
 WSL host. It is allowed for UDP and TCP, by address and port, not by process.
@@ -57,7 +63,14 @@ BREACH, ERROR = 1, 2
 
 
 class CensusError(Exception):
-    """The census could not enumerate the listeners, so it must not report clean."""
+    """The census could not enumerate the listeners, so it must not report clean.
+
+    violations holds the breaches found in the lines that did parse, so the error still reports them.
+    """
+
+    def __init__(self, message, violations=()):
+        super().__init__(message)
+        self.violations = list(violations)
 
 
 def parse_address(address):
@@ -81,16 +94,24 @@ def is_loopback(host):
 
 
 def census(lines):
-    """Return (listeners, violations) for ss output lines, or raise CensusError."""
-    total, violations = 0, []
+    """Return (listeners, violations) for ss output lines, or raise CensusError.
+
+    Every line is read before a line that does not parse raises, so the error carries the other lines' violations.
+    """
+    total, violations, unparsed = 0, [], []
     for line in lines:
         fields = line.split()
         if not fields:
             continue
         if len(fields) < 6 or fields[0] not in PROTOCOLS:
-            raise CensusError(f"unparseable ss line {line.strip()[:80]!r}")
+            unparsed.append(f"unparseable ss line {line.strip()[:80]!r}")
+            continue
         proto, address = fields[0], fields[4]
-        host, port = parse_address(address)
+        try:
+            host, port = parse_address(address)
+        except CensusError as error:
+            unparsed.append(str(error))
+            continue
         total += 1
         if (proto, host, port) in ALLOWED or is_loopback(host):
             continue
@@ -99,6 +120,9 @@ def census(lines):
         entry = {"proto": proto, "address": address, "process": process}
         if entry not in violations:
             violations.append(entry)
+    if unparsed:
+        more = f" and {len(unparsed) - 1} more" if len(unparsed) > 1 else ""
+        raise CensusError(unparsed[0] + more, violations)
     if total == 0:
         raise CensusError("ss listed no listener")
     return total, violations
@@ -106,34 +130,43 @@ def census(lines):
 
 def run_ss(timeout):
     try:
-        result = subprocess.run(SS_ARGV, capture_output=True, text=True, timeout=timeout)
+        result = subprocess.run(SS_ARGV, capture_output=True, encoding="utf-8", errors="replace", timeout=timeout)
     except FileNotFoundError:
         raise CensusError("ss is not installed") from None
     except subprocess.TimeoutExpired:
         raise CensusError(f"ss did not finish within {timeout:g} s") from None
+    except OSError as error:
+        raise CensusError(f"ss could not start: {error.strerror}") from None
     if result.returncode:
         raise CensusError(f"ss exited {result.returncode}")
     return result.stdout
 
 
-def keep(state_dir, report):
-    """Replace last.json, and keep a new set of violations as breaches/<stamp>.json. Return the breach record's path."""
-    state_dir.mkdir(parents=True, exist_ok=True)
-    last = state_dir / "last.json"
+def read_listing(path, timeout):
+    """Return the listing, from a run of SS_ARGV or the saved file at path. Raise CensusError when it cannot be read."""
+    if path is None:
+        return run_ss(timeout)
     try:
-        previous = json.loads(last.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        previous = {}
-    temporary = state_dir / ".last.json.tmp"
-    temporary.write_text(json.dumps(report) + "\n", encoding="utf-8")
-    os.replace(temporary, last)
-    if not report.get("violations"):
+        with open(path, encoding="utf-8", errors="replace") as stream:
+            return stream.read()
+    except OSError as error:
+        raise CensusError(f"cannot read {path}: {error.strerror}") from None
+
+
+def reusable(breaches, previous, violations):
+    """Return the record that the previous last.json names if it holds exactly these violations, else None."""
+    named = previous.get("record") if isinstance(previous, dict) else None
+    if not isinstance(named, str) or Path(named).name != named:
         return None
-    breaches = state_dir / "breaches"
-    breaches.mkdir(exist_ok=True)
-    existing = sorted(breaches.glob("*.json"))
-    if existing and previous.get("violations") == report["violations"]:
-        return existing[-1]
+    try:
+        kept = json.loads((breaches / named).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    return breaches / named if isinstance(kept, dict) and kept.get("violations") == violations else None
+
+
+def new_record(breaches, report):
+    """Write report to a new breaches/<stamp>.json, suffixed -<n> when that name is taken, and return its path."""
     stamp = report["at"].replace("-", "").replace(":", "")
     record = breaches / f"{stamp}.json"
     serial = 1
@@ -144,6 +177,46 @@ def keep(state_dir, report):
     return record
 
 
+def keep(state_dir, report):
+    """Keep the run in state_dir. Return its breach record's path, or None for a run without violations.
+
+    The record is written before last.json, so last.json never names a missing record.
+    """
+    state_dir.mkdir(parents=True, exist_ok=True)
+    last = state_dir / "last.json"
+    try:
+        previous = json.loads(last.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        previous = {}
+    record = None
+    if report.get("violations"):
+        breaches = state_dir / "breaches"
+        breaches.mkdir(exist_ok=True)
+        record = reusable(breaches, previous, report["violations"]) or new_record(breaches, report)
+    temporary = state_dir / ".last.json.tmp"
+    temporary.write_text(json.dumps(dict(report, record=record.name) if record else report) + "\n", encoding="utf-8")
+    os.replace(temporary, last)
+    return record
+
+
+def finish(state_dir, report, code):
+    """Keep the run when state_dir is set, name its breach record on stderr, and return code.
+
+    A state that cannot be written returns ERROR. The report then goes to stderr, so its detail still reaches the journal.
+    """
+    if state_dir is None:
+        return code
+    try:
+        record = keep(state_dir, report)
+    except OSError as error:
+        print(f"loopback census error: state not kept in {state_dir}: {error.strerror or error}; report "
+              f"{json.dumps(report)}", file=sys.stderr)
+        return ERROR
+    if record:
+        print(f"loopback census: breach record {record}", file=sys.stderr)
+    return code
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--state-dir", type=Path, help="keep last.json and breaches/ here")
@@ -152,27 +225,20 @@ def main(argv=None):
     args = parser.parse_args(argv)
     at = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     try:
-        if args.ss_output:
-            with open(args.ss_output, encoding="utf-8") as stream:
-                text = stream.read()
-        else:
-            text = run_ss(args.ss_timeout)
-        total, violations = census(text.splitlines())
+        total, violations = census(read_listing(args.ss_output, args.ss_timeout).splitlines())
     except CensusError as error:
         report = {"check": "loopback-census", "at": at, "error": str(error)}
+        if error.violations:
+            report["violations"] = error.violations
         print(json.dumps(report))
-        if args.state_dir:
-            keep(args.state_dir, report)
-        print(f"loopback census error: {error}", file=sys.stderr)
-        return ERROR
+        found = f"; {len(error.violations)} non-loopback listener(s) in the other lines" if error.violations else ""
+        print(f"loopback census error: {error}{found}", file=sys.stderr)
+        return finish(args.state_dir, report, ERROR)
     report = {"check": "loopback-census", "at": at, "listeners": total, "violations": violations}
     print(json.dumps(report))
-    record = keep(args.state_dir, report) if args.state_dir else None
     if violations:
-        where = f"; record {record}" if record else ""
-        print(f"loopback census: {len(violations)} non-loopback listener(s){where}", file=sys.stderr)
-        return BREACH
-    return 0
+        print(f"loopback census: {len(violations)} non-loopback listener(s)", file=sys.stderr)
+    return finish(args.state_dir, report, BREACH if violations else 0)
 
 
 if __name__ == "__main__":

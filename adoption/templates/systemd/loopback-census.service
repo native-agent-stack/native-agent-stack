@@ -6,16 +6,18 @@
 #   0: every TCP and UDP listener binds loopback (127.0.0.0/8, ::1 or ::ffff:127.0.0.0/104), apart from WSL's DNS
 #      tunnel at 10.255.255.254:53;
 #   1: a breach;
-#   2: a census error: ss is missing, failing or hung, ss listed no listener, or a line did not parse.
+#   2: a census error: ss is missing, failing or hung, ss listed no listener, a line did not parse, or the state
+#      directory could not be written.
 # So a broken census never reports clean.
 #
 # Either failure starts stack-alert@%n.service through OnFailure=. That handler sends the command center one named hcom
 # message with a journal pointer, as in mineru.service.
 #
 # The script writes the run's JSON to $XDG_STATE_HOME/loopback-census/last.json. StateDirectory= creates that directory
-# (systemd.exec(5)), and %S is its root in user mode (systemd.unit(5)). Each new set of violations is also kept there as
-# breaches/<UTC stamp>.json. The script's one stderr line names that record, or the error. StandardError=journal sends
-# that line to the journal, so the alert's journal pointer leads to it.
+# (systemd.exec(5)), and %S is its root in user mode (systemd.unit(5)). A run whose violations differ from the previous
+# run's also keeps them there as breaches/<UTC stamp>.json. The script's stderr states the breach count or the error,
+# then names that record. StandardError=journal sends those lines to the journal, so the alert's journal pointer leads to
+# them.
 #
 # TimeoutStartSec=60 fails the unit, and so alerts, if a run hangs. Without it, Type=oneshot has no start timeout
 # (systemd.service(5)).
