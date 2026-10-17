@@ -1,0 +1,67 @@
+{
+  "uid": "ns2604-net-silent-crit",
+  "title": "WSL eth0 receive under 5 KiB/s for 2 minutes",
+  "condition": "B",
+  "data": [
+    {
+      "refId": "A",
+      "relativeTimeRange": {
+        "from": 600,
+        "to": 0
+      },
+      "datasourceUid": "ns2604-prometheus",
+      "model": {
+        "refId": "A",
+        "editorMode": "code",
+        "expr": "rate(node_network_receive_bytes_total{job=\"workstation-node\",device=\"eth0\"}[30s]) / 1024 + on() group_left() 1000000 * (((max(net_probe_public_ok) == bool 1) and on() (time() - max(net_probe_last_run_timestamp_seconds) < 180)) or vector(0))",
+        "instant": true,
+        "range": false,
+        "intervalMs": 15000,
+        "maxDataPoints": 1000
+      }
+    },
+    {
+      "refId": "B",
+      "relativeTimeRange": {
+        "from": 0,
+        "to": 0
+      },
+      "datasourceUid": "__expr__",
+      "model": {
+        "refId": "B",
+        "type": "threshold",
+        "expression": "A",
+        "conditions": [
+          {
+            "evaluator": {
+              "type": "lt",
+              "params": [
+                5
+              ]
+            }
+          }
+        ],
+        "datasource": {
+          "type": "__expr__",
+          "uid": "__expr__"
+        }
+      }
+    }
+  ],
+  "noDataState": "NoData",
+  "execErrState": "Error",
+  "for": "2m",
+  "isPaused": false,
+  "dashboardUid": "cc-god-view",
+  "panelId": 35,
+  "labels": {
+    "severity": "CRIT",
+    "scope": "workstation-wsl",
+    "monitoring_component": "ns2604-net-silent-crit",
+    "notify": "cc"
+  },
+  "annotations": {
+    "summary": "WSL eth0 receive under 5 KiB/s for 2 minutes",
+    "description": "The VM's eth0 has moved under 5 KiB/s for two minutes and the active probe (native-net-probe, once a minute) does not show the Internet reachable, or has gone stale. While the probe is fresh and reaches a public resolver the value is raised by 1e6, so an idle weekend cannot fire it. Basis: HOST-HEALTH-ADDENDUM-NETWORK-20261014.md; records: ALERT-NET-SILENT-20261014.md, ALERT-NET-PROBE-20261014.md (host-capacity record); tests: tools/alert_replay.py and changes-20261014/promtool/net-silent-confirmed.test.yaml."
+  }
+}

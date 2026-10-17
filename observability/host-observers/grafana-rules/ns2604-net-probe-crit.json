@@ -1,0 +1,67 @@
+{
+  "uid": "ns2604-net-probe-crit",
+  "title": "VM cannot reach either public resolver for 2 minutes",
+  "condition": "B",
+  "data": [
+    {
+      "refId": "A",
+      "relativeTimeRange": {
+        "from": 600,
+        "to": 0
+      },
+      "datasourceUid": "ns2604-prometheus",
+      "model": {
+        "refId": "A",
+        "editorMode": "code",
+        "expr": "min(net_probe_public_ok) and on() (time() - max(net_probe_last_run_timestamp_seconds) <= 300)",
+        "instant": true,
+        "range": false,
+        "intervalMs": 15000,
+        "maxDataPoints": 1000
+      }
+    },
+    {
+      "refId": "B",
+      "relativeTimeRange": {
+        "from": 0,
+        "to": 0
+      },
+      "datasourceUid": "__expr__",
+      "model": {
+        "refId": "B",
+        "type": "threshold",
+        "expression": "A",
+        "conditions": [
+          {
+            "evaluator": {
+              "type": "lt",
+              "params": [
+                1
+              ]
+            }
+          }
+        ],
+        "datasource": {
+          "type": "__expr__",
+          "uid": "__expr__"
+        }
+      }
+    }
+  ],
+  "noDataState": "OK",
+  "execErrState": "Error",
+  "for": "2m",
+  "isPaused": false,
+  "dashboardUid": "cc-god-view",
+  "panelId": 35,
+  "labels": {
+    "severity": "CRIT",
+    "scope": "workstation-wsl",
+    "monitoring_component": "ns2604-net-probe-crit",
+    "notify": "cc"
+  },
+  "annotations": {
+    "summary": "VM cannot reach either public resolver for 2 minutes",
+    "description": "The active probe (native-net-probe, once a minute) got no DNS answer from 1.1.1.1 or 9.9.9.9 and no TCP connect to their port 443 for two minutes: the VM has no Internet path, whatever the traffic. Check the router and the uplink before the lanes. The measurement is read only while the probe is fresh (a run within the last 300 s): a stopped probe leaves its last gauge in the textfile, so a stale one reads no data here and the rule stays normal; ns2604-net-probe-stale-warn owns that case. Records: ALERT-NET-PROBE-20261014.md, HOST-HEALTH-ADDENDUM-NETWORK-20261014.md (host-capacity record)."
+  }
+}

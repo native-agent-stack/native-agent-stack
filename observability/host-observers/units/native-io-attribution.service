@@ -1,0 +1,19 @@
+[Unit]
+Description=Native IO attribution sampler: D-state wait sampling and cgroup IO per 5-minute window, active hours only (read-only, idle class)
+Documentation=file:%h/.local/share/native-agent-stack/host-observers/README.md
+# Inverse: systemctl --user disable --now native-io-attribution.service; remove this file. Its output files stay.
+# Command center ruling 3, 2026-10-14. Cost: one sample reads the stat of every process and thread, about 0.5 s of CPU, so 20 s between samples is about 2.5% of one core at idle weight.
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 -I %h/.local/share/native-agent-stack/host-observers/io_attribution_daemon.py --out-dir %h/.local/state/native-agent-stack/host-observers --interval 20 --window 300 --active 03:45-20:15
+Nice=19
+CPUWeight=idle
+IOSchedulingClass=idle
+MemoryMax=256M
+Restart=on-failure
+RestartSec=30
+TimeoutStopSec=60
+
+[Install]
+WantedBy=default.target

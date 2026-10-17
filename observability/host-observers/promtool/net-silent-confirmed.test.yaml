@@ -1,0 +1,100 @@
+rule_files: []
+evaluation_interval: 15s
+tests:
+  # healthy network, probe fresh and ok: the rate plus 1e6 (never under 5)
+  - interval: 15s
+    input_series:
+      - series: 'node_network_receive_bytes_total{job="workstation-node",device="eth0",instance="127.0.0.1:21255"}'
+        values: '0+1536000x80'
+      - series: 'net_probe_public_ok{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '1+0x80'
+      - series: 'net_probe_last_run_timestamp_seconds{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+15x80'
+    promql_expr_test:
+      - expr: 'rate(node_network_receive_bytes_total{job="workstation-node",device="eth0"}[30s]) / 1024 + on() group_left() 1000000 * (((max(net_probe_public_ok) == bool 1) and on() (time() - max(net_probe_last_run_timestamp_seconds) < 180)) or vector(0))'
+        eval_time: 10m
+        exp_samples:
+          - labels: '{device="eth0", instance="127.0.0.1:21255", job="workstation-node"}'
+            value: 1000100
+  # outage: no receive traffic and a fresh probe with every public check failing: the plain rate, 0 (under 5, the rule can fire)
+  - interval: 15s
+    input_series:
+      - series: 'node_network_receive_bytes_total{job="workstation-node",device="eth0",instance="127.0.0.1:21255"}'
+        values: '5000000+0x80'
+      - series: 'net_probe_public_ok{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+0x80'
+      - series: 'net_probe_last_run_timestamp_seconds{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+15x80'
+    promql_expr_test:
+      - expr: 'rate(node_network_receive_bytes_total{job="workstation-node",device="eth0"}[30s]) / 1024 + on() group_left() 1000000 * (((max(net_probe_public_ok) == bool 1) and on() (time() - max(net_probe_last_run_timestamp_seconds) < 180)) or vector(0))'
+        eval_time: 10m
+        exp_samples:
+          - labels: '{device="eth0", instance="127.0.0.1:21255", job="workstation-node"}'
+            value: 0
+  # quiet weekend: no receive traffic but a fresh probe that reaches the Internet: 1e6, the rule cannot fire
+  - interval: 15s
+    input_series:
+      - series: 'node_network_receive_bytes_total{job="workstation-node",device="eth0",instance="127.0.0.1:21255"}'
+        values: '5000000+0x80'
+      - series: 'net_probe_public_ok{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '1+0x80'
+      - series: 'net_probe_last_run_timestamp_seconds{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+15x80'
+    promql_expr_test:
+      - expr: 'rate(node_network_receive_bytes_total{job="workstation-node",device="eth0"}[30s]) / 1024 + on() group_left() 1000000 * (((max(net_probe_public_ok) == bool 1) and on() (time() - max(net_probe_last_run_timestamp_seconds) < 180)) or vector(0))'
+        eval_time: 10m
+        exp_samples:
+          - labels: '{device="eth0", instance="127.0.0.1:21255", job="workstation-node"}'
+            value: 1000000
+  # stale probe, no traffic: falls back to the plain rate, 0
+  - interval: 15s
+    input_series:
+      - series: 'node_network_receive_bytes_total{job="workstation-node",device="eth0",instance="127.0.0.1:21255"}'
+        values: '5000000+0x80'
+      - series: 'net_probe_public_ok{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '1+0x80'
+      - series: 'net_probe_last_run_timestamp_seconds{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+0x80'
+    promql_expr_test:
+      - expr: 'rate(node_network_receive_bytes_total{job="workstation-node",device="eth0"}[30s]) / 1024 + on() group_left() 1000000 * (((max(net_probe_public_ok) == bool 1) and on() (time() - max(net_probe_last_run_timestamp_seconds) < 180)) or vector(0))'
+        eval_time: 10m
+        exp_samples:
+          - labels: '{device="eth0", instance="127.0.0.1:21255", job="workstation-node"}'
+            value: 0
+  # no probe series at all, no traffic: falls back to the plain rate, 0
+  - interval: 15s
+    input_series:
+      - series: 'node_network_receive_bytes_total{job="workstation-node",device="eth0",instance="127.0.0.1:21255"}'
+        values: '5000000+0x80'
+    promql_expr_test:
+      - expr: 'rate(node_network_receive_bytes_total{job="workstation-node",device="eth0"}[30s]) / 1024 + on() group_left() 1000000 * (((max(net_probe_public_ok) == bool 1) and on() (time() - max(net_probe_last_run_timestamp_seconds) < 180)) or vector(0))'
+        eval_time: 10m
+        exp_samples:
+          - labels: '{device="eth0", instance="127.0.0.1:21255", job="workstation-node"}'
+            value: 0
+  # fresh probe failing but traffic still flowing (the rate is high): 100, not under 5
+  - interval: 15s
+    input_series:
+      - series: 'node_network_receive_bytes_total{job="workstation-node",device="eth0",instance="127.0.0.1:21255"}'
+        values: '0+1536000x80'
+      - series: 'net_probe_public_ok{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+0x80'
+      - series: 'net_probe_last_run_timestamp_seconds{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+15x80'
+    promql_expr_test:
+      - expr: 'rate(node_network_receive_bytes_total{job="workstation-node",device="eth0"}[30s]) / 1024 + on() group_left() 1000000 * (((max(net_probe_public_ok) == bool 1) and on() (time() - max(net_probe_last_run_timestamp_seconds) < 180)) or vector(0))'
+        eval_time: 10m
+        exp_samples:
+          - labels: '{device="eth0", instance="127.0.0.1:21255", job="workstation-node"}'
+            value: 100
+  # the interface series is missing: no sample, so the rule reads no data
+  - interval: 15s
+    input_series:
+      - series: 'net_probe_public_ok{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '1+0x80'
+      - series: 'net_probe_last_run_timestamp_seconds{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+15x80'
+    promql_expr_test:
+      - expr: 'rate(node_network_receive_bytes_total{job="workstation-node",device="eth0"}[30s]) / 1024 + on() group_left() 1000000 * (((max(net_probe_public_ok) == bool 1) and on() (time() - max(net_probe_last_run_timestamp_seconds) < 180)) or vector(0))'
+        eval_time: 10m
+        exp_samples: []

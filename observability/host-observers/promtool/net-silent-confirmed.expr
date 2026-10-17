@@ -1,0 +1,1 @@
+rate(node_network_receive_bytes_total{job="workstation-node",device="eth0"}[30s]) / 1024 + on() group_left() 1000000 * (((max(net_probe_public_ok) == bool 1) and on() (time() - max(net_probe_last_run_timestamp_seconds) < 180)) or vector(0))
