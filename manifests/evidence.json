@@ -5392,8 +5392,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "852799ff836f4905c44a97b3cc552879939c9e6642c83b88b8fad61efe4813c0",
-      "bytes": 52652
+      "sha256": "d91fc63e1d06706104dc64f619ff64549ab3879569248f4a5f61f21afb2fda69",
+      "bytes": 52999
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -18468,8 +18468,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-key-management.md",
-      "sha256": "d91376de866cd39d334947757957e194c59b904991404977dea8c415deffec46",
-      "bytes": 98368
+      "sha256": "fc1c1b65144f9c014f711c16b9650ce38e1b07125bad86284b7c9ce7e5794c60",
+      "bytes": 99808
     },
     {
       "path": "docs/decisions/2026-09-29-max-default-effort.md",
@@ -63328,8 +63328,8 @@
     },
     {
       "path": "tests/canary_mutants.py",
-      "sha256": "580c4d471815c69746167c830e679361cd37bbbf13335c573035197af7b71890",
-      "bytes": 61240
+      "sha256": "0b3043ee34885ff0669d602f357e7a97fc70d81cb95d8cf3a6c29feb66fe2824",
+      "bytes": 65616
     },
     {
       "path": "tests/fixtures/adaptive_paper_citations/asset-attributes.json",
@@ -63953,8 +63953,8 @@
     },
     {
       "path": "tests/test_canary_proof.py",
-      "sha256": "751f34daaab45d8c36a608dd9e1aeabd4d8c324c6e109dd9d62fbcd978a96de1",
-      "bytes": 234149
+      "sha256": "62d290d2d562951a0198fd13e0e43d0f47df1cb06e89f0f4ce544b854a678a56",
+      "bytes": 241719
     },
     {
       "path": "tests/test_capability_gate.py",
@@ -65658,13 +65658,13 @@
     },
     {
       "path": "tools/credentials/canary_proof.py",
-      "sha256": "b01f28e903c18789e9a41cbe841f5a708fdc967d0b9a24ff95ce8c6bae92453f",
-      "bytes": 105055
+      "sha256": "35ead5b75b3e0d897c704b001ef43376ffb7b848eb4ca11b296e092170c2dcfe",
+      "bytes": 105504
     },
     {
       "path": "tools/credentials/canary_scan_worker.py",
-      "sha256": "e363a67601fc6a23b0d6511c51579bf1ed17cb63680464c5238141dcdef761b1",
-      "bytes": 108020
+      "sha256": "ff6eb5cdc6cc1e5e3682f8dbaf249fe88478c90a1dd77ebd524b97dc77e22f9a",
+      "bytes": 108353
     },
     {
       "path": "tools/credentials/canary_workflow.js",

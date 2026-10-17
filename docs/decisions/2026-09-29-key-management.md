@@ -1271,18 +1271,38 @@ An inventory row may now carry an optional `override_variables` list, beside
     path. No scan root moves.
   - **Exclusions match on canonical forms on both sides** (fold 7; this
     covers every exclusion, not only these rows):
-    - Prepare adds, beside each literal exact exclusion and each glob
-      exclusion's directory, the form `realpath(dirname) + "/" + basename`.
-      The final component is never resolved, so a symlink planted at a token
-      name excludes only itself.
+    - `scan_sink` builds these forms at each scan, against the live
+      filesystem (`canary_proof.py` `exclusions`); prepare only records a
+      digest of the list and stores no form that a scan reads. Beside each
+      literal exact exclusion it adds `realpath(dirname) + "/" + basename`,
+      and beside each glob exclusion's directory the realpath of the whole
+      directory (fold 8: the worker compares that directory with the fully
+      resolved parent of a matched name). The final component of an exact
+      rule is never resolved, so a symlink planted at a token name excludes
+      only itself.
+    - Residual, kept by the ruling (fold 8): a symlink at an excluded token
+      name keys only the link. If its target is an ordinary file inside a
+      covered root, that file is walked and scanned as itself; fold 6 had
+      excluded the resolved target. A target outside every root makes the
+      sink incomplete (`link_out`). A symlink to a directory at that name
+      leaves the directory walked, which is the ruling's purpose.
     - The scan worker takes each walked root's canonical path from the
-      directory descriptor it opened (`/proc/self/fd/<fd>`; the proof runs on
-      Linux only). It excludes an entry when either its literal spelling or
-      `canonical_root + "/" + rel` matches, and for a glob rule, its parent
-      either way.
-    - The same code serves `dir`, `glob`, `git` and `tasks` roots. The tests
-      exercise `dir` and `glob` roots through the worker's own walk; the
-      `tasks` root is not separately tested.
+      directory descriptor it opened (`/proc/self/fd/<fd>`; a file root uses
+      its parent's descriptor). It excludes an entry when either its literal
+      spelling or `canonical_root + "/" + rel` matches, and for a glob rule,
+      its parent either way. When the kernel gives no path for an opened
+      root's descriptor, the walk ends as `walk_error` and the sink is
+      incomplete (fold 8), never matched on the literal spelling alone; a
+      missing `/proc` fails closed earlier, at the scope check.
+    - The proof runs on Linux only (`canary_proof.py` `platform_check`,
+      called from prepare and scan). The ruling's macOS `F_GETPATH` branch is
+      not implemented: no macOS run is possible, and lifting that platform
+      gate needs the branch first.
+    - The same code serves `dir`, `glob`, `file`, `git` and `tasks` roots.
+      The tests exercise `dir`, `glob` and `file` roots through the worker's
+      own walk, and the ST9 end-to-end tests run only under a reviewed
+      ripgrep (14.1.0 or 15.2.0). The `git` and `tasks` roots are served and
+      untested.
   - **The runner** leaves the variable in a child's environment.
 
 The settings template's hooks pass `--data-dir` with the default. Other

@@ -699,18 +699,23 @@ def exclusions(home: str, codex: list, env, transcripts: str, group: str, pointe
     if transcripts == "exclude":
         exact.append((f"{h}/.claude/projects", "declined"))
     # Each exclusion also in its canonical form, which the worker matches against canonical_root + "/" + rel (canary_scan_worker.py
-    # Walk.canonical_of): the literal spelling stays beside it (A2 finding G8-A02).
+    # Walk.canonical_of): the literal spelling stays beside it (A2 finding G8-A02). scan_sink builds these forms at each scan
+    # against the live filesystem; prepare only records a digest of this list.
     exact += [(canonical_exclusion(path), klass) for path, klass in exact]
-    glob += [(canonical_exclusion(directory), pattern, klass) for directory, pattern, klass in glob]
+    glob += [(canonical_exclusion(directory, directory=True), pattern, klass) for directory, pattern, klass in glob]
     return sorted(set(exact)), sorted(set(glob))
 
 
-def canonical_exclusion(path: str) -> str:
-    """realpath(dirname) + "/" + basename, trailing slashes dropped first; the final component is never resolved, so a symlink
-    planted at an excluded name excludes only itself, never its target. A relative path is returned unchanged."""
+def canonical_exclusion(path: str, directory: bool = False) -> str:
+    """The canonical form of an exclusion, trailing slashes dropped first. An exact rule is realpath(dirname) + "/" + basename: the
+    final component is never resolved, so a symlink planted at an excluded name excludes only itself, never its target. A glob
+    rule's `directory` is the realpath of the whole directory, because the worker compares it with the canonical parent of a
+    matched name, which is fully resolved. A relative path is returned unchanged."""
     if not os.path.isabs(path):
         return path
     trimmed = path.rstrip("/") or "/"
+    if directory:
+        return os.path.realpath(trimmed)
     parent, name = os.path.split(trimmed)
     return trimmed if not name else os.path.join(os.path.realpath(parent), name)
 

@@ -840,12 +840,19 @@ class UnitTests(unittest.TestCase):
     G8_TOKENS = ("auth-token", "auth-header", "auth-tokens/default", "auth.json")
 
     @staticmethod
-    def g8_walk(home: str, codex: list, env: dict, sink: str, root_path: str = None, kind: str = "dir") -> "wire.Walk":
+    def g8_walk(home: str, codex: list, env: dict, sink: str, root_path: str = None, kind: str = "dir", walk_path: str = None,
+                extra_exact: tuple = ()) -> "wire.Walk":
         """The worker's own pre-walk (canary_scan_worker.Walk.traverse) over one root of `sink`, with the plan's exclusions built by
-        canary_proof.exclusions exactly as scan_sink builds them. No scanner runs and no file is opened: a pre-walk lists, stats
-        and classifies entries only. A stub stands in for the Scan object's counters, key and name checks."""
-        exact, glob = cp.exclusions(home, codex, env, "confirmed", "agent", [])
-        plan = {"roots": [], "threshold_ns": 0, "selection": "changed", "pointers": {"bound": [], "current": []},
+        canary_proof.exclusions the way scan_sink builds them: the sink's group ("user" for U*, else "agent") and the current pointer
+        paths. No scanner runs and no file is opened: a pre-walk lists, stats and classifies entries only. A stub stands in for the
+        Scan object's counters, key and name checks. `walk_path` walks that spelling of the root instead of the recipe's, as a
+        symlink may differ between what the exclusions were computed from and what the worker meets; `extra_exact` adds literal
+        exact rules the recipe does not carry."""
+        group = "user" if sink.startswith("U") else "agent"
+        pointers = cp.pointer_paths(env)
+        exact, glob = cp.exclusions(home, codex, env, "confirmed", group, pointers)
+        exact = exact + [(path, klass) for path, klass in extra_exact]
+        plan = {"roots": [], "threshold_ns": 0, "selection": "changed", "pointers": {"bound": [], "current": pointers},
                 "exclude": [{"path": path, "class": klass} for path, klass in exact],
                 "exclude_glob": [{"dir": directory, "glob": pattern, "class": klass} for directory, pattern, klass in glob],
                 "link_pairs": [], "user_roots": [], "coverage": []}
@@ -854,13 +861,14 @@ class UnitTests(unittest.TestCase):
         roots = [path for recipe, path in cp.sink_roots(home, os.getuid(), codex, "")[sink] if recipe == kind]
         path = root_path or roots[0]
         assert path in roots, (path, roots)
-        walk = wire.Walk(scan, {"id": "00" * 16, "kind": kind, "path": path, "present": True}, number=1)
+        walk = wire.Walk(scan, {"id": "00" * 16, "kind": kind, "path": walk_path or path, "present": True}, number=1)
         walk.traverse("pre")
         return walk
 
+    @unittest.skipUnless(LINUX, NOT_LINUX)
     def test_ai_memory_moved_tokens_are_keyed_by_the_worker_in_every_spelling(self):
         """A2 finding G8-A02, fold 7 (B1, the CC's ruling): exclusions match on literal or canonical forms on both sides. The worker
-        derives each walked root's canonical path from the descriptor it opened and also matches canonical_root + "/" + rel; prepare
+        derives each walked root's canonical path from the descriptor it opened and also matches canonical_root + "/" + rel; scan_sink
         adds realpath(dirname) + "/" + basename beside each literal exclusion. Driven through the worker's own walk, each shape keys
         all four token files: a trailing-slash CODEX_HOME, a leading `//`, `.`, `..`, a symlinked HOME, a symlinked ancestor of a
         root, and a trailing-slash HOME with the variable unset. Synthetic: temporary directories, empty fake token files."""
@@ -892,12 +900,13 @@ class UnitTests(unittest.TestCase):
                         rel = os.fsencode(f"{base}/{name}" if base else name)
                         self.assertEqual(walk.items.get(rel), ("x", "key"), f"G8-{shape}-{name}")
                     self.assertEqual(walk.counted["excluded_key"], 4, f"G8-{shape}-count")
-            # A glob root (U7's CODEX_HOME/*.toml*) and a glob exclusion (CODEX_HOME, *.toml*) behind a trailing-slash CODEX_HOME: the
-            # walked directory is spelled without the slash and the rule's directory with it, so only the canonical forms meet.
+            # A glob exclusion (CODEX_HOME, *.toml*; an agent-group rule, so an A4 walk) behind a trailing-slash CODEX_HOME: the walked
+            # directory is spelled without the slash and the rule's directory with it, so only the canonical forms meet.
             Path(f"{real}/.codex/config.toml").write_text("")
-            walk = self.g8_walk(real, [f"{real}/.codex/"], {"HOME": real}, "U7", f"{real}/.codex//*.toml*", kind="glob")
+            walk = self.g8_walk(real, [f"{real}/.codex/"], {"HOME": real}, "A4", f"{real}/.codex/")
             self.assertEqual(walk.items.get(b"config.toml"), ("x", "user"), "G8-glob-canonical-parent")
 
+    @unittest.skipUnless(LINUX, NOT_LINUX)
     def test_ai_memory_symlink_at_a_token_name_keys_only_itself(self):
         """A2 finding G8-A02, fold 7 (B2): prepare never resolves an exclusion's final component, so a symlink planted at a token
         name (<data>/auth-token pointing at a non-token directory under A1) keys only the link itself; the directory it points at,
@@ -914,6 +923,93 @@ class UnitTests(unittest.TestCase):
             self.assertNotEqual(walk.items.get(b"notes"), ("x", "key"), "G8-target-dir-not-keyed")
             self.assertIn(b"d:notes", walk.items, "G8-target-dir-walked")
             self.assertEqual(walk.items.get(b"notes/chat.jsonl", ("missing",))[0], "f", "G8-target-file-walked")
+
+    @unittest.skipUnless(LINUX, NOT_LINUX)
+    def test_ai_memory_glob_exclusion_directory_that_is_a_symlink(self):
+        """A2 finding G8-A02, fold 8 (F1): a glob exclusion's directory is canonical by its whole realpath, because the worker compares
+        it with the fully resolved parent of a matched name. HOME/.claude/sessions (rule *.key) is a symlink to another directory under
+        the walked A1 root, so the names it matches are reached through the target. Synthetic: temporary directories, empty files."""
+        with tempfile.TemporaryDirectory(prefix="g8-a02-real-") as real:
+            real = os.path.realpath(real)
+            os.makedirs(f"{real}/.claude/shared")
+            for name in ("x.key", "y.txt"):
+                Path(f"{real}/.claude/shared/{name}").write_text("")
+            os.symlink(f"{real}/.claude/shared", f"{real}/.claude/sessions")
+            walk = self.g8_walk(real, [f"{real}/.codex"], {"HOME": real}, "A1")
+            self.assertEqual(walk.items.get(b"shared/x.key"), ("x", "key"), "G8-glob-dir-symlink-keyed")
+            self.assertEqual(walk.items.get(b"shared/y.txt", ("missing",))[0], "f", "G8-glob-dir-symlink-others-walked")
+
+    @unittest.skipUnless(LINUX, NOT_LINUX)
+    def test_ai_memory_exclusions_match_through_the_workers_canonical_path_alone(self):
+        """A2 finding G8-A02, fold 8 (F6): the exclusions are computed from the real HOME and the worker walks each root through a
+        symlinked ancestor, so no literal spelling of a rule meets the walked path and only canonical_root + "/" + rel does: an exact
+        rule and a glob rule's parent in a directory root, a glob root, and a file root. Synthetic: temporary directories, empty files."""
+        with tempfile.TemporaryDirectory(prefix="g8-a02-real-") as real, tempfile.TemporaryDirectory(prefix="g8-a02-out-") as out:
+            real = os.path.realpath(real)
+            os.makedirs(f"{real}/.codex")
+            for name in ("auth.json", "config.toml", "history.jsonl", "x.toml"):
+                Path(f"{real}/.codex/{name}").write_text("")
+            ancestor = f"{out}/ancestor"
+            os.symlink(real, ancestor)
+            codex, env = [f"{real}/.codex"], {"HOME": real}
+            walk = self.g8_walk(real, codex, env, "A4", walk_path=f"{ancestor}/.codex")
+            self.assertEqual(walk.items.get(b"auth.json"), ("x", "key"), "G8-canonical-only-exact")
+            self.assertEqual(walk.items.get(b"config.toml"), ("x", "user"), "G8-canonical-only-glob-parent")
+            # The user group has no glob exclusion and no file-root exclusion: a literal exact rule the recipe lacks stands in.
+            walk = self.g8_walk(real, codex, env, "U7", f"{real}/.codex/*.toml*", kind="glob",
+                                walk_path=f"{ancestor}/.codex/*.toml*", extra_exact=((f"{real}/.codex/x.toml", "key"),))
+            self.assertEqual(walk.items.get(b"x.toml"), ("x", "key"), "G8-canonical-only-glob-root")
+            walk = self.g8_walk(real, codex, env, "U6", f"{real}/.codex/history.jsonl", kind="file",
+                                walk_path=f"{ancestor}/.codex/history.jsonl",
+                                extra_exact=((f"{real}/.codex/history.jsonl", "key"),))
+            self.assertEqual(walk.items.get(b""), ("x", "key"), "G8-canonical-only-file-root")
+
+    @unittest.skipUnless(LINUX, NOT_LINUX)
+    def test_ai_memory_root_without_a_canonical_path_is_incomplete(self):
+        """A2 finding G8-A02, fold 8 (F2): when the kernel gives no path for an opened root's descriptor, the walk is incomplete
+        (walk_error), never a literal-only match. A seam forces fd_path to None for a directory root and a file root; fd_path itself
+        returns the real path of an open directory and None for a removed directory and for a descriptor that names no path."""
+        with tempfile.TemporaryDirectory(prefix="g8-a02-real-") as real:
+            real = os.path.realpath(real)
+            os.makedirs(f"{real}/.claude/aim")
+            os.makedirs(f"{real}/.codex")
+            Path(f"{real}/.codex/history.jsonl").write_text("")
+            env = {"HOME": real, "AI_MEMORY_DATA_DIR": f"{real}/.claude/aim"}
+            original, wire.fd_path = wire.fd_path, lambda fd: None
+            try:
+                walk = self.g8_walk(real, [f"{real}/.codex"], env, "A1")
+                self.assertEqual(walk.state, "walk_error", "G8-no-canonical-dir-incomplete")
+                walk = self.g8_walk(real, [f"{real}/.codex"], env, "U6", f"{real}/.codex/history.jsonl", kind="file")
+                self.assertEqual(walk.state, "walk_error", "G8-no-canonical-file-incomplete")
+            finally:
+                wire.fd_path = original
+            descriptors = [os.open(real, wire.DIR_FLAGS)]
+            os.mkdir(f"{real}/gone")
+            descriptors.append(os.open(f"{real}/gone", wire.DIR_FLAGS))
+            os.rmdir(f"{real}/gone")
+            descriptors += os.pipe()
+            try:
+                self.assertEqual(wire.fd_path(descriptors[0]), os.fsencode(real), "G8-fd-path-real")
+                self.assertIsNone(wire.fd_path(descriptors[1]), "G8-fd-path-removed")
+                self.assertIsNone(wire.fd_path(descriptors[2]), "G8-fd-path-not-absolute")
+            finally:
+                for descriptor in descriptors:
+                    os.close(descriptor)
+
+    def test_canonical_exclusion_forms(self):
+        """A2 finding G8-A02, fold 8 (F1, F6): an exact rule keeps its final component unresolved, a glob rule's directory is resolved
+        whole, trailing slashes are dropped, a relative path is unchanged and the root stays the root."""
+        with tempfile.TemporaryDirectory(prefix="g8-a02-real-") as real:
+            real = os.path.realpath(real)
+            os.makedirs(f"{real}/target")
+            os.symlink(f"{real}/target", f"{real}/link")
+            self.assertEqual(cp.canonical_exclusion(f"{real}/link/"), f"{real}/link", "G8-canonical-final-component-kept")
+            self.assertEqual(cp.canonical_exclusion(f"{real}/link/", directory=True), f"{real}/target",
+                             "G8-canonical-glob-directory-resolved")
+            self.assertEqual(cp.canonical_exclusion(f"{real}/target/../link"), f"{real}/link", "G8-canonical-parent-resolved")
+        self.assertEqual(cp.canonical_exclusion("relative/x"), "relative/x", "G8-canonical-relative-unchanged")
+        self.assertEqual(cp.canonical_exclusion("/"), "/", "G8-canonical-root")
+        self.assertEqual(cp.canonical_exclusion("//", directory=True), "/", "G8-canonical-root-directory")
 
     def test_canary_grammar(self):
         import set_credential as writer
@@ -2109,7 +2205,7 @@ class StabilityTests(unittest.TestCase):
                 files = [Path(data.format(home=home)) / name for name in names]
                 for path in files:
                     path.parent.mkdir(parents=True, exist_ok=True)
-                    path.write_text(host.canary() + "\n")
+                    path.write_text("placeholder\n")
                 extra = {"AI_MEMORY_DATA_DIR": value.format(home=home)}
                 if codex_home:
                     extra["CODEX_HOME"] = codex_home.format(home=home)
@@ -2117,7 +2213,12 @@ class StabilityTests(unittest.TestCase):
                 result = host.tool("prepare", "--transcripts", "confirmed", env=env)
                 self.assertEqual(result.returncode, 0, result.stderr[-400:])
                 host.run_id = re.search(rb"run: (cp-\S+)", result.stdout).group(1).decode()
-                forbidden = [str(path) for path in files] + [str(path).replace("/.codex/", "/.codex//") for path in files]
+                # The canary exists only after prepare; writing it now makes each file selected (changed since the threshold), so
+                # only the exclusion keeps the worker from opening it.
+                for path in files:
+                    path.write_text(host.canary() + "\n")
+                # The worker's seam builds a dir_fd path from readlink(/proc/self/fd/<fd>), which never holds a doubled slash.
+                forbidden = [str(path) for path in files]
                 self.assertEqual(host.scan(env=env, worker={"forbid_paths": forbidden}).returncode, 0, "G8-e2e-scan")
                 self.assertEqual(host.finished()["sinks"][sink]["counters"]["excluded_key"], 4, "G8-e2e-excluded-key")
 

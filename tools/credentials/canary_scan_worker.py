@@ -1342,6 +1342,9 @@ class Walk:
                     self.state = "file_set_changed"
                     return
                 self.canonical_dir = fd_path(fd)
+                if self.canonical_dir is None:  # no canonical spelling to match: incomplete, never literal-only
+                    self.state = "walk_error"
+                    return
                 self.directory(fd, b"", path, 0, None)
             finally:
                 os.close(fd)
@@ -1349,7 +1352,10 @@ class Walk:
             parent = os.open(os.path.dirname(path), DIR_FLAGS)
             try:
                 canonical_parent = fd_path(parent)
-                self.canonical_file = canonical_parent.rstrip(b"/") + b"/" + os.path.basename(path) if canonical_parent else None
+                if canonical_parent is None:  # as for a directory root: incomplete, never literal-only
+                    self.state = "walk_error"
+                    return
+                self.canonical_file = canonical_parent.rstrip(b"/") + b"/" + os.path.basename(path)
                 self.fs_all = fs_magic(parent) not in FS_CHANGED_OK
                 if mode == "pre" and self.selected_by_time(info):
                     self.selected.add(b"")
