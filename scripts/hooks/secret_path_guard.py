@@ -4613,25 +4613,35 @@ K4_CURL_GLOB = re.compile(r"\{([^{}]*)\}|\[([^\[\]]*)\]")
 K4_CURL_RANGE = re.compile(r"\A(?:([0-9]+)-([0-9]+)|([A-Za-z])-([A-Za-z]))(?::([0-9]+))?\Z")
 K4_CURL_GLOBS = 256
 K4_GW_HOST_NAMES = ("127.0.0.1", "localhost", "::1", "10.0.2.2", "host.docker.internal")
-# The host's gateway port allocation (#1180): the flat string maps the repository's port tooling reads
-# (evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py, load_service_ports() and default_config_root()),
-# whose gpt-gateway rows (SERVICE_PORTS) are NS_PORT_GATEWAY (dashboard, /v1 and /api), NS_PORT_GATEWAY_WS and
-# NS_PORT_GATEWAY_EMBED_WS. Every NS_PORT_GATEWAY* key a host file names is a covered port, so a later gateway key is covered too.
+# The host's gateway port allocation (#1180): flat string maps of NS_PORT_* keys. The port tooling
+# (evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py) reads ONE of them per run: the --host-file it
+# is given (adoption/hosts/<host>.json in the allocation addendum's commands), else the file NS2604_HOST_FILE names, else the
+# installed allocation .service-ports.json under default_config_root() (load_service_ports(), default_config_root()). The guard
+# cannot know which file a run was given, so it reads every one of them (gateway_allocation_files()). The gpt-gateway rows of
+# SERVICE_PORTS are NS_PORT_GATEWAY (dashboard, /v1 and /api), NS_PORT_GATEWAY_WS and NS_PORT_GATEWAY_EMBED_WS; every
+# NS_PORT_GATEWAY* key a file names is a covered port, so a later gateway key is covered too.
 K4_GW_HOST_API_KEY = "NS_PORT_GATEWAY"
 K4_GW_HOST_KEY_PREFIX = "NS_PORT_GATEWAY"
 # The same keys in a file that is not valid JSON: its gateway ports are still covered.
 K4_GW_HOST_PAIR = re.compile(r'"(NS_PORT_GATEWAY[A-Z0-9_]*)"\s*:\s*"?([0-9]{1,5})\b')
 K4_GW_HOST_NUMBER = re.compile(r"\A[0-9]{1,5}\Z")
-K4_GW_HOST_FILE_BYTES = 1 << 20  # host files are about 1 KiB; a longer file is read up to this many bytes
-K4_GW_HOST_FILES = 64  # host files read from one adoption/hosts directory
+# The read caps. Only the first K4_GW_HOST_FILE_BYTES of a file are read (host files are about 1 KiB): a pair past them covers
+# nothing. Only the first K4_GW_HOST_FILES *.json of an adoption/hosts directory, in sorted name order, are read: a later file
+# covers nothing. The bound this gives: at most 2 * K4_GW_HOST_FILES + 2 files, and at most 65,535 distinct ports. The allocation
+# is read at import, outside WORK_LIMITS and outside main()'s guard_error catch; gateway_allocation() catches every exception, and
+# an import that still failed (exit 1) or outlasted the hook timeout blocks the call under the hook's onFailure: block
+# (docs/decisions/2026-10-08-guard-hook-fails-closed.md).
+K4_GW_HOST_FILE_BYTES = 1 << 20
+K4_GW_HOST_FILES = 64
 
 
 def gateway_allocation_files(environ, guard_file: str) -> list[str]:
-    """The files that can hold the host's gateway allocation: every adoption/hosts/*.json of the session's project root
-    (CLAUDE_PROJECT_DIR, which Claude Code sets for hook commands) and of the checkout this guard file sits in (scripts/hooks/ under it;
-    the copy installed as ~/.claude/hooks/secret_path_guard.py has none), the host file NS2604_HOST_FILE names, and the installed
-    allocation ${XDG_CONFIG_HOME:-$HOME/.config}/new-wsl-native-stack/.service-ports.json, which the port tooling reads when it is given
-    no host file and which covers sessions in every project."""
+    """The files that can hold the host's gateway allocation: the first K4_GW_HOST_FILES adoption/hosts/*.json (sorted) of the
+    session's project root (CLAUDE_PROJECT_DIR, which Claude Code sets for hook commands) and of the checkout this guard file sits in
+    (scripts/hooks/ under it; every checkout has the committed adoption/hosts/example.json, and the copy installed as
+    ~/.claude/hooks/secret_path_guard.py has no checkout), the host file NS2604_HOST_FILE names, and the installed allocation
+    ${XDG_CONFIG_HOME:-$HOME/.config}/new-wsl-native-stack/.service-ports.json, which the port tooling reads when it is given no host
+    file and which covers sessions in every project."""
     roots = []
     if environ.get("CLAUDE_PROJECT_DIR"):
         roots.append(environ["CLAUDE_PROJECT_DIR"])
@@ -4696,11 +4706,16 @@ def gateway_allocation(environ=None, guard_file: str | None = None) -> tuple[fro
     api: set[int] = set()
     other: set[int] = set()
     try:
-        for path in gateway_allocation_files(environ, guard_file or __file__):
-            for key, port in gateway_allocation_ports(path):
-                (api if key == K4_GW_HOST_API_KEY else other).add(port)
+        paths = gateway_allocation_files(environ, guard_file or __file__)
     except Exception:  # noqa: BLE001 - an allocation the guard cannot read never opens a port the fixed list covers
-        pass
+        paths = []
+    for path in paths:
+        try:
+            pairs = gateway_allocation_ports(path)
+        except Exception:  # noqa: BLE001 - this source adds nothing; the later sources still count
+            continue
+        for key, port in pairs:
+            (api if key == K4_GW_HOST_API_KEY else other).add(port)
     return frozenset(api), frozenset(other)
 
 
