@@ -506,6 +506,157 @@ class IngestTests(unittest.TestCase):
             (self.staging / f'{name}.refused').unlink()
         self.assertEqual(self.written(), [RCP])
 
+    def test_marker_write_failure_alerts_once_until_marker_written(self):
+        # GPT 1 (fold 5): clear_failed() runs before the marker write, so a persistent marker-write
+        # fault must keep its dedup key through the marker attempt instead of re-alerting every run.
+        batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+        cls, orig_write_text = type(self.staging), type(self.staging).write_text
+
+        def denying_write_text(self, *args, **kwargs):
+            if str(self).endswith('.ingested'):
+                raise OSError(28, 'No space left on device', str(self))
+            return orig_write_text(self, *args, **kwargs)
+
+        cls.write_text = denying_write_text
+        try:
+            rc1, rc2 = self.m.main(), self.m.main()
+            alerts, flag = len(self.alerts), self.staging / '20261016T205433Z.failed'
+            flagged, marked = flag.exists(), (self.staging / '20261016T205433Z.ingested').exists()
+        finally:
+            cls.write_text = orig_write_text
+        self.assertEqual((rc1, rc2), (2, 2))
+        self.assertEqual(alerts, 1)
+        self.assertTrue(flagged)
+        self.assertFalse(marked)
+        failed = [l for l in (self.coord / '.sync-ingest.log').read_text().splitlines() if 'FAILED' in l]
+        self.assertEqual(len(failed), 1)
+        self.assertEqual(self.m.main(), 0)
+        self.assertTrue((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertFalse(flag.exists())
+        self.assertEqual(len(self.alerts), 1)
+
+    def test_pathless_plan_hash_failures_on_different_files_alert_separately(self):
+        # GPT 2 (fold 5): a descriptor-level read error carries no filename, so plan() must annotate
+        # the batch-relative file or a second file's identical error is suppressed as 'plan: -'.
+        b = batch(self.staging, '20261016T205433Z', {GPT: 'g\n', TCC: 't\n'})
+        orig_sha256 = self.m.sha256
+        target = [b / GPT]
+
+        def failing_sha256(path):
+            if Path(path) == target[0]:
+                raise OSError(5, 'Input/output error')  # no filename / filename2
+            return orig_sha256(path)
+
+        self.m.sha256 = failing_sha256
+        try:
+            rc1, n1 = self.m.main(), len(self.alerts)
+            target[0] = b / TCC  # the first file recovers; the second now fails identically
+            rc2 = self.m.main()
+        finally:
+            self.m.sha256 = orig_sha256
+        self.assertEqual((rc1, rc2), (2, 2))
+        self.assertEqual(n1, 1)
+        self.assertEqual(len(self.alerts), 2)
+        self.assertEqual(self.m.main(), 0)
+        self.assertTrue((self.staging / '20261016T205433Z.ingested').exists())
+
+    def test_source_and_mirror_hash_failures_alert_separately(self):
+        # P3-D (fold 5): the staged source and its mirror copy share a relative path, so the key
+        # needs a source/destination tag or the second side's identical fault is suppressed.
+        b = batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+        orig_sha256 = self.m.sha256
+        mode = ['source']
+
+        def failing_sha256(path):
+            p = Path(path)
+            if mode[0] == 'source' and p == b / GPT:
+                raise PermissionError(13, 'Permission denied', str(p))
+            if mode[0] == 'mirror' and p == self.coord / GPT:
+                raise PermissionError(13, 'Permission denied', str(p))
+            return orig_sha256(path)
+
+        self.m.sha256 = failing_sha256
+        try:
+            rc1, n1 = self.m.main(), len(self.alerts)
+            (self.coord / GPT).parent.mkdir(parents=True, exist_ok=True)
+            (self.coord / GPT).write_text('g\n')
+            mode[0] = 'mirror'
+            rc2 = self.m.main()
+        finally:
+            self.m.sha256 = orig_sha256
+        self.assertEqual((rc1, rc2), (2, 2))
+        self.assertEqual(n1, 1)
+        self.assertEqual(len(self.alerts), 2)
+        self.assertEqual(self.m.main(), 0)
+        self.assertTrue((self.staging / '20261016T205433Z.ingested').exists())
+
+    def test_broken_stdout_after_marker_keeps_ingested_state(self):
+        # P3-B (fold 5): the fallback print in log_or_print must be guarded, or a broken stdout
+        # escapes after the marker and sends a false "No ingested marker was written" alert.
+        batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+
+        class Broken(io.TextIOBase):
+            def write(self, s):
+                raise BrokenPipeError(32, 'Broken pipe')
+
+            def flush(self):
+                raise BrokenPipeError(32, 'Broken pipe')
+
+        with contextlib.redirect_stdout(Broken()):
+            rc = self.m.main()
+        self.assertEqual(rc, 0)
+        self.assertTrue((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.failed').exists())
+        self.assertEqual(self.alerts, [])
+
+    def test_vanish_during_walk_clears_failed_flag(self):
+        # P3-C (fold 5): the plan-error vanish exit must clear an earlier <batch>.failed.
+        b = batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+        batch(self.staging, '20261016T210000Z', {TCC: 'later\n'})
+        flag = self.staging / '20261016T205433Z.failed'
+        flag.write_text('deadbeef 2026-01-01T00:00:00Z earlier fault\n')
+        orig_walk = os.walk
+
+        def vanishing_walk(top, *args, **kwargs):
+            if Path(top) == b and b.exists():
+                shutil.rmtree(b)
+            yield from orig_walk(top, *args, **kwargs)
+
+        os.walk = vanishing_walk
+        try:
+            rc = self.m.main()
+        finally:
+            os.walk = orig_walk
+        self.assertEqual(rc, 0)
+        self.assertEqual(self.written(), [TCC])
+        self.assertEqual(self.alerts, [])
+        self.assertFalse(flag.exists())
+        self.assertFalse((self.staging / '20261016T205433Z.refused').exists())
+
+    def test_vanish_during_verify_clears_failed_flag(self):
+        # P3-C (fold 5): the FileNotFoundError vanish exit must clear an earlier <batch>.failed.
+        b = batch(self.staging, '20261016T205433Z', {GPT: 'g\n'})
+        batch(self.staging, '20261016T210000Z', {TCC: 'later\n'})
+        flag = self.staging / '20261016T205433Z.failed'
+        flag.write_text('deadbeef 2026-01-01T00:00:00Z earlier fault\n')
+        orig_sha256 = self.m.sha256
+
+        def vanishing_sha256(path):
+            if Path(path) == b / GPT and b.exists():
+                shutil.rmtree(b)
+            return orig_sha256(path)
+
+        self.m.sha256 = vanishing_sha256
+        try:
+            rc = self.m.main()
+        finally:
+            self.m.sha256 = orig_sha256
+        self.assertEqual(rc, 0)
+        self.assertEqual(self.written(), [TCC])
+        self.assertEqual(self.alerts, [])
+        self.assertFalse(flag.exists())
+        self.assertFalse((self.staging / '20261016T205433Z.refused').exists())
+
 
 class MissingStagingTests(unittest.TestCase):
     def test_unset_or_empty_staging_exits_3_and_creates_nothing(self):

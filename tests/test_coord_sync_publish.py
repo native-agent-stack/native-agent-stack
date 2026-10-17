@@ -196,6 +196,93 @@ class PublishTests(unittest.TestCase):
         self.assertFalse((self.staging / f'{b1.name}.ingested').exists())
         self.assertTrue(b2.exists())
 
+    def test_pathless_copy_failures_on_different_files_alert_separately(self):
+        # GPT 2 (fold 5): copy2 can forward a descriptor read/write error with no filename, so
+        # stage() must annotate the batch-relative file or a later file's error is suppressed.
+        put(self.src / 'uet131-micro/CC-FULL-6d5c8c00.md', 'VERDICT: PASS at 6d5c8c00\n')
+        put(self.src / 'uet131-micro/MICRO-full-6d5c8c00.md', 'micro\n')
+        orig_copy2 = self.m.shutil.copy2
+        target = ['CC-FULL-6d5c8c00.md']
+
+        def failing_copy2(src, dst, *args, **kwargs):
+            if Path(src).name == target[0]:
+                raise OSError(5, 'Input/output error')  # no filename / filename2
+            return orig_copy2(src, dst, *args, **kwargs)
+
+        self.m.shutil.copy2 = failing_copy2
+        try:
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                rc1, n1 = self.m.main(), len(self.alerts)
+                target[0] = 'MICRO-full-6d5c8c00.md'  # the first file recovers; the second fails
+                rc2 = self.m.main()
+        finally:
+            self.m.shutil.copy2 = orig_copy2
+        self.assertEqual((rc1, rc2), (2, 2))
+        self.assertEqual(n1, 1)
+        self.assertEqual(len(self.alerts), 2)
+        self.assertEqual(self.batches(), [])
+        self.assertFalse(self.ledger.exists())
+        self.assertEqual(self.m.main(), 0)
+        self.assertEqual(len(self.batches()), 1)
+        self.assertFalse((self.staging / '.publisher-failed').exists())
+
+    def test_truncated_ledger_after_complete_batch_still_refuses_same_path_change(self):
+        # GPT 3 (fold 5): a cut ledger append after SHA256SUMS was staged must not make an
+        # already-published path look new; identity is recovered from the completed batch.
+        f = self.src / 'a-micro/CC-DELTA-11111111.md'
+        rel = 'cc-cc-work/a-micro/CC-DELTA-11111111.md'
+        put(f, 'one\n')
+        self.assertEqual(self.m.main(), 0)
+        [b] = self.batches()
+        digest = hashlib.sha256(b'one\n').hexdigest()
+        self.ledger.write_text(f'{rel}\t{digest[:12]}')  # cut append: partial digest, no newline
+        (self.staging / f'{b.name}.ingested').write_text(
+            hashlib.sha256((b / 'SHA256SUMS').read_bytes()).hexdigest() + ' 2026-10-17T06:00:00Z\n')
+        put(f, 'changed\n')  # same name, edited and resealed after the cut append
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rc1, rc2 = self.m.main(), self.m.main()
+        self.assertEqual((rc1, rc2), (2, 2))
+        self.assertEqual(len(self.alerts), 1)
+        self.assertIn('REFUSED', self.alerts[0])
+        self.assertIn('same-path change', self.alerts[0])
+        self.assertEqual(self.batches(), [])  # acknowledged batch cleaned; changed bytes never staged
+        self.assertEqual(self.m.read_ledger().get(rel), digest)
+
+    def test_append_after_truncated_tail_without_newline_keeps_next_record(self):
+        # P3-A (fold 5): the next append must not glue onto a cut tail, or its first record is
+        # swallowed by the whole-digest check and the file is staged again next run.
+        f = self.src / 'a-micro/CC-DELTA-11111111.md'
+        rel = 'cc-cc-work/a-micro/CC-DELTA-11111111.md'
+        put(f, 'one\n')
+        digest = hashlib.sha256(b'one\n').hexdigest()
+        self.ledger.write_text(f'{rel}\tabc123')  # truncated tail, deliberately no newline
+        self.assertEqual(self.m.main(), 0)
+        lines = self.ledger.read_text().splitlines()
+        self.assertEqual(len(lines), 2)
+        self.assertEqual(lines[1].split('\t')[1], digest)
+        self.assertEqual(self.m.main(), 0)
+        self.assertEqual(len(self.batches()), 1)  # the appended record stands; nothing re-staged
+        self.assertEqual(self.alerts, [])
+
+    def test_refusal_alert_survives_refused_flag_failure(self):
+        # P3-E (fold 5): the REFUSED alert must go before the .publisher-refused write, guarded,
+        # or a failing flag write sends no alert at all (and reruns repeat it while unwritable).
+        f = self.src / 'uet131-micro/CC-FULL-6d5c8c00.md'
+        put(f, 'VERDICT: PASS at 6d5c8c00\n')
+        self.assertEqual(self.m.main(), 0)
+        (self.staging / '.publisher-refused').mkdir()  # reading/writing the flag now fails
+        put(f, 'VERDICT: CHANGES_REQUESTED at 6d5c8c00\n')
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rc1, rc2 = self.m.main(), self.m.main()
+        self.assertEqual((rc1, rc2), (2, 2))
+        self.assertEqual(len(self.alerts), 2)  # unwritable flag: the alert repeats each run
+        self.assertIn('REFUSED', self.alerts[0])
+        self.assertIn('REFUSED', out.getvalue())
+        self.assertEqual(len([p for p in self.batches() if p.name[0].isdigit()]), 1)
+
 
 class MissingStagingTests(unittest.TestCase):
     def test_unset_or_empty_staging_exits_3_and_creates_nothing(self):

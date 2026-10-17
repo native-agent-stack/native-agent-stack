@@ -17,12 +17,17 @@ A refusal writes <batch>.refused (reported and alerted once over hcom, to the CC
 the refused one is resolved and its marker removed; a refusal writes nothing in the run that refuses, though files copied by an earlier run stay.
 A failure part-way through a batch (for example ENOSPC while copying, or bytes that changed after SHA256SUMS was written) writes no ingested or
 refused marker: it is logged FAILED and stops the run, with a <batch>.failed flag (the SHA256SUMS sha256 and a normalised fault key: exception
-type, errno, operation and batch-relative path, with per-run temporary names mapped to their destination) so the same fault is alerted only once
-while it lasts, while a fault on a different file still alerts. The flag must be removed before the ingested marker is written, so success is
-never acknowledged while it stands; once the marker is written, the summary log is best-effort and cannot recreate the flag. Files already
+type, errno, operation, source-or-destination side and batch-relative path - hashing and copying faults are stamped with their file at the call
+site, so a pathless error still keys to it, and per-run temporary names map to their destination) so the same fault is alerted only once while
+it lasts and the flag can be written, while a fault on a different file, or on the other side of the same file, still alerts; if the flag
+itself cannot be written, the alert repeats on each run until it can. The flag must be removed before the ingested marker is written, so success is
+never acknowledged while it stands, and the key it held is kept through the marker attempt so a persistent marker-write fault still alerts only
+once; once the marker is written, the summary log is best-effort (even a broken stdout is swallowed) and cannot recreate the flag. Files already
 copied stay. The next run retries the batch: it completes once a copy fault clears, but a staged file that still does not match SHA256SUMS is
-then refused in verification, so that case is resolved like a refusal. A batch directory that is itself a symlink, and a batch that vanishes at
-any point before its ingested marker is written, are skipped.
+then refused in verification, so that case is resolved like a refusal. A batch directory that is itself a symlink is skipped, as is a batch
+found gone at the run's own checks (its SHA256SUMS missing after listing, its directory gone after a verification error or a FileNotFoundError,
+or gone after copying), clearing any earlier failed flag best-effort; a batch whose removal is only part-done, so its directory still exists
+at those checks, is judged on what remains and may refuse or fail a run instead.
 One summary line per batch on stdout and in coordination/.sync-ingest.log.
 Exit 0 when every pending batch ingests (or none is pending), 2 when a batch is refused or fails part-way, 3 when COORD_SYNC_STAGING is unset,
 empty, relative or contains '@', or when the staging root is unreadable.
@@ -75,11 +80,15 @@ def log(line):
 
 
 def log_or_print(line):
-    """Log a line, falling back to stdout (the journal) when the log file cannot be written."""
+    """Log a line, falling back to stdout (the journal) when the log file cannot be written. The fallback
+    print is guarded too: a broken stdout must not escape and turn a written marker into a false failure."""
     try:
         log(line)
     except OSError:
-        print(line)
+        try:
+            print(line)
+        except OSError:
+            pass
 
 
 def alert(text):
@@ -106,6 +115,15 @@ def dst_rel(dst):
         return str(Path(dst).relative_to(COORD))
     except ValueError:
         return Path(dst).name
+
+
+def annotate_fault(e, rel, side):
+    """Stamp the batch-relative file and side ('source' or 'destination') a fault belongs to at its call site,
+    so a pathless descriptor error still keys to its file and a staged source never keys as its mirror copy."""
+    try:
+        e.coord_rel, e.coord_side = rel, side
+    except Exception:
+        pass
 
 
 def error_rel(e, batch_dir, rel_hint):
@@ -137,6 +155,31 @@ def error_rel(e, batch_dir, rel_hint):
     return '-'
 
 
+def error_side(e, batch_dir):
+    """Which side of a record a fault belongs to: the call site's stamp, else inferred from the failing path
+    (in the batch a staged source, in the mirror its destination)."""
+    annotated = getattr(e, 'coord_side', None)
+    if annotated:
+        return str(annotated)
+    for attr in ('filename2', 'filename'):
+        fn = getattr(e, attr, None)
+        if not fn:
+            continue
+        p = Path(fn)
+        if p.name.startswith('.ingest-'):
+            return 'destination'
+        for base, side in ((batch_dir, 'source'), (COORD, 'destination')):
+            if base is None:
+                continue
+            try:
+                p.relative_to(base)
+                return side
+            except ValueError:
+                continue
+        return '-'
+    return '-'
+
+
 def error_detail(e):
     """The stable part of an error's text: an OSError's strerror (its rendered form carries per-run file names),
     else the message with any random temp-file name normalised away."""
@@ -145,19 +188,25 @@ def error_detail(e):
 
 
 def failure_key(e, batch_dir=None, op='-', rel_hint=None):
-    """Dedup key for a part-way fault: exception type, errno, operation and batch-relative path, plus the stable
-    detail, so the same fault dedupes across runs while a fault on a different file still alerts."""
+    """Dedup key for a part-way fault: exception type, errno, operation, source-or-destination side and
+    batch-relative path, plus the stable detail, so the same fault dedupes across runs while a fault on a
+    different file (or on the other side of the same file) still alerts."""
     return (f'{type(e).__name__}: errno={getattr(e, "errno", None)}: {op}: '
-            f'{error_rel(e, batch_dir, rel_hint)}: {error_detail(e)}').strip()
+            f'{error_side(e, batch_dir)}:{error_rel(e, batch_dir, rel_hint)}: {error_detail(e)}').strip()
+
+
+def failed_key_stored(name, sums_sha):
+    """The normalised key a batch's failed flag records for this SHA256SUMS, or None."""
+    try:
+        parts = failed_flag(name).read_text().split(None, 2)
+    except OSError:
+        return None
+    return parts[2].strip() if len(parts) == 3 and parts[0] == (sums_sha or '-') else None
 
 
 def failed_seen(name, sums_sha, key):
     """True when this exact fault (same SHA256SUMS, same normalised key) was already reported."""
-    try:
-        parts = failed_flag(name).read_text().split(None, 2)
-    except OSError:
-        return False
-    return len(parts) == 3 and parts[0] == (sums_sha or '-') and parts[2].strip() == key.strip()
+    return failed_key_stored(name, sums_sha) == key.strip()
 
 
 def clear_failed(name):
@@ -169,15 +218,31 @@ def clear_failed(name):
         pass
 
 
+def clear_failed_quietly(name):
+    """Best-effort flag removal for a batch found vanished: nothing is owed for it, so a removal failure is silent."""
+    try:
+        clear_failed(name)
+    except OSError:
+        pass
+
+
 def batch_dir_for(name):
     return STAGING / name if STAGING is not None else Path(name)
 
 
-def report_failed(name, sums_sha, e, op='-', rel_hint=None):
+def report_failed(name, sums_sha, e, op='-', rel_hint=None, prior_key=None):
     err = f'{type(e).__name__}: {e}'
     key = failure_key(e, batch_dir_for(name), op, rel_hint)
-    if failed_seen(name, sums_sha, key):
-        return 2  # already alerted for this fault; reruns retry silently until it clears or changes
+    if failed_seen(name, sums_sha, key) or (prior_key is not None and prior_key.strip() == key.strip()):
+        # Already alerted for this fault. The prior key is the one the flag held before clear_failed()
+        # removed it ahead of the marker write, so a persistent marker-write fault still dedupes; put
+        # the flag back (it was cleared) so the next run dedupes from disk as well.
+        if not failed_flag(name).exists():
+            try:
+                failed_flag(name).write_text(f'{sums_sha or "-"} {utc()} {key}\n')
+            except OSError:
+                pass
+        return 2  # reruns retry silently until the fault clears or changes
     try:
         alert(f'coord-sync FAILED batch {name}: {err}. No ingested marker was written and later batches wait. '
               f'Files already copied stay in the mirror. The next run retries this batch: it completes if the fault '
@@ -228,7 +293,12 @@ def plan(batch_dir):
         raise FileNotFoundError(f'batch vanished: {batch_dir.name}')  # ingest() skips it like an incomplete batch
     sums = batch_dir / 'SHA256SUMS'
     listed = {}
-    for n, raw in enumerate(sums.read_text(encoding='utf-8').splitlines(), 1):
+    try:
+        sum_lines = sums.read_text(encoding='utf-8').splitlines()
+    except Exception as e:
+        annotate_fault(e, 'SHA256SUMS', 'source')
+        raise
+    for n, raw in enumerate(sum_lines, 1):
         if not raw.strip():
             continue
         m = SUMLINE.match(raw)
@@ -258,14 +328,25 @@ def plan(batch_dir):
             return None, f'not a regular file: {rel}'
         if not SCOPE.match(rel):
             return None, f'out of scope: {rel}'
-        if sha256(src) != digest:
+        try:
+            src_matches = sha256(src) == digest
+        except Exception as e:
+            annotate_fault(e, rel, 'source')  # a pathless read error still keys to this staged file
+            raise
+        if not src_matches:
             return None, f'sha256 mismatch: {rel}'
         dst = COORD / rel
         if dst.is_symlink():
             return None, f'destination is a symlink: {rel}'
         if not dst.exists():
             actions.append((rel, src, dst, 'new', digest))
-        elif sha256(dst) == digest:
+            continue
+        try:
+            dst_matches = sha256(dst) == digest
+        except Exception as e:
+            annotate_fault(e, rel, 'destination')  # the mirror copy of the same record, not its source
+            raise
+        if dst_matches:
             actions.append((rel, src, dst, 'same', digest))
         else:
             return None, f'same-path change to a synced record: {rel}'
@@ -274,25 +355,36 @@ def plan(batch_dir):
 
 def place(src, dst, expected):
     tmp = None
+    side = 'destination'
     try:
         dst.parent.mkdir(parents=True, exist_ok=True)
         fd, tmp = tempfile.mkstemp(dir=dst.parent, prefix='.ingest-')
         h = hashlib.sha256()
-        with os.fdopen(fd, 'wb') as out, open(src, 'rb') as inp:
-            for chunk in iter(lambda: inp.read(1 << 20), b''):
-                h.update(chunk)
-                out.write(chunk)
+        with os.fdopen(fd, 'wb') as out:
+            side = 'source'
+            with open(src, 'rb') as inp:
+                while True:
+                    side = 'source'
+                    chunk = inp.read(1 << 20)
+                    if not chunk:
+                        break
+                    h.update(chunk)
+                    side = 'destination'
+                    out.write(chunk)
+        side = 'source'  # the bytes read from the staged file are what a mismatch indicts
         if h.hexdigest() != expected:
             raise ValueError(f'sha256 mismatch while copying: {dst_rel(dst)} changed after SHA256SUMS was written')
+        side = 'destination'
         os.chmod(tmp, 0o444)
+        side = 'source'
         st = src.stat()
+        side = 'destination'
         os.utime(tmp, (st.st_atime, st.st_mtime))
         os.replace(tmp, dst)
     except BaseException as e:
-        try:
-            e.coord_rel = dst_rel(dst)  # map the random temp path to its destination for the dedup key
-        except Exception:
-            pass
+        # Map the random temp path to its destination for the dedup key, keeping the side that faulted.
+        if not getattr(e, 'coord_rel', None):
+            annotate_fault(e, dst_rel(dst), getattr(e, 'coord_side', None) or side)
         if tmp and os.path.exists(tmp):
             os.unlink(tmp)
         raise
@@ -302,11 +394,17 @@ def ingest(batch_dir):
     name = batch_dir.name
     sums_sha = None
     op, rel_hint = 'hash-sums', None
+    prior_key = None  # the failed flag's key before clear_failed(); kept through the marker attempt (GPT 1)
     try:
         try:
             sums_sha = sha256(batch_dir / 'SHA256SUMS')
         except FileNotFoundError:
+            if not batch_dir.exists():
+                clear_failed_quietly(name)
             return 0  # the batch vanished after main()'s is_file check; skipped like an incomplete batch
+        except Exception as e:
+            annotate_fault(e, 'SHA256SUMS', 'source')
+            raise
         op = 'check-markers'
         marker = STAGING / f'{name}.ingested'
         if marker_matches(marker, sums_sha):
@@ -322,6 +420,7 @@ def ingest(batch_dir):
         actions, err = plan(batch_dir)
         if err:
             if not batch_dir.exists():
+                clear_failed_quietly(name)
                 return 0  # the batch vanished during verification; skipped like an incomplete batch
             refused.write_text(f'{sums_sha} {utc()} {err}\n')
             try:
@@ -345,12 +444,10 @@ def ingest(batch_dir):
                 place(src, dst, digest)
         rel_hint = None
         if not batch_dir.exists():
-            try:
-                clear_failed(name)
-            except OSError:
-                pass
+            clear_failed_quietly(name)
             return 0  # the batch vanished during copying; files already copied stay, no marker is owed
         op = 'clear-failed'
+        prior_key = failed_key_stored(name, sums_sha)  # keep it: clearing must not restart marker-fault alerts
         clear_failed(name)  # before the marker: success is not acknowledged while the failed flag stands
         op = 'write-marker'
         marker.write_text(f'{sums_sha} {utc()}\n')
@@ -360,10 +457,11 @@ def ingest(batch_dir):
         return 0
     except FileNotFoundError as e:
         if not batch_dir.exists():
+            clear_failed_quietly(name)
             return 0  # the batch vanished mid-run; skipped like an incomplete batch, later batches proceed
-        return report_failed(name, sums_sha, e, op, rel_hint)
+        return report_failed(name, sums_sha, e, op, rel_hint, prior_key)
     except Exception as e:
-        return report_failed(name, sums_sha, e, op, rel_hint)
+        return report_failed(name, sums_sha, e, op, rel_hint, prior_key)
 
 
 def main():

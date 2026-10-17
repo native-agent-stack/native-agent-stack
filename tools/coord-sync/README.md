@@ -58,13 +58,20 @@ that refuses, because verification happens first; files copied into the mirror b
 matched `SHA256SUMS` when it was copied). A failure part-way through a batch (for example `ENOSPC` while copying, or
 a copy whose hash no longer matches `SHA256SUMS`) writes no ingested or refused marker: instead it writes
 **`<batch>.failed`** (the `SHA256SUMS` sha256, the UTC time and a normalised fault key: exception type, errno,
-operation and batch-relative path, with per-run temporary file names mapped to their destination), logs one
+operation, source-or-destination side and batch-relative path - hashing and copying faults are stamped with
+their file at the call site, so an error carrying no filename still keys to it, and per-run temporary file names
+map to their destination), logs one
 `FAILED` line, alerts once and stops the run with exit 2. While the same `SHA256SUMS` and the same normalised
 fault last, reruns retry the batch but do not re-log or re-alert; a different fault (including the same kind of
-fault on a different file), or a changed `SHA256SUMS`, is reported again. The flag must be removed before the
+fault on a different file, or on the mirror side rather than the staged side of the same file), or a changed
+`SHA256SUMS`, is reported again. The flag must be removed before the
 ingested marker is written: if it cannot be removed, the run fails without writing the marker (for a batch whose
-marker already stands, the stale flag is instead reported once and later batches wait), and once the marker is
-written the summary log is best-effort (stdout fallback), so it cannot recreate the flag. Files already copied stay in the mirror. For a copy fault (for example `ENOSPC`) recovery needs
+marker already stands, the stale flag is instead reported once and later batches wait); the key the flag held is
+kept through the marker attempt, so a persistent marker-write fault still alerts only once instead of restarting
+its alerts when the flag is cleared ahead of each attempt; and once the marker is
+written the summary log is best-effort (stdout fallback, itself guarded, so even a broken stdout is swallowed),
+so it cannot recreate the flag. If the `<batch>.failed` flag itself cannot be written, no dedup state survives
+to the next run and the alert repeats on every (60 s) run until the flag can be written. Files already copied stay in the mirror. For a copy fault (for example `ENOSPC`) recovery needs
 no manual step beyond clearing the fault, because the next run retries the same batch, sees the copied files as
 identical and completes it. A copy whose hash no longer matches `SHA256SUMS` is different: the mismatched file is
 never installed, and unless the staged bytes again match `SHA256SUMS` before the next run, that run refuses the batch
@@ -72,9 +79,12 @@ in verification, so it is then resolved like a refusal. One summary line per bat
 to `.sync-ingest.log` in the coordination mirror. Exit 0 when every pending batch ingests or none is pending, 2 when
 a batch is refused or fails part-way, 3 when the staging root is unreadable or when `COORD_SYNC_STAGING` is unset,
 empty, relative or contains `@` (one line naming the variable, before anything is touched). An incomplete batch (no
-`SHA256SUMS` yet), a batch directory that is itself a symlink, and a batch that vanishes at any point before its
-ingested marker is written (before its `SHA256SUMS` is hashed, during verification, or during copying) are skipped
-silently and later batches proceed; files already copied from a vanished batch stay in the mirror.
+`SHA256SUMS` yet) and a batch directory that is itself a symlink are skipped silently and later batches proceed.
+So is a batch found gone at the run's own checks - its `SHA256SUMS` missing after listing, its directory gone
+after a verification error or a missing file, or gone after copying - and those exits remove any earlier
+`<batch>.failed` on a best-effort basis. A batch whose removal is only part-done still has its directory at those
+checks, so it is judged on what remains instead: a listing mismatch can refuse it and a missing file can fail
+it, rather than the vanish always being recognised. Files already copied from a vanished batch stay in the mirror.
 
 ## Reverse: NativeHorizonNY to 2604 (`publish_cc_verdicts.py`)
 
@@ -82,27 +92,42 @@ Two 2604 readers depend on this direction: the co-op's GPT read-wave, which cite
 sha256, and trading-cc's gates and Monday tree manifest (suki #750, #764). The 2604 half installs each staged file
 at `/var/tmp/cc-cc-work/<pr>-micro/<file>` at 0400 and writes `<batch>.ingested`. One run here:
 
-1. **Cleans up**: deletes each staged batch (and its marker) whose `<batch>.ingested` holds the sha256 of that
-   batch's `SHA256SUMS`. A marker that does not match deletes nothing.
+1. **Recovers, then cleans up**: first the published identity proved by each completed staged batch's
+   `SHA256SUMS` is recovered and anything missing from the ledger is appended back as whole lines (step 4's
+   newline rule applies); only then is each staged batch (and its marker) whose `<batch>.ingested` holds the
+   sha256 of that batch's `SHA256SUMS` deleted, so cleanup can never erase the only surviving record of a ledger
+   append that was cut after its batch was exposed. A marker that does not match deletes nothing. If the repair
+   append itself fails, the run stops as a ledger-append failure with the batches left staged.
 2. **Scans** the source root's `<name>-micro/` directories for `CC-*.md` and `MICRO-*.md` files that are sealed (no
    write bit for anyone), regular files and not symlinks. Unsealed drafts, other names (such as `BRIEF-*.md`),
    symlinks and files outside a `-micro` directory are ignored.
-3. **Checks the ledger** (a tab-separated record of everything already published: relative path, sha256, batch, UTC
-   time). A sealed file already in the ledger with the same sha256 is done. One with a different sha256 is a
-   same-path change to a published record: the run is refused, nothing is staged, a `.publisher-refused` flag is
-   written in the staging root and one alert is sent (once per distinct refusal). A correction must ship under a new
-   name, as in the forward direction.
+3. **Checks the published record** (the ledger, a tab-separated record of everything already published: relative
+   path, sha256, batch, UTC time, as repaired in step 1). A sealed file already published with the same sha256 is
+   done. One with a different sha256 is a same-path change to a published record: the run is refused, nothing is
+   staged and one alert is sent (once per distinct refusal); the alert goes before the `.publisher-refused` flag
+   is written in the staging root, and that write is guarded, so a failing flag write cannot lose the alert -
+   while the flag cannot be written the alert instead repeats on every (60 s) run. A correction must ship under
+   a new name, as in the forward direction.
 4. **Stages one batch** with every new sealed file under `cc-cc-work/<pr>-micro/<file>` (mtime kept), writes
    `SHA256SUMS` last by rename from `SHA256SUMS.tmp`, and only then appends the files to the ledger, so the ledger
-   never claims a file whose batch is incomplete. If staging fails before `SHA256SUMS` is renamed into place, the
+   never claims a file whose batch is incomplete. An append first writes the newline a truncated tail is missing,
+   so its first record is never glued onto the cut line and lost to the whole-digest check. If staging fails
+   before `SHA256SUMS` is renamed into place, the
    incomplete batch directory is removed (cleanup could never retire it) and the ledger is not appended; the run
    prints one `FAILED` line, alerts once per distinct normalised fault (a `.publisher-failed` flag in the staging
-   root holding phase, exception type, errno and batch-relative path with the per-run `STAGING/<UTC>/` prefix
-   stripped, removed by the next successful stage) and the next run retries. If instead the ledger append fails
+   root holding phase, exception type, errno, the failing file's position in the attempt and its batch-relative
+   path - copy faults are stamped with their file at the copy, so an error carrying no filename still names it -
+   with the per-run `STAGING/<UTC>/` prefix
+   stripped, removed by the next successful stage) and the next run retries. Because that retry restarts the
+   batch from its first file, the same fault striking at or before the previous attempt's failure point is the
+   same standing fault and stays deduplicated, while a fault past that point - the file that failed before now
+   copies, and a later one fails - alerts anew. If instead the ledger append fails
    after `SHA256SUMS` is in place, the complete batch stays for ingestion and the failure is reported as a
-   ledger-append failure, not a staging failure; the next run may stage the same files again until the append
-   succeeds, and a ledger line without a whole digest (a truncated append) is ignored rather than treated as a
-   published record.
+   ledger-append failure, not a staging failure; the next run recovers the identity from that batch and retries
+   the append (step 1), and a ledger line without a whole digest (a truncated append) is only the cut remnant -
+   the completed batch behind it, not the remnant, decides whether the path was already published, so a sealed
+   file changed in place after a cut append is refused like any other same-path change. With no completed batch
+   behind it, a truncated line proves nothing and the file is staged as new.
 
 Exit 0 when there is nothing to do or a batch was staged, 2 when refused or staging fails, 3 when a root is unreadable or when
 `REVERSE_SYNC_STAGING` is unset, empty, relative or contains `@` (one line naming the variable, before anything is
@@ -113,7 +138,10 @@ exit 3 rather than created, so a mis-rendered value can never grow a shadow stag
 
 Both scripts alert the same two holders over hcom (`ALERT_TO` in each script): the CC and the fallback holder (dula
 closed, #2427, so the co-op holds the fallback). An alert is sent once per refusal and once per distinct part-way
-failure, with `--intent request`, through
+failure while the flag that records it can be written. The part-way-failure flags and the publisher's refused
+flag are written after their alert, guarded, so a staging root that rejects such a write cannot lose the alert;
+it repeats on every (60 s) run instead, until the write succeeds and the dedup state stands. Alerts go
+with `--intent request`, through
 the hcom-x directory named by `HCOM_DIR` (default `/mnt/wsl/hcom-x`, also set by the units). A failed send is logged
 or printed, never fatal: the refusal itself, its marker and the nonzero exit already hold the sync still.
 `COORD_SYNC_NO_ALERT=1` (ingest) and `REVERSE_SYNC_NO_ALERT=1` (publish) disable alerts; the tests set them.
@@ -196,7 +224,7 @@ reinstalling (these templates, or the command center's earlier unit files) resum
 
 ## Tests
 
-`python3 -m unittest tests.test_coord_sync_ingest tests.test_coord_sync_publish` (50 tests, stdlib only). Each test
+`python3 -m unittest tests.test_coord_sync_ingest tests.test_coord_sync_publish` (60 tests, stdlib only). Each test
 runs a script against temporary roots through its environment overrides: all four scopes landing read-only, tampered,
 unlisted, symlinked and out-of-scope batches refusing with nothing written in that run, same-path changes refusing in
 every scope, a refused batch blocking later batches and alerting exactly once, a mid-batch failure logging `FAILED`,
@@ -215,5 +243,11 @@ separately, a `REFUSED` alert surviving a failing log write, a later refusal cle
 a failed-flag removal failure blocking acknowledgment for both a fresh and an already-ingested batch, a
 success-log failure leaving the ingested state standing, a batch vanishing during verification, the directory
 walk or copying being skipped, a ledger-append failure labelled as such with the complete batch left staged, a
-truncated ledger line ignored, a failed hcom send printed when the ingest log also fails, and the alert reaching
-an off-PATH stub hcom addressed to the CC and the fallback holder.
+truncated ledger line ignored, a failed hcom send printed when the ingest log also fails, a persistent
+marker-write failure alerting only once, pathless hashing (ingest) and copying (publish) failures on different
+files alerting separately, source-side and mirror-side hashing failures of one record alerting separately, a
+broken stdout after the marker leaving the ingested state standing, a batch vanishing during the walk or
+verification clearing its earlier failed flag, a same-path change after a cut ledger append still refusing from
+the completed batch's identity, an append after a newline-less truncated tail keeping its first record, a
+publish refusal alert surviving an unwritable refused flag (and repeating while it stays unwritable), and the
+alert reaching an off-PATH stub hcom addressed to the CC and the fallback holder.

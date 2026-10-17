@@ -6,17 +6,27 @@ Contract: proposed by the CC (hcom #719 thread), confirmed by nami (#766); nami'
 read-wave (CC verdicts as priors, cited by name and sha256) and trading-cc's gates and Monday tree manifest (suki #750, #764).
 
 One run:
-  1. cleanup: delete each staged batch whose <batch>.ingested holds the sha256 of that batch's SHA256SUMS;
+  1. recover, then cleanup: the published identity proved by each completed staged batch's SHA256SUMS is recovered first and
+     any of it missing from the ledger is appended back as whole lines; only then is each staged batch whose <batch>.ingested
+     holds the sha256 of that batch's SHA256SUMS deleted, so cleanup can never erase the only record of a cut ledger append;
   2. scan SRC/<pr>-micro/ for CC-*.md and MICRO-*.md that are SEALED (no write bit for anyone), regular files, not symlinks;
-  3. a file already in the ledger with the same sha256 is done; with a different sha256 it is a same-path change to a published
-     record: the run is REFUSED (nothing staged) and the CC and the fallback holder are alerted once (corrections ship under a new name);
+  3. a file already published (in the ledger, or recovered from a completed batch) with the same sha256 is done; with a
+     different sha256 it is a same-path change to a published record: the run is REFUSED (nothing staged) and the CC and the
+     fallback holder are alerted once per distinct refusal while the .publisher-refused flag can be written - the alert goes
+     before that flag write, guarded, so a failing write cannot lose it, and the alert repeats each run until the flag can
+     be written (corrections ship under a new name);
   4. new sealed files go into ONE batch STAGING/<UTC>/cc-cc-work/<pr>-micro/<file> (mtime kept), with SHA256SUMS written LAST
-     by rename; the ledger records each file only after the batch is complete. If staging fails part-way (for example ENOSPC
+     by rename; the ledger records each file only after the batch is complete, writing a truncated tail's missing newline
+     first so the append's first record is never glued onto the cut line. If staging fails part-way (for example ENOSPC
      while copying), a batch without its SHA256SUMS is removed, the failure is printed FAILED and alerted once per distinct
-     normalised fault (a .publisher-failed flag in the staging root holding phase, exception type, errno and batch-relative
-     path with the per-run STAGING/<UTC>/ prefix stripped, removed by the next successful stage), and the next run retries.
+     normalised fault while the .publisher-failed flag can be written, repeating each run until it can (the flag in the
+     staging root holds phase, exception type, errno, the file's position in the attempt and its batch-relative path - copy
+     faults are stamped with their file at the call site, for errors with no filename - with the per-run STAGING/<UTC>/
+     prefix stripped, removed by the next successful stage), and the next run retries; because a retry restarts the batch,
+     the same fault striking at or before the previous attempt's failure point dedupes, while one past it alerts anew.
      If the ledger append fails after SHA256SUMS is in place, the complete batch stays and the failure is reported as a
-     ledger-append failure; a ledger line without a whole digest is a truncated append and is ignored, not refused.
+     ledger-append failure; a ledger line without a whole digest is by itself only a truncated append - it is the completed
+     batch behind it (step 1) that decides whether the path was already published, and a change to such a path is refused.
 Exit 0 (nothing to do, or a batch staged), 2 (refused, or staging failed), 3 (REVERSE_SYNC_STAGING unset, empty, relative or contains '@', or a root unreadable).
 """
 import hashlib
@@ -58,7 +68,7 @@ def hcom_bin():
 
 
 def alert(text):
-    """Tell the CC and the fallback holder over hcom-x once; a failed send is printed, never fatal. REVERSE_SYNC_NO_ALERT=1 disables it."""
+    """Tell the CC and the fallback holder over hcom-x; a failed send is printed, never fatal. REVERSE_SYNC_NO_ALERT=1 disables it."""
     if os.environ.get('REVERSE_SYNC_NO_ALERT') == '1':
         return
     env = dict(os.environ, HCOM_DIR=os.environ.get('HCOM_DIR', '/mnt/wsl/hcom-x'))
@@ -72,6 +82,7 @@ def alert(text):
 
 
 DIGEST = re.compile(r'^[0-9a-f]{64}$')
+SUMLINE = re.compile(r'^([0-9a-f]{64}) [ *](.+)$')
 
 
 def read_ledger():
@@ -81,13 +92,53 @@ def read_ledger():
             parts = line.split('\t')
             if len(parts) >= 2 and DIGEST.match(parts[1]):
                 done[parts[0]] = parts[1]
-            # a line without a whole digest is a truncated append, not a published record: the file is staged again
+            # a line without a whole digest is a truncated append, not by itself a published record; a
+            # completed staged batch may still prove that record (recovered_published() below)
     return done
+
+
+def append_ledger(text):
+    """Append whole lines to the ledger, first writing the newline a truncated tail is missing, so the
+    append's first record is never glued onto the cut line and swallowed by the whole-digest check."""
+    LEDGER.parent.mkdir(parents=True, exist_ok=True)
+    prefix = ''
+    if LEDGER.exists() and LEDGER.stat().st_size > 0:
+        with open(LEDGER, 'rb') as f:
+            f.seek(-1, os.SEEK_END)
+            if f.read() != b'\n':
+                prefix = '\n'
+    with open(LEDGER, 'a') as f:
+        f.write(prefix + text)
+
+
+def recovered_published():
+    """{rel: (digest, batch)} proved by completed staged batches (SHA256SUMS in place), earliest batch
+    first. A batch is exposed for ingestion the moment its SHA256SUMS lands, before its ledger append,
+    so this is the published identity a truncated ledger line cannot be allowed to erase."""
+    recovered = {}
+    if STAGING is None or not STAGING.exists():
+        return recovered
+    for b in sorted(p for p in STAGING.iterdir() if p.is_dir() and not p.is_symlink() and BATCH.match(p.name)):
+        sums = b / 'SHA256SUMS'
+        if not sums.is_file():
+            continue
+        for line in sums.read_text().splitlines():
+            m = SUMLINE.match(line)
+            if not m:
+                continue
+            digest, rel = m.group(1), m.group(2)
+            parts = rel.split('/')
+            if len(parts) == 3 and parts[0] == 'cc-cc-work' and MICRO_DIR.match(parts[1]) and NAME.match(parts[2]):
+                recovered.setdefault(rel, (digest, b.name))
+    return recovered
 
 
 def error_rel(e):
     """The stable path a staging fault belongs to, relative to the batch: the failing file with the per-run
     STAGING/<UTC>/ prefix stripped (the destination for a copy, which names both paths), else relative to SRC."""
+    annotated = getattr(e, 'coord_rel', None)
+    if annotated:
+        return str(annotated)  # stamped at the copy call site, for errors carrying no filename at all
     for attr in ('filename2', 'filename'):
         fn = getattr(e, attr, None)
         if not fn:
@@ -113,10 +164,61 @@ def error_detail(e):
 
 
 def failure_key(e, after_sums):
-    """Dedup key for a staging or ledger fault: phase, exception type, errno and batch-relative path, plus the
-    stable detail, so the same fault dedupes across runs despite the fresh batch name each run."""
+    """Dedup key for a staging or ledger fault: phase, exception type, errno, the file's position in the
+    staging attempt and its batch-relative path, plus the stable detail, so the same fault dedupes across
+    runs despite the fresh batch name each run."""
     phase = 'ledger-append' if after_sums else 'staging'
-    return f'{phase}: {type(e).__name__}: errno={getattr(e, "errno", None)}: {error_rel(e)}: {error_detail(e)}'.strip()
+    index = getattr(e, 'coord_index', '-')
+    return (f'{phase}: {type(e).__name__}: errno={getattr(e, "errno", None)}: '
+            f'{index}:{error_rel(e)}: {error_detail(e)}').strip()
+
+
+_KEY_RE = re.compile(r'^(staging|ledger-append): ([^:]+): errno=([^:]*): ([^:]*):([^:]*): (.*)$')
+
+
+def failure_seen(stored, key):
+    """True when the .publisher-failed flag already records this fault. Staging retries from scratch (the
+    incomplete batch was removed), so the same standing fault striking at or before the previous attempt's
+    failure point is the same fault; a fault past that point (the previous file now copies) is a new one."""
+    stored, key = stored.strip(), key.strip()
+    if stored == key:
+        return True
+    sm, km = _KEY_RE.match(stored), _KEY_RE.match(key)
+    if not sm or not km or sm.group(1) != 'staging' or km.group(1) != 'staging':
+        return False
+    if (sm.group(2), sm.group(3), sm.group(6)) != (km.group(2), km.group(3), km.group(6)):
+        return False
+    try:
+        return int(km.group(4)) <= int(sm.group(4))
+    except ValueError:
+        return False
+
+
+def report_failure(e, after_sums):
+    """Report a staging or ledger-append fault: alert once per distinct fault while the flag can be written
+    (see failure_seen()), record the key in .publisher-failed after alerting, print FAILED and return exit 2."""
+    if after_sums:
+        err = f'ledger append failed after SHA256SUMS was staged: {type(e).__name__}: {e}'
+        alert_text = (f'cc-reverse-sync FAILED: {err}. The staged batch is complete and will be ingested; '
+                      f'the next run retries the ledger append, recovering the published identity from the '
+                      f'staged batch until it succeeds.')
+    else:
+        err = f'staging failed: {type(e).__name__}: {e}'
+        alert_text = f'cc-reverse-sync FAILED: {err}. The next run retries.'
+    key = failure_key(e, after_sums)
+    flag = STAGING / '.publisher-failed'
+    try:
+        seen = failure_seen(flag.read_text(), key)
+    except OSError:
+        seen = False
+    if not seen:
+        alert(alert_text)
+        try:
+            flag.write_text(key + '\n')
+        except OSError:
+            pass  # the alert already went out; without the flag the next run may alert again
+    print(f'FAILED: {err}')
+    return 2
 
 
 def cleanup():
@@ -156,17 +258,22 @@ def stage(new):
     b.mkdir(parents=True)
     complete = False
     try:
-        for rel, src, _ in new:
+        for index, (rel, src, _) in enumerate(new):
             dst = b / rel
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dst)
+            try:
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dst)
+            except BaseException as e:
+                try:  # copy2 can forward a pathless read/write error: name the file and its position
+                    e.coord_rel, e.coord_index = rel, index
+                except Exception:
+                    pass
+                raise
         tmp = b / 'SHA256SUMS.tmp'
         tmp.write_text(''.join(f'{digest}  {rel}\n' for rel, _, digest in new))
         os.replace(tmp, b / 'SHA256SUMS')
         complete = True  # SHA256SUMS is in place: the batch itself is whole from here on
-        LEDGER.parent.mkdir(parents=True, exist_ok=True)
-        with open(LEDGER, 'a') as f:
-            f.write(''.join(f'{rel}\t{digest}\t{name}\t{utc()}\n' for rel, _, digest in new))
+        append_ledger(''.join(f'{rel}\t{digest}\t{name}\t{utc()}\n' for rel, _, digest in new))
     except BaseException as e:
         try:
             e.coord_after_sums = complete  # main() labels a post-SHA256SUMS fault as the ledger append it is
@@ -187,16 +294,42 @@ def main():
         return 3
     try:
         STAGING.mkdir(exist_ok=True)
+        done = read_ledger()
+        # Recover before cleanup() can delete an acknowledged batch and before scan() judges: a completed
+        # batch's SHA256SUMS proves the digest a truncated ledger append lost. Repairing the ledger here
+        # (appending the whole recovered lines) makes that identity survive the cleanup that follows, so
+        # a same-name edit is refused on this and every later run, never staged as new.
+        missing = [(rel, digest, batch) for rel, (digest, batch) in sorted(recovered_published().items())
+                   if rel not in done]
+        if missing:
+            try:
+                append_ledger(''.join(f'{rel}\t{digest}\t{batch}\t{utc()}\n' for rel, digest, batch in missing))
+            except OSError as e:
+                return report_failure(e, True)  # the batches stay staged; nothing is cleaned or scanned
+            for rel, digest, _ in missing:
+                done[rel] = digest
+            try:  # the ledger-append fault this repair clears is no longer standing
+                if (STAGING / '.publisher-failed').read_text().startswith('ledger-append:'):
+                    (STAGING / '.publisher-failed').unlink()
+            except OSError:
+                pass
         removed = cleanup()
-        new, err = scan(read_ledger())
+        new, err = scan(done)
     except OSError as e:
         print(f'root unreadable ({type(e).__name__})')
         return 3
     if err:
         flag = STAGING / '.publisher-refused'
-        if not flag.exists() or flag.read_text().strip() != err:
-            flag.write_text(err + '\n')
+        try:
+            seen = flag.read_text().strip() == err
+        except OSError:
+            seen = False
+        if not seen:
             alert(f'cc-reverse-sync REFUSED: {err}. Nothing was staged. A correction must ship under a new name.')
+            try:
+                flag.write_text(err + '\n')
+            except OSError:
+                pass  # the alert already went out; without the flag the next run may alert again
         print(f'REFUSED: {err}')
         return 2
     if not new:
@@ -205,28 +338,7 @@ def main():
     try:
         name = stage(new)
     except OSError as e:
-        after_sums = getattr(e, 'coord_after_sums', False)
-        if after_sums:
-            err = f'ledger append failed after SHA256SUMS was staged: {type(e).__name__}: {e}'
-            alert_text = (f'cc-reverse-sync FAILED: {err}. The staged batch is complete and will be ingested; '
-                          f'the next run retries and may stage the same files again until the ledger append succeeds.')
-        else:
-            err = f'staging failed: {type(e).__name__}: {e}'
-            alert_text = f'cc-reverse-sync FAILED: {err}. The next run retries.'
-        key = failure_key(e, after_sums)
-        flag = STAGING / '.publisher-failed'
-        try:
-            seen = flag.read_text().strip() == key.strip()
-        except OSError:
-            seen = False
-        if not seen:
-            alert(alert_text)
-            try:
-                flag.write_text(key + '\n')
-            except OSError:
-                pass  # the alert already went out; without the flag the next run may alert again
-        print(f'FAILED: {err}')
-        return 2
+        return report_failure(e, getattr(e, 'coord_after_sums', False))
     try:
         (STAGING / '.publisher-failed').unlink()
     except OSError:
