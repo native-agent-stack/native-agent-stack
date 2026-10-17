@@ -71,7 +71,10 @@ It restricts visible local HTTP management requests to the exact method/path/
 query/body matrix in docs/secret-storage.md: provider-limits POST on 20128 may
 synchronize live quota state; compression preview POST is 20129-only. The new
 WSL distribution's gateway port 21128 takes 20128's rows, and its WebSocket
-port 21129 none. Actual
+port 21129 none. The gateway ports a host allocates (#1180: NS_PORT_GATEWAY*
+in adoption/hosts/*.json, NS2604_HOST_FILE or the installed
+.service-ports.json) are covered too; NS_PORT_GATEWAY takes 21128's rows, the
+other gateway keys none, and an unreadable host file covers no fewer. Actual
 omniroute api/sync commands refuse. Other tightenings cover manager environment
 writes, literal keyring feeds with quote provenance, explicit ps personalities,
 canary comparison/user-run invocations, both Claude OAuth/messaging token names,
@@ -110,7 +113,9 @@ from __future__ import annotations
 import bisect
 import json
 import re
+import os
 import shlex
+import stat
 import sys
 import unicodedata
 
@@ -2561,12 +2566,15 @@ def current_reading(command: str, texts: tuple[str, str], words_list: list[list[
 # data-tree name, a manager verb, a here-document operator, an environment source. Quote removal never splits these literals (they hold no
 # quote or backslash) and every word of a command is made of its unquoted() characters in order, so one scan of the unquoted text tells which
 # rules can apply at all: an ordinary command pays one charged pass for K4, and a rule whose literal is absent does no work.
-K4_ANCHOR = re.compile(r"<<|CLAUDE_CODE_|omniroute|credential_run\.py|kernel_keyring\.py|tvly-keyring|2012|2112|curl|environment"
-                       r"|environ|process|PS_PERSONALITY|CMD_ENV|I_WANT_A_BROKEN_PS|canary_proof\.py")
+K4_ANCHOR_TEXT = (r"<<|CLAUDE_CODE_|omniroute|credential_run\.py|kernel_keyring\.py|tvly-keyring|2012|2112|curl|environment"
+                  r"|environ|process|PS_PERSONALITY|CMD_ENV|I_WANT_A_BROKEN_PS|canary_proof\.py")
+K4_ANCHOR = re.compile(K4_ANCHOR_TEXT)  # gateway_allocation_configure() appends the host's allocated gateway port anchors
 K4_ANCHOR_KEYS = {"environment": ("environment", "environ")}
-# The gateway rules run when a gateway port shows (2012x on the workstation, 2112x on the new WSL distribution), the omniroute CLI
-# is named, or curl runs (its URL globbing can spell a port: 2012[8-9]).
-K4_GATEWAY_PORT_ANCHORS = frozenset({"2012", "2112"})
+# The gateway rules run when a gateway port shows (2012x on the workstation, 2112x on the new WSL distribution, and the first four
+# digits of each gateway port the host allocates, gateway_allocation_configure()), the omniroute CLI is named, or curl runs (its URL globbing
+# can spell a port: 2012[8-9]).
+K4_GATEWAY_FIXED_PORT_ANCHORS = frozenset({"2012", "2112"})
+K4_GATEWAY_PORT_ANCHORS = K4_GATEWAY_FIXED_PORT_ANCHORS
 K4_GATEWAY_ANCHORS = K4_GATEWAY_PORT_ANCHORS | {"omniroute", "curl"}
 # A K4 walk differs from B's only where a runner or keyring start (or tvly-keyring) can hide a shell string or start a command, or where a
 # string-tuple deduplication dropped a segment with other descriptors (note_identity_collision).
@@ -4543,22 +4551,29 @@ def k4_gateway_reason(r: K4Reading, segments: list[list[str]]) -> str | None:
     return None
 
 
-# The covered gateway ports: the workstation's two gateways (20128, and the second instance on 20129), and the new WSL
-# distribution's gateway (21128: dashboard, /v1 and /api in one port) and its live-dashboard WebSocket (21129), added on
-# 2026-10-03 before that gateway holds accounts (wave-2 custody ruling, change 11; the gateway dossier's port list).
-K4_GW_PORTS = ("20128", "20129", "21128", "21129")
-K4_GW_HEAD = re.compile(r"^(?:http://)?(?:(?P<user>[^/\s@?#]*)@)?(?P<host>127\.0\.0\.1|localhost|\[::1\]|10\.0\.2\.2|host\.docker\.internal):(?P<port>20128|20129|21128|21129)(?P<rest>(?:[/\\?#].*)?)$", re.I | re.S)
+# The covered gateway ports. Fixed: the workstation's two gateways (20128, and the second instance on 20129), and the new WSL
+# distribution's default gateway (21128: dashboard, /v1 and /api in one port) and its live-dashboard WebSocket (21129), added on
+# 2026-10-03 before that gateway holds accounts (wave-2 custody ruling, change 11; the gateway dossier's port list). Allocated: every
+# gateway port the host's port allocation (#1180) names, read once at import by gateway_allocation() and added by
+# gateway_allocation_configure(); K4_GW_PORTS, K4_GW_HEAD, K4_GW_FIND and K4_GW_ROWS below hold the fixed ports until then.
+K4_GW_FIXED_PORTS = ("20128", "20129", "21128", "21129")
+K4_GW_PORTS = K4_GW_FIXED_PORTS
+K4_GW_HEAD_TEXT = (r"^(?:http://)?(?:(?P<user>[^/\s@?#]*)@)?(?P<host>127\.0\.0\.1|localhost|\[::1\]|10\.0\.2\.2|host\.docker\.internal)"
+                   r":(?P<port>{ports})(?P<rest>(?:[/\\?#].*)?)$")
+K4_GW_HEAD = re.compile(K4_GW_HEAD_TEXT.replace("{ports}", "20128|20129|21128|21129"), re.I | re.S)
 K4_PERCENT_ESCAPE = re.compile(r"%([0-9A-Fa-f]{2})")
 # A covered target inside other text (the words of an interpreter command line whose options could not all be read).
-K4_GW_FIND = re.compile(r"(?:[Hh][Tt][Tt][Pp]://)?(?:127\.0\.0\.1|[Ll][Oo][Cc][Aa][Ll][Hh][Oo][Ss][Tt]|\[::1\]|10\.0\.2\.2"
-                        r"|[Hh][Oo][Ss][Tt]\.[Dd][Oo][Cc][Kk][Ee][Rr]\.[Ii][Nn][Tt][Ee][Rr][Nn][Aa][Ll]):(?:2012[89]|2112[89])[^\s'\"]*")
+K4_GW_FIND_TEXT = (r"(?:[Hh][Tt][Tt][Pp]://)?(?:127\.0\.0\.1|[Ll][Oo][Cc][Aa][Ll][Hh][Oo][Ss][Tt]|\[::1\]|10\.0\.2\.2"
+                   r"|[Hh][Oo][Ss][Tt]\.[Dd][Oo][Cc][Kk][Ee][Rr]\.[Ii][Nn][Tt][Ee][Rr][Nn][Aa][Ll]):(?:{ports})[^\s'\"]*")
+K4_GW_FIND = re.compile(K4_GW_FIND_TEXT.replace("{ports}", "2012[89]|2112[89]"))
 K4_GW_ID = re.compile(r"\A[A-Za-z0-9-]{1,64}\Z")
 K4_GW_NUMBER = re.compile(r"\A[0-9]{1,5}\Z")
 K4_GW_METHOD = re.compile(r"\A[A-Z]+\Z")
 K4_GW_ENCODE_DATA = re.compile(r"\A[A-Za-z0-9_-]+=[A-Za-z0-9_.~-]*\Z")
 # 21128 takes the rows of 20128, the gateway it replaces; 21129 is a WebSocket with no management route, so no row names
-# it and every covered /api/ request to it refuses.
-K4_GW_ROWS = {
+# it and every covered /api/ request to it refuses. A host-allocated NS_PORT_GATEWAY port takes the rows of 21128 and every other
+# allocated gateway port none (gateway_allocation_configure()).
+K4_GW_FIXED_ROWS = {
     ('GET', '/api/health'): ((20128, 20129, 21128), 'none', False),
     ('GET', '/api/settings/compression'): ((20128, 20129, 21128), 'none', False),
     ('GET', '/api/context/combos'): ((20128, 20129, 21128), 'none', False),
@@ -4572,6 +4587,10 @@ K4_GW_ROWS = {
     ('POST', '/api/usage/provider-limits'): ((20128, 21128), 'none', True),
     ('POST', '/api/compression/preview'): ((20129,), 'none', False),
 }
+K4_GW_ROWS = dict(K4_GW_FIXED_ROWS)
+# The ports of the call-logs <id> route (GET /api/usage/call-logs/<id>), the rows of the collection route's ports.
+K4_GW_FIXED_ID_PORTS = (20128, 20129, 21128)
+K4_GW_ID_PORTS = K4_GW_FIXED_ID_PORTS
 # curl 8.5.0 (`curl --help all` and curl(1), read 2026-09-30): the transport and output options the documented replay uses and a few more
 # that change no URL, method or body; every other option is unknown, and an unknown option in an operation with a covered management URL
 # refuses (it could be a request-target override, a config file, a proxy, --netrc ...).
@@ -4594,6 +4613,125 @@ K4_CURL_GLOB = re.compile(r"\{([^{}]*)\}|\[([^\[\]]*)\]")
 K4_CURL_RANGE = re.compile(r"\A(?:([0-9]+)-([0-9]+)|([A-Za-z])-([A-Za-z]))(?::([0-9]+))?\Z")
 K4_CURL_GLOBS = 256
 K4_GW_HOST_NAMES = ("127.0.0.1", "localhost", "::1", "10.0.2.2", "host.docker.internal")
+# The host's gateway port allocation (#1180): the flat string maps the repository's port tooling reads
+# (evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py, load_service_ports() and default_config_root()),
+# whose gpt-gateway rows (SERVICE_PORTS) are NS_PORT_GATEWAY (dashboard, /v1 and /api), NS_PORT_GATEWAY_WS and
+# NS_PORT_GATEWAY_EMBED_WS. Every NS_PORT_GATEWAY* key a host file names is a covered port, so a later gateway key is covered too.
+K4_GW_HOST_API_KEY = "NS_PORT_GATEWAY"
+K4_GW_HOST_KEY_PREFIX = "NS_PORT_GATEWAY"
+# The same keys in a file that is not valid JSON: its gateway ports are still covered.
+K4_GW_HOST_PAIR = re.compile(r'"(NS_PORT_GATEWAY[A-Z0-9_]*)"\s*:\s*"?([0-9]{1,5})\b')
+K4_GW_HOST_NUMBER = re.compile(r"\A[0-9]{1,5}\Z")
+K4_GW_HOST_FILE_BYTES = 1 << 20  # host files are about 1 KiB; a longer file is read up to this many bytes
+K4_GW_HOST_FILES = 64  # host files read from one adoption/hosts directory
+
+
+def gateway_allocation_files(environ, guard_file: str) -> list[str]:
+    """The files that can hold the host's gateway allocation: every adoption/hosts/*.json of the session's project root
+    (CLAUDE_PROJECT_DIR, which Claude Code sets for hook commands) and of the checkout this guard file sits in (scripts/hooks/ under it;
+    the copy installed as ~/.claude/hooks/secret_path_guard.py has none), the host file NS2604_HOST_FILE names, and the installed
+    allocation ${XDG_CONFIG_HOME:-$HOME/.config}/new-wsl-native-stack/.service-ports.json, which the port tooling reads when it is given
+    no host file and which covers sessions in every project."""
+    roots = []
+    if environ.get("CLAUDE_PROJECT_DIR"):
+        roots.append(environ["CLAUDE_PROJECT_DIR"])
+    roots.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(guard_file)))))
+    files: list[str] = []
+    for root in dict.fromkeys(roots):
+        hosts = os.path.join(root, "adoption", "hosts")
+        try:
+            names = sorted(name for name in os.listdir(hosts) if name.endswith(".json"))
+        except OSError:
+            continue  # no host directory: nothing allocated there
+        files.extend(os.path.join(hosts, name) for name in names[:K4_GW_HOST_FILES])
+    if environ.get("NS2604_HOST_FILE"):
+        files.append(environ["NS2604_HOST_FILE"])
+    config = environ.get("XDG_CONFIG_HOME") or os.path.join(environ.get("HOME") or os.path.expanduser("~"), ".config")
+    files.append(os.path.join(config, "new-wsl-native-stack", ".service-ports.json"))
+    return files
+
+
+def gateway_allocation_ports(path: str) -> list[tuple[str, int]]:
+    """The (key, port) gateway allocations one host file names: the NS_PORT_GATEWAY* keys of its JSON object, and in any case every
+    "NS_PORT_GATEWAY*": "D" pair in its text (K4_GW_HOST_PAIR), so a file that is not valid JSON still covers the ports it names. A file
+    that is absent, unreadable or not a regular file (a FIFO is never waited on) names none. Nothing is printed."""
+    try:
+        descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_CLOEXEC", 0))
+    except OSError:
+        return []
+    chunks: list[bytes] = []
+    try:
+        if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+            return []
+        size = 0
+        while size < K4_GW_HOST_FILE_BYTES:
+            chunk = os.read(descriptor, K4_GW_HOST_FILE_BYTES - size)
+            if not chunk:
+                break
+            chunks.append(chunk)
+            size += len(chunk)
+    except OSError:
+        pass  # what was read before the error still counts
+    finally:
+        os.close(descriptor)
+    text = b"".join(chunks).decode("utf-8", "replace")
+    found = [(match[1], int(match[2])) for match in K4_GW_HOST_PAIR.finditer(text)]
+    try:
+        values = json.loads(text)
+    except Exception:  # noqa: BLE001 - malformed or too deeply nested: the text pairs above stand
+        values = None
+    if isinstance(values, dict):
+        for key, value in values.items():
+            if isinstance(key, str) and key.startswith(K4_GW_HOST_KEY_PREFIX) and isinstance(value, (str, int)) \
+                    and not isinstance(value, bool) and K4_GW_HOST_NUMBER.fullmatch(str(value)):
+                found.append((key, int(value)))
+    return [(key, port) for key, port in found if 0 < port < 65536]
+
+
+def gateway_allocation(environ=None, guard_file: str | None = None) -> tuple[frozenset[int], frozenset[int]]:
+    """The host-allocated gateway ports (#1180), read once when the guard starts: (NS_PORT_GATEWAY ports, every other NS_PORT_GATEWAY*
+    port) across gateway_allocation_files(). Fails closed: a source that cannot be read adds nothing and removes nothing, so the fixed ports
+    (K4_GW_FIXED_PORTS) stay covered whatever the host files hold; with no host file the covered ports are the fixed ones."""
+    environ = os.environ if environ is None else environ
+    api: set[int] = set()
+    other: set[int] = set()
+    try:
+        for path in gateway_allocation_files(environ, guard_file or __file__):
+            for key, port in gateway_allocation_ports(path):
+                (api if key == K4_GW_HOST_API_KEY else other).add(port)
+    except Exception:  # noqa: BLE001 - an allocation the guard cannot read never opens a port the fixed list covers
+        pass
+    return frozenset(api), frozenset(other)
+
+
+def gateway_allocation_configure(api, other) -> None:
+    """Cover the host-allocated gateway ports in addition to the fixed ones: every port is covered (K4_GW_PORTS, K4_GW_HEAD, K4_GW_FIND,
+    and its first four digits a gateway anchor); an NS_PORT_GATEWAY port that is not a fixed port takes the rows of 21128 (a fixed port
+    keeps its own), and a port allocated to any other gateway key serves no row, even when it is also allocated as NS_PORT_GATEWAY or is
+    a fixed port."""
+    global K4_GW_PORTS, K4_GW_HEAD, K4_GW_FIND, K4_GW_ROWS, K4_GW_ID_PORTS, K4_ANCHOR, K4_GATEWAY_PORT_ANCHORS, K4_GATEWAY_ANCHORS
+    other = frozenset(int(port) for port in other)
+    # A fixed port keeps its own rows: an allocation adds ports and removes rows, and never adds a row to a port already covered.
+    api = frozenset(int(port) for port in api) - other - {int(port) for port in K4_GW_FIXED_PORTS}
+    numbers = sorted({int(port) for port in K4_GW_FIXED_PORTS} | api | other)
+    K4_GW_PORTS = tuple(str(number) for number in numbers)
+    allocated = [str(number) for number in sorted(api | other) if str(number) not in K4_GW_FIXED_PORTS]
+    alternation = "|".join(sorted(K4_GW_PORTS, key=lambda port: (-len(port), port)))
+    K4_GW_HEAD = re.compile(K4_GW_HEAD_TEXT.replace("{ports}", alternation), re.I | re.S)
+    K4_GW_FIND = re.compile(K4_GW_FIND_TEXT.replace("{ports}", alternation))
+
+    def widen(ports):
+        return tuple(sorted((set(ports) | (api if 21128 in ports else set())) - other))
+
+    K4_GW_ROWS = {route: (widen(row[0]),) + tuple(row[1:]) for route, row in K4_GW_FIXED_ROWS.items()}
+    K4_GW_ID_PORTS = widen(K4_GW_FIXED_ID_PORTS)
+    extra = sorted({port[:4] for port in allocated} - K4_GATEWAY_FIXED_PORT_ANCHORS)
+    K4_GATEWAY_PORT_ANCHORS = K4_GATEWAY_FIXED_PORT_ANCHORS | frozenset(extra)
+    K4_GATEWAY_ANCHORS = K4_GATEWAY_PORT_ANCHORS | {"omniroute", "curl"}
+    K4_ANCHOR = re.compile(K4_ANCHOR_TEXT + "".join("|" + re.escape(anchor) for anchor in extra))
+
+
+gateway_allocation_configure(*gateway_allocation())
 
 
 def k4_curl_expansions(url: str) -> list[str] | None:
@@ -4635,7 +4773,8 @@ def k4_curl_expansions(url: str) -> list[str] | None:
 def k4_gateway_url(url: str, method='GET', body=False, additions=(), unresolved=False) -> bool:
     """Whether one request is a covered management request the frozen matrix (contract-v2 section 5.1, K4_GW_ROWS) does not permit.
     Covered: scheme http (a scheme-less client operand is http, amendment A11), host 127.0.0.1, localhost, [::1], 10.0.2.2 or
-    host.docker.internal (ASCII case folded), port 20128, 20129, 21128 or 21129 (K4_GW_PORTS). Under /api/ every request refuses unless its effective method, complete
+    host.docker.internal (ASCII case folded), port 20128, 20129, 21128, 21129 or a gateway port the host allocates (K4_GW_PORTS,
+    gateway_allocation_configure()). Under /api/ every request refuses unless its effective method, complete
     path (exact segments; <id> a single [A-Za-z0-9-]{1,64} segment of the call-logs route), query (none; exactly since=all on analytics;
     limit=D and/or offset=D, D of 1 to 5 ASCII digits, once each, joined by one `&`, on call-logs) and body condition (none on provider-limits)
     match a row. Management targeting is evident when the path, dot and slash segments resolved and percent escapes decoded, reaches /api;
@@ -4673,7 +4812,7 @@ def k4_gateway_url(url: str, method='GET', body=False, additions=(), unresolved=
     row = K4_GW_ROWS.get((method, path))
     if row is None and method == 'GET' and path.startswith('/api/usage/call-logs/') \
             and K4_GW_ID.fullmatch(path[len('/api/usage/call-logs/'):]):
-        row = ((20128, 20129, 21128), 'none', False)
+        row = (K4_GW_ID_PORTS, 'none', False)
     if row is None or int(found['port']) not in row[0] or (row[2] and body):
         return True
     if query is None:

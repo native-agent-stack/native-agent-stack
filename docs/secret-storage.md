@@ -1517,9 +1517,29 @@ uv remains a recorded limit. Available status does not make the runner the defau
 distribution's single-port gateway and its live-dashboard WebSocket, added on
 2026-10-03 before that gateway holds accounts; wave-2 custody ruling, change 11).
 21128 takes the rows of 20128; 21129 serves no management route, so no row names
-it. Recognized scheme-less client targets use HTTP. Each covered
+it. Every gateway port the host's port allocation (#1180) names is covered as well.
+The guard reads that allocation once when it starts, from the same flat
+`NS_PORT_*` maps the port tooling reads
+(`evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py`,
+`load_service_ports()`): every `adoption/hosts/*.json` under the session's project
+root (`CLAUDE_PROJECT_DIR`) and under the guard's own checkout, the file
+`NS2604_HOST_FILE` names, and the installed allocation
+`${XDG_CONFIG_HOME:-$HOME/.config}/new-wsl-native-stack/.service-ports.json`, which
+also covers sessions in other projects. Each `NS_PORT_GATEWAY*` key is a covered
+port: `NS_PORT_GATEWAY` (dashboard, `/v1` and `/api` in one port) takes the rows
+of 21128 unless it names a fixed port, which keeps its own rows, and every other gateway key (`NS_PORT_GATEWAY_WS`,
+`NS_PORT_GATEWAY_EMBED_WS`) serves no row, even where it repeats a port the
+gateway key or the fixed list names. So on a host whose file sets
+`NS_PORT_GATEWAY=23128` and `NS_PORT_GATEWAY_WS=23129`, 23128 has the rows of
+21128 and 23129 none. The allocation fails closed: it only adds ports. A file
+that is not valid JSON still covers each `"NS_PORT_GATEWAY…": "D"` pair in its
+text; an unreadable file, a non-regular file or no host file at all adds nothing,
+and the fixed ports above stay covered. Recognized scheme-less client targets use HTTP. Each covered
 `/api/` request refuses `gateway_credential_route` unless the complete request
 matches one row. The rows never override another guard rule.
+
+In the table, 21128 also stands for every host-allocated `NS_PORT_GATEWAY` port
+that is not one of the fixed ports.
 
 | Effective method | Exact path | Ports | Query | Body condition |
 | --- | --- | --- | --- | --- |
