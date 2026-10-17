@@ -39492,6 +39492,26 @@
       "bytes": 16887
     },
     {
+      "path": "evidence/artifacts/live-distro-stage1-logs-20261017/NativeHorizonNY-r1-stage1.log",
+      "sha256": "42bdd8a9852323206e2919a57c80f97e6859eff8e1363097e2bbf6fb811ef93b",
+      "bytes": 5045
+    },
+    {
+      "path": "evidence/artifacts/live-distro-stage1-logs-20261017/NativeHorizonNY-stage1.log",
+      "sha256": "dc8871bd2cad469d0f8f385df8c8806b77ebc52d3c31e91cd095223307f97532",
+      "bytes": 4175
+    },
+    {
+      "path": "evidence/artifacts/live-distro-stage1-logs-20261017/NativeStack2604-stage1.log",
+      "sha256": "c0dc4d89c1e7f4c3021f5385e44b1e90b25c19ddda7dbd69359d33be356e7bba",
+      "bytes": 9034
+    },
+    {
+      "path": "evidence/artifacts/live-distro-stage1-logs-20261017/receipt.json",
+      "sha256": "9c023483feec7f6a1da52b8f33c6600e69937db569d37f264de9ee3550bddc28",
+      "bytes": 12800
+    },
+    {
       "path": "evidence/artifacts/local-model-alignment-20260923/ai-memory-embedder-deployment.json",
       "sha256": "7db664c997713c029c0f3c84c57357c1c63e394157e8baf0c668ca37afd66cca",
       "bytes": 3828

@@ -1,0 +1,156 @@
+**********************
+PowerShell transcript start
+Start time: 20261015143816
+Username: <win-host>\<win-user>
+RunAs User: <win-host>\<win-user>
+Configuration Name: 
+Machine: <win-host> (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \\wsl.localhost\NativeStack2604\var\tmp\horizon-build\w1-real.ps1
+Process ID: 99380
+PSVersion: 7.6.7
+PSEdition: Core
+GitCommitId: 7.6.7
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+test-path location: False
+test-path pro user-data: False
+test-path agent.yaml: False
+[wsl2]
+vmIdleTimeout=-1
+[experimental]
+[general]
+instanceIdleTimeout=-1
+
+Name : Z
+Used : 2548710211584
+Free : 1452058112000
+
+**********************
+PowerShell transcript end
+End time: 20261015143816
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261015143823
+Username: <win-host>\<win-user>
+RunAs User: <win-host>\<win-user>
+Configuration Name: 
+Machine: <win-host> (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \\wsl.localhost\NativeStack2604\var\tmp\horizon-build\w2-w4-real.ps1
+Process ID: 100152
+PSVersion: 7.6.7
+PSEdition: Core
+GitCommitId: 7.6.7
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+image already present with the expected hash; not downloaded again
+computed 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 published 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 listed 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 url https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl
+length 418495746
+#cloud-config
+- name: <WSL_USER>
+    default=<WSL_USER>
+user-data sha256 11f92916bad4607c19cee3452eb07bb80f4590e9f16ec295370cd1d416744502
+placeholders left: 0
+
+install exit 0
+
+**********************
+PowerShell transcript end
+End time: 20261015143836
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261015143851
+Username: <win-host>\<win-user>
+RunAs User: <win-host>\<win-user>
+Configuration Name: 
+Machine: <win-host> (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \\wsl.localhost\NativeStack2604\var\tmp\horizon-build\w5-real.ps1
+Process ID: 91716
+PSVersion: 7.6.7
+PSEdition: Core
+GitCommitId: 7.6.7
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+launch exit 0
+== id
+
+
+== getty
+
+
+== cloud-init
+
+
+status exit 2
+== result.json
+
+== status.json
+
+== schema
+
+schema exit 0
+== wsl.conf
+
+== tz
+
+
+
+windows_region US
+== marker
+
+== sudo
+
+== list
+
+**********************
+PowerShell transcript end
+End time: 20261015143904
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261015143926
+Username: <win-host>\<win-user>
+RunAs User: <win-host>\<win-user>
+Configuration Name: 
+Machine: <win-host> (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \\wsl.localhost\NativeStack2604\var\tmp\horizon-build\w7-real.ps1
+Process ID: 120240
+PSVersion: 7.6.7
+PSEdition: Core
+GitCommitId: 7.6.7
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+running after terminate: [NativeStack2604]
+
+owner 1000:1000
+removed
+**********************
+PowerShell transcript end
+End time: 20261015143940
+**********************
