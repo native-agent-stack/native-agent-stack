@@ -138,7 +138,7 @@
      "trigger": "the CC names the ruling record"},
     {"id": "gpt-reserve", "text": "The GPT account pool keeps a 30-point reserve.",
      "recorded_in": [],
-     "mechanism": [{"path": "tools/sota-convergence/landscape-sweep/codex_job.py", "line": 76, "anchor": "Quota gate"}],
+     "mechanism": [{"path": "tools/sota-convergence/landscape-sweep/codex_job.py", "line": 77, "anchor": "Quota gate"}],
      "mechanism_note": "A candidate mechanism: the quota gate. Whether the reserve is wired through it is unverified.",
      "trigger": "the CC names the ruling record"},
     {"id": "zero-stale", "text": "Zero tolerance for stale models, runtimes and repositories: a stale pick starts its replacement at once, and a stale record is refreshed.",
