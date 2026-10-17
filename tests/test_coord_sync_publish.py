@@ -131,6 +131,69 @@ class MissingStagingTests(unittest.TestCase):
                     os.environ[k] = v
 
 
+    def test_relative_or_placeholder_staging_exits_3_and_creates_nothing(self):
+        saved = {k: os.environ.get(k) for k in ('CC_VERDICT_SRC', 'REVERSE_SYNC_STAGING', 'REVERSE_SYNC_LEDGER', 'REVERSE_SYNC_NO_ALERT')}
+        cwd = os.getcwd()
+        try:
+            for label in ('relative', 'placeholder', 'absolute-placeholder'):
+                with self.subTest(label=label), tempfile.TemporaryDirectory() as t:
+                    root = Path(t)
+                    src, ledger = root / 'src', root / 'ledger.tsv'
+                    sealed = src / 'a-micro/CC-DELTA-11111111.md'
+                    put(sealed, 'one\n')
+                    before = sorted(str(p.relative_to(root)) for p in root.rglob('*'))
+                    if label == 'relative':
+                        value = 'relative-staging'
+                    elif label == 'placeholder':
+                        value = '@WINDOWS_TEMP@/nhny-to-2604-sync'
+                    else:
+                        value = str(root / '@WINDOWS_TEMP@' / 'nhny-to-2604-sync')
+                    os.environ['REVERSE_SYNC_STAGING'] = value
+                    os.environ.update(CC_VERDICT_SRC=str(src), REVERSE_SYNC_LEDGER=str(ledger), REVERSE_SYNC_NO_ALERT='1')
+                    spec = importlib.util.spec_from_file_location('publish', TOOL)
+                    mod = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(mod)
+                    os.chdir(root)
+                    try:
+                        out = io.StringIO()
+                        with contextlib.redirect_stdout(out):
+                            rc = mod.main()
+                    finally:
+                        os.chdir(cwd)
+                    self.assertEqual(rc, 3)
+                    lines = out.getvalue().strip().splitlines()
+                    self.assertEqual(len(lines), 1)
+                    self.assertIn('REVERSE_SYNC_STAGING', lines[0])
+                    self.assertFalse(ledger.exists())
+                    self.assertEqual(sorted(str(p.relative_to(root)) for p in root.rglob('*')), before)
+                    os.chmod(sealed, 0o600)
+        finally:
+            os.chdir(cwd)
+            for k, v in saved.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
+
+
+class DocstringTemplateAndReadmeTests(unittest.TestCase):
+    def test_docstring_documents_invalid_staging_exit_3(self):
+        with tempfile.TemporaryDirectory() as t:
+            m = load(Path(t) / 'src', Path(t) / 'staging', Path(t) / 'ledger.tsv')
+            doc = m.__doc__ or ''
+            self.assertIn('REVERSE_SYNC_STAGING', doc)
+            self.assertIn("contains '@'", doc)
+
+    def test_publish_service_template_quotes_staging_assignment(self):
+        text = (ROOT / 'adoption/templates/systemd/nhny-cc-verdict-publish.service').read_text()
+        self.assertIn('Environment="REVERSE_SYNC_STAGING=', text)
+
+    def test_readme_renders_placeholders_without_sed_replacement_hazards(self):
+        text = (ROOT / 'tools/coord-sync/README.md').read_text()
+        self.assertNotIn('s#@WINDOWS_TEMP@#$WINDOWS_TEMP', text)
+        self.assertIn('python3 -I', text)
+
+
 class AlertTests(unittest.TestCase):
     def test_alert_reaches_hcom_off_path_and_names_the_cc_and_the_fallback(self):
         # A systemd --user unit's PATH lacks ~/.local/bin (systemd 259 here), so the 2026-10-16T22:55:43Z refusal's alert
@@ -159,6 +222,30 @@ class AlertTests(unittest.TestCase):
             self.assertEqual(argv[:3], ['send', '@nhny-gino', '@nami'])  # dula closed (#2427); the co-op holds the fallback
             self.assertNotIn('@dula', argv)
             self.assertEqual(argv[-1], 'probe text')
+
+    def test_alert_logs_nonzero_hcom_exit(self):
+        with tempfile.TemporaryDirectory() as t:
+            home = Path(t)
+            stub = home / '.local/bin/hcom'
+            stub.parent.mkdir(parents=True)
+            stub.write_text('#!/bin/sh\nexit 7\n')
+            stub.chmod(0o755)
+            saved = {k: os.environ.get(k) for k in ('PATH', 'HOME', 'REVERSE_SYNC_NO_ALERT')}
+            try:
+                m = load(home / 'src', home / 'staging', home / 'ledger.tsv')
+                os.environ.update(PATH='/usr/bin:/bin', HOME=str(home))
+                os.environ['REVERSE_SYNC_NO_ALERT'] = '0'
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    m.alert('probe text')
+            finally:
+                for k, v in saved.items():
+                    if v is None:
+                        os.environ.pop(k, None)
+                    else:
+                        os.environ[k] = v
+            self.assertIn('alert send failed', out.getvalue())
+            self.assertIn('7', out.getvalue())
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

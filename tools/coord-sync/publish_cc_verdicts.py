@@ -12,7 +12,7 @@ One run:
      record: the run is REFUSED (nothing staged) and the CC and the fallback holder are alerted once (corrections ship under a new name);
   4. new sealed files go into ONE batch STAGING/<UTC>/cc-cc-work/<pr>-micro/<file> (mtime kept), with SHA256SUMS written LAST
      by rename; the ledger records each file only after the batch is complete.
-Exit 0 (nothing to do, or a batch staged), 2 (refused), 3 (a root unreadable).
+Exit 0 (nothing to do, or a batch staged), 2 (refused), 3 (REVERSE_SYNC_STAGING unset, empty, relative or contains '@', or a root unreadable).
 """
 import hashlib
 import os
@@ -58,8 +58,10 @@ def alert(text):
         return
     env = dict(os.environ, HCOM_DIR=os.environ.get('HCOM_DIR', '/mnt/wsl/hcom-x'))
     try:
-        subprocess.run([hcom_bin(), 'send', *ALERT_TO, '--intent', 'request', '--from', 'cc-reverse-sync', '--', text],
-                       env=env, stdin=subprocess.DEVNULL, capture_output=True, timeout=60)
+        r = subprocess.run([hcom_bin(), 'send', *ALERT_TO, '--intent', 'request', '--from', 'cc-reverse-sync', '--', text],
+                           env=env, stdin=subprocess.DEVNULL, capture_output=True, timeout=60)
+        if r.returncode != 0:
+            print(f'alert send failed rc={r.returncode}')
     except (OSError, subprocess.SubprocessError) as e:
         print(f'alert send failed ({type(e).__name__})')
 
@@ -127,8 +129,11 @@ def main():
     if STAGING is None:
         print('REVERSE_SYNC_STAGING is not set or empty')
         return 3
+    if not STAGING.is_absolute() or '@' in str(STAGING):
+        print('REVERSE_SYNC_STAGING must be an absolute path with no placeholder')
+        return 3
     try:
-        STAGING.mkdir(parents=True, exist_ok=True)
+        STAGING.mkdir(exist_ok=True)
         removed = cleanup()
         new, err = scan(read_ledger())
     except OSError as e:

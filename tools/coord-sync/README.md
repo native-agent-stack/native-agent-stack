@@ -25,7 +25,8 @@ for each one that is not already marked ingested:
 
 1. **Verifies the batch whole before writing anything.** Every listed file's sha256 must match `SHA256SUMS`; nothing
    on disk may be unlisted and nothing listed may be missing; every path must be relative with no `..` and no
-   duplicates; there must be no symlinks and only regular files; and every path must be in scope:
+   duplicates; there must be no symlinks and only regular files (a batch directory that is itself a symlink is
+   skipped); and every path must be in scope:
 
    | Path | What it carries |
    | --- | --- |
@@ -39,7 +40,10 @@ for each one that is not already marked ingested:
    exists refuses the whole batch. Corrections ship under a new versioned name, never as an overwrite. A destination
    that is a symlink also refuses the batch.
 3. **Copies each new file** into the coordination mirror at mode 0444 with the source mtime, through a temporary file
-   in the destination directory renamed into place, so readers see the old state or the new file whole.
+   in the destination directory renamed into place, so readers see the old state or the new file whole. The copy is
+   hashed as it is written and checked against `SHA256SUMS` before the rename, so the bytes installed are the bytes
+   verified even if a staged file changed after `SHA256SUMS` was written; on a mismatch the temporary file is removed
+   and nothing is renamed into place for that file.
 4. **Writes `<batch>.ingested`** beside the batch, holding the sha256 of its `SHA256SUMS` and the UTC time. The 2604
    side then deletes the batch and the marker. A later run that finds a marker matching the batch's `SHA256SUMS`
    does nothing for that batch.
@@ -47,11 +51,15 @@ for each one that is not already marked ingested:
 A refusal writes **`<batch>.refused`** (the `SHA256SUMS` sha256, the UTC time and the reason), logs one `REFUSED`
 line, alerts once (see below) and **stops the run**: later batches wait until the refused one is resolved and its
 marker removed. While the marker matches the batch's `SHA256SUMS`, reruns return the refusal without re-verifying,
-re-logging or re-alerting; a batch whose `SHA256SUMS` changed is verified again. One summary line per batch goes to
-stdout (the journal) and to `.sync-ingest.log` in the coordination mirror. Exit 0 when every pending batch ingests
-or none is pending, 2 when a batch is refused, 3 when the staging root is unreadable or when
-`COORD_SYNC_STAGING` is unset or empty (one line naming the variable, before anything is touched). An incomplete batch (no
-`SHA256SUMS` yet) is skipped silently.
+re-logging or re-alerting; a batch whose `SHA256SUMS` changed is verified again. A failure part-way through a batch
+(for example `ENOSPC` while copying, or a copy whose hash no longer matches `SHA256SUMS`) writes no marker: it logs
+one `FAILED` line, alerts once and stops the run with exit 2; files already copied stay in the mirror, and recovery
+needs no manual step beyond clearing the fault, because the next run retries the same batch, sees the copied files as
+identical and completes it. One summary line per batch goes to stdout (the journal) and to `.sync-ingest.log` in the
+coordination mirror. Exit 0 when every pending batch ingests or none is pending, 2 when a batch is refused or fails
+part-way, 3 when the staging root is unreadable or when `COORD_SYNC_STAGING` is unset, empty, relative or contains
+`@` (one line naming the variable, before anything is touched). An incomplete batch (no `SHA256SUMS` yet) and a batch
+directory that is itself a symlink are skipped silently.
 
 ## Reverse: NativeHorizonNY to 2604 (`publish_cc_verdicts.py`)
 
@@ -74,7 +82,9 @@ at `/var/tmp/cc-cc-work/<pr>-micro/<file>` at 0400 and writes `<batch>.ingested`
    never claims a file whose batch is incomplete.
 
 Exit 0 when there is nothing to do or a batch was staged, 2 when refused, 3 when a root is unreadable or when
-`REVERSE_SYNC_STAGING` is unset or empty (one line naming the variable, before anything is touched).
+`REVERSE_SYNC_STAGING` is unset, empty, relative or contains `@` (one line naming the variable, before anything is
+touched). The staging root itself is created only when its parent already exists; a missing parent is refused with
+exit 3 rather than created, so a mis-rendered value can never grow a shadow staging tree under the working directory.
 
 ## Refusal alerts
 
@@ -99,10 +109,13 @@ or printed, never fatal: the refusal itself, its marker and the nonzero exit alr
 ## Paths and environment
 
 Every other root has the default below. The two staging roots have no default: each script takes its staging
-directory only from its environment variable and, when that variable is unset or empty, prints one line naming
-the variable and exits 3 before touching anything. The units set both variables through the install-time
-placeholder `@WINDOWS_TEMP@`, the WSL path of the Windows TEMP folder (see Install); the repository holds only
-the placeholder and the directory names below, never the rendered value.
+directory only from its environment variable and, unless that value is an absolute path containing no `@`, prints one
+line naming the variable and exits 3 before touching anything. That refuses an unset or empty variable, a relative
+value, and an unrendered placeholder such as a literal `@WINDOWS_TEMP@` left by a renderer that substituted only
+`@REPOSITORY@`. The units set both variables through the install-time placeholder `@WINDOWS_TEMP@`, the WSL path of
+the Windows TEMP folder (see Install); the repository holds only the placeholder and the directory names below, never
+the rendered value. Both units quote the whole staging `Environment=` assignment, as `systemd.exec(5)` advises for
+values that may hold whitespace.
 
 | Variable | Default | Read by |
 | --- | --- | --- |
@@ -124,12 +137,17 @@ coordination mirror and the ledger carry over as they are. Install from the live
 value in the templates' headers), rendering `@WINDOWS_TEMP@` on the host as below, then verify before enabling.
 The first line sets `WINDOWS_TEMP` to the WSL path of the Windows TEMP folder: `cmd.exe` prints the folder
 Windows names with `%TEMP%` and `wslpath -u` rewrites that Windows path in WSL form. Run it on the host at
-install time and keep the result out of the repository:
+install time and keep the result out of the repository. Render the placeholders with `python3`, not `sed`: in a
+`sed` replacement `&` reinserts the matched placeholder and the delimiter itself (`#` in the usual form) ends the
+command early, so a Windows TEMP path containing either character would silently corrupt the rendered unit;
+Python's `str.replace` has no metacharacters, and any `@...@` placeholder still left in a staging value is refused
+by both scripts with exit 3 in any case:
 
 ```bash
 WINDOWS_TEMP="$(wslpath -u "$(/mnt/c/Windows/System32/cmd.exe /d /c 'echo %TEMP%' | tr -d '\r')")"
-sed -e 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' -e "s#@WINDOWS_TEMP@#$WINDOWS_TEMP#g" adoption/templates/systemd/nhny-coord-sync-ingest.service > ~/.config/systemd/user/nhny-coord-sync-ingest.service
-sed -e 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' -e "s#@WINDOWS_TEMP@#$WINDOWS_TEMP#g" adoption/templates/systemd/nhny-cc-verdict-publish.service > ~/.config/systemd/user/nhny-cc-verdict-publish.service
+render() { WINDOWS_TEMP="$WINDOWS_TEMP" python3 -I -c 'import os,sys; s=open(sys.argv[1]).read().replace("@REPOSITORY@","%h/code/native-agent-stack-live").replace("@WINDOWS_TEMP@",os.environ["WINDOWS_TEMP"]); open(sys.argv[2],"w").write(s)' "$1" "$2"; }
+render adoption/templates/systemd/nhny-coord-sync-ingest.service ~/.config/systemd/user/nhny-coord-sync-ingest.service
+render adoption/templates/systemd/nhny-cc-verdict-publish.service ~/.config/systemd/user/nhny-cc-verdict-publish.service
 cp adoption/templates/systemd/nhny-coord-sync-ingest.timer adoption/templates/systemd/nhny-cc-verdict-publish.timer ~/.config/systemd/user/
 systemctl --user daemon-reload
 systemd-analyze --user verify ~/.config/systemd/user/nhny-coord-sync-ingest.service ~/.config/systemd/user/nhny-coord-sync-ingest.timer ~/.config/systemd/user/nhny-cc-verdict-publish.service ~/.config/systemd/user/nhny-cc-verdict-publish.timer
@@ -148,10 +166,12 @@ reinstalling (these templates, or the command center's earlier unit files) resum
 
 ## Tests
 
-`python3 -m unittest tests.test_coord_sync_ingest tests.test_coord_sync_publish` (17 tests, stdlib only). Each test
+`python3 -m unittest tests.test_coord_sync_ingest tests.test_coord_sync_publish` (28 tests, stdlib only). Each test
 runs a script against temporary roots through its environment overrides: all four scopes landing read-only, tampered,
 unlisted, symlinked and out-of-scope batches refusing with nothing written, same-path changes refusing in every
-scope, a refused batch blocking later batches and alerting exactly once, each script refusing with exit 3 and
-creating nothing when its staging variable is unset or empty, sealed-only staging with `SHA256SUMS`
-written last, cleanup only on a matching marker, and the alert reaching an off-PATH stub hcom addressed to the CC
-and the fallback holder.
+scope, a refused batch blocking later batches and alerting exactly once, a mid-batch failure logging `FAILED`,
+alerting once, writing no marker and completing on the next run, a file changed between verification and copying
+never being installed, a symlinked batch directory being skipped, each script refusing with exit 3 and creating
+nothing when its staging variable is unset, empty, relative or still holds a placeholder, sealed-only staging with
+`SHA256SUMS` written last, cleanup only on a matching marker, a nonzero hcom exit being reported by the publish
+alert, and the alert reaching an off-PATH stub hcom addressed to the CC and the fallback holder.

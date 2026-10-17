@@ -138,6 +138,59 @@ class IngestTests(unittest.TestCase):
         self.assertEqual(self.m.main(), 0)
         self.assertEqual(self.written(), [])
 
+    def test_mid_batch_failure_is_logged_alerted_and_completed_by_next_run(self):
+        batch(self.staging, '20261016T205433Z', {GPT: 'g\n', TCC: 't\n', CCV: 'c\n'})
+        orig_place = self.m.place
+        calls = []
+
+        def flaky_place(src, dst, *args):
+            calls.append(src)
+            if len(calls) == 2:
+                raise OSError('injected mid-batch failure')
+            return orig_place(src, dst, *args)
+
+        self.m.place = flaky_place
+        self.assertEqual(self.m.main(), 2)
+        self.assertEqual(len(self.written()), 1)
+        self.assertFalse((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertFalse((self.staging / '20261016T205433Z.refused').exists())
+        self.assertEqual(len(self.alerts), 1)
+        failed = [l for l in (self.coord / '.sync-ingest.log').read_text().splitlines() if 'FAILED' in l]
+        self.assertEqual(len(failed), 1)
+        self.m.place = orig_place
+        self.assertEqual(self.m.main(), 0)
+        self.assertEqual(self.written(), sorted([GPT, TCC, CCV]))
+        self.assertTrue((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertEqual(len(self.alerts), 1)
+
+    def test_file_changed_between_verify_and_copy_is_not_installed(self):
+        batch(self.staging, '20261016T205433Z', {GPT: 'good\n'})
+        orig_place = self.m.place
+
+        def tampering_place(src, dst, *args):
+            Path(src).write_text('evil\n')  # changed after SHA256SUMS was written and verified
+            return orig_place(src, dst, *args)
+
+        self.m.place = tampering_place
+        self.assertEqual(self.m.main(), 2)
+        self.assertEqual(self.written(), [])
+        self.assertFalse((self.coord / GPT).exists())
+        self.assertFalse((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertEqual(len(self.alerts), 1)
+        leftovers = list(self.coord.rglob('.ingest-*')) if self.coord.exists() else []
+        self.assertEqual(leftovers, [])
+
+    def test_symlinked_batch_directory_is_skipped(self):
+        target_root = Path(self.tmp.name) / 'elsewhere'
+        target_root.mkdir()
+        batch(target_root, '20261016T205433Z', {GPT: 'g\n'})
+        os.symlink(target_root / '20261016T205433Z', self.staging / '20261016T205433Z', target_is_directory=True)
+        batch(self.staging, '20261016T210000Z', {TCC: 'later\n'})
+        self.assertEqual(self.m.main(), 0)
+        self.assertEqual(self.written(), [TCC])
+        self.assertFalse((self.staging / '20261016T205433Z.ingested').exists())
+        self.assertTrue((self.staging / '20261016T210000Z.ingested').exists())
+
     def test_cc_receipt_lands_and_nested_or_non_md_receipts_refuse(self):
         batch(self.staging, '20261016T225519Z', {RCP: 'closing record\n'})
         self.assertEqual(self.m.main(), 0)
@@ -183,6 +236,61 @@ class MissingStagingTests(unittest.TestCase):
                     os.environ.pop(k, None)
                 else:
                     os.environ[k] = v
+
+
+    def test_relative_or_placeholder_staging_exits_3_and_creates_nothing(self):
+        saved = {k: os.environ.get(k) for k in ('COORD_SYNC_STAGING', 'COORD_ROOT', 'COORD_SYNC_NO_ALERT')}
+        cwd = os.getcwd()
+        try:
+            for label in ('relative', 'placeholder', 'absolute-placeholder'):
+                with self.subTest(label=label), tempfile.TemporaryDirectory() as t:
+                    root = Path(t)
+                    coord = root / 'coord'
+                    if label == 'relative':
+                        value = 'relative-staging'
+                    elif label == 'placeholder':
+                        value = '@WINDOWS_TEMP@/nhny-coord-sync'
+                    else:
+                        value = str(root / '@WINDOWS_TEMP@' / 'nhny-coord-sync')
+                    os.environ['COORD_SYNC_STAGING'] = value
+                    os.environ['COORD_ROOT'] = str(coord)
+                    os.environ['COORD_SYNC_NO_ALERT'] = '1'
+                    spec = importlib.util.spec_from_file_location('ingest', TOOL)
+                    mod = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(mod)
+                    os.chdir(root)
+                    try:
+                        out = io.StringIO()
+                        with contextlib.redirect_stdout(out):
+                            rc = mod.main()
+                    finally:
+                        os.chdir(cwd)
+                    self.assertEqual(rc, 3)
+                    lines = out.getvalue().strip().splitlines()
+                    self.assertEqual(len(lines), 1)
+                    self.assertIn('COORD_SYNC_STAGING', lines[0])
+                    self.assertFalse(coord.exists())
+                    self.assertEqual(list(root.iterdir()), [])
+        finally:
+            os.chdir(cwd)
+            for k, v in saved.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
+
+
+class DocstringAndTemplateTests(unittest.TestCase):
+    def test_docstring_documents_invalid_staging_exit_3(self):
+        with tempfile.TemporaryDirectory() as t:
+            m = load(Path(t) / 'staging', Path(t) / 'coord')
+            doc = m.__doc__ or ''
+            self.assertIn('COORD_SYNC_STAGING', doc)
+            self.assertIn("contains '@'", doc)
+
+    def test_ingest_service_template_quotes_staging_assignment(self):
+        text = (ROOT / 'adoption/templates/systemd/nhny-coord-sync-ingest.service').read_text()
+        self.assertIn('Environment="COORD_SYNC_STAGING=', text)
 
 
 class AlertTests(unittest.TestCase):

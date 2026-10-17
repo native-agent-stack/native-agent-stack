@@ -14,7 +14,7 @@
 # tools/coord-sync/README.md gives the wslpath command that yields the value;
 # the rendered value itself never belongs in the repository. Substitute both
 # before installing, then verify both units together:
-#   sed -e 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' -e "s#@WINDOWS_TEMP@#$WINDOWS_TEMP#g" adoption/templates/systemd/nhny-cc-verdict-publish.service > ~/.config/systemd/user/nhny-cc-verdict-publish.service
+#   render both placeholders with the python3 command in tools/coord-sync/README.md (Install), writing to ~/.config/systemd/user/nhny-cc-verdict-publish.service
 #   cp adoption/templates/systemd/nhny-cc-verdict-publish.timer ~/.config/systemd/user/
 #   systemd-analyze --user verify ~/.config/systemd/user/nhny-cc-verdict-publish.service ~/.config/systemd/user/nhny-cc-verdict-publish.timer
 # %h is systemd's own specifier for the invoking user's home directory and needs
@@ -32,7 +32,7 @@ Documentation=https://github.com/seathatflowsinourveins/native-agent-stack/blob/
 
 [Service]
 Type=oneshot
-Environment=REVERSE_SYNC_STAGING=@WINDOWS_TEMP@/nhny-to-2604-sync
+Environment="REVERSE_SYNC_STAGING=@WINDOWS_TEMP@/nhny-to-2604-sync"
 Environment=HCOM_DIR=/mnt/wsl/hcom-x
 # PATH: a user manager's PATH lacks ~/.local/bin (measured on systemd 259), so
 # name it here; the scripts also resolve hcom by absolute path (hcom_bin()).

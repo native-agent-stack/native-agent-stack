@@ -10,11 +10,16 @@ For each complete batch (SHA256SUMS present) under the staging root, oldest firs
        command-center/receipts/<name>.md       CC-lane receipts (dula's closing record via the co-op sync's extra-paths list, #2427);
   2. append-only for every path (dula's ruling, nami #543): an identical file is skipped; a different file at a path that
      already exists REFUSES the batch. Corrections ship under a new versioned name, never as an overwrite;
-  3. copy to ~/.local/state/native-agent-stack/coordination/<path> at 0444 with the source mtime, via a temporary file and rename;
+  3. copy to ~/.local/state/native-agent-stack/coordination/<path> at 0444 with the source mtime, via a temporary file and rename,
+     hashing while copying so the bytes renamed into place are the bytes SHA256SUMS lists;
   4. write <batch>.ingested beside the batch: the sha256 of its SHA256SUMS and the UTC time (nami then deletes both).
 A refusal writes <batch>.refused (reported and alerted once over hcom, to the CC and the fallback holder) and STOPS the run: later batches wait until
-the refused one is resolved and its marker removed. One summary line per batch on stdout and in coordination/.sync-ingest.log.
-Exit 0 when every pending batch ingests (or none is pending), 2 when a batch is refused, 3 when the staging root is unreadable.
+the refused one is resolved and its marker removed. A failure part-way through a batch (for example ENOSPC while copying, or bytes that
+changed after SHA256SUMS was written) writes no marker: it is logged FAILED, alerted once, and stops the run; files already copied stay, and
+the next run retries the batch and completes it once the fault clears. A batch directory that is itself a symlink is skipped. One summary line
+per batch on stdout and in coordination/.sync-ingest.log.
+Exit 0 when every pending batch ingests (or none is pending), 2 when a batch is refused or fails part-way, 3 when COORD_SYNC_STAGING is unset,
+empty, relative or contains '@', or when the staging root is unreadable.
 """
 import hashlib
 import os
@@ -78,7 +83,7 @@ def alert(text):
 
 
 def plan(batch_dir):
-    """Return (actions, error). actions: list of (rel, src, dst, kind) with kind new|same."""
+    """Return (actions, error). actions: list of (rel, src, dst, kind, digest) with kind new|same."""
     sums = batch_dir / 'SHA256SUMS'
     listed = {}
     for n, raw in enumerate(sums.read_text(encoding='utf-8').splitlines(), 1):
@@ -117,21 +122,25 @@ def plan(batch_dir):
         if dst.is_symlink():
             return None, f'destination is a symlink: {rel}'
         if not dst.exists():
-            actions.append((rel, src, dst, 'new'))
+            actions.append((rel, src, dst, 'new', digest))
         elif sha256(dst) == digest:
-            actions.append((rel, src, dst, 'same'))
+            actions.append((rel, src, dst, 'same', digest))
         else:
             return None, f'same-path change to a synced record: {rel}'
     return actions, None
 
 
-def place(src, dst):
+def place(src, dst, expected):
     dst.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=dst.parent, prefix='.ingest-')
     try:
+        h = hashlib.sha256()
         with os.fdopen(fd, 'wb') as out, open(src, 'rb') as inp:
             for chunk in iter(lambda: inp.read(1 << 20), b''):
+                h.update(chunk)
                 out.write(chunk)
+        if h.hexdigest() != expected:
+            raise ValueError(f'sha256 mismatch while copying: {src.name} changed after SHA256SUMS was written')
         os.chmod(tmp, 0o444)
         st = src.stat()
         os.utime(tmp, (st.st_atime, st.st_mtime))
@@ -144,37 +153,47 @@ def place(src, dst):
 
 def ingest(batch_dir):
     name = batch_dir.name
-    sums_sha = sha256(batch_dir / 'SHA256SUMS')
-    marker = STAGING / f'{name}.ingested'
-    if marker.exists() and marker.read_text().split()[:1] == [sums_sha]:
+    try:
+        sums_sha = sha256(batch_dir / 'SHA256SUMS')
+        marker = STAGING / f'{name}.ingested'
+        if marker.exists() and marker.read_text().split()[:1] == [sums_sha]:
+            return 0
+        refused = STAGING / f'{name}.refused'  # reported once; blocks later batches until resolved and removed
+        if refused.exists() and refused.read_text().split()[:1] == [sums_sha]:
+            return 2
+        actions, err = plan(batch_dir)
+        if err:
+            refused.write_text(f'{sums_sha} {utc()} {err}\n')
+            log(f'REFUSED batch {name} (SHA256SUMS {sums_sha[:16]}): {err}; nothing written; later batches wait')
+            alert(f'coord-sync REFUSED batch {name} (SHA256SUMS {sums_sha[:16]}): {err}. Nothing from it was written and '
+                  f'later batches wait. Resolve, then remove {name}.refused in the staging root.')
+            return 2
+        counts = {'new': 0, 'same': 0}
+        for rel, src, dst, kind, digest in actions:
+            counts[kind] += 1
+            if kind == 'new':
+                place(src, dst, digest)
+        marker.write_text(f'{sums_sha} {utc()}\n')
+        log(f'INGESTED batch {name} (SHA256SUMS {sums_sha[:16]}): {len(actions)} files, '
+            f'{counts["new"]} new, {counts["same"]} identical')
         return 0
-    refused = STAGING / f'{name}.refused'  # reported once; blocks later batches until resolved and removed
-    if refused.exists() and refused.read_text().split()[:1] == [sums_sha]:
+    except Exception as e:
+        log(f'FAILED batch {name}: {type(e).__name__}: {e}; no ingested marker written; later batches wait; '
+            f'the next run retries this batch')
+        alert(f'coord-sync FAILED batch {name}: {type(e).__name__}: {e}. No ingested marker was written and later '
+              f'batches wait. The next run retries this batch and completes it once the fault clears.')
         return 2
-    actions, err = plan(batch_dir)
-    if err:
-        refused.write_text(f'{sums_sha} {utc()} {err}\n')
-        log(f'REFUSED batch {name} (SHA256SUMS {sums_sha[:16]}): {err}; nothing written; later batches wait')
-        alert(f'coord-sync REFUSED batch {name} (SHA256SUMS {sums_sha[:16]}): {err}. Nothing from it was written and '
-              f'later batches wait. Resolve, then remove {name}.refused in the staging root.')
-        return 2
-    counts = {'new': 0, 'same': 0}
-    for rel, src, dst, kind in actions:
-        counts[kind] += 1
-        if kind == 'new':
-            place(src, dst)
-    marker.write_text(f'{sums_sha} {utc()}\n')
-    log(f'INGESTED batch {name} (SHA256SUMS {sums_sha[:16]}): {len(actions)} files, '
-        f'{counts["new"]} new, {counts["same"]} identical')
-    return 0
 
 
 def main():
     if STAGING is None:
         print('COORD_SYNC_STAGING is not set or empty')
         return 3
+    if not STAGING.is_absolute() or '@' in str(STAGING):
+        print('COORD_SYNC_STAGING must be an absolute path with no placeholder')
+        return 3
     try:
-        batches = sorted(p for p in STAGING.iterdir() if p.is_dir() and BATCH.match(p.name))
+        batches = sorted(p for p in STAGING.iterdir() if p.is_dir() and not p.is_symlink() and BATCH.match(p.name))
     except OSError as e:
         print(f'staging root unreadable ({type(e).__name__})')
         return 3
@@ -182,7 +201,7 @@ def main():
         if not (b / 'SHA256SUMS').is_file():
             continue  # incomplete: SHA256SUMS is written last
         if ingest(b) != 0:
-            return 2  # a refusal stops the run (dula's ruling, nami #543)
+            return 2  # a refusal or failure stops the run (dula's ruling, nami #543)
     return 0
 
 
