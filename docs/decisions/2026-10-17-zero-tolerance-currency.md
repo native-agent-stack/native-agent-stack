@@ -17,8 +17,8 @@ file amends them.
 2. **2026-10-16.** No pick is stale, whether a default, a live pick or a trial arm. Each pick comes from a current
    cross-vendor landscape screen, and each release date in it from a tool read, never from memory.
 3. **2026-10-15.** Enforcement does not break the workflow mechanically. No required CI check fails pull requests
-   because the date rolled over; "The existing age failure" below applies this. Currency work runs in parallel lanes
-   and never displaces a gate read.
+   because the date rolled over; "The existing date-compared failures" applies this. Currency work runs in parallel
+   lanes and never displaces a gate read.
 4. **2026-10-16.** A release is never set aside for being new. It is screened, and quantization or on-demand loading
    is tried before anyone concludes that it cannot fit. An upstream's own cooldown window still applies (Kept).
 
@@ -52,19 +52,28 @@ file amends them.
   than the upstream's. The "cooldown" at `docs/model-currency.md:106` now means the upstream's own window. CC ruling 1
   sets this scope; the windows themselves stay (Kept).
 
-## The existing age failure
+## The existing date-compared failures
 
-The model-currency age check compares release and landscape-check dates with the current UTC date
-(`scripts/validate.py:73-75,246-248`) inside the required check: shard 0 of the validate matrix
-(`.github/workflows/validate.yml:20-21,173-178`), aggregated as `validate` (`:451-454`;
-`docs/github-automation.md:34-36`). For a release more than 42 days old, a `landscape_check` that turns eight days
-old therefore fails that check for any pull request until it is refreshed. On 2026-10-15 the "nine October 7
-landscape exceptions became eight days old at UTC rollover", and the current-date `model_currency_problems(document)`
-check "reproduces nine errors on the base inventory" (2026-10-15 record `:4,48-49`). The 2026-10-15 direction rules
-out such a required check, so this record endorses
-[PR #1201](https://github.com/native-agent-stack/native-agent-stack/pull/1201), which turns the age failure into a
-notice (Sources). Until #1201 lands, the check stays as it is and the daily runs keep each `landscape_check` fresh.
-Enforcement stays with the daily runs, the CC's review and immediate replacement work. CC ruling 6.
+The 2026-10-15 direction covers every date-compared failure inside the required check: shard 0 of the validate
+matrix (`.github/workflows/validate.yml:20-21,173-178`), aggregated as `validate` (`:451-454`;
+`docs/github-automation.md:34-36`). Two are known. Enforcement stays with the daily runs, the CC's review and
+immediate replacement work.
+
+- **The model-currency age failure.** The age check compares release and landscape-check dates with the current UTC
+  date (`scripts/validate.py:73-75,246-248`). For a release more than 42 days old, a `landscape_check` that turns
+  eight days old therefore fails the required check for any pull request until it is refreshed. On 2026-10-15 the
+  "nine October 7 landscape exceptions became eight days old at UTC rollover", and the current-date
+  `model_currency_problems(document)` check "reproduces nine errors on the base inventory" (2026-10-15 record
+  `:4,48-49`). This record endorses [PR #1201](https://github.com/native-agent-stack/native-agent-stack/pull/1201),
+  which turns the age failure into a notice (Sources). Until #1201 lands, the check stays as it is and the daily runs
+  keep each `landscape_check` fresh. CC ruling 6.
+- **The public-star pending age.** The same validator runs `validate_pending_age` (`scripts/validate.py:698-701`),
+  which fails once a PENDING public-star entry is more than seven days past its first observation, read against the
+  current UTC time (`scripts/public_starred.py:62-68,139-155`). It needs the same conversion to a notice, in a
+  follow-up PR owned by the public-starred maintainers. Until that lands, the starred refresh keeps PENDING entries
+  inside their window: each is dispositioned within seven days of its first observation, because "Refresh time
+  cannot replace a row's retained first observation" (`:142`). A later CC ruling of 2026-10-17, on this PR's note
+  about the check, adds this instance.
 
 ## Kept
 
@@ -139,7 +148,7 @@ Enforcement stays with the daily runs, the CC's review and immediate replacement
 
 ## Alternatives
 
-- **A date-compared required check, new or kept.** Rule 3 rules it out ("The existing age failure").
+- **A date-compared required check, new or kept.** Rule 3 rules it out ("The existing date-compared failures").
 - **Notices and proposals alone,** the superseded reading. A known stale pick stays in use until someone acts.
 - **A timer that switches.** Rejected for the reason the 2026-10-07 record gives (`:56-57`, quoted under Kept).
 
