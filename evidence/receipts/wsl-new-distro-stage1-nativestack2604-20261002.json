@@ -1,0 +1,1474 @@
+{
+  "schema_version": 1,
+  "artifact_class": "local_integration_check",
+  "id": "wsl-new-distro-stage1-nativestack2604-20261002",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "systemd"
+  ],
+  "claim": "W2 printed one hash, 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104, as computed, published and listed for https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl, with length 418495746, and ended '[W2 completed without throw]'; W3's user-data starts '#cloud-config', names <WSL_USER> and has sha256 6eebab9fe9892c48931e4eccb1935411203ee27286edb7d6a6b535864f104e7e. W4's list ended [list exit=0]; in W5, cloud-init status --long ended [exit=2] and cloud-init schema --system [exit=0]; and in W7 the terminate of NativeStack2604, the probe's creation, its stat and its removal each ended [exit=0] or [ok=True].",
+  "limitations": [
+    "One run on one Windows host, recorded only by its stage-1 PowerShell transcript (Start-Transcript, adoption/platforms/linux-wsl2-new-distro.md:68). The P1 to P3 pre-checks, the Linux-shell baseline and paired-isolation commands, R1's comparison probes and the F outputs are not in the transcript.",
+    "Most native command output is missing from the transcript. Those steps record an exit value only where the transcript labels one, and otherwise say what the transcript shows.",
+    "steps[] holds the 212 recipe commands of the template (adoption/templates/wsl/stage1-receipt.example.json) in order. Rows the transcript records have <Name> and <RELEASE> filled; every other row keeps the template's text, as adoption/platforms/linux-wsl2-new-distro.md:1269-1270 directs, so no operation the transcript does not show is listed against a named distribution. This run's own step scripts (source_transcript.step_scripts) are not in the repository, so a row counts as recorded only where the transcript's label or output names that operation. All 29 R1 rows keep <Name>: R1 runs on a separate throwaway name, never the real <Name> (adoption/platforms/linux-wsl2-new-distro.md:167-168, :172).",
+    "Sanitized per adoption/platforms/linux-wsl2-new-distro.md:1248-1250, plus <win-host> for the computer name (docs/decisions/2026-10-09-host-name-scan.md:160-161). In values copied from the transcript this receipt uses <WSL_USER> for the Linux user name, %USERPROFILE% for the Windows profile path and ~ for the Linux home. The recipe commands in steps[] keep the template's own placeholders, such as <WSL_USER>, <checkout>, <Survivor> and ~. The Windows user name appears in transcript body paths (profile paths, user-data name lines and the wsl.localhost home path), in the Host Application header (copied only as the sanitized run-from path at deviations[0]) and in the Username and RunAs User headers; the listed replacements (%USERPROFILE%, <WSL_USER> and ~) remove it, so <win-user> does not appear. The computer name appears only in the Username, RunAs User and Machine headers, which this receipt does not copy, so <win-host> does not appear. The transcript holds no GUID. The raw transcript stays private on Z:; source_transcript gives its path, size and sha256.",
+    "Exit values come only from the transcript's own markers ([New-Item ok=True], [ReadAllText ok=True], [WriteAllText ok=True], [exit=0], [exit=1], [exit=2], [list exit=0], [ok=False], [ok=True]), with a marker ending ok=True read as 0 and ok=False as 1, and 0 for W2's hash line, hash check and image length, whose block ends '[W2 completed without throw]'. The unlabeled '0' lines in the W4 and W5 blocks are not read as exit values. Elsewhere steps[].exit is null.",
+    "Each null field is named below with its reason. Null means the transcript records nothing for that field, not that the item was absent.",
+    "Null (the transcript shows the source command but not the output this field records): host.wsl_version, host.default_distribution_before, host.default_distribution_after.",
+    "Null (the transcript has no line for the source command): first_launch.windows_region, first_launch.user_prompt_marker, first_launch.oobe_failed_marker, first_launch.systemd_user_session_warning.",
+    "Null (the P1 and P2 pre-checks run in the workstation shell, outside the PowerShell transcript): pre_checks.signed_sums, pre_checks.user_data_schema.",
+    "Null (P3's and W5's storage-error reads run in a Linux shell, outside the PowerShell transcript): storage_errors.baseline, storage_errors.newest_line_time, storage_errors.swap, storage_errors.second_count, storage_errors.new_lines.",
+    "Null (W1's workstation baseline and W5's paired reads run in a Linux shell, outside the PowerShell transcript): host.workstation_baseline.uid, host.workstation_baseline.system_state, host.workstation_baseline.failed_units, host.workstation_baseline.user_manager, host.workstation_baseline.cgroup_namespace, first_launch.cgroup_isolation, paired_isolation.recorded_with, paired_isolation.workstation.uid, paired_isolation.workstation.system_state, paired_isolation.workstation.failed_units, paired_isolation.workstation.user_manager, paired_isolation.workstation.cgroup_namespace, paired_isolation.new_distribution.uid, paired_isolation.new_distribution.system_state, paired_isolation.new_distribution.failed_units, paired_isolation.new_distribution.user_manager, paired_isolation.new_distribution.cgroup_namespace.",
+    "Null (the F outputs (F2, F3, F5, F7, F9) are kept separately from the transcript (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input): recipe.catalog_revision, idle_observation, subordinate_ids, authorization_settings, rootless_container.",
+    "Null (path B's W6 export: the transcript has no W6 block): failed_attempt_export.file, failed_attempt_export.sha256, failed_attempt_export.bytes.",
+    "Null (W5's failure export: the W5 block shows no removal or export): w5_failure_export.file, w5_failure_export.sha256, w5_failure_export.bytes, w5_failure_export.cause.",
+    "Null (this transcript shows no unregister): interop_after_unregister.",
+    "Null (no rehearsal transcript for NativeStack2604 was among the harvested logs; see the last limitation): rehearsal.name, rehearsal.result, rehearsal.creation_path, rehearsal.schema_system, rehearsal.ownership_probe, rehearsal.idle_observation, rehearsal.storage_readings, rehearsal.export.file, rehearsal.export.sha256, rehearsal.export.bytes.",
+    "Null (R1's comparison probes are not in this transcript): comparison_arms.26.04.1.name, comparison_arms.26.04.1.first_boot, comparison_arms.26.04.1.systemd_user_from_second_instance, comparison_arms.26.04.1.wsl_gpu, comparison_arms.26.04.1.uv_cpython_3_13, comparison_arms.26.04.1.node_24, comparison_arms.24.04.5.name, comparison_arms.24.04.5.first_boot, comparison_arms.24.04.5.systemd_user_from_second_instance, comparison_arms.24.04.5.wsl_gpu, comparison_arms.24.04.5.uv_cpython_3_13, comparison_arms.24.04.5.node_24.",
+    "cloud-init status --long exited 2 and its output is not in the transcript, so its reason is not recorded here.",
+    "Transcript times (source_transcript.*_local) are Windows local time, EDT (UTC-4).",
+    "jcodemunch_registration is skipped: F11 is not in the stage-1 transcript.",
+    "No rehearsal transcript for NativeStack2604 was among the harvested logs, so the rehearsal block's fields are null. The 2026-10-02 rehearsal records in evidence/artifacts/new-wsl-rehearsal-20261002/ name StackRehearsal2604, StackRehearsal2604e1, StackRehearsal2604r2, StackRehearsal2604r3; none names NativeStack2604."
+  ],
+  "recorded_at_utc": "2026-10-17T05:56:31Z",
+  "recipe": {
+    "path": "adoption/platforms/linux-wsl2-new-distro.md",
+    "catalog_revision": null,
+    "creation_path": "A",
+    "creation_path_basis": "W3 wrote user-data whose first line is '#cloud-config' (path A's input), and the transcript has no W6 block (path B's import and manual user). W5's markers, which would show path B, are not in the transcript."
+  },
+  "supported_images": {
+    "26.04.1": {
+      "file": "ubuntu-26.04.1-wsl-amd64.wsl",
+      "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
+      "sha256": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+      "catalog_name": "Ubuntu-26.04",
+      "bytes": 418495746
+    },
+    "24.04.5": {
+      "file": "ubuntu-24.04.5-wsl-amd64.wsl",
+      "url": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl",
+      "sha256": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
+      "catalog_name": "Ubuntu-24.04",
+      "bytes": 388975696
+    }
+  },
+  "rehearsal": {
+    "name": null,
+    "result": null,
+    "creation_path": null,
+    "schema_system": null,
+    "ownership_probe": null,
+    "idle_observation": null,
+    "storage_readings": null,
+    "export": {
+      "file": null,
+      "sha256": null,
+      "bytes": null
+    }
+  },
+  "pre_checks": {
+    "signed_sums": null,
+    "user_data_schema": null
+  },
+  "storage_errors": {
+    "baseline": null,
+    "newest_line_time": null,
+    "swap": null,
+    "second_count": null,
+    "new_lines": null
+  },
+  "host": {
+    "wsl_version": null,
+    "default_distribution_before": null,
+    "default_distribution_after": null,
+    "z_free_bytes": 2502399971328,
+    "idle_keys": "W1's .wslconfig read: vmIdleTimeout=-1 under [wsl2] (line 165, header line 27); instanceIdleTimeout=-1 under [general] (line 265, header line 234)",
+    "workstation_baseline": {
+      "uid": null,
+      "system_state": null,
+      "failed_units": null,
+      "user_manager": null,
+      "cgroup_namespace": null
+    }
+  },
+  "image": {
+    "release": "26.04.1",
+    "file": "ubuntu-26.04.1-wsl-amd64.wsl",
+    "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
+    "bytes": 418495746,
+    "sha256_published": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+    "sha256_distributioninfo": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+    "sha256_computed": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104"
+  },
+  "first_launch": {
+    "user_prompt_marker": null,
+    "oobe_failed_marker": null,
+    "schema_system": "cloud-init schema --system ended [exit=0]; its output line is not in the transcript",
+    "cloud_init_version": "cloud-init --version ended [exit=0]; its output line is not in the transcript",
+    "windows_region": null,
+    "cgroup_isolation": null,
+    "systemd_user_session_warning": null,
+    "getty_mask": {
+      "is_enabled": "systemctl is-enabled ended [exit=1], the normal exit for a masked unit; the state it printed is not in the transcript",
+      "load_state": "systemctl show ended [exit=0]; its LoadState line is not in the transcript",
+      "active_state": "systemctl show ended [exit=0]; its ActiveState line is not in the transcript",
+      "n_restarts": "systemctl show ended [exit=0]; its NRestarts line is not in the transcript"
+    }
+  },
+  "paired_isolation": {
+    "recorded_with": null,
+    "workstation": {
+      "uid": null,
+      "system_state": null,
+      "failed_units": null,
+      "user_manager": null,
+      "cgroup_namespace": null
+    },
+    "new_distribution": {
+      "uid": null,
+      "system_state": null,
+      "failed_units": null,
+      "user_manager": null,
+      "cgroup_namespace": null
+    }
+  },
+  "ownership_probe": "stat -c %u:%g ended [exit=0] on the probe; its output is not in the transcript",
+  "idle_observation": null,
+  "subordinate_ids": null,
+  "jcodemunch_registration": "skipped: F11 is not in the stage-1 transcript",
+  "authorization_settings": null,
+  "failed_attempt_export": {
+    "file": null,
+    "sha256": null,
+    "bytes": null
+  },
+  "steps": [
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'stat -c %U,%F /run/user/$(id -u) /run/user/$(id -u)/bus'",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec systemctl --user is-system-running --wait",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec test -c /dev/dxg",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec /usr/lib/wsl/lib/nvidia-smi",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'python3 --version'",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'uv run --no-project --python 3.13 python --version'",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'node --version'",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar'",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "$LASTEXITCODE",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar').Hash.ToLowerInvariant()",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar').Length",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "ls /proc/sys/fs/binfmt_misc",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "R1",
+      "cmd": "systemctl status systemd-binfmt.service --no-pager",
+      "exit": null,
+      "output_excerpt": "not in this transcript"
+    },
+    {
+      "step": "P1",
+      "cmd": "for RELEASE in 26.04.1 24.04.5; do",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P1",
+      "cmd": "SUMS_DIR=\"$(mktemp -d)\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P1",
+      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS\" \"https://releases.ubuntu.com/$RELEASE/SHA256SUMS\" || exit 1",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P1",
+      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS.gpg\" \"https://releases.ubuntu.com/$RELEASE/SHA256SUMS.gpg\" || exit 1",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P1",
+      "cmd": "gpgv --homedir \"$SUMS_DIR\" --keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg \"$SUMS_DIR/SHA256SUMS.gpg\" \"$SUMS_DIR/SHA256SUMS\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P1",
+      "cmd": "if [ \"$?\" -ne 0 ]; then exit 1; fi",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P1",
+      "cmd": "grep -F \" *ubuntu-$RELEASE-wsl-amd64.wsl\" \"$SUMS_DIR/SHA256SUMS\" || exit 1",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P1",
+      "cmd": "done",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P2",
+      "cmd": "RENDER_DIR=\"$(mktemp -d)\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P2",
+      "cmd": "python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/cloud-init.user-data.template '<WSL_USER>' > \"$RENDER_DIR/<Name>.user-data\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P2",
+      "cmd": "cloud-init --version",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P2",
+      "cmd": "cloud-init schema -c \"$RENDER_DIR/<Name>.user-data\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P2",
+      "cmd": "sha256sum \"$RENDER_DIR/<Name>.user-data\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P3",
+      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -Evc 'registering driver hv_storvsc|[Cc]ommand line:'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P3",
+      "cmd": "sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | grep -Ev 'registering driver hv_storvsc|[Cc]ommand line:' | tail -n 1",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P3",
+      "cmd": "cat /proc/uptime",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "P3",
+      "cmd": "swapon --show",
+      "exit": null,
+      "output_excerpt": "not in the transcript: P1 to P3 are workstation-shell pre-checks, outside the PowerShell transcript"
+    },
+    {
+      "step": "W1",
+      "cmd": "New-Item -ItemType Directory -Force -Path 'Z:\\WSL\\downloads'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it runs before Start-Transcript (adoption/platforms/linux-wsl2-new-distro.md:68)"
+    },
+    {
+      "step": "W1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "no line in the transcript"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --version",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath 'Z:\\WSL\\NativeStack2604'",
+      "exit": 0,
+      "output_excerpt": "False [ok=True]"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\NativeStack2604.user-data')",
+      "exit": 0,
+      "output_excerpt": "False [ok=True]"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\agent.yaml')",
+      "exit": 0,
+      "output_excerpt": "False [ok=True]"
+    },
+    {
+      "step": "W1",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\agent.yaml') -Pattern '^[A-Za-z_][A-Za-z0-9_-]*:' -ErrorAction SilentlyContinue",
+      "exit": 1,
+      "output_excerpt": "prints nothing, marked [ok=False] (the preceding Test-Path printed False)"
+    },
+    {
+      "step": "W1",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.wslconfig') -Pattern '^\\s*\\[', '^\\s*instanceIdleTimeout\\s*=', '^\\s*vmIdleTimeout\\s*=' -ErrorAction SilentlyContinue",
+      "exit": 0,
+      "output_excerpt": "line 27: [wsl2] | line 165: vmIdleTimeout=-1 | line 192: [experimental] | line 234: [general] | line 265: instanceIdleTimeout=-1 [ok=True]"
+    },
+    {
+      "step": "W1",
+      "cmd": "Get-PSDrive -Name Z | Select-Object -Property Name, Used, Free",
+      "exit": 0,
+      "output_excerpt": "Name Z; Used 1498368352256; Free 2502399971328 [ok=True]"
+    },
+    {
+      "step": "W1",
+      "cmd": "id -u",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl is-system-running",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl --failed --no-legend --plain",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl is-active \"user@$(id -u).service\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W1",
+      "cmd": "readlink /proc/self/ns/cgroup",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl show getty@tty1.service -p Result -p NRestarts",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ProgressPreference = 'SilentlyContinue'",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Release = '26.04.1'",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "switch ($Release) {",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "'26.04.1' { $Expected = '48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104'; $CatalogName = 'Ubuntu-26.04' }",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "'24.04.5' { $Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'; $CatalogName = 'Ubuntu-24.04' }",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "default { throw 'unsupported release: do not download or install' }",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "}",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Image = \"ubuntu-$Release-wsl-amd64.wsl\"",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ImagePath = \"Z:\\WSL\\downloads\\$Image\"",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ImageUrl = \"https://releases.ubuntu.com/$Release/$Image\"",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "$SumsPath = \"Z:\\WSL\\downloads\\$Release-SHA256SUMS\"",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri $ImageUrl -OutFile $ImagePath",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri \"https://releases.ubuntu.com/$Release/SHA256SUMS\" -OutFile $SumsPath",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Published = (Select-String -LiteralPath $SumsPath -Pattern (' \\*' + [regex]::Escape($Image) + '$')).Line.Split(' ')[0]",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content | ConvertFrom-Json).ModernDistributions.Ubuntu | Where-Object Name -eq $CatalogName",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $ImagePath).Hash.ToLowerInvariant()",
+      "exit": null,
+      "output_excerpt": "no output line; the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "\"computed $Actual published $Published listed $($Listed.Amd64Url.Sha256) url $($Listed.Amd64Url.Url)\"",
+      "exit": 0,
+      "output_excerpt": "computed 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 published 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 listed 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 url https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl"
+    },
+    {
+      "step": "W2",
+      "cmd": "if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected -or $Listed.Amd64Url.Url -ne $ImageUrl) { throw 'sha256 mismatch: do not install' }",
+      "exit": 0,
+      "output_excerpt": "no throw: the block ends [W2 completed without throw]"
+    },
+    {
+      "step": "W2",
+      "cmd": "(Get-Item -LiteralPath $ImagePath).Length",
+      "exit": 0,
+      "output_excerpt": "418495746"
+    },
+    {
+      "step": "W3",
+      "cmd": "New-Item -ItemType Directory -Force -Path (Join-Path $env:USERPROFILE '.cloud-init')",
+      "exit": 0,
+      "output_excerpt": "Directory: %USERPROFILE% | d----- 10/2/2026 8:55 AM .cloud-init [New-Item ok=True]"
+    },
+    {
+      "step": "W3",
+      "cmd": "$Text = [System.IO.File]::ReadAllText('<checkout>\\adoption\\templates\\wsl\\cloud-init.user-data.template').Replace('${WSL_USER}', '<WSL_USER>')",
+      "exit": 0,
+      "output_excerpt": "(no output) [ReadAllText ok=True]"
+    },
+    {
+      "step": "W3",
+      "cmd": "[System.IO.File]::WriteAllText((Join-Path $env:USERPROFILE '.cloud-init\\NativeStack2604.user-data'), $Text)",
+      "exit": 0,
+      "output_excerpt": "(no output) [WriteAllText ok=True]"
+    },
+    {
+      "step": "W3",
+      "cmd": "Get-Content -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\NativeStack2604.user-data') -TotalCount 1",
+      "exit": 0,
+      "output_excerpt": "#cloud-config [ok=True]"
+    },
+    {
+      "step": "W3",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\NativeStack2604.user-data') -Pattern '^- name: ', '^    default='",
+      "exit": 0,
+      "output_excerpt": "line 13: - name: <WSL_USER> | line 25:     default=<WSL_USER> [ok=True]"
+    },
+    {
+      "step": "W3",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\NativeStack2604.user-data')).Hash.ToLowerInvariant()",
+      "exit": 0,
+      "output_excerpt": "6eebab9fe9892c48931e4eccb1935411203ee27286edb7d6a6b535864f104e7e [ok=True]"
+    },
+    {
+      "step": "W3",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\NativeStack2604.user-data') -SimpleMatch -Pattern '${'",
+      "exit": 0,
+      "output_excerpt": "prints nothing [ok=True]"
+    },
+    {
+      "step": "W4",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "no line in the transcript"
+    },
+    {
+      "step": "W4",
+      "cmd": "wsl.exe --install --from-file 'Z:\\WSL\\downloads\\ubuntu-<RELEASE>-wsl-amd64.wsl' --name '<Name>' --location 'Z:\\WSL\\<Name>' --no-launch",
+      "exit": null,
+      "output_excerpt": "output not captured: the W4 block shows only an unlabeled line '0', then '[list exit=0]'"
+    },
+    {
+      "step": "W4",
+      "cmd": "$LASTEXITCODE",
+      "exit": null,
+      "output_excerpt": "the W4 block shows an unlabeled line '0'; the transcript does not say which command printed it"
+    },
+    {
+      "step": "W4",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": 0,
+      "output_excerpt": "output not captured; [list exit=0]"
+    },
+    {
+      "step": "W5",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "no line in the transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "cmd.exe /d /c \"wsl.exe -d <Name> < NUL\"",
+      "exit": null,
+      "output_excerpt": "output not captured: the W5 block shows only an unlabeled line '0' before its first labeled command"
+    },
+    {
+      "step": "W5",
+      "cmd": "$LASTEXITCODE",
+      "exit": null,
+      "output_excerpt": "the W5 block shows an unlabeled line '0'; the transcript does not say which command printed it"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'NativeStack2604' --exec id -un",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'NativeStack2604' --exec id -u",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'NativeStack2604' --exec systemctl is-enabled getty@tty1.service",
+      "exit": 1,
+      "output_excerpt": "output not captured: a blank line, then [exit=1]"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'NativeStack2604' --exec systemctl show getty@tty1.service -p LoadState -p ActiveState -p NRestarts",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'NativeStack2604' -u root --exec cloud-init --version",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'NativeStack2604' -u root --exec cloud-init status --long",
+      "exit": 2,
+      "output_excerpt": "output not captured: a blank line, then [exit=2]"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'NativeStack2604' -u root --exec cat /var/lib/cloud/data/result.json",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'NativeStack2604' -u root --exec cat /var/lib/cloud/data/status.json",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'NativeStack2604' -u root --exec cloud-init schema --system",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'NativeStack2604' -u root --exec cat /etc/wsl.conf",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec timedatectl show -p Timezone --value",
+      "exit": null,
+      "output_excerpt": "no line in the transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "tzutil /g",
+      "exit": null,
+      "output_excerpt": "no line in the transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "if (-not ('WslRegionProof.Native' -as [type])) { Add-Type -Namespace WslRegionProof -Name Native -MemberDefinition '[System.Runtime.InteropServices.DllImport(\"kernel32.dll\", CharSet=System.Runtime.InteropServices.CharSet.Unicode, ExactSpelling=true, SetLastError=true)] public static extern int GetUserDefaultGeoName(System.Text.StringBuilder geoName, int geoNameCount);' -ErrorAction Stop }; $wslRegionBuffer = [System.Text.StringBuilder]::new(16); if ([WslRegionProof.Native]::GetUserDefaultGeoName($wslRegionBuffer, $wslRegionBuffer.Capacity) -eq 0) { throw [System.ComponentModel.Win32Exception]::new([System.Runtime.InteropServices.Marshal]::GetLastWin32Error()) }; $wslRegionBuffer.ToString()",
+      "exit": null,
+      "output_excerpt": "no line in the transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'NativeStack2604' -u root --exec ls -l /etc/cloud/cloud-init.disabled",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'NativeStack2604' -u root --exec sudo -l -U '<WSL_USER>'",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0] (the transcript labels it 'sudo -l -U user')"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl is-active '<COMMON_UNIT>'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-active '<COMMON_UNIT>'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "cat '/sys/fs/cgroup/system.slice/<COMMON_UNIT>/cgroup.procs'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active \"user@$(id -u).service\"'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "id -u",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl is-system-running",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl --failed --no-legend --plain",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl is-active \"user@$(id -u).service\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "readlink /proc/self/ns/cgroup",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec id -u",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-system-running",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl --failed --no-legend --plain",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active \"user@$(id -u).service\"'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec readlink /proc/self/ns/cgroup",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W5",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": null,
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": null,
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar'",
+      "exit": null,
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
+    },
+    {
+      "step": "W5",
+      "cmd": "$LASTEXITCODE",
+      "exit": null,
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
+    },
+    {
+      "step": "W5",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": null,
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
+    },
+    {
+      "step": "W5",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar').Hash.ToLowerInvariant()",
+      "exit": null,
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
+    },
+    {
+      "step": "W5",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar').Length",
+      "exit": null,
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": null,
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": null,
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
+    },
+    {
+      "step": "W5",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": null,
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": null,
+      "output_excerpt": "no line in the transcript: the W5 block shows no removal or export, and W7 later ran against the same distribution"
+    },
+    {
+      "step": "W5",
+      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -Evc 'registering driver hv_storvsc|[Cc]ommand line:'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: a Linux-shell command, outside the PowerShell transcript"
+    },
+    {
+      "step": "W6",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-failed.tar'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "$LASTEXITCODE",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-failed.tar').Hash.ToLowerInvariant()",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-failed.tar').Length",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --import '<Name>' 'Z:\\WSL\\<Name>' 'Z:\\WSL\\downloads\\ubuntu-<RELEASE>-wsl-amd64.wsl' --version 2",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "systemctl mask --now getty@tty1.service",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "id -u '<WSL_USER>' || useradd --create-home --uid 1000 --groups adm,cdrom,sudo,dip,plugdev --shell /bin/bash '<WSL_USER>'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "printf '%s ALL=(ALL) NOPASSWD:ALL\\n' '<WSL_USER>' > /etc/sudoers.d/90-wsl-default-user",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "chmod 0440 /etc/sudoers.d/90-wsl-default-user",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "visudo -cf /etc/sudoers.d/90-wsl-default-user",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "grep -q '^\\[user\\]' /etc/wsl.conf || printf '\\n[user]\\ndefault=%s\\n' '<WSL_USER>' >> /etc/wsl.conf",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "python3 -c 'import configparser, io; from pathlib import Path; p = Path(\"/etc/wsl.conf\"); c = configparser.ConfigParser(interpolation=None); c.optionxform = str; c.read_string(p.read_text() if p.exists() else \"\"); c.has_section(\"time\") or c.add_section(\"time\"); c.set(\"time\", \"useWindowsTimezone\", \"true\"); out = io.StringIO(); c.write(out, space_around_delimiters=False); p.write_text(out.getvalue())' || exit \"$?\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "touch /etc/cloud/cloud-init.disabled",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --list --running",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d '<Name>' --exec id -un",
+      "exit": null,
+      "output_excerpt": "not in the transcript: it has no W6 block (W3 wrote '#cloud-config' user-data, path A's input)"
+    },
+    {
+      "step": "W7",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "no line in the transcript"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe --terminate 'NativeStack2604'",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe --list --running --quiet",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe -d 'NativeStack2604' --exec id -un",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W7",
+      "cmd": "New-Item -ItemType File -Path '\\\\wsl.localhost\\NativeStack2604\\home\\<WSL_USER>\\wsl-owner-probe'",
+      "exit": 0,
+      "output_excerpt": "Directory: \\\\wsl.localhost\\NativeStack2604\\home\\<WSL_USER> | ------ 10/2/2026 10:38 AM 0 wsl-owner-probe [ok=True]"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe -d 'NativeStack2604' --exec stat -c %u:%g '/home/<WSL_USER>/wsl-owner-probe'",
+      "exit": 0,
+      "output_excerpt": "output not captured: a blank line, then [exit=0]"
+    },
+    {
+      "step": "W7",
+      "cmd": "Remove-Item -LiteralPath '\\\\wsl.localhost\\NativeStack2604\\home\\<WSL_USER>\\wsl-owner-probe'",
+      "exit": 0,
+      "output_excerpt": "(prints nothing) [ok=True]"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl is-system-running --wait",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl --failed --no-legend --plain",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F1",
+      "cmd": "journalctl -b 0 -t systemd-binfmt --no-pager -n 4",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl list-unit-files --type=service --no-pager",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F1",
+      "cmd": "sudo journalctl -b 0 -t systemd-binfmt --no-pager -n 4",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F2",
+      "cmd": "sudo loginctl enable-linger \"$(id -un)\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F2",
+      "cmd": "loginctl show-user \"$(id -un)\" --property=Linger --value",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F2",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F2",
+      "cmd": "foreach ($Poll in 1..12) { Start-Sleep -Seconds 10; [DateTime]::UtcNow.ToString('HH:mm:ss'); wsl.exe --list --running --quiet }",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F3",
+      "cmd": "stat -c '%U %F' \"/run/user/$(id -u)\" \"/run/user/$(id -u)/bus\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F3",
+      "cmd": "systemctl --user is-system-running --wait",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F3",
+      "cmd": "docker --context rootless info --format '{{json .SecurityOptions}}'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F3",
+      "cmd": "docker --context rootless run --rm hello-world",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F4",
+      "cmd": "sudo apt-get update",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F4",
+      "cmd": "sudo apt-get install -y --no-install-recommends ca-certificates curl git tar gzip xz-utils jq libatomic1 uidmap",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F4",
+      "cmd": "dpkg-query -W -f='${Package} ${Version}\\n' jq libatomic1 uidmap",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F5",
+      "cmd": "grep \"^$(id -un):\" /etc/subuid /etc/subgid",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F5",
+      "cmd": "grep -q \"^$(id -un):\" /etc/subuid || sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 \"$(id -un)\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F5",
+      "cmd": "grep \"^$(id -un):\" /etc/subuid /etc/subgid",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F6",
+      "cmd": "test -e ~/.bash_profile || printf '%s\\n' 'if [ -r \"$HOME/.profile\" ]; then . \"$HOME/.profile\"; fi' > ~/.bash_profile",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F6",
+      "cmd": "cat ~/.bash_profile",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F7",
+      "cmd": "mkdir -p ~/code",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F7",
+      "cmd": "git clone https://github.com/seathatflowsinourveins/native-agent-stack.git ~/code/native-agent-stack",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F7",
+      "cmd": "git -C ~/code/native-agent-stack rev-parse HEAD",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F7",
+      "cmd": "git -C ~/code/native-agent-stack ls-remote origin refs/heads/main",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F8",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F8",
+      "cmd": "python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/host.new-distro.json.template \"$(id -un)\" > 'adoption/hosts/<host>.json'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F8",
+      "cmd": "python3 -m json.tool 'adoption/hosts/<host>.json'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F8",
+      "cmd": "git check-ignore 'adoption/hosts/<host>.json'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F8",
+      "cmd": "ss -ltnH > /tmp/native-stack-port-preflight.txt",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F8",
+      "cmd": "python3 -B evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py --host-file 'adoption/hosts/<host>.json' --ss-output /tmp/native-stack-port-preflight.txt",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F9",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F9",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --no-start --host-file 'adoption/hosts/<host>.json'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F9",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --host-file 'adoption/hosts/<host>.json'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --check",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F10",
+      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F10",
+      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=$(type -P $n); [[ -f $p && -x $p ]] && echo executable: $p; done'",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F11",
+      "cmd": "test -x \"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F11",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F11",
+      "cmd": "claude mcp add --scope local jcodemunch -e \"CODE_INDEX_PATH=$HOME/.code-index\" -e JCODEMUNCH_SHARE_SAVINGS=0 -- \"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\"",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    },
+    {
+      "step": "F11",
+      "cmd": "claude mcp get jcodemunch",
+      "exit": null,
+      "output_excerpt": "not in the transcript: the F outputs are kept separately from it (adoption/platforms/linux-wsl2-new-distro.md:1247) and were not an input to this receipt"
+    }
+  ],
+  "comparison_arms": {
+    "26.04.1": {
+      "status": "not in this transcript",
+      "name": null,
+      "first_boot": null,
+      "systemd_user_from_second_instance": null,
+      "wsl_gpu": null,
+      "uv_cpython_3_13": null,
+      "node_24": null
+    },
+    "24.04.5": {
+      "status": "not in this transcript",
+      "name": null,
+      "first_boot": null,
+      "systemd_user_from_second_instance": null,
+      "wsl_gpu": null,
+      "uv_cpython_3_13": null,
+      "node_24": null
+    }
+  },
+  "w5_failure_export": {
+    "file": null,
+    "sha256": null,
+    "bytes": null,
+    "cause": null
+  },
+  "interop_after_unregister": null,
+  "rootless_container": null,
+  "source_transcript": {
+    "path": "/mnt/z/WSL/downloads/NativeStack2604-stage1.log",
+    "windows_path": "Z:\\WSL\\downloads\\NativeStack2604-stage1.log",
+    "bytes": 9195,
+    "sha256": "0ead7573e318ce570db8d5cec9561e83a21866744f59e4fb437d04da881e46b7",
+    "mtime_utc": "2026-10-02T14:38:54Z",
+    "sections": 6,
+    "first_start_local": "20261002103814",
+    "last_end_local": "20261002103854",
+    "powershell": [
+      "5.1.26100.9168"
+    ],
+    "step_scripts": [
+      "W1.ps1",
+      "W2.ps1",
+      "W3.ps1",
+      "W4.ps1",
+      "W5.ps1",
+      "W7.ps1"
+    ],
+    "retention": "private raw log, kept on Z: and never committed (adoption/platforms/linux-wsl2-new-distro.md:1247)"
+  },
+  "deviations": [
+    "Ran under Windows PowerShell 5.1.26100.9168 (the transcript header); adoption/platforms/linux-wsl2-new-distro.md:61 now says stage 1 runs in PowerShell 7. The step scripts ran from ~/.local/state/native-agent-stack/new-wsl-final-20261002/steps on the NativeStack workstation distribution, reached through \\\\wsl.localhost.",
+    "The W5 sudo check is labeled 'sudo -l -U user' in the transcript."
+  ]
+}
