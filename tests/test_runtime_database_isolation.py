@@ -1,6 +1,6 @@
 """Native private DB fixture; no model/auth call or real account DB.
 
-anomalyco/opencode@53d1eabb:packages/core/src/flag/flag.ts:47 and
+anomalyco/opencode@e3c4eb24:packages/core/src/flag/flag.ts:47 and
 packages/core/src/database/database.ts:43-55 give the override precedence.
 """
 import argparse
@@ -69,7 +69,7 @@ class NativeDatabaseIsolationTests(unittest.TestCase):
                     with mock.patch.dict(os.environ,environment,clear=True), \
                             mock.patch.object(tempfile,'tempdir','/var/tmp'), \
                             mock.patch.object(profiles,'fresh_worktree',return_value=workspace), \
-                            mock.patch.object(profiles,'verify_runtime_binary',return_value='1.18.35'), \
+                            mock.patch.object(profiles,'verify_runtime_binary',return_value='1.19.3'), \
                             mock.patch.object(profiles,'choose_slot',return_value='fixture-slot'), \
                             mock.patch.object(profiles,'opencode_sandbox_command',side_effect=lambda command,*args:command), \
                             mock.patch.object(profiles,'cleanup_worktree',return_value={'status':'removed'}), \
@@ -114,7 +114,7 @@ class DatabaseEnvironmentPolicyTests(unittest.TestCase):
                 with mock.patch.dict(os.environ,{'HOME':str(state),'PATH':os.defpath,
                                                   'TMPDIR':'/var/tmp','OPENCODE_DB':str(outside)},clear=True), \
                         mock.patch.object(profiles,'fresh_worktree',return_value=workspace), \
-                        mock.patch.object(profiles,'verify_runtime_binary',return_value='1.18.35'), \
+                        mock.patch.object(profiles,'verify_runtime_binary',return_value='1.19.3'), \
                         mock.patch.object(profiles,'choose_slot',return_value='fixture-slot'), \
                         mock.patch.object(profiles,'opencode_sandbox_command',side_effect=lambda command,*args:command), \
                         mock.patch.object(profiles,'cleanup_worktree',return_value={'status':'removed'}), \

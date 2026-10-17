@@ -397,7 +397,7 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
 
     def test_an_ordinary_error_inside_a_response_settles_as_unknown_spend(self):
         # The GPT read and the local review at 64f41af3/5bea71f9: a step that started and never finished, ended by a
-        # non-credit API error (OpenCode exits 1: anomalyco/opencode@53d1eabb run.ts:842), left its usage unreported;
+        # non-credit API error (OpenCode exits 1: anomalyco/opencode@e3c4eb24 run.ts:832), left its usage unreported;
         # it was settled as known spend because the outcome was "ended".
         step = {"type": "step_finish", "sessionID": "ses_fixture1", "part": {"tokens": {"total": 9}, "cost": 0.5}}
         start = {"type": "step_start", "sessionID": "ses_fixture1", "part": {}}

@@ -65078,7 +65078,7 @@
     },
     {
       "path": "tests/test_pi_builder_output_budget.py",
-      "sha256": "9f887c3788c4fe0a097a826e5367ba771718e425735df1b56f821da104b9dcdc",
+      "sha256": "f42646c64d5c19feaef8ccc4d0796eca81fa10f069cc14cd7fcffa186f8ce03c",
       "bytes": 3086
     },
     {
@@ -65238,8 +65238,8 @@
     },
     {
       "path": "tests/test_runtime_database_isolation.py",
-      "sha256": "1dff0cfa903b3a4468a2a687c619786bfcb26edd8197dc5720b9a71dce728b6a",
-      "bytes": 10935
+      "sha256": "f3abcdb80cca399801fd291c7f37e3c07ab5b9e9bbc16375edf470f080368ca4",
+      "bytes": 10933
     },
     {
       "path": "tests/test_runtime_directory_identity.py",
@@ -65248,17 +65248,17 @@
     },
     {
       "path": "tests/test_runtime_opencode_native.py",
-      "sha256": "72c3f3ef5027aeb36b6f0581c3eb8e7c08bad29c5a4ef4d395e324927f386e6c",
-      "bytes": 17037
+      "sha256": "633bfdabeeefc8fc6f3602c89b72b34979c5b9ed412be6d8d3246821c0205bb4",
+      "bytes": 17033
     },
     {
       "path": "tests/test_runtime_profile_readiness.py",
-      "sha256": "ea6904016837c15760f1d7f96d27c7d81d897fdb865e8aaa9d3b176ec9db8ae7",
-      "bytes": 8473
+      "sha256": "bd43077409a6b23cf62c56315105596ed33e3a9863f125ac8499640b2512a8f3",
+      "bytes": 9806
     },
     {
       "path": "tests/test_runtime_profiles.py",
-      "sha256": "c9af3264e0fbb911e9d8fcabb0e951231328f9c2ec23ea802788c7ee370e842d",
+      "sha256": "0faf452fef01ef585282ca828891fa1f39059105ba67b929a85b4400ca05c297",
       "bytes": 91228
     },
     {
@@ -65738,8 +65738,8 @@
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "cfd44384626f7213f00fe18a139867e544acc46d1a8952c5dff5bf6a64bedc84",
-      "bytes": 105522
+      "sha256": "3f4c7d80cb3c9bb46fdc30a44baa5ce79c7eb901f46e0de1c6ef20ca475aad6b",
+      "bytes": 105740
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",

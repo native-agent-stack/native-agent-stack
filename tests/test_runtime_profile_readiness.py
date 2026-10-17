@@ -42,7 +42,7 @@ class RuntimeReadinessTests(unittest.TestCase):
     def test_absent_wrong_and_correct_runtime_versions_are_checked_without_native_user_state(self):
         with tempfile.TemporaryDirectory(dir="/var/tmp") as temporary:
             root = Path(temporary)
-            for runtime, expected in [('pi','1.1.0'),('opencode','1.18.35')]:
+            for runtime, expected in [('pi','1.3.0'),('opencode','1.19.3')]:
                 with self.subTest(runtime=runtime):
                     absent = root/runtime
                     with self.assertRaises(profiles.ProfileError):
@@ -53,12 +53,30 @@ class RuntimeReadinessTests(unittest.TestCase):
                     absent.write_text('#!/bin/sh\nprintf "'+expected+'\\n"\n')
                     self.assertEqual(profiles.verify_runtime_binary(runtime, absent),expected)
 
+    def test_the_previous_releases_are_refused_and_the_repinned_releases_admitted(self):
+        # Repin: pi 1.3.0 (earendil-works/pi@71023aec) and OpenCode 1.19.3 (anomalyco/opencode@e3c4eb24).
+        # Admission is an exact match, so the releases qualified before the repin must be refused in every
+        # output shape the native `--version` is accepted in.
+        pins = {'pi': ('1.3.0', '1.1.0'), 'opencode': ('1.19.3', '1.18.35')}
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as temporary:
+            root = Path(temporary)
+            for runtime, (current, previous) in pins.items():
+                for shape in ('{v}', '{r} {v}', '{r} v{v}'):
+                    with self.subTest(runtime=runtime, shape=shape):
+                        shim = root / (runtime + '-' + str(abs(hash((runtime, shape)))))
+                        shim.write_text('#!/bin/sh\nprintf "' + shape.format(r=runtime, v=previous) + '\\n"\n')
+                        shim.chmod(0o700)
+                        with self.assertRaises(profiles.ProfileError):
+                            profiles.verify_runtime_binary(runtime, shim)
+                        shim.write_text('#!/bin/sh\nprintf "' + shape.format(r=runtime, v=current) + '\\n"\n')
+                        self.assertEqual(profiles.verify_runtime_binary(runtime, shim), current)
+
     def test_installed_public_runtime_versions_match_the_qualified_releases(self):
         import os
         supplied={'pi':os.environ.get('NS_PI_TEST_BIN'),'opencode':os.environ.get('NS_OPENCODE_TEST_BIN')}
         if not all(supplied.values()):self.skipTest('explicit installed public binary paths required')
-        self.assertEqual(profiles.verify_runtime_binary('pi',Path(supplied['pi'])),'1.1.0')
-        self.assertEqual(profiles.verify_runtime_binary('opencode',Path(supplied['opencode'])),'1.18.35')
+        self.assertEqual(profiles.verify_runtime_binary('pi',Path(supplied['pi'])),'1.3.0')
+        self.assertEqual(profiles.verify_runtime_binary('opencode',Path(supplied['opencode'])),'1.19.3')
 
     def test_changed_runtime_binding_refuses_launch_before_creating_worktree(self):
         with tempfile.TemporaryDirectory(dir="/var/tmp") as temporary:
@@ -111,7 +129,7 @@ class RuntimeReadinessTests(unittest.TestCase):
                         return subprocess.CompletedProcess(command,code)
                     return subprocess.CompletedProcess(command,0)
                 with mock.patch.object(profiles,'fresh_worktree',return_value=workspace), \
-                        mock.patch.object(profiles,'verify_runtime_binary',return_value='1.18.35',create=True), \
+                        mock.patch.object(profiles,'verify_runtime_binary',return_value='1.19.3',create=True), \
                         mock.patch.object(profiles,'opencode_sandbox_command',side_effect=lambda command,*a:command), \
                         mock.patch.object(profiles,'cleanup_worktree') as cleanup, \
                         mock.patch.object(profiles.subprocess,'run',side_effect=run),redirect_stdout(io.StringIO()):

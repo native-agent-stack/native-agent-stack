@@ -38,7 +38,7 @@ class PiBuilderOutputTests(unittest.TestCase):
                                     ('reviewer', 8192), ('auditor', 8192), (None, 8192)]:
                 with self.subTest(route=route, scope=scope), tempfile.TemporaryDirectory(dir='/var/tmp') as td:
                     state = Path(td)
-                    with mock.patch.object(profiles, 'verify_runtime_binary', return_value='1.1.0'), \
+                    with mock.patch.object(profiles, 'verify_runtime_binary', return_value='1.3.0'), \
                             mock.patch.object(profiles, 'canonical_servers', return_value={'context-mode': {
                                 'command': 'node', 'args': []}}), \
                             mock.patch.object(profiles.shutil, 'which', return_value='/fixture/rtk'), \
