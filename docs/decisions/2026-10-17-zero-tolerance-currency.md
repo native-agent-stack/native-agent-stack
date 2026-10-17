@@ -60,15 +60,17 @@ file amends them.
 
 The 2026-10-15 direction covers every date-compared failure inside the required `validate` check, which needs every
 shard of the validate matrix, 0 to 7, to succeed (`.github/workflows/validate.yml:26,454,476-480`;
-`docs/github-automation.md:34-36`). Two are known in `scripts/validate.py`, which shard 0 runs (`:173-178`), and the
-modules it imports. Enforcement stays with the daily runs, the CC's review and immediate replacement work.
+`docs/github-automation.md:34-36`). Two are known in `scripts/validate.py`, which shard 0 runs
+(`.github/workflows/validate.yml:173-178`), and the modules it imports. Enforcement stays with the daily runs, the
+CC's review and immediate replacement work.
 
 - **The model-currency age failure.** The age check compares release and landscape-check dates with the current UTC
   date (`scripts/validate.py:73-75,246-248`). For a release more than 42 days old, a `landscape_check` that turns
   eight days old therefore fails the required check for any pull request until it is refreshed. On 2026-10-15 the
   "nine October 7 landscape exceptions became eight days old at UTC rollover", and the current-date
-  `model_currency_problems(document)` check "reproduces nine errors on the base inventory" (2026-10-15 record
-  `:4,48-49`). This record endorses [PR #1201](https://github.com/native-agent-stack/native-agent-stack/pull/1201),
+  `model_currency_problems(document)` check "reproduces nine errors on the base inventory"
+  ([2026-10-15 record](2026-10-15-model-currency-landscape-check.md) `:4,48-49`). This record endorses
+  [PR #1201](https://github.com/native-agent-stack/native-agent-stack/pull/1201),
   which turns the age failure into a notice (Sources). Until #1201 lands, the check stays as it is, and each
   `landscape_check` is renewed by its lane's refresh, which the daily run prompts on day five
   (`docs/model-currency.md:108-112`). CC ruling 6, as corrected.
@@ -102,11 +104,12 @@ modules it imports. Enforcement stays with the daily runs, the CC's review and i
 - **No startup audit.** Dispatch happens in a lane, never at session start. The September 30 no-startup-audit
   contract stays authoritative ([2026-10-09 record](2026-10-09-active-model-currency.md) `:65-66`).
 - **Each replacement's gates.** The layer's screen and multi-angle convergence
-  ([2026-10-12 record](2026-10-12-converged-candidates-only.md)); the 2026-10-13 re-pin triggers (`:88-98`,
-  `:128-135`, `:150-160`); and trading runtime selections, which stay with the trading lane
-  (`blueprints/us-equities/AGENTS.md:9`). This record makes their qualification due at once and relaxes no
-  trading-strategy or order-path gate. A candidate that fails its screen or cannot fit keeps its recorded reason and
-  re-check trigger, as the 2026-09-27 holds do (`:67-84`).
+  ([2026-10-12 record](2026-10-12-converged-candidates-only.md)); the
+  [2026-10-13 record](2026-10-13-engine-currency.md)'s re-pin triggers (`:88-98`, `:128-135`, `:150-160`); and
+  trading runtime selections, which stay with the trading lane (`blueprints/us-equities/AGENTS.md:9`). This record
+  makes their qualification due at once and relaxes no trading-strategy or order-path gate. A candidate that fails its
+  screen or cannot fit keeps its recorded reason and re-check trigger, as the
+  [2026-09-27 record](2026-09-27-model-currency.md)'s holds do (`:67-84`).
 - **The layer-resolution protocol** governs each dispatch ([2026-10-11 record](2026-10-11-layer-resolution-protocol.md)
   `:29-60`): read the verdict and the latest sweep, then dispatch only the delta. A newer release that a daily run
   finds triggers its layer's sweep at once, as a targeted sweep run, and a FINAL layer still reopens only through
@@ -116,8 +119,10 @@ modules it imports. Enforcement stays with the daily runs, the CC's review and i
 
 1. **Daily runs.** `stack-currency.timer` (`adoption/templates/systemd/stack-currency.timer:14-17`) starts
    `stack-currency.service`, which pulls in and runs after `upstream-surface-watch.service`
-   (`stack-currency.service:51-52,63-64`; `upstream-surface-watch.service:49-50`). Both run from the live clone
-   (`stack-currency.service:7-9`; `upstream-surface-watch.service:16`).
+   (`adoption/templates/systemd/stack-currency.service:51-52,63-64`;
+   `adoption/templates/systemd/upstream-surface-watch.service:49-50`). Both run from the live clone
+   (`adoption/templates/systemd/stack-currency.service:7-9`;
+   `adoption/templates/systemd/upstream-surface-watch.service:16`).
 2. **Fast-forward before each run.** The templates carry no fetch or fast-forward step. On the workstation each service
    has a user drop-in, `~/.config/systemd/user/<unit>.d/10-live-clone-ff.conf`, that runs `git fetch origin main` and
    then `git merge --ff-only origin/main`, each with systemd's `-` prefix. This is a host observation, read with
@@ -130,8 +135,9 @@ modules it imports. Enforcement stays with the daily runs, the CC's review and i
    in a parallel currency lane. A newer release that a daily run finds schedules its layer's targeted sweep at once:
    the cross-vendor screen that the daily runs cannot do, since they check only each row's own release line and its
    landscape check's age (`docs/model-currency.md:101-102,108-111`). A FINAL layer reopens only through that sweep
-   (protocol `:62-63`), and the lane then dispatches only the delta. A comparison whose inputs exist and has not run
-   is a defect (protocol `:92-94`); work starts when its inputs exist, never on a date (`AGENTS.md:8`).
+   ([protocol](2026-10-11-layer-resolution-protocol.md) `:62-63`), and the lane then dispatches only the delta. A
+   comparison whose inputs exist and has not run is a defect (protocol `:92-94`); work starts when its inputs exist,
+   never on a date (`AGENTS.md:8`).
 5. **Dates from tool reads.** Each date names the field it came from, read at pick time: the Hub's `createdAt`
    (repository creation) or the selected revision's commit date, labelled as such; the Anthropic models API
    `created_at` (release time, an epoch value when unknown); PyPI's per-file `upload_time_iso_8601`; a GitHub
@@ -145,7 +151,8 @@ modules it imports. Enforcement stays with the daily runs, the CC's review and i
 - Step order. In `stack-currency.service` the drop-in's steps run after the unit's own
   `freshness_propose.py --model-currency` pre-step, in the order `systemctl --user show` reported. Normally the watch
   has just fast-forwarded the same clone. When the paper-window check skips the watch, its later commands are skipped
-  too (`upstream-surface-watch.service:26-32`), so that day's model proposals read the clone before the fast-forward.
+  too (`adoption/templates/systemd/upstream-surface-watch.service:26-32`), so that day's model proposals read the
+  clone before the fast-forward.
   A failed fetch also leaves a run on the last fast-forwarded bytes, as the drop-in's own comment says.
 - `docs/model-currency.md` keeps the superseded wording; a pointer to this record is a follow-up, left out here because
   open PRs #1201 and #840 edit that guide.
@@ -155,7 +162,8 @@ modules it imports. Enforcement stays with the daily runs, the CC's review and i
 
 - **A date-compared required check, new or kept.** Rule 3 rules it out ("The existing date-compared failures").
 - **Notices and proposals alone,** the superseded reading. A known stale pick stays in use until someone acts.
-- **A timer that switches.** Rejected for the reason the 2026-10-07 record gives (`:56-57`, quoted under Kept).
+- **A timer that switches.** Rejected for the reason the [2026-10-07 record](2026-10-07-model-currency-enforcement.md)
+  gives (`:56-57`, quoted under Kept).
 
 ## Overturn
 
