@@ -343,7 +343,8 @@ class Harness:
 
     def worker(self, repos, *, post=False, keys=KEYS):
         self.gh_fixtures.write_text(json.dumps(self.fixtures))
-        settings = crw.Settings(self.state, self.ledger_path, tuple(keys), self.claude, post, 60)
+        settings = crw.Settings(self.state, self.ledger_path, tuple(keys), self.claude, post, 60,
+                                claude_sha256=crw.sha256_file(self.claude))  # a pin is required (#1127 B4)
         self.launcher = DirectLauncher(self.claude, {"PATH": os.environ.get("PATH", os.defpath),
                                                      "FAKE_CLAUDE_SCRIPT": str(self.script),
                                                      "FAKE_CLAUDE_LOG": str(self.claude_log)})
@@ -695,30 +696,96 @@ class ReviewRunTest(unittest.TestCase):
         self.assertEqual([c["key"] for c in h.launcher.calls], [KEYS[0]])
         self.assertEqual([(r["kind"], r["key"]) for r in h.rows()], [("debit", KEYS[0]), ("void", KEYS[0])])
         self.assertTrue(any("no longer matches its sha256 pin" in line and KEYS[1] in line for line in h.logs), h.logs)
+        # #1127 B6 (Muse P3, carried from d7ca288c): key 1 ran, so the tick's log says so, not that nothing started.
+        self.assertFalse(any("did not start" in line for line in h.logs), h.logs)
+        self.assertTrue(any(f"{KEYS[0]} (credit_exhausted) ran and were refused" in line for line in h.logs), h.logs)
+
+    def test_a_binary_that_becomes_unreadable_before_the_next_key_starts_nothing_more(self):
+        # #1127 B5 (Muse P3 at 37dfd70a): the per-key read-failure branch (again is None) had no test; the mismatch
+        # branch is the test above. A read error before key 2 stops the run before the switch row, the debit and the
+        # launch.
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.queue([refusal(402, "API Error: 402 billing_error"), run_of(PASS_REPORT)])
+        worker = h.worker([repo])
+        identity, fresh_reads = worker.binary_identity, []
+
+        def unreadable_at_the_second_fresh_read(*, fresh=False):
+            if fresh:
+                fresh_reads.append(1)
+                if len(fresh_reads) == 2:  # the first is the run's own hash, the second the check before key 2
+                    raise PermissionError(13, "Permission denied")
+            return identity(fresh=fresh)
+
+        worker.binary_identity = unreadable_at_the_second_fresh_read
+        worker.tick()
+        self.assertEqual(len(fresh_reads), 2)
+        self.assertEqual([c["key"] for c in h.launcher.calls], [KEYS[0]])
+        self.assertEqual([(r["kind"], r["key"]) for r in h.rows()], [("debit", KEYS[0]), ("void", KEYS[0])])
+        self.assertTrue(any("could not be read" in line and KEYS[1] in line for line in h.logs), h.logs)
+        attempt = h.record(repo, 3, sha)["attempts"][-1]
+        self.assertEqual((attempt["outcome"], attempt["counted"]), ("launch_failed", False))
+
+    def test_a_refusal_before_any_debit_keeps_its_receipt_when_the_next_attempt_runs(self):
+        # #1127 B6 (Muse P3, carried from d7ca288c): an undebited refusal appended no attempt, so the next attempt took
+        # the same number and overwrote attempt{N}/receipt.json. It is recorded (uncounted), and the next attempt gets
+        # its own number and directory.
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.queue([run_of(PASS_REPORT)])
+        worker = h.worker([repo])
+        checked = worker.preflight
+
+        def preflight_then_replace(*args, **kwargs):
+            problems = checked(*args, **kwargs)
+            with open(h.claude, "a", encoding="utf-8") as handle:
+                handle.write("# replaced after the check\n")
+            return problems
+
+        worker.preflight = preflight_then_replace
+        worker.tick()
+        self.assertEqual((h.launcher.calls, h.rows()), ([], []))
+        first = h.record(repo, 3, sha)["attempts"]
+        self.assertEqual([(a["number"], a["outcome"], a["counted"]) for a in first], [(1, "launch_failed", False)])
+        refused = h.state / first[0]["report_path"] / "receipt.json"
+        self.assertEqual(json.loads(refused.read_text())["outcome"], "launch_failed")
+        # The replaced binary is pinned again (an operator's re-pin), and the next tick reviews the head.
+        again = h.worker([repo])
+        again.settings = dataclasses.replace(again.settings, claude_sha256=crw.sha256_file(h.claude))
+        again.tick()
+        attempts = h.record(repo, 3, sha)["attempts"]
+        self.assertEqual([(a["number"], a["outcome"]) for a in attempts], [(1, "launch_failed"), (2, "completed")])
+        self.assertNotEqual(attempts[0]["report_path"], attempts[1]["report_path"])
+        self.assertEqual(json.loads(refused.read_text())["outcome"], "launch_failed")  # not overwritten
+        second = h.state / attempts[1]["report_path"] / "receipt.json"
+        self.assertEqual(json.loads(second.read_text())["outcome"], "completed")
 
     def test_a_binary_that_cannot_be_read_at_the_run_is_a_recorded_refusal(self):
         # CC adjudication of #1127 at 0fb64d83 (e): the read-error correction of fix 2 gets its own test, and a binary
         # that stays unreadable cannot escape while the refusal's receipt is written (the receipt's binary field read
-        # the same file).
+        # the same file). The read error is raised by the hash function itself, not by chmod(0), which root ignores
+        # (#1127 B6), so the test holds under any euid.
         h = Harness(self)
         repo, sha = self.private(h)
         h.queue([run_of(REPORT)])
         worker = h.worker([repo])
-        worker.settings = dataclasses.replace(worker.settings, claude_sha256=crw.sha256_file(h.claude))
         checked = worker.preflight
+        unreadable = mock.patch.object(crw, "sha256_file", side_effect=PermissionError(13, "Permission denied"))
 
         def preflight_then_unreadable(*args, **kwargs):
             problems = checked(*args, **kwargs)
-            h.claude.chmod(0)
+            unreadable.start()  # every later read of the binary fails, the receipt's included
             return problems
 
         worker.preflight = preflight_then_unreadable
         try:
             worker.tick()
         finally:
-            h.claude.chmod(0o755)
+            unreadable.stop()
         self.assertEqual((h.launcher.calls, h.rows()), ([], []))
         self.assertTrue(any("could not be read for its sha256 check" in line for line in h.logs), h.logs)
+        receipt = h.state / "reports" / repo.slug / f"pr3-{sha}" / "attempt1" / "receipt.json"
+        self.assertIsNone(json.loads(receipt.read_text())["binary"])
 
     def test_a_private_repository_gets_the_status_and_one_sanitized_comment(self):
         h = Harness(self)
@@ -1033,7 +1100,8 @@ class ReviewRunTest(unittest.TestCase):
             runner = Path(temporary) / "credential_run.py"
             runner.write_text("import sys\nsys.exit(0 if sys.argv[1] == 'anthropic-api-4' else 1)\n")
             launcher = crw.SandboxLauncher(Path("/c/claude"), "/usr/bin/true", credential_run=runner)
-            settings = crw.Settings(Path(temporary) / "state", None, KEYS, Path("/c/claude"), False, 60)
+            settings = crw.Settings(Path(temporary) / "state", None, KEYS, Path("/c/claude"), False, 60,
+                                    claude_sha256="0" * 64)
             worker = crw.Worker([], settings, {"PATH": "/usr/bin:/bin", "HOME": temporary}, launcher=launcher,
                                 log=lambda line: None, bwrap="")
             self.assertEqual([worker.key_usable(k) for k in KEYS], [True, False, False])
@@ -1694,9 +1762,11 @@ class InvocationTest(unittest.TestCase):
                 self.assertNotIn("--unshare-net", argv)
                 self.assertNotIn("ANTHROPIC_API_KEY", " ".join(argv))
                 written = json.loads((net / "srt.json").read_text())
+                # allowNestedUserNamespaces lets the inner bwrap make its user namespace under srt 0.0.80 (#1127 B1).
                 self.assertEqual(written, {"network": {"allowedDomains": ["api.anthropic.com"], "deniedDomains": []},
                                            "filesystem": {"denyRead": [], "allowWrite": [str(plan.config_dir)],
-                                                          "denyWrite": []}})
+                                                          "denyWrite": []},
+                                           "allowNestedUserNamespaces": True})
                 for forbidden in crw.SRT_FORBIDDEN:
                     self.assertNotIn(forbidden, json.dumps(written))
                 self.assertEqual((net / "srt.json").stat().st_mode & 0o777, 0o600)
@@ -1722,11 +1792,30 @@ class InvocationTest(unittest.TestCase):
             deep = crw.Boundary(Path(temporary) / "none", Path(temporary) / "none", Path("/" + "x" * 60))
             self.assertTrue(any("too long" in problem for problem in deep.problems()))
 
+    # boundary_self_check's probe output through srt 0.0.80 with allowNestedUserNamespaces, 2026-10-17 12:08:37Z.
     MEASURED = ("interfaces lo \napi 0 404 200\nother 7 000 403\ndirect 6 000 000\nloopback_direct 7 000 000\n"
-                "loopback_proxy 0 403 000\n")
+                "loopback_proxy 0 403 000\nvsock refused EPERM\n")
+
+    def test_the_pinned_srt_is_0_0_80_from_its_registry_tarball_with_nested_namespaces_allowed(self):
+        # #1127 B1 (security read P2-1 at 37dfd70a): 0.0.79 has no AF_VSOCK rule, and a vsock socket opened inside its
+        # chain (measured 2026-10-17). The pin is 0.0.80, whose integrity is the npm registry's own value, and the
+        # settings carry the opt-out its inner bwrap needs. A silent change of any literal fails here.
+        self.assertEqual(crw.SRT_VERSION, "0.0.80")
+        self.assertEqual(crw.SRT_INTEGRITY, "sha512-WG4P8faU/JDH90I8NLUBPmg7e72zhanlW3AVCD0OF06JCtId9IDFewFgv4YRvHLcn"
+                                            "n//h1r6a1AMosBsMLpxnA==")
+        self.assertIs(crw.Boundary.settings("/c")["allowNestedUserNamespaces"], True)
+        self.assertIn("allowAllUnixSockets", crw.SRT_FORBIDDEN)  # it would drop the seccomp helper, and its vsock rule
+        tarball = "7da66e1a5161bbcb57cf8a6f7ba7d85f1e6bb7897040b295885dc74c1a255f95"
+        readme = (TOOL / "README.md").read_text(encoding="utf-8")
+        for text in (tarball, "npm pack @anthropic-ai/sandbox-runtime@0.0.80",
+                     "--ignore-scripts ./anthropic-ai-sandbox-runtime-0.0.80.tgz",
+                     "`@anthropic-ai/sandbox-runtime` 0.0.80"):
+            self.assertIn(text, readme)
+        self.assertIn(f"(sha256 {tarball})", (TOOL / "worker.py").read_text(encoding="utf-8"))
 
     def test_the_boundary_check_passes_only_what_was_measured_closed(self):
-        self.assertTrue(crw.judge_boundary(self.MEASURED, 0)[0])
+        ok, detail = crw.judge_boundary(self.MEASURED, 0)
+        self.assertTrue(ok, detail)
         broken = {
             "a host interface": ("interfaces lo ", "interfaces eth0 lo "),
             "no proxy (the client would hang)": ("api 0 404 200", "api 7 000 000"),
@@ -1735,19 +1824,25 @@ class InvocationTest(unittest.TestCase):
             "host loopback direct": ("loopback_direct 7 000 000", "loopback_direct 0 200 000"),
             "host loopback through the proxy": ("loopback_proxy 0 403 000", "loopback_proxy 0 200 000"),
             "a probe missing": ("direct 6 000 000\n", ""),
+            # #1127 B1: srt 0.0.79's chain let the socket open; no filter (EAFNOSUPPORT) or no answer fails as well.
+            "a vsock socket opened": ("vsock refused EPERM", "vsock opened"),
+            "vsock refused by the kernel, not the filter": ("vsock refused EPERM", "vsock refused EAFNOSUPPORT"),
+            "the vsock line missing": ("vsock refused EPERM\n", ""),
         }
         for name, (old, new) in broken.items():
             with self.subTest(name=name):
                 self.assertIn(old, self.MEASURED)
                 self.assertFalse(crw.judge_boundary(self.MEASURED.replace(old, new), 0)[0])
         self.assertFalse(crw.judge_boundary(self.MEASURED, 1)[0])  # the host listener was reached
+        self.assertIn("socket(AF_VSOCK) refused", detail)  # what the boundary refuses, named (#1127 B1)
 
     def test_no_tick_reads_a_key_without_the_boundary_and_its_check(self):
         h = Harness(self)
         repo, shas = h.repo("o/priv", heads={1: {"a.py": "a\n"}})
         h.pulls("o/priv", [pull("o/priv", 1, shas[1])])
         h.gh_fixtures.write_text(json.dumps(h.fixtures))
-        settings = crw.Settings(h.state, h.ledger_path, KEYS, h.claude, False, 60)
+        settings = crw.Settings(h.state, h.ledger_path, KEYS, h.claude, False, 60,
+                                claude_sha256=crw.sha256_file(h.claude))
         worker = crw.Worker([repo], settings, h.env(), clock=h.clock, log=h.logs.append, bwrap="/usr/bin/true")
         self.assertIs(worker.launcher.boundary, worker.boundary)  # the worker's own launcher always has srt
         original = (crw.sandbox_self_check, crw.boundary_self_check)
@@ -1776,17 +1871,48 @@ class InvocationTest(unittest.TestCase):
         self.assertEqual((started, h.rows()), ([], []))  # no run started and nothing debited
 
     def test_preflight_refuses_a_client_binary_that_fails_its_sha256_check(self):
-        # B2 (CC, 2026-10-15): the worker runs a retained copy of the adopted release (2.1.302) and checks it at every tick;
-        # a binary whose sha256 is not the pinned one stops the tick before any key is read.
+        # B2 (CC, 2026-10-15): the worker runs a retained copy of the adopted release (2.1.302 since 2026-10-17) and
+        # checks it at every tick; a binary whose sha256 is not the pinned one stops the tick before any key is read.
         h = Harness(self)
         repo, _ = h.repo("o/priv", heads={1: {"a.py": "a\n"}})
         digest = hashlib.sha256(h.claude.read_bytes()).hexdigest()
-        for expected, refused in ((digest, False), ("0" * 64, True), (None, False)):
+        for expected, refused in ((digest, False), ("0" * 64, True)):
             with self.subTest(expected=expected):
                 settings = crw.Settings(h.state, h.ledger_path, KEYS, h.claude, False, 60, claude_sha256=expected)
                 worker = crw.Worker([repo], settings, h.env(), clock=h.clock, log=h.logs.append, bwrap="")
                 problems = worker.preflight(sandbox=False)
                 self.assertEqual(any("CLAUDE_BIN failed its sha256 check" in p for p in problems), refused, problems)
+
+    def test_settings_without_a_pin_are_refused(self):
+        # #1127 B4 (Muse P3 at 37dfd70a): claude_sha256=None switched every hash gate off, for an in-process caller
+        # that builds Settings itself. A missing or malformed pin now refuses the settings, so no gate can be skipped.
+        h = Harness(self)
+        for pin in (None, "", "0" * 63, "A" * 64):
+            with self.subTest(pin=pin), self.assertRaisesRegex(crw.ConfigError, "sha256 pin"):
+                crw.Settings(h.state, h.ledger_path, KEYS, h.claude, False, 60, claude_sha256=pin)
+        settings = crw.Settings(h.state, h.ledger_path, KEYS, h.claude, False, 60,
+                                claude_sha256=crw.sha256_file(h.claude))
+        with self.assertRaisesRegex(crw.ConfigError, "sha256 pin"):
+            dataclasses.replace(settings, claude_sha256=None)
+
+    def test_a_relative_client_binary_is_refused_even_with_its_digest(self):
+        # #1127 B2 (Muse P2 at 37dfd70a): the worker hashes CLAUDE_BIN from its own working directory, while bwrap binds
+        # it from srt's run directory, so a relative path could hash one file and run another. It is refused, even
+        # with the right digest; so is a relative HOME, which would make the default paths relative.
+        h = Harness(self)
+        digest = crw.sha256_file(h.claude)
+        for env, needle in (({"HOME": "/h", "CLAUDE_BIN": os.path.relpath(h.claude), "CLAUDE_BIN_SHA256": digest},
+                             "CLAUDE_BIN must be an absolute path"),
+                            ({"HOME": "/h", "CLAUDE_BIN": "../../shared/claude", "CLAUDE_BIN_SHA256": digest},
+                             "CLAUDE_BIN must be an absolute path"),
+                            ({"HOME": "h"}, "HOME must be an absolute path"),
+                            *(({"HOME": "/h", name: "relative/path"}, f"{name} must be an absolute path")
+                              for name in ("CLAUDE_REVIEW_STATE", "CLAUDE_REVIEW_SRT", "CLAUDE_REVIEW_NODE",
+                                           "CLAUDE_REVIEW_UPSTREAM", "API_ACTIONS_LEDGER"))):
+            with self.subTest(env=env), self.assertRaisesRegex(crw.ConfigError, needle):
+                crw.settings_from(env)
+        with self.subTest("Settings itself"), self.assertRaisesRegex(crw.ConfigError, "absolute"):
+            crw.Settings(h.state, h.ledger_path, KEYS, Path("claude"), False, 60, claude_sha256=digest)
 
     def test_an_unreadable_client_binary_is_a_recorded_refusal(self):
         # GPT full1 P3-3 and CC micro F2 (2026-10-15): an OSError from the hash read (unreadable, or removed after the
@@ -1826,8 +1952,11 @@ class InvocationTest(unittest.TestCase):
         self.assertEqual(crw.DEFAULT_CLAUDE_BIN_SHA256, "60d7eb7f12fbb28a52533fe8be5884097403562aa02dc73991a021c7067e29a5")
         self.assertEqual(settings.claude_sha256, crw.DEFAULT_CLAUDE_BIN_SHA256)
         # An override fails closed (GPT full1 blocker 1 and CC micro F1, 2026-10-15): another path needs its own digest, an
-        # empty digest is none, and the default path, however it is spelled, keeps the default digest.
-        for env in ({"CLAUDE_BIN": "/x/claude"}, {"CLAUDE_BIN": "/x/claude", "CLAUDE_BIN_SHA256": ""}):
+        # empty digest is none, and the default path keeps the default digest when it is spelled with ~ or as its
+        # expanded absolute path. The comparison is lexical (#1127 B7), so any other spelling of the same file, such as
+        # one with a .. segment, counts as another binary and needs its own digest.
+        for env in ({"CLAUDE_BIN": "/x/claude"}, {"CLAUDE_BIN": "/x/claude", "CLAUDE_BIN_SHA256": ""},
+                    {"CLAUDE_BIN": "/h/.local/share/claude-retained/../claude-retained/2.1.302/claude"}):
             with self.subTest(env=env), self.assertRaisesRegex(crw.ConfigError, "CLAUDE_BIN_SHA256"):
                 crw.settings_from({"HOME": "/h", **env})
         for spelled in (crw.DEFAULT_CLAUDE_BIN, "/h/.local/share/claude-retained/2.1.302/claude"):
@@ -1915,7 +2044,8 @@ class ProbesOfflineTest(unittest.TestCase):
 
     def test_the_fixture_builds_and_its_link_is_stripped_before_any_run(self):
         fixture = probes.build_fixture(self.base / "fixture")
-        settings = crw.Settings(self.base / "state", None, KEYS, self.base / "claude", False, 60)
+        settings = crw.Settings(self.base / "state", None, KEYS, self.base / "claude", False, 60,
+                                claude_sha256="0" * 64)
         worker = crw.Worker([], settings, {"PATH": os.environ.get("PATH", os.defpath), "HOME": str(self.base)},
                             launcher=DirectLauncher(self.base / "claude", {}), bwrap="")
         candidate, plan = probes.prepare(worker, fixture)
@@ -2245,7 +2375,8 @@ class RealSandboxChainTest(unittest.TestCase):
         h.pulls("o/priv", [pull("o/priv", 1, shas[1])])
         h.gh_fixtures.write_text(json.dumps(h.fixtures))
         env = {**h.env(), "XDG_CONFIG_HOME": str(config)}
-        settings = crw.Settings(h.state, h.ledger_path, ("anthropic-api-3",), stand_in, False, 120)
+        settings = crw.Settings(h.state, h.ledger_path, ("anthropic-api-3",), stand_in, False, 120,
+                                claude_sha256=crw.sha256_file(stand_in))
         launcher = crw.SandboxLauncher(stand_in, shutil.which("bwrap"))
         worker = crw.Worker([repo], settings, env, launcher=launcher, clock=Clock(), log=h.logs.append)
         candidate = worker.list_heads()[0]
@@ -2293,7 +2424,8 @@ class RealBoundaryChainTest(unittest.TestCase):
         h.pulls("o/priv", [pull("o/priv", 1, shas[1])])
         h.gh_fixtures.write_text(json.dumps(h.fixtures))
         env = {**h.env(), "XDG_CONFIG_HOME": str(config)}
-        settings = crw.Settings(h.state, h.ledger_path, ("anthropic-api-3",), stand_in, False, 120)
+        settings = crw.Settings(h.state, h.ledger_path, ("anthropic-api-3",), stand_in, False, 120,
+                                claude_sha256=crw.sha256_file(stand_in))
         boundary = crw.Boundary(Path(SRT_NODE), Path(SRT_PREFIX), crw.net_base(dict(os.environ)))
         self.assertEqual(boundary.problems(), [])
         launcher = crw.SandboxLauncher(stand_in, shutil.which("bwrap"), boundary=boundary)

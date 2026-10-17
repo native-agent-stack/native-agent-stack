@@ -18,7 +18,7 @@ measurements and its open boundaries is
 2. Checks it can run at all, before any key is read: the ledger is named, the pinned binary exists, bubblewrap starts
    the binary in the sandbox, node, srt and socat are the pinned ones, and a keyless check through srt and bubblewrap
    shows the network boundary closed (only `lo`, the API reachable through srt's proxy, `example.com` refused, no
-   direct route, and nothing reaching a listener on the host's loopback).
+   direct route, nothing reaching a listener on the host's loopback, and `socket(AF_VSOCK)` refused with `EPERM`).
 3. Settles anything a stopped tick left open: an open `CRW` debit becomes an unknown settle at 11 USD, an attempt
    still marked `started` becomes `interrupted` (counted, not final), and the stopped run's leftover scratch (its
    CLAUDE_CONFIG_DIR, an archive) is deleted.
@@ -48,9 +48,14 @@ for a paths-limited review, and the attempt is final.
 The review process is started as `env … node <srt>/dist/cli.js --settings <run>/srt.json -- env … credential_run.py
 <key> -- bwrap … /opt/claude-review/claude -p …`. srt starts without the key. The runner, srt's command, reads the key
 store and passes the key in the environment of bwrap and the client only, never in argv, so srt's node process, shells
-and bridges never hold it. srt (Anthropic's sandbox runtime, `@anthropic-ai/sandbox-runtime` 0.0.79) is the network
-boundary: its own bubblewrap layer gives the run a network namespace with only `lo`, and its proxy on the host,
-reached through a bound unix socket, passes `api.anthropic.com` and refuses everything else. srt gets a private
+and bridges never hold it. srt (Anthropic's sandbox runtime, `@anthropic-ai/sandbox-runtime` 0.0.80) is the network
+boundary: its own bubblewrap layer gives the run a network namespace with only `lo`, so IP traffic has no route but
+srt's proxy on the host, reached through a bound unix socket, which passes `api.anthropic.com` and refuses every other
+host. A network namespace does not fence VM sockets (on WSL2 a vsock connection reaches the host past the proxy), so
+srt's seccomp filter refuses the command `socket(AF_VSOCK)`, and new `AF_UNIX` sockets, with `EPERM`. The settings set
+`allowNestedUserNamespaces`, without which srt 0.0.80 refuses the inner bubblewrap its user namespace; its price is
+that srt's own write denies do not hold against a command that makes one, a limit 0.0.79 did not have either (the
+comment at `SRT_VERSION` in `worker.py` gives the sources and the measurement). srt gets a private
 directory per run under `$XDG_RUNTIME_DIR/claude-review-worker/` (its settings, TMPDIR, HOME and an empty working
 directory), deleted after the run. The inner bubblewrap is the filesystem fence. It has a new root:
 `/usr` and `/etc` read-only, `/proc`, `/dev`, an empty `/tmp`, an empty home at `/review/home`, the main worktree at
@@ -73,13 +78,13 @@ prompt says the check covers citation presence only.
 ## Install (command center)
 
 0. Install srt from its pinned npm tarball (sha256
-   `5a730e4367c264ccc4b592af01dab038a6c39db7c184efbd132841688fa854f1`), without its install scripts, and check that
+   `7da66e1a5161bbcb57cf8a6f7ba7d85f1e6bb7897040b295885dc74c1a255f95`), without its install scripts, and check that
    socat is installed. Node is the host's mise install (`~/.local/share/mise/installs/node/24.21.0/bin/node`, at least
    22.12). The worker checks the version and npm's recorded integrity of the install on every tick.
 
    ```sh
-   npm pack @anthropic-ai/sandbox-runtime@0.0.79   # then compare sha256sum of the .tgz with the value above
-   npm install --prefix ~/.local/share/claude-review-worker/srt --ignore-scripts ./anthropic-ai-sandbox-runtime-0.0.79.tgz
+   npm pack @anthropic-ai/sandbox-runtime@0.0.80   # then compare sha256sum of the .tgz with the value above
+   npm install --prefix ~/.local/share/claude-review-worker/srt --ignore-scripts ./anthropic-ai-sandbox-runtime-0.0.80.tgz
    ```
 1. Run the offline probes, then the live probes.
    - The offline checks cover the sandbox, the client's start, main's project settings, the run's config directory
@@ -112,7 +117,9 @@ prompt says the check covers citation presence only.
    #   versions/ (the native installer's cleanup keeps only the launcher's, running and two newest versions there)
    # CLAUDE_BIN_SHA256=60d7eb7f12fbb28a52533fe8be5884097403562aa02dc73991a021c7067e29a5   # checked at every tick; the
    #   default binary's digest is built in (the signed 2.1.302 manifest's linux-x64 checksum); a CLAUDE_BIN naming
-   #   another path needs this line too, or the worker stops at its settings (exit 2): no binary runs unchecked
+   #   another path needs this line too, or the worker stops at its settings (exit 2); every path must be absolute.
+   #   The check is by path: the file is hashed at the tick and again before each key's launch, then bubblewrap binds
+   #   it by path, so a writer with the worker's own uid could swap it in between; that uid can already edit worker.py
    # CLAUDE_REVIEW_STATE=~/.local/state/native-agent-stack/claude-review-worker
    # CLAUDE_REVIEW_TIMEOUT_SECONDS=2700
    # CLAUDE_REVIEW_UPSTREAM=~/code/upstream   # the local upstream mirrors, read as git objects only
