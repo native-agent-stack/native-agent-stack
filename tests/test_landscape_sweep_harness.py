@@ -1547,6 +1547,19 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
                 else:
                     self.assertIn(f'url = "{expected}"', config)
 
+    def test_readme_documents_the_standalone_search_option_and_its_byte_identity_exception(self):
+        # Review D2 on #1251: the hardening section said every opt-in leaves the lane home and the failover argv
+        # byte-identical when absent, but the search default changed both; --standalone-web-search had no table row.
+        readme = (HARNESS / "README.md").read_text(encoding="utf-8")
+        section = readme.split("#### Opt-in lane hardening", 1)[1].split("\n#### ", 1)[0]
+        claim = section.split("byte-identical to before", 1)[1].split("\n\n", 1)[0]
+        self.assertIn("standalone web search", claim)
+        self.assertIn("`config.toml`", claim)
+        self.assertIn("failover argv", claim)
+        rows = [line for line in section.splitlines() if line.startswith("| `--standalone-web-search`")]
+        self.assertEqual(len(rows), 1, rows)
+        self.assertIn("`standalone_web_search`", rows[0])
+
     def test_builder_and_runner_keep_the_name_patterns_equal(self):
         # build_args.py checks what it stages and codex_job.py what it runs; the two copies must never drift.
         for name in ("MODEL_NAME", "HEADER_VALUE"):

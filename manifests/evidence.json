@@ -17643,7 +17643,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "6b6f24739e6a2dcfcb271f8cd7a975b1d5eb7c0e5c35c1554fb2101d0d8cc6c3",
+      "sha256": "70226f1d50b19ab719b74764252418d80f55438790d98f225ff5ae0c8f16046f",
       "bytes": 193410
     },
     {
@@ -64603,8 +64603,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "d18c4997372383f923825db8e6e7e4e5d1c0628e85c17719a6b1912e5b5c6242",
-      "bytes": 398010
+      "sha256": "316b74b9cac75a1dc43ccc99f3f3844d58c9f1b3a67be405103314b5e2560a0e",
+      "bytes": 398936
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
@@ -66088,8 +66088,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "c024ea5a9b0a9c89ec1c46023b740a42a5dab7128855bc1c04805ea676b4c0cc",
-      "bytes": 124385
+      "sha256": "6ab2e74151f09adcf6c9b3d8fa140f075f5b01ceea64ea9061118541f5efad62",
+      "bytes": 125364
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
