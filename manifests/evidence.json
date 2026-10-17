@@ -5782,8 +5782,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "dd39aee7815e52aed292ee3c0e9c6c0e232e6be3c5aef943bb78237b6e81cb99",
-      "bytes": 13903
+      "sha256": "a2ee127f3d1165971aaf4e976a8bd5088add7219584d7f5a7a359b4c17aae864",
+      "bytes": 14658
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -18583,8 +18583,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "43cc2ff82481dbf509418b036aabbe868b52812c78870c587eeaadfc64c23490",
-      "bytes": 150626
+      "sha256": "c54fb0c2d9687da3d4fe299c5d93c0aa9963bb8e017ac3c1cba9c2f6c3342cc6",
+      "bytes": 151670
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -64403,8 +64403,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "dd3256ecc09f7fb0d451fe74b0630cde59dd2acd6de04e78f38dc5f37e44febc",
-      "bytes": 172637
+      "sha256": "8e8f5055b5cc5c39e6d6bb681cb83dd3b608f895130d326dfc94f6feb8a6c1af",
+      "bytes": 175283
     },
     {
       "path": "tests/test_install_skills.py",
