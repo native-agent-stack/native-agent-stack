@@ -1,0 +1,47 @@
+# systemd-analyze security --offline=yes --user --json=short, rows ProtectSystem, ProtectHome, PrivateTmp, PrivateUsers of the rendered services (systemd 259.5)
+## before: sources of 6c4bbd0db
+verify exit 0 stderr lines 0
+claude security exit 0 stdout bytes 13383 stderr bytes 0
+  json type list len 81
+   {"set": false, "name": "ProtectSystem=", "json_field": "ProtectSystem", "description": "Service has full access to the OS file hierarchy", "exposure": "0.2"}
+   {"set": false, "name": "ProtectHome=", "json_field": "ProtectHome", "description": "Service has full access to home directories", "exposure": "0.2"}
+   {"set": false, "name": "PrivateUsers=", "json_field": "PrivateUsers", "description": "Service has access to other users", "exposure": "0.2"}
+   {"set": false, "name": "PrivateTmp=", "json_field": "PrivateTmp", "description": "Service has access to other software's temporary files", "exposure": "0.2"}
+  keys of one row: ['description', 'exposure', 'json_field', 'name', 'set']
+codex security exit 0 stdout bytes 13383 stderr bytes 0
+  json type list len 81
+   {"set": false, "name": "ProtectSystem=", "json_field": "ProtectSystem", "description": "Service has full access to the OS file hierarchy", "exposure": "0.2"}
+   {"set": false, "name": "ProtectHome=", "json_field": "ProtectHome", "description": "Service has full access to home directories", "exposure": "0.2"}
+   {"set": false, "name": "PrivateUsers=", "json_field": "PrivateUsers", "description": "Service has access to other users", "exposure": "0.2"}
+   {"set": false, "name": "PrivateTmp=", "json_field": "PrivateTmp", "description": "Service has access to other software's temporary files", "exposure": "0.2"}
+  keys of one row: ['description', 'exposure', 'json_field', 'name', 'set']
+
+## after: this change
+verify exit 0 stderr lines 0
+claude security exit 0 stdout bytes 13399 stderr bytes 0
+  json type list len 81
+   {"set": true, "name": "ProtectSystem=", "json_field": "ProtectSystem", "description": "Service has strict read-only access to the OS file hierarchy", "exposure": null}
+   {"set": false, "name": "ProtectHome=", "json_field": "ProtectHome", "description": "Service has read-only access to home directories", "exposure": "0.1"}
+   {"set": true, "name": "PrivateTmp=", "json_field": "PrivateTmp", "description": "Service has no access to other software's temporary files", "exposure": null}
+   {"set": false, "name": "PrivateUsers=", "json_field": "PrivateUsers", "description": "Service has access to other users", "exposure": "0.2"}
+  keys of one row: ['description', 'exposure', 'json_field', 'name', 'set']
+codex security exit 0 stdout bytes 13399 stderr bytes 0
+  json type list len 81
+   {"set": true, "name": "ProtectSystem=", "json_field": "ProtectSystem", "description": "Service has strict read-only access to the OS file hierarchy", "exposure": null}
+   {"set": false, "name": "ProtectHome=", "json_field": "ProtectHome", "description": "Service has read-only access to home directories", "exposure": "0.1"}
+   {"set": true, "name": "PrivateTmp=", "json_field": "PrivateTmp", "description": "Service has no access to other software's temporary files", "exposure": null}
+   {"set": false, "name": "PrivateUsers=", "json_field": "PrivateUsers", "description": "Service has access to other users", "exposure": "0.2"}
+  keys of one row: ['description', 'exposure', 'json_field', 'name', 'set']
+
+## round 3: PrivateUsers=true added (the rendered services of this change)
+verify exit 0 stderr lines 0
+claude security exit 0 stdout bytes 13407 stderr bytes 0
+   {"set": true, "name": "ProtectSystem=", "json_field": "ProtectSystem", "description": "Service has strict read-only access to the OS file hierarchy", "exposure": null}
+   {"set": false, "name": "ProtectHome=", "json_field": "ProtectHome", "description": "Service has read-only access to home directories", "exposure": "0.1"}
+   {"set": true, "name": "PrivateTmp=", "json_field": "PrivateTmp", "description": "Service has no access to other software's temporary files", "exposure": null}
+   {"set": true, "name": "PrivateUsers=", "json_field": "PrivateUsers", "description": "Service does not have access to other users", "exposure": null}
+codex security exit 0 stdout bytes 13407 stderr bytes 0
+   {"set": true, "name": "ProtectSystem=", "json_field": "ProtectSystem", "description": "Service has strict read-only access to the OS file hierarchy", "exposure": null}
+   {"set": false, "name": "ProtectHome=", "json_field": "ProtectHome", "description": "Service has read-only access to home directories", "exposure": "0.1"}
+   {"set": true, "name": "PrivateTmp=", "json_field": "PrivateTmp", "description": "Service has no access to other software's temporary files", "exposure": null}
+   {"set": true, "name": "PrivateUsers=", "json_field": "PrivateUsers", "description": "Service does not have access to other users", "exposure": null}

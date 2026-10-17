@@ -1,0 +1,50 @@
+Each command of the daily run on its own as a transient user unit (systemd-run --user --wait), one at a time; times are UTC; no sandbox.
+
+== claude-doctor
+name=claude-doctor
+start=2026-10-12T11:20:11Z
+end=2026-10-12T11:20:31Z
+exit=0
+Running as unit: ccnp-half-claude-doctor.service; invocation ID: 8b96affe4dc3433c8f67222e315d74f6
+          Finished with result: success
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 19.943s
+             CPU time consumed: 30.393s
+                   Memory peak: 1.5G (swap: 0B)
+
+== claude-sweep
+name=claude-sweep
+start=2026-10-12T11:20:31Z
+end=2026-10-12T11:22:49Z
+exit=0
+Running as unit: ccnp-half-claude-sweep.service; invocation ID: 062ac79ebed645d98f683c8f9dccba7b
+          Finished with result: success
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 2min 17.869s
+             CPU time consumed: 2min 39.690s
+                   Memory peak: 1.8G (swap: 0B)
+
+== codex-host
+name=codex-host
+start=2026-10-12T11:22:49Z
+end=2026-10-12T11:24:00Z
+exit=0
+Running as unit: ccnp-half-codex-host.service; invocation ID: 1f3ec62d8e0f462ca018e9fcddc6e9d0
+          Finished with result: success
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 1min 10.473s
+             CPU time consumed: 1min 5.154s
+                   Memory peak: 2.8G (swap: 0B)
+
+== codex-lanes (skill_usage.py --lanes over the Codex rollouts; window since/until UTC: 2026-10-12T09:46:08Z 2026-10-05T09:46:08Z)
+Running as unit: ccnp-codex-lanes-check.service; invocation ID: 6139c59dd7654cef896ba3e39812ec38
+          Finished with result: success
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 25min 47.126s
+             CPU time consumed: 29min 18.112s
+                   Memory peak: 1.8G (swap: 0B)
+exit=0
+
+== parameters of the first three runs (interpreters and load averages at start/end)
+until=2026-10-12T11:20:11+00:00 since=2026-10-05T11:20:11+00:00 py=~/.local/share/mise/installs/python/3.13.16/bin/python3 node=~/.local/share/codex-ecosystem/bin/node load=12.44 17.73 18.94
+load-at-end=17.56 17.20 18.42

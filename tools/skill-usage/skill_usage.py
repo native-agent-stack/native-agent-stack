@@ -88,14 +88,19 @@ def now_utc() -> datetime:
 
 
 def parse_iso(text: str) -> datetime:
-    """Parse an ISO-8601 timestamp (accepting a trailing 'Z') as a tz-aware UTC datetime."""
+    """Parse an ISO-8601 timestamp (accepting a trailing 'Z') as a tz-aware UTC datetime. A timestamp that is valid but whose conversion to UTC leaves the supported range (0001-01-01T00:00:00+01:00 and
+    9999-12-31T23:59:59-01:00 do) is a ValueError like any other unusable timestamp, with no value in its text: the conversion raises OverflowError, which the callers' handlers of ValueError did not cover
+    (python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91: Modules/_datetimemodule.c L6510-L6515 (astimezone subtracts the offset and returns its failure) and L805-L808 (a date outside the supported range sets OverflowError "date value out of range"); Lib/_pydatetime.py L2034 and L2230 the same in the pure-Python implementation)."""
     value = text.strip()
     if value.endswith("Z"):
         value = value[:-1] + "+00:00"
     parsed = datetime.fromisoformat(value)
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc)
+    try:
+        return parsed.astimezone(timezone.utc)
+    except OverflowError:
+        raise ValueError("timestamp is out of range") from None
 
 
 def parse_approx_count(raw: str) -> int | None:
@@ -129,7 +134,7 @@ def parse_skill_doctor_text(text: str) -> dict[str, dict]:
             "context_tokens": parse_approx_count(groups["context"]),
             "tokens_7d": parse_approx_count(groups["tokens_7d"]),
             "uses": int(groups["uses"]),
-            "last_used": groups["last_used"].strip(),
+            "last_used": closed_last_used(groups["last_used"].strip()),
         }
     return rows
 
@@ -167,7 +172,7 @@ def parse_claude_output(raw: str) -> dict:
     plain-text capture: there is no cost signal to check, because there is no result event.
     """
     try:
-        events = json.loads(raw)
+        events = decode_capture(raw)
     except json.JSONDecodeError:
         return {"format": "text", "rows": parse_skill_doctor_text(raw),
                 "total_cost_usd": None, "num_turns": None}
@@ -186,19 +191,19 @@ def parse_claude_output(raw: str) -> dict:
     # pin above), and is_error can be true while subtype is "success" (an API error, types.py:1358-1360),
     # so only a result that is both "success" and not is_error carries a /skill-doctor table.
     if result_event.get("subtype") != "success" or result_event.get("is_error") is not False:
-        return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
-                "error": f"refusing an error result (subtype={result_event.get('subtype')!r}, "
-                         f"is_error={result_event.get('is_error')!r})"}
+        return {"format": "json", "rows": {}, "total_cost_usd": closed_number(total_cost_usd), "num_turns": closed_number(num_turns),
+                "error": f"refusing an error result (subtype={closed_word(result_event.get('subtype'))}, "
+                         f"is_error={closed_flag(result_event.get('is_error'))})"}
     if not evaluate_cost(total_cost_usd, num_turns):
-        return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
-                "error": f"refusing a nonzero-cost result (total_cost_usd={total_cost_usd!r}, "
-                         f"num_turns={num_turns!r}); a native /skill-doctor run is zero-cost"}
+        return {"format": "json", "rows": {}, "total_cost_usd": closed_number(total_cost_usd), "num_turns": closed_number(num_turns),
+                "error": f"refusing a nonzero-cost result (total_cost_usd={closed_text(total_cost_usd)}, "
+                         f"num_turns={closed_text(num_turns)}); a native /skill-doctor run is zero-cost"}
     text = result_event.get("result")
     if not isinstance(text, str):
-        return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
+        return {"format": "json", "rows": {}, "total_cost_usd": closed_number(total_cost_usd), "num_turns": closed_number(num_turns),
                 "error": "result event has no string 'result' field"}
     return {"format": "json", "rows": parse_skill_doctor_text(text),
-            "total_cost_usd": total_cost_usd, "num_turns": num_turns}
+            "total_cost_usd": closed_number(total_cost_usd), "num_turns": closed_number(num_turns)}
 
 
 # /skill-doctor is a local command (0 turns, $0), so these fences change nothing while the client recognises it:
@@ -251,7 +256,15 @@ def skill_doctor_argv(managed_paths=None) -> list:
     return list(SKILL_DOCTOR_ARGV)
 
 
-def run_skill_doctor(*, timeout: int = 30, runner=subprocess.run, managed_paths=None) -> dict:
+# One capture is about one core of CPU work, so its wall time follows the load of the host. Measured 2026-10-12 on Claude Code 2.1.296 (the account's store held 6,263 transcript files, 7.3 GB): 13 captures on a quiet
+# host took 17.2 to 20.1 s (median 18.5), 26.5 CPU seconds in 18.5 s, and 19.0 s with the process pinned to one CPU (start-up and hooks are about 2 s of it; the rest is the command's own work, over a store that was
+# not varied). On one CPU shared with two busy loops (three runnable threads per CPU) two captures took 57.7 and 61.9 s. The capture of 2026-10-11T16:13:49Z that hit the old 30 s limit ran at a 1 minute load of 175
+# on 64 CPUs (2.7 per CPU); over 7 days that load peaked at 201 (3.1 per CPU, about 58 s) and its 95th percentile was 111 (1.7 per CPU, about 32 s, already past 30 s). 300 s is five times the capture at the peak
+# and leaves room for the store to double during the trial (docs/decisions/2026-10-12-skill-invoke-rate-timer.md).
+DEFAULT_CLAUDE_TIMEOUT = 300
+
+
+def run_skill_doctor(*, timeout: int = DEFAULT_CLAUDE_TIMEOUT, runner=subprocess.run, managed_paths=None) -> dict:
     """Run skill_doctor_argv() (SKILL_DOCTOR_ARGV; without --strict-mcp-config on a host with a managed MCP config),
     stdin from /dev/null."""
     try:
@@ -541,9 +554,22 @@ def node_path_join(*parts: str) -> Path:
     return install_skills.node_path_join(*parts)
 
 
+def validated_installed_at(value) -> str | None:
+    """An installation time as published: the value itself when parse_iso accepts it, else None. The skills CLI writes an
+    ISO timestamp (vercel-labs/skills@7407f389 v1.7.0 src/skill-lock.ts L30-L31, L182-L188), so anything else is not one,
+    and its text must not reach a report (fix round 11 of #1043: an unparseable value was copied into installed_at)."""
+    if not isinstance(value, str):
+        return None
+    try:
+        parse_iso(value)
+    except ValueError:
+        return None
+    return value
+
+
 def load_lock_installed_at(lock_path: Path) -> dict[str, str]:
-    """{name: installedAt} from the lock's version-3 skills{} map. Missing or unreadable is {},
-    never an error: age becomes unknown for every skill rather than aborting the report."""
+    """{name: installedAt} from the lock's version-3 skills{} map, keeping only values that parse as timestamps. Missing or
+    unreadable is {}, never an error: age becomes unknown for every skill rather than aborting the report."""
     try:
         document = json.loads(Path(lock_path).read_text(encoding="utf-8"))
     except (OSError, ValueError):
@@ -552,7 +578,7 @@ def load_lock_installed_at(lock_path: Path) -> dict[str, str]:
     if not isinstance(skills, dict):
         return {}
     return {name: entry["installedAt"] for name, entry in skills.items()
-            if isinstance(entry, dict) and isinstance(entry.get("installedAt"), str)}
+            if isinstance(entry, dict) and validated_installed_at(entry.get("installedAt")) is not None}
 
 
 # --------------------------------------------------------------------------- join and report
@@ -603,13 +629,11 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
         codex_enabled = bool(skill.get("codex_enabled", False))
         claude_listed = claude_listing != "off"
 
-        installed_at = lock_installed_at.get(name)
+        # Published only after it parses, whoever built the map (a lock read, a plugin's record or a direct caller).
+        installed_at = validated_installed_at(lock_installed_at.get(name))
         age_days = None
         if installed_at:
-            try:
-                age_days = (now - parse_iso(installed_at)).total_seconds() / 86400.0
-            except ValueError:
-                age_days = None
+            age_days = (now - parse_iso(installed_at)).total_seconds() / 86400.0
 
         if not claude_usable:
             claude_out: dict | str = "not-measured"
@@ -629,7 +653,7 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
             else:
                 claude_out = {"listing": claude_listing, "in_table": True,
                               "context_tokens": row["context_tokens"], "uses": row["uses"],
-                              "last_used": row["last_used"]}
+                              "last_used": closed_last_used(row["last_used"])}
             claude_zero = claude_out["uses"] == 0 if claude_out["uses"] is not None else None
             claude_evaluated = claude_listed and claude_out["uses"] is not None
 
@@ -2337,7 +2361,7 @@ def render_lanes_text(report: dict) -> str:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = FixedErrorParser(description=__doc__.splitlines()[0])
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     claude_source = parser.add_mutually_exclusive_group()
     claude_source.add_argument("--claude-skill-doctor", type=Path, metavar="FILE",
@@ -2348,8 +2372,8 @@ def build_parser() -> argparse.ArgumentParser:
                                 help=f"Run '{shlex.join(SKILL_DOCTOR_ARGV)}' now (stdin from /dev/null; without "
                                      "--strict-mcp-config where a managed MCP config is deployed); refused "
                                      "unless total_cost_usd == 0 and num_turns == 0")
-    parser.add_argument("--claude-timeout", type=int, default=30, metavar="SECONDS",
-                         help="Timeout for --run-skill-doctor (default: 30)")
+    parser.add_argument("--claude-timeout", type=int, default=DEFAULT_CLAUDE_TIMEOUT, metavar="SECONDS",
+                         help=f"Timeout for --run-skill-doctor (default: {DEFAULT_CLAUDE_TIMEOUT}; a capture takes about 19 s on a quiet host and about 60 s at three runnable threads per CPU)")
     parser.add_argument("--codex-root", action="append", default=[], type=Path, metavar="DIR",
                          help="Root to scan for rollout-*.jsonl (repeatable; no default search: "
                               "omit entirely to report Codex as not-measured)")
@@ -2390,21 +2414,21 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv=None) -> int:
+def run(argv=None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
     try:
         manifest = load_manifest(args.manifest)
     except (OSError, ValueError) as error:
-        print(f"skill_usage: invalid manifest {args.manifest}: {type(error).__name__}: {error}",
-              file=sys.stderr)
+        print(f"skill_usage: invalid manifest ({type(error).__name__})",
+              file=sys.stderr)   # the class only: the path and the text of the error are the caller's
         return 2
 
     try:
         now = parse_iso(args.now) if args.now else now_utc()
-    except ValueError as error:
-        print(f"skill_usage: invalid --now: {error}", file=sys.stderr)
+    except ValueError:
+        print("skill_usage: invalid --now", file=sys.stderr)   # the text of the parser's error holds the argument (python/cpython@cbc944f4bc59 Modules/_datetimemodule.c L5774-L5775)
         return 2
 
     if args.lanes:
@@ -2473,7 +2497,7 @@ def out_refused(out: Path | None) -> bool:
         return False
     resolved_out = out.resolve()
     if resolved_out == ROOT or ROOT in resolved_out.parents:
-        print(f"skill_usage: refusing --out inside the repository checkout: {out}", file=sys.stderr)
+        print("skill_usage: refusing --out inside the repository checkout", file=sys.stderr)
         return True
     return False
 
@@ -2600,8 +2624,8 @@ def lanes_main(args, manifest: dict, now: datetime) -> int:
     try:
         since = parse_iso(args.since) if args.since is not None else None
         until = parse_iso(args.until) if args.until is not None else None
-    except ValueError as error:
-        print(f"skill_usage: invalid --since/--until: {error}", file=sys.stderr)
+    except ValueError:
+        print("skill_usage: invalid --since/--until", file=sys.stderr)
         return 2
     if since is not None and until is not None and since >= until:
         print("skill_usage: --since must be earlier than --until", file=sys.stderr)
@@ -2642,8 +2666,8 @@ def lanes_main(args, manifest: dict, now: datetime) -> int:
     if ledger is not None:
         try:
             write_private_ledger(args.call_ledger, ledger)
-        except ValueError as error:
-            print(f"skill_usage: --call-ledger: {error}", file=sys.stderr)
+        except ValueError:
+            print("skill_usage: --call-ledger: refused (the path is inside a git work tree or exists)", file=sys.stderr)
             return 2
         except OSError as error:
             print(f"skill_usage: --call-ledger: cannot create the file ({type(error).__name__})", file=sys.stderr)
@@ -2652,6 +2676,88 @@ def lanes_main(args, manifest: dict, now: datetime) -> int:
         return 2
     print(json.dumps(report, indent=2, sort_keys=True) if args.json else render_lanes_text(report))
     return 0
+
+
+# These sit at the end of the module so that no line number cited by another record (ledger_path_issue, the native metadata) moves; build_parser, parse_claude_output, parse_skill_doctor_text and build_report use them at call time.
+ARGUMENT_REFUSAL = "skill_usage: the command line has an argument this version does not take, or lacks one it needs; nothing was run"
+
+
+class FixedErrorParser(argparse.ArgumentParser):
+    """A command line this program cannot use ends in one fixed line and exit 2: argparse's own message names the values it could not use (`unrecognized arguments: ...`, `invalid int value: ...`), and a
+    command line of this program carries paths. `error` is argparse's hook for another behavior (python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91 Lib/argparse.py L1925-L1932 builds the message from the
+    values and calls it; L2675-L2686 prints the message to stderr and exits 2, and says an override should exit or raise)."""
+
+    def error(self, message):
+        self.exit(2, ARGUMENT_REFUSAL + "\n")
+
+
+# What a captured result may put into a diagnostic or into the report (review round 10, the fix8 verdict's blocker 1): a value of the capture is never copied through a character filter, which a bare name of an
+# account passes. A subtype is one of the words the SDK documents for a result (anthropics/claude-agent-sdk-python@f7529348747235da34af3ed202251228ff31db08 src/claude_agent_sdk/_errors.py:71 and :78-80 and
+# src/claude_agent_sdk/types.py:2057-2060 name success, error_max_turns, error_during_execution and error_max_budget_usd; ResultMessage.subtype is an open `str`, types.py:1343, so any other word is `other`), a
+# flag is the boolean it is, a count is a finite number that is not a boolean, and everything else is `other` (diagnostic) or null (report).
+RESULT_SUBTYPES = frozenset({"success", "error_max_turns", "error_during_execution", "error_max_budget_usd"})
+
+
+def closed_word(value) -> str:
+    """The subtype of a result as a diagnostic may carry it: one of RESULT_SUBTYPES, else `other`."""
+    return value if isinstance(value, str) and value in RESULT_SUBTYPES else "other"
+
+
+def closed_flag(value) -> str:
+    """A flag of a result as a diagnostic may carry it: `true` or `false` for a boolean, else `other`."""
+    return {True: "true", False: "false"}.get(value, "other") if isinstance(value, bool) else "other"
+
+
+def closed_number(value):
+    """A count of a result as the report may carry it: a finite number that is not a boolean, else None."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    return value if value == value and abs(value) != float("inf") else None
+
+
+def closed_text(value) -> str:
+    """A count of a result as a diagnostic may carry it: the number's text, else `other`."""
+    number = closed_number(value)
+    return "other" if number is None else repr(number)
+
+
+def decode_capture(raw: str):
+    """json.loads of a capture, where a text that is JSON but cannot be decoded (nested beyond the decoder's limit: python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91 Modules/_json.c L1031-L1046
+    raises RecursionError, and Lib/json/decoder.py L360-L363 translates only StopIteration; an integer beyond the digit limit raises ValueError) is None, which parse_claude_output refuses. A text that is not
+    JSON at all is still a JSONDecodeError, the plain-text table's route."""
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        raise
+    except (RecursionError, ValueError):
+        return None
+
+
+# What the last-used column of a captured table may put into the report (review round 11, the fix9 verdict file, blocker 1): the column is a time/status field of the native table, not a name, so no test of
+# its characters decides it; it is one of the spellings the client prints, else unknown (None). The client's table cell is `lastUsed: daysSinceUse === null ? "never" : daysSinceUse === 0 ? "today" :
+# `${daysSinceUse} ${I(daysSinceUse, "day")}``, daysSinceUse being Math.floor((Date.now() - lastUsedAt) / 86400000) (anthropics/claude-code, the installed 2.1.294, 2.1.295 and 2.1.296: the same text in each
+# binary), and measured on each of the three at $0 and 0 turns over a synthetic usage store: `never`, `today`, `1 day`, `N days` (to 10 digits) and, for a use time ahead of the clock, `-N days`
+# (evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/native-last-used-spellings.txt). The count is 1 to 12 digits here: the client prints any integer, and the cap only bounds the shape.
+# `N day(s) ago` is the older spelling of the retained fixture, kept. An absolute time, a name, a path or any other word is not a spelling of the column: this module has no source that the client prints one.
+LAST_USED_SPELLING = re.compile(r"never|today|1 day(?: ago)?|(?:[2-9]|[1-9][0-9]{1,11}) days(?: ago)?|-[1-9][0-9]{0,11} days")
+
+
+def closed_last_used(value):
+    """The last-used value of a row as the report may carry it: a spelling of LAST_USED_SPELLING, as it is, else None."""
+    return value if isinstance(value, str) and LAST_USED_SPELLING.fullmatch(value) else None
+
+
+PROCESSING_REFUSAL = "skill_usage: an input could not be read or processed; the program stopped (exit 2)"
+
+
+def main(argv=None) -> int:
+    """The program's public boundary: an exception that no check below names (a reader, a decoder, a processing step) ends in one fixed line and exit 2, with no exception text, no value and no traceback; a
+    command line that argparse refuses ends in its own fixed line (FixedErrorParser) and SystemExit."""
+    try:
+        return run(argv)
+    except Exception:  # noqa: BLE001 - the boundary: nothing below it may print what it was given
+        print(PROCESSING_REFUSAL, file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

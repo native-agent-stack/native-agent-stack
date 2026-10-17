@@ -1,0 +1,12 @@
+One transient user unit running the whole daily run as the first version of the units did (three commands at 1,200 s each), started and finished (UTC):
+2026-10-12T09:13:47Z
+2026-10-12T09:37:44Z
+
+systemd-run summary:
+Running as unit: ccnp-skill-invoke-rate-check.service; invocation ID: ef9917201b3d4d0ea5844b6e98a2033b
+          Finished with result: exit-code
+Main processes terminated with: code=exited, status=1/FAILURE
+               Service runtime: 23min 57.016s
+             CPU time consumed: 26min 54.931s
+                   Memory peak: 12.5G (swap: 0B)
+exit=1

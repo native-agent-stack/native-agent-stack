@@ -1,0 +1,168 @@
+{
+ "environment": {
+  "os": "Ubuntu 26.04.1 LTS",
+  "kernel": "6.18.40.1-microsoft-standard-WSL2",
+  "systemd": "systemd 259 (259.5-0ubuntu3.4)",
+  "image": {
+   "ImageOS": null,
+   "ImageVersion": null
+  },
+  "apparmor_restrict_unprivileged_userns": null,
+  "unprivileged_userns_clone": null,
+  "max_user_namespaces": "418421",
+  "unshare_user_mount_rc": 0,
+  "unshare_user_mount_stderr": "",
+  "srv": {
+   "exists": true,
+   "is_symlink": false,
+   "entries": 0
+  },
+  "runtime_dir_fstype": "tmpfs",
+  "starter_mnt_ns": "mnt:[4026532466]",
+  "user_manager_mnt_ns": ""
+ },
+ "control": {
+  "rc": 0,
+  "started": true,
+  "silent": false,
+  "ns": "mnt:[4026532170]",
+  "writes": {
+   "clone": "written",
+   "other": "written",
+   "records": "written",
+   "unrelated": "written",
+   "runtime": "written"
+  },
+  "manager": "0/SUCCESS"
+ },
+ "control_manager_says": [
+  "Main processes terminated with: code=exited, status=0/SUCCESS"
+ ],
+ "sets": [
+  {
+   "set": "the shipped directives before round 5 (no marker)",
+   "properties": [
+    "ProtectSystem=strict",
+    "ProtectHome=read-only",
+    "ReadWritePaths=<fixture>/records",
+    "PrivateTmp=true",
+    "PrivateUsers=true",
+    "Environment=PYTHONDONTWRITEBYTECODE=1"
+   ],
+   "manager_says": [
+    "Main processes terminated with: code=exited, status=0/SUCCESS"
+   ],
+   "observation": {
+    "rc": 0,
+    "started": true,
+    "silent": false,
+    "ns": "mnt:[4026532608]",
+    "writes": {
+     "clone": "EROFS",
+     "other": "EROFS",
+     "records": "written",
+     "unrelated": "EROFS",
+     "runtime": "EROFS"
+    },
+    "manager": "0/SUCCESS"
+   },
+   "class": [
+    "enforced",
+    ""
+   ]
+  },
+  {
+   "set": "the Claude unit's directives",
+   "properties": [
+    "ProtectSystem=strict",
+    "ProtectHome=read-only",
+    "ReadWritePaths=<fixture>/records",
+    "PrivateTmp=true",
+    "PrivateUsers=true",
+    "TemporaryFileSystem=/srv:ro",
+    "Environment=PYTHONDONTWRITEBYTECODE=1"
+   ],
+   "manager_says": [
+    "Main processes terminated with: code=exited, status=0/SUCCESS"
+   ],
+   "observation": {
+    "rc": 0,
+    "started": true,
+    "silent": false,
+    "ns": "mnt:[4026532609]",
+    "writes": {
+     "clone": "EROFS",
+     "other": "EROFS",
+     "records": "written",
+     "unrelated": "EROFS",
+     "runtime": "EROFS"
+    },
+    "manager": "0/SUCCESS"
+   },
+   "class": [
+    "enforced",
+    ""
+   ]
+  },
+  {
+   "set": "the Codex unit's directives",
+   "properties": [
+    "ProtectSystem=strict",
+    "ProtectHome=read-only",
+    "ReadWritePaths=<fixture>/records",
+    "PrivateTmp=true",
+    "PrivateUsers=true",
+    "TemporaryFileSystem=/srv:ro",
+    "Environment=PYTHONDONTWRITEBYTECODE=1"
+   ],
+   "manager_says": [
+    "Main processes terminated with: code=exited, status=0/SUCCESS"
+   ],
+   "observation": {
+    "rc": 0,
+    "started": true,
+    "silent": false,
+    "ns": "mnt:[4026532609]",
+    "writes": {
+     "clone": "EROFS",
+     "other": "EROFS",
+     "records": "written",
+     "unrelated": "EROFS",
+     "runtime": "EROFS"
+    },
+    "manager": "0/SUCCESS"
+   },
+   "class": [
+    "enforced",
+    ""
+   ]
+  },
+  {
+   "set": "a marker on a missing mount point",
+   "properties": [
+    "ProtectSystem=strict",
+    "ProtectHome=read-only",
+    "ReadWritePaths=<fixture>/records",
+    "PrivateTmp=true",
+    "PrivateUsers=true",
+    "Environment=PYTHONDONTWRITEBYTECODE=1",
+    "TemporaryFileSystem=/skill-marker-absent-<pid>:ro"
+   ],
+   "manager_says": [
+    "Main processes terminated with: code=exited, status=226/NAMESPACE"
+   ],
+   "observation": {
+    "rc": 226,
+    "started": false,
+    "silent": true,
+    "ns": null,
+    "writes": null,
+    "manager": "226/NAMESPACE"
+   },
+   "class": [
+    "fails_closed",
+    "226/NAMESPACE"
+   ]
+  }
+ ]
+}

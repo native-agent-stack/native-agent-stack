@@ -1,0 +1,7 @@
+Round 12 of #1043: mutants of the fix in tools/skill-usage/skill_usage.py, each in a scratch copy of the tree, judged by tests.test_skill_usage.InstalledTimePublication (idle-class).
+killed: validator returns any string
+killed: validator accepts non-strings
+killed: lock reader keeps any string
+killed: report builder copies the raw value
+killed: age from an unvalidated value
+5 of 5 killed

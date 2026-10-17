@@ -1,0 +1,22 @@
+The 19 mutants of the round-10 changes of #1043 (Astra's two P1 of the read of cb42f789c, blockers 1 and 2 of its verdict file): the public boundary (absent, printing the exception, exiting 1, swallowing SystemExit, not the entry point), the decoder (a nested capture escaping, bypassed, losing the plain-text route) and the closed vocabularies of a refused capture (a subtype, a flag, a count, the report's cost and turns, each diagnostic printing its raw value). Each is one exact change in a scratch copy of the minimal tree, then the native collector's diagnostics class and the boundary class with GITHUB_ACTIONS=true; a mutant is killed when the run fails (the unmutated copy passes first).
+
+killed    skill_usage.py             the boundary catches nothing that matters
+killed    skill_usage.py             the boundary prints the exception
+killed    skill_usage.py             the boundary exits 1
+killed    skill_usage.py             the boundary swallows SystemExit and the interrupt
+killed    skill_usage.py             the boundary is not the public entry point
+killed    skill_usage.py             a nested capture escapes the decoder
+killed    skill_usage.py             the decoder is bypassed
+killed    skill_usage.py             text that is not JSON loses the plain-text route
+killed    skill_usage.py             a subtype is any text
+killed    skill_usage.py             a subtype is any short word (the earlier filter)
+killed    skill_usage.py             a flag is any value's text
+killed    skill_usage.py             a boolean is a count
+killed    skill_usage.py             a count is any text
+killed    skill_usage.py             a count may be infinite
+killed    skill_usage.py             the report carries the raw cost and turns of a nonzero-cost refusal
+killed    skill_usage.py             the cost diagnostic prints the raw value
+killed    skill_usage.py             the turns diagnostic prints the raw value
+killed    skill_usage.py             the subtype diagnostic prints the raw value
+killed    skill_usage.py             the flag diagnostic prints the raw value
+19 mutants, 19 killed, survivors: none

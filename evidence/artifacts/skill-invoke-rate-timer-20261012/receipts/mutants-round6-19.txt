@@ -1,0 +1,22 @@
+The 19 mutants of the scope-locked round (the local codex review and Astra's read of da4895b5: the order of the lanes in the combined record, the marker comparison of the native test with the stand-in managers it is checked against, the fixed refusal of a command line the program cannot use, and the reader of the payload's output): one change each, in a scratch copy of the minimal tree, with GITHUB_ACTIONS=true; a mutant is killed when tests.test_skill_usage_daily fails (the unmutated copy runs first and passes).
+
+killed    daily_skill_usage.py               the Claude lanes lead in the combined record  
+killed    daily_skill_usage.py               a half contributes the lanes of either client  
+killed    test_skill_usage_daily.py          the marker comparison is always made  
+killed    test_skill_usage_daily.py          the marker comparison is made for any refusal, 217/USER included  
+killed    test_skill_usage_daily.py          the marker is not taken away in the comparison  
+killed    test_skill_usage_daily.py          the comparison does not reach the manager that was asked  
+killed    test_skill_usage_daily.py          the insisting stand-in refuses a unit without the marker too  
+killed    test_skill_usage_daily.py          the insisting stand-in never sees the marker  
+killed    test_skill_usage_daily.py          the user-namespace stand-in refuses the wrong units  
+killed    daily_skill_usage.py               the refusal of a command line echoes argparse's message  
+killed    daily_skill_usage.py               the program uses argparse's own error  
+killed    daily_skill_usage.py               the refusal line is another text  
+killed    test_skill_usage_daily.py          a second start is accepted  
+killed    test_skill_usage_daily.py          a second write map is accepted  
+killed    test_skill_usage_daily.py          a stray line is accepted  
+killed    test_skill_usage_daily.py          a write map without a start is accepted  
+killed    test_skill_usage_daily.py          a line that is not JSON is ignored  
+killed    test_skill_usage_daily.py          a frame of another kind is ignored  
+killed    test_skill_usage_daily.py          a blank line is a stray  
+19 mutants, 19 killed, survivors: none

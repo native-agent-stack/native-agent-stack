@@ -1,0 +1,38 @@
+The 35 mutants of round 3 (the native-report shapes, the confinement check and its option, the two unit templates): one change each; a mutant is killed when tests.test_skill_usage_daily fails.
+
+killed    daily_skill_usage.py               table() lets any value through  
+killed    daily_skill_usage.py               the use groups are read without table()  
+killed    daily_skill_usage.py               the host's codex state is read without table()  
+killed    daily_skill_usage.py               a skill's claude entry is read without table()  
+killed    daily_skill_usage.py               a skill's codex entry is read without table()  
+killed    daily_skill_usage.py               a skill's counts are read without table()  
+killed    daily_skill_usage.py               a skill's use counts are read without table()  
+killed    daily_skill_usage.py               a lane's use groups that are not an object are read as one  
+killed    daily_skill_usage.py               the codex groups are read without table()  
+killed    daily_skill_usage.py               the role groups are read without table()  
+killed    daily_skill_usage.py               the kind groups are read without table()  
+killed    daily_skill_usage.py               the role use groups are read without table()  
+killed    daily_skill_usage.py               the kind use groups are read without table()  
+killed    daily_skill_usage.py               the spawn groups are read without table()  
+killed    daily_skill_usage.py               a spawn's agents are read without table()  
+killed    daily_skill_usage.py               the host's claude state is read without table() (the reproduced defect)  
+killed    daily_skill_usage.py               the use policy is read without table()  
+killed    daily_skill_usage.py               an error nobody foresaw is not caught  
+killed    daily_skill_usage.py               a confinement refusal is not caught as a refusal  
+killed    daily_skill_usage.py               any error counts as a refused write  
+killed    daily_skill_usage.py               EROFS is not a refused write  
+killed    daily_skill_usage.py               EACCES is not a refused write  
+killed    daily_skill_usage.py               EPERM is not a refused write  
+killed    daily_skill_usage.py               the probe file is left behind  
+killed    daily_skill_usage.py               a writable directory is accepted  
+killed    daily_skill_usage.py               an existing file of the probe's name is opened and then removed  
+killed    daily_skill_usage.py               the check is never made  
+killed    daily_skill_usage.py               rendering the units is subject to the check  
+killed    daily_skill_usage.py               the directories are asked in reverse order  
+killed    skill-invoke-rate-claude.service   the Claude unit does not ask for the user namespace  
+killed    skill-invoke-rate-codex.service    the Codex unit does not ask for the user namespace  
+killed    skill-invoke-rate-claude.service   the Claude unit does not check the home directory  
+killed    skill-invoke-rate-codex.service    the Codex unit does not check the clone  
+killed    skill-invoke-rate-claude.service   the Claude unit has no check  
+killed    skill-invoke-rate-codex.service    the Codex unit checks after it has started the work  
+35 mutants, 35 killed, survivors: none

@@ -1,0 +1,29 @@
+The rendered units of the split, each started as a transient user unit with its rendered ExecStart and TimeoutStartSec (record paths moved to a scratch directory), one half after the other; no sandbox.
+
+== claude half
+half=claude
+start=2026-10-12T11:27:34Z
+end=2026-10-12T11:30:18Z
+exit=0
+timeout_start=17min
+load-at-end=16.96 20.14 19.65
+Running as unit: ccnp-split-claude.service; invocation ID: fffa35f10de74a3099cbb4553adc9fd4
+          Finished with result: success
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 2min 43.860s
+             CPU time consumed: 3min 15.963s
+                   Memory peak: 2.1G (swap: 0B)
+
+== codex half
+half=codex
+start=2026-10-12T11:30:18Z
+end=2026-10-12T11:58:21Z
+exit=0
+timeout_start=63min
+load-at-end=15.42 16.84 18.57
+Running as unit: ccnp-split-codex.service; invocation ID: 29e9513a88a346d5b532a721c0cb90d2
+          Finished with result: success
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 28min 3.605s
+             CPU time consumed: 31min 33.825s
+                   Memory peak: 3.4G (swap: 0B)

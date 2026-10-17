@@ -1,0 +1,32 @@
+{
+ "summary": {
+  "runs": 2,
+  "unit_env": true,
+  "min": 17.8,
+  "median": 18.3,
+  "max": 18.8,
+  "errors": 0
+ },
+ "rows": [
+  {
+   "run": 1,
+   "seconds": 17.8,
+   "load1": 13.8,
+   "format": "json",
+   "skills": 73,
+   "num_turns": 0,
+   "total_cost_usd": 0,
+   "error": null
+  },
+  {
+   "run": 2,
+   "seconds": 18.8,
+   "load1": 15.7,
+   "format": "json",
+   "skills": 73,
+   "num_turns": 0,
+   "total_cost_usd": 0,
+   "error": null
+  }
+ ]
+}

@@ -1,0 +1,38 @@
+GitHub Actions run 38325995828, job 115064673607 (validate-shard-7) of the pull request at 68d4f4343, started 2026-10-13 00:11Z.
+Runner image ubuntu-24.04 version 20261004.327.1 (the job log, 'Runner Image'); the image's readme (actions/runner-images@2c421200c9e6, images/ubuntu/Ubuntu2404-Readme.md) lists kernel 6.17.0-1022-azure and
+systemd 255.4-1ubuntu8.17. The first version of ServiceSandboxRuntimeTests passed its own gate (a transient user unit with ProtectSystem=strict, ProtectHome=read-only and PrivateTmp=true ran /bin/true, exit 0) and
+the control (no directives: everything written), then ran the probe under the rendered directives of each half. Expected: EROFS for the clone, the sibling directory and the rest of the home. Got: written.
+The log, with the workspace path replaced and the job prefix removed:
+
+FAIL: test_the_rendered_directives_refuse_writes_to_the_clone_and_the_home_and_allow_the_records (tests.test_skill_usage_daily.ServiceSandboxRuntimeTests.test_the_rendered_directives_refuse_writes_to_the_clone_and_the_home_and_allow_the_records) (half='claude')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<workspace>/tests/test_skill_usage_daily.py", line 750, in test_the_rendered_directives_refuse_writes_to_the_clone_and_the_home_and_allow_the_records
+    self.assertEqual(confined, {"clone": "EROFS", "other": "EROFS", "unrelated": "EROFS", "records": "written", "pycache": False, "helper": 7})
+AssertionError: {'clone': 'written', 'other': 'written', 'unrelated'[60 chars]': 7} != {'clone': 'EROFS', 'other': 'EROFS', 'unrelated': 'E[54 chars]': 7}
+- {'clone': 'written',
++ {'clone': 'EROFS',
+   'helper': 7,
+-  'other': 'written',
++  'other': 'EROFS',
+   'pycache': False,
+   'records': 'written',
+-  'unrelated': 'written'}
++  'unrelated': 'EROFS'}
+
+======================================================================
+FAIL: test_the_rendered_directives_refuse_writes_to_the_clone_and_the_home_and_allow_the_records (tests.test_skill_usage_daily.ServiceSandboxRuntimeTests.test_the_rendered_directives_refuse_writes_to_the_clone_and_the_home_and_allow_the_records) (half='codex')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<workspace>/tests/test_skill_usage_daily.py", line 750, in test_the_rendered_directives_refuse_writes_to_the_clone_and_the_home_and_allow_the_records
+    self.assertEqual(confined, {"clone": "EROFS", "other": "EROFS", "unrelated": "EROFS", "records": "written", "pycache": False, "helper": 7})
+AssertionError: {'clone': 'written', 'other': 'written', 'unrelated'[60 chars]': 7} != {'clone': 'EROFS', 'other': 'EROFS', 'unrelated': 'E[54 chars]': 7}
+- {'clone': 'written',
++ {'clone': 'EROFS',
+   'helper': 7,
+-  'other': 'written',
++  'other': 'EROFS',
+   'pycache': False,
+   'records': 'written',
+-  'unrelated': 'written'}
++  'unrelated': 'EROFS'}

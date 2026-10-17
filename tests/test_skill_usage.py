@@ -778,6 +778,68 @@ class ManifestAndLock(unittest.TestCase):
             self.assertEqual(S.load_lock_installed_at(bad), {})
 
 
+class InstalledTimePublication(unittest.TestCase):
+    """Fix round 11 (the GPT read at 8ec8ebc37, its BLOCKER 1): an installation time that the timestamp parser does not accept
+    is never published. The lock reader keeps only parseable values, and the report builder publishes a time only after it
+    has parsed, so file-fed and programmatic callers agree. The marker below is synthetic; the tests count it, never print it."""
+
+    MARKER = "synthetic-marker" + "@" + "example.invalid"
+    VALID = "2026-10-01T00:00:00.000Z"
+    NOW = "2026-10-12T10:00:00+00:00"
+
+    def scratch_home(self, tmp, value):
+        home = Path(tmp) / "home"
+        (home / ".agents").mkdir(parents=True)
+        (home / ".agents" / ".skill-lock.json").write_text(json.dumps({"version": 3, "skills": {"gh-fix-ci": {"installedAt": value}}}))
+        return home
+
+    def run_cli(self, home, route):
+        out = home / "report.out"
+        argv = [sys.executable, "-B", str(ROOT / "tools" / "skill-usage" / "skill_usage.py"), "--home", str(home), "--out", str(out),
+                "--now", self.NOW] + (["--json"] if route == "json" else [])
+        env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+        env.pop("XDG_STATE_HOME", None)
+        done = subprocess.run(argv, cwd=home, env=env, capture_output=True, text=True, timeout=300)
+        return done, out.read_text(encoding="utf-8")
+
+    def test_an_unparseable_installation_time_reaches_no_output_of_the_cli(self):
+        for route in ("json", "text"):
+            with self.subTest(route=route), tempfile.TemporaryDirectory() as tmp:
+                done, written = self.run_cli(self.scratch_home(tmp, self.MARKER), route)
+                self.assertEqual(done.returncode, 0)
+                self.assertEqual([text.count(self.MARKER) for text in (done.stdout, done.stderr, written)], [0, 0, 0])
+                if route == "json":
+                    entry = next(s for s in json.loads(written)["skills"] if s["name"] == "gh-fix-ci")
+                    self.assertEqual((entry["installed_at"], entry["age_days"]), (None, None))
+
+    def test_a_valid_installation_time_keeps_its_value_and_age(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            done, written = self.run_cli(self.scratch_home(tmp, self.VALID), "json")
+            self.assertEqual(done.returncode, 0)
+            entry = next(s for s in json.loads(written)["skills"] if s["name"] == "gh-fix-ci")
+            self.assertEqual(entry["installed_at"], self.VALID)
+            self.assertAlmostEqual(entry["age_days"], 11 + 10 / 24, places=6)
+
+    def test_the_lock_reader_drops_an_unparseable_value(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = self.scratch_home(tmp, self.MARKER)
+            self.assertEqual(S.load_lock_installed_at(home / ".agents" / ".skill-lock.json"), {})
+
+    def test_the_report_builder_drops_an_unparseable_value_from_a_programmatic_caller(self):
+        # The same arguments as BuildReportPruneLogic's, with the lock map given directly.
+        manifest, now = load_fixture_manifest(), S.parse_iso(NOW)
+        windows = S.effective_windows([7, 30], manifest)
+        tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        scan = S.scan_codex_roots(materialize_codex_roots(tmp), fixture_names(), now=now, windows=windows)
+        claude = S.parse_claude_output((FIXTURES / "skill-doctor-sample.json").read_text())
+        claude["origin"] = "file"
+        report = S.build_report(manifest, claude=claude, codex_scan=scan, lock_installed_at={"gh-fix-ci": self.MARKER},
+                                now=now, windows=[7, 30])
+        entry = next(s for s in report["skills"] if s["name"] == "gh-fix-ci")
+        self.assertEqual((entry["installed_at"], entry["age_days"]), (None, None))
+        self.assertNotIn(self.MARKER, json.dumps(report))
+
+
 class BuildReportPruneLogic(unittest.TestCase):
     """The master join test: exercises every prune_rule branch named in the manifest's own
     trial.prune_rule ("kept skills are flagged 'verdict re-record required' instead of demoted")
@@ -3855,6 +3917,337 @@ class CodexCallLedger(unittest.TestCase):
                 self.assertEqual(collections.Counter(row["state"] for row in mine),
                                  +collections.Counter({state: states[state] for state in {row["state"] for row in mine}}))
         assert_id_free_report(self, report, [*self.SECRETS, str(root), str(target)])
+
+
+
+class NativeCliDiagnosticTests(unittest.TestCase):
+    """The command center's design decision on #1043 (2026-10-13), after Astra's read of c23b9ce48 (P1 2): the diagnostics of this program's command line name no value of an argument: argparse's own errors
+    (`unrecognized arguments: ...`, `invalid int value: ...`) and the program's (the text of an exception that holds the argument) end in one fixed line each. Every option is driven with a value that
+    carries a private-looking path; the case passes when the marker reaches neither stream and no traceback does."""
+
+    MARK = "PRIVATE-MARKER"
+
+    def run_cli(self, arguments, cwd):
+        return subprocess.run([sys.executable, "-B", str(ROOT / "tools/skill-usage/skill_usage.py"), *arguments], capture_output=True, text=True, timeout=180, cwd=cwd)
+
+    def test_no_option_of_the_command_line_echoes_its_value(self):
+        mark = self.MARK
+        with tempfile.TemporaryDirectory() as temp:
+            work = Path(temp)
+            bad_manifest = work / "bad-manifest.json"
+            bad_manifest.write_text(json.dumps({"skills": mark}))
+            capture = work / "capture.json"
+            capture.write_text(json.dumps({"type": "result", "subtype": f"/fixture/{mark}/subtype", "is_error": False, "total_cost_usd": 0, "num_turns": 0, "result": ""}))
+            capture_cost = work / "capture-cost.json"
+            capture_cost.write_text(json.dumps({"type": "result", "subtype": "success", "is_error": False, "total_cost_usd": f"/fixture/{mark}/cost", "num_turns": f"/fixture/{mark}/turns", "result": ""}))
+            existing = work / f"{mark}-existing.jsonl"
+            existing.write_text("")
+            lanes = ["--lanes", "--codex-root", f"/fixture/{mark}/root"]
+            cases = (
+                ("--manifest missing", ["--manifest", f"/fixture/{mark}/missing.json"], 2), ("--manifest of the wrong shape", ["--manifest", str(bad_manifest)], 2),
+                ("--now text", ["--now", f"/fixture/{mark}/now"], 2), ("--now overflow low", ["--now", "0001-01-01T00:00:00+01:00"], 2), ("--now overflow high", ["--now", "9999-12-31T23:59:59-01:00"], 2),
+                ("--window text", ["--window", f"/fixture/{mark}/window"], 2), ("--window without a value", ["--window"], 2), ("--claude-timeout text", ["--claude-timeout", f"/fixture/{mark}/timeout"], 2),
+                ("--claude-skill-doctor missing", ["--claude-skill-doctor", f"/fixture/{mark}/missing"], 2),
+                ("--claude-skill-doctor subtype", ["--claude-skill-doctor", str(capture)], 0), ("--claude-skill-doctor cost", ["--claude-skill-doctor", str(capture_cost)], 0),
+                ("--runtime-log", ["--runtime-log", mark, f"/fixture/{mark}/log.jsonl"], 2),
+                ("--out in the checkout", ["--out", str(ROOT / f"{mark}-out.json")], 2),
+                ("an unrecognized option", [f"--{mark}-option", "value"], 2), ("an unrecognized argument", [f"/fixture/{mark}/positional"], 2),
+                ("--lanes --since text", lanes + ["--since", f"/fixture/{mark}/since"], 2), ("--lanes --until text", lanes + ["--until", f"/fixture/{mark}/until"], 2),
+                ("--lanes --since overflow", lanes + ["--since", "0001-01-01T00:00:00+01:00"], 2), ("--lanes --until overflow", lanes + ["--until", "9999-12-31T23:59:59-01:00"], 2),
+                ("--lanes --marker blank", lanes + ["--marker", "   "], 2), ("--lanes --call-ledger existing", lanes + ["--call-ledger", str(existing)], 2),
+                ("--lanes --exceptions missing", lanes + ["--exceptions", f"/fixture/{mark}/exceptions.json"], 2),
+            )
+            self.assertEqual(len(cases), 22, "every option of the command line is driven")
+            for label, arguments, code in cases:
+                with self.subTest(case=label):
+                    done = self.run_cli(arguments, work)
+                    self.assertEqual(done.returncode, code, done.stderr[-300:])
+                    self.assertNotIn(mark, done.stderr)
+                    self.assertNotIn(mark, done.stdout)
+                    self.assertNotIn("Traceback", done.stderr)
+
+    def test_the_fixed_lines_say_what_was_refused_and_help_still_works(self):
+        with tempfile.TemporaryDirectory() as temp:
+            for arguments in (["--window", "x"], ["--nonsense"], ["--window"]):
+                with self.subTest(arguments=arguments):
+                    done = self.run_cli(arguments, temp)
+                    self.assertEqual((done.returncode, done.stdout, done.stderr),
+                                     (2, "", "skill_usage: the command line has an argument this version does not take, or lacks one it needs; nothing was run\n"))
+            done = self.run_cli(["--help"], temp)
+            self.assertEqual(done.returncode, 0)
+            self.assertIn("--claude-skill-doctor", done.stdout)
+            for arguments, line in ((["--now", "tomorrow"], "skill_usage: invalid --now\n"), (["--lanes", "--codex-root", "/fixture/root", "--since", "tomorrow"], "skill_usage: invalid --since/--until\n")):
+                with self.subTest(arguments=arguments):
+                    done = self.run_cli(arguments, temp)
+                    self.assertEqual((done.returncode, done.stderr), (2, line))
+
+    def test_a_refused_capture_carries_only_closed_words_numbers_and_flags(self):
+        """Round 10 (the fix8 verdict, blocker 1): the character filter of round 9 let a bare name through, and the bare name of an account has that shape. The values of a capture that a diagnostic or the
+        report may carry now come from closed sets: the subtype one of the words the SDK documents for a result, a flag the boolean it is, a count a finite number that is not a boolean."""
+        names = ("success", "error_max_turns", "error_during_execution", "error_max_budget_usd")
+        for value in names:
+            with self.subTest(subtype=value):
+                self.assertEqual(S.closed_word(value), value)
+        for value in ("account", "Root9", "a" * 40, "error_made_up", "SUCCESS", "", f"/fixture/{self.MARK}/x", True, 0, None, ["success"], {"a": 1}):
+            with self.subTest(subtype=repr(value)[:30]):
+                self.assertEqual(S.closed_word(value), "other")
+        self.assertEqual((S.closed_flag(True), S.closed_flag(False)), ("true", "false"))
+        for value in ("account", "false", 0, 1, None, [True], {"a": True}):
+            with self.subTest(flag=repr(value)[:30]):
+                self.assertEqual(S.closed_flag(value), "other")
+        for value, number, shown in ((0, 0, "0"), (3, 3, "3"), (0.5, 0.5, "0.5"), (-1, -1, "-1")):
+            with self.subTest(count=value):
+                self.assertEqual((S.closed_number(value), S.closed_text(value)), (number, shown))
+        for value in ("0", "account", True, False, None, [0], {"a": 0}, float("inf"), float("-inf"), float("nan")):
+            with self.subTest(count=repr(value)[:30]):
+                self.assertEqual((S.closed_number(value), S.closed_text(value)), (None, "other"))
+
+    def test_a_bare_name_in_any_field_of_a_capture_reaches_no_stream_and_no_file(self):
+        """The fix8 verdict's blocker 1, through the command line: each of the four fields holds, in turn, a bare name with no separator in it; neither stream, nor the JSON report written with --out, may
+        carry it; the clean controls keep their diagnostic and their numbers."""
+        clean = {"type": "result", "subtype": "success", "is_error": False, "total_cost_usd": 0, "num_turns": 0, "result": ""}
+        name = "Account9marker"
+        with tempfile.TemporaryDirectory() as temp:
+            work = Path(temp)
+            for field in ("subtype", "is_error", "total_cost_usd", "num_turns"):
+                with self.subTest(field=field):
+                    capture = work / f"capture-{field}.json"
+                    capture.write_text(json.dumps({**clean, field: name}))
+                    out = work / f"report-{field}.json"
+                    done = self.run_cli(["--claude-skill-doctor", str(capture), "--json", "--out", str(out), "--now", "2026-10-12T10:00:00+00:00"], work)
+                    self.assertEqual(done.returncode, 0, done.stderr[-300:])
+                    for label, content in (("stdout", done.stdout), ("stderr", done.stderr), ("the --out file", out.read_text(encoding="utf-8"))):
+                        self.assertNotIn(name, content, f"{field}: {label}")
+                    report = json.loads(out.read_text(encoding="utf-8"))["claude"]
+                    self.assertEqual((report["measured"], report["refused"]), (False, True))
+                    self.assertIn("refusing", report["reason"])
+                    self.assertIn(report["total_cost_usd"], (None, 0))
+                    self.assertIn(report["num_turns"], (None, 0))
+            for label, capture_value, expected in (
+                    ("a documented error subtype", {**clean, "subtype": "error_max_turns", "is_error": True, "total_cost_usd": 0.12, "num_turns": 5},
+                     "refusing an error result (subtype=error_max_turns, is_error=true)"),
+                    ("a nonzero cost", {**clean, "total_cost_usd": 0.5, "num_turns": 3}, "refusing a nonzero-cost result (total_cost_usd=0.5, num_turns=3)"),
+                    ("an unknown subtype", {**clean, "subtype": "error_made_up"}, "refusing an error result (subtype=other, is_error=false)")):
+                with self.subTest(control=label):
+                    capture = work / "control.json"
+                    capture.write_text(json.dumps(capture_value))
+                    done = self.run_cli(["--claude-skill-doctor", str(capture), "--now", "2026-10-12T10:00:00+00:00"], work)
+                    self.assertEqual(done.returncode, 0)
+                    self.assertIn(expected, done.stderr)
+            capture = work / "clean.json"
+            capture.write_text(json.dumps(clean))
+            done = self.run_cli(["--claude-skill-doctor", str(capture), "--json", "--now", "2026-10-12T10:00:00+00:00"], work)
+            self.assertEqual(done.returncode, 0)
+            self.assertEqual(json.loads(done.stdout)["claude"]["measured"], True)
+            self.assertEqual((json.loads(done.stdout)["claude"]["total_cost_usd"], json.loads(done.stdout)["claude"]["num_turns"]), (0, 0))
+
+
+class NativeBoundaryTests(unittest.TestCase):
+    """Round 10 (the fix8 verdict, blocker 2): the program's public boundary. A reader, a decoder or a processing step below the argument parser may raise what it likes (a decoder's RecursionError is not a
+    ValueError): the program ends in one fixed line and exit 2, with no exception text, no value, no path and no traceback, and a capture that cannot be decoded is a refused capture."""
+
+    def run_cli(self, arguments, cwd):
+        return subprocess.run([sys.executable, "-B", str(ROOT / "tools/skill-usage/skill_usage.py"), *arguments], capture_output=True, text=True, timeout=180, cwd=cwd)
+
+    def test_an_exception_below_the_parser_ends_in_the_fixed_line_whatever_it_is_and_holds_its_text_back(self):
+        marker = "PRIVATE-MARKER-9"
+        errors = (KeyError(marker), RecursionError(marker), UnicodeDecodeError("utf-8", b"\xff", 0, 1, marker), TypeError(marker), RuntimeError(marker), MemoryError(marker), OSError(2, marker, f"/fixture/{marker}"))
+        for error in errors:
+            with self.subTest(error=type(error).__name__):
+                out, err = io.StringIO(), io.StringIO()
+                with mock.patch.object(S, "run", side_effect=error), contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                    code = S.main(["--now", "2026-10-12T10:00:00+00:00"])
+                self.assertEqual((code, out.getvalue(), err.getvalue()), (2, "", S.PROCESSING_REFUSAL + "\n"))
+        with mock.patch.object(S, "run", side_effect=SystemExit(0)):
+            with self.assertRaises(SystemExit):
+                S.main([])
+        with mock.patch.object(S, "run", side_effect=KeyboardInterrupt):
+            with self.assertRaises(KeyboardInterrupt):
+                S.main([])
+
+    def test_a_manifest_and_a_capture_that_the_decoder_cannot_read_end_without_a_traceback(self):
+        """The two readers of the fix8 verdict's blocker 2, with ordinary malformed JSON and clean controls: a manifest ends in the fixed line and exit 2; a capture that is JSON but cannot be decoded is a
+        refused capture, never a successful one."""
+        deep = "[" * 10000 + "0" + "]" * 10000
+        long_integer = "1" * 5000
+        with tempfile.TemporaryDirectory() as temp:
+            work = Path(temp)
+            marker_dir = work.name
+            cases = {}
+            for label, content in (("deeply nested", deep), ("an integer beyond the digit limit", long_integer)):
+                path = work / f"{label.split()[0]}.json"
+                path.write_text(content)
+                cases[label] = path
+            undecodable = work / "undecodable.json"
+            undecodable.write_bytes(b"\xff\xfe{}")
+            for label, path in cases.items():
+                with self.subTest(reader="manifest", input=label):
+                    done = self.run_cli(["--manifest", str(path)], work)
+                    self.assertEqual((done.returncode, done.stdout), (2, ""))
+                    self.assertNotIn("Traceback", done.stderr)
+                    self.assertNotIn(marker_dir, done.stderr)
+                    self.assertEqual(len(done.stderr.strip().splitlines()), 1, done.stderr[-200:])
+                with self.subTest(reader="capture", input=label):
+                    done = self.run_cli(["--claude-skill-doctor", str(path), "--json", "--now", "2026-10-12T10:00:00+00:00"], work)
+                    self.assertEqual(done.returncode, 0, done.stderr[-300:])
+                    self.assertNotIn("Traceback", done.stderr)
+                    self.assertNotIn(marker_dir, done.stderr + done.stdout)
+                    claude = json.loads(done.stdout)["claude"]
+                    self.assertEqual((claude["measured"], claude["refused"]), (False, True))
+            for reader, arguments in (("manifest", ["--manifest", str(undecodable)]), ("capture", ["--claude-skill-doctor", str(undecodable)])):
+                with self.subTest(reader=reader, input="not UTF-8"):
+                    done = self.run_cli(arguments, work)
+                    self.assertEqual((done.returncode, done.stdout), (2, ""))
+                    self.assertNotIn("Traceback", done.stderr)
+                    self.assertNotIn(marker_dir, done.stderr)
+            # the clean controls and the ordinary malformed JSON keep their routes
+            clean = work / "clean.json"
+            clean.write_text(json.dumps({"type": "result", "subtype": "success", "is_error": False, "total_cost_usd": 0, "num_turns": 0, "result": ""}))
+            done = self.run_cli(["--claude-skill-doctor", str(clean), "--json", "--now", "2026-10-12T10:00:00+00:00"], work)
+            self.assertEqual((done.returncode, json.loads(done.stdout)["claude"]["measured"]), (0, True))
+            malformed = work / "malformed.json"
+            malformed.write_text("{not json at all")
+            done = self.run_cli(["--claude-skill-doctor", str(malformed), "--json", "--now", "2026-10-12T10:00:00+00:00"], work)
+            self.assertEqual(done.returncode, 0)
+            self.assertEqual(json.loads(done.stdout)["claude"]["format"], "text", "text that is not JSON is still the plain-text table's route")
+            done = self.run_cli(["--manifest", str(malformed)], work)
+            self.assertEqual((done.returncode, done.stderr), (2, "skill_usage: invalid manifest (JSONDecodeError)\n"))
+
+
+class LastUsedBoundaryTests(unittest.TestCase):
+    """Review round 11 (the fix9 verdict file of #1043, sha256 975cc574..., blocker 1): the last-used column of a successful capture is a time/status field with a closed set of spellings, not a name, and
+    the report carries it only from that set. The client's formatter prints `never`, `today`, `1 day` and `N days` (anthropics/claude-code, the installed 2.1.294, 2.1.295 and 2.1.296: the table cell
+    `lastUsed:o.daysSinceUse===null?"never":o.daysSinceUse===0?"today":`${o.daysSinceUse} ${I(o.daysSinceUse,"day")}``); the retained fixture's older `N days ago` spelling stays. Every other text is unknown
+    (None), at the parser and at the report. The account name is a synthetic marker here; the verdict file is cited by number and not restated."""
+
+    MARK = "Account9marker"
+    TIMES = chr(0xD7)
+
+    class Looks:
+        """An object whose text is a spelling of the column, which is no spelling: only a string is read."""
+
+        def __str__(self):
+            return "never"
+
+    SPELLINGS = ("never", "today", "1 day", "2 days", "9 days", "10 days", "365 days", "99999 days", "1234567890 days", "999999999999 days", "-1 days", "-3 days", "-1001 days", "-999999999999 days",
+                 "1 day ago", "2 days ago", "30 days ago")
+    HOSTILE = (MARK, f"/home/example/{MARK}/private")
+    # near misses of the grammar: a character filter would pass several of these
+    NOT_SPELLINGS = (
+        MARK, "root", "a", "nev", "tod", "never_", "/home/example/" + MARK + "/private", "~/" + MARK, "../" + MARK, "C:" + chr(92) + "Users" + chr(92) + MARK,
+        "never " + MARK, MARK + " never", "2 days ago " + MARK, MARK + " 2 days ago", "never/" + MARK, "never; " + MARK, "today:" + MARK, "2 days " + MARK,
+        "Never", "NEVER", "Today", "2 Days", "2 days Ago",
+        "0 days", "1 days", "2 day", "02 days", "+2 days", "2.5 days", "2,000 days", "1000000000000 days", "-1000000000000 days", "2 days ago ago", "2 days ago ",
+        "-0 days", "-1 day", "-01 days", "--1 days", "- 1 days", "-1 days ago", "-1" + chr(0x662) + " days", chr(0x2212) + "1 days", "-1  days", "-1 Days",
+        "2  days", "2" + chr(9) + "days", " never", "never ", "never" + chr(10), "2 days  ago", "2 days" + chr(9) + "ago", "2" + chr(0xA0) + "days",
+        chr(0x662) + " days", chr(0xFF12) + " days", "1" + chr(0x662) + " days", "1" + chr(0xFF12) + " days", "2 days " + chr(0x430) + "go",
+        "2026-10-12", "2026-10-12T10:00:00Z", "Oct 12", "12 Oct 2026", "yesterday", "just now", "1 hour ago", "3 weeks ago",
+        "", " ", None, 3, 2.5, True, ["never"], ("never",), b"never", {"never": 1}, Looks(),
+    )
+
+    def table(self, last_used, second="never"):
+        return ("Skills loaded this session\n\n"
+                "  skill                           source          context  7d tokens   uses  last used\n"
+                f"  gh-fix-ci                       userSettings       ~110         340    6{self.TIMES}  {last_used}\n"
+                f"  typesafe-ai                     userSettings       ~230           -    0{self.TIMES}  {second}\n")
+
+    def capture(self, route, table):
+        if route == "text":
+            return table
+        return json.dumps({"type": "result", "subtype": "success", "is_error": False, "total_cost_usd": 0, "num_turns": 0, "result": table})
+
+    def run_cli(self, arguments, cwd):
+        return subprocess.run([sys.executable, "-B", str(ROOT / "tools/skill-usage/skill_usage.py"), *arguments], capture_output=True, text=True, timeout=180, cwd=cwd)
+
+    def report_of(self, work, route, last_used):
+        capture = work / f"{route}-{abs(hash(str(last_used)))}.capture"
+        capture.write_text(self.capture(route, self.table(last_used)), encoding="utf-8")
+        out = work / (capture.name + ".report.json")
+        done = self.run_cli(["--claude-skill-doctor", str(capture), "--json", "--out", str(out), "--now", "2026-10-12T10:00:00+00:00"], work)
+        return done, out
+
+    def test_the_spellings_the_client_prints_pass_unchanged_and_no_other_text_does(self):
+        for value in self.SPELLINGS:
+            with self.subTest(spelling=value):
+                self.assertEqual(S.closed_last_used(value), value)
+        for value in self.NOT_SPELLINGS:
+            with self.subTest(not_a_spelling=repr(value)[:40]):
+                self.assertIsNone(S.closed_last_used(value))
+
+    def test_the_parser_keeps_a_rows_numbers_and_reads_an_unknown_last_used_as_none(self):
+        for route in ("text", "json"):
+            for value in self.HOSTILE:
+                with self.subTest(route=route, value=value[:12]):
+                    raw = self.capture(route, self.table(value))
+                    rows = S.parse_claude_output(raw)["rows"]
+                    self.assertEqual(rows["gh-fix-ci"], {"source": "userSettings", "context_tokens": 110, "tokens_7d": 340, "uses": 6, "last_used": None})
+                    self.assertEqual(rows["typesafe-ai"]["last_used"], "never", "the other row of the table is read as before")
+        for value in self.SPELLINGS:
+            with self.subTest(spelling=value):
+                self.assertEqual(S.parse_skill_doctor_text(self.table(value))["gh-fix-ci"]["last_used"], value)
+
+    def test_the_report_carries_a_last_used_value_only_from_the_closed_set_whatever_the_caller_passes(self):
+        manifest = S.load_manifest(FIXTURES / "manifest.json")
+        skill = dict(manifest["skills"][0], name="claude-api", claude_skill_name="claude-api:claude-api", codex_enabled=False)
+        manifest["skills"] = [skill]
+        now = S.parse_iso("2026-10-11T00:00:00Z")
+        for value in self.SPELLINGS + self.HOSTILE:
+            with self.subTest(value=repr(value)[:30]):
+                report = S.build_report(manifest, claude={"rows": {"claude-api:claude-api": {"uses": 3, "context_tokens": 10, "last_used": value}}},
+                                        codex_scan=S.scan_codex_roots([], ["claude-api"], now=now, windows=[7, 30]), lock_installed_at={"claude-api": "2026-10-10T00:00:00Z"},
+                                        now=now, windows=[7])
+                carried = report["skills"][0]["claude"]
+                self.assertEqual((carried["uses"], carried["context_tokens"]), (3, 10))
+                self.assertEqual(carried["last_used"], value if value in self.SPELLINGS else None)
+                self.assertNotIn(self.MARK, json.dumps(report))
+
+    def test_every_spelling_the_installed_clients_printed_is_kept(self):
+        """The receipt holds the tables that Claude Code 2.1.294, 2.1.295 and 2.1.296 printed for a synthetic usage store (their last-used column: `never`, `today`, `1 day`, `N days` and, for a use time ahead
+        of the clock, `-N days`); the module keeps every one of them, so a closed set that is narrower than the client's own output fails here."""
+        receipt = ROOT / "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/native-last-used-spellings.txt"
+        text = receipt.read_text(encoding="utf-8")
+        printed = [line.split(self.TIMES, 1)[1].strip() for line in text.splitlines() if line.lstrip().startswith("zz-")]
+        self.assertEqual(len(printed), 42, "14 rows from each of the three clients")
+        for value in printed:
+            with self.subTest(printed=value):
+                self.assertEqual(S.closed_last_used(value), value)
+        rows = S.parse_skill_doctor_text(text)
+        self.assertEqual(len(rows), 14)
+        self.assertEqual(sorted(row["last_used"] for row in rows.values() if row["last_used"] is None), [])
+
+    def test_a_successful_capture_publishes_no_text_of_the_last_used_column_that_the_client_does_not_print(self):
+        """Through the actual native collector (`--claude-skill-doctor <capture> --json --out <report>`), in a plain-text capture and in an otherwise clean zero-cost JSON capture: text that the client
+        does not print in the last-used column reaches neither stream nor the JSON report written with --out, and the row's numbers are kept."""
+        with tempfile.TemporaryDirectory() as temp:
+            work = Path(temp)
+            for route in ("text", "json"):
+                for value in self.HOSTILE:
+                    with self.subTest(route=route, value=value[:12]):
+                        done, out = self.report_of(work, route, value)
+                        self.assertEqual(done.returncode, 0, done.stderr[-300:])
+                        for label, content in (("stdout", done.stdout), ("stderr", done.stderr), ("the --out file", out.read_text(encoding="utf-8"))):
+                            self.assertNotIn(self.MARK, content, f"{route}: {label}")
+                        report = json.loads(out.read_text(encoding="utf-8"))
+                        self.assertEqual(json.loads(done.stdout), report, "both JSON routes carry the one report")
+                        self.assertTrue(report["claude"]["measured"])
+                        row = {entry["name"]: entry for entry in report["skills"]}["gh-fix-ci"]["claude"]
+                        self.assertEqual((row["in_table"], row["uses"], row["context_tokens"], row["last_used"]), (True, 6, 110, None))
+            plain = work / "plain.capture"
+            plain.write_text(self.table(self.MARK), encoding="utf-8")
+            done = self.run_cli(["--claude-skill-doctor", str(plain), "--now", "2026-10-12T10:00:00+00:00"], work)
+            self.assertEqual(done.returncode, 0)
+            self.assertNotIn(self.MARK, done.stdout + done.stderr, "the text rendering carries it neither")
+
+    def test_the_clean_controls_keep_their_last_used_value_through_the_native_collector(self):
+        with tempfile.TemporaryDirectory() as temp:
+            work = Path(temp)
+            for route in ("text", "json"):
+                for value in ("never", "today", "1 day", "2 days ago"):
+                    with self.subTest(route=route, value=value):
+                        done, out = self.report_of(work, route, value)
+                        self.assertEqual(done.returncode, 0, done.stderr[-300:])
+                        row = {entry["name"]: entry for entry in json.loads(out.read_text(encoding="utf-8"))["skills"]}["gh-fix-ci"]["claude"]
+                        self.assertEqual((row["in_table"], row["uses"], row["context_tokens"], row["last_used"]), (True, 6, 110, value))
 
 
 if __name__ == "__main__":

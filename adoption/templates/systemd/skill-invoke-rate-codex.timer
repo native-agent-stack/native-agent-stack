@@ -1,0 +1,13 @@
+# 10:00 UTC (06:00 New York): in the quietest span of the host's load by hour of day (08:00 to 13:00 UTC), after the Claude half at 09:30 UTC; the Codex half takes 26 minutes and is limited to 63.
+# The load is by hour of the last 7 days from the host's Prometheus, 281 five-minute samples (the series is sparse): the hour is provisional (docs/decisions/2026-10-12-skill-invoke-rate-timer.md).
+[Unit]
+Description=Daily skill invocation measurement, Codex half
+
+[Timer]
+OnCalendar=*-*-* 10:00:00 UTC
+Persistent=true
+RandomizedDelaySec=5m
+Unit=skill-invoke-rate-codex.service
+
+[Install]
+WantedBy=timers.target

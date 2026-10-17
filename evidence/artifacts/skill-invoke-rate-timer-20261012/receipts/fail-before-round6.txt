@@ -1,0 +1,22 @@
+tests/test_skill_usage_daily.py of the scope-locked round (the local codex review and Astra's read of da4895b5) against the sources of da4895b5 (tools/skill-usage and adoption/templates/systemd; the test module and the probe receipts copied in; GITHUB_ACTIONS=true): Ran 87 tests, FAILED (failures=10), counting subtests.
+
+Tests that fail or raise:
+  FAIL  HalvesTests.test_the_codex_lanes_come_first_so_the_fleet_readers_cut_of_the_lane_list_keeps_them [1]
+  FAIL  ServiceSandboxTests.test_replaying_the_retired_probe_option_refuses_without_the_account_or_a_path [8]
+  FAIL  ServiceSandboxTests.test_the_program_has_no_confinement_probe_option [1]
+
+The cases of the local codex review (findings 1, 2) and of Astra's read (findings 3, 4) of da4895b5, reproduced (r6_repro.py):
+== da4895b5, the head that was read (its own test module and sources)
+finding 1: the combined record holds 567 lanes (566 Claude, 1 Codex); the Fleet page shows 200 of them, 0 of the 1 Codex lanes
+finding 2: the test FAILS on a manager that refuses PrivateUsers=true with 217/USER: AssertionError: 'fails_closed' != 'fail'
+finding 3: the old command line: exit 2; stderr holds the account name 2 times and the home path 2 times; last line: r6_repro.py: error: unrecognized arguments: --refuse-writable <home> --refuse-writable <home>/code/live-clone
+finding 3: the joined framing: exit 2; stderr holds the account name 1 times and the home path 1 times; last line: r6_repro.py: error: unrecognized arguments: --refuse-writable=<home>
+finding 4: the contradictory framing is classified as ('enforced', '')
+== this head
+finding 1: the combined record holds 567 lanes (566 Claude, 1 Codex); the Fleet page shows 200 of them, 1 of the 1 Codex lanes
+finding 2: the test passes on a manager that refuses PrivateUsers=true with 217/USER
+finding 3: the old command line: exit 2; stderr holds the account name 0 times and the home path 0 times; last line: daily skill usage refused: the command line has an argument this version does not take, or lacks one it needs; nothing was run
+finding 3: the joined framing: exit 2; stderr holds the account name 0 times and the home path 0 times; last line: daily skill usage refused: the command line has an argument this version does not take, or lacks one it needs; nothing was run
+finding 4: the contradictory framing is classified as ('fail', 'the observation of the run is incomplete')
+
+The marker comparison (finding 2) and the reader of the payload's output (finding 4) live in the test module, so the sources of da4895b5 cannot fail their tests; their evidence is the reproduction above (the test of da4895b5 on a manager that refuses PrivateUsers=true with 217/USER; the contradictory framing classified as enforced) and the mutants of receipts/mutants-round6-*.txt. Findings 1 and 3 are in the program: the lane-order test and the replay test fail on its sources.

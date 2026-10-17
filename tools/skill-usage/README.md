@@ -9,28 +9,66 @@ Pages and zero-use decisions use the de-inflated count; reads remain visible.
 
 ## Daily host and lane results
 
-`daily_skill_usage.py` runs the existing host report, Codex `--lanes` report and
-Claude `child-usage.mjs --lanes-sweep` with a common seven-day window. Its
-private output contains names/counts only, plus timestamps and measurement
-flags. Fleet reads `coordination/command-center/skills/skill-invoke-rate-latest.json`
+`daily_skill_usage.py` runs the existing native reports for one client at a time
+with a common seven-day window: `--half claude` the host report's `/skill-doctor`
+capture and Claude `child-usage.mjs --lanes-sweep`, `--half codex` the host
+report's Codex rollout scan and the Codex `--lanes` report. Each half is its own
+user unit with its own limits and its own record (`skill-invoke-rate-claude-latest.json`,
+`skill-invoke-rate-codex-latest.json`), whose `measured` holds only that half's
+keys, so a slow Codex scan (25 min 47 s on the host) never leaves the Claude half
+unmeasured and a timeout marks only its own half. After its record is written,
+a half refreshes the combined `skill-invoke-rate-latest.json` (`--combined-out`)
+from its own record and the other half's newest (`--other-record`). The private
+output contains names/counts only, plus timestamps and measurement flags. Fleet
+reads the combined `coordination/command-center/skills/skill-invoke-rate-latest.json`
 under its state root; it labels lifetime Claude host uses, windowed native
 Claude Skill calls and Codex skill-file reads separately.
 
-Render the timer for the selected live main clone into a review directory:
+Render the timers for the live clone into a review directory:
 
 ```sh
 python3 tools/skill-usage/daily_skill_usage.py \
   --render-units /tmp/skill-invoke-rate-units \
-  --repository <absolute-live-main-clone> \
+  --repository <absolute-live-clone> \
   --python /usr/bin/python3 --node <absolute-node-executable>
 ```
 
-The CC verifies/installs/enables these files after landing, following the
-existing user-timer procedure. Rendering does not load or start a unit.
-Live scheduled collection refuses a checkout whose branch is not main.
-Both transcript roots are explicit in the rendered service. Offline replay
-accepts `--host-report`, `--codex-lanes-report` and `--claude-lanes-report`
-captures; an omitted client remains UNKNOWN, with a nonzero run status.
+This writes `skill-invoke-rate-claude.{service,timer}` (09:30 UTC, limit 17 minutes)
+and `skill-invoke-rate-codex.{service,timer}` (10:00 UTC, limit 63 minutes). The
+CC verifies/installs/enables these files after landing, following the
+existing user-timer procedure. Rendering does not load or start a unit. Each service is confined to its record
+directory: `ProtectSystem=strict` and `ProtectHome=read-only` make the file system
+read-only for it (the live clone and the client's own state included),
+`ReadWritePaths=` opens `~/.local/state/native-agent-stack/coordination/command-center/skills`
+(the half's record, the combined record and its lock; create it with `mkdir -m 0700 -p`
+before enabling the timers, because a missing path fails the unit), and
+`PYTHONDONTWRITEBYTECODE=1` keeps every interpreter from writing bytecode
+(docs/decisions/2026-10-12-skill-invoke-rate-timer.md, decision 7). systemd starts a unit without these
+directives, and says nothing, when its manager cannot create the mount namespace (it ran the probe
+unconfined on the GitHub-hosted runner), unless the unit also carries a directive that the manager insists on:
+each service carries `TemporaryFileSystem=/srv:ro` for that, so the manager stops the unit (status
+226/NAMESPACE) instead, and `PrivateUsers=true` does the same for the user namespace (217/USER). The program
+asks the file system nothing: the confinement is the manager's, and a run started any other way is not
+confined. The marker hides `/srv` from the unit and `PrivateTmp=true` replaces `/tmp` and `/var/tmp`, so rendering refuses a
+clone, an interpreter or node at or below any of them (review rounds 5 and 8 of the record). The refresh of
+the combined record holds a lock, so two halves that finish together (both timers
+are `Persistent=true`) leave a record built from the newest record of each.
+The record is written through one closed-schema check (`render_record`: only the schema's keys, and leaves that are null, a boolean, a count, a time, a name of the allowed pattern or a fixed word), to the standard
+output and to the file alike, and the diagnostics of both command lines are fixed text that names no value (review round 9 of the record).
+The native collector's `main` is its public boundary (review round 10): an exception below the argument parser ends in one fixed line and exit 2, and the values of a refused capture that a diagnostic or the report carries come from closed sets.
+Live scheduled collection, and rendering, refuse a clone that is not at a
+commit of origin/main (`git merge-base --is-ancestor HEAD origin/main`): the
+live clone is a detached worktree of origin/main, so a branch name cannot be
+the test, while a feature branch or commits of the clone's own are refused.
+Each command has its own limit (`TIMEOUTS`, measured in
+docs/decisions/2026-10-12-skill-invoke-rate-timer.md): the `/skill-doctor`
+capture may take 300 s (`--claude-timeout`, default `skill_usage.py`
+`DEFAULT_CLAUDE_TIMEOUT`; about 19 s on a quiet host and about 60 s at three
+runnable threads per CPU), the Claude sweep 600 s, the host report's Codex scan
+600 s and the Codex lanes scan 3,120 s. The root of the half's own client is
+explicit in its service. Offline replay accepts `--host-report`,
+`--codex-lanes-report` and `--claude-lanes-report` captures (no `--half`: a
+combined projection); an omitted client remains UNKNOWN, with a nonzero run status.
 
 The official `claude-api@anthropic-agent-skills` entry stays a native plugin;
 it is checked against its registry commit and unchanged SKILL.md hash and is
@@ -78,6 +116,9 @@ one root is explicitly given. The report itself contains only skill names and co
   never the matched string, the surrounding message, or any other field of the line.
 - the Claude side is limited to native `/skill-doctor`'s own table (skill, source, context tokens,
   7-day tokens, uses, last used); it is never asked to read `~/.claude/skills` or any transcript.
+  The report carries from that table the counts of the manifest's skills and, for last used, one
+  of the spellings the client prints (`never`, `today`, `1 day`, `N days`, and the older
+  `N days ago`); any other text in that column is reported as `null` (`closed_last_used`).
 
 ## Commands
 

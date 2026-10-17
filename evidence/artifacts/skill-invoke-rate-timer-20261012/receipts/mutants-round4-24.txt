@@ -1,0 +1,27 @@
+The 24 mutants of round 4 (only EROFS is confinement; a lanes report with a container of the wrong shape is not measured): one change each; a mutant is killed when tests.test_skill_usage_daily fails.
+
+killed    daily_skill_usage.py               a refusal by a mode is accepted as confinement  
+killed    daily_skill_usage.py               the wrong error is taken for the read-only file system  
+killed    daily_skill_usage.py               EPERM is not an access refusal  
+killed    daily_skill_usage.py               EACCES is not an access refusal  
+killed    daily_skill_usage.py               an access refusal is not told from another error  
+killed    daily_skill_usage.py               an access refusal is a plain value error  
+killed    daily_skill_usage.py               an unverified refusal is not a refusal of the run  
+killed    daily_skill_usage.py               a Claude main lane of the wrong shape is usable  
+killed    daily_skill_usage.py               Claude spawn groups of the wrong shape are usable  
+killed    daily_skill_usage.py               a Claude agent group without counts is usable  
+killed    daily_skill_usage.py               Claude agents of the wrong shape are usable  
+killed    daily_skill_usage.py               an aggregate without its counts is usable  
+killed    daily_skill_usage.py               Codex groups of the wrong shape are usable  
+killed    daily_skill_usage.py               a Codex lane group of the wrong shape is usable  
+killed    daily_skill_usage.py               Codex role and kind groups of the wrong shape are usable  
+killed    daily_skill_usage.py               the Claude shape is not checked  
+killed    daily_skill_usage.py               the Codex shape is not checked  
+killed    daily_skill_usage.py               a Codex report that cannot be read is measured  
+killed    daily_skill_usage.py               lanes of a Codex report that cannot be read are published  
+killed    daily_skill_usage.py               lanes of a Claude report that cannot be read are published  
+killed    daily_skill_usage.py               a Claude report that cannot be read is measured  
+killed    daily_skill_usage.py               the reason is not printed  
+killed    daily_skill_usage.py               no note for a Codex report that cannot be read  
+killed    daily_skill_usage.py               no note for a Claude report that cannot be read  
+24 mutants, 24 killed, survivors: none

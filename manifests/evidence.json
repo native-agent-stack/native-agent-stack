@@ -5846,14 +5846,24 @@
       "bytes": 7463
     },
     {
-      "path": "adoption/templates/systemd/skill-invoke-rate.service",
-      "sha256": "9297270957f82b401d82afa99663d41381bf708ab9992b88e3aa8416ac099a5c",
-      "bytes": 731
+      "path": "adoption/templates/systemd/skill-invoke-rate-claude.service",
+      "sha256": "32f15da04ef590911c11ec15371183b9fb83e634d5704a47604887ef31b3203c",
+      "bytes": 4658
     },
     {
-      "path": "adoption/templates/systemd/skill-invoke-rate.timer",
-      "sha256": "b1f9eded28471df410105cb841ef1d4537c2da71efe2ad794aac32d413a0719a",
-      "bytes": 184
+      "path": "adoption/templates/systemd/skill-invoke-rate-claude.timer",
+      "sha256": "63d1e4f180755bb00bd8d80b275faf166c7b45fedece422e0e3f138402865478",
+      "bytes": 598
+    },
+    {
+      "path": "adoption/templates/systemd/skill-invoke-rate-codex.service",
+      "sha256": "fcd0126041f8d84e7907afa05e5ef9596c80c9a245b6a6d5ef72147dbf6c20ff",
+      "bytes": 4768
+    },
+    {
+      "path": "adoption/templates/systemd/skill-invoke-rate-codex.timer",
+      "sha256": "b0fc30b0a9e13eb2669289b0be2d10c00e74c84c49ef50c418ac3d54c304c5d3",
+      "bytes": 608
     },
     {
       "path": "adoption/templates/systemd/stack-currency.service",
@@ -18758,7 +18768,7 @@
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
-      "sha256": "8f5e0f1b66df663e1e83860f286098fb3cbdc0644c10a12f32d502d327c1d6f1",
+      "sha256": "c895a47e923908b73c6c0f65e9a7f9571f25cb5d81c37979db001d974ee44348",
       "bytes": 16799
     },
     {
@@ -19138,7 +19148,7 @@
     },
     {
       "path": "docs/decisions/2026-10-10-daily-skill-invoke-rate.md",
-      "sha256": "25446226cae9d87a5aaea0b21f3aa0e108478613983494510f2277d05aa99d62",
+      "sha256": "92bba4fd60c622387dc1ed2836e04d0ab56a8b444d78eecc8f66ffccbe1cc151",
       "bytes": 39835
     },
     {
@@ -19255,6 +19265,11 @@
       "path": "docs/decisions/2026-10-12-model-effort-routing.md",
       "sha256": "fc889cf0005b619d69268bd5bec8b5b94307bd606481a9ba4926664c4dba8fb4",
       "bytes": 11192
+    },
+    {
+      "path": "docs/decisions/2026-10-12-skill-invoke-rate-timer.md",
+      "sha256": "be548a47074f07515e07293bd19b6b37a30010bcc30de1f835b61840411e2183",
+      "bytes": 84070
     },
     {
       "path": "docs/decisions/2026-10-12-skills-installer-foreign-content.md",
@@ -53307,6 +53322,216 @@
       "bytes": 183
     },
     {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/README.md",
+      "sha256": "7d5dbe49c932a667ad2d4b912b8a9c345c3d61ac70792853de66c1a435eb9234",
+      "bytes": 15406
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/analyze-security.txt",
+      "sha256": "32eebf037dae2f31717104961629488150b263246b003e2fd4757c4984209df7",
+      "bytes": 4906
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/capture-timings/timing-1-core.json",
+      "sha256": "fd2f72b9c8fd808150f7143d6f986d3a7ced5c6c38f7ffb0b7c4a4bf4583682c",
+      "bytes": 446
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/capture-timings/timing-3-cores.json",
+      "sha256": "fb0f79e12958bcd0ed80fe76265fbf793bfe96407a5cbe9649c4063e1b1bd034",
+      "bytes": 604
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/capture-timings/timing-contended-3-per-cpu.json",
+      "sha256": "a3eab6dd6aba9c5a67c2b0ee945fe1501caa4ed74daf286c8c9fde667ab8fab6",
+      "bytes": 223
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/capture-timings/timing-interactive-env.json",
+      "sha256": "7530f7609b0af67ccacfadcaef9ff094198006ee1d06bed43fb32ce76ad82153",
+      "bytes": 603
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/ci-runner-unconfined-20261013.txt",
+      "sha256": "7cc2dfe24a8c630522a6b13bb39690b033260817e96cc0fcf39bf5a4cded61ec",
+      "bytes": 2951
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/design-probe-first-host.json",
+      "sha256": "9bb9aedb52b20a86e4a0012858b61f2ea3c5153d49606f2912a5622cd7ef05a2",
+      "bytes": 8015
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/design-probe-hosted-runner.json",
+      "sha256": "a1bb86e514787cf53d08f2e46ec42dfb73f8b3aea044f4cfc5e8259c0c8e0bea",
+      "bytes": 16102
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/fail-before-round10.txt",
+      "sha256": "b4743616ac6c62af3ee3b8d7ef816c318d53ebcf67f2d2fcdb85be0686eb2b5a",
+      "bytes": 2923
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/fail-before-round11.txt",
+      "sha256": "71153f22104d44792838ecf6feff72130847c3b97893624eff877631dc666742",
+      "bytes": 4070
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/fail-before-round12.txt",
+      "sha256": "569f30c1faaa22fad3fb0d704901cb54dc08812a8dd20027813baca2c392bf25",
+      "bytes": 1829
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/fail-before-round2.txt",
+      "sha256": "5d3fe65be336605b1633806dc2cf5c101a694e7be24faa1a3a53ad4c9ba4e911",
+      "bytes": 1012
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/fail-before-round3.txt",
+      "sha256": "dd2e9f35c23346c09095e3c72e30948fcb0380cc453a5d05c6c9bdbf9bb8d89a",
+      "bytes": 1711
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/fail-before-round4.txt",
+      "sha256": "e6702b6730f620260c8ab1a73d6b63301c89e77d79fb0a6908f119ade4ccd602",
+      "bytes": 1253
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/fail-before-round5.txt",
+      "sha256": "96866046de52cb72d92e3a307f02a08171543c452fd299e7a7a1a3a432738d11",
+      "bytes": 1969
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/fail-before-round6.txt",
+      "sha256": "3d9464f59f45970902734c447ec90ac46d52c68f629de8afbb21b75645838e2f",
+      "bytes": 2883
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/fail-before-round7.txt",
+      "sha256": "65d6cb6b1b0bd96ff0827fda17d23cc928836ca5e7fdf2c1d1da35e9b5e6ff18",
+      "bytes": 3725
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/fail-before-round8.txt",
+      "sha256": "7b0cabe428d9d52efe40b3ac43b6af5cb7d33f9c7e03bef9b7b860eb50ec1c7f",
+      "bytes": 5253
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/fail-before-round9.txt",
+      "sha256": "bfcf6410ad88ff04550fbe74046a4a27e95de7b6511c2f5cfbceff2c4a9c4e36",
+      "bytes": 2900
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/marker-probe-first-host.json",
+      "sha256": "71950288134ad1d87d645821c0c75df14cc89285709d84af98276b9a350188f2",
+      "bytes": 3733
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/marker-probe-hosted-runner.json",
+      "sha256": "f930c27d65ee3fea5bb88943199b4f2fad9ad8777211623071a2aee84fa0d63a",
+      "bytes": 3729
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round10-19.txt",
+      "sha256": "d02eb26ed468ca3750f8a94d72443ab3104177eb6fb9f654de72063855f3f1be",
+      "bytes": 2140
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round11-37.txt",
+      "sha256": "d29b47418f02e679a701fddde1f407224bad5384850b2539e6cd47a446758b5c",
+      "bytes": 3688
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round12-5.txt",
+      "sha256": "536ea04fa73043979584efdf92876723abb94e606de3a5352277dd915f21e09b",
+      "bytes": 391
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round2-26.txt",
+      "sha256": "71a88c12556cf4df62e3c931a09725f87890adc0cc508f5af1bc98b6c966aef4",
+      "bytes": 1811
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round3-35.txt",
+      "sha256": "b184b9f77cab459e1beed28315d4b806fd621951529453fb4576462937e71bb1",
+      "bytes": 3368
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round4-24.txt",
+      "sha256": "9d9258f2d5e619645c7d35194ba8c8578de981af0c6623beeddf8183b11f8e30",
+      "bytes": 2447
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round5-45.txt",
+      "sha256": "83c400b2faa8ff535cb4c4f619f4eb5870f2a6a4c2ba7478944c38e95edab161",
+      "bytes": 4404
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round6-19.txt",
+      "sha256": "f62025d30c9e037b9b1a073ed19f0d491ad3fd4fb8d8bece1f10f773fb076db5",
+      "bytes": 2251
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round7-12.txt",
+      "sha256": "0cfe7a9f394b027617351010c8af23b82c0e4d3b70a1b84b2622285fb253540c",
+      "bytes": 2238
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round8-17.txt",
+      "sha256": "622222ed0970c16940c16aa44726ca3a172611d5e393aeab7b2c7e7992bf607c",
+      "bytes": 2346
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round9-25.txt",
+      "sha256": "27a2777f5c7da9b5f2adb4017d5ba624d44a092f76409d251aecc71ba2d466ae",
+      "bytes": 2780
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-split-34.txt",
+      "sha256": "d2fac51c3d5a9b132fed7a029a41f75cb0e8e39ae43186fdecfcb9356a169f29",
+      "bytes": 2605
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/native-last-used-spellings.txt",
+      "sha256": "8e60ff82e33e5c8f299e6fab546dd404ab168634721f2d6299515fb60465f596",
+      "bytes": 4984
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/sandbox-probe.json",
+      "sha256": "e33703c0c619c4bf60eacc092920c28c30451f4b79d100c854a18a8692e93811",
+      "bytes": 2422
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/sandboxed-halves-end-to-end-round5.txt",
+      "sha256": "42866679b523fd9f6e61ed7d2951fd806b6ea4c8d0abef4612d50b3c0a586c3a",
+      "bytes": 2442
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/sandboxed-halves-end-to-end.txt",
+      "sha256": "bec9c68810af1b1b48c89508895faa97a0e1f7b97293463b3b642c074f5e133d",
+      "bytes": 1913
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/unsandboxed-halves-end-to-end.txt",
+      "sha256": "4a62f6a8657fe08b552a00c8c4caa22e29cf5f3c4d8554d49272c7e32e1fe867",
+      "bytes": 1138
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/unsandboxed-live-clone-refusal.txt",
+      "sha256": "5ceb231ebe7f63bb7feda00902c161ee5d04f03306ae4be1350e52f3a5401bd6",
+      "bytes": 371
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/unsandboxed-per-command.txt",
+      "sha256": "d83a3f67ffbe55234c0a5fce75d1a91555bbb06025cfe7b17304ba7bd0d98832",
+      "bytes": 2200
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/unsandboxed-single-unit-1200s.txt",
+      "sha256": "f578ed5d7b8f60c3c30fd6c4e325769a02204369e82af64791a5f63261385410",
+      "bytes": 571
+    },
+    {
       "path": "evidence/artifacts/skills-agents-layer-20260926/README.md",
       "sha256": "dc170a49e01f35c5ab30af6f51108c8a29559294467353d156b3c626e71829f3",
       "bytes": 8407
@@ -65183,13 +65408,13 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "18cc554e12513db0331a2eba74d503d635bab941393fd10a12e397e903fcb8bf",
-      "bytes": 276027
+      "sha256": "289723c1537a1aee984badcd16f32f859971e7d9454050c4ca414ccd0cb5f351",
+      "bytes": 305819
     },
     {
       "path": "tests/test_skill_usage_daily.py",
-      "sha256": "04719068560e1e4daa32ed6b3363646c29e1e6e73f3eb9b75f22d074f0e3993f",
-      "bytes": 17439
+      "sha256": "fc834423394f8e06d209c89e062d238f6c262c0224e725570247ec0194a8a791",
+      "bytes": 174941
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -65858,13 +66083,13 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "4a603c06bef574515481b8794c1ae264dd2e5bff1911e96e2adb2ec1b97e3277",
-      "bytes": 57941
+      "sha256": "cb3952bf768328b54a2240868aaea0a654a4fc74e91da28f67f89dade8182b71",
+      "bytes": 61828
     },
     {
       "path": "tools/skill-usage/daily_skill_usage.py",
-      "sha256": "1936dc7c54fc098431017eb769b4caf8914616698435a53b4146ed76b44b9d07",
-      "bytes": 11118
+      "sha256": "1a724d2b0f834165523ea8e1286bc77ae92db8856d90bdac3bf9b8c30392991c",
+      "bytes": 41065
     },
     {
       "path": "tools/skill-usage/runtime_usage.py",
@@ -65873,8 +66098,8 @@
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "0c16c817238bf687596a14e5fccc129e2703544cb3d053d46c13466c1c784a96",
-      "bytes": 161317
+      "sha256": "d5712ec4c4eed686825b5838ca54ff2fc5049a21de3201dd82f27ff6713ed947",
+      "bytes": 170067
     },
     {
       "path": "tools/skill-usage/stage_routing_eval.py",

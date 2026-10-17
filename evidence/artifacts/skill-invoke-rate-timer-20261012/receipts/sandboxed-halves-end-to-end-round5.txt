@@ -1,0 +1,27 @@
+Round 5 (route B): the two rendered units, with the marker TemporaryFileSystem=/srv:ro, run end to end as transient user units on the first host (systemd 259.5, Linux 6.18 under WSL2) from a scratch live clone (a clone whose HEAD is a commit carrying the round-5 files, with refs/remotes/origin/main at that commit, so the clone test of the program passes), the record paths moved to a scratch directory. The driver renders the units without writing bytecode (python -B), counts __pycache__ directories before the halves and after them, and prints the manager's own words, exit statuses, wall times, the counts of the records written and the state of the clone: no name, no text.
+
+render-units from a scratch live clone (a commit of origin/main carrying the round-5 files): exit 0
+before the halves: __pycache__ directories in the clone: 0
+The [Service] sections of the rendered units are the properties of the transient units below; the record paths are moved to a scratch directory.
+
+== claude half
+properties: WorkingDirectory=<live-clone> Type=oneshot TimeoutStartSec=17min UMask=0077 Nice=10 ProtectSystem=strict ProtectHome=read-only PrivateTmp=true PrivateUsers=true TemporaryFileSystem=/srv:ro ReadWritePaths=<records> Environment=PYTHONDONTWRITEBYTECODE=1
+start 2026-10-13T09:04:06Z
+Main processes terminated with: code=exited, status=0/SUCCESS
+systemd-run exit 0
+end   2026-10-13T09:06:37Z (151 s)
+
+== codex half
+properties: WorkingDirectory=<live-clone> Type=oneshot TimeoutStartSec=63min UMask=0077 Nice=10 ProtectSystem=strict ProtectHome=read-only PrivateTmp=true PrivateUsers=true TemporaryFileSystem=/srv:ro ReadWritePaths=<records> Environment=PYTHONDONTWRITEBYTECODE=1
+start 2026-10-13T09:06:37Z
+Main processes terminated with: code=exited, status=0/SUCCESS
+systemd-run exit 0
+end   2026-10-13T09:31:18Z (1482 s)
+
+== afterwards: the records the two halves wrote (counts only) and the clone
+skill-invoke-rate-claude-latest.json: mode 0o600, 85581 bytes, half claude, measured {'claude': True, 'host': True}, skills 30, lanes 564
+skill-invoke-rate-codex-latest.json: mode 0o600, 9624 bytes, half codex, measured {'codex': True}, skills 30, lanes 3
+skill-invoke-rate-latest.json: mode 0o600, 89033 bytes, half all, measured {'claude': True, 'codex': True, 'host': True}, skills 30, lanes 567
+skill-invoke-rate-latest.json.lock: mode 0o600, 0 bytes
+records dir mode: 0o700
+clone git status lines: 0 | __pycache__ directories: 0

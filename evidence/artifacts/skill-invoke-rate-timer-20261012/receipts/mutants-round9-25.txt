@@ -1,0 +1,28 @@
+The 25 mutants of the round-9 changes of #1043 (Astra's two P1 of the read of c23b9ce48 and the command center's design decision): the closed schema of the record (the check absent at the file, at the standard output and in the renderer; a count, a name, a time, a word, a list of names, a flag and a key outside the schema each let through; the upper bound of a count; the boolean as a count; the lane's own fields; the policy scalar copied unchecked) and the native collector's diagnostics (the parser echoing, argparse's own parser, the manifest, --now, --since/--until and --out naming their value, a reason that may carry a long word or a container, the two reasons of a refused capture as repr). Each is one exact change in a scratch copy of the minimal tree, then the daily module and the native collector's diagnostics class with GITHUB_ACTIONS=true; a mutant is killed when the run fails (the unmutated copy passes first).
+
+killed    daily_skill_usage.py       the record is written unchecked
+killed    daily_skill_usage.py       the file is written from the unchecked report
+killed    daily_skill_usage.py       the standard output is written unchecked
+killed    daily_skill_usage.py       a count leaf is copied as it is
+killed    daily_skill_usage.py       a name leaf is any text
+killed    daily_skill_usage.py       a time leaf is any text
+killed    daily_skill_usage.py       a time leaf is not parsed
+killed    daily_skill_usage.py       a word leaf is any text
+killed    daily_skill_usage.py       an object keeps its keys outside the schema
+killed    daily_skill_usage.py       a list of names keeps any text
+killed    daily_skill_usage.py       a measured flag is truthiness
+killed    daily_skill_usage.py       a count has no upper bound
+killed    daily_skill_usage.py       a boolean is a count
+killed    daily_skill_usage.py       the policy scalar is copied unchecked
+killed    daily_skill_usage.py       the schema lets a lane carry its own fields
+killed    skill_usage.py             the parser echoes the values it could not use
+killed    skill_usage.py             the parser is argparse's own
+killed    skill_usage.py             the manifest diagnostic names the error
+killed    skill_usage.py             the --now diagnostic names the error
+killed    skill_usage.py             the --since/--until diagnostic names the error
+killed    skill_usage.py             the --out diagnostic names the path
+killed    skill_usage.py             a word of any length may stand in a reason
+killed    skill_usage.py             a container may stand in a reason
+killed    skill_usage.py             the subtype of a refused capture is its repr
+killed    skill_usage.py             the cost of a refused capture is its repr
+25 mutants, 25 killed, survivors: none
