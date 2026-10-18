@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "kind": "claude_native_practice_reference_refresh_observation",
+  "evidence_class": "native_proven",
+  "observed_date": "2026-10-18",
+  "result": "HOST_REFRESH_VERIFIED",
+  "owner_direction_paraphrase": "Qualify the existing full native runtime foundation and refresh its already-selected practice references through supported pinned installation, preserving unrelated skills and evidence limits.",
+  "source": {
+    "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+    "ref": "4f827e637f256fee4f0534f395431b722aabc43c",
+    "path": ".claude/skills/claude-native-practice",
+    "tree_sha": "16be5475f518f8e7bd2cc94f4f4363c61a602ed9",
+    "skill_md_sha256": "005288455c9d6a0bd70772847e2bb2411554d90eeabc0aa135af5d12fe99b353"
+  },
+  "supported_installation": {
+    "entrypoint": "tools/adoption/install_skills.py",
+    "entrypoint_sha256": "a89b0a4e97c56bb3ec5973253ef6a683f4d44ab5f32c4e4ea37cdb688f2bbe46",
+    "selection": "claude-native-practice only, using the owned candidate adoption/skills/manifest.json",
+    "cli_repository": "https://github.com/vercel-labs/skills",
+    "cli_version": "1.7.0",
+    "cli_commit": "7407f3893ad4dceab546ac002c3ef806e4000c73",
+    "cli_published_files_verified": 19,
+    "dry_run": {
+      "exit_code": 0,
+      "result": "planned"
+    },
+    "apply": {
+      "exit_code": 0,
+      "result": "installed",
+      "ok": true
+    },
+    "postcheck": {
+      "exit_code": 0,
+      "result": "ok",
+      "ok": true
+    },
+    "dependencies_installed": false,
+    "manual_copy": false,
+    "force": false,
+    "exact_apply_argv_embedded_in_condensed_source_receipt": false
+  },
+  "before": {
+    "tree_sha": "f08d0d241b774112bbc1e1f43558e7604e4916b6",
+    "reference_client_version": "2.1.295"
+  },
+  "after": {
+    "folder_tree": "ok",
+    "tree_sha": "16be5475f518f8e7bd2cc94f4f4363c61a602ed9",
+    "reference_client_version": "2.1.302",
+    "claude_link_correct": true,
+    "skill_md_unchanged": true
+  },
+  "preservation": {
+    "other_lock_entries": 28,
+    "other_entries_sha256": "abf28828aa74bfc69faf08263a126d018f66bc94882637524b42f75fed2b9c21",
+    "digest_encoding": "sorted compact JSON",
+    "slot_defaults_and_statuses_unchanged": 33,
+    "updated_supporting_reference_files": 13,
+    "settings_permissions_and_models_changed": false
+  },
+  "reused_test_receipts": {
+    "source_commit": "4f827e637f256fee4f0534f395431b722aabc43c",
+    "installer": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_install_skills.py -q",
+      "passed": 136,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "classification": "existing temporary-home/project integration fixtures, including pinned CLI offline controls"
+    },
+    "manifest": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_skills_manifest.py -q",
+      "passed": 38,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "classification": "existing structural contract suite on candidate manifest"
+    },
+    "rerun_for_this_proposal": false,
+    "new_tests_added": false
+  },
+  "original_custody_sha256": {
+    "claude-practice-refresh-install.json": "9d4754d5861b844d47d854f657c7c6a75e4f17e4b3af28b43e3b46100e3d320f",
+    "claude-practice-refresh-preflight.json": "81a17df41fcc331f4d85b107bb5b5d0e8f00007c6df452205e58da5f2a9836df"
+  },
+  "limits": [
+    "An installation observation and byte/reference verification, not a new full native runtime qualification or performance/cost comparison.",
+    "No native Workflow execution, child routing, role-wide quality parity, memory durability or recovery conclusion follows.",
+    "No layer winner, platform_status, slot default/status, model, effort or permission changes.",
+    "This is a registered artifact observation, not a new evidence/hosts stage acceptance receipt and not a verdict-review lane return.",
+    "The condensed original record does not embed full apply argv; do not invent it. Original native invocation custody can be added by its recorder before final review."
+  ]
+}
