@@ -68,8 +68,7 @@
   },
   "preservation": {
     "other_global_skill_lock_entries": 28,
-    "other_entries_sha256_before": "abf28828aa74bfc69faf08263a126d018f66bc94882637524b42f75fed2b9c21",
-    "other_entries_sha256_after": "abf28828aa74bfc69faf08263a126d018f66bc94882637524b42f75fed2b9c21",
+    "other_entries_verification": "Private host readback found the other entries unchanged; the raw lock and its digests are withheld and this observation is not publicly reproducible.",
     "all_other_manifest_rows_unchanged": true,
     "manifest_changed_fields": [
       "url",
@@ -79,11 +78,12 @@
     "role_defaults_and_statuses": {
       "count": 33,
       "unchanged_against_source_pin": "4f827e637f256fee4f0534f395431b722aabc43c",
-      "id_default_status_digest": "c41112489f3808e7630f3a7ae47bff0d16c51c11016ef0da20aae2b7a02b68d4"
+      "id_default_status_digest": "c41112489f3808e7630f3a7ae47bff0d16c51c11016ef0da20aae2b7a02b68d4",
+      "digest_serialization": "UTF-8 JSON of {slot.id: {default: slot.default, status: slot.status}} for all 33 published slots, sort_keys=true, separators=(',', ':'), without a trailing newline."
     },
     "skill_md_unchanged": true,
     "stored_authentication_permissions_hooks_services_or_models_changed": false,
-    "completed_readback_window": "Romi native final at 2026-10-18T10:01:45; source post-snapshot at10:03:33 preceded this global refresh."
+    "completed_readback_window": "The native memory-readback task completed at 2026-10-18T10:01:45; its source post-snapshot at 10:03:33 preceded this global refresh. This is a private historical ordering observation, not memory qualification."
   },
   "reused_test_receipts": {
     "new_manifest_tests": {
@@ -93,13 +93,13 @@
       "errors": 0,
       "exit_code": 0
     },
-    "source_corrections_and_atlas": "Same source bytes as reviewed 8a9128f1; existing 136 passing practice tests plus3 pre-existing skips and51 passing Atlas tests under the existing locked CI interpreter are retained separately. Native Review02 also retained its independent5 missing-cssselect2 errors.",
+    "source_corrections_and_atlas": "Same source bytes as reviewed 8a9128f1; existing 136 passing practice tests plus 3 pre-existing skips and 51 passing Atlas tests under the existing locked CI interpreter are retained separately. A historical private independent review also retained 5 missing-cssselect2 errors; those are not counted as passing checks here.",
     "installer_implementation": "Unchanged; prior native installer test evidence retained, not newly counted here."
   },
   "limits": [
     "This is a host skill-reference update, not a runtime/model version or default-selection change.",
     "The updated adoption manifest/receipt still need full publication validation and new exact-head review; earlier verdicts remain bound to their original heads.",
-    "Historical PR1256 refresh at4f827 and its receipt remain valid history; this newer source is intended to supersede that pending publication, not silently overwrite it.",
+    "Historical PR #1256 refresh at 4f827 and its receipt remain valid history; this newer source is intended to supersede that pending publication, not silently overwrite it.",
     "No memory/RAG, preserved-quality performance, final-stack, canonical layer-verdict or full foundation completion is claimed.",
     "Horizon hook activation and separate direct-API funding/source-packet gates remain unresolved."
   ]

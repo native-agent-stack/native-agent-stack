@@ -45,7 +45,7 @@
     {"source_id": "aannoo-hcom", "kind": "github-skills-repo", "url": "https://github.com/aannoo/hcom", "pin": "b2a7c192003e7fd67ed93265289e4ac36276f965"},
     {"source_id": "promptfoo-promptfoo", "kind": "github-skills-repo", "url": "https://github.com/promptfoo/promptfoo", "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8"},
     {"source_id": "grafana-skills", "kind": "github-skills-repo", "url": "https://github.com/grafana/skills", "pin": "1ccacf29049fde66637fe01ab93a83a772da323b"},
-    {"source_id": "seathatflowsinourveins-native-agent-stack", "kind": "github-skills-repo", "url": "https://github.com/seathatflowsinourveins/native-agent-stack", "pin": "c59655c7c85a014b86699240754c382c75a475a6"}
+    {"source_id": "seathatflowsinourveins-native-agent-stack", "kind": "github-skills-repo", "url": "https://github.com/seathatflowsinourveins/native-agent-stack", "pin": "8a9128f1b45caa8fb414db022ddd0d5af22bb16c"}
   ],
   "tasks": [
     {

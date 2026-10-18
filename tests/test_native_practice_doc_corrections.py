@@ -91,6 +91,9 @@ class PracticeReferenceSourceTests(unittest.TestCase):
         self.assertEqual(guard["onFailure"], "block")
         self.assertIn("halt_error(2)", guard["command"])
         self.assertIn("secret-path wrapper also refuses a missing script", note)
+        route = self.rows["hooks"]["route"]
+        self.assertIn("adoption/templates/claude.settings.template.json", route)
+        self.assertNotIn("proposal with the command center", route)
 
     def test_completion_note_cites_documented_failure_scope(self):
         note = self.rows["loops-completion"]["notes"]
@@ -113,7 +116,7 @@ class PracticeReferenceSourceTests(unittest.TestCase):
             ("native-clients.md", "client-core", ("evidence",)),
             ("native-clients.md", "instruction-files", ("evidence",)),
             ("native-clients.md", "settings-permissions", ("alternatives", "evidence", "supersedes")),
-            ("native-clients.md", "hooks", ("notes",)),
+            ("native-clients.md", "hooks", ("route", "notes")),
             ("workers.md", "loops-completion", ("notes",)),
             ("git-github-automation.md", "pr-review-pre-cue", ("route",)),
         ):
@@ -123,6 +126,47 @@ class PracticeReferenceSourceTests(unittest.TestCase):
                 for value in values if isinstance(values, list) else [values]:
                     with self.subTest(slot=slot_id, field=field):
                         self.assertIn(value, section)
+
+
+class PracticeAdoptionCoherenceTests(unittest.TestCase):
+    """Bindings at NAS 4f827e637f256fee4f0534f395431b722aabc43c:
+
+    docs/decisions/2026-10-10-skills-claude-native-practice-row.md:82-86 explicitly
+    ties this first-party lifecycle pin to the selected manifest row. Correction #161
+    (tests/test_provenance_digest_custody.py:1-12) excludes unpublished home-state
+    digests from public receipts. These checks do not inspect the private lock.
+    """
+
+    def test_the_first_party_lifecycle_source_follows_the_selected_skill_pin(self):
+        manifest = json.loads((ROOT / "adoption/skills/manifest.json").read_text())
+        selected = next(row for row in manifest["skills"] if row["name"] == "claude-native-practice")
+        lifecycle = json.loads((ROOT / "catalogs/landscape/skills-lifecycle.json").read_text())
+        source = next(row for row in lifecycle["sources"]
+                      if row["source_id"] == "seathatflowsinourveins-native-agent-stack")
+        self.assertEqual(source["pin"], selected["ref"])
+
+    def test_the_public_install_receipt_withholds_private_lock_digests(self):
+        receipt = json.loads((ROOT / "evidence/artifacts/claude-native-practice-refresh-20261018-final/receipt.json").read_text())
+        preservation = receipt["preservation"]
+        private_fields = {key: value for key, value in preservation.items() if key.startswith("other_")}
+        self.assertFalse(any(isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value)
+                             for value in private_fields.values()),
+                         "A public receipt cannot bind unpublished private lock bytes with a digest")
+        self.assertGreaterEqual(preservation["other_global_skill_lock_entries"], 0)
+        self.assertIn("not publicly reproducible", preservation["other_entries_verification"])
+
+    def test_the_snapshot_note_dates_the_current_source_correction(self):
+        snapshot = json.loads((ROOT / "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json").read_text())
+        self.assertIn("2026-10-18", snapshot["snapshot"]["current_decision_source"]["note"])
+
+    def test_the_platform_install_guide_uses_the_adopted_floor(self):
+        pins = json.loads((ROOT / "adoption/pins-linux-x86_64.json").read_text())
+        floor = next(tool["version"] for tool in pins["tools"] if tool["id"] == "claude-code")
+        text = (ROOT / "adoption/platforms/linux-wsl2.md").read_text()
+        current = re.search(r"On main the pin is ([0-9.]+) and a floor", text)
+        self.assertIsNotNone(current)
+        self.assertEqual(current.group(1), floor)
+        self.assertIn(f"whose `--version` reports {floor} or newer", text)
 
 
 class WorkflowsReadmeAdoptTests(unittest.TestCase):

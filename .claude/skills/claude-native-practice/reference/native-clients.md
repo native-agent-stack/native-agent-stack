@@ -70,7 +70,7 @@ Client 2.1.302, checked 2026-10-16. Index: [slots.md](slots.md).
 
 **Status:** default (scoped). **Default:** Settings command hooks, with `onFailure: "block"` on each guard hook entry
 
-- **Route:** Needs client 2.1.295 or later; the guard wrapper must also refuse when its script is missing (proposal with the command center)
+- **Route:** Needs client 2.1.295 or later; the adopted guard wrapper in adoption/templates/claude.settings.template.json refuses when its script is missing
 - **Alternatives, ranked:** 1. hookify (anthropics/claude-plugins-official); 2. Skill-scoped frontmatter hooks
 - **Rejected:** lasso-security/claude-hooks; Plugin mods as guards; Prompt or agent hooks as security guards; `onFailure` on the matcher group (no effect)
 - **Evidence:** hooks-O9 (2.1.295 onFailure); docs/decisions/2026-10-08-guard-hook-fails-closed.md probe cases

@@ -5097,8 +5097,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/native-clients.md",
-      "sha256": "77d7fba299536201ea2409bd8b2481502bc3ae22815c3c591f36c0ab68d2ec7b",
-      "bytes": 21368
+      "sha256": "cb0893a2655d08823014227ccb590bed3962603c1ce79f081a0d2349a81cf671",
+      "bytes": 21384
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/observation-inference.md",
@@ -5112,8 +5112,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "8b50ab5041a6815ae65e0b6b7c00c44b0607726429471b806f45c601891a54a5",
-      "bytes": 170268
+      "sha256": "b80187d9b75b680ddabc20b1ba80bc26e68f9fcc7dcf4dde0bcc2643b1c004ad",
+      "bytes": 170284
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5707,7 +5707,7 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "6ef7140eab6ca92485aeda946362fec655385a22b651a6f34e026961688e8ed5",
+      "sha256": "e05daf6d4ea41521d18483dd0c6813cc91c2d7b664e6aeef3916b34f4465d9b7",
       "bytes": 30359
     },
     {
@@ -17808,7 +17808,7 @@
     },
     {
       "path": "catalogs/landscape/skills-lifecycle.json",
-      "sha256": "4167b554698d7d6a8a60ebe7928d9b9b998ac2f47b4cd5d598c22a39c92f0db6",
+      "sha256": "b6bc8456e60f3e25762a2c55dc7691d52f18c134c3ba487d21a6fc44b97fee2f",
       "bytes": 27733
     },
     {
@@ -19278,8 +19278,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-skills-claude-native-practice-row.md",
-      "sha256": "7c7587e0f2ee29ea1bf90976fdbea05fab3a5e41798478b8d91c228664ebf2ca",
-      "bytes": 6936
+      "sha256": "f7e3e925b72664c8a7551d132e0a774c32fb323bf59ff5ef55b6c12fca40c3d0",
+      "bytes": 7993
     },
     {
       "path": "docs/decisions/2026-10-10-starred-repository-convergence.md",
@@ -21923,8 +21923,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "704edd3874ee0faa1b65c5ebb8db1e65e51bf7377cd4f4a18f22097de67c360f",
-      "bytes": 238803
+      "sha256": "fa52589d9933c484793c5524520dd8e13325cae37102f73a5bc9279fab276654",
+      "bytes": 239199
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json",
@@ -21983,8 +21983,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-refresh-20261018-final/receipt.json",
-      "sha256": "5215fdd3852755c65401ef0167b2ed1c9f0caa67a01981661a75182a492e3c2f",
-      "bytes": 5650
+      "sha256": "fd09f0a7cef489c490d9c8b5fc03283588b2abfbe1cf1380aec2d4f0af79fc6f",
+      "bytes": 5996
     },
     {
       "path": "evidence/artifacts/claude-repository-evidence-20260921/provenance.json",
@@ -64893,8 +64893,8 @@
     },
     {
       "path": "tests/test_native_practice_doc_corrections.py",
-      "sha256": "623e7528594d5f7220db0d7f5618e2fa34cbc602e0035c7a602066b9005fa990",
-      "bytes": 8928
+      "sha256": "dd7d84b7174b3cdceb64c69c4403caf106f69e4a753e7d98d2ff77a292d1d58e",
+      "bytes": 11838
     },
     {
       "path": "tests/test_native_practice_ledger_obs_sched.py",

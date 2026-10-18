@@ -84,3 +84,9 @@ measured pin fields change, from the commit's own bytes: the ref and the tree UR
 `005288455c9d6a0bd70772847e2bb2411554d90eeabc0aa135af5d12fe99b353` (2,290 bytes, was 2,224). The description is unchanged at 349 characters, so the listing check above and its sums are unchanged, and the row's other fields
 (first-party flag, listing, Codex enablement, audit text, gap text) equal the measured ones. `catalogs/landscape/skills-lifecycle.json` follows the pin of this repository. The skill is not installed by this change: the designated host shell
 installs it by `adoption/skills/lifecycle.md` after the pull request lands, from the new pin (an installed copy at the old pin is stale until then).
+
+## Reference repair and source ordering (2026-10-18)
+
+Owner direction of 2026-10-18, paraphrased: qualify the current runtime foundation through pinned native installation, independent review and retained end-to-end evidence before accepting it. PR #1257 corrects source claims and keeps this first-party lifecycle source and the selected manifest ref equal.
+
+The source pin is a verified predecessor of the manifest and install-receipt update, fetched through the supported installer. It may therefore be reachable through this pull request rather than main when the receipt is recorded. The lander squash-merges: that predecessor is not claimed to become an ancestor of main. The exact commit, skill tree and installed files must match before an install receipt passes. This ordering lets the receipt describe an actual installation without making a manifest refer to its own future commit. A later adoption may re-pin both records to the landed main commit; the current pin remains an explicit source identity, not an assertion of main-branch ancestry.

@@ -227,7 +227,7 @@
    "layer_id": "native-clients",
    "status": "default-scoped",
    "default": "Settings command hooks, with `onFailure: \"block\"` on each guard hook entry",
-   "route": "Needs client 2.1.295 or later; the guard wrapper must also refuse when its script is missing (proposal with the command center)",
+   "route": "Needs client 2.1.295 or later; the adopted guard wrapper in adoption/templates/claude.settings.template.json refuses when its script is missing",
    "alternatives": [
     "hookify (anthropics/claude-plugins-official)",
     "Skill-scoped frontmatter hooks"
