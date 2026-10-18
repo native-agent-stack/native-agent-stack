@@ -397,16 +397,24 @@ class SlotsJsonTests(unittest.TestCase):
     def test_only_retired_slots_carry_a_retired_block(self):
         self.assertEqual([found for slot in self.slots for found in retired_violations(slot, self.record)], [])
 
-    def test_the_pre_cue_keeps_the_local_toolkit_and_separates_the_open_worker_from_the_routes_available(self):
+    def test_the_pre_cue_keeps_the_local_toolkit_and_separates_worker_source_from_host_qualification(self):
         slot = self.by_id["pr-review-pre-cue"]
         self.assertEqual(slot["status"], "default-scoped")
         self.assertIn("pr-review-toolkit pre-cue", slot["default"])
-        available, _, not_yet = slot["route"].partition("Not available yet")
-        self.assertTrue(not_yet, "the route must say what is not available yet")
-        for route in ("GPT reads", "verdict-review-gate"):
-            self.assertIn(route, available)
-        self.assertNotIn("#953", available)
-        self.assertIn("#953", not_yet)
+        # NAS 3a8a8461ee60bd499efcb78156ce4c3c052430c5 landed #953.
+        # README Install still requires offline/live probes before enablement.
+        route = slot["route"]
+        for available in ("GPT reads", "verdict-review-gate", "Codex's GitHub review"):
+            self.assertIn(available, route)
+        self.assertNotIn("Not available yet", route)
+        self.assertNotIn("#953, open", route)
+        for name in ("README.md", "worker.py", "probes.py"):
+            self.assertTrue((ROOT / "tools/claude-review-worker" / name).is_file())
+        self.assertIn("implemented in this repository", route)
+        self.assertIn("host qualification remains separate from source availability", route)
+        readme = " ".join((ROOT / "tools/claude-review-worker/README.md").read_text(encoding="utf-8").split())
+        self.assertIn("Run the offline probes, then the live probes", readme)
+        self.assertIn("Enable nothing while a check fails", readme)
         self.assertRegex(slot["notes"], r"claude-pr-toolkit-review\.yml.*retired")
 
     def test_the_retired_workflows_are_not_in_the_repository(self):

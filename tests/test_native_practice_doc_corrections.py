@@ -1,4 +1,4 @@
-"""The native-practice follow-up's two documentation corrections stay aligned with the sources they rest on.
+"""The native-practice documentation corrections stay aligned with the sources they rest on.
 
 Each check pins one claim that was wrong before the correction, so a later edit cannot silently restore it:
 
@@ -10,7 +10,8 @@ Each check pins one claim that was wrong before the correction, so a later edit 
   `AGENTSVIEW_DATA_DIR` override the default directory, and its session count and date match the dated probe artifact.
   The launcher file itself is a host file, so the repository cannot read it; the probe artifact is the retained reading.
 
-These are repository-text checks, not a run of the installer or of agentsview.
+The Layer 12 F4 checks also keep release boundaries, adopted inputs and source availability
+distinct from runtime qualification. These are repository-text checks, not runtime acceptance.
 """
 
 from __future__ import annotations
@@ -29,6 +30,7 @@ import install_claude_profile as icp  # noqa: E402
 README = ROOT / "examples/claude-native/workflows/README.md"
 DASHBOARDS = ROOT / "docs/native-dashboards.md"
 PROBES = ROOT / "evidence/artifacts/claude-native-practice-20261009/probes-20261009.json"
+REF = ROOT / ".claude/skills/claude-native-practice/reference"
 UPSTREAM_DATA_DIR = ("https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/"
                      "internal/config/config.go#L2051-L2053")
 
@@ -40,6 +42,87 @@ def adopt_section() -> str:
 def live_archive_bullet() -> str:
     text = DASHBOARDS.read_text(encoding="utf-8")
     return text.split("- On the workstation the unit serves the directory its launcher sets,", 1)[1].split("\n- ", 1)[0]
+
+
+class PracticeReferenceSourceTests(unittest.TestCase):
+    """Layer 12 F4: source locators and release boundaries, not client-runtime acceptance.
+
+    The npm locator is valid in its explicitly cited v2.1.295 source at
+    602df92bf481ed904533e95c09f740f40aab5aed:CHANGELOG.md (sha256
+    c0b1f9aa313a8021d863ec0053c047b0acc792d74e04af9c7741d3ecd23c3d1a).
+    Other release lines were independently checked in anthropics/claude-code at
+    c017428c8c27e604840435048d5bce6a9a22c040:CHANGELOG.md (sha256
+    57fde96b3318543cfe7ba6622950620a81d4d40e3e0e196ae1de49ccd1fd00da).
+    The hooks reference fetched 2026-10-18 (sha256 bc2ab6b0362a88086c62b7cb4bc3b539a552b37d5958e325882b2e1c3d94ac4a)
+    documents onFailure and excludes completion events. Adoption and worker availability
+    are checked against repository inputs, rather than inferred from this prose.
+    """
+
+    def setUp(self):
+        self.rows = {row["id"]: row for row in json.loads((REF / "slots.json").read_text())["slots"]}
+
+    def page_section(self, page: str, slot_id: str) -> str:
+        return (REF / page).read_text().split(f"\n## {slot_id}\n", 1)[1].split("\n## ", 1)[0]
+
+    def test_npm_deprecation_cites_the_line_in_the_named_changelog(self):
+        evidence = self.rows["client-core"]["evidence"]
+        self.assertIn("CHANGELOG@v2.1.295 L7262 (npm deprecation, 2.1.15)", evidence)
+
+    def test_instruction_rule_triggers_keep_their_separate_release_boundaries(self):
+        evidence = "; ".join(self.rows["instruction-files"]["evidence"])
+        self.assertIn("CHANGELOG@v2.1.302 L1076 (2.1.288, Write and Edit)", evidence)
+        self.assertIn("L670 (2.1.293, single-file Bash views)", evidence)
+
+    def test_interactive_auto_mode_is_not_dated_to_the_headless_change(self):
+        row = self.rows["settings-permissions"]
+        self.assertIn("`auto` mode (unconfigured interactive sessions start in it since 2.1.284)", row["alternatives"])
+        self.assertIn("CHANGELOG@v2.1.302 L1516 (2.1.284, interactive auto-mode start)", row["evidence"])
+        self.assertNotIn("M46 evidence sentence (auto start mode, 2.1.285)", row["supersedes"])
+
+    def test_hooks_note_matches_the_adopted_floor(self):
+        pins = json.loads((ROOT / "adoption/pins-linux-x86_64.json").read_text())
+        floor = next(tool["version"] for tool in pins["tools"] if tool["id"] == "claude-code")
+        note = self.rows["hooks"]["notes"]
+        self.assertIn(f"The repository's pinned floor is {floor} (adoption/pins-linux-x86_64.json)", note)
+        self.assertNotIn("which ignores `onFailure`", note)
+        template = json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text())
+        guard = next(hook for group in template["hooks"]["PreToolUse"] for hook in group["hooks"]
+                     if "secret_path_guard.py" in hook.get("command", ""))
+        self.assertEqual(guard["onFailure"], "block")
+        self.assertIn("halt_error(2)", guard["command"])
+        self.assertIn("secret-path wrapper also refuses a missing script", note)
+
+    def test_completion_note_cites_documented_failure_scope(self):
+        note = self.rows["loops-completion"]["notes"]
+        self.assertNotIn("not yet in hooks.md", note)
+        self.assertIn("https://code.claude.com/docs/en/hooks#block-the-action-when-a-hook-fails", note)
+        self.assertIn("no effect on Stop, SubagentStop, TaskCompleted or TeammateIdle", note)
+
+    def test_review_worker_availability_does_not_claim_host_qualification(self):
+        for name in ("README.md", "worker.py", "probes.py"):
+            self.assertTrue((ROOT / "tools/claude-review-worker" / name).is_file())
+        route = self.rows["pr-review-pre-cue"]["route"]
+        self.assertNotIn("Not available yet", route)
+        self.assertNotIn("#953, open", route)
+        self.assertIn("implemented in this repository", route)
+        self.assertIn("host qualification", route)
+        self.assertIn("tools/claude-review-worker/README.md", route)
+
+    def test_corrected_fields_are_carried_on_the_layer_pages(self):
+        for page, slot_id, fields in (
+            ("native-clients.md", "client-core", ("evidence",)),
+            ("native-clients.md", "instruction-files", ("evidence",)),
+            ("native-clients.md", "settings-permissions", ("alternatives", "evidence", "supersedes")),
+            ("native-clients.md", "hooks", ("notes",)),
+            ("workers.md", "loops-completion", ("notes",)),
+            ("git-github-automation.md", "pr-review-pre-cue", ("route",)),
+        ):
+            section = self.page_section(page, slot_id)
+            for field in fields:
+                values = self.rows[slot_id][field]
+                for value in values if isinstance(values, list) else [values]:
+                    with self.subTest(slot=slot_id, field=field):
+                        self.assertIn(value, section)
 
 
 class WorkflowsReadmeAdoptTests(unittest.TestCase):
