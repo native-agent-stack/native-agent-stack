@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "kind": "claude_native_practice_reviewed_source_install",
+  "evidence_class": "native_proven",
+  "recorded_on": "2026-10-18",
+  "scope": "One supported global skill-reference update and scoped readback, not runtime or default qualification.",
+  "source": {
+    "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+    "ref": "99f82d7e0e0da2ddc075a5ca7c6a82aef292515f",
+    "path": ".claude/skills/claude-native-practice",
+    "tree_sha": "995ae9d1c8c95533c9f61587d2b83b3d5748cf98",
+    "skill_md_sha256": "005288455c9d6a0bd70772847e2bb2411554d90eeabc0aa135af5d12fe99b353",
+    "skill_md_bytes": 2290,
+    "pin_ordering": "The source precedes this manifest/receipt update on PR #1257 and is not claimed to be an ancestor of main after the lander's squash. The native installer fetched this exact source; all installed files match its Git blobs. See docs/decisions/2026-10-10-skills-claude-native-practice-row.md, Reference repair and source ordering."
+  },
+  "manifest_sha256_at_apply": "071603f76531c245096f3eef7b18f92f25ddb08983ed4a8b264b1d68f1826a6d",
+  "native_helpers": {
+    "tools/adoption/install_skills.py": "a89b0a4e97c56bb3ec5973253ef6a683f4d44ab5f32c4e4ea37cdb688f2bbe46",
+    "scripts/skills_status.py": "70c1232390f99cc5b0cb3aaf23abef56ef9f6c69011981762c26aa03ff09aaa8",
+    "scripts/host_receipts.py": "c3dc47cdab33e2ed2f1473700774a006a34c6218d6cd7ceb36f33d7f71f0fd6f"
+  },
+  "invoke": {
+    "argv": [
+      "/tmp/claude-practice-ci-20261018/bin/python",
+      "-B",
+      "tools/adoption/install_skills.py",
+      "--manifest",
+      "adoption/skills/manifest.json",
+      "--skills-bin",
+      "~/.local/share/new-wsl-native-stack/tools/skills-1.7.0/bin/skills",
+      "--only",
+      "claude-native-practice",
+      "--json"
+    ],
+    "cwd": "owned PR #1257 worktree",
+    "publication_path_note": "The personal home prefix in the actual skills-bin argument is represented as ~/; this is a publication projection, not shell expansion performed by the invocation.",
+    "actual_started_at": "2026-10-18T11:39:47.795267+00:00",
+    "actual_completed_at": "2026-10-18T11:39:53.962431+00:00",
+    "wall_seconds": 6.167177975003142,
+    "exit_code": 0,
+    "force_or_manual_folder_copy": false
+  },
+  "before": {
+    "captured_at": "2026-10-18T11:39:47.794985+00:00",
+    "installed_tree": "beeb621fb2fde18ddb66853e9339b4d100bbbeb4",
+    "selected_lock_ref": "8a9128f1b45caa8fb414db022ddd0d5af22bb16c",
+    "observation_boundary": "Private native installation-metadata readback at capture time, not independently reproducible from this public receipt."
+  },
+  "after": {
+    "captured_at": "2026-10-18T11:39:54.154640+00:00",
+    "installed_tree": "995ae9d1c8c95533c9f61587d2b83b3d5748cf98",
+    "selected_lock_ref": "99f82d7e0e0da2ddc075a5ca7c6a82aef292515f",
+    "selected_lock_skillFolderHash": "995ae9d1c8c95533c9f61587d2b83b3d5748cf98",
+    "selected_lock_updatedAt": "2026-10-18T11:39:53.685Z",
+    "strict_native_tree_check": true,
+    "installed_files_equal_source_git_blobs": 15,
+    "claude_link_resolves_to_canonical": true,
+    "native_check_only_exit_code": 0
+  },
+  "preservation": {
+    "other_global_skill_lock_entries": 28,
+    "other_entries_verification": "Private in-memory before/after readback found the other entries unchanged. Their preimages and digests are withheld; this observation is not publicly reproducible.",
+    "role_defaults_and_statuses": {
+      "count": 33,
+      "unchanged_against_source_pin": "4f827e637f256fee4f0534f395431b722aabc43c",
+      "id_default_status_digest": "c41112489f3808e7630f3a7ae47bff0d16c51c11016ef0da20aae2b7a02b68d4",
+      "digest_serialization": "UTF-8 JSON of {slot.id: {default: slot.default, status: slot.status}} for all 33 published slots, sort_keys=true, separators=(',', ':'), without a trailing newline."
+    },
+    "skill_md_unchanged": true,
+    "manifest_unchanged_during_native_apply": true
+  },
+  "previous_receipt": "evidence/artifacts/claude-native-practice-refresh-20261018-final/receipt.json",
+  "limits": [
+    "Raw native streams and private host metadata are retained privately; no digest of their unpublished bytes is published here.",
+    "The metadata comparisons attest only the named skill and scoped preservation observations, not filesystem-wide confinement or absence of every possible side effect.",
+    "The first-party lifecycle pin and selected manifest ref move together; the earlier source/install records retain their historical timestamps.",
+    "This manifest/receipt head requires its own publication checks and full-head reviews; earlier review verdicts are not transferred.",
+    "No memory repair, matched quality or performance improvement, final runtime-stack verdict or complete foundation acceptance is established."
+  ]
+}

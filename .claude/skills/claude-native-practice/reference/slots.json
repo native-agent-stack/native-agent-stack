@@ -55,7 +55,9 @@
    ],
    "evidence": [
     "memory.md import and AGENTS.md sections",
-    "memory-O7 (2.1.293: path-scoped rules also load on Write, Edit and single-file Bash views)"
+    "memory-O7",
+    "CHANGELOG@v2.1.302 L1076 (2.1.288, Write and Edit)",
+    "L670 (2.1.293, single-file Bash views)"
    ],
    "notes": "The core loads twice per session on this host (user CLAUDE.md and the AGENTS.md import) and a third time when files under examples/claude-native/ are touched; AN-12's `claudeMdExcludes` entry is still unapplied. The token cost is unmeasured.",
    "overturn_when": "A paired same-task run shows the import pattern loses adherence against an alternative, or a release changes AGENTS.md handling.",
@@ -170,7 +172,7 @@
    "default": "Native layered settings (managed > `--settings` > local > project > user) with deny-first rules",
    "route": "Deny rules block in every mode, bypass included; the host's `bypassPermissions` default is the owner's standing choice and is not reopened here",
    "alternatives": [
-    "`auto` mode (unconfigured interactive sessions start in it since 2.1.285)",
+    "`auto` mode (unconfigured interactive sessions start in it since 2.1.284)",
     "`dontAsk` with `--permission-prompts none` for headless review",
     "`permissions.blockReadsOutsideWorkingDirectories`"
    ],
@@ -184,6 +186,7 @@
     "permissions.md deny-first evaluation",
     "permission-modes.md",
     "settings-permissions-O7, O15, O16",
+    "CHANGELOG@v2.1.302 L1516 (2.1.284, interactive auto-mode start)",
     "CHANGELOG@v2.1.302 L373 (2.1.299, MCP allow rules reach only the named server)",
     "L280 and L270 (2.1.299 fixes)",
     "L245 (2.1.299, rm prompts on shell `-c` scripts)"
@@ -191,7 +194,7 @@
    "notes": "Under bypass, writes to `.claude` and `.git` are auto-approved and no deny rule covers the guard's own files; any non-interactive run skips the trust dialog. The docs limit bypass to isolated containers or VMs; the recipe records bypass as an open owner decision (recipes/claude-native-profile.md:367). The Artifact tool, which publishes session output as a private web page on claude.ai, is off on NativeStack2604: its user settings hold `enableArtifact: false` (exact-key read, 2026-10-15), the key `/config` writes when its Artifacts row is turned off. Any settings file can turn the tool off and none can turn it back on, and the deprecated `disableArtifact: true` means the same (settings-reference.md:5427-5443, :5354-5360, client 2.1.300). It is recorded as this host's choice, not a template default: the `claude:setting:enableArtifact` row of catalogs/foundation/upstream-surface-dispositions.json (enabled, scope NativeStack2604); re-applying the template keeps it, because keys the template does not mention are kept from the live file (tools/adoption/apply_claude_settings.py:323-329; gap ledger A3-0031, 2026-10-15). Rule evaluation changed in 2.1.299 (CHANGELOG@v2.1.302 L373 and L280): an MCP allow rule reaches only the server it names, so `mcp__a` no longer allows a server named `a__b` or `a_`, and an allow rule for a server is written `mcp__<server>__*` with the server's whole normalized name; and deny and ask rules now apply to a server whose normalized name contains `__`. The same release changed a built-in prompt, not rule evaluation (L245): an rm built at run time in a script Claude Code cannot read no longer prompts unless `CLAUDE_CODE_STRICT_INLINE_SHELL_RM_PROMPT=1`. The overturn fired (2.1.299 changed rule evaluation: CHANGELOG@v2.1.302 L373); precedence and deny-first evaluation are unchanged, so the default stands. Audited 2026-10-17 at client 2.1.302: the only `mcp__` allow rules are `mcp__semble__search` and `mcp__semble__find_related` in the user settings, each a whole tool name; no user or project settings file holds an `mcp__` deny or ask rule or sets `enabledMcpjsonServers` or `disabledMcpjsonServers`, and no local settings file exists; and no configured server's normalized name contains `__`. No rule relied on prefix matching, so none changes.",
    "overturn_when": "The owner reopens the permission mode, a release changes precedence or rule evaluation, or an incident shows a deny or hook gap.",
    "supersedes": [
-    "M46 evidence sentence (auto start mode, 2.1.285)",
+    "M46 evidence sentence (auto start mode, 2.1.284)",
     "AN-20 list of what still blocks under bypass"
    ]
   },
@@ -224,7 +227,7 @@
    "layer_id": "native-clients",
    "status": "default-scoped",
    "default": "Settings command hooks, with `onFailure: \"block\"` on each guard hook entry",
-   "route": "Needs client 2.1.295 or later; the guard wrapper must also refuse when its script is missing (proposal with the command center)",
+   "route": "Needs client 2.1.295 or later; the adopted guard wrapper in adoption/templates/claude.settings.template.json refuses when its script is missing",
    "alternatives": [
     "hookify (anthropics/claude-plugins-official)",
     "Skill-scoped frontmatter hooks"
@@ -239,7 +242,7 @@
     "hooks-O9 (2.1.295 onFailure)",
     "docs/decisions/2026-10-08-guard-hook-fails-closed.md probe cases"
    ],
-   "notes": "The repository's pinned floor is 2.1.284 (adoption/pins-linux-x86_64.json), which ignores `onFailure`; the template wrapper exits 0 when the guard script is missing. Only managed-settings hooks resist `disableAllHooks`.",
+   "notes": "The repository's pinned floor is 2.1.295 (adoption/pins-linux-x86_64.json), which supports `onFailure` (CHANGELOG@v2.1.302 L491). The template's secret-path wrapper also refuses a missing script (adoption/templates/claude.settings.template.json, PreToolUse guard entry). Only managed-settings hooks resist `disableAllHooks`.",
    "overturn_when": "A release changes `onFailure` semantics, or reruns of the record's cases B, D, H and N on a newer client let the call through.",
    "supersedes": [
     "M40 refined",
@@ -1557,7 +1560,7 @@
     "goal.md",
     "Paired run 2b, 2026-10-10 (evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json; RESULT.md sha256 293fe657916a, analysis.txt d75d7876e8a5, lost_work.json e871e89e37ca): 12 runs; the Ralph-style loop passed 4 of 4, won no cell and ran all 8 sessions on F5 without declaring done"
    ],
-   "notes": "No completion gate is configured today; the KC-19 trial was designed and never run. Verified: a command gate fails open by default (a gate that cannot start or times out lets Claude stop); `onFailure: \"block\"` (2.1.295) is not yet in hooks.md, so pick and test the failure mode; for agent-team members use TeammateIdle; for Workflow children put a Stop hook in the agent's frontmatter (runs as SubagentStop), from a user-scope definition in ~/.claude/agents or one passed with --agents: a project .claude/agents file's frontmatter hooks are skipped until that folder itself is trusted, a parent folder's trust does not count and a -p session does not count as trusted, so a Workflow child or a -p child would silently run without its gate (sub-agents.md:757, client 2.1.300; the rule dates from 2.1.218; gap ledger A4-0079, 2026-10-15).",
+   "notes": "No completion gate is configured today; the KC-19 trial was designed and never run. Verified: a command gate fails open by default (a gate that cannot start or times out lets Claude stop); hooks.md now documents `onFailure: \"block\"` (2.1.295) and states it has no effect on Stop, SubagentStop, TaskCompleted or TeammateIdle ([failure scope](https://code.claude.com/docs/en/hooks#block-the-action-when-a-hook-fails), read 2026-10-18), so pick and test the completion gate's failure mode; for agent-team members use TeammateIdle; for Workflow children put a Stop hook in the agent's frontmatter (runs as SubagentStop), from a user-scope definition in ~/.claude/agents or one passed with --agents: a project .claude/agents file's frontmatter hooks are skipped until that folder itself is trusted, a parent folder's trust does not count and a -p session does not count as trusted, so a Workflow child or a -p child would silently run without its gate (sub-agents.md:757, client 2.1.300; the rule dates from 2.1.218; gap ledger A4-0079, 2026-10-15).",
    "overturn_when": "A paired run shows a loop pattern catching more real defects at equal cost, or a release changes Stop semantics.",
    "supersedes": [
     "Completion-loops topic (native composition now converged)"
@@ -1958,7 +1961,7 @@
    "layer_id": "git-github-automation",
    "status": "default-scoped",
    "default": "pr-review-toolkit pre-cue (pr-test-analyzer and silent-failure-hunter): locally in J8; its run in GitHub is retired (2026-10-10)",
-   "route": "Runs before a landing cue; findings at confidence 80 or above go to the lane. Available now (the 2026-10-10 record, What remains): local Claude reads (trading-cc's pr-review-toolkit reads) and GPT reads (the command center's and the co-op's), all on the host; Codex's GitHub review, which the retirement does not affect; and GitHub's required `verdict-review-gate`, which enforces the verdict. Not available yet: the local Claude review worker (`tools/claude-review-worker`, #953, open), a candidate until it lands",
+   "route": "Runs before a landing cue; findings at confidence 80 or above go to the lane. The 2026-10-10 retirement record lists local Claude reads (trading-cc's pr-review-toolkit reads) and GPT reads (the command center's and the co-op's), all on the host; Codex's GitHub review, which the retirement does not affect; and GitHub's required `verdict-review-gate`, which enforces the verdict. The local Claude review worker is implemented in this repository; host qualification remains separate from source availability (tools/claude-review-worker/README.md, Install: offline and live probes before enablement).",
    "alternatives": [
     "Native `/code-review` at max effort (paired same-delta run owed, J7 class D)"
    ],

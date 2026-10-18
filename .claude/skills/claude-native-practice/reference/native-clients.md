@@ -20,7 +20,7 @@ Client 2.1.302, checked 2026-10-16. Index: [slots.md](slots.md).
 - **Route:** The four-rule core stays the only always-loaded text (G6a); practice lives in skills, hooks and docs
 - **Alternatives, ranked:** 1. Project-instructions setting `claude-md-and-agents-md`; 2. AGENTS.md read directly (2.1.277+) without a CLAUDE.md
 - **Rejected:** SessionStart hook that prints AGENTS.md; Prose telling Claude to read AGENTS.md; `<important if>` conditional tags; Telegraphic compression of the core (M20)
-- **Evidence:** memory.md import and AGENTS.md sections; memory-O7 (2.1.293: path-scoped rules also load on Write, Edit and single-file Bash views)
+- **Evidence:** memory.md import and AGENTS.md sections; memory-O7; CHANGELOG@v2.1.302 L1076 (2.1.288, Write and Edit); L670 (2.1.293, single-file Bash views)
 - **Notes:** The core loads twice per session on this host (user CLAUDE.md and the AGENTS.md import) and a third time when files under examples/claude-native/ are touched; AN-12's `claudeMdExcludes` entry is still unapplied. The token cost is unmeasured.
 - **Supersedes:** M2 (wider rule triggers); MI-7 sizes are dated history
 - **Overturn when:** A paired same-task run shows the import pattern loses adherence against an alternative, or a release changes AGENTS.md handling.
@@ -48,11 +48,11 @@ Client 2.1.302, checked 2026-10-16. Index: [slots.md](slots.md).
 **Status:** default (scoped). **Default:** Native layered settings (managed > `--settings` > local > project > user) with deny-first rules
 
 - **Route:** Deny rules block in every mode, bypass included; the host's `bypassPermissions` default is the owner's standing choice and is not reopened here
-- **Alternatives, ranked:** 1. `auto` mode (unconfigured interactive sessions start in it since 2.1.285); 2. `dontAsk` with `--permission-prompts none` for headless review; 3. `permissions.blockReadsOutsideWorkingDirectories`
+- **Alternatives, ranked:** 1. `auto` mode (unconfigured interactive sessions start in it since 2.1.284); 2. `dontAsk` with `--permission-prompts none` for headless review; 3. `permissions.blockReadsOutsideWorkingDirectories`
 - **Rejected:** `bypassPermissions` or `auto` in project settings; Model-backed PermissionRequest auto-approve hooks; Managed settings on this single-owner host
-- **Evidence:** settings.md precedence; permissions.md deny-first evaluation; permission-modes.md; settings-permissions-O7, O15, O16; CHANGELOG@v2.1.302 L373 (2.1.299, MCP allow rules reach only the named server); L280 and L270 (2.1.299 fixes); L245 (2.1.299, rm prompts on shell `-c` scripts)
+- **Evidence:** settings.md precedence; permissions.md deny-first evaluation; permission-modes.md; settings-permissions-O7, O15, O16; CHANGELOG@v2.1.302 L1516 (2.1.284, interactive auto-mode start); CHANGELOG@v2.1.302 L373 (2.1.299, MCP allow rules reach only the named server); L280 and L270 (2.1.299 fixes); L245 (2.1.299, rm prompts on shell `-c` scripts)
 - **Notes:** Under bypass, writes to `.claude` and `.git` are auto-approved and no deny rule covers the guard's own files; any non-interactive run skips the trust dialog. The docs limit bypass to isolated containers or VMs; the recipe records bypass as an open owner decision (recipes/claude-native-profile.md:367). The Artifact tool, which publishes session output as a private web page on claude.ai, is off on NativeStack2604: its user settings hold `enableArtifact: false` (exact-key read, 2026-10-15), the key `/config` writes when its Artifacts row is turned off. Any settings file can turn the tool off and none can turn it back on, and the deprecated `disableArtifact: true` means the same (settings-reference.md:5427-5443, :5354-5360, client 2.1.300). It is recorded as this host's choice, not a template default: the `claude:setting:enableArtifact` row of catalogs/foundation/upstream-surface-dispositions.json (enabled, scope NativeStack2604); re-applying the template keeps it, because keys the template does not mention are kept from the live file (tools/adoption/apply_claude_settings.py:323-329; gap ledger A3-0031, 2026-10-15). Rule evaluation changed in 2.1.299 (CHANGELOG@v2.1.302 L373 and L280): an MCP allow rule reaches only the server it names, so `mcp__a` no longer allows a server named `a__b` or `a_`, and an allow rule for a server is written `mcp__<server>__*` with the server's whole normalized name; and deny and ask rules now apply to a server whose normalized name contains `__`. The same release changed a built-in prompt, not rule evaluation (L245): an rm built at run time in a script Claude Code cannot read no longer prompts unless `CLAUDE_CODE_STRICT_INLINE_SHELL_RM_PROMPT=1`. The overturn fired (2.1.299 changed rule evaluation: CHANGELOG@v2.1.302 L373); precedence and deny-first evaluation are unchanged, so the default stands. Audited 2026-10-17 at client 2.1.302: the only `mcp__` allow rules are `mcp__semble__search` and `mcp__semble__find_related` in the user settings, each a whole tool name; no user or project settings file holds an `mcp__` deny or ask rule or sets `enabledMcpjsonServers` or `disabledMcpjsonServers`, and no local settings file exists; and no configured server's normalized name contains `__`. No rule relied on prefix matching, so none changes.
-- **Supersedes:** M46 evidence sentence (auto start mode, 2.1.285); AN-20 list of what still blocks under bypass
+- **Supersedes:** M46 evidence sentence (auto start mode, 2.1.284); AN-20 list of what still blocks under bypass
 - **Overturn when:** The owner reopens the permission mode, a release changes precedence or rule evaluation, or an incident shows a deny or hook gap.
 
 ## config-managers
@@ -70,11 +70,11 @@ Client 2.1.302, checked 2026-10-16. Index: [slots.md](slots.md).
 
 **Status:** default (scoped). **Default:** Settings command hooks, with `onFailure: "block"` on each guard hook entry
 
-- **Route:** Needs client 2.1.295 or later; the guard wrapper must also refuse when its script is missing (proposal with the command center)
+- **Route:** Needs client 2.1.295 or later; the adopted guard wrapper in adoption/templates/claude.settings.template.json refuses when its script is missing
 - **Alternatives, ranked:** 1. hookify (anthropics/claude-plugins-official); 2. Skill-scoped frontmatter hooks
 - **Rejected:** lasso-security/claude-hooks; Plugin mods as guards; Prompt or agent hooks as security guards; `onFailure` on the matcher group (no effect)
 - **Evidence:** hooks-O9 (2.1.295 onFailure); docs/decisions/2026-10-08-guard-hook-fails-closed.md probe cases
-- **Notes:** The repository's pinned floor is 2.1.284 (adoption/pins-linux-x86_64.json), which ignores `onFailure`; the template wrapper exits 0 when the guard script is missing. Only managed-settings hooks resist `disableAllHooks`.
+- **Notes:** The repository's pinned floor is 2.1.295 (adoption/pins-linux-x86_64.json), which supports `onFailure` (CHANGELOG@v2.1.302 L491). The template's secret-path wrapper also refuses a missing script (adoption/templates/claude.settings.template.json, PreToolUse guard entry). Only managed-settings hooks resist `disableAllHooks`.
 - **Supersedes:** M40 refined; M28 refined (onFailure does not make Stop gates fail closed)
 - **Overturn when:** A release changes `onFailure` semantics, or reruns of the record's cases B, D, H and N on a newer client let the call through.
 - **Primary sources** (read 2026-10-09; 4 of 4 practices the refuters kept, measured first; fetch time and sha256 of the bytes read in the record's reading file):

@@ -457,7 +457,7 @@ def called_servers(windows: list) -> list[str]:
 
 
 def _ttl_note(source: dict) -> dict | None:
-    """The prompt-caching slot's status and route text (slots.json:661-665), stated beside the TTL columns without a judgment."""
+    """The prompt-caching slot's status and route text (slots.json:664-668), stated beside the TTL columns without a judgment."""
     content = source.get("content") if source["status"] == "present" and isinstance(source.get("content"), dict) else None
     slot = next((row for row in (content or {}).get("slots") or [] if isinstance(row, dict) and row.get("id") == "prompt-caching"), None)
     if slot is None:

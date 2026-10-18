@@ -88,8 +88,8 @@ itself evidence the WSL UVA gap closed.
    `adoption/bootstrap-linux.sh` and its `claude-code` pin
    changed after `v2026.09.24.1`: at that tag the pin is 2.1.280 and the
    script reinstalls it even over a newer Claude Code, so a re-run
-   downgrades a native auto-updated install. On main the pin is 2.1.284 and a floor: the script
-   keeps a `~/.local/bin/claude` whose `--version` reports 2.1.284 or newer
+   downgrades a native auto-updated install. On main the pin is 2.1.295 and a floor: the script
+   keeps a `~/.local/bin/claude` whose `--version` reports 2.1.295 or newer
    (logging `Kept installed claude-code <version>`, with nothing downloaded
    or installed) and runs the checksum-verified install only when that
    launcher is missing, older or unreadable. The pin also changed after `v2026.09.26.2`,

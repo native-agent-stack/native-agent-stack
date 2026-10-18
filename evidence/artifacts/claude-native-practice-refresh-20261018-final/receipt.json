@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "kind": "claude_native_practice_reference_refresh_observation",
+  "evidence_class": "native_proven",
+  "observed_date": "2026-10-18",
+  "result": "PASS_SCOPED_CORRECTED_SOURCE_INSTALL_AND_READBACK",
+  "owner_direction_paraphrase": "On 2026-10-18, resolve the runtime foundation from current pinned upstream evidence, preserve main max and suitable native worker routing, and record actual supported installs and their limits.",
+  "source": {
+    "repository": "native-agent-stack/native-agent-stack",
+    "configured_existing_alias": "seathatflowsinourveins/native-agent-stack",
+    "source_pin": "8a9128f1b45caa8fb414db022ddd0d5af22bb16c",
+    "skill_path": ".claude/skills/claude-native-practice",
+    "tree_sha": "beeb621fb2fde18ddb66853e9339b4d100bbbeb4",
+    "skill_md_sha256": "005288455c9d6a0bd70772847e2bb2411554d90eeabc0aa135af5d12fe99b353",
+    "skill_md_bytes": 2290,
+    "manifest_sha256_at_apply": "a6d528431e456b3f30b9f9bdc1e4fcf98a9ad1e95e7d99ad19e8562ea1ff6c7f",
+    "source_pin_precedes_this_manifest_update": true,
+    "source_alias_changed": false
+  },
+  "supported_installation": {
+    "argv": [
+      "python3",
+      "-B",
+      "tools/adoption/install_skills.py",
+      "--manifest",
+      "adoption/skills/manifest.json",
+      "--skills-bin",
+      "~/.local/share/new-wsl-native-stack/tools/skills-1.7.0/bin/skills",
+      "--only",
+      "claude-native-practice",
+      "--json"
+    ],
+    "cwd": "~/code/native-agent-stack.claude-practice-reference-corrections-20261018",
+    "publication_path_note": "Home prefixes in argv and cwd are normalized to ~ using the native host-receipt publication convention; private audit evidence retains the actual absolute paths and original failed publication receipt.",
+    "started_at": "2026-10-18T10:07:37.507166+00:00",
+    "completed_at": "2026-10-18T10:07:44.104988+00:00",
+    "elapsed_seconds": 6.597640978987329,
+    "exit_code": 0,
+    "stdout": "{\"dry_run\": false, \"ok\": true, \"skills\": {\"claude-native-practice\": \"installed\"}}\n",
+    "stderr": "",
+    "force": false,
+    "manual_lock_or_skill_folder_edits": false,
+    "installer_sha256": "a89b0a4e97c56bb3ec5973253ef6a683f4d44ab5f32c4e4ea37cdb688f2bbe46",
+    "status_helper_sha256": "70c1232390f99cc5b0cb3aaf23abef56ef9f6c69011981762c26aa03ff09aaa8",
+    "native_registration_helper_sha256": "c3dc47cdab33e2ed2f1473700774a006a34c6218d6cd7ceb36f33d7f71f0fd6f"
+  },
+  "before": {
+    "captured_at": "2026-10-18T10:05:30.602975+00:00",
+    "source_pin": "4f827e637f256fee4f0534f395431b722aabc43c",
+    "installed_tree": "16be5475f518f8e7bd2cc94f4f4363c61a602ed9",
+    "strict_native_tree_check": true,
+    "canonical_folder_is_symlink": false,
+    "claude_link_resolves_to_canonical": true
+  },
+  "after": {
+    "captured_at": "2026-10-18T10:09:03.474635+00:00",
+    "installed_tree": "beeb621fb2fde18ddb66853e9339b4d100bbbeb4",
+    "selected_lock_ref": "8a9128f1b45caa8fb414db022ddd0d5af22bb16c",
+    "selected_lock_skillFolderHash": "beeb621fb2fde18ddb66853e9339b4d100bbbeb4",
+    "selected_lock_updatedAt": "2026-10-18T10:07:43.828Z",
+    "strict_native_tree_check": true,
+    "claude_link_resolves_to_canonical": true,
+    "native_check_only": {
+      "exit_code": 0,
+      "result": "ok",
+      "stdout": "{\"dry_run\": false, \"ok\": true, \"skills\": {\"claude-native-practice\": \"ok\"}}\n"
+    }
+  },
+  "preservation": {
+    "other_global_skill_lock_entries": 28,
+    "other_entries_verification": "Private host readback found the other entries unchanged; the raw lock and its digests are withheld and this observation is not publicly reproducible.",
+    "all_other_manifest_rows_unchanged": true,
+    "manifest_changed_fields": [
+      "url",
+      "ref",
+      "tree_sha"
+    ],
+    "role_defaults_and_statuses": {
+      "count": 33,
+      "unchanged_against_source_pin": "4f827e637f256fee4f0534f395431b722aabc43c",
+      "id_default_status_digest": "c41112489f3808e7630f3a7ae47bff0d16c51c11016ef0da20aae2b7a02b68d4",
+      "digest_serialization": "UTF-8 JSON of {slot.id: {default: slot.default, status: slot.status}} for all 33 published slots, sort_keys=true, separators=(',', ':'), without a trailing newline."
+    },
+    "skill_md_unchanged": true,
+    "stored_authentication_permissions_hooks_services_or_models_changed": false,
+    "completed_readback_window": "The native memory-readback task completed at 2026-10-18T10:01:45; its source post-snapshot at 10:03:33 preceded this global refresh. This is a private historical ordering observation, not memory qualification."
+  },
+  "reused_test_receipts": {
+    "new_manifest_tests": {
+      "command": "/tmp/claude-practice-ci-20261018/bin/python -B -m unittest tests.test_skills_manifest -q",
+      "tests": 38,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0
+    },
+    "source_corrections_and_atlas": "Same source bytes as reviewed 8a9128f1; existing 136 passing practice tests plus 3 pre-existing skips and 51 passing Atlas tests under the existing locked CI interpreter are retained separately. A historical private independent review also retained 5 missing-cssselect2 errors; those are not counted as passing checks here.",
+    "installer_implementation": "Unchanged; prior native installer test evidence retained, not newly counted here."
+  },
+  "limits": [
+    "This is a host skill-reference update, not a runtime/model version or default-selection change.",
+    "The updated adoption manifest/receipt still need full publication validation and new exact-head review; earlier verdicts remain bound to their original heads.",
+    "Historical PR #1256 refresh at 4f827 and its receipt remain valid history; this newer source is intended to supersede that pending publication, not silently overwrite it.",
+    "No memory/RAG, preserved-quality performance, final-stack, canonical layer-verdict or full foundation completion is claimed.",
+    "Horizon hook activation and separate direct-API funding/source-packet gates remain unresolved."
+  ]
+}
