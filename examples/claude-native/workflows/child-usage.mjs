@@ -55,7 +55,6 @@ const readRows = (file) => {
   }
   return { rows, errors, digest: createHash('sha256').update(bytes).digest('hex') }
 }
-const lines = (file) => readRows(file).rows.filter(Boolean)
 // Client-written rows (an API error such as a usage-limit notice) carry this model; the
 // family check still reports them, and the two fallback checks below ignore them.
 const SYNTHETIC = '<synthetic>'
@@ -3040,7 +3039,7 @@ export const loadExceptions = (path) => validateExceptions(JSON.parse(readFileSy
 // windows add up); first_prompt_tokens is null unless the first request is inside. rtkDecisions maps
 // tool_use_id -> hook_decisions.decision and is joined to the Bash calls counted in the window;
 // covered = allow + ask (rtk v0.50.0 src/core/tracking.rs HookOutcome::is_covered).
-export function childLanes(transcript, { marker = DEFAULT_MARKER, rtkDecisions = null, window = null, exceptions = {}, rtkCheck = false } = {}) {
+export function childLanes(transcript, { marker = DEFAULT_MARKER, rtkDecisions = null, window = null, exceptions = {}, rtkCheck = false, parseErrors = 0 } = {}) {
   const lanes = {
     tool_calls: 0, bash_calls: 0, mcp_calls: counter(), skill_calls: counter(),
     tool_search: { calls: 0, loaded: counter() },
@@ -3124,6 +3123,15 @@ export function childLanes(transcript, { marker = DEFAULT_MARKER, rtkDecisions =
   }
   lanes.subagent_start.types = [...types].sort()
   lanes.measurement = measureTranscript(transcript, { window, exceptions, rtkCheck, marker })
+  // Source: native-agent-stack/native-agent-stack@0a585369943e8000dc853a689acbacb34e7b4b0b,
+  // examples/claude-native/workflows/child-usage.mjs:48-56,3258-3259.
+  // Apply the existing NAS sweep rule to run mode: skipped JSONL rows can hide
+  // usage or tool results, so their observed counters remain incomplete.
+  if (parseErrors) {
+    lanes.measurement.parse_errors = parseErrors
+    lanes.measurement.bytes_complete = false
+    lanes.measurement.usage.complete = false
+  }
   if (lanes.rtk.decisions) lanes.rtk.not_logged_share = share(lanes.rtk.decisions.not_logged, lanes.bash_calls)
   return lanes
 }
@@ -3253,10 +3261,9 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
       spawn: file.spawn, session: file.path.split('\\').join('/').replace(/\/subagents\/.*$/, ''), first,
       agent_type: meta && typeof meta.agentType === 'string' && meta.agentType ? safeKey(meta.agentType) : '(none)',
       started_before_window: first < window.since, ran_past_window_end: last >= window.until,
-      lanes: childLanes(rows, { marker, rtkDecisions: rtk ? rtk.map : null, window, rtkCheck, exceptions: exceptionsFor(exceptionRecords, digest) }),
+      lanes: childLanes(rows, { marker, rtkDecisions: rtk ? rtk.map : null, window, rtkCheck, exceptions: exceptionsFor(exceptionRecords, digest), parseErrors: errors }),
     }
     actor.lanes.measurement.parse_errors = errors
-    if (errors) { actor.lanes.measurement.bytes_complete = false; actor.lanes.measurement.usage.complete = false }
     if (onLedger) actor.ledger = callLedger(rows, { window })
     ;(file.spawn === 'main' ? main : children).push(actor)
   }
@@ -3342,6 +3349,7 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
   if (finalRet.background_pending) issues.push('returned with ' + finalRet.background_pending + ' background task(s) that had no completion notification')
   if (!meta) issues.push('missing meta.json')
   if (!transcriptFound) usageIssues.push('no transcript file (usage unknown)')
+  if (lanes.measurement.parse_errors) usageIssues.push(lanes.measurement.parse_errors + ' malformed transcript JSONL row(s) (usage unknown)')
   const neverCounted = [...withoutUsage].filter((id) => !byId.has(id)).length
   if (neverCounted) usageIssues.push(neverCounted + ' assistant message(s) without provider usage')
   const unresolved = messages.filter((r) => !r.message.model).length
@@ -3384,7 +3392,8 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
 export function summarizeRun(dir, lanesOptions = {}) {
   const journalPath = join(dir, 'journal.jsonl')
   if (!existsSync(journalPath)) return { status: 'incomplete', reason: 'journal.jsonl not found in ' + dir, children: [] }
-  const journal = lines(journalPath)
+  const journalData = readRows(journalPath)
+  const journal = journalData.rows.filter(Boolean)
   const results = new Map(journal.filter((e) => e.type === 'result').map((e) => [e.agentId, e]))
   const started = journal.filter((e) => e.type === 'started' && e.agentId)
   // The runtime re-runs a call under the same journal key after a pause (observed on 2026-09-26: "Usage limit
@@ -3405,7 +3414,7 @@ export function summarizeRun(dir, lanesOptions = {}) {
     const found = existsSync(logPath)
     const data = found ? readRows(logPath) : { rows: [], errors: 0, digest: '' }
     const child = summarizeChild(s, results.get(s.agentId) || null, meta, data.rows, found,
-      { ...lanesOptions, exceptions: exceptionsFor(lanesOptions.exceptionRecords || [], data.digest) })
+      { ...lanesOptions, exceptions: exceptionsFor(lanesOptions.exceptionRecords || [], data.digest), parseErrors: data.errors })
     // lanesOptions.onLedger receives the attempt's private call ledger with its journal label and whether a later attempt superseded it.
     if (lanesOptions.onLedger) lanesOptions.onLedger(callLedger(data.rows).map((r) => ({ ...r, label: s.label ?? null, superseded: supersededBy.has(s.agentId) })))
     return supersededBy.has(s.agentId) ? { ...child, superseded_by: supersededBy.get(s.agentId) } : child
@@ -3424,7 +3433,12 @@ export function summarizeRun(dir, lanesOptions = {}) {
   const uncounted = superseded.filter((c) => c.usage_issues)
   const rerun = superseded.length ? '; ' + superseded.length + ' earlier attempt(s) that returned nothing were re-run under the same call key (superseded_attempts, whose usage by_resolved_model counts)' : ''
   const gaps = [incomplete.length ? incomplete.length + ' child(ren) incomplete' : null,
-    uncounted.length ? uncounted.length + ' superseded attempt(s) with usage by_resolved_model cannot count (usage_issues)' : null].filter(Boolean)
+    uncounted.length ? uncounted.length + ' superseded attempt(s) with usage by_resolved_model cannot count (usage_issues)' : null,
+    journalData.errors ? journalData.errors + ' malformed journal JSONL row(s)' : null].filter(Boolean)
+  const usageAccounting = aggregateUsage(attempts.map((c) => c.lanes?.measurement?.usage || { complete: false }))
+  // A damaged journal can hide an attempt. Parsed counters are still observations,
+  // but cannot establish the full roster's usage even if each known child is valid.
+  if (journalData.errors) usageAccounting.complete = false
   return {
     status: !children.length || gaps.length ? 'incomplete' : 'complete',
     reason: (!children.length ? 'journal has no started children' : gaps.length ? gaps.join('; ') : 'every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result that is neither empty nor a wait notice, with no background task left running at its final message') + rerun,
@@ -3435,6 +3449,11 @@ export function summarizeRun(dir, lanesOptions = {}) {
       capped: attempts.reduce((n, c) => n + c.web_search.capped, 0),
       capped_children: attempts.filter((c) => c.web_search.capped).map((c) => c.label || c.agent_id),
     },
+    // Keep legacy per-model counters executor-only. The existing measurement reader
+    // accounts for advisor sub-inferences separately (advisor tool, Usage and billing).
+    // Include superseded attempts; missing measurement usage must stay unknown.
+    usage_accounting: usageAccounting,
+    ...(journalData.errors ? { journal_parse_errors: journalData.errors } : {}),
     children, ...(superseded.length ? { superseded_attempts: superseded } : {}), by_resolved_model: byModel,
   }
 }

@@ -4931,6 +4931,66 @@ class UsageRecordTests(unittest.TestCase):
         self.assertNotIn("raw_output_sha256", document["measurement"])
         return done, document
 
+    def test_journal_parse_failure_survives_retry_post_processing(self):
+        raw = paused_child_usage("critic")
+        raw["journal_parse_errors"] = 1
+        raw["usage_accounting"] = {"complete": False}
+        raw["reason"] = "1 malformed journal JSONL row(s)"
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1, done.stdout)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "incomplete")
+        self.assertEqual(usage["journal_parse_errors"], 1)
+        self.assertIs(usage["usage_accounting"]["complete"], False)
+        self.assertIn("malformed journal", usage["reason"])
+        self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 1)
+
+    def test_incomplete_accounting_is_not_accepted_with_native_exit_zero(self):
+        work = temp_dir(self)
+        raw = json.loads(child_usage_raw("wf_fixture-unknown", ["discover:alpha"]))
+        raw["usage_accounting"] = {"complete": False}
+        (work / "raw.json").write_text(json.dumps(raw))
+        done = run([sys.executable, HARNESS / "usage_record.py", "--raw-output", work / "raw.json", "--exit-code", "0",
+                    "--out", work / "usage.json"])
+        self.assertEqual(done.returncode, 1, done.stdout)
+        document = json.loads((work / "usage.json").read_text())
+        self.assertEqual(document["measurement"]["exit_code"], 0)
+        self.assertEqual(document["child_usage"]["status"], "incomplete")
+        self.assertIs(document["child_usage"]["usage_accounting"]["complete"], False)
+        self.assertIn("usage accounting incomplete", document["child_usage"]["reason"])
+
+    def test_complete_accounting_survives_retry_linking_without_copying_private_fields(self):
+        raw = paused_child_usage("critic")
+        raw["journal_parse_errors"] = 0
+        raw["usage_accounting"] = {"complete": True, "private": "unpublished-native-marker"}
+        raw["reason"] = "unpublished-native-marker"
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "complete")
+        self.assertEqual(usage["journal_parse_errors"], 0)
+        self.assertEqual(usage["usage_accounting"], {"complete": True})
+        self.assertNotIn("unpublished-native-marker", json.dumps(document))
+
+    def test_journal_error_alone_remains_incomplete_for_legacy_accounting_shape(self):
+        raw = paused_child_usage("critic")
+        raw["journal_parse_errors"] = 2
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1, done.stdout)
+        self.assertEqual(document["child_usage"]["status"], "incomplete")
+        self.assertIn("2 malformed journal", document["child_usage"]["reason"])
+        self.assertNotIn("usage_accounting", document["child_usage"])
+
+    def test_integrity_metadata_requires_typed_native_values(self):
+        cases = [*(dict(journal_parse_errors=value) for value in (True, -1, "1", None)),
+                 *(dict(usage_accounting=value) for value in (None, {}, {"complete": 1}, {"complete": "false"}))]
+        for fields in cases:
+            with self.subTest(fields=fields):
+                raw = paused_child_usage("critic")
+                raw.update(fields)
+                with self.assertRaises(ValueError):
+                    usage_record.record(json.dumps(raw).encode(), 1, "fixture", ROOT)
+
     def test_killed_critic_rerun_under_changed_call_key_is_superseded(self):
         raw = paused_child_usage("critic")
         # Aggregate usage is already over all attempts; moving a child must never add it a second time.
@@ -5098,37 +5158,42 @@ class UsageRecordTests(unittest.TestCase):
 
     def test_native_changed_keys_link_two_critics_and_a_followup_and_count_usage_once(self):
         self.assertTrue(NODE, "node is required for the native child-usage.mjs changed-key recovery fixture")
-        transcripts = temp_dir(self) / "subagents" / "workflows" / "wf_changed-keys"
-        transcripts.mkdir(parents=True)
-        followup = "refute-facts:scheduling-supervision:followup"
-        attempts = [("c0", "critic", "old-critic"), ("f0", followup, "old-facts"),
-                    ("c1", "critic", "changed-critic"), ("c2", "critic", "final-critic"),
-                    ("f1", followup, "changed-facts")]
-        journal = []
-        zero = {"input_tokens": 0, "output_tokens": 0, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}
-        for agent, label, key in attempts:
-            journal.append({"type": "started", "agentId": agent, "label": label, "key": key})
-            if agent in ("c2", "f1"):
-                journal.append({"type": "result", "agentId": agent, "result": {"ok": True}})
-            rows = []
-            if agent in ("c0", "c2", "f1"):
-                rows = [{"type": "assistant", "effort": "max", "message": {
-                    "id": f"m-{agent}", "model": "claude-opus-5-5", "usage": dict(zero, output_tokens=7 if agent == "c0" else 5)}}]
-            write_json(transcripts / f"agent-{agent}.meta.json", {"model": "opus"})
-            (transcripts / f"agent-{agent}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
-        (transcripts / "journal.jsonl").write_text("".join(json.dumps(e) + "\n" for e in journal), encoding="utf-8")
-        out = temp_dir(self) / "usage.json"
-        done = run([sys.executable, HARNESS / "usage_record.py", "--transcript-dir", transcripts, "--out", out])
-        self.assertEqual(done.returncode, 0, done.stderr)
-        document = json.loads(out.read_text())
-        usage = document["child_usage"]
-        self.assertEqual(document["measurement"]["exit_code"], 1)
-        self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 3)
-        self.assertEqual(usage["status"], "complete")
-        self.assertEqual([(c["agent_id"], c["superseded_by"]) for c in usage["superseded_attempts"]],
-                         [("c0", "c2"), ("f0", "f1"), ("c1", "c2")])
-        self.assertEqual([c["agent_id"] for c in usage["children"]], ["c2", "f1"])
-        self.assertEqual(usage["by_resolved_model"]["claude-opus-5-5"]["output_tokens"], 17)
+        for measured_zero in (False, True):
+            with self.subTest(measured_zero=measured_zero):
+                transcripts = temp_dir(self) / "subagents" / "workflows" / "wf_changed-keys"
+                transcripts.mkdir(parents=True)
+                followup = "refute-facts:scheduling-supervision:followup"
+                attempts = [("c0", "critic", "old-critic"), ("f0", followup, "old-facts"),
+                            ("c1", "critic", "changed-critic"), ("c2", "critic", "final-critic"),
+                            ("f1", followup, "changed-facts")]
+                journal = []
+                zero = {"input_tokens": 0, "output_tokens": 0, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}
+                for agent, label, key in attempts:
+                    journal.append({"type": "started", "agentId": agent, "label": label, "key": key})
+                    if agent in ("c2", "f1"):
+                        journal.append({"type": "result", "agentId": agent, "result": {"ok": True}})
+                    rows = []
+                    if measured_zero or agent in ("c0", "c2", "f1"):
+                        tokens = 7 if agent == "c0" else 5 if agent in ("c2", "f1") else 0
+                        rows = [{"type": "assistant", "effort": "max", "message": {
+                            "id": f"m-{agent}", "model": "claude-opus-5-5", "usage": dict(zero, output_tokens=tokens)}}]
+                    write_json(transcripts / f"agent-{agent}.meta.json", {"model": "opus"})
+                    (transcripts / f"agent-{agent}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+                (transcripts / "journal.jsonl").write_text("".join(json.dumps(e) + "\n" for e in journal), encoding="utf-8")
+                out = temp_dir(self) / "usage.json"
+                done = run([sys.executable, HARNESS / "usage_record.py", "--transcript-dir", transcripts, "--out", out])
+                # No rows is unknown usage; an explicit provider measurement of zero is known zero.
+                self.assertEqual(done.returncode, 0 if measured_zero else 1, done.stderr)
+                document = json.loads(out.read_text())
+                usage = document["child_usage"]
+                self.assertEqual(document["measurement"]["exit_code"], 1)
+                self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 3)
+                self.assertEqual(usage["status"], "complete" if measured_zero else "incomplete")
+                self.assertIs(usage["usage_accounting"]["complete"], measured_zero)
+                self.assertEqual([(c["agent_id"], c["superseded_by"]) for c in usage["superseded_attempts"]],
+                                 [("c0", "c2"), ("f0", "f1"), ("c1", "c2")])
+                self.assertEqual([c["agent_id"] for c in usage["children"]], ["c2", "f1"])
+                self.assertEqual(usage["by_resolved_model"]["claude-opus-5-5"]["output_tokens"], 17)
 
     def test_native_changed_keys_reports_missing_node_as_a_failure(self):
         with mock.patch(__name__ + ".NODE", None):

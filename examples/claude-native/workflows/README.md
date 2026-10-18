@@ -258,6 +258,45 @@ reading cannot read, when its top-level counters differ from the sum of its
 result ([beta Messages API](https://platform.claude.com/docs/en/api/beta/messages/create),
 `BetaIterationsUsage`; [advisor tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool), "Usage and billing").
 
+Run mode also exposes a compact `usage_accounting` summary using this existing
+reader. `totals` contains executor counters; `advisor_totals` and
+`advisor_iteration_count` describe advisor sub-inferences;
+`totals_including_advisor` includes both. It counts every started attempt once,
+including superseded attempts, without adding the executor's `message`
+iterations again. Legacy child `usage`, `usage_by_model` and `by_resolved_model`
+remain executor-only where applicable. For valid complete inputs, their observed
+counters and the CLI status/effort checks are unchanged.
+Require `usage_accounting.complete` for complete-usage acceptance: an otherwise
+complete run can have unread iterations or unknown counters. Keep its null
+counters and `iteration_issues`; incomplete figures are not a full usage total.
+Advisor model attribution remains in each child's
+`lanes.measurement.usage.advisor_iterations`. The Workflow summary excludes
+parent mirrors, the main session and OTel-only calls, and is not an invoice.
+
+Malformed or truncated transcript JSONL rows are reported in the child's
+`lanes.measurement.parse_errors`. Their parsed counters stay available as partial
+observations, but measurement bytes and usage are incomplete. They are usage
+integrity failures for final and superseded attempts, so the run/CLI also fails
+completeness. A damaged journal can hide actors: `journal_parse_errors` reports
+its errors and the run and `usage_accounting` are incomplete even when every
+known child is valid. Empty inputs do not establish complete zero usage; file
+read failures still propagate. Files not started by the journal remain outside
+this run. Valid complete inputs and their executor counters/status are unchanged.
+The correction follows NAS's existing
+[JSONL reader](https://github.com/native-agent-stack/native-agent-stack/blob/0a585369943e8000dc853a689acbacb34e7b4b0b/examples/claude-native/workflows/child-usage.mjs#L48-L56)
+and [sweep completeness rule](https://github.com/native-agent-stack/native-agent-stack/blob/0a585369943e8000dc853a689acbacb34e7b4b0b/examples/claude-native/workflows/child-usage.mjs#L3258-L3259)
+at `0a585369943e8000dc853a689acbacb34e7b4b0b`. The changed mechanism is the
+NAS observer's completeness accounting; Claude Code's producer format remains
+unchanged.
+A superseded attempt with only a synthetic rate-limit row has no measured
+provider usage: its accounting stays unknown with null totals, rather than
+complete zero, even if a later attempt completes the logical call.
+The landscape sweep's `usage_record.py` preserves the typed journal error count
+and `usage_accounting.complete` in its public derivative. Retry linkage can
+recover a missing result but cannot clear either source-integrity failure;
+acceptance stays incomplete. That derivative withholds arbitrary nested native
+fields and source reasons and reports controlled integrity reasons instead.
+
 **Call states (item 7, M14).** `call_states` gives every call attempted in the
 window one state in the sealed M14 names, per actor and per MCP server
 (`by_server`):
