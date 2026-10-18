@@ -5867,7 +5867,7 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "f55d6065c4022b8b8164a8cd6c70bb83f78968c0e289579c3642ebc08fa4d724",
+      "sha256": "a6d528431e456b3f30b9f9bdc1e4fcf98a9ad1e95e7d99ad19e8562ea1ff6c7f",
       "bytes": 64651
     },
     {
@@ -21980,6 +21980,11 @@
       "path": "evidence/artifacts/claude-native-practice-20261009/verification.json",
       "sha256": "8a1b218833c8fe423e2aec93b274b09519b2a044d5884d9b950b5a78c89a5a6e",
       "bytes": 721036
+    },
+    {
+      "path": "evidence/artifacts/claude-native-practice-refresh-20261018-final/receipt.json",
+      "sha256": "5215fdd3852755c65401ef0167b2ed1c9f0caa67a01981661a75182a492e3c2f",
+      "bytes": 5650
     },
     {
       "path": "evidence/artifacts/claude-repository-evidence-20260921/provenance.json",

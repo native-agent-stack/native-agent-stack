@@ -789,10 +789,10 @@
     {
       "name": "claude-native-practice",
       "source": "seathatflowsinourveins/native-agent-stack",
-      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/c59655c7c85a014b86699240754c382c75a475a6/.claude/skills/claude-native-practice",
-      "ref": "c59655c7c85a014b86699240754c382c75a475a6",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/8a9128f1b45caa8fb414db022ddd0d5af22bb16c/.claude/skills/claude-native-practice",
+      "ref": "8a9128f1b45caa8fb414db022ddd0d5af22bb16c",
       "path": ".claude/skills/claude-native-practice",
-      "tree_sha": "f08d0d241b774112bbc1e1f43558e7604e4916b6",
+      "tree_sha": "beeb621fb2fde18ddb66853e9339b4d100bbbeb4",
       "skill_md_sha256": "005288455c9d6a0bd70772847e2bb2411554d90eeabc0aa135af5d12fe99b353",
       "skill_md_bytes": 2290,
       "description_chars": 349,
