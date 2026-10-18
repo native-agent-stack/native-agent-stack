@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "fixture_class": "synthetic",
+  "status": "passed_source_checks",
+  "native_qualification": "HOLD",
+  "base_commit": "6f57256a6db754edb576519ed7803f202b5430a8",
+  "subjects": [
+    {
+      "path": "examples/claude-native/workflows/layer-verdict-lane.js",
+      "sha256": "0de995421ad47c43150d4104b07fb6832277f6b2bcfd9efa76d2d8db96d9b414",
+      "bytes": 24122
+    },
+    {
+      "path": "tests/test_layer_verdict_workflow.py",
+      "sha256": "852798fa1d4607ebec3b923a217250cd2df492f9613f27e7fccb43a713de25a5",
+      "bytes": 13294
+    },
+    {
+      "path": "examples/claude-native/workflows/test-envelope.mjs",
+      "sha256": "a62843aff13c7d4f0df532dc8ac9b9ca4f8f71335e47a33085b9a607794a80d3",
+      "bytes": 59972
+    },
+    {
+      "path": "examples/claude-native/workflows/README.md",
+      "sha256": "2c2756b6515e087a90f03712988cc20580b5758bfb0bfd17548ffa8620f97c53",
+      "bytes": 120819
+    },
+    {
+      "path": "examples/claude-native/workflows/vendored-lanes.json",
+      "sha256": "bd83d9dae573920fcfab722854c0c4152c2d12ee0ce2714b23830fb5e23c6898",
+      "bytes": 2424
+    },
+    {
+      "path": "examples/claude-native/workflows/SHA256SUMS",
+      "sha256": "b8b4bd5f8522e4a0492bee63481ecf636fa3a4907d6615275293a658c6bfb8e3",
+      "bytes": 1217
+    },
+    {
+      "path": "tools/sota-convergence/lane-provenance.json",
+      "sha256": "d359982903d82d574ab4a45f58001ca372ebcabcd2ed758d10644123953e15fb",
+      "bytes": 20900
+    },
+    {
+      "path": "docs/decisions/2026-10-18-layer-verdict-semantic-closure.md",
+      "sha256": "1c43f71141e027a3965b185e758c1076cddd4e9c67127c76db92d9ec351a2a1c",
+      "bytes": 7119
+    },
+    {
+      "path": "evidence/artifacts/layer-verdict-semantic-closure-20261018/tests-first.json",
+      "sha256": "a22760e1a6b28feb3e93222b05f1ea09dcd7c61633e6688e6b9eddaac26a4125",
+      "bytes": 23370
+    },
+    {
+      "path": "evidence/artifacts/layer-verdict-semantic-closure-20261018/source-review.md",
+      "sha256": "807a29039c6222ede20bcb17f2bcdfb25ba9ae3af87c43b95e8029ef4b5765c8",
+      "bytes": 1299
+    }
+  ],
+  "summary": {
+    "focused_python_methods": 13,
+    "python_suite_tests": 48,
+    "envelope_checks": 256,
+    "mutation_checks": 80,
+    "sha256sum_entries": 14,
+    "native_workflow_runs": 0,
+    "provider_probes": 0
+  },
+  "limits": [
+    "The Python harness injects synthetic agent and parallel results into the existing source-loading seam; it does not run Claude Code Workflow or a provider.",
+    "Source-visible semantic closure does not prove effective loaded role, confinement, native retries, terminal/usage closure or global producer admission.",
+    "Long stdout/stderr streams are marked as excerpts. Earlier failed validation and the interrupted attempt are retained.",
+    "Publication validation passes for the preceding registered tree. This file and its own manifest binding are finalized afterward and revalidated before commit; no self-referential digest is asserted.",
+    "Commit/push hook results and the final commit are reported in the completion message rather than embedded in their own committed subject."
+  ],
+  "custody": {
+    "registry_prefix_preserved": {
+      "adjudication": {
+        "old": 13,
+        "current": 13
+      },
+      "claude": {
+        "old": 12,
+        "current": 14
+      },
+      "codex": {
+        "old": 14,
+        "current": 14
+      }
+    },
+    "collector_unchanged": true,
+    "final_admission_guard_unchanged": true
+  },
+  "records": [
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow",
+        "tests.test_verdict_lane_vendoring",
+        "tests.test_claude_lane"
+      ],
+      "cwd_relative": ".",
+      "exit_code": 0,
+      "stdout": "layer-verdict-lane.js\", \"workflow_sha256\": \"0de995421ad47c43150d4104b07fb6832277f6b2bcfd9efa76d2d8db96d9b414\"}, \"without_final\": [\"foundation__l2.json\"], \"written\": 1}\n{\"lost\": [\"us-equities/l3\"], \"provenance\": {\"agent_sha256\": \"a87a9883618b320c8b97a442a43c471c0994fb70ea9bb64ce0b5f513ba31500c\", \"agentlab_commit\": \"d44d2d7e252f9710be99c1edbca572d32af15712\", \"prompt_sha256\": \"d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4\", \"repo_tree_sha256\": \"7c4d7a46642a9fd0b20765bbb89fb63f7500ec8a27d2b293b793ce27469db48e\", \"transcript_audit_py_sha256\": \"af78e463833f5759dcc4d8a6d8b0738352b99ccba654792d1327ddc6a1b3c032\", \"workflow_path\": \".claude/workflows/layer-verdict-lane.js\", \"workflow_sha256\": \"0de995421ad47c43150d4104b07fb6832277f6b2bcfd9efa76d2d8db96d9b414\"}, \"without_final\": [\"foundation__l2.json\"], \"written\": 1}\n{\"lost\": [\"us-equities/l3\"], \"provenance\": {\"agent_sha256\": \"a87a9883618b320c8b97a442a43c471c0994fb70ea9bb64ce0b5f513ba31500c\", \"agentlab_commit\": \"d44d2d7e252f9710be99c1edbca572d32af15712\", \"prompt_sha256\": \"d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4\", \"repo_tree_sha256\": \"7c4d7a46642a9fd0b20765bbb89fb63f7500ec8a27d2b293b793ce27469db48e\", \"transcript_audit_py_sha256\": \"af78e463833f5759dcc4d8a6d8b0738352b99ccba654792d1327ddc6a1b3c032\", \"workflow_path\": \".claude/workflows/layer-verdict-lane.js\", \"workflow_sha256\": \"0de995421ad47c43150d4104b07fb6832277f6b2bcfd9efa76d2d8db96d9b414\"}, \"without_final\": [\"foundation__l2.json\"], \"written\": 1}\n",
+      "stderr": "...............................................claude/workflows/layer-verdict-lane.js sha256 0ab7ddda7e8d0fdea42a973fd209b33a9ad45cb288f34b25ece73b5cdf5d1c4b is not the vendored SHA256SUMS entry for layer-verdict-lane.js (0de995421ad47c43150d4104b07fb6832277f6b2bcfd9efa76d2d8db96d9b414); vendor the new bytes into the catalog first\n.claude/workflows/layer-verdict-lane.js sha256 0ab7ddda7e8d0fdea42a973fd209b33a9ad45cb288f34b25ece73b5cdf5d1c4b is not the vendored SHA256SUMS entry for layer-verdict-lane.js (0de995421ad47c43150d4104b07fb6832277f6b2bcfd9efa76d2d8db96d9b414); vendor the new bytes into the catalog first\n..\n----------------------------------------------------------------------\nRan 48 tests in 2.418s\n\nOK\n",
+      "stdout_excerpted": true,
+      "stderr_excerpted": false
+    },
+    {
+      "command": [
+        "node",
+        "examples/claude-native/workflows/test-envelope.mjs"
+      ],
+      "cwd_relative": ".",
+      "exit_code": 0,
+      "stdout": " maxEffortLevel caps the stage effort\nPASS instructions: the project instructions state the effort literal every stage binds\nPASS instructions: no active guidance puts every project agent at the stage effort\nPASS routing doc: no text says the launchers drop the max of 2026-09-29 at relaunch\nPASS agents: evidence-reviewer tool surface is exactly the reviewed list\nPASS agents: evidence-reviewer body and the review stage agree that it never runs acceptance commands\nPASS settings: workflowSizeGuideline is a documented value and the project instructions name the same one\nPASS agents: source-scout is read-only built-ins without project instructions\nPASS routing doc: the role table maps each dispatch role to its project agent with the model and effort its file declares\nPASS routing doc: the agent table restates each listed agent with the model and effort its file declares\nPASS agents: security-reviewer tool surface is exactly the reviewed list\nPASS agents: isolated-builder preloads exactly its reviewed skills\nPASS agents: security-reviewer preloads exactly its reviewed skill\nPASS agents: stack-researcher tool surface is exactly the reviewed list\nPASS agents: stack-verifier tool surface is exactly the reviewed list\nPASS agents: isolated-builder grants only Serena read tools\nPASS agents: stack-researcher fetches pages through Context Mode and returns findings inline\nPASS agents: stack-verifier runs named commands through rtk proxy and never fixes\nSUMMARY passed=256 failed=0 total=256\n",
+      "stderr": "",
+      "stdout_excerpted": true,
+      "stderr_excerpted": false
+    },
+    {
+      "command": [
+        "node",
+        "examples/claude-native/workflows/test-contract-mutations.mjs"
+      ],
+      "cwd_relative": ".",
+      "exit_code": 0,
+      "stdout": "ions say the contract fails an agent off max again\nPASS suite newly fails on its SUMMARY line when the instructions give every agent one max effort line again\nPASS suite newly fails on its SUMMARY line when the routing doc says the launchers drop the 2026-09-29 max at relaunch again\nPASS suite newly fails on its SUMMARY line when the instructions stop naming the size guideline the settings select\nPASS suite newly fails on its SUMMARY line when the settings env sets CLAUDE_CODE_EFFORT_LEVEL=max\nPASS suite newly fails on its SUMMARY line when the settings env sets CLAUDE_CODE_EFFORT_LEVEL=xhigh\nPASS suite newly fails on its SUMMARY line when the settings cap every model at xhigh\nPASS suite newly fails on its SUMMARY line when a per-model settings entry caps Sonnet at high\nPASS no new failure when a harmless max cap in the settings\nPASS no new failure when a harmless comment mentions a lower effort\nPASS suite newly fails on its SUMMARY line when the configured contract heading is absent from the contract doc\nPASS suite newly fails on its SUMMARY line when the configured settings path points at a missing file\nPASS suite newly fails on its SUMMARY line when the configured settings path names a directory instead of a file\nPASS suite newly fails on its SUMMARY line when a binding is not a string\nPASS suite newly fails on its SUMMARY line when a binding names a file the tree does not hold\nPASS no new failure when a harmless comment mentions agent(\nSUMMARY passed=80 failed=0 total=80\n",
+      "stderr": "",
+      "stdout_excerpted": true,
+      "stderr_excerpted": false
+    },
+    {
+      "command": [
+        "node",
+        "examples/claude-native/workflows/check-syntax.mjs",
+        "examples/claude-native/workflows/layer-verdict-lane.js"
+      ],
+      "cwd_relative": ".",
+      "exit_code": 0,
+      "stdout": "SYNTAX_OK examples/claude-native/workflows/layer-verdict-lane.js\n",
+      "stderr": "",
+      "stdout_excerpted": false,
+      "stderr_excerpted": false
+    },
+    {
+      "command": [
+        "sha256sum",
+        "--check",
+        "--strict",
+        "SHA256SUMS"
+      ],
+      "cwd_relative": "examples/claude-native/workflows",
+      "exit_code": 0,
+      "stdout": "check-syntax.mjs: OK\nchild-usage.mjs: OK\ncodex-cross-review.mjs: OK\ntest-child-usage.mjs: OK\ntest-codex-envelope.mjs: OK\ntest-contract-mutations.mjs: OK\ntest-envelope.mjs: OK\ntest-usage-receipts.mjs: OK\nlayer-verdict-lane.js: OK\nreadiness-audit.js: OK\nreview-changes.js: OK\ncontract.config.json: OK\nshell-parser.pin.json: OK\nvendored-lanes.json: OK\n",
+      "stderr": "",
+      "stdout_excerpted": false,
+      "stderr_excerpted": false
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "cwd_relative": ".",
+      "exit_code": 1,
+      "stdout": "Publication validation failed:\nexamples/claude-native/workflows/README.md: SHA-256 mismatch\nexamples/claude-native/workflows/README.md: byte count mismatch\nexamples/claude-native/workflows/SHA256SUMS: SHA-256 mismatch\nexamples/claude-native/workflows/test-envelope.mjs: SHA-256 mismatch\nexamples/claude-native/workflows/test-envelope.mjs: byte count mismatch\ntools/sota-convergence/lane-provenance.json: SHA-256 mismatch\ntools/sota-convergence/lane-provenance.json: byte count mismatch\n",
+      "stderr": "",
+      "stdout_excerpted": false,
+      "stderr_excerpted": false
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd_relative": ".",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "stdout_excerpted": false,
+      "stderr_excerpted": false
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "cwd_relative": ".",
+      "exit_code": null,
+      "status": "interrupted",
+      "stdout": "",
+      "stderr": "Execution timed out after 30000ms",
+      "note": "The bounded context-mode invocation returned no validator conclusion. Retried with an asynchronous command session."
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "cwd_relative": ".",
+      "exit_code": 1,
+      "stdout": "Publication validation failed:\nevidence/artifacts/layer-verdict-semantic-closure-20261018/tests-first.json: evidence file is not hash-listed\n",
+      "stderr": "",
+      "note": "The invocation loaded the manifest before receipt registration was complete. Registration was finished before the next invocation; no source defect was inferred."
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "cwd_relative": ".",
+      "exit_code": 0,
+      "stdout": "{\"components\": 71, \"hashed_files\": 12318, \"profiles\": 4, \"receipts\": 243, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "stderr": "",
+      "note": "After all source/test/decision and current receipt bindings were refreshed; before this verification file and its binding were added."
+    }
+  ]
+}

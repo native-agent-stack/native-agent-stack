@@ -1,7 +1,7 @@
 export const meta = {
   name: 'layer-verdict-lane',
-  description: 'Run the Claude lane of the layer-verdict convergence: for every stripped layer packet an Opus proposer selects the winner set on retained evidence, two Opus refuters (evidence lens, challenger lens) attack it, one revision round follows any refutation or major finding and both lenses re-check the revision; a layer seals a final object only when both votes on it returned and neither refuted it, otherwise final is null and refutation.status says refuted or unknown; the script writes nothing and never promotes a candidate - the record tool applies the rules',
-  whenToUse: 'After tools/sota-convergence/lane_packets.py wrote the packets: args = {repo: "<catalog checkout>", packets: [{catalog, layer_id, path, sha256}], prompt: "<lane-prompt.md text with {PACKET_PATH} {REPO_ROOT} {LANE} placeholders>", model?: {name: "opus", effort: "max"} (optional; a different value is logged and returned as caller_model, never applied, because every agent() call binds that literal), launch?: {repo, repo_tree_sha256, ...} (optional; returned unchanged as launch so the collector can bind the result to the export it was launched on)}',
+  description: 'Review exactly one stripped layer packet: an Opus proposer, two refuter lenses, and at most one revision/recheck. Final requires complete lens returns, no refutation or remaining major/blocking finding, and explicit evidence-backed closure of prior findings by their originating lenses. A required unsuccessful revision returns unknown, preserving both rounds, errors and stop cause. The script writes nothing and never promotes a candidate; native identity, global capacity and terminal/usage closure remain caller gates.',
+  whenToUse: 'After tools/sota-convergence/lane_packets.py wrote the packet: args = {repo: "<admitted confined source view>", packets: [{catalog, layer_id, path, sha256}] (exactly one valid packet; docs mode is rejected), prompt: "<lane-prompt.md text with {PACKET_PATH} {REPO_ROOT} {LANE} placeholders>", model?: {name: "opus", effort: "max"} (optional; a different value is logged and returned as caller_model, never applied, because every agent() call binds that literal), launch?: {repo, repo_tree_sha256, ...} (optional; returned unchanged as launch so the collector can bind the result to the export it was launched on)}',
   phases: [
     { title: 'Propose', detail: 'blind-lane-reviewer per packet, Opus max, Read/Glob/Grep only, no skills or project instructions', model: 'opus' },
     { title: 'Refute', detail: 'evidence lens + challenger lens per proposal, blind-lane-reviewer, Opus max', model: 'opus' },
@@ -14,13 +14,15 @@ const issues = []
 const nonblank = (v) => typeof v === 'string' && v.trim().length > 0
 const REPO = nonblank(a.repo) ? a.repo : '.'
 const PROMPT = nonblank(a.prompt) ? a.prompt : 'You are the {LANE} lane. Read the packet at {PACKET_PATH} under {REPO_ROOT} and return the schema object.'
-const validPacket = (p) => p && typeof p === 'object' && nonblank(p.catalog) && nonblank(p.layer_id) && nonblank(p.path) && /^[0-9a-f]{64}$/.test(p.sha256 || '')
-const docs = Array.isArray(a.docs) ? a.docs.filter((d) => typeof d === 'string' && d.trim()) : []
-// Degenerate mode (envelope/contract runs): with no packets, each given doc is treated as a foundation packet with a zero hash; the record tool rejects such a return by its packet hash.
-const packets = Array.isArray(a.packets) && a.packets.length ? a.packets.filter(validPacket) : docs.map((d, i) => ({ catalog: 'foundation', layer_id: 'unnamed-' + i, path: d, sha256: '0'.repeat(64) }))
-if (!packets.length) issues.push('packets must be a nonempty array of {catalog, layer_id, path, sha256}')
-// A real run (packets given) must name its prompt: the built-in fallback is for envelope/doc runs only, and the
-// collector binds the echoed prompt to the registered lane-prompt.md (catalog review of #145, M1).
+const validPacket = (p) => p && typeof p === 'object' && !Array.isArray(p) && ['foundation', 'us-equities'].includes(p.catalog) && nonblank(p.layer_id) && nonblank(p.path) && typeof p.sha256 === 'string' && /^[0-9a-f]{64}$/.test(p.sha256)
+// Admission checks the raw input: no filtering, docs fallback or hidden extra chain.
+// Packet bytes and source-view closure still need the external caller's checks.
+const packets = Array.isArray(a.packets) ? a.packets : []
+if (packets.length !== 1 || !validPacket(packets[0])) issues.push('one packet per run: exactly one valid {catalog, layer_id, path, sha256} is required')
+if (a.docs !== undefined) issues.push('docs mode is not admitted; supply one packet')
+if (!nonblank(a.repo)) issues.push('repo must name the admitted source view')
+// Every admitted run names its prompt. The collector binds the echoed prompt to
+// the registered lane-prompt.md (catalog review of #145, M1).
 if (Array.isArray(a.packets) && a.packets.length && !nonblank(a.prompt)) issues.push('prompt must be the lane-prompt.md text when packets are given')
 // Every agent() call below binds the literal model 'opus' / effort 'max' (the contract suite requires inline alias
 // literals), so the recorded model is that same literal and args.model cannot re-route the lane.
@@ -33,7 +35,7 @@ const LAUNCH = a.launch && typeof a.launch === 'object' && !Array.isArray(a.laun
 // The echoed identity must name the repository the agents actually read (Codex review of #42).
 if (a.launch !== undefined && (!LAUNCH || LAUNCH.repo !== REPO)) issues.push('launch must be an object whose repo equals repo')
 if (CALLER_MODEL) log('args.model ' + JSON.stringify(CALLER_MODEL) + ' is not applied: every agent() call binds ' + JSON.stringify(MODEL))
-if (issues.length) { for (const i of issues) log('argument issue: ' + i); return { status: 'incomplete', argument_issues: issues } }
+if (issues.length) { for (const i of issues) log('argument issue: ' + i); return { status: 'incomplete', stop_cause: 'argument_rejected', argument_issues: issues } }
 const PACKET = [
   'Worker packet contract: bounded objective, only the listed sources, no writes except what an acceptance command named in your task itself produces, return only the schema.',
   'Cite every claim with file path and section/line or the exact command. Copy numbers exactly. Never print credential or env values. Never claim token savings.',
@@ -57,58 +59,130 @@ const LANE_RETURN = { type: 'object', properties: {
   overturn_when: { type: 'string' }, overturn_protocol: { type: 'object', properties: { fixture_paths: { type: 'array', items: { type: 'string' } }, metric: { type: 'string' }, arms: { type: 'array', items: { type: 'string' } } }, required: ['fixture_paths', 'metric', 'arms'] },
   open_gaps: { type: 'array', items: { type: 'string' } }, sources_read: { type: 'array', items: { type: 'string' } }, limits: { type: 'array', items: { type: 'string' } } },
   required: ['schema_version', 'lane', 'catalog', 'layer_id', 'packet_sha256', 'model', 'winner_keys', 'why_selected', 'winner_evidence_class', 'winner_evidence_refs', 'alternatives', 'challenger_preferred', 'overturn_when', 'overturn_protocol', 'open_gaps', 'sources_read', 'limits'] }
-const VOTE = { type: 'object', properties: { refuted: { type: 'boolean' }, reason: { type: 'string' }, findings: { type: 'array', items: { type: 'object', properties: { claim: { type: 'string' }, evidence: { type: 'string' }, severity: { type: 'string', enum: ['blocking', 'major', 'minor'] } }, required: ['claim', 'evidence', 'severity'] } }, paths_checked: { type: 'array', items: { type: 'string' } } }, required: ['refuted', 'reason', 'findings', 'paths_checked'] }
+const RESOLUTION = { type: 'object', properties: { finding_id: { type: 'string' }, disposition: { type: 'string', enum: ['resolved', 'unresolved'] }, evidence: { type: 'string' } }, required: ['finding_id', 'disposition', 'evidence'] }
+const VOTE = { type: 'object', properties: { refuted: { type: 'boolean' }, reason: { type: 'string' }, findings: { type: 'array', items: { type: 'object', properties: { claim: { type: 'string' }, evidence: { type: 'string' }, severity: { type: 'string', enum: ['blocking', 'major', 'minor'] } }, required: ['claim', 'evidence', 'severity'] } }, paths_checked: { type: 'array', items: { type: 'string' } }, resolutions: { type: 'array', items: RESOLUTION } }, required: ['refuted', 'reason', 'findings', 'paths_checked', 'resolutions'] }
 const fill = (p) => PROMPT.split('{PACKET_PATH}').join(p.path).split('{REPO_ROOT}').join(REPO).split('{LANE}').join('claude')
 const fixed = (p) => `\nFixed values you must copy exactly: schema_version 1, lane "claude", catalog "${p.catalog}", layer_id "${p.layer_id}", packet_sha256 "${p.sha256}", model {"name": "${MODEL.name}", "effort": "${MODEL.effort}"}. Read files only under ${REPO}; you cannot run commands, so verify a path exists by opening it. winner_keys, alternatives[].key and challenger_preferred.key are the packet's candidate keys (c1, c2, ...).`
 const lensPrompt = (p, proposal, lens) => PACKET + '\n' + BLIND + '\n' + (lens === 'evidence'
   ? `Evidence lens. Try to refute this layer-verdict proposal for packet ${p.path} (repository root ${REPO}): ${JSON.stringify(proposal)}. Open every path in winner_evidence_refs, alternatives[].evidence_refs and sources_read; a path that does not exist or does not support the claim made about it is a blocking finding. Check that every packet candidate with adopted == true that is not a winner appears in alternatives (missing one is blocking), that every winner key is adopted (else blocking), that why_selected reports an observed result rather than a project claim, that overturn_when names a fixtures/, blueprints/ or tests/ path or a python3/node command that exists or is runnable, and that no number or result is stated without a cited path. refuted = true if any blocking finding; reason is one sentence naming the deciding finding or why none blocks. Do not edit anything.`
   : `Challenger lens. Try to refute this layer-verdict proposal for packet ${p.path} (repository root ${REPO}): ${JSON.stringify(proposal)}. Read the packet's requirement and the evidence_refs of the strongest non-winner candidate(s), adopted or not. Argue that one of them satisfies the requirement at least as well as the winner set on the retained evidence. refuted = true only when the cited evidence shows that (name the paths), or when a stated why_not_default is contradicted by its own evidence; a stronger candidate that is not adopted must have been recorded in challenger_preferred (its absence is a major finding, not a refutation of the winner); reason is one sentence naming the deciding evidence. Do not edit anything.`)
-// One chain per packet (propose -> refute -> revise -> re-check), run through parallel(): no barrier
-// between packets, and the contract suite's parallel stub reaches every stage.
+// Admission allows one chain; only its two refuter lenses run concurrently.
 const LENSES = ['evidence', 'challenger']
+const stageIdentity = (label) => {
+  if (label.startsWith('parallel:')) {
+    const round = label.split(':')[1]
+    return { label, round, lens: null, role: round + ':parallel' }
+  }
+  const round = label.startsWith('propose:revise:') || label.startsWith('refute:recheck:') ? 'revision' : 'proposal'
+  const lens = label.match(/^refute:(?:recheck:)?(evidence|challenger):/)?.[1] || null
+  return { label, round, lens, role: round + (lens ? ':' + lens : '') }
+}
+const started = (stages, label) => stages.push({ ...stageIdentity(label), status: 'running' })
+const failed = (stages, label, error) => {
+  const record = stages.find((s) => s.label === label)
+  const failure = { ...stageIdentity(label), status: 'error', error: { name: error && typeof error.name === 'string' ? error.name : 'Error', message: error && typeof error.message === 'string' ? error.message : String(error) } }
+  if (record) Object.assign(record, failure)
+  else stages.push(failure)
+  return null
+}
+const validSubject = (v) => v && typeof v === 'object' && !Array.isArray(v)
+const validVote = (v) => validSubject(v) && typeof v.refuted === 'boolean' && nonblank(v.reason)
+  && Array.isArray(v.findings) && v.findings.every((f) => validSubject(f) && ['blocking', 'major', 'minor'].includes(f.severity) && nonblank(f.claim) && nonblank(f.evidence))
+  && Array.isArray(v.paths_checked) && v.paths_checked.every(nonblank)
+  && Array.isArray(v.resolutions) && v.resolutions.every((r) => validSubject(r) && nonblank(r.finding_id) && ['resolved', 'unresolved'].includes(r.disposition) && nonblank(r.evidence))
+const outcome = (stages, label, value, valid) => {
+  if (stages.some((s) => s.label === label && s.status === 'error')) return null
+  const status = value == null ? 'null' : valid(value) ? 'returned' : 'invalid'
+  const record = stages.find((s) => s.label === label)
+  const result = { ...stageIdentity(label), status, ...(status === 'invalid' ? { returned: value } : {}) }
+  if (record) Object.assign(record, result)
+  else stages.push(result)
+  return status === 'returned' ? value : null
+}
 // Both lens votes are required on every checked object. A vote that is missing, null, thrown or
 // lacks a boolean `refuted` is kept as refuted: null, so a lost refuter reads as unknown, never as unrefuted.
-const refute = async (p, subject, round) => {
-  const got = await parallel(LENSES.map((lens) => () =>
-    agent(lensPrompt(p, subject, lens), { label: (round === 'revision' ? 'refute:recheck:' : 'refute:') + `${lens}:${p.catalog}/${p.layer_id}`, phase: round === 'revision' ? 'Re-check' : 'Refute', agentType: 'blind-lane-reviewer', model: 'opus', effort: 'max', schema: VOTE }).catch(() => null)))
-  return LENSES.map((lens, i) => {
-    const v = Array.isArray(got) ? got[i] : null
-    return v && typeof v === 'object' && typeof v.refuted === 'boolean' ? { ...v, lens, round } : { lens, round, refuted: null, reason: 'no vote returned', findings: [], paths_checked: [] }
-  })
+const refute = async (p, subject, round, prior, stages) => {
+  const labels = LENSES.map((lens) => (round === 'revision' ? 'refute:recheck:' : 'refute:') + `${lens}:${p.catalog}/${p.layer_id}`)
+  const observed = []
+  const groupLabel = `parallel:${round}:${p.catalog}/${p.layer_id}`
+  const got = await Promise.resolve().then(() => parallel(LENSES.map((lens, i) => async () => {
+    started(stages, labels[i])
+    const raw = await Promise.resolve().then(() => agent(lensPrompt(p, subject, lens) + '\nRecheck obligations for this lens: ' + JSON.stringify(prior.filter((f) => f.lens === lens)) + '. Return one resolutions entry for each finding_id, with disposition resolved or unresolved and cited evidence from the revision. Do not mark a finding resolved merely because the revision omits it. With no obligations, return resolutions: [].', { label: labels[i], phase: round === 'revision' ? 'Re-check' : 'Refute', agentType: 'blind-lane-reviewer', model: 'opus', effort: 'max', schema: VOTE })).catch((error) => failed(stages, labels[i], error))
+    const v = outcome(stages, labels[i], raw, validVote)
+    observed[i] = v ? { ...v, lens, round } : { lens, round, refuted: null, reason: raw == null ? 'no vote returned; see stage_results' : 'invalid vote returned; see stage_results', findings: Array.isArray(raw && raw.findings) ? raw.findings : [], paths_checked: [] }
+    return observed[i]
+  }))).catch((error) => failed(stages, groupLabel, error))
+  if ((!Array.isArray(got) || got.length !== LENSES.length || got.some((v) => v == null)) && !stages.some((s) => s.label === groupLabel)) failed(stages, groupLabel, new Error('parallel returned an incomplete result array'))
+  return LENSES.map((lens, i) => observed[i] || { lens, round, refuted: null, reason: 'no completed vote; see stage_results', findings: [], paths_checked: [] })
 }
 // Round status from the two votes: any refutation decides; otherwise a missing vote leaves it unknown.
 const roundStatus = (votes) => votes.some((v) => v.refuted === true) ? 'refuted' : votes.length === LENSES.length && votes.every((v) => v.refuted === false) ? 'unrefuted' : 'unknown'
+const completeVotes = (votes) => votes.length === LENSES.length && votes.every((v) => typeof v.refuted === 'boolean')
+const completeRound = (votes, stages, round) => completeVotes(votes) && !stages.some((s) => s.round === round && s.status !== 'returned')
+// Finding identities survive the revision. A refutation without a structured major
+// still needs an explicit disposition of its reason by the originating lens.
+const requiredFindings = (votes) => votes.flatMap((v) => {
+  const findings = (v.findings || []).map((f, i) => f && typeof f === 'object' ? { ...f, finding_id: `${v.round}:${v.lens}:${i}`, lens: v.lens } : null).filter((f) => f && f.severity !== 'minor')
+  return findings.length || !v.refuted ? findings : [{ finding_id: `${v.round}:${v.lens}:refutation`, lens: v.lens, claim: v.reason, evidence: v.reason, severity: 'blocking' }]
+})
+const findingsClosed = (prior, votes) => votes.every((v) => {
+  const own = prior.filter((f) => f.lens === v.lens)
+  const resolutions = v.resolutions
+  return Array.isArray(resolutions) && resolutions.length === own.length && own.every((f) => {
+    const got = resolutions.filter((r) => r && r.finding_id === f.finding_id)
+    return got.length === 1 && got[0].disposition === 'resolved' && nonblank(got[0].evidence)
+  })
+})
 const summary = (votes) => votes.map((v) => {
   const blocking = (v.findings || []).filter((f) => f && f.severity !== 'minor').map((f) => f.claim).filter(nonblank)
   return { lens: v.lens, round: v.round, refuted: v.refuted, reason: nonblank(v.reason) ? v.reason : blocking.length ? blocking.join('; ') : v.refuted === null ? 'no vote returned' : 'no reason given' }
 })
 // Each layer echoes the packet path its agents read (catalog Codex review of #145): the collector requires it to be
 // the work dir's packet with that sha256, so edited args cannot pass a different packet under the same hash.
-const layer = (p, proposal, votes, revised, revisionVotes, final, finalSource, status) => ({
+const layer = (p, proposal, votes, revised, revisionVotes, final, finalSource, status, stages, stopCause = null) => {
+  const expected = ['proposal', ...LENSES.map((l) => 'proposal:' + l)]
+  if (completeRound(votes, stages, 'proposal') && requiredFindings(votes).length) expected.push('revision', ...LENSES.map((l) => 'revision:' + l))
+  return {
   catalog: p.catalog, layer_id: p.layer_id, packet_sha256: p.sha256, packet_path: p.path, proposal, votes, revised, revision_votes: revisionVotes, final, final_source: finalSource,
+  required_findings: requiredFindings(votes), stage_results: stages, stop_cause: stopCause,
+  expected_roles: expected, returned_roles: stages.filter((s) => s.status === 'returned').map((s) => s.role), not_started_roles: expected.filter((role) => !stages.some((s) => s.role === role)),
   refutation: { status, final_source: finalSource, proposal_status: votes.length ? roundStatus(votes) : null, revision_status: revisionVotes.length ? roundStatus(revisionVotes) : null, votes: summary([...votes, ...revisionVotes]) },
-})
-const chain = async (p) => {
-  const proposal = await agent(PACKET + '\n' + BLIND + '\n' + fill(p) + fixed(p), { label: `propose:${p.catalog}/${p.layer_id}`, phase: 'Propose', agentType: 'blind-lane-reviewer', model: 'opus', effort: 'max', schema: LANE_RETURN })
-  if (!proposal) return layer(p, null, [], null, [], null, null, 'unknown')
-  const votes = await refute(p, proposal, 'proposal')
-  const first = roundStatus(votes)
-  const majors = votes.flatMap((v) => (v.findings || []).filter((f) => f && f.severity !== 'minor'))
-  // No refutation and no major finding: the proposal is final only when both votes returned.
-  if (first !== 'refuted' && !majors.length) return layer(p, proposal, votes, null, [], first === 'unrefuted' ? proposal : null, first === 'unrefuted' ? 'proposal' : null, first)
-  const revised = await agent(PACKET + '\n' + BLIND + '\n' + fill(p) + fixed(p) + `\nThis is the revision round. Your earlier proposal was: ${JSON.stringify(proposal)}. Independent refuters found: ${JSON.stringify(votes)}. Resolve every blocking and major finding by re-reading the cited evidence; keep what the evidence supports, drop or correct what it does not, and add what was missing. Return the complete revised object.`, { label: `propose:revise:${p.catalog}/${p.layer_id}`, phase: 'Revise', agentType: 'blind-lane-reviewer', model: 'opus', effort: 'max', schema: LANE_RETURN })
-  const revisionVotes = revised ? await refute(p, revised, 'revision') : []
-  const second = revised ? roundStatus(revisionVotes) : null
-  if (second === 'unrefuted') return layer(p, proposal, votes, revised, revisionVotes, revised, 'revision', 'unrefuted')
-  // The unrevised proposal stays final only when both of its votes returned and neither refuted it
-  // (the revision ran for major findings alone); a refuted or unknown proposal is never sealed.
-  if (first === 'unrefuted') return layer(p, proposal, votes, revised, revisionVotes, proposal, 'proposal', 'unrefuted')
-  // Nothing sealed: report the last checked object's status (the proposal's when no revision returned).
-  return layer(p, proposal, votes, revised, revisionVotes, null, null, second || first)
+  }
 }
-const results = await parallel(packets.map((p) => () => chain(p)))
+const subjectStop = (stages, role) => role + '_' + (stages.find((s) => s.role === role)?.status === 'error' ? 'failed' : stages.find((s) => s.role === role)?.status === 'invalid' ? 'invalid' : 'missing')
+const chain = async (p) => {
+  const stages = []
+  const proposalLabel = `propose:${p.catalog}/${p.layer_id}`
+  started(stages, proposalLabel)
+  const rawProposal = await Promise.resolve().then(() => agent(PACKET + '\n' + BLIND + '\n' + fill(p) + fixed(p), { label: proposalLabel, phase: 'Propose', agentType: 'blind-lane-reviewer', model: 'opus', effort: 'max', schema: LANE_RETURN })).catch((error) => failed(stages, proposalLabel, error))
+  const proposal = outcome(stages, proposalLabel, rawProposal, validSubject)
+  if (!proposal) return layer(p, null, [], null, [], null, null, 'unknown', stages, subjectStop(stages, 'proposal'))
+  const votes = await refute(p, proposal, 'proposal', [], stages)
+  const first = roundStatus(votes)
+  const majors = requiredFindings(votes)
+  if (!completeRound(votes, stages, 'proposal')) return layer(p, proposal, votes, null, [], null, null, 'unknown', stages, 'proposal_votes_incomplete')
+  // No refutation and no major finding: the proposal is final only when both votes returned.
+  if (first !== 'refuted' && !majors.length) return layer(p, proposal, votes, null, [], proposal, 'proposal', first, stages)
+  const revisionLabel = `propose:revise:${p.catalog}/${p.layer_id}`
+  started(stages, revisionLabel)
+  const rawRevision = await Promise.resolve().then(() => agent(PACKET + '\n' + BLIND + '\n' + fill(p) + fixed(p) + `\nThis is the revision round. Your earlier proposal was: ${JSON.stringify(proposal)}. Independent refuters found: ${JSON.stringify(votes)}. Resolve every blocking and major finding by re-reading the cited evidence; keep what the evidence supports, drop or correct what it does not, and add what was missing. Return the complete revised object.`, { label: revisionLabel, phase: 'Revise', agentType: 'blind-lane-reviewer', model: 'opus', effort: 'max', schema: LANE_RETURN })).catch((error) => failed(stages, revisionLabel, error))
+  const revised = outcome(stages, revisionLabel, rawRevision, validSubject)
+  if (!revised) return layer(p, proposal, votes, null, [], null, null, 'unknown', stages, subjectStop(stages, 'revision'))
+  const revisionVotes = await refute(p, revised, 'revision', majors, stages)
+  const second = revised ? roundStatus(revisionVotes) : null
+  if (completeRound(revisionVotes, stages, 'revision') && second === 'unrefuted' && !requiredFindings(revisionVotes).length && findingsClosed(majors, revisionVotes)) return layer(p, proposal, votes, revised, revisionVotes, revised, 'revision', 'unrefuted', stages)
+  // A required revision that failed, stayed refuted/unknown or left a finding open
+  // cannot restore the original proposal. Keep both rounds and refuse judgment.
+  const stopCause = !completeRound(revisionVotes, stages, 'revision') ? 'revision_votes_incomplete' : second === 'refuted' ? 'revision_refuted' : requiredFindings(revisionVotes).length ? 'revision_findings_unresolved' : 'prior_findings_unresolved'
+  return layer(p, proposal, votes, revised, revisionVotes, null, null, 'unknown', stages, stopCause)
+}
+// There is exactly one admitted packet; an outer parallel group adds no capacity
+// and could discard its partial layer on an orchestration failure.
+const results = [await chain(packets[0])]
 const out = results.filter(Boolean)
 const lost = packets.filter((p) => !out.find((r) => r.catalog === p.catalog && r.layer_id === p.layer_id)).map((p) => `${p.catalog}/${p.layer_id}`)
+const status = lost.length || out.some((r) => !r.final) ? 'incomplete' : 'complete'
+const stopCause = lost.length ? 'layer_result_missing' : out.find((r) => r.stop_cause)?.stop_cause || null
 const count = (st) => out.filter((r) => r.refutation && r.refutation.status === st).length
 log(`layers: ${out.length} returned, ${out.filter((r) => r.revised).length} revised, ${out.filter((r) => r.final).length} sealed (${out.filter((r) => r.final_source === 'revision').length} from a revision), ${count('refuted')} refuted, ${count('unknown')} unknown (${out.filter((r) => !r.proposal).length} without a proposal), ${lost.length} lost`)
-return { lane: 'claude', launch: LAUNCH, prompt: PROMPT, refutation_counts: { unrefuted: count('unrefuted'), refuted: count('refuted'), unknown: count('unknown') }, model: MODEL, caller_model: CALLER_MODEL, model_note: 'model is the literal alias/effort bound by every agent() call in this lane, not an observed identity; read the resolved model per child from node .claude/workflows/child-usage.mjs --latest (on Claude Code >= 2.1.280 the opus alias resolves to claude-opus-5-5)', layers: out, lost }
+return { lane: 'claude', launch: LAUNCH, prompt: PROMPT, status, stop_cause: stopCause, refutation_counts: { unrefuted: count('unrefuted'), refuted: count('refuted'), unknown: count('unknown') }, model: MODEL, caller_model: CALLER_MODEL, model_note: 'model is the literal alias/effort bound by every agent() call in this lane, not an observed identity; bind resolved child models/efforts and native attempts/usage to this run separately', layers: out, lost }

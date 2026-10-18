@@ -19487,6 +19487,11 @@
       "bytes": 5644
     },
     {
+      "path": "docs/decisions/2026-10-18-layer-verdict-semantic-closure.md",
+      "sha256": "1c43f71141e027a3965b185e758c1076cddd4e9c67127c76db92d9ec351a2a1c",
+      "bytes": 7119
+    },
+    {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
       "sha256": "f646835af1648cfab7798f64626141c3964dfba4799d780dc728ea27f91f7f6c",
       "bytes": 15393
@@ -39080,6 +39085,21 @@
       "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
       "sha256": "70d2df52a1dd02a3db0275d0116837cb1c213988f28d34812bb01413640705e0",
       "bytes": 363206
+    },
+    {
+      "path": "evidence/artifacts/layer-verdict-semantic-closure-20261018/source-review.md",
+      "sha256": "807a29039c6222ede20bcb17f2bcdfb25ba9ae3af87c43b95e8029ef4b5765c8",
+      "bytes": 1299
+    },
+    {
+      "path": "evidence/artifacts/layer-verdict-semantic-closure-20261018/tests-first.json",
+      "sha256": "a22760e1a6b28feb3e93222b05f1ea09dcd7c61633e6688e6b9eddaac26a4125",
+      "bytes": 23370
+    },
+    {
+      "path": "evidence/artifacts/layer-verdict-semantic-closure-20261018/verification.json",
+      "sha256": "b6145209254457cce556758206f1b3949491fe8f3bd30ecf3896fc7c074e7854",
+      "bytes": 13260
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",
@@ -62143,12 +62163,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "ac1fefa1799dc2f6d68052924554855ad104b2ff7e6e61b746f4e8c61e237401",
-      "bytes": 119189
+      "sha256": "2c2756b6515e087a90f03712988cc20580b5758bfb0bfd17548ffa8620f97c53",
+      "bytes": 120819
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "f98e22c94c7009526fd29d9bab41c352a8670ed4d32ac027fe783baa2238f1e3",
+      "sha256": "b8b4bd5f8522e4a0492bee63481ecf636fa3a4907d6615275293a658c6bfb8e3",
       "bytes": 1217
     },
     {
@@ -62170,6 +62190,11 @@
       "path": "examples/claude-native/workflows/contract.config.json",
       "sha256": "ff73c08c0ec55af194794b614840575d32c9e4174371907e12bffb1aacff70ab",
       "bytes": 349
+    },
+    {
+      "path": "examples/claude-native/workflows/layer-verdict-lane.js",
+      "sha256": "0de995421ad47c43150d4104b07fb6832277f6b2bcfd9efa76d2d8db96d9b414",
+      "bytes": 24122
     },
     {
       "path": "examples/claude-native/workflows/readiness-audit.js",
@@ -62203,13 +62228,18 @@
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "e0b640da73ceb36bad225db5c1ad00839c124547f0a0809cf9c18a90b4322f67",
-      "bytes": 59705
+      "sha256": "a62843aff13c7d4f0df532dc8ac9b9ca4f8f71335e47a33085b9a607794a80d3",
+      "bytes": 59972
     },
     {
       "path": "examples/claude-native/workflows/test-usage-receipts.mjs",
       "sha256": "2ed3323db76d0104327a0c0bb35f00cf6a05018bdd9f49982b0c279cf2540871",
       "bytes": 8495
+    },
+    {
+      "path": "examples/claude-native/workflows/vendored-lanes.json",
+      "sha256": "bd83d9dae573920fcfab722854c0c4152c2d12ee0ce2714b23830fb5e23c6898",
+      "bytes": 2424
     },
     {
       "path": "examples/claude-runtime-sdk/README.md",
@@ -64717,6 +64747,11 @@
       "bytes": 111632
     },
     {
+      "path": "tests/test_layer_verdict_workflow.py",
+      "sha256": "852798fa1d4607ebec3b923a217250cd2df492f9613f27e7fccb43a713de25a5",
+      "bytes": 13294
+    },
+    {
       "path": "tests/test_layer_verdicts.py",
       "sha256": "c4d6d04f50ec5d73e97206558f62eb688d88cc6555cc406e51a249b0153ab4f4",
       "bytes": 32578
@@ -66303,8 +66338,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "f097b8c982e613d59e80e7213ae55a500dd615302dcedb65eb5deae8546f13fa",
-      "bytes": 19787
+      "sha256": "d359982903d82d574ab4a45f58001ca372ebcabcd2ed758d10644123953e15fb",
+      "bytes": 20900
     },
     {
       "path": "tools/sota-convergence/lane-return.schema.json",
