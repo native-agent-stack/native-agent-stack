@@ -339,11 +339,11 @@ class CurrencySweepRepin(unittest.TestCase):
 
     def test_the_rtk_pin_names_the_other_consumer_of_the_old_version(self):
         source = (ROOT / "tools/adoption/runtime_profiles.py").read_text(encoding="utf-8").splitlines()
-        self.assertIn('rtk 0.51.0', source[561], "the line the record cites no longer holds the 0.51.0 check")
+        self.assertIn('rtk 0.51.0', source[597], "the line the record cites no longer holds the 0.51.0 check")
         gaps = " ".join(rows()["RTK"]["blocking_gaps"])
         decision = DECISION.read_text(encoding="utf-8")
-        self.assertIn("tools/adoption/runtime_profiles.py:562", gaps)
-        self.assertIn("tools/adoption/runtime_profiles.py:562", decision)
+        self.assertIn("tools/adoption/runtime_profiles.py:598", gaps)
+        self.assertIn("tools/adoption/runtime_profiles.py:598", decision)
 
 
 if __name__ == "__main__":

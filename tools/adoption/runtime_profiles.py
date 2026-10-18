@@ -266,7 +266,43 @@ def render_wsl_mcp(home: Path, eco_root: Path) -> dict:
     try: files = render_files(home, eco_root=eco_root, host_file=Path(selected))
     except DriftError as error: raise ProfileError(str(error)) from error
     install = module("runtime_claude_install", ROOT / "tools/adoption/install_claude_profile.py")
-    return install.render_servers(json.loads(files["mcp-servers.json"]), home, eco_root)
+    servers = install.render_servers(json.loads(files["mcp-servers.json"]), home, eco_root)
+    # The rendered ai-memory entry is Claude Code's session-aware bridge, which refuses to start without
+    # CLAUDE_CODE_SESSION_ID; upstream gives every other stdio client the session-less bridge (akitaonrails/ai-memory@11ca7c5b
+    # crates/ai-memory-cli/src/commands/install_mcp.rs:182-185 and 214-225; `ai-memory mcp-bridge --help`). Upstream leaves
+    # Pi out of that route, because its generated extension reads the hook credential file (install_mcp.rs:181 and 193);
+    # giving Pi the session-less bridge here is this repository's adaptation, since Pi's profile takes the rendered servers.
+    bridge = servers.get("ai-memory", {})
+    if bridge.get("args", [])[:1] == ["mcp-bridge"] and "--no-session-id" not in bridge["args"]:
+        servers["ai-memory"] = {**bridge, "args": ["mcp-bridge", "--no-session-id", *bridge["args"][1:]]}
+    # An opencode profile has its own XDG_DATA_HOME, and ai-memory finds its data directory, with the config and token
+    # file in it, through dirs::data_local_dir() unless --data-dir names it (akitaonrails/ai-memory@11ca7c5b
+    # crates/ai-memory-cli/src/config.rs:2259-2268 and 3446-3449; the global flag at cli.rs:95-100). So the bridge names
+    # the memory-owner row's directory, <home>/.local/share/ai-memory, as upstream's Muse entry does for a client that
+    # starts it in another environment (install_mcp.rs:1815-1818).
+    bridge = servers.get("ai-memory", {})
+    if bridge.get("args", [])[:1] == ["mcp-bridge"] and "--data-dir" not in bridge["args"]:
+        servers["ai-memory"] = {**bridge, "args": [*bridge["args"], "--data-dir", str(home / ".local/share/ai-memory")]}
+    # A mise shim finds its tool through mise's own config and data, which an opencode profile's own XDG_CONFIG_HOME and
+    # XDG_DATA_HOME hide, and an absolute command bypasses PATH. So a shim command is resolved on the host, before the
+    # profile is isolated, with mise's `mise which` (jdx/mise@bc11f90c docs/cli/which.md:6-31).
+    for name, server in list(servers.items()):
+        command = Path(server.get("command", ""))
+        if command.parent.name == "shims" and command.parent.parent.name == "mise":
+            servers[name] = {**server, "command": mise_which(command.name)}
+    return servers
+
+
+def mise_which(binary: str) -> str:
+    """The real path of a mise-managed executable, from `mise which`. A shim that cannot be resolved is refused."""
+    mise = shutil.which("mise")
+    if not mise:
+        raise ProfileError(f"an MCP command is the mise shim for {binary!r}, and mise is not on PATH to resolve it")
+    done = subprocess.run([mise, "which", binary], capture_output=True, text=True, timeout=60, check=False)
+    path = done.stdout.strip()
+    if done.returncode or not path or not Path(path).is_absolute():
+        raise ProfileError(f"`mise which {binary}` did not resolve it: {(done.stderr or done.stdout).strip()[-200:]}")
+    return path
 
 
 def selected_service_ports() -> dict:

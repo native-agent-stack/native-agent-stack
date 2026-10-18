@@ -28,6 +28,18 @@ import runtime_acceptance as acceptance
 
 
 WORKER = ROOT / "tools/claude-review-worker/worker.py"
+FIXTURE_NODE = "/opt/fixture-mise/installs/node/24.21.0/bin/node"
+
+
+def fake_mise(directory: Path) -> Path:
+    """An executable `mise` in directory/bin that answers `mise which node` as mise does (docs/cli/which.md:28-31 at
+    jdx/mise@bc11f90c), so a rendered SocratiCode shim command can be resolved without a real mise."""
+    bin_dir = directory / "fake-mise-bin"
+    bin_dir.mkdir(exist_ok=True)
+    script = bin_dir / "mise"
+    script.write_text(f'#!/bin/sh\n[ "$1 $2" = "which node" ] && echo "{FIXTURE_NODE}" && exit 0\nexit 1\n')
+    script.chmod(0o755)
+    return bin_dir
 
 
 class StrictHostConsumerTests(unittest.TestCase):
@@ -39,12 +51,50 @@ class StrictHostConsumerTests(unittest.TestCase):
         path.write_text(json.dumps(values))
         return path
 
+    def env(self, root, **extra):
+        return {"NS2604_HOST_FILE": str(self.host(root)), "PATH": f"{fake_mise(root)}:{os.environ.get('PATH', '')}", **extra}
+
     def test_wsl_mcp_uses_the_explicit_complete_host_source(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            with mock.patch.dict(os.environ, {"NS2604_HOST_FILE": str(self.host(root))}):
+            with mock.patch.dict(os.environ, self.env(root)):
                 servers = profiles.render_wsl_mcp(root, root / "ecosystem")
-            self.assertEqual(servers["ai-memory"]["url"], "http://127.0.0.1:39374/mcp")
+            # ai-memory 3.1.0's bridge, session-less for these clients (install_mcp.rs:181-185 and 214-225 at 11ca7c5b),
+            # naming the shared data directory.
+            self.assertEqual(servers["ai-memory"]["args"],
+                             ["mcp-bridge", "--no-session-id", "--server-url", "http://127.0.0.1:39374/mcp",
+                              "--data-dir", str(root / ".local/share/ai-memory")])
+            self.assertNotIn("url", servers["ai-memory"])
+
+    def test_wsl_mcp_bridge_names_the_shared_data_directory_that_an_opencode_profile_hides(self):
+        # profile_environment gives opencode profiles their own XDG_DATA_HOME, where ai-memory's default data directory
+        # (dirs::data_local_dir(), config.rs:3446-3449 at 11ca7c5b) would be <profile>/data/ai-memory.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with mock.patch.dict(os.environ, self.env(root)):
+                servers = profiles.render_wsl_mcp(root, root / "ecosystem")
+                isolated = profiles.profile_environment("opencode-gpt", root / "state")
+            args = servers["ai-memory"]["args"]
+            self.assertEqual(args[args.index("--data-dir") + 1], str(root / ".local/share/ai-memory"))
+            self.assertNotEqual(Path(isolated["XDG_DATA_HOME"]) / "ai-memory", root / ".local/share/ai-memory")
+
+    def test_wsl_mcp_resolves_a_mise_shim_on_the_host(self):
+        # The SocratiCode entry's command is the mise node shim, which an opencode profile's own XDG roots break.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with mock.patch.dict(os.environ, self.env(root)):
+                servers = profiles.render_wsl_mcp(root, root / "ecosystem")
+            self.assertEqual(servers["socraticode"]["command"], FIXTURE_NODE)
+            self.assertFalse(any("/mise/shims/" in server.get("command", "") for server in servers.values()))
+
+    def test_wsl_mcp_refuses_a_mise_shim_it_cannot_resolve(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            empty = root / "no-mise"
+            empty.mkdir()
+            with mock.patch.dict(os.environ, {"NS2604_HOST_FILE": str(self.host(root)), "PATH": str(empty)}):
+                with self.assertRaisesRegex(profiles.ProfileError, "mise is not on PATH"):
+                    profiles.render_wsl_mcp(root, root / "ecosystem")
 
     def test_runtime_telemetry_uses_the_same_host_allocation(self):
         with tempfile.TemporaryDirectory() as tmp:
