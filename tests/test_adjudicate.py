@@ -1082,6 +1082,13 @@ class LeakTests(AdjudicateFixture):
         self.assertIsNone(adjudicate.claude_transcripts_issue(record, entry))
         (clean / "agent-0000.jsonl").write_text("", encoding="utf-8")
         self.assertIn("changed", adjudicate.claude_transcripts_issue(record, entry))
+        # Adjacent cache-consumer control: removing every transcript cannot preserve an accepted cached judgment.
+        for path in clean.glob("agent-*.jsonl"):
+            path.unlink()
+        self.assertIn("changed", adjudicate.claude_transcripts_issue(record, entry))
+        with self.assertRaisesRegex(ValueError, "--transcripts"):
+            self.real_collect_claude(self.work, result, "claude-opus-5-5", transcripts=clean)
+        self.assertIn("changed", adjudicate.claude_transcripts_issue(record, entry))
 
     def test_a_duplicated_or_extra_claude_item_is_refused(self):
         # Codex review of #145 at 68e74f2c: an edited args or result could run several chains for one item and keep

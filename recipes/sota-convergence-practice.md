@@ -139,7 +139,11 @@ install -D -m 0644 adoption/agents/claude/blind-adjudicator.md ~/.claude/agents/
 #    2026-09-24 lane was killed 20 minutes in). Set it for this call and the adjudication's.
 python3 tools/sota-convergence/claude_lane_args.py --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
   --agent-file ~/.claude/agents/blind-lane-reviewer.md --agentlab-root "$AL" > "$WORK_DIR/claude-args.json"
-(cd "$BLIND_DIR/export" && CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 claude -p --settings '{"disableAllHooks": true}' \
+#    Claude Code 2.1.296: the installed client's Rkt() guard honors DISABLE_ADVISOR_TOOL; the role's tools list
+#    cannot exclude advisor. --strict-mcp-config with no --mcp-config excludes configured MCP servers and their
+#    instructions (confirmed by 2.1.296 --help/source). Collect also refuses advisor_tool availability attachments.
+(cd "$BLIND_DIR/export" && CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1 \
+  claude -p --strict-mcp-config --settings '{"disableAllHooks": true}' \
   --output-format json "Use a workflow. \
 Run the saved workflow at scriptPath $AL/.claude/workflows/layer-verdict-lane.js with the Workflow tool, passing the \
 JSON object in $WORK_DIR/claude-args.json exactly as args, then copy its task output file byte for byte to \
@@ -171,8 +175,15 @@ python3 tools/sota-convergence/adjudicate.py codex --work-dir "$WORK_DIR" --repo
 python3 tools/sota-convergence/adjudicate.py claude-args --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
   --run-dir "$BLIND_DIR/export" > "$WORK_DIR/adjudication-claude-args.json"
 #    Run $CATALOG/tools/sota-convergence/adjudication-lane.js (the export has no tools/) headless from the
-#    export root as in step 3, with CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 (its --output-format json to adjudication-session.json), with
-#    adjudication-claude-args.json as args, and write the workflow's result to adjudication-claude-result.json.
+#    export root with the same advisor/MCP controls as step 3. This is also the CC's next adjudication launch:
+(cd "$BLIND_DIR/export" && CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1 \
+  claude -p --strict-mcp-config --settings '{"disableAllHooks": true}' \
+  --output-format json "Use a workflow. \
+Run the saved workflow at scriptPath $CATALOG/tools/sota-convergence/adjudication-lane.js with the Workflow tool, passing the \
+JSON object in $WORK_DIR/adjudication-claude-args.json exactly as args, then copy its task output file byte for byte to \
+$WORK_DIR/adjudication-workflow-output.json." > "$WORK_DIR/adjudication-session.json")
+python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); json.dump(d.get("result", d), open(sys.argv[2], "w"))' \
+  "$WORK_DIR/adjudication-workflow-output.json" "$WORK_DIR/adjudication-claude-result.json"
 #    claude-collect audits each judgment on what its agents opened, from that run's transcripts.
 python3 tools/sota-convergence/adjudicate.py claude-collect --work-dir "$WORK_DIR" \
   --result "$WORK_DIR/adjudication-claude-result.json" --model claude-opus-5-5 \
