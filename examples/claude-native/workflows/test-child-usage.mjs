@@ -253,6 +253,83 @@ try {
   expect('usage: run-mode children carry advisor iterations with their own model and split, tier fields per message, and incomplete usage for a compaction entry', advUsage.complete === false && JSON.stringify((advUsage.advisor_iterations || []).map((a) => [a.message_ordinal, a.model, a.usage.output_tokens, a.cache_creation_5m, a.cache_creation_1h])) === JSON.stringify([[1, 'claude-opus-5-5', 60, 10, 0]]) && advUsage.messages[0].speed === 'standard' && advUsage.messages[0].cache_creation_5m === 2 && JSON.stringify(advUsage.iteration_issues?.unread_entries) === '{"compaction":1}')
   const supAdv = summarizeRun(rerunWith('rerun-advisor', [advisorRow, limitRow]))
   expect('usage: a superseded attempt carries its advisor iterations too', (((supAdv.superseded_attempts || [])[0] || {}).lanes?.measurement?.usage?.advisor_iterations || []).length === 1)
+  // The current native advisor usage shape, reduced to model/type/counters only.
+  // Advisor tool "Usage and billing": top-level counters already sum BOTH executor
+  // iterations; only advisor_message is additional. These are independently retained
+  // numeric values, with invented fixture identifiers and no transcript content.
+  const nativeAdvisorRow = { type: 'assistant', version: '2.1.302', effort: 'max', message: {
+    id: 'accounting-message', model: 'claude-sonnet-5-5', usage: {
+      input_tokens: 4, output_tokens: 1399, cache_read_input_tokens: 198788, cache_creation_input_tokens: 3776,
+      iterations: [
+        { type: 'message', input_tokens: 2, output_tokens: 900, cache_read_input_tokens: 99126, cache_creation_input_tokens: 536 },
+        { type: 'advisor_message', model: 'claude-opus-5-5', input_tokens: 100834, output_tokens: 13892, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 },
+        { type: 'message', input_tokens: 2, output_tokens: 499, cache_read_input_tokens: 99662, cache_creation_input_tokens: 3240 },
+      ],
+    },
+  } }
+  const usageAccountingRun = (name, rows) => {
+    const target = join(dir, name); mkdirSync(target)
+    writeFileSync(join(target, 'journal.jsonl'), [started, done].map((e) => JSON.stringify(e)).join('\n') + '\n')
+    writeFileSync(join(target, 'agent-a1.meta.json'), JSON.stringify({ model: 'sonnet', agentType: 'workflow' }))
+    writeFileSync(join(target, 'agent-a1.jsonl'), rows.map((e) => JSON.stringify(e)).join('\n') + '\n')
+    return summarizeRun(target)
+  }
+  const countersEqual = (actual, expected) => Object.entries(expected).every(([k, n]) => actual?.[k] === n)
+  const accountingNative = usageAccountingRun('usage-accounting-native', [nativeAdvisorRow])
+  expect('usage accounting: the run exposes executor, advisor and inclusive counters without adding executor iterations twice',
+    accountingNative.usage_accounting?.complete === true && accountingNative.usage_accounting.advisor_iteration_count === 1
+    && countersEqual(accountingNative.usage_accounting.totals, { input_tokens: 4, output_tokens: 1399, cache_read_input_tokens: 198788, cache_creation_input_tokens: 3776 })
+    && countersEqual(accountingNative.usage_accounting.advisor_totals, { input_tokens: 100834, output_tokens: 13892, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 })
+    && countersEqual(accountingNative.usage_accounting.totals_including_advisor, { input_tokens: 100838, output_tokens: 15291, cache_read_input_tokens: 198788, cache_creation_input_tokens: 3776 }))
+  const earlyNativeAdvisorRow = { ...nativeAdvisorRow, message: { ...nativeAdvisorRow.message, usage: {
+    input_tokens: 2, output_tokens: 900, cache_read_input_tokens: 99126, cache_creation_input_tokens: 536,
+    iterations: [nativeAdvisorRow.message.usage.iterations[0]],
+  } } }
+  const accountingDuplicate = usageAccountingRun('usage-accounting-duplicate', [earlyNativeAdvisorRow, nativeAdvisorRow, nativeAdvisorRow])
+  expect('usage accounting: streamed updates and repeated message rows count executor and advisor usage once',
+    JSON.stringify(accountingDuplicate.usage_accounting) === JSON.stringify(accountingNative.usage_accounting)
+    && accountingDuplicate.children[0].requests === 1)
+  const twiceAdvisorRow = structuredClone(nativeAdvisorRow)
+  twiceAdvisorRow.message.usage.iterations.splice(2, 0, structuredClone(twiceAdvisorRow.message.usage.iterations[1]))
+  const accountingTwice = usageAccountingRun('usage-accounting-two-advisors', [twiceAdvisorRow])
+  expect('usage accounting: distinct same-valued advisor iterations both count at their own model',
+    accountingTwice.usage_accounting?.advisor_iteration_count === 2
+    && countersEqual(accountingTwice.usage_accounting.advisor_totals, { input_tokens: 201668, output_tokens: 27784, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 })
+    && accountingTwice.children[0].lanes.measurement.usage.advisor_iterations.every((a) => a.model === 'claude-opus-5-5'))
+  expect('usage accounting: legacy executor fields, model attribution and child counts stay unchanged',
+    countersEqual(accountingTwice.children[0].usage, { input_tokens: 4, output_tokens: 1399, cache_read_input_tokens: 198788, cache_creation_input_tokens: 3776 })
+    && accountingTwice.by_resolved_model['claude-sonnet-5-5'].children === 1
+    && accountingTwice.by_resolved_model['claude-sonnet-5-5'].output_tokens === 1399
+    && !Object.hasOwn(accountingTwice.by_resolved_model, 'claude-opus-5-5') && accountingTwice.status === 'complete')
+  expect('usage accounting: incurred usage from a superseded attempt is retained once',
+    supAdv.usage_accounting?.complete === true && supAdv.usage_accounting.advisor_iteration_count === 1
+    && supAdv.usage_accounting.totals.output_tokens === 19 && supAdv.usage_accounting.advisor_totals.output_tokens === 60
+    && supAdv.usage_accounting.totals_including_advisor.output_tokens === 79 && supAdv.status === 'complete')
+  writeFileSync(join(dir, 'accounting-parent-mirror.jsonl'), JSON.stringify(nativeAdvisorRow) + '\n')
+  writeFileSync(join(dir, 'usage-accounting-native', 'agent-unstarted.jsonl'), JSON.stringify(nativeAdvisorRow) + '\n')
+  expect('usage accounting: parent mirrors and transcripts not started by this journal are outside the Workflow total',
+    JSON.stringify(summarizeRun(join(dir, 'usage-accounting-native')).usage_accounting) === JSON.stringify(accountingNative.usage_accounting))
+  const accountingLegacy = summarizeRun(one)
+  expect('usage accounting: a legacy record without iterations has zero advisor usage and the same inclusive executor counters',
+    accountingLegacy.usage_accounting?.complete === true && accountingLegacy.usage_accounting.advisor_iteration_count === 0
+    && countersEqual(accountingLegacy.usage_accounting.advisor_totals, { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 })
+    && countersEqual(accountingLegacy.usage_accounting.totals_including_advisor, { input_tokens: 2, output_tokens: 9, cache_read_input_tokens: 100, cache_creation_input_tokens: 0 })
+    && accountingLegacy.status === 'complete')
+  expect('usage accounting: an unread compaction iteration is incomplete without changing legacy run status',
+    advRun.usage_accounting?.complete === false && advRun.usage_accounting.iteration_issues.unread_entries.compaction === 1
+    && advRun.status === 'complete')
+  const missingCounterRow = structuredClone(nativeAdvisorRow)
+  delete missingCounterRow.message.usage.output_tokens
+  const accountingUnknown = usageAccountingRun('usage-accounting-unknown-counter', [missingCounterRow])
+  expect('usage accounting: an absent counter stays unknown rather than becoming a complete zero',
+    accountingUnknown.usage_accounting?.complete === false && accountingUnknown.usage_accounting.totals.output_tokens === null
+    && accountingUnknown.usage_accounting.totals_including_advisor.output_tokens === null)
+  const missingAdvisorModelRow = structuredClone(nativeAdvisorRow)
+  delete missingAdvisorModelRow.message.usage.iterations[1].model
+  expect('usage accounting: an advisor with an unresolved model cannot establish complete usage',
+    usageAccountingRun('usage-accounting-unknown-advisor-model', [missingAdvisorModelRow]).usage_accounting?.complete === false)
+  expect('usage accounting: a missing attempt transcript is included as unknown instead of being filtered out',
+    noLog.usage_accounting?.complete === false && Object.values(noLog.usage_accounting.totals).every((n) => n === null))
   const capRun = join(dir, 'cap'); mkdirSync(capRun)
   writeFileSync(join(capRun, 'journal.jsonl'), [started, done, { ...started, agentId: 'a2', label: 'review' }, { type: 'result', agentId: 'a2', result: { ok: true } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
   for (const id of ['a1', 'a2']) writeFileSync(join(capRun, 'agent-' + id + '.meta.json'), JSON.stringify({ model: 'opus', agentType: 'workflow' }))

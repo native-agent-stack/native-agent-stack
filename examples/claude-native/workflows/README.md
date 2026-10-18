@@ -258,6 +258,20 @@ reading cannot read, when its top-level counters differ from the sum of its
 result ([beta Messages API](https://platform.claude.com/docs/en/api/beta/messages/create),
 `BetaIterationsUsage`; [advisor tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool), "Usage and billing").
 
+Run mode also exposes a compact `usage_accounting` summary using this existing
+reader. `totals` contains executor counters; `advisor_totals` and
+`advisor_iteration_count` describe advisor sub-inferences;
+`totals_including_advisor` includes both. It counts every started attempt once,
+including superseded attempts, without adding the executor's `message`
+iterations again. Legacy child `usage`, `usage_by_model`, `by_resolved_model`
+and CLI status/effort checks remain unchanged and executor-only where applicable.
+Require `usage_accounting.complete` for complete-usage acceptance: an otherwise
+complete run can have unread iterations or unknown counters. Keep its null
+counters and `iteration_issues`; incomplete figures are not a full usage total.
+Advisor model attribution remains in each child's
+`lanes.measurement.usage.advisor_iterations`. The Workflow summary excludes
+parent mirrors, the main session and OTel-only calls, and is not an invoice.
+
 **Call states (item 7, M14).** `call_states` gives every call attempted in the
 window one state in the sealed M14 names, per actor and per MCP server
 (`by_server`):

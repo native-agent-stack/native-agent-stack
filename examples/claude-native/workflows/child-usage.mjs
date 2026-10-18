@@ -3435,6 +3435,10 @@ export function summarizeRun(dir, lanesOptions = {}) {
       capped: attempts.reduce((n, c) => n + c.web_search.capped, 0),
       capped_children: attempts.filter((c) => c.web_search.capped).map((c) => c.label || c.agent_id),
     },
+    // Keep legacy per-model counters executor-only. The existing measurement reader
+    // accounts for advisor sub-inferences separately (advisor tool, Usage and billing).
+    // Include superseded attempts; missing measurement usage must stay unknown.
+    usage_accounting: aggregateUsage(attempts.map((c) => c.lanes?.measurement?.usage || { complete: false })),
     children, ...(superseded.length ? { superseded_attempts: superseded } : {}), by_resolved_model: byModel,
   }
 }

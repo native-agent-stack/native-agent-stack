@@ -62133,12 +62133,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "dcf56c4346c1c11bb134549db548a129e5ced28537d7361b8d31ac41136a8501",
-      "bytes": 116291
+      "sha256": "8f27c4abcc7d21bfb62ca31dfc19c6c2f803e953c31000ab740025a848414296",
+      "bytes": 117245
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "32dea17c27507e4bb645aac7211d2939b91605b00c5e62bae6e536f15e52e803",
+      "sha256": "359440c31887203ff7294d8cf28d46ca949308c65aebc83149c1542c79179da8",
       "bytes": 1217
     },
     {
@@ -62148,8 +62148,8 @@
     },
     {
       "path": "examples/claude-native/workflows/child-usage.mjs",
-      "sha256": "5e6976c8838c9ffc9e1bd8f629c6fd473da97805d09e7ec2d490997d0c4ed682",
-      "bytes": 265197
+      "sha256": "4834fb85f82290b418f300be2e84b6502427aff22a5964f927b87c6eabf54096",
+      "bytes": 265563
     },
     {
       "path": "examples/claude-native/workflows/codex-cross-review.mjs",
@@ -62178,8 +62178,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-child-usage.mjs",
-      "sha256": "29ae85fd0daba92cd1de32d1d7289198d8f5457c5178a65b40d83b24cff80408",
-      "bytes": 118761
+      "sha256": "0b0839d11797eeb22a1af9ae8bee17162d0c813332110af88d4421b3f981f3d2",
+      "bytes": 126313
     },
     {
       "path": "examples/claude-native/workflows/test-codex-envelope.mjs",
