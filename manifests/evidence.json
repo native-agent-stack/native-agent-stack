@@ -19483,8 +19483,8 @@
     },
     {
       "path": "docs/decisions/2026-10-18-codex-pin-retain-existing-pending-gates.md",
-      "sha256": "557f9aac77ec83b2044cf6731b647548875d68352ea2d21791192b8a6c470a74",
-      "bytes": 4795
+      "sha256": "d467c80c35538fc17ad7192422d444713fd4e2239d77925b971b33a3c78bf778",
+      "bytes": 5644
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -52853,8 +52853,8 @@
     },
     {
       "path": "evidence/artifacts/runtime-compounding-codex-pin-retention-20261018/receipt.json",
-      "sha256": "24532791042fd6c7c7506bf6c5aa9981f7c0f22294c6fa9d4a1da8192df6d0af",
-      "bytes": 7309
+      "sha256": "584b45efcf2f051fca1a3321119bc0ba8e2ff7f6e217f8f00cd99d04b441f031",
+      "bytes": 7068
     },
     {
       "path": "evidence/artifacts/runtime-final-lock-binding-20261008/final-native-24-acceptance.json",

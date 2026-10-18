@@ -31,7 +31,12 @@
     "profile": "foundation-cpu",
     "catalog_pin": "0.160.0",
     "observed_installed": "0.163.0",
-    "original_detector_sha256": "d8efb1b914d913b94f7adc65a5678c19485d0fb42f080ed0bf45403fe5a859ff"
+    "observed_installed_sources": [
+      "surface-watch/latest.json /versions/codex_binary/version (retained private observation)",
+      "compounding-codex-pin-run-01/worker.md:12"
+    ],
+    "detector_alone_establishes_installed_version": false,
+    "original_detector_record": "currency-due.json (retained in private compounding-frozen-detectors-r1.tar.gz)"
   },
   "existing_native_run": {
     "worker_model": "cx/gpt-6.1-sol",
@@ -51,29 +56,27 @@
     "Original exact worker-request materialization differed from its frozen requirement by an operator preamble and final newline",
     "The frozen installed child-usage helper path did not exist; a distinct pinned source helper was actually used",
     "The actual interactive worker does not supply the frozen fresh-CLI output-stream evidence",
-    "The original retention layout/materialization defects are not retroactively repaired by later archival"
+    "The original retention layout/materialization defects are not retroactively repaired by later archival",
+    "The original review's fifth reported issue: worker wording verified exceeded its described digest agreement; preserve this reported issue without treating all five as unquestioned gold-oracle errors"
   ],
   "dated_correction": {
     "broad_claim": "The E2E proposal was bound nowhere or by no recorded hash",
     "disposition": "REFUTED_AS_A_BROAD_ABSENCE_CLAIM",
-    "native_request_line": 909,
-    "native_result_line": 917,
-    "before_workflow_line": 1024,
     "proposal_bytes": 15647,
-    "proposal_sha256": "f31176fb28912468653363d795788d887e9f88753f1b6a81a45055054314fa09",
+    "native_request_result_and_digest": "WITHHELD_PRIVATE; original request/result bound the proposal before the Workflow invocation",
     "narrow_mandatory_graph_claim": "UNPROVEN_WITHOUT_ACTUAL_CONTRACT_CITATION",
     "historical_review_output_preserved": true
   },
   "archive": {
     "bytes": 273025,
-    "sha256": "9f2769f2b6e6ad5dbb046d76ff88b57f0647e196f4b212bed6dca6e850a3740f",
+    "path": "compounding-native-review-retention-01/native-review-retained.tar.gz",
     "member_files": 23,
-    "receipt_sha256": "491d26be5f3c9bda2f1e59db7b30e5387f79ca42289d1a7c770438e424c44709",
+    "receipt_path": "compounding-native-review-retention-01/receipt.json",
     "custody": "OWNER_HOST_PRIVATE_RAW_NOT_COPIED_TO_THIS_PUBLIC_DERIVATIVE",
     "later_declared_r1_mutation_is_not_archive_corruption": true
   },
   "later_evidence": {
-    "codex_crypto_receipt_sha256": "4fe909c3c54d64fc55af8e1c0b31676ded27ea1e7757a37d7f7679fb5084fe38",
+    "codex_crypto_receipt_path": "codex-artifact-crypto-audit-01/verification-receipt.json",
     "disposition": "Separately dated artifact-custody evidence does not change what the original run executed or establish a replacement comparison",
     "current_runtime_audit_is_not_final": true
   },
@@ -90,54 +93,36 @@
     "not_blanket_blockers_on_independent_runtime_work": true
   },
   "source_bindings": {
-    "root": "Owner-host Horizon evidence/runtime-foundation-20261018; originals remain private/unpublished",
+    "root": "Owner-host Horizon evidence/runtime-foundation-20261018; originals and verification digests remain private/unpublished and are cited by name/path only",
     "public_record_class": "NORMALIZED_ALLOWLISTED_DERIVATIVE_NOT_BYTE_EQUIVALENT_RAW_ARCHIVE",
     "files": [
       {
-        "path": "compounding-codex-pin-run-01/run-receipt.json",
-        "bytes": 10207,
-        "sha256": "6bbe8a6f3187f2b20479921c8c68eaa3647789d287eacf960d8d72250412f29e"
+        "path": "compounding-codex-pin-run-01/run-receipt.json"
       },
       {
-        "path": "compounding-codex-pin-run-01/supersession-proposal.md",
-        "bytes": 3307,
-        "sha256": "21ec8da0826c757b815c692b423567d5e268fd125432d75238c71c73352b59fd"
+        "path": "compounding-codex-pin-run-01/supersession-proposal.md"
       },
       {
-        "path": "compounding-r1-corrective-supplement.md",
-        "bytes": 4648,
-        "sha256": "82ecf3ef162b014b49975954df9a5bad7af5708dbc7e5250a3cad18915caf88d"
+        "path": "compounding-r1-corrective-supplement.md"
       },
       {
-        "path": "compounding-proposal-preflight-binding-correction-01.json",
-        "bytes": 3422,
-        "sha256": "07a488b48191ea44d31f7458c22b27b6f073ede0dd1523a92a66795625419a1b"
+        "path": "compounding-proposal-preflight-binding-correction-01.json"
       },
       {
-        "path": "compounding-native-review-retention-01/receipt.json",
-        "bytes": 31028,
-        "sha256": "491d26be5f3c9bda2f1e59db7b30e5387f79ca42289d1a7c770438e424c44709"
+        "path": "compounding-native-review-retention-01/receipt.json"
       },
       {
-        "path": "compounding-native-review-retention-01/native-review-retained.tar.gz",
-        "bytes": 273025,
-        "sha256": "9f2769f2b6e6ad5dbb046d76ff88b57f0647e196f4b212bed6dca6e850a3740f"
+        "path": "compounding-native-review-retention-01/native-review-retained.tar.gz"
       },
       {
-        "path": "codex-artifact-crypto-audit-01/verification-receipt.json",
-        "bytes": 15404,
-        "sha256": "4fe909c3c54d64fc55af8e1c0b31676ded27ea1e7757a37d7f7679fb5084fe38"
+        "path": "codex-artifact-crypto-audit-01/verification-receipt.json"
       },
       {
         "label": "current-codex-runtime-opening-audit-readme",
-        "source_path_withheld": true,
-        "bytes": 19858,
-        "sha256": "eb04cd3b98eefb5edb2acae44d4d457ba603a7fe970d258947efa04c605a6f38"
+        "source_path_withheld": true
       },
       {
-        "path": "runtime-foundation-completion-map-01/seal.json",
-        "bytes": 5990,
-        "sha256": "1229fb61f242a320d17e0dede28ce6e5bc0d3686ddf4f89329d0257bffca5b94"
+        "path": "runtime-foundation-completion-map-01/seal.json"
       }
     ]
   },
@@ -159,8 +144,10 @@
     "whole_foundation_final_claim": false
   },
   "publication_policy": {
-    "source": "scripts/validate.py:36 at owner_source.base_commit",
+    "local_identity_rule": "scripts/validate.py:40 at owner_source.base_commit",
+    "private_source_digest_rule": "docs/decisions/2026-10-15-jev-trading-harness-build.md:13-14 and tests/test_provenance_digest_custody.py:373-380 at owner_source.base_commit",
     "local_session_identifiers": "WITHHELD",
+    "unpublished_source_digests": "WITHHELD; public manifest digests bind only tracked published bytes",
     "raw_source_bytes_unchanged": true
   }
 }
