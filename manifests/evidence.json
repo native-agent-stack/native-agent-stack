@@ -19482,6 +19482,11 @@
       "bytes": 18602
     },
     {
+      "path": "docs/decisions/2026-10-18-codex-pin-retain-existing-pending-gates.md",
+      "sha256": "557f9aac77ec83b2044cf6731b647548875d68352ea2d21791192b8a6c470a74",
+      "bytes": 4795
+    },
+    {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
       "sha256": "f646835af1648cfab7798f64626141c3964dfba4799d780dc728ea27f91f7f6c",
       "bytes": 15393
@@ -52845,6 +52850,11 @@
       "path": "evidence/artifacts/rtk-native-git256-20261002/receipt.json",
       "sha256": "5072a228e15c58da0c4268d9efe7afde491a7fe560407cd0ac829e1ccadcee1d",
       "bytes": 29902
+    },
+    {
+      "path": "evidence/artifacts/runtime-compounding-codex-pin-retention-20261018/receipt.json",
+      "sha256": "24532791042fd6c7c7506bf6c5aa9981f7c0f22294c6fa9d4a1da8192df6d0af",
+      "bytes": 7309
     },
     {
       "path": "evidence/artifacts/runtime-final-lock-binding-20261008/final-native-24-acceptance.json",

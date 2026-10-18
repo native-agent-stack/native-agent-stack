@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "kind": "scoped_compounding_retention_observation",
+  "recorded_on": "2026-10-18",
+  "owner_direction": {
+    "date": "2026-10-18",
+    "paraphrase": "Qualify a small current best-evidenced runtime foundation and retain cited decisions, failures and dated supersessions so later sessions can continue and evolve it before North Star work."
+  },
+  "scope": {
+    "layer": "native-clients",
+    "component": "codex",
+    "decision": "RETAIN_EXISTING_CATALOG_PENDING_EVIDENCE_GATES",
+    "foundation_status": "recorded_not_FINAL",
+    "catalog_version": "0.160.0",
+    "observed_installed_version": "0.163.0",
+    "installed_runtime_downgrade_performed": false
+  },
+  "owner_source": {
+    "repository": "https://github.com/native-agent-stack/native-agent-stack",
+    "base_commit": "0a585369943e8000dc853a689acbacb34e7b4b0b",
+    "original_run_commit": "4f827e637f256fee4f0534f395431b722aabc43c",
+    "contracts": [
+      "docs/decisions/2026-10-11-compounding-rule-text.md:36",
+      "docs/decisions/2026-10-11-layer-resolution-protocol.md:69",
+      "scripts/host_receipts.py:710"
+    ]
+  },
+  "trigger": {
+    "kind": "pin_mismatch",
+    "component_id": "codex",
+    "profile": "foundation-cpu",
+    "catalog_pin": "0.160.0",
+    "observed_installed": "0.163.0",
+    "original_detector_sha256": "d8efb1b914d913b94f7adc65a5678c19485d0fb42f080ed0bf45403fe5a859ff"
+  },
+  "existing_native_run": {
+    "worker_model": "cx/gpt-6.1-sol",
+    "worker_native_effort": "ultra",
+    "workflow_completed_at": "2026-10-18T09:05:11.853Z",
+    "result": "NATIVE_REVIEW_COMPLETE_READINESS_NOT_EVIDENCE_COMPLETE",
+    "reported_review_counts": {
+      "claims_checked": 155,
+      "claims_confirmed": 150,
+      "claims_corrected": 5
+    },
+    "counts_are_original_model_review_not_independent_gold": true,
+    "new_model_or_workflow_replays_for_this_record": 0,
+    "local_identifiers": "WITHHELD_FROM_PUBLIC_DERIVATIVE; exact native identities remain bound by the private original run receipt"
+  },
+  "preserved_failures": [
+    "Original exact worker-request materialization differed from its frozen requirement by an operator preamble and final newline",
+    "The frozen installed child-usage helper path did not exist; a distinct pinned source helper was actually used",
+    "The actual interactive worker does not supply the frozen fresh-CLI output-stream evidence",
+    "The original retention layout/materialization defects are not retroactively repaired by later archival"
+  ],
+  "dated_correction": {
+    "broad_claim": "The E2E proposal was bound nowhere or by no recorded hash",
+    "disposition": "REFUTED_AS_A_BROAD_ABSENCE_CLAIM",
+    "native_request_line": 909,
+    "native_result_line": 917,
+    "before_workflow_line": 1024,
+    "proposal_bytes": 15647,
+    "proposal_sha256": "f31176fb28912468653363d795788d887e9f88753f1b6a81a45055054314fa09",
+    "narrow_mandatory_graph_claim": "UNPROVEN_WITHOUT_ACTUAL_CONTRACT_CITATION",
+    "historical_review_output_preserved": true
+  },
+  "archive": {
+    "bytes": 273025,
+    "sha256": "9f2769f2b6e6ad5dbb046d76ff88b57f0647e196f4b212bed6dca6e850a3740f",
+    "member_files": 23,
+    "receipt_sha256": "491d26be5f3c9bda2f1e59db7b30e5387f79ca42289d1a7c770438e424c44709",
+    "custody": "OWNER_HOST_PRIVATE_RAW_NOT_COPIED_TO_THIS_PUBLIC_DERIVATIVE",
+    "later_declared_r1_mutation_is_not_archive_corruption": true
+  },
+  "later_evidence": {
+    "codex_crypto_receipt_sha256": "4fe909c3c54d64fc55af8e1c0b31676ded27ea1e7757a37d7f7679fb5084fe38",
+    "disposition": "Separately dated artifact-custody evidence does not change what the original run executed or establish a replacement comparison",
+    "current_runtime_audit_is_not_final": true
+  },
+  "remaining_inputs": [
+    "Owner-reviewed amendment or complete newly dated comparison under the existing native-clients layer protocol; preserve unresolved candidates and prior stopped/completed sweeps",
+    "Per-pin upstream E2E and actual full-harness invoke/quality/usage/recovery evidence joined to the proposed replacement",
+    "Prospective exact materialization and declared retention layout, with independent review of the actual resulting artifacts",
+    "Fresh native-session readback of the landed decision, its exact source bindings and named unmet inputs"
+  ],
+  "historical_inputs": {
+    "october10_manifest_returns_and_corrected_inputs": "NOT_RECOVERED",
+    "references_993_995": "SOURCE_BODIES_NOT_RECOVERED",
+    "no_reconstruction_or_clean_saturation_claim": true,
+    "not_blanket_blockers_on_independent_runtime_work": true
+  },
+  "source_bindings": {
+    "root": "Owner-host Horizon evidence/runtime-foundation-20261018; originals remain private/unpublished",
+    "public_record_class": "NORMALIZED_ALLOWLISTED_DERIVATIVE_NOT_BYTE_EQUIVALENT_RAW_ARCHIVE",
+    "files": [
+      {
+        "path": "compounding-codex-pin-run-01/run-receipt.json",
+        "bytes": 10207,
+        "sha256": "6bbe8a6f3187f2b20479921c8c68eaa3647789d287eacf960d8d72250412f29e"
+      },
+      {
+        "path": "compounding-codex-pin-run-01/supersession-proposal.md",
+        "bytes": 3307,
+        "sha256": "21ec8da0826c757b815c692b423567d5e268fd125432d75238c71c73352b59fd"
+      },
+      {
+        "path": "compounding-r1-corrective-supplement.md",
+        "bytes": 4648,
+        "sha256": "82ecf3ef162b014b49975954df9a5bad7af5708dbc7e5250a3cad18915caf88d"
+      },
+      {
+        "path": "compounding-proposal-preflight-binding-correction-01.json",
+        "bytes": 3422,
+        "sha256": "07a488b48191ea44d31f7458c22b27b6f073ede0dd1523a92a66795625419a1b"
+      },
+      {
+        "path": "compounding-native-review-retention-01/receipt.json",
+        "bytes": 31028,
+        "sha256": "491d26be5f3c9bda2f1e59db7b30e5387f79ca42289d1a7c770438e424c44709"
+      },
+      {
+        "path": "compounding-native-review-retention-01/native-review-retained.tar.gz",
+        "bytes": 273025,
+        "sha256": "9f2769f2b6e6ad5dbb046d76ff88b57f0647e196f4b212bed6dca6e850a3740f"
+      },
+      {
+        "path": "codex-artifact-crypto-audit-01/verification-receipt.json",
+        "bytes": 15404,
+        "sha256": "4fe909c3c54d64fc55af8e1c0b31676ded27ea1e7757a37d7f7679fb5084fe38"
+      },
+      {
+        "label": "current-codex-runtime-opening-audit-readme",
+        "source_path_withheld": true,
+        "bytes": 19858,
+        "sha256": "eb04cd3b98eefb5edb2acae44d4d457ba603a7fe970d258947efa04c605a6f38"
+      },
+      {
+        "path": "runtime-foundation-completion-map-01/seal.json",
+        "bytes": 5990,
+        "sha256": "1229fb61f242a320d17e0dede28ce6e5bc0d3686ddf4f89329d0257bffca5b94"
+      }
+    ]
+  },
+  "changes": {
+    "catalog": false,
+    "default": false,
+    "installed_runtime": false,
+    "verdict_wave": false,
+    "comparison": false,
+    "host_hold": false,
+    "private_ledger": false,
+    "permissions": false,
+    "trading": false
+  },
+  "acceptance": {
+    "supported_nas_reviews_ci_and_lander": "REQUIRED_ON_ACTUAL_HEAD",
+    "fresh_landed_readback": "REQUIRED_SEPARATE_RECEIPT",
+    "bounded_compounding_loop_complete_claim": false,
+    "whole_foundation_final_claim": false
+  },
+  "publication_policy": {
+    "source": "scripts/validate.py:36 at owner_source.base_commit",
+    "local_session_identifiers": "WITHHELD",
+    "raw_source_bytes_unchanged": true
+  }
+}
