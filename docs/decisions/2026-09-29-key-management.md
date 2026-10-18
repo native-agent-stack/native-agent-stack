@@ -1354,15 +1354,16 @@ path separately and preserved verbatim; a live file whose basename alone ends
 in the suffix is scanned under that full name. This is the existing fail-closed
 policy, with a conservative refusal for ambiguous directory-descriptor paths.
 
-This fold changes comments, this addendum and the retained PR body, plus their
-evidence rows.
+Fold 9 changes the worker comments, this decision addendum and their two
+existing evidence rows. The PR description is carried on the PR.
 No executable behavior or test changes are needed. The existing
 `tests/test_canary_proof.py:967-997` checks missing canonical paths for both root
 forms and the real, removed and non-path descriptor cases. Its rerun is
 synthetic local verification; the kernel and manual citations are
 `source_review`, not an executed full proof or a new platform qualification.
 
-Verification for this fold (CI virtual environment on `PATH`):
+Verification recorded for Fold 9 (CI virtual environment on `PATH`;
+manifest counts below describe the final `f2462c37` head):
 
 - `python3 -m unittest tests.test_canary_proof.UnitTests.test_ai_memory_root_without_a_canonical_path_is_incomplete`:
   exit 0, one existing test passed.
@@ -1371,9 +1372,9 @@ Verification for this fold (CI virtual environment on `PATH`):
   conditional fail-first requirement does not apply.
 - `git diff --exit-code` against each supplied upstream tag for all cited
   kernel and man-page files: exit 0 for both repositories.
-- `python3 scripts/validate.py`: exit 0, 12,308 hashed files, 71 components,
+- `python3 scripts/validate.py`: exit 0, 12,307 hashed files, 71 components,
   four profiles and 243 manifest receipts. This checks integrity and scope.
-- `python3 scripts/evidence_manifest.py --check`: exit 0, 12,308 file rows.
+- `python3 scripts/evidence_manifest.py --check`: exit 0, 12,307 file rows.
 - `python3 scripts/host_receipts.py validate`: exit 0, 183 host receipts.
 
 Resolution boundary: `catalogs/landscape/foundation.json` still records the
@@ -1387,3 +1388,34 @@ Noseyparker and ggshield survivor rows, earlier unresolved adjudications and
 the layer's existing gaps retain their status. The bounded action here is
 NC-1240-1's missing descriptor-path provenance; no candidate comparison or
 default selection is reopened.
+
+### Fold 10 (2026-10-17): final-head counts and scope (R-1240-1, R-1240-2)
+
+The sealed verdict at `f2462c3717fb30786d93ba433dda610129426a20`
+requires two corrections to Fold 9's record:
+
+- **R-1240-1 (P2), fixed:** the final-head checks above report 12,307 hashed
+  files and file rows. The 12,308 result belonged to the intermediate builder
+  tree that still included a PR-body file and its evidence row.
+- **R-1240-2 (P3), fixed:** Fold 9 consists of worker comments, this decision
+  addendum and their two existing evidence rows. The PR description is carried
+  on the PR. This correction fold changes the decision and refreshes its
+  existing evidence row; the corrected PR description is supplied separately.
+
+The deciding repository source is **native-agent-stack at
+f2462c3717fb30786d93ba433dda610129426a20**:
+`manifests/evidence.json:5012` begins the 12,307-entry `files` array, and
+`:18565` and `:65870` identify the decision and worker rows. Comparing that
+array with `ac01e51b4293b1bd6aa15e01f2611d5de5610a39` shows exactly those
+two changed file rows and no PR-body row. This is `source_review` evidence.
+
+**NC-1240-1** remains closed by Fold 9's pinned kernel and manual citations.
+**R-1240-3** remains refuted: those citations already give repository, tag,
+full commit, source path, line and URL. **F3** remains a recorded nonblocking
+follow-up: the earlier outside-root `link_out` claim does not account for the
+worker returning on an excluded entry before following its link. This fold
+does not close F3.
+
+No worker statement or test changes. Both corrections are documentation-only,
+so the verdict's conditional requirement for a new failing regression does
+not apply.

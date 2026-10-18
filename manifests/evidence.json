@@ -18563,8 +18563,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-key-management.md",
-      "sha256": "b9205bb0ceb4643c1471696a73c1b5d1e516adda78e47c49e3f051d94e53664a",
-      "bytes": 104961
+      "sha256": "19f9d2e6d914e07888bbf27086573da8d5c5e746bab3b7ca83d59ef67eb84233",
+      "bytes": 106756
     },
     {
       "path": "docs/decisions/2026-09-29-max-default-effort.md",
