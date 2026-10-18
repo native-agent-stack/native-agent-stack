@@ -330,6 +330,81 @@ try {
     usageAccountingRun('usage-accounting-unknown-advisor-model', [missingAdvisorModelRow]).usage_accounting?.complete === false)
   expect('usage accounting: a missing attempt transcript is included as unknown instead of being filtered out',
     noLog.usage_accounting?.complete === false && Object.values(noLog.usage_accounting.totals).every((n) => n === null))
+  // File-level syntax failures can hide provider messages or journal actors, even
+  // when the rows that survived parsing carry otherwise complete provider usage.
+  usageAccountingRun('usage-accounting-truncated-jsonl', [nativeAdvisorRow])
+  const truncatedDir = join(dir, 'usage-accounting-truncated-jsonl')
+  writeFileSync(join(truncatedDir, 'agent-a1.jsonl'), JSON.stringify(nativeAdvisorRow) + '\n{"type":')
+  const truncatedRun = summarizeRun(truncatedDir)
+  expect('usage accounting: a valid usage row plus a truncated JSONL row cannot establish complete accounting',
+    truncatedRun.usage_accounting.complete === false && truncatedRun.status === 'incomplete'
+    && truncatedRun.children[0].lanes.measurement.parse_errors === 1
+    && truncatedRun.children[0].lanes.measurement.bytes_complete === false
+    && truncatedRun.usage_accounting.totals.output_tokens === 1399)
+  usageAccountingRun('usage-accounting-malformed-journal', [nativeAdvisorRow])
+  const malformedJournalDir = join(dir, 'usage-accounting-malformed-journal')
+  writeFileSync(join(malformedJournalDir, 'journal.jsonl'), [started, done].map((e) => JSON.stringify(e)).join('\n') + '\n{bad}\n')
+  const malformedJournalRun = summarizeRun(malformedJournalDir)
+  expect('usage accounting: a damaged journal cannot establish a complete actor roster or usage total',
+    malformedJournalRun.usage_accounting.complete === false && malformedJournalRun.status === 'incomplete'
+    && malformedJournalRun.journal_parse_errors === 1 && malformedJournalRun.usage_accounting.totals.output_tokens === 1399)
+  expect('usage accounting: the CLI rejects damaged transcript and journal inputs', cli(truncatedDir) === 1 && cli(malformedJournalDir) === 1)
+  usageAccountingRun('usage-accounting-malformed-middle', [nativeAdvisorRow])
+  const malformedMiddleDir = join(dir, 'usage-accounting-malformed-middle')
+  writeFileSync(join(malformedMiddleDir, 'agent-a1.jsonl'), JSON.stringify(nativeAdvisorRow) + '\n{bad}\n'
+    + JSON.stringify(msg('after-damage', 'claude-sonnet-5-5', 2, 0, 0, 'max')) + '\n')
+  const malformedMiddleRun = summarizeRun(malformedMiddleDir)
+  expect('usage accounting: parsing continues after damage but the observed partial counters cannot be complete',
+    malformedMiddleRun.usage_accounting.complete === false && malformedMiddleRun.usage_accounting.totals.output_tokens === 1401
+    && malformedMiddleRun.children[0].lanes.measurement.parse_errors === 1)
+  for (const [name, text, errors] of [['empty', '', 0], ['all-malformed', '{bad}\n{"type":', 2]]) {
+    usageAccountingRun('usage-accounting-' + name, [nativeAdvisorRow])
+    const d = join(dir, 'usage-accounting-' + name)
+    writeFileSync(join(d, 'agent-a1.jsonl'), text)
+    const r = summarizeRun(d)
+    expect('usage accounting: ' + name + ' transcript has unknown usage, not a complete zero', r.status === 'incomplete'
+      && r.usage_accounting.complete === false && Object.values(r.usage_accounting.totals).every((n) => n === null)
+      && (r.children[0].lanes.measurement.parse_errors || 0) === errors)
+    usageAccountingRun('usage-accounting-journal-' + name, [nativeAdvisorRow])
+    const jd = join(dir, 'usage-accounting-journal-' + name)
+    writeFileSync(join(jd, 'journal.jsonl'), text)
+    const jr = summarizeRun(jd)
+    expect('usage accounting: ' + name + ' journal does not infer a roster from unstarted transcript files',
+      jr.status === 'incomplete' && jr.children.length === 0 && jr.usage_accounting.complete === false
+      && Object.values(jr.usage_accounting.totals).every((n) => n === null) && (jr.journal_parse_errors || 0) === errors)
+  }
+  writeFileSync(join(dir, 'usage-accounting-native', 'agent-unstarted.jsonl'), '{bad}\n{"type":')
+  expect('usage accounting: damage in an unstarted transcript does not change the journal-scoped accounting',
+    JSON.stringify(summarizeRun(join(dir, 'usage-accounting-native')).usage_accounting) === JSON.stringify(accountingNative.usage_accounting))
+  usageAccountingRun('usage-accounting-blank-lines', [nativeAdvisorRow])
+  const blankDir = join(dir, 'usage-accounting-blank-lines')
+  writeFileSync(join(blankDir, 'agent-a1.jsonl'), '\n \t\n' + JSON.stringify(nativeAdvisorRow) + '\n\n')
+  expect('usage accounting: blank lines are not syntax errors and valid complete usage remains complete',
+    JSON.stringify(summarizeRun(blankDir).usage_accounting) === JSON.stringify(accountingNative.usage_accounting))
+  const corruptSupersededDir = rerunWith('rerun-parse-error', [nativeAdvisorRow])
+  const beforeCorruptSuperseded = summarizeRun(corruptSupersededDir)
+  writeFileSync(join(corruptSupersededDir, 'agent-a1.jsonl'), JSON.stringify(nativeAdvisorRow) + '\n{bad}\n')
+  const corruptSuperseded = summarizeRun(corruptSupersededDir)
+  expect('usage accounting: syntax damage in a superseded attempt remains a usage-integrity failure',
+    beforeCorruptSuperseded.status === 'complete' && corruptSuperseded.status === 'incomplete'
+    && corruptSuperseded.children.every((c) => c.complete) && corruptSuperseded.usage_accounting.complete === false
+    && corruptSuperseded.superseded_attempts[0].usage_issues.some((i) => i.includes('malformed transcript JSONL'))
+    && JSON.stringify(corruptSuperseded.by_resolved_model) === JSON.stringify(beforeCorruptSuperseded.by_resolved_model))
+  const syntheticOnlySuperseded = summarizeRun(rerunWith('rerun-synthetic-only', [limitRow]))
+  expect('usage accounting: a synthetic-only superseded attempt does not prove complete zero provider usage',
+    syntheticOnlySuperseded.superseded_attempts[0].requests === 0
+    && syntheticOnlySuperseded.usage_accounting.complete === false
+    && Object.values(syntheticOnlySuperseded.usage_accounting.totals).every((n) => n === null)
+    && syntheticOnlySuperseded.status === 'complete')
+  for (const filename of ['agent-a1.jsonl', 'journal.jsonl']) {
+    const name = 'usage-accounting-read-error-' + filename
+    usageAccountingRun(name, [nativeAdvisorRow])
+    const d = join(dir, name)
+    rmSync(join(d, filename)); mkdirSync(join(d, filename))
+    let readFailed = false
+    try { summarizeRun(d) } catch (error) { readFailed = error.code === 'EISDIR' }
+    expect('usage accounting: ' + filename + ' read failure propagates and the CLI cannot report a complete run', readFailed && cli(d) === 1)
+  }
   const capRun = join(dir, 'cap'); mkdirSync(capRun)
   writeFileSync(join(capRun, 'journal.jsonl'), [started, done, { ...started, agentId: 'a2', label: 'review' }, { type: 'result', agentId: 'a2', result: { ok: true } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
   for (const id of ['a1', 'a2']) writeFileSync(join(capRun, 'agent-' + id + '.meta.json'), JSON.stringify({ model: 'opus', agentType: 'workflow' }))

@@ -156,6 +156,24 @@ def public_mismatch(value: dict) -> dict:
     return result
 
 
+def usage_integrity_gaps(value: dict) -> list[str]:
+    """Keep native source uncertainty authoritative when retry linkage changes child status."""
+    gaps = []
+    if "journal_parse_errors" in value:
+        count = value["journal_parse_errors"]
+        if type(count) is not int or count < 0:
+            raise ValueError("native journal parse errors must be a nonnegative integer")
+        if count:
+            gaps.append(f"{count} malformed journal JSONL row(s)")
+    if "usage_accounting" in value:
+        accounting = value["usage_accounting"]
+        if not isinstance(accounting, dict) or type(accounting.get("complete")) is not bool:
+            raise ValueError("native usage accounting needs a boolean completeness flag")
+        if not accounting["complete"]:
+            gaps.append("usage accounting incomplete")
+    return gaps
+
+
 def public_run(value: dict) -> dict:
     """Build the publication representation by allowlist; never recursively copy raw native output."""
     if value.get("status") not in ("complete", "incomplete"):
@@ -164,8 +182,15 @@ def public_run(value: dict) -> dict:
     if not isinstance(locator, str):
         raise ValueError("native transcript locator must be text")
     public_labels({"run": locator.rsplit("/", 1)[-1]}, ("run",))
-    result = {"transcript_dir": sanitize_transcript_dir(locator), "status": value["status"],
+    integrity_gaps = usage_integrity_gaps(value)
+    result = {"transcript_dir": sanitize_transcript_dir(locator),
+              "status": "incomplete" if integrity_gaps else value["status"],
               "children": [public_attempt(child) for child in value.get("children") or []]}
+    if "journal_parse_errors" in value:
+        result["journal_parse_errors"] = value["journal_parse_errors"]
+    if "usage_accounting" in value:
+        # Expose the typed completeness flag, never arbitrary nested native strings or source reasons.
+        result["usage_accounting"] = {"complete": value["usage_accounting"]["complete"]}
     if "superseded_attempts" in value:
         result["superseded_attempts"] = [public_attempt(child) for child in value["superseded_attempts"]]
     if "by_resolved_model" in value:
@@ -178,6 +203,8 @@ def public_run(value: dict) -> dict:
         result["multi_model_children"] = public_label_list(value["multi_model_children"])
     result["reason"] = (f"{sum(child.get('complete') is not True for child in result['children'])} child(ren) incomplete; "
                         f"{len(result.get('superseded_attempts', []))} superseded attempt(s)")
+    if integrity_gaps:
+        result["reason"] += "; " + "; ".join(integrity_gaps)
     return result
 
 
@@ -396,6 +423,7 @@ def post_process(output: dict, required: str, explicit_pairs=(), explicit_proven
     A label with multiple complete children is ambiguous unless the caller supplies validated explicit pairs.
     Call keys are not available in the native summary; explicit pairs are checked against the bound journal.
     """
+    integrity_gaps = usage_integrity_gaps(output)
     children = output.get("children") or []
     complete_counts = Counter(c.get("label") for c in children if isinstance(c, dict) and c.get("complete") is True)
     linked, retained = [], []
@@ -425,13 +453,17 @@ def post_process(output: dict, required: str, explicit_pairs=(), explicit_proven
                                           if isinstance(c, dict) and len(c.get("resolved_models") or []) > 1]
         incomplete = sum(not isinstance(c, dict) or c.get("complete") is not True for c in retained)
         uncounted = sum(bool(c.get("usage_issues")) for c in output["superseded_attempts"] if isinstance(c, dict))
-        output["status"] = "incomplete" if incomplete or uncounted else "complete"
+        output["status"] = "incomplete" if incomplete or uncounted or integrity_gaps else "complete"
         gaps = [f"{incomplete} child(ren) incomplete" if incomplete else None,
-                f"{uncounted} superseded attempt(s) with usage_issues" if uncounted else None]
+                f"{uncounted} superseded attempt(s) with usage_issues" if uncounted else None,
+                *integrity_gaps]
         description = ("attempt(s) linked with explicit proven supersession" if explicit_pairs else
                        f"incomplete attempt(s) linked to later complete same-label attempts: {SAME_LABEL_REASON}")
         output["reason"] = (f"{len(linked)} {description}; "
                             + ("; ".join(g for g in gaps if g) or "every remaining child is complete"))
+    elif integrity_gaps:
+        output["status"] = "incomplete"
+        output["reason"] = "; ".join(integrity_gaps)
     # The raw tool's mismatches name labels, not agent ids. Bind each newly linked finding to its re-run before
     # filtering; other mismatches with that label (including an unsuperseded non-max attempt) remain uncovered.
     mismatches = [dict(item) if isinstance(item, dict) else item for item in output.get("effort_mismatches") or []]
