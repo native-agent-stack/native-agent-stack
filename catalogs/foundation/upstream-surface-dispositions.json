@@ -70,8 +70,8 @@
   {
    "key": "claude:env:ANTHROPIC_DEFAULT_OPUS_MODEL",
    "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository record at examples/claude-native/workflows/child-usage.mjs:67 names it",
-   "source": "examples/claude-native/workflows/child-usage.mjs:67",
+   "reason": "off on both hosts (read 2026-10-04)); the repository record at examples/claude-native/workflows/child-usage.mjs:66 names it",
+   "source": "examples/claude-native/workflows/child-usage.mjs:66",
    "carrier": null,
    "value": null,
    "scope": null,
@@ -310,8 +310,8 @@
   {
    "key": "claude:env:CLAUDE_CODE_MCP_TOOL_IDLE_TIMEOUT",
    "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository record at examples/claude-native/workflows/child-usage.mjs:1925 names it",
-   "source": "examples/claude-native/workflows/child-usage.mjs:1925",
+   "reason": "off on both hosts (read 2026-10-04)); the repository record at examples/claude-native/workflows/child-usage.mjs:1924 names it",
+   "source": "examples/claude-native/workflows/child-usage.mjs:1924",
    "carrier": null,
    "value": null,
    "scope": null,
@@ -562,8 +562,8 @@
   {
    "key": "claude:env:CLAUDE_CODE_WORKFLOW_PREFIX_STAGGER_MS",
    "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository record at examples/claude-native/workflows/README.md:1097 names it",
-   "source": "examples/claude-native/workflows/README.md:1097",
+   "reason": "off on both hosts (read 2026-10-04)); the repository record at examples/claude-native/workflows/README.md:1136 names it",
+   "source": "examples/claude-native/workflows/README.md:1136",
    "carrier": null,
    "value": null,
    "scope": null,

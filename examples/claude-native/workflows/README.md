@@ -282,6 +282,12 @@ its errors and the run and `usage_accounting` are incomplete even when every
 known child is valid. Empty inputs do not establish complete zero usage; file
 read failures still propagate. Files not started by the journal remain outside
 this run. Valid complete inputs and their executor counters/status are unchanged.
+The correction follows NAS's existing
+[JSONL reader](https://github.com/native-agent-stack/native-agent-stack/blob/0a585369943e8000dc853a689acbacb34e7b4b0b/examples/claude-native/workflows/child-usage.mjs#L48-L56)
+and [sweep completeness rule](https://github.com/native-agent-stack/native-agent-stack/blob/0a585369943e8000dc853a689acbacb34e7b4b0b/examples/claude-native/workflows/child-usage.mjs#L3258-L3259)
+at `0a585369943e8000dc853a689acbacb34e7b4b0b`. The changed mechanism is the
+NAS observer's completeness accounting; Claude Code's producer format remains
+unchanged.
 A superseded attempt with only a synthetic rate-limit row has no measured
 provider usage: its accounting stays unknown with null totals, rather than
 complete zero, even if a later attempt completes the logical call.

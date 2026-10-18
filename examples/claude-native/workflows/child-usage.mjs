@@ -3123,8 +3123,10 @@ export function childLanes(transcript, { marker = DEFAULT_MARKER, rtkDecisions =
   }
   lanes.subagent_start.types = [...types].sort()
   lanes.measurement = measureTranscript(transcript, { window, exceptions, rtkCheck, marker })
-  // readRows can skip damaged JSONL rows containing unknown usage or tool results.
-  // Keep the observed counters, but share the sweep's incomplete-measurement rule.
+  // Source: native-agent-stack/native-agent-stack@0a585369943e8000dc853a689acbacb34e7b4b0b,
+  // examples/claude-native/workflows/child-usage.mjs:48-56,3258-3259.
+  // Apply the existing NAS sweep rule to run mode: skipped JSONL rows can hide
+  // usage or tool results, so their observed counters remain incomplete.
   if (parseErrors) {
     lanes.measurement.parse_errors = parseErrors
     lanes.measurement.bytes_complete = false
