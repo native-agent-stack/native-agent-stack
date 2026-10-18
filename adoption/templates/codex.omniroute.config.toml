@@ -8,7 +8,7 @@
 # (tools/sota-convergence/landscape-sweep/build_args.py stage_lane_home) with this file's model, effort, provider,
 # [features] and key filter, and tests/test_codex_worker_lane.py checks each one it writes against this file.
 # That home's config.toml writes [shell_environment_policy.filters] OMNIROUTE_API_KEY = "exclude"
-# (build_args.py:356-357 at the current base), keeping the exported gateway key out of model-run commands.
+# (build_args.py stage_lane_home), keeping the exported gateway key out of model-run commands.
 # The home has no env_key_instructions; its web_search = "live" comes from the stack-worker profile and runner flag.
 #
 # Effort: OmniRoute 3.8.50 caps any model missing from MAX_EFFORT_BY_MODEL at xhigh, gpt-6-astra included
@@ -16,7 +16,7 @@
 # level above max (open-sse/executors/codex/reasoningSuffix.ts L1-31), so max passes with the gateway's Thinking
 # Budget left at passthrough. That commit alone is not a working gateway for this profile: upstream PR #14904 (open
 # on 2026-09-27) reports HTTP 500 for every /v1/responses request on release/v3.8.51, and search needs the route
-# of PR #13788 (see supports_standalone_web_search below).
+# of PR #13788, which only the opt-in standalone search switches below need.
 # Max-effort GPT-6 lanes keep Codex's native openai provider as their default until a preregistered same-task
 # comparison with native Codex passes; this profile does not change that default.
 model = "cx/gpt-6-astra"
@@ -30,9 +30,13 @@ model_reasoning_effort = "max"
 # e2e-truth-20261006/omni-context-window-20261008T025328Z).
 model_context_window = 800000
 # Live search as in the stack-worker profile. The bundled catalog runs gpt-6-astra on Responses Lite
-# (use_responses_lite, codex-rs/models-manager/models.json L4-23), which sends no hosted tools
-# (codex-rs/core/src/tools/spec_plan.rs L598-601), so a search reaches it only as Codex's standalone web search
-# (web.run), which the provider below opts into.
+# (use_responses_lite, codex-rs/models-manager/models.json L4-23), which sends no hosted tool
+# (openai/codex rust-v0.163.0 at 83086188ae0614bd882818ff1aa23f3194962012, codex-rs/core/src/tools/spec_plan.rs:691-693),
+# so a search reaches it only as Codex's standalone web search (web.run). Both standalone switches below are off, so with
+# this Lite model `live` exposes no search tool: a gateway release without /v1/alpha/search (OmniRoute 3.8.51) answers
+# web.run's POST with 404, and docs/decisions/2026-10-06-codex-omniroute-opt-in-search.md keeps the workhorse on Lite
+# with both switches false and puts hosted search in a separate opt-in profile. Turn the two switches on only against
+# a gateway that serves the route (the carried-patch gateway, docs/foundation-stack.md).
 web_search = "live"
 
 # Upstream's documented block (docs/guides/CODEX-CLI-CONFIGURATION.md L22-41 at a58000c7), using the recorded
@@ -40,10 +44,12 @@ web_search = "live"
 # a host-value placeholder here would fail every host that lacks the value. OmniRoute's Codex models carry the cx/
 # prefix (same guide, L150-161); no gateway-side alias is needed. Never set name = "OpenAI": Codex's is_openai()
 # compares only this display name (codex-rs/model-provider-info/src/lib.rs L601-603) and would switch on OpenAI-only
-# paths. supports_websockets stays unset, so false (lib.rs L190-192). supports_standalone_web_search lets Codex send
-# web.run searches to the provider-relative alpha/search (codex-rs/codex-api/src/endpoint/search.rs L14-15), here
+# paths. supports_websockets stays unset, so false (lib.rs L190-192). supports_standalone_web_search is false, the
+# default (codex-rs/model-provider-info/src/lib.rs:200-202 at rust-v0.163.0, 83086188): true would let the web-search
+# extension offer web.run to this non-OpenAI provider (ext/web-search/src/extension.rs:46-50), which POSTs the
+# provider-relative alpha/search (codex-rs/codex-api/src/endpoint/search.rs:14-15 and 41-44), here
 # POST /v1/alpha/search. OmniRoute serves that route only with upstream PR #13788 (open and labelled
-# deferred-v3.8.52 on 2026-09-27); a gateway without it has no such route.
+# deferred-v3.8.52 on 2026-09-27); a gateway without it has no such route and answers 404 unknown_route.
 [model_providers.omniroute]
 name = "OmniRoute"
 base_url = "http://127.0.0.1:21128/v1"
@@ -51,7 +57,7 @@ env_key = "OMNIROUTE_API_KEY"
 env_key_instructions = "Export OMNIROUTE_API_KEY only in the shell that starts `codex -p omniroute`: the gateway's key, stored under inventory id omniroute with tools/credentials/open_credential_terminal.sh omniroute, or any non-empty value for a keyless loopback gateway."
 wire_api = "responses"
 requires_openai_auth = false
-supports_standalone_web_search = true
+supports_standalone_web_search = false
 
 # Keeps the gateway key out of every command the model runs. The keyed `filters` table is the canonical form, and it
 # must not be mixed with the legacy exclude/include_only arrays in one layer (codex-rs/config/src/
@@ -59,10 +65,12 @@ supports_standalone_web_search = true
 [shell_environment_policy.filters]
 "OMNIROUTE_API_KEY" = "exclude"
 
-# standalone_web_search is under development at 0.157.1 (codex-rs/features/src/lib.rs L1115-1120), so Codex prints
-# an under-development warning at startup; it stays visible on purpose. shell_snapshot (stable, default on) writes
+# standalone_web_search is under development and off by default (codex-rs/features/src/lib.rs:1250-1255 at
+# rust-v0.163.0, 83086188); it is off here, so Codex prints no under-development warning. Core selects the standalone
+# executor when the feature is on or the model is Lite (codex-rs/core/src/tools/spec_plan.rs:1199-1207), and the
+# provider switch above makes it available. shell_snapshot (stable, default on) writes
 # every exported variable, a provider key included, into $CODEX_HOME/shell_snapshots
 # (codex-rs/shell-command/src/shell_snapshot_exports.rs), so this profile turns it off whatever the base config says.
 [features]
-standalone_web_search = true
+standalone_web_search = false
 shell_snapshot = false

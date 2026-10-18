@@ -39,10 +39,11 @@ codex key that codex_job.py reads, and no option writes nothing: --codex-hook (h
 the Bash-only secret-path guard; a gateway lane gets its hooks.json from upstream's own `rtk init -g --codex` run with
 CODEX_HOME at the lane home, and secret_guard stages a byte-for-byte copy of scripts/hooks/secret_path_guard.py beside
 codex_job.py with its sha256 under harness.files), --codex-disable-feature and --web-search (reviewer jobs: disable and
-web_search), --codex-otel-endpoint and --codex-otel-lane (otel), --rollout-usage (rollout_usage) and, for a gateway
-lane, --ai-memory-bearer-env (the lane's ai-memory MCP entry reads its token from the named environment variable,
-default AI_MEMORY_AUTH_TOKEN, which the lane config also filters out of the model's shells; the token itself is never
-written). A restage rewrites staged.json, so repeat the options. No option runs the real rtk in a test: the stager takes
+web_search), --codex-otel-endpoint and --codex-otel-lane (otel), --rollout-usage (rollout_usage),
+--standalone-web-search (standalone_web_search: both standalone web search switches in a gateway lane's config.toml and
+in the failover provider, off unless given) and, for a gateway lane, --ai-memory-bearer-env (the lane's ai-memory MCP
+entry reads its token from the named environment variable, default AI_MEMORY_AUTH_TOKEN, which the lane config also
+filters out of the model's shells; the token itself is never written). A restage rewrites staged.json, so repeat the options. No option runs the real rtk in a test: the stager takes
 the binary from PATH only when --codex-hook rtk is given with a gateway lane.
 Refuses a work dir inside a git repository, templates naming a skill the pinned skills manifest lacks, a selection
 that mixes repository and skills-* layers, and restaging a work dir whose gpt6/ already holds jobs (an earlier run's
@@ -341,6 +342,10 @@ def with_ai_memory_bearer(servers_text: str, name: str) -> str:
     return text
 
 
+def toml_bool(value: bool) -> str:
+    return "true" if value else "false"
+
+
 def run_rtk_init(home: Path, work: Path, rtk: str | None = None) -> None:
     """Upstream's own `rtk init -g --codex` with CODEX_HOME at the lane home (rtk 1.0.1): it writes RTK.md, appends the
     @RTK.md pointer to the home's AGENTS.md and registers `rtk hook codex` in the home's hooks.json (a second run
@@ -363,14 +368,15 @@ def run_rtk_init(home: Path, work: Path, rtk: str | None = None) -> None:
 
 def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile: Path, repo_root: Path,
                     require_key: bool = False, http_headers: dict | None = None, bearer_env: str | None = None,
-                    rtk_init: bool = False, rtk_binary: str | None = None) -> dict:
+                    rtk_init: bool = False, rtk_binary: str | None = None, standalone_search: bool = False) -> dict:
     """Write <work>/codex-home: config.toml (the OmniRoute provider block, with http_headers only when given, plus the
     rendered token MCP servers), stack-worker.config.toml (the worker profile, verbatim) and AGENTS.md (the host's
     Codex user instructions: the philosophy core and RTK's, as codex_user_instructions reads them), and
     <work>/empty/.claude/settings.json (context-mode read access to each pinned skill file by its exact path). Return
     what staged.json records about them. http_headers must come from omniroute_headers. Both opt-in steps leave the
     default bytes alone and run no subprocess unless asked: bearer_env names the variable the ai-memory entry reads its
-    token from (and the shell filter excludes), rtk_init runs upstream's `rtk init -g --codex` against the home."""
+    token from (and the shell filter excludes), rtk_init runs upstream's `rtk init -g --codex` against the home.
+    standalone_search writes both standalone web search switches true; the default writes both false."""
     http_headers = dict(sorted((http_headers or {}).items()))
     header_lines = []
     if http_headers:
@@ -411,10 +417,14 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
         f"# {host_label!r} by tools/adoption/render_config.py. The provider key comes from ${OMNIROUTE_KEY_ENV}; it is never",
         "# stored here. supports_websockets stays unset (false): OmniRoute's WebSocket bridge drops the client headers",
         "# that carry the Codex version, which only its HTTP /v1/responses path forwards.",
-        "# Web search: GPT-6 Astra runs Responses Lite, which carries no hosted tools, so search reaches it only as",
-        "# Codex's standalone web search (web.run). A custom provider advertises that with",
-        "# supports_standalone_web_search (Codex config docs, config-advanced) and the standalone_web_search feature",
-        "# turns it on (under development in 0.157.1); the lane's parity check must show it works through OmniRoute.",
+        "# Web search: both standalone switches are off unless build_args.py --standalone-web-search is given. GPT-6",
+        "# Astra runs Responses Lite, which sends no hosted tool (openai/codex rust-v0.163.0 at 83086188,",
+        "# codex-rs/core/src/tools/spec_plan.rs:691-693), so search reaches it only as Codex's standalone web.run. A custom",
+        "# provider offers that with supports_standalone_web_search (model-provider-info/src/lib.rs:200-202,",
+        "# ext/web-search/src/extension.rs:46-50) and the under-development standalone_web_search feature",
+        "# (features/src/lib.rs:1250-1255) selects it (spec_plan.rs:1199-1207). web.run POSTs <base_url>/alpha/search",
+        "# (codex-api/src/endpoint/search.rs:14-15 and 41-44); an OmniRoute release without that route (3.8.51) answers 404.",
+        "# Off, the lane exposes no search tool and sends no 404 request.",
         "# shell_snapshot is off: Codex's shell snapshot writes the exported environment, the provider key included,",
         "# to <CODEX_HOME>/shell_snapshots (codex-rs/shell-command/src/shell_snapshot_exports.rs at rust-v0.157.1).",
         f"# {OMNIROUTE_KEY_ENV} is filtered out of model-run commands: 0.157.1 skips its default *KEY*/*SECRET*/*TOKEN*",
@@ -426,7 +436,7 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
         "",
         "[features]",
         "shell_snapshot = false",
-        "standalone_web_search = true",
+        f"standalone_web_search = {toml_bool(standalone_search)}",
         "",
         "[shell_environment_policy.filters]",
         *filter_lines,
@@ -437,7 +447,7 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
         f'env_key = "{OMNIROUTE_KEY_ENV}"',
         "requires_openai_auth = false",
         'wire_api = "responses"',
-        "supports_standalone_web_search = true",
+        f"supports_standalone_web_search = {toml_bool(standalone_search)}",
         *header_lines,
         "",
         servers_text,
@@ -679,7 +689,8 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
                                      profile=lane["profile"], repo_root=repo_root,
                                      require_key=lane.get("require_key", False),
                                      http_headers=lane.get("http_headers"), bearer_env=lane.get("bearer_env"),
-                                     rtk_init=lane.get("rtk_init", False), rtk_binary=lane.get("rtk_binary")))
+                                     rtk_init=lane.get("rtk_init", False), rtk_binary=lane.get("rtk_binary"),
+                                     standalone_search=bool((codex_extra or {}).get("standalone_web_search"))))
     codex.update(codex_extra or {})  # the opt-in keys, each present only when its option was given
     harness_files = sorted([*RUNTIME, "sweep.js", "templates.json", *(f"schemas/{name}.json" for name in SCHEMAS)])
     staged_files = {name: sha256_bytes((HERE / name).read_bytes()) for name in harness_files}
@@ -759,6 +770,10 @@ def main(argv=None) -> int:
                         help="pass `codex exec --disable FEATURE` (repeatable), for example apps on a web-free reviewer")
     parser.add_argument("--web-search", choices=codex_job.WEB_SEARCH_MODES,
                         help="stage codex.web_search (the harness default is live); reviewers use disabled")
+    parser.add_argument("--standalone-web-search", action="store_true",
+                        help="opt in to Codex's standalone web search (web.run) for a gateway lane's config.toml and "
+                             "the --gpt6-fallback provider: both switches stay false without it. It POSTs "
+                             "<base_url>/alpha/search, so use it only against a gateway that serves that route")
     parser.add_argument("--codex-otel-endpoint", metavar="HOST:PORT",
                         help="export each job's logs and metrics to this loopback OTLP collector (127.0.0.1:PORT)")
     parser.add_argument("--codex-otel-lane", metavar="NAME",
@@ -818,6 +833,11 @@ def main(argv=None) -> int:
             raise ValueError(str(error)) from None
         if args.rollout_usage:
             codex_extra["rollout_usage"] = True
+        if args.standalone_web_search:
+            if args.gpt6_provider != "omniroute" and not args.gpt6_fallback:
+                raise ValueError("--standalone-web-search needs --gpt6-provider omniroute or --gpt6-fallback omniroute: "
+                                 "the native lane has no provider block to switch")
+            codex_extra["standalone_web_search"] = True
         fallback = None
         if args.fallback_codex_host and not args.gpt6_fallback:
             raise ValueError("--fallback-codex-host needs --gpt6-fallback omniroute")

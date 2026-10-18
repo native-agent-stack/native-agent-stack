@@ -1642,8 +1642,8 @@ class RenderTests(unittest.TestCase):
         self.assertEqual(servers["serena"]["command"], "serena")
         self.assertEqual(servers["serena"]["args"][:1] + servers["serena"]["args"][3:6],
                          ["start-mcp-server", "--project-from-cwd", "--context", "claude-code"])
-        self.assertEqual(servers["qmd"], {"type": "http", "url": "http://127.0.0.1:21851/mcp"})
         host = json.loads((ROOT / "adoption/hosts/example.json").read_text())
+        self.assertEqual(servers["qmd"], {"type": "http", "url": f"http://{host['QMD_URL']}/mcp"})
         self.assertEqual(servers["ai-memory"], {"type": "http", "url": f"http://{host['AI_MEMORY_URL']}/mcp"})
         # semble: the pinned model's local snapshot and Claude Code's own cache (wave-2 code-search ruling, changes 4, 5);
         # ${HOME} is filled when install_claude_profile.py registers the file.
@@ -1819,6 +1819,23 @@ class RenderTests(unittest.TestCase):
                       if row["slot"] == "memory-owner")
         self.assertTrue(any(f'bind = "{host["AI_MEMORY_URL"]}"' in command for command in memory["commands"]),
                         memory["commands"])
+
+    def test_a_host_qmd_url_is_the_qmd_port_of_both_clients(self):
+        # QMD_URL is an optional host value: the Codex template reads it (render_config.py) and the Claude entry takes
+        # it through the map's override, so the renders cannot name two ports. A host without it keeps 21851.
+        example = json.loads((ROOT / "adoption/hosts/example.json").read_text())
+        for qmd_url, expected in (("127.0.0.1:23851", "http://127.0.0.1:23851/mcp"), (None, "http://127.0.0.1:21851/mcp")):
+            with self.subTest(qmd_url=qmd_url):
+                values = {key: value for key, value in example.items() if key != "QMD_URL"}
+                values.update({"QMD_URL": qmd_url} if qmd_url else {})
+                with mock.patch.object(cfg.render_config, "load_host_values", return_value=values), \
+                        tempfile.TemporaryDirectory() as tmp:
+                    code, _, err = run_main("--render", "--host", EXAMPLE_HOST, "--out", tmp)
+                    self.assertEqual(code, 0, err)
+                    claude = json.loads((Path(tmp) / "mcp-servers.json").read_text())["mcpServers"]["qmd"]
+                    codex = tomllib.loads((Path(tmp) / "codex.config.toml").read_text())["mcp_servers"]["qmd"]
+                self.assertEqual(claude, {"type": "http", "url": expected})
+                self.assertEqual(codex["url"], expected)
 
     def test_the_render_follows_the_host_and_refuses_a_plan_that_states_a_port_twice(self):
         with tempfile.TemporaryDirectory() as tmp:

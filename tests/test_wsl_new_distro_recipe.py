@@ -563,7 +563,10 @@ def host_template_errors(template: str, example: dict, recipe: str, user: str = 
         return errors + [f"the host template does not render to JSON: {error!r}"]
     # The image experiment freezes the legacy nine fields. New host inputs are
     # required by the install/client renderers, without rewriting that evidence.
-    if sorted(values) != sorted(key for key in example if not key.startswith("NS_PORT_") and key != "WSL_DISTRO_NAME"):
+    # QMD_URL is an optional selector that render_config.py defaults to the shared service's 127.0.0.1:21851, so the
+    # template need not carry it.
+    if sorted(values) != sorted(key for key in example
+                                if not key.startswith("NS_PORT_") and key not in ("WSL_DISTRO_NAME", "QMD_URL")):
         errors.append(f"keys {sorted(values)} are not adoption/hosts/example.json's {sorted(example)}")
     ports = []
     for key in URL_KEYS:

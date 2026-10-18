@@ -5482,8 +5482,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "852802c73e3137eb3048951eb0fc6baea6cda2cda074fe58190c26e7110f6faa",
-      "bytes": 77932
+      "sha256": "b9c0a5eb2ce0122386e1a767ddca25e64dce5da4054755b9bef16ded846fa9ce",
+      "bytes": 78390
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5567,8 +5567,8 @@
     },
     {
       "path": "adoption/hosts/example.json",
-      "sha256": "e373877423278ad2c2cbe0d8cf8fbf4086066365b90d2fb711492479ba1d3c9c",
-      "bytes": 1162
+      "sha256": "29ac523d2a1a272eb0a9369d09cb209a0af0d345be19acd0099c3983f6766e52",
+      "bytes": 1194
     },
     {
       "path": "adoption/hosts/macos-example.json",
@@ -5632,8 +5632,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "f249e2ae2a3d5f57b1f74bc342ba565963884a89aa4a54ec904f0dffd1dd432c",
-      "bytes": 58341
+      "sha256": "bef42b672d1f65a718565a5d80d4ffcda2d532a5d37a34b7c133e59a15bbea42",
+      "bytes": 58792
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5887,13 +5887,13 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "9c7f810ad4874c6447a582787d58b5095cb8602ea61acb7557864eeccf315330",
-      "bytes": 19105
+      "sha256": "469d5714536cb5b2dd7d3e07c548215ec50ce65d6ee0c828e3a8ed3a3bf0eb7c",
+      "bytes": 19236
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
-      "sha256": "d7bceccbade707b4293e3157dd5929e9c2173c5c88436c0c99e3ac981686e958",
-      "bytes": 5562
+      "sha256": "864a866203a8366a858be9fc58c880ed19730dbcb3990a7ee2c50b059ee48616",
+      "bytes": 6533
     },
     {
       "path": "adoption/templates/codex.stack-worker.config.toml",
@@ -17643,7 +17643,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "6b6f24739e6a2dcfcb271f8cd7a975b1d5eb7c0e5c35c1554fb2101d0d8cc6c3",
+      "sha256": "70226f1d50b19ab719b74764252418d80f55438790d98f225ff5ae0c8f16046f",
       "bytes": 193410
     },
     {
@@ -64323,8 +64323,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "a048170ec42e185e44cd3f6de8c3b7500a00437ef6914e27669b70d9593fa171",
-      "bytes": 196757
+      "sha256": "dd68b5b1f5b52ba0bd6f6dbb20b1d56294b5d1e8a0c01c00aa35afbdd8c81820",
+      "bytes": 197116
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -64688,8 +64688,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "69ee39d4d1007934ae0ee45d0d51e189ec3792da6c5c88bb90a4a7d98fbdefba",
-      "bytes": 392428
+      "sha256": "71198bb02fe328554c9e355dfe6cd095595baf7518d890c1e8b4976c193e5ddf",
+      "bytes": 405488
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
@@ -64973,8 +64973,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "eec94cbde1f92866c8775f41ab68d09b4df0d282c98368a5f27e77d7f97791e9",
-      "bytes": 345889
+      "sha256": "cea26f88d123f0a5f3589c9040cf1e6aad4cfd666080e166e28b356cc9ea0da0",
+      "bytes": 347265
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -65198,8 +65198,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "03d31001eef58ba1d6cf1498d9a7e9c6d6fe391d5ff9a4d02a9174bdc89dc136",
-      "bytes": 47826
+      "sha256": "8d83f841521bf97d4ee682f7ca60c2f3b860b4b9f592117156d5ba05ea7866c2",
+      "bytes": 50707
     },
     {
       "path": "tests/test_research_convergence_practice.py",
@@ -65648,8 +65648,8 @@
     },
     {
       "path": "tests/test_wsl_new_distro_recipe.py",
-      "sha256": "244cd5b910c53f5e79b125e890a84359acdf9b20907c5184ef302ba20cb39b1c",
-      "bytes": 240334
+      "sha256": "d0501b30d040817e81fd676df8a6d2f1937b6a4bcb99571111491482220a6a82",
+      "bytes": 240534
     },
     {
       "path": "tests/test_wsl_restore.py",
@@ -65728,8 +65728,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "f10bcc847295aa29a2a7f2829753f390d2b5928a17af4662020e77b786b1af1f",
-      "bytes": 167892
+      "sha256": "38addb6eba0259b2143ed6e495305f55f3840e1fe554e6b631b5154ecb2a6e2f",
+      "bytes": 168008
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
@@ -65738,8 +65738,8 @@
     },
     {
       "path": "tools/adoption/render_config.py",
-      "sha256": "40156162b38c04fd55e16e297d47327fc8dc452f43f57e634d5dac07b739a1ef",
-      "bytes": 19970
+      "sha256": "3ef2f41e901389915ab982ebf3b0437a277c5a9125af083eb554132d3b7eb9c8",
+      "bytes": 21162
     },
     {
       "path": "tools/adoption/render_launchd.py",
@@ -66173,13 +66173,13 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "e91507bc7d6c17267fb451ea4c45f08d3155d05c3153693340a96fe185c9a83e",
-      "bytes": 123184
+      "sha256": "fb1088244fc37eebc661020da9b0940a3ce6f4ea801e298d581f91683a8f7b66",
+      "bytes": 125790
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
-      "sha256": "cda5289351a8648579734cbb229fa593d89e428d7c069e51282a4ea447bd0056",
-      "bytes": 62100
+      "sha256": "416684b2a70d42caedf2b46e374a2f628a2eb0139ad60bc824b96d7ad2719a81",
+      "bytes": 63878
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
@@ -66193,13 +66193,13 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
-      "sha256": "8086d3c02f3bb0015ff61037471c518455cae4b9622eeabbf4fa83a492db7ffc",
-      "bytes": 109265
+      "sha256": "980530655359afb0efccf76ab81c318c8da36466b125669c5605e7fc8365bfdf",
+      "bytes": 110929
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
-      "sha256": "ad5a99e41cebb40df9568b66cedd0f754dc271581934d6f523b9ed203d872eab",
-      "bytes": 60145
+      "sha256": "70d7b5781d699e0df289cdcccc261ff6b932e28080a818a41510474afa2b382c",
+      "bytes": 60229
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/make_prompt.py",

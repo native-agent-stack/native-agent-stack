@@ -313,11 +313,11 @@ With `build_args.py --gpt6-provider omniroute --codex-host <HOST>`, the GPT-6 la
 What the lane config also sets:
 - **`[features] shell_snapshot = false`.** Codex's shell snapshot writes the exported environment, the provider key included, into `<CODEX_HOME>/shell_snapshots/*.sh` with mode 0644 (`codex-rs/shell-command/src/shell_snapshot_exports.rs` at rust-v0.157.1). A GPT-6 probe reproduced this.
 - **`[shell_environment_policy.filters] OMNIROUTE_API_KEY = "exclude"`.** Codex 0.157.1 applies its default `*KEY*`, `*SECRET*` and `*TOKEN*` excludes only when `ignore_default_excludes` is false, and that setting defaults to true (`codex-rs/config/src/shell_environment_policy.rs`, `codex-rs/protocol/src/shell_environment.rs`). Without the filter, a real key would reach every command the model runs.
-- **Web search for GPT-6 Astra.** Astra runs Responses Lite, which carries no hosted tools, so search reaches it only as Codex's standalone web search (`web.run`). The lane therefore sets:
-  - `supports_standalone_web_search = true` on the provider, which defaults to false for custom providers ([Codex advanced config](https://learn.chatgpt.com/docs/config-file/config-advanced));
-  - `[features] standalone_web_search = true`, which is under development in 0.157.1.
+- **Web search for GPT-6 Astra: opt-in, default off.** Astra runs Responses Lite, which sends no hosted tool, so search reaches it only as Codex's standalone web search (`web.run`). The lane config writes both switches `false`, which parse as false and expose no search tool, unless `--standalone-web-search` is given, which writes:
+  - `supports_standalone_web_search = true` on the provider, which defaults to false for custom providers (`codex-rs/model-provider-info/src/lib.rs:200-202` at openai/codex rust-v0.163.0, `83086188ae0614bd882818ff1aa23f3194962012`; it makes `codex-rs/ext/web-search/src/extension.rs:46-50` offer `web.run` to a non-OpenAI provider);
+  - `[features] standalone_web_search = true`, which is under development and off by default (`codex-rs/features/src/lib.rs:1250-1255`). Core selects the standalone executor when it is on or the model is Lite (`codex-rs/core/src/tools/spec_plan.rs:1199-1207`).
 
-  The capability flag alone enables nothing: OmniRoute must serve a compatible endpoint, and the parity check below has to show it working before a sweep counts on GPT-6 search through the gateway.
+  The reason for the default: `web.run` POSTs `<base_url>/alpha/search` (`codex-rs/codex-api/src/endpoint/search.rs:14-15` and `41-44`), and an OmniRoute release without that route (3.8.51) answers 404 `unknown_route`, so with the switches on every search call of a lane through that gateway failed. A Lite model gets no hosted search tool either way (`spec_plan.rs:691-693`). `docs/decisions/2026-10-06-codex-omniroute-opt-in-search.md` already keeps the workhorse profile's switches false. Turn them on only for a gateway that serves the route, and let the parity check below show it working before a sweep counts on GPT-6 search through the gateway. `--standalone-web-search` also stages `codex.standalone_web_search = true`, which the `--gpt6-fallback` provider reads.
 
   Measured 2026-09-27: `web.run` POSTs `<base_url>/alpha/search`. OmniRoute release/v3.8.51 at `a58000c7` answers 404 there. Upstream PR #13788 adds the route, but answers from OmniRoute's own search registry, not OpenAI's hosted search: the keyless `duckduckgo-free` provider, unless a keyed provider is configured. Through that route, `site:` queries returned nothing and plain queries few results. GPT-6 fell back to fetched pages and the GitHub API through context-mode.
 - **Skills.** Codex lists user skills from `$CODEX_HOME/skills` and `$HOME/.agents/skills` (`codex-rs/ext/skills/src/host_roots.rs` at rust-v0.157.1). In the lane, `$CODEX_HOME/skills` holds only Codex's `.system` cache; the pinned skills are in `$HOME/.agents/skills`, where `install_skills.py` puts them.
@@ -357,7 +357,10 @@ Before a full run through the gateway, run the lane's parity check on the staged
 
 Decision record: [docs/decisions/2026-10-17-codex-job-lane-hooks-mcp-memory.md](../../../docs/decisions/2026-10-17-codex-job-lane-hooks-mcp-memory.md).
 Every item is a `build_args.py` option that writes one `staged.json` `codex` key; with no option the argv, the
-environment, `inputs.json`, `result` and the lane home are byte-identical to before. Pins: openai/codex `rust-v0.163.0`
+environment, `inputs.json`, `result` and the lane home are byte-identical to before, except for the search default below:
+the lane `config.toml` and the failover argv now write both standalone web search switches `false`, a change from the
+earlier `true`. The failover `result` and `route.json` now record `search_backend` as `none` instead of
+`omniroute:/alpha/search`. `--standalone-web-search` restores the earlier switches and backend. Pins: openai/codex `rust-v0.163.0`
 at `83086188ae0614bd882818ff1aa23f3194962012`, rtk 1.0.1, ai-memory 3.1.0. A restage rewrites `staged.json`, so repeat the options.
 
 | Option | Staged key | What the runner does | Bound in `inputs.json` |
@@ -365,6 +368,7 @@ at `83086188ae0614bd882818ff1aa23f3194962012`, rtk 1.0.1, ai-memory 3.1.0. A res
 | `--codex-hook rtk` | `hooks.rtk` | One `-c hooks.state={...}` inline table trusts the one `rtk hook codex` PreToolUse handler found in `<home>/hooks.json` (by command, never by position; the realpath of `CODEX_HOME`, else `$HOME/.codex`; for a gateway lane `<work-dir>/codex-home`, where `build_args.py` runs upstream's own `rtk init -g --codex`). Sets `RTK_TELEMETRY_DISABLED=1` and the same value for the model's shells. A missing or duplicate handler ends the job before codex starts (exit 2, failure kind `hook_trust`). `--ignore-user-config` stays on the native lane. | `hooks` |
 | `--codex-hook secret_guard` | `hooks.secret_guard` | Registers the staged, hash-checked copy of `scripts/hooks/secret_path_guard.py` as a PreToolUse hook for `Bash` only (timeout 10) with `-c hooks.PreToolUse=[...]`, trusted under the session-flags key in the same `hooks.state` table. A missing or changed copy ends the job before codex starts, and the registered command itself exits 2 with a reason if the copy or the interpreter vanishes later. | `hooks` |
 | `--codex-disable-feature apps`, `--web-search disabled` | `disable`, `web_search` | `codex exec --disable apps` (Codex validates the name). `web_search` was already a staged key; nothing couples it to `disable`. | `disable`, `web_search` |
+| `--standalone-web-search` (gateway lane or `--gpt6-fallback`) | `standalone_web_search` | Writes `supports_standalone_web_search = true` and `[features] standalone_web_search = true` in the lane `config.toml`, and the same two in the failover argv (`supports_standalone_web_search` in the `-c model_providers.omniroute={...}` table, and `-c features.standalone_web_search=`), so Codex's `web.run` POSTs `<base_url>/alpha/search`. Without it both are `false`, and a failover result's `route.search_backend` is `none`. Refused without `--gpt6-provider omniroute` or `--gpt6-fallback`. The "Web search for GPT-6 Astra" item under "GPT-6 through OmniRoute" gives the reason for the default. | `standalone_web_search` (only when true) |
 | `--codex-otel-endpoint 127.0.0.1:PORT [--codex-otel-lane NAME]` | `otel` | `otel.exporter` and `otel.metrics_exporter` (OTLP/HTTP binary to the loopback collector), `otel.tool_result.max_bytes=0` and `otel.environment=<NAME>-<job id>`. A tag the collector would delete (longer than 128 characters or outside its id pattern) is refused before state changes. | `otel` |
 | `--rollout-usage` | `rollout_usage` | After each attempt, a field of its own, `rollout_usage {status, thread_id, rollout, usage, reason}`, from the last `token_count` of the thread's rollout under the attempt's recorded Codex home, found by thread id and never by date. `usage` and `usage_status` stay as they were, `total_tokens` is dropped, and a job that died before `thread.started` stays `unavailable`. | no (it only reads a finished attempt) |
 | `--ai-memory-bearer-env [NAME]` (gateway) | `ai_memory_token_env` | The lane's ai-memory MCP entry carries `bearer_token_env_var = "NAME"` (default `AI_MEMORY_AUTH_TOKEN`), the host's own form. The lane config filters `NAME` out of the model's shells, the runner refuses a start while it is unset or blank (exit 6, kind `no_key`), and the value is written nowhere. | `ai_memory_token_env` |
@@ -405,7 +409,8 @@ by the remaining budget, and an expired budget prevents probe launch. Failed pro
 
 The fallback keeps the native `CODEX_HOME`, its global `AGENTS.md`, `--ignore-user-config`, read-only sandbox,
 staged effort and web-search mode. Its inline provider has `wire_api = "responses"`, `requires_openai_auth = false`,
-`env_key = "OMNIROUTE_API_KEY"` and `supports_standalone_web_search = true`. It enables standalone web search,
+`env_key = "OMNIROUTE_API_KEY"` and `supports_standalone_web_search` set from `codex.standalone_web_search` (false unless
+`build_args.py --standalone-web-search` staged it). It sets `features.standalone_web_search` the same way,
 disables shell snapshots, filters the key out of model-run shells, and requests
 `cx/<native model>-<request_effort>` under the
 [pinned gateway's suffix convention](https://github.com/HouMinXi/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts#L35).
@@ -424,12 +429,14 @@ directly to the gateway has `native_attempt: null`, because it has no native att
 the route and each archived route; later retries preserve it. `convert.py` reads the original sibling receipt,
 because the Workflow wrapper copies a fixed set of result fields. It retains the route in raw metadata and GPT-6
 fit votes and adds the gateway search limitation to the lane. A successful fallback job is reused only while its
-bound inputs and requested fallback route still match; changing the endpoint or disabling fallback reruns that job
-and archives the earlier result.
+bound inputs and requested fallback route (provider, endpoint, model, effort and search backend) still match;
+changing the endpoint or standalone search mode, or disabling fallback, reruns that job and archives the earlier result.
+`standalone_web_search` is bound only when true, so default-off inputs still match older records without that key.
+A legacy `omniroute:/alpha/search` fallback route reruns with standalone search off even when its bound inputs match.
 
 The installed gateway's carried
 [search adapter](https://github.com/amsjavan/OmniRoute/blob/6c7990058c4ce9677de79452c8cefb10b4bf1b3d/src/app/api/v1/alpha/search/route.ts)
-handles `/alpha/search` through its web-search registry with a DuckDuckGo fallback. It supports `search_query` and
+handles `/alpha/search` through its web-search registry with a DuckDuckGo fallback (the route that `--standalone-web-search` calls). It supports `search_query` and
 rejects `open`, `click`, `find` and `screenshot`. Prompt equality does not establish tool or search-recall parity.
 Outbound effort and operation-level parity remain unqualified until the gateway's measured parity check passes.
 The implementation never consumes a reset credit or changes the shared gateway's settings, combos or keys.

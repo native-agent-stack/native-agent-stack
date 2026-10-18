@@ -328,7 +328,13 @@ GitHub-hosted macOS runner; see
    `python3 scripts/credential_status.py` (both added after `v2026.09.24.1`).
 
 4. **Start and check shared QMD, then render configs.** The portable Claude and
-   Codex templates require QMD's native HTTP endpoint on loopback port 21851.
+   Codex templates require QMD's native HTTP endpoint on loopback port 21851,
+   unless the host value file sets the optional `QMD_URL` (`127.0.0.1:<port>`):
+   `render_config.py` renders it into the Codex template's `qmd` URL, and the
+   new WSL distribution's renderer into the Claude entry too. Start and check the
+   service on that port, and keep the shown daemon commands' port equal to it.
+   `adoption/mcp/claude-user.json`, which `install_claude_profile.py` copies
+   with only `${HOME}` and `${ECO_ROOT}` filled, keeps 21851.
    A newly installed package is not a running server. Complete this prerequisite
    before exporting the URL or using step 2's `--configure-full-profile` or
    `--configure-claude-user-profile` flags; install packages first without those
