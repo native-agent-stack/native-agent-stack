@@ -134,7 +134,7 @@
     {"id": "api-keys-quality-caching", "text": "Anthropic API keys serve only the highest-quality resolution that the subscription lanes cannot give, and always with prompt caching.",
      "recorded_in": [],
      "mechanism": [{"path": "docs/decisions/2026-10-10-anthropic-key-slots-and-practice.md", "line": 15, "anchor": "Record the command center's key practice"},
-                   {"path": ".claude/skills/claude-native-practice/reference/slots.json", "line": 661, "anchor": "\"id\": \"prompt-caching\""}],
+                   {"path": ".claude/skills/claude-native-practice/reference/slots.json", "line": 664, "anchor": "\"id\": \"prompt-caching\""}],
      "trigger": "the CC names the ruling record"},
     {"id": "gpt-reserve", "text": "The GPT account pool keeps a 30-point reserve.",
      "recorded_in": [],
