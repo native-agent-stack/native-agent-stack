@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "evidence_class": "synthetic",
+  "reviewed_head": "52924b028c8419b48042f80b088ec3135a0f8084",
+  "content_rebase_target": "fda24cfe436310658755a75e5b6b7865512c8df1",
+  "latest_fetched_main": "39b3fcaf5bcb96c8a672fb6198972dffd3d9937a",
+  "scope": "Content integration with landed #1119, preserving both cancellation/integrity behaviors and both transport exception contracts. Mechanical source-hash correction is included.",
+  "before_change_id_excluding_evidence_manifest": "6ee750e449038e95c359b5ee9f2154ea9ee57da7",
+  "source_refs": [
+    "https://github.com/native-agent-stack/native-agent-stack/blob/fda24cfe436310658755a75e5b6b7865512c8df1/blueprints/us-equities/adaptive-paper/runner.py",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/fda24cfe436310658755a75e5b6b7865512c8df1/blueprints/us-equities/adaptive-paper/transport.py",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/fda24cfe436310658755a75e5b6b7865512c8df1/tests/integration/stream_cancel_dispatch.py",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/52924b028c8419b48042f80b088ec3135a0f8084/blueprints/us-equities/adaptive-paper/runner.py",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/52924b028c8419b48042f80b088ec3135a0f8084/blueprints/us-equities/adaptive-paper/transport.py",
+    "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/live/src/python/runtime.rs#L685-L697",
+    "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/tests/unit/live/test_client_runtime.py#L193-L228",
+    "https://github.com/python/cpython/blob/v3.12.3/Lib/unittest/mock.py"
+  ],
+  "conflicted_files": [
+    "blueprints/us-equities/adaptive-paper/runner.py",
+    "blueprints/us-equities/adaptive-paper/transport.py",
+    "blueprints/us-equities/adaptive-paper/source-hashes.json",
+    "manifests/evidence.json"
+  ],
+  "resolutions": [
+    {
+      "file": "blueprints/us-equities/adaptive-paper/runner.py",
+      "hunk": "first integrity guard in run_native",
+      "kind": "landed side verbatim",
+      "decision": "Keep #1119's disable/cancel/native-and-durable-terminal-confirmation/deadline block. Its cancellation request already subsumes the incoming request."
+    },
+    {
+      "file": "blueprints/us-equities/adaptive-paper/runner.py",
+      "hunk": "second integrity guard after snapshot/refresh work, before rebalance",
+      "kind": "synthesized caller",
+      "decision": "Keep #1091's mid-tick check and use the same landed bounded cancellation wait, admission disable and unconfirmed reporting before breaking. The helper itself remains verbatim."
+    },
+    {
+      "file": "blueprints/us-equities/adaptive-paper/transport.py",
+      "hunk": "GuardedSession.request pre-wire exception boundary",
+      "kind": "synthesized handler",
+      "decision": "Keep #1091 refusal_code and numeric retry_after forwarding; also retain #1119's three fixed local messages. All other messages remain masked."
+    },
+    {
+      "file": "blueprints/us-equities/adaptive-paper/source-hashes.json",
+      "hunk": "all path-to-hash entries",
+      "kind": "regenerated",
+      "decision": "Hash every resolved file, including tests/test_adaptive_paper_sell_chunks.py. No prior value is accepted merely because a side supplied it."
+    },
+    {
+      "file": "manifests/evidence.json",
+      "hunk": "files registry rows",
+      "kind": "regenerated union",
+      "decision": "Preserve landed rows and apply each replayed branch row delta; recompute resolved-file digests and byte counts. The two source heads contribute 12083 paths before this four-file evidence addition; neither source head removes a base path."
+    },
+    {
+      "file": "tests/integration/stream_cancel_dispatch.py",
+      "hunk": "new mid-tick test and optional injection seam",
+      "kind": "new regression",
+      "decision": "Use the real native queues/adapter/callbacks with a synthetic broker. Inject loss during mark_to_market between health checks; assert cancellation confirmation before stop and no further rebalance."
+    },
+    {
+      "file": "docs/decisions/2026-10-13-adaptive-paper-sell-chunks.md",
+      "hunk": "content rebase addendum",
+      "kind": "new documentation",
+      "decision": "Record these integration decisions and bounded measurements without changing historical evidence."
+    }
+  ],
+  "tested_source_sha256": {
+    "blueprints/us-equities/adaptive-paper/runner.py": "95168de280292c141071d79731b0130d271776e6677662c1538555e4f71f8cac",
+    "blueprints/us-equities/adaptive-paper/transport.py": "170309e0f32d5e1274546d6ff0c1dedb4cbd204c8efc0d48e9bf9edec3a3d702",
+    "blueprints/us-equities/adaptive-paper/native_strategy.py": "178aa8c8b5a3ce5e2700578d959c577a96f48c7bba4d0139fd6dc35f077b7910",
+    "blueprints/us-equities/adaptive-paper/native_adapter.py": "4949447c95320d965c37819405c5acf54303d90472032ff03fe51c0a9b5f5b4a",
+    "blueprints/us-equities/adaptive-paper/safety.py": "140856337a13721c852c2c6bd30a2066712c46e3282273f2685ae54dcf6b781b",
+    "blueprints/us-equities/adaptive-paper/recovery.py": "43f8176a01a321e976e527e10d2b29b82258e718de85a3239bd37430a40fecbc",
+    "blueprints/us-equities/adaptive-paper/source-hashes.json": "177491187b8803cebd562075aac5c6e7e1967447813e6137aa7772fe2519e109",
+    "tests/test_adaptive_paper_sell_chunks.py": "319f2c93eab3aa54eb418963d3de33f73ee0ea8feb8c22fe2a078bdd9b08bbe3",
+    "tests/test_adaptive_paper_recovery.py": "7a65e2f879f3e68aa63c31d62d5311169eff6c9f226a67be194a1404881a9e7b",
+    "tests/test_adaptive_paper_transport.py": "a171f0c387ec6a5cfb96beaa03028f72c777ee54ec195498b5f3ec4158f2ccb7",
+    "tests/test_adaptive_paper_stream_backpressure.py": "727fa830331bea2b8d5b8b6872d0a592b867c2e1ea09243555269f38c60eccfd",
+    "tests/test_adaptive_paper_stream_followups.py": "9ee80621f3eef2c2201b6dd4ef06990e616accf99f6066c8e4bacb652f3f8650",
+    "tests/test_adaptive_paper_readiness_backpressure.py": "ccf8fa1c2df875b0357f2d746d0874ef1871a42a96b60df583568c991268ff8b",
+    "tests/integration/stream_cancel_dispatch.py": "de4605714830a47f210d0caed81f126de9214ba09a6cd166991d36e5502aa476",
+    "tests/integration/stream_integrity_followups.py": "9e37ada153aaffc8c4ffe003036647e5c18587c54b83a0754b36832d9b240a5d",
+    "tests/adaptive_paper_hermetic.py": "ee3fe5d3f97143e9361281f2c4d95076b758ec8d245a942bd7470412673558cd"
+  },
+  "source_preservation": {
+    "byte_identical_to_reviewed_head": [
+      "native_strategy.py",
+      "native_adapter.py",
+      "safety.py",
+      "recovery.py",
+      "tests/test_adaptive_paper_sell_chunks.py",
+      "tests/test_adaptive_paper_recovery.py"
+    ],
+    "landed_symbols_verbatim": [
+      "_wait_for_integrity_cancellations",
+      "_QueuedStreamEvent",
+      "AlpacaPaperTransport.stream_health",
+      "AlpacaPaperTransport._wire_guard",
+      "AlpacaPaperTransport._enqueue_stream_event",
+      "AlpacaPaperTransport._consume_events"
+    ],
+    "note": "Symbol comparison used the named immutable source commits and exact source segments. Full-file paths for the first four entries are under blueprints/us-equities/adaptive-paper/."
+  },
+  "fail_first": {
+    "source_hash": {
+      "baseline": "52924b028c8419b48042f80b088ec3135a0f8084",
+      "tests": 8,
+      "failures": 1,
+      "errors": 0,
+      "skips": 0,
+      "reason": "Sell-chunk test recorded c34ec7b5... while actual file is 319f2c93...; resolved tree passes all eight checks."
+    },
+    "transport": {
+      "baseline": "incoming-only conflict choice during replay of 03faf1e8c",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "reason": "Landed fixed integrity diagnosis is masked; combined handler passes the same no-HTTP regression and final transport suite."
+    },
+    "native_mid_tick": [
+      {
+        "baseline": "52924b028c8419b48042f80b088ec3135a0f8084",
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "reason": "Queued native cancel is abandoned; zero port cancellation calls and one unresolved order."
+      },
+      {
+        "baseline": "fda24cfe436310658755a75e5b6b7865512c8df1",
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "reason": "Cancellation is confirmed, but another rebalance occurs after the injected integrity loss."
+      }
+    ],
+    "fixture_sha256": "de4605714830a47f210d0caed81f126de9214ba09a6cd166991d36e5502aa476",
+    "production_unchanged_in_both_source_head_controls": true
+  },
+  "acceptance": {
+    "core": {
+      "return_code": 0,
+      "tests": 201,
+      "test_seconds": 41.346,
+      "wall_seconds": 43.242,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "transport_stream": {
+      "return_code": 0,
+      "tests": 159,
+      "test_seconds": 4.206,
+      "wall_seconds": 4.981,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "native_integration": {
+      "return_code": 0,
+      "tests": 7,
+      "test_seconds": 8.959,
+      "wall_seconds": 9.865,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "total_runtime_tests": 367,
+    "source_hash_checks": 8,
+    "source_hash_return_code": 0
+  },
+  "artifacts": {
+    "runtime": "runtime-tests.json",
+    "controls": "merge-controls.json",
+    "resolved_runtime_delta": "resolved-runtime.diff"
+  },
+  "boundaries": [
+    "Synthetic orders, fills, sockets and broker responses. No broker acceptance or live paper operation is established.",
+    "Tests use private journals/STOP bindings; no host runtime lock, live unit, credential store or live latch was accessed.",
+    "Test commands run with network isolation. The named test source root is explicitly pinned to the checkout.",
+    "Fourteen existing temporary-directory ResourceWarnings remain in the core output.",
+    "Historical round2/red-tests.txt contains one trailing space in captured unittest output and is byte-identical to the reviewed head; historical captures are preserved.",
+    "The final change ID and final Git head are recorded in the handoff, avoiding a self-referential artifact."
+  ]
+}

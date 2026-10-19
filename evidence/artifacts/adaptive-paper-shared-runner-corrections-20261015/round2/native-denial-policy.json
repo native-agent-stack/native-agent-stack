@@ -1,0 +1,339 @@
+{
+  "source": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/events/order/denied_reason.rs",
+  "members": [
+    {
+      "variant": "PricePrecisionExceedsMaximum",
+      "code": "PRICE_PRECISION_EXCEEDS_MAXIMUM",
+      "display": "PRICE_PRECISION_EXCEEDS_MAXIMUM: field={field}, price={price}, precision={price_precision}, max_precision={max_precision}",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "PriceNotPositive",
+      "code": "PRICE_NOT_POSITIVE",
+      "display": "PRICE_NOT_POSITIVE: field={field}, price={price}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "QuantityPrecisionExceedsMaximum",
+      "code": "QUANTITY_PRECISION_EXCEEDS_MAXIMUM",
+      "display": "QUANTITY_PRECISION_EXCEEDS_MAXIMUM: quantity={quantity}, precision={quantity_precision}, max_precision={max_precision}",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "QuantityConversionFailed",
+      "code": "QUANTITY_CONVERSION_FAILED",
+      "display": "QUANTITY_CONVERSION_FAILED: {detail}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "QuantityExceedsMaximum",
+      "code": "QUANTITY_EXCEEDS_MAXIMUM",
+      "display": "QUANTITY_EXCEEDS_MAXIMUM: effective={effective_quantity}, max={max_quantity}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "QuantityBelowMinimum",
+      "code": "QUANTITY_BELOW_MINIMUM",
+      "display": "QUANTITY_BELOW_MINIMUM: effective={effective_quantity}, min={min_quantity}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "InvalidMaxNotionalPerOrder",
+      "code": "INVALID_MAX_NOTIONAL_PER_ORDER",
+      "display": "INVALID_MAX_NOTIONAL_PER_ORDER: instrument_id={instrument_id}, value={value}",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "MissingExpireTime",
+      "code": "MISSING_EXPIRE_TIME",
+      "display": "MISSING_EXPIRE_TIME",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "ExpireTimeInPast",
+      "code": "EXPIRE_TIME_IN_PAST",
+      "display": "EXPIRE_TIME_IN_PAST: {expire_time}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "MissingTrailingOffsetType",
+      "code": "MISSING_TRAILING_OFFSET_TYPE",
+      "display": "MISSING_TRAILING_OFFSET_TYPE",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "UnsupportedTrailingOffsetType",
+      "code": "UNSUPPORTED_TRAILING_OFFSET_TYPE",
+      "display": "UNSUPPORTED_TRAILING_OFFSET_TYPE: {offset_type}",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "MissingTriggerType",
+      "code": "MISSING_TRIGGER_TYPE",
+      "display": "MISSING_TRIGGER_TYPE",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "MissingTrailingOffset",
+      "code": "MISSING_TRAILING_OFFSET",
+      "display": "MISSING_TRAILING_OFFSET",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "InstrumentNotFound",
+      "code": "INSTRUMENT_NOT_FOUND",
+      "display": "INSTRUMENT_NOT_FOUND: {instrument_id}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "PositionNotFound",
+      "code": "POSITION_NOT_FOUND",
+      "display": "POSITION_NOT_FOUND: {position_id}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "MarketPriceUnavailable",
+      "code": "MARKET_PRICE_UNAVAILABLE",
+      "display": "MARKET_PRICE_UNAVAILABLE: order_type={order_type}, instrument_id={instrument_id}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "TrailingStopCalculationFailed",
+      "code": "TRAILING_STOP_CALCULATION_FAILED",
+      "display": "TRAILING_STOP_CALCULATION_FAILED: {detail}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "NotionalCalculationFailed",
+      "code": "NOTIONAL_CALCULATION_FAILED",
+      "display": "NOTIONAL_CALCULATION_FAILED: {detail}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "NotionalBelowMinimum",
+      "code": "NOTIONAL_BELOW_MINIMUM",
+      "display": "NOTIONAL_BELOW_MINIMUM: min={min_notional}, notional={notional}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "NotionalExceedsMaximum",
+      "code": "NOTIONAL_EXCEEDS_MAXIMUM",
+      "display": "NOTIONAL_EXCEEDS_MAXIMUM: max={max_notional}, notional={notional}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "NotionalExceedsMaxPerOrder",
+      "code": "NOTIONAL_EXCEEDS_MAX_PER_ORDER",
+      "display": "NOTIONAL_EXCEEDS_MAX_PER_ORDER: max={max_notional}, notional={notional}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "NotionalExceedsFreeBalance",
+      "code": "NOTIONAL_EXCEEDS_FREE_BALANCE",
+      "display": "NOTIONAL_EXCEEDS_FREE_BALANCE: free={free_balance}, notional={notional}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "InitialMarginCalculationFailed",
+      "code": "INITIAL_MARGIN_CALCULATION_FAILED",
+      "display": "INITIAL_MARGIN_CALCULATION_FAILED: {detail}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "InitialMarginExceedsFreeBalance",
+      "code": "INITIAL_MARGIN_EXCEEDS_FREE_BALANCE",
+      "display": "INITIAL_MARGIN_EXCEEDS_FREE_BALANCE: free={free_balance}, margin={initial_margin}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "BettingBalanceLockedCalculationFailed",
+      "code": "BETTING_BALANCE_LOCKED_CALCULATION_FAILED",
+      "display": "BETTING_BALANCE_LOCKED_CALCULATION_FAILED: {detail}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "CumulativeNotionalExceedsFreeBalance",
+      "code": "CUMULATIVE_NOTIONAL_EXCEEDS_FREE_BALANCE",
+      "display": "CUMULATIVE_NOTIONAL_EXCEEDS_FREE_BALANCE: free={free_balance}, notional={cumulative_notional}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "CumulativeInitialMarginCalculationFailed",
+      "code": "CUMULATIVE_INITIAL_MARGIN_CALCULATION_FAILED",
+      "display": "CUMULATIVE_INITIAL_MARGIN_CALCULATION_FAILED: {detail}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "CumulativeInitialMarginExceedsFreeBalance",
+      "code": "CUMULATIVE_INITIAL_MARGIN_EXCEEDS_FREE_BALANCE",
+      "display": "CUMULATIVE_INITIAL_MARGIN_EXCEEDS_FREE_BALANCE: free={free_balance}, margin={cumulative_initial_margin}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "ReduceOnlyWouldIncreasePosition",
+      "code": "REDUCE_ONLY_WOULD_INCREASE_POSITION",
+      "display": "REDUCE_ONLY_WOULD_INCREASE_POSITION: {position_id}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "OrderListIncomplete",
+      "code": "ORDER_LIST_INCOMPLETE",
+      "display": "ORDER_LIST_INCOMPLETE: {order_list_id}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "OrderListDenied",
+      "code": "ORDER_LIST_DENIED",
+      "display": "ORDER_LIST_DENIED: {order_list_id}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "TradingHalted",
+      "code": "TRADING_HALTED",
+      "display": "TRADING_HALTED",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "TradingStateReducing",
+      "code": "TRADING_STATE_REDUCING",
+      "display": "TRADING_STATE_REDUCING: side={order_side}, instrument_id={instrument_id}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "RateLimitExceeded",
+      "code": "RATE_LIMIT_EXCEEDED",
+      "display": "RATE_LIMIT_EXCEEDED",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "StreamReconciling",
+      "code": "STREAM_RECONCILING",
+      "display": "STREAM_RECONCILING: execution stream unavailable or recovering, retry after recovery",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "NoExecutionClient",
+      "code": "NO_EXECUTION_CLIENT",
+      "display": "NO_EXECUTION_CLIENT: client_id={client}, {routing_context}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "ClientVenueMismatch",
+      "code": "CLIENT_VENUE_MISMATCH",
+      "display": "CLIENT_VENUE_MISMATCH: client_id={client_id}, order_venue={order_venue}, client_venue={client_venue}",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "SubmitFailed",
+      "code": "SUBMIT_FAILED",
+      "display": "SUBMIT_FAILED: {detail}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "InvalidClientOrderId",
+      "code": "INVALID_CLIENT_ORDER_ID",
+      "display": "INVALID_CLIENT_ORDER_ID: {detail}",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "InvalidPositionId",
+      "code": "INVALID_POSITION_ID",
+      "display": "INVALID_POSITION_ID: {position_id}; {detail}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    },
+    {
+      "variant": "UnsupportedOrderList",
+      "code": "UNSUPPORTED_ORDER_LIST",
+      "display": "UNSUPPORTED_ORDER_LIST: {detail}",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "UnsupportedOrderType",
+      "code": "UNSUPPORTED_ORDER_TYPE",
+      "display": "UNSUPPORTED_ORDER_TYPE: {order_type}",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "UnsupportedReduceOnly",
+      "code": "UNSUPPORTED_REDUCE_ONLY",
+      "display": "UNSUPPORTED_REDUCE_ONLY",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "UnsupportedTimeInForce",
+      "code": "UNSUPPORTED_TIME_IN_FORCE",
+      "display": "UNSUPPORTED_TIME_IN_FORCE: {0}",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "UnsupportedTpSl",
+      "code": "UNSUPPORTED_TP_SL",
+      "display": "UNSUPPORTED_TP_SL: {detail}",
+      "policy": "definitive",
+      "rationale": "Fixed order-contract/configuration failure requiring repair; elapsed time does not release it."
+    },
+    {
+      "variant": "ValidationFailed",
+      "code": "VALIDATION_FAILED",
+      "display": "VALIDATION_FAILED: {detail}",
+      "policy": "transient_with_reconcile",
+      "rationale": "Revalidate/reconcile the current state; this code must not create a permanent exit refusal."
+    }
+  ],
+  "unknown_policy": "transient_with_reconcile",
+  "native_no_venue_reconciliation": "OrderDenied is a publisher-guaranteed local denial. The callback retires a never-venue reservation first. A missing reservation or a no-broker/no-fill not_sent record settles reconciliation locally and enables the existing durable paced retry.",
+  "attempted_reconciliation": "An uncertain attempted request remains blocked until a healthy complete snapshot reconciles its client_order_id and confirms a terminal outcome. Missing attempted IDs still fail closed.",
+  "diagnostics": "Only the leading canonical native code is retained; unknown diagnostics become NATIVE_DENIAL_UNKNOWN.",
+  "local_definitive_allowlist": [
+    "global_stop_latched",
+    "outside_allowed_session",
+    "only_USD_equity_limit_DAY_supported",
+    "invalid_price_increment",
+    "RejectedSubmission"
+  ],
+  "integrity_policy": "integrity_lost is permanent for the damaged observation session and released only by healthy fresh recovery."
+}

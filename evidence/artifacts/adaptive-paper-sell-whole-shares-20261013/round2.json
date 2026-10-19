@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "evidence_class": "synthetic",
+  "parent": "54a12969c060b10aaf52a6c281d89b76e59b79e8",
+  "review_basis": "Astra FIRST at 17c49649040cf98abc872bbc32b9cf37a0dd93c6, review-regressions.py",
+  "fail_first": {
+    "reviewer_assertions": 3,
+    "rc": 1,
+    "failures": 3,
+    "observed": ["take-profit left one owned share", "four identical definitive native denials", "appreciated one owned share remained unsold"]
+  },
+  "corrected_reviewer_assertions": {"tests": 3, "failures": 0, "rc": 0},
+  "verification": {
+    "broad_native_modules": ["tests.test_adaptive_paper_sell_chunks", "tests.test_adaptive_paper_native", "tests.test_adaptive_paper_runner", "tests.test_adaptive_paper_exits", "tests.test_adaptive_paper_extended_exits", "tests.test_adaptive_paper_corporate_actions", "tests.test_adaptive_paper_recovery", "tests.test_adaptive_paper_safety"],
+    "broad_native_tests": 600,
+    "broad_native_rc": 0,
+    "final_targeted_tests": 14,
+    "final_targeted_rc": 0,
+    "final_recovery_tests": 41,
+    "final_recovery_rc": 0,
+    "scope": "Final targeted run follows the last refusal replay-fallback and zero-request sizing edits; broad run covers the eight native modules. Prior round-1 runner failure remains historical, not erased."
+  },
+  "policy_correction": "The CC whole-share minimum supersedes the reviewer's fractional recommendation. Original flatness assertion retained; no fractional sell is submitted.",
+  "implementation": {
+    "committed_target": "Durable per-symbol original remaining target and reason, reconciled against held and unresolved orders; original partial target is retained.",
+    "minimum_owned_exit": "One whole owned share may exceed the notional cap only; ownership/quantity guards and exit_cap_exceeded_reduce_only event remain mandatory.",
+    "definitive_refusal": "Retained reason and visible attention; no automatic retry until explicit recorded reconciliation with no outstanding order.",
+    "transient_refusal": "Only four exact known pre-wire reasons; maximum two automatic retries, at least five seconds apart; counts/times survive restart.",
+    "recovery": "Uses the shared whole-share sizing and refusal state; explicit recovery logs a full-flat target policy without clearing refusal state.",
+    "fractional_residual": "Needs attention; preserved owned balance, no fractional native or recovery sell."
+  },
+  "primary_sources": [
+    {"repository": "https://github.com/nautechsystems/nautilus_trader", "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e", "path": "crates/risk/src/engine/mod.rs", "lines": "2148-2154", "claim": "Instrument quantity precision check"},
+    {"repository": "https://github.com/nautechsystems/nautilus_trader", "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e", "path": "crates/model/src/events/order/denied.rs", "lines": "36-61", "claim": "Native denial event and retained reason"},
+    {"repository": "https://github.com/native-agent-stack/native-agent-stack", "commit": "54a12969c060b10aaf52a6c281d89b76e59b79e8", "path": "blueprints/us-equities/adaptive-paper/safety.py", "claim": "Existing transactional journal metadata, events, owned reservation and unresolved-intent accounting"}
+  ],
+  "limits": [
+    "Synthetic quotes and broker transport; real installed NautilusTrader 2.0.0rc5 risk and native numeric/event types where explicitly tested.",
+    "No new broker operation, credential access, operating activation or paper acceptance.",
+    "Prior round-1 evidence and its runner timing limitation remain historical; round-2 measurements are recorded separately.",
+    "P3s remain follow-ups."
+  ]
+}

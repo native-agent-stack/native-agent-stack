@@ -15,6 +15,7 @@ sys.path.insert(0, str(SOURCE))
 import exits as X  # noqa: E402
 from strategies_v1 import PolicyConfig  # noqa: E402
 from strategies import AdaptivePolicy  # noqa: E402
+from safety import RiskLimits  # noqa: E402
 
 NATIVE = importlib.util.find_spec("nautilus_trader") is not None
 
@@ -254,6 +255,8 @@ class NativeExtendedExitCallerTests(unittest.TestCase):
         # must use a fresh identity, as the real journal-seeded sequence does.
         strategy.sequence = 1
         strategy.positions = lambda: {"AAPL": {"qty": "2", "avg_entry_price": "100"}}
+        strategy.ledger.positions = lambda: {"AAPL": SimpleNamespace(qty=Decimal(2), average_cost=Decimal(100))}
+        strategy.ledger.limits = RiskLimits()
         strategy.ledger.unresolved = lambda: []
         strategy._gap_risk_stop_symbols = lambda at, held: set()
         strategy._corporate_action_guard_symbols = lambda *args: (set(), set())

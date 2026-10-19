@@ -196,9 +196,30 @@ class AdaptiveStrategy(Strategy):
             self.received_quotes += 1
 
     @guarded_callback
+    def on_order_accepted(self, event):
+        info = self.pending.get(str(event.client_order_id))
+        if info and info.get("side") == "sell" and hasattr(self.ledger, "record_exit_acceptance"):
+            self.ledger.record_exit_acceptance(info["symbol"])
+
+    @guarded_callback
     def on_order_filled(self, event):
         self.native_fills += 1
         client_id = str(event.client_order_id)
+        info = self.pending.get(client_id)
+        if info and info.get("side") == "sell" and hasattr(self.ledger, "exit_state"):
+            symbol = info["symbol"]
+            state = self.ledger.exit_state(symbol)
+            changed = False
+            if state.get("refusal", {}).get("classification") == "transient":
+                state.pop("refusal")
+                changed = True
+            position = self.ledger.positions().get(symbol)
+            owned = position.qty if position else Decimal(0)
+            if state.get("reason") and owned <= Decimal(state["target"]):
+                state["completed"] = True
+                changed = True
+            if changed:
+                self.ledger.record_exit_state(symbol, state, transition="confirmed_fill")
         # D1 (round 3): a fill (full or partial) can race a staged
         # cancel-then-replace -- see _release_staged_replacement's
         # docstring. Residue protection for a partial fill still holds:
@@ -252,6 +273,7 @@ class AdaptiveStrategy(Strategy):
     def on_order_rejected(self, event):
         self.native_rejections += 1
         client_id = str(event.client_order_id)
+        self._retain_exit_refusal(client_id, str(event.reason))
         self._release_staged_replacement(client_id)
         self._clear_gap_stop_applied_if_matches(self.pending.get(client_id))
         if str(event.reason).startswith("broker definitively rejected"):
@@ -264,9 +286,11 @@ class AdaptiveStrategy(Strategy):
     def on_order_denied(self, event):
         self.native_rejections += 1
         client_id = str(event.client_order_id)
+        self._mark_definitive_refusal(client_id)
+        self._retain_exit_refusal(client_id, str(getattr(event, "reason", "native_denial_reason_missing")),
+                                  native_denied=True)
         self._release_staged_replacement(client_id)
         self._clear_gap_stop_applied_if_matches(self.pending.get(client_id))
-        self._mark_definitive_refusal(client_id)
         self.pending.pop(client_id, None)
 
     @guarded_callback
@@ -385,6 +409,19 @@ class AdaptiveStrategy(Strategy):
             if terminal != "fill":
                 self._clear_gap_stop_for_dropped_replacement(info["replace_with"])
             info["replace_with"] = None
+
+    def _retain_exit_refusal(self, client_id, reason, *, native_denied=False):
+        info = self.pending.get(client_id)
+        if info is None:
+            intent = next((i for i in self.ledger.intents() if i.client_id == client_id), None)
+            if intent is not None:
+                info = {"symbol": intent.symbol, "side": intent.side}
+        if info and info.get("side") == "sell" and hasattr(self.ledger, "record_exit_refusal"):
+            refusal = self.ledger.record_exit_refusal(info["symbol"], reason, self._clock(),
+                reconcile_client_id=client_id, native_denied=native_denied)
+            self._flag_exit_position(info["symbol"], ExitDecision(
+                "exit_refused:" + refusal["classification"] + ":" + refusal["reason"],
+                0.0, "hold", submit=False, flag_position=True))
 
     def _mark_definitive_refusal(self, client_id):
         intent = next((i for i in self.ledger.intents() if i.client_id == client_id), None)
@@ -885,6 +922,33 @@ class AdaptiveStrategy(Strategy):
                      else self._exit_pending_attention)
         attention.pop(symbol, None)
 
+    def _sell_chunk(self, symbol, quantity, price, bid):
+        """Size a risk-reducing exit within its durable envelope, as recovery does.
+
+        Use the current position and quote at dispatch (also on cancel ack).
+        The policy's entry share bound does not constrain an owned sell.
+        Equity size_precision=0 requires whole shares, including fixed-qty mode.
+        rc5@1b0a49d2 crates/risk/src/engine/mod.rs:2148-2154 rejects excess precision.
+        """
+        position = self.ledger.positions().get(symbol)
+        if position is None:
+            return Decimal(0)
+        if hasattr(self.ledger, "owned_exit_quantity"):
+            return self.ledger.owned_exit_quantity(quantity, position.qty, price, bid)
+        price = Decimal(str(price))
+        capacity = (self.ledger.limits.max_order_notional_usd / price).quantize(
+            Decimal("0.000000001"), rounding="ROUND_DOWN")
+        return min(Decimal(str(quantity)), position.qty,
+                   self.ledger.limits.effective_max_order_qty(price, quote_price=Decimal(str(bid))),
+                   capacity).to_integral_value(rounding="ROUND_DOWN")
+
+    def _flag_unrepresentable_sell(self, symbol):
+        if symbol in self.ledger.positions():
+            self._flag_exit_position(symbol, ExitDecision(
+                "exit_quantity_unrepresentable", 0.0, "hold", submit=False, flag_position=True))
+        else:
+            self._resolve_exit_attention(symbol)
+
     def rebalance(self, now=None, *, force_exit=False):
         """Publish one attention transition after the entire owner tick."""
         completed = False
@@ -1048,12 +1112,51 @@ class AdaptiveStrategy(Strategy):
         # excludes both sets.
         actions += [(s, "sell", held[s], "gap_risk_stop")
                    for s in gap_stop_symbols - ca_must_flatten if held.get(s, 0) > 0]
+        # Commit the original target, not a fraction of each successive remainder.
+        # Durable held quantities include fills; outstanding orders remain serialized
+        # by busy below. Replay loads the same target/refusal state from the journal.
+        if hasattr(self.ledger, "exit_state"):
+            proposed = {s: (q, r) for s, side, q, r in actions if side == "sell"}
+            continued = []
+            # Reconciliation can confirm flat without a strategy fill callback.
+            # Complete that target before filtering a new entry for the symbol.
+            for s in dict.fromkeys((*held, *decision.targets)):
+                qty = held.get(s, Decimal(0))
+                state = self.ledger.exit_state(s)
+                if s in proposed:
+                    reduction, reason = proposed[s]
+                    # A repeated fractional exit keeps its original target until
+                    # the ledger re-arms it on a confirmed scale-in after completion.
+                    # An absolute allocation cut can strengthen the same reason.
+                    repeated_partial = (reason == state.get("reason") and s in decision.exits
+                                        and self.policy.last_exit_fractions.get(s, 1.0) < 1)
+                    if not repeated_partial:
+                        target = max(Decimal(0), qty - reduction)
+                        if not state.get("reason") or state.get("completed") or target < Decimal(state["target"]):
+                            state.update(target=str(target), reason=reason, completed=False)
+                            self.ledger.record_exit_state(s, state, transition="commit_reduction")
+                if state.get("reason") and not state.get("completed") and qty > Decimal(state["target"]):
+                    continued.append((s, "sell", qty - Decimal(state["target"]), state["reason"]))
+                elif state.get("reason") and not state.get("completed"):
+                    state["completed"] = True
+                    self.ledger.record_exit_state(s, state, transition="target_reached")
+            actions = continued
         if self.enabled and not force_exit:
             actions += [(s, "buy", qty - held.get(s, 0),
                          next((x.family for x in decision.signals if x.symbol == s), "rebalance"))
                         for s, qty in decision.targets.items()
-                        if qty > held.get(s, 0) and s not in ca_block_entry]
+                        if qty > held.get(s, 0) and s not in ca_block_entry
+                        and not (hasattr(self.ledger, "exit_state")
+                                 and self.ledger.exit_state(s).get("reason")
+                                 and not self.ledger.exit_state(s).get("completed"))]
         for symbol, side, quantity, reason in actions:
+            if side == "sell" and hasattr(self.ledger, "exit_retry_allowed") \
+                    and not self.ledger.exit_retry_allowed(symbol, now):
+                refusal = self.ledger.exit_state(symbol)["refusal"]
+                self._flag_exit_position(symbol, ExitDecision(
+                    "exit_refused:" + refusal["classification"] + ":" + refusal["reason"],
+                    0.0, "hold", submit=False, flag_position=True))
+                continue
             if symbol in flagged_exits:
                 continue
             if self._halted(symbol):
@@ -1114,15 +1217,20 @@ class AdaptiveStrategy(Strategy):
                     # quote, cap, reject).
                     self.replace_exit(symbol, now, quantity, reason)
                 continue
-            self.sequence += 1
-            client_id = f"adp-{self.trial_id}-{self.sequence:07d}"
             price_str = (session_exit.limit_price if session_exit is not None
                          and session_exit.price_rule == "limit" else
                          limit_price(quote.bid, quote.ask, side))
+            order_quantity = (self._sell_chunk(symbol, quantity, price_str, quote.bid) if side == "sell"
+                              else min(quantity, self.policy.config.max_shares))
+            if side == "sell" and order_quantity <= 0:
+                self._flag_unrepresentable_sell(symbol)
+                continue
+            self.sequence += 1
+            client_id = f"adp-{self.trial_id}-{self.sequence:07d}"
             order = self.order_factory.limit(
                 InstrumentId.from_str(symbol + ".ALPACA"),
                 OrderSide.BUY if side == "buy" else OrderSide.SELL,
-                Quantity.from_str(str(min(quantity, self.policy.config.max_shares))),
+                Quantity.from_int(int(order_quantity)) if side == "sell" else Quantity.from_str(str(order_quantity)),
                 Price.from_str(price_str),
                 time_in_force=TimeInForce.DAY, client_order_id=ClientOrderId(client_id),
                 tags=[f"strategy={reason}", f"reason={reason}"])
@@ -1149,12 +1257,9 @@ class AdaptiveStrategy(Strategy):
             # has actually been submitted, not preemptively when the stop
             # was first evaluated inside _gap_risk_stop_symbols. D6 (round
             # 4): only when the FULL held quantity was actually submitted
-            # -- `Quantity.from_str(str(min(quantity, max_shares)))` above
-            # silently truncates a gap_risk_stop sell larger than
-            # max_shares, and marking fire-once regardless used to leave
-            # the untruncated remainder permanently unprotected for the
-            # rest of the RTH session.
-            if reason == "gap_risk_stop" and quantity <= self.policy.config.max_shares:
+            # -- a share/notional-bounded chunk must not consume the stop
+            # while a remainder stays held. The next tick protects it too.
+            if reason == "gap_risk_stop" and order_quantity >= held[symbol]:
                 self._gap_stop_applied.add(symbol)
         return decision
 
@@ -1367,8 +1472,6 @@ class AdaptiveStrategy(Strategy):
             # _clear_gap_stop_for_dropped_replacement.
             self._clear_gap_stop_for_dropped_replacement(replacement)
             return
-        self.sequence += 1
-        client_id = f"adp-{self.trial_id}-{self.sequence:07d}"
         reason = replacement["reason"]
         quantity = replacement["quantity"]
         price_str = (session_exit.limit_price if session_exit is not None
@@ -1378,9 +1481,28 @@ class AdaptiveStrategy(Strategy):
                       and session_exit.price_rule == "limit" else
                       REASON_PRICE_RULE.get(reason, "market") if session_exit is not None
                       else replacement["price_rule"])
+        remaining = self.ledger.positions().get(symbol)
+        if hasattr(self.ledger, "exit_retry_allowed") and not self.ledger.exit_retry_allowed(symbol, now):
+            refusal = self.ledger.exit_state(symbol)["refusal"]
+            self._flag_exit_position(symbol, ExitDecision(
+                "exit_refused:" + refusal["classification"] + ":" + refusal["reason"],
+                0.0, "hold", submit=False, flag_position=True))
+            self._clear_gap_stop_for_dropped_replacement(replacement)
+            return
+        if hasattr(self.ledger, "exit_state"):
+            state = self.ledger.exit_state(symbol)
+            if state.get("reason") and remaining:
+                quantity = min(Decimal(str(quantity)), max(Decimal(0), remaining.qty - Decimal(state["target"])))
+        order_quantity = self._sell_chunk(symbol, quantity, price_str, quote.bid)
+        if order_quantity <= 0:
+            self._flag_unrepresentable_sell(symbol)
+            self._clear_gap_stop_for_dropped_replacement(replacement)
+            return
+        self.sequence += 1
+        client_id = f"adp-{self.trial_id}-{self.sequence:07d}"
         order = self.order_factory.limit(
             InstrumentId.from_str(symbol + ".ALPACA"), OrderSide.SELL,
-            Quantity.from_str(str(min(quantity, self.policy.config.max_shares))),
+            Quantity.from_int(int(order_quantity)),
             Price.from_str(price_str),
             time_in_force=TimeInForce.DAY, client_order_id=ClientOrderId(client_id),
             tags=[f"strategy={reason}", f"reason={reason}", f"price_rule={price_rule}"])
@@ -1391,10 +1513,9 @@ class AdaptiveStrategy(Strategy):
         # D1 (round 4): fire-once is marked here -- once the replacement
         # order has actually been submitted -- not on replace_exit's
         # earlier "cancel_requested" outcome. D6 (round 4): only when the
-        # FULL quantity was actually submitted, not truncated by
-        # max_shares (see rebalance()'s identical guard on its own direct
-        # submit path).
-        if reason == "gap_risk_stop" and quantity <= self.policy.config.max_shares:
+        # FULL currently held quantity was submitted, rather than one
+        # share/notional-bounded chunk (same rule as ordinary dispatch).
+        if reason == "gap_risk_stop" and remaining is not None and order_quantity >= remaining.qty:
             self._gap_stop_applied.add(symbol)
 
     def cancel_expired(self, now, timeout, *, all_entries=False, symbols=None):

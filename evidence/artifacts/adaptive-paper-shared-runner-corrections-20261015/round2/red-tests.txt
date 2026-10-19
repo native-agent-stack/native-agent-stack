@@ -1,0 +1,738 @@
+test_ambiguous_exit_reconciles_cancelled_id_before_retry (tests.test_adaptive_paper_recovery.RecoveryTests.test_ambiguous_exit_reconciles_cancelled_id_before_retry) ... FAIL
+test_post_submit_deadline_reconciles_cancelled_id_before_retry (tests.test_adaptive_paper_recovery.RecoveryTests.test_post_submit_deadline_reconciles_cancelled_id_before_retry) ... FAIL
+test_ambiguous_unfilled_exit_is_cancelled_before_retry (tests.test_adaptive_paper_recovery.RecoveryTests.test_ambiguous_unfilled_exit_is_cancelled_before_retry) ... FAIL
+test_shared_journal_ambiguous_exit_allows_mover_recovery (tests.test_adaptive_paper_recovery.RecoveryTests.test_shared_journal_ambiguous_exit_allows_mover_recovery) ... FAIL
+test_transport_ambiguous_submission_reconciles_before_retry (tests.test_adaptive_paper_recovery.RecoveryTests.test_transport_ambiguous_submission_reconciles_before_retry) ... FAIL
+test_ambiguous_fill_reconciled_flat_does_not_poison_later_exits (tests.test_adaptive_paper_recovery.RecoveryTests.test_ambiguous_fill_reconciled_flat_does_not_poison_later_exits) ... FAIL
+test_foreign_exception_text_is_absent_from_refusal_journal_and_next_receipt (tests.test_adaptive_paper_recovery.RecoveryTests.test_foreign_exception_text_is_absent_from_refusal_journal_and_next_receipt) ... FAIL
+test_integrity_handoff_requests_entry_cancellation_before_node_stop (tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_integrity_handoff_requests_entry_cancellation_before_node_stop) ... F1_MEASUREMENT {"held_at_handoff": {"AAPL": "1"}, "lifecycle": ["node_stop"], "loss_to_handoff_seconds": 0.279, "post_loss_submit_budget_calls": [], "recovery_errors": ["cancellation_not_confirmed"], "recovery_status": "needs_attention"}
+FAIL
+test_ambiguous_exit_missing_from_snapshot_cannot_retry (tests.test_adaptive_paper_recovery.RecoveryTests.test_ambiguous_exit_missing_from_snapshot_cannot_retry) ... ok
+test_native_sizing_fixture_isolates_every_stop_binding (tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_native_sizing_fixture_isolates_every_stop_binding) ... FAIL
+test_native_rate_limit_expiry_retries_the_owned_exit (tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_native_rate_limit_expiry_retries_the_owned_exit) ... NATIVE_RATE_MEASUREMENT {'reason': 'RATE_LIMIT_EXCEEDED', 'retry_at_120s': False, 'held_after_expiry': {'AAPL': '1'}}
+FAIL
+test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) ... 
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='PRICE_PRECISION_EXCEEDS_MAXIMUM') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='PRICE_NOT_POSITIVE') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='QUANTITY_PRECISION_EXCEEDS_MAXIMUM') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='QUANTITY_CONVERSION_FAILED') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='QUANTITY_EXCEEDS_MAXIMUM') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='QUANTITY_BELOW_MINIMUM') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='INVALID_MAX_NOTIONAL_PER_ORDER') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='MISSING_EXPIRE_TIME') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='EXPIRE_TIME_IN_PAST') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='MISSING_TRAILING_OFFSET_TYPE') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='UNSUPPORTED_TRAILING_OFFSET_TYPE') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='MISSING_TRIGGER_TYPE') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='MISSING_TRAILING_OFFSET') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='INSTRUMENT_NOT_FOUND') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='POSITION_NOT_FOUND') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='MARKET_PRICE_UNAVAILABLE') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='TRAILING_STOP_CALCULATION_FAILED') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='NOTIONAL_CALCULATION_FAILED') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='NOTIONAL_BELOW_MINIMUM') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='NOTIONAL_EXCEEDS_MAXIMUM') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='NOTIONAL_EXCEEDS_MAX_PER_ORDER') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='NOTIONAL_EXCEEDS_FREE_BALANCE') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='INITIAL_MARGIN_CALCULATION_FAILED') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='INITIAL_MARGIN_EXCEEDS_FREE_BALANCE') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='BETTING_BALANCE_LOCKED_CALCULATION_FAILED') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='CUMULATIVE_NOTIONAL_EXCEEDS_FREE_BALANCE') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='CUMULATIVE_INITIAL_MARGIN_CALCULATION_FAILED') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='CUMULATIVE_INITIAL_MARGIN_EXCEEDS_FREE_BALANCE') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='REDUCE_ONLY_WOULD_INCREASE_POSITION') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='ORDER_LIST_INCOMPLETE') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='ORDER_LIST_DENIED') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='TRADING_HALTED') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='TRADING_STATE_REDUCING') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='RATE_LIMIT_EXCEEDED') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='STREAM_RECONCILING') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='NO_EXECUTION_CLIENT') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='CLIENT_VENUE_MISMATCH') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='SUBMIT_FAILED') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='INVALID_CLIENT_ORDER_ID') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='INVALID_POSITION_ID') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='UNSUPPORTED_ORDER_LIST') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='UNSUPPORTED_ORDER_TYPE') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='UNSUPPORTED_REDUCE_ONLY') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='UNSUPPORTED_TIME_IN_FORCE') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='UNSUPPORTED_TP_SL') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='VALIDATION_FAILED') ... FAIL
+  test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='FUTURE_NATIVE_DENIAL') ... FAIL
+test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) ... FAIL
+
+======================================================================
+FAIL: test_ambiguous_exit_reconciles_cancelled_id_before_retry (tests.test_adaptive_paper_recovery.RecoveryTests.test_ambiguous_exit_reconciles_cancelled_id_before_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 778, in test_ambiguous_exit_reconciles_cancelled_id_before_retry
+    self.reconciled_ambiguous_exit()
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 769, in reconciled_ambiguous_exit
+    self.assertEqual(second['status'], 'passed', second['errors'])
+AssertionError: 'needs_attention' != 'passed'
+- needs_attention
++ passed
+ : ['SafetyError']
+
+======================================================================
+FAIL: test_post_submit_deadline_reconciles_cancelled_id_before_retry (tests.test_adaptive_paper_recovery.RecoveryTests.test_post_submit_deadline_reconciles_cancelled_id_before_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 781, in test_post_submit_deadline_reconciles_cancelled_id_before_retry
+    self.reconciled_ambiguous_exit(deadline=True)
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 769, in reconciled_ambiguous_exit
+    self.assertEqual(second['status'], 'passed', second['errors'])
+AssertionError: 'needs_attention' != 'passed'
+- needs_attention
++ passed
+ : ['SafetyError']
+
+======================================================================
+FAIL: test_ambiguous_unfilled_exit_is_cancelled_before_retry (tests.test_adaptive_paper_recovery.RecoveryTests.test_ambiguous_unfilled_exit_is_cancelled_before_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 784, in test_ambiguous_unfilled_exit_is_cancelled_before_retry
+    self.reconciled_ambiguous_exit(status='new')
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 769, in reconciled_ambiguous_exit
+    self.assertEqual(second['status'], 'passed', second['errors'])
+AssertionError: 'needs_attention' != 'passed'
+- needs_attention
++ passed
+ : ['SafetyError']
+
+======================================================================
+FAIL: test_shared_journal_ambiguous_exit_allows_mover_recovery (tests.test_adaptive_paper_recovery.RecoveryTests.test_shared_journal_ambiguous_exit_allows_mover_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 787, in test_shared_journal_ambiguous_exit_allows_mover_recovery
+    self.reconciled_ambiguous_exit(mover=True)
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 769, in reconciled_ambiguous_exit
+    self.assertEqual(second['status'], 'passed', second['errors'])
+AssertionError: 'needs_attention' != 'passed'
+- needs_attention
++ passed
+ : ['SafetyError']
+
+======================================================================
+FAIL: test_transport_ambiguous_submission_reconciles_before_retry (tests.test_adaptive_paper_recovery.RecoveryTests.test_transport_ambiguous_submission_reconciles_before_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 790, in test_transport_ambiguous_submission_reconciles_before_retry
+    self.reconciled_ambiguous_exit(transport_error=True)
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 769, in reconciled_ambiguous_exit
+    self.assertEqual(second['status'], 'passed', second['errors'])
+AssertionError: 'needs_attention' != 'passed'
+- needs_attention
++ passed
+ : ['SafetyError']
+
+======================================================================
+FAIL: test_ambiguous_fill_reconciled_flat_does_not_poison_later_exits (tests.test_adaptive_paper_recovery.RecoveryTests.test_ambiguous_fill_reconciled_flat_does_not_poison_later_exits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 793, in test_ambiguous_fill_reconciled_flat_does_not_poison_later_exits
+    self.reconciled_ambiguous_exit(status='filled')
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 772, in reconciled_ambiguous_exit
+    self.assertNotIn('refusal', self.ledger.exit_state('SPY'))
+AssertionError: 'refusal' unexpectedly found in {'completed': False, 'reason': 'owned_residual_exit', 'refusal': {'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'provider secret must not escape', 'retry_at': 1792061368.1675162}, 'target': '0'}
+
+======================================================================
+FAIL: test_foreign_exception_text_is_absent_from_refusal_journal_and_next_receipt (tests.test_adaptive_paper_recovery.RecoveryTests.test_foreign_exception_text_is_absent_from_refusal_journal_and_next_receipt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 823, in test_foreign_exception_text_is_absent_from_refusal_journal_and_next_receipt
+    self.assertNotIn('provider secret must not escape', json.dumps(next_receipt))
+AssertionError: 'provider secret must not escape' unexpectedly found in '{"mode": "official_sdk_recovery", "native_engine_resumed": false, "status": "needs_attention", "flat": false, "errors": ["SafetyError"], "error_details": [{"code": "SafetyError", "type": "SafetyError", "message": "recovery_exit_refused:definitive:provider secret must not escape"}], "positions": [{"symbol": "SPY", "qty": "1"}], "unresolved_orders": [], "stale_symbols": [], "broker_positions_last_observed": [{"symbol": "SPY", "qty": "1"}], "reconciliation": {"positions": 1, "open_orders": 0, "cash_match": true, "positions_match": true}, "cancel_attempt_client_ids": [], "exit_attempt_client_ids": [], "buy_submissions": 0, "order_deadline_seconds": 3.0}'
+
+======================================================================
+FAIL: test_integrity_handoff_requests_entry_cancellation_before_node_stop (tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_integrity_handoff_requests_entry_cancellation_before_node_stop)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 917, in test_integrity_handoff_requests_entry_cancellation_before_node_stop
+    self.exercise_integrity_handoff(resting_entry=True)
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 1032, in exercise_integrity_handoff
+    self.assertIn('cancel_requested', lifecycle, lifecycle)
+AssertionError: 'cancel_requested' not found in ['node_stop'] : ['node_stop']
+
+======================================================================
+FAIL: test_native_sizing_fixture_isolates_every_stop_binding (tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_native_sizing_fixture_isolates_every_stop_binding)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 832, in test_native_sizing_fixture_isolates_every_stop_binding
+    self.exercise_exit('fixed')
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 1117, in exercise_exit
+    first_remaining = asyncio.run(exercise())
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "<python-runtime>/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "<python-runtime>/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<python-runtime>/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 1098, in exercise
+    self.assertEqual(strategy.observed_denials, [])
+AssertionError: Lists differ: ['admissions_not_ready'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'admissions_not_ready'
+
+- ['admissions_not_ready']
++ []
+
+======================================================================
+FAIL: test_native_rate_limit_expiry_retries_the_owned_exit (tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_native_rate_limit_expiry_retries_the_owned_exit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 911, in test_native_rate_limit_expiry_retries_the_owned_exit
+    asyncio.run(exercise())
+  File "<python-runtime>/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "<python-runtime>/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<python-runtime>/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 901, in exercise
+    self.assertEqual(ledger.positions(), {}, 'expired native throttle stranded the exit')
+AssertionError: {'AAPL': Position(symbol='AAPL', qty=Decim[35 chars]0'))} != {}
++ {}
+- {'AAPL': Position(symbol='AAPL',
+-                   qty=Decimal('1'),
+-                   cost_basis_usd=Decimal('100'))} : expired native throttle stranded the exit
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='PRICE_PRECISION_EXCEEDS_MAXIMUM')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'PRICE_PRECISION_EXCEEDS_MAXIMUM: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='PRICE_NOT_POSITIVE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='QUANTITY_PRECISION_EXCEEDS_MAXIMUM')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'QUANTITY_PRECISION_EXCEEDS_MAXIMUM: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='QUANTITY_CONVERSION_FAILED')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='QUANTITY_EXCEEDS_MAXIMUM')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='QUANTITY_BELOW_MINIMUM')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='INVALID_MAX_NOTIONAL_PER_ORDER')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'INVALID_MAX_NOTIONAL_PER_ORDER: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='MISSING_EXPIRE_TIME')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'MISSING_EXPIRE_TIME: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='EXPIRE_TIME_IN_PAST')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='MISSING_TRAILING_OFFSET_TYPE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'MISSING_TRAILING_OFFSET_TYPE: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='UNSUPPORTED_TRAILING_OFFSET_TYPE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'UNSUPPORTED_TRAILING_OFFSET_TYPE: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='MISSING_TRIGGER_TYPE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'MISSING_TRIGGER_TYPE: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='MISSING_TRAILING_OFFSET')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'MISSING_TRAILING_OFFSET: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='INSTRUMENT_NOT_FOUND')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='POSITION_NOT_FOUND')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='MARKET_PRICE_UNAVAILABLE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='TRAILING_STOP_CALCULATION_FAILED')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='NOTIONAL_CALCULATION_FAILED')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='NOTIONAL_BELOW_MINIMUM')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='NOTIONAL_EXCEEDS_MAXIMUM')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='NOTIONAL_EXCEEDS_MAX_PER_ORDER')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='NOTIONAL_EXCEEDS_FREE_BALANCE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='INITIAL_MARGIN_CALCULATION_FAILED')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='INITIAL_MARGIN_EXCEEDS_FREE_BALANCE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='BETTING_BALANCE_LOCKED_CALCULATION_FAILED')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='CUMULATIVE_NOTIONAL_EXCEEDS_FREE_BALANCE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='CUMULATIVE_INITIAL_MARGIN_CALCULATION_FAILED')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='CUMULATIVE_INITIAL_MARGIN_EXCEEDS_FREE_BALANCE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='REDUCE_ONLY_WOULD_INCREASE_POSITION')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='ORDER_LIST_INCOMPLETE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='ORDER_LIST_DENIED')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='TRADING_HALTED')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='TRADING_STATE_REDUCING')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='RATE_LIMIT_EXCEEDED')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='STREAM_RECONCILING')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='NO_EXECUTION_CLIENT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='CLIENT_VENUE_MISMATCH')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'CLIENT_VENUE_MISMATCH: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='SUBMIT_FAILED')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='INVALID_CLIENT_ORDER_ID')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'INVALID_CLIENT_ORDER_ID: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='INVALID_POSITION_ID')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='UNSUPPORTED_ORDER_LIST')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'UNSUPPORTED_ORDER_LIST: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='UNSUPPORTED_ORDER_TYPE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'UNSUPPORTED_ORDER_TYPE: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='UNSUPPORTED_REDUCE_ONLY')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'UNSUPPORTED_REDUCE_ONLY: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='UNSUPPORTED_TIME_IN_FORCE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'UNSUPPORTED_TIME_IN_FORCE: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='UNSUPPORTED_TP_SL')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 261, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertNotIn('opaque fixture diagnostic', str(refusal))
+AssertionError: 'opaque fixture diagnostic' unexpectedly found in "{'attempts': 1, 'classification': 'definitive', 'needs_attention': False, 'reason': 'UNSUPPORTED_TP_SL: opaque fixture diagnostic must not be persisted', 'retry_at': 1791903605.0}"
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='VALIDATION_FAILED')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback) (code='FUTURE_NATIVE_DENIAL')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 257, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(refusal['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 263, in test_every_pinned_native_denial_has_an_explicit_policy_and_safe_fallback
+    self.assertEqual(set(table), {r['code'] for r in rows})
+AssertionError: Items in the second set but not the first:
+'NO_EXECUTION_CLIENT'
+'INVALID_POSITION_ID'
+'UNSUPPORTED_ORDER_LIST'
+'PRICE_PRECISION_EXCEEDS_MAXIMUM'
+'MARKET_PRICE_UNAVAILABLE'
+'MISSING_TRAILING_OFFSET'
+'INSTRUMENT_NOT_FOUND'
+'EXPIRE_TIME_IN_PAST'
+'TRAILING_STOP_CALCULATION_FAILED'
+'NOTIONAL_EXCEEDS_FREE_BALANCE'
+'STREAM_RECONCILING'
+'UNSUPPORTED_ORDER_TYPE'
+'ORDER_LIST_DENIED'
+'POSITION_NOT_FOUND'
+'NOTIONAL_EXCEEDS_MAXIMUM'
+'MISSING_TRIGGER_TYPE'
+'QUANTITY_EXCEEDS_MAXIMUM'
+'ORDER_LIST_INCOMPLETE'
+'CUMULATIVE_INITIAL_MARGIN_CALCULATION_FAILED'
+'INITIAL_MARGIN_CALCULATION_FAILED'
+'INVALID_MAX_NOTIONAL_PER_ORDER'
+'QUANTITY_BELOW_MINIMUM'
+'NOTIONAL_EXCEEDS_MAX_PER_ORDER'
+'INVALID_CLIENT_ORDER_ID'
+'INITIAL_MARGIN_EXCEEDS_FREE_BALANCE'
+'UNSUPPORTED_REDUCE_ONLY'
+'UNSUPPORTED_TIME_IN_FORCE'
+'CLIENT_VENUE_MISMATCH'
+'CUMULATIVE_NOTIONAL_EXCEEDS_FREE_BALANCE'
+'PRICE_NOT_POSITIVE'
+'SUBMIT_FAILED'
+'UNSUPPORTED_TP_SL'
+'MISSING_EXPIRE_TIME'
+'REDUCE_ONLY_WOULD_INCREASE_POSITION'
+'TRADING_STATE_REDUCING'
+'RATE_LIMIT_EXCEEDED'
+'NOTIONAL_CALCULATION_FAILED'
+'BETTING_BALANCE_LOCKED_CALCULATION_FAILED'
+'NOTIONAL_BELOW_MINIMUM'
+'MISSING_TRAILING_OFFSET_TYPE'
+'CUMULATIVE_INITIAL_MARGIN_EXCEEDS_FREE_BALANCE'
+'VALIDATION_FAILED'
+'UNSUPPORTED_TRAILING_OFFSET_TYPE'
+'QUANTITY_CONVERSION_FAILED'
+'QUANTITY_PRECISION_EXCEEDS_MAXIMUM'
+'TRADING_HALTED'
+
+----------------------------------------------------------------------
+Ran 12 tests in 12.788s
+
+FAILED (failures=58)
