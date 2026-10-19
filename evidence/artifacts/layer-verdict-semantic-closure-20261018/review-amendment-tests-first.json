@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "fixture_class": "synthetic",
+  "reviewed_head": "2fcfaffcfb24e192d86744be2bab75946ed96103",
+  "review_sha256": "88be05ddb14124b1dd98aa3fd64d10eeef17b299a114abecfa89601b82f96ae2",
+  "supersedes_claims": [
+    "The initial one-packet source constraint was compatible with the complete-wave pipeline.",
+    "The initial negative fixtures independently pinned the remaining-findings and complete-round guards."
+  ],
+  "limits": [
+    "Saved sequential observations with evolving tests and interim source; intermediate snapshots were not separately committed.",
+    "The first red proves both weakened guards survived the prior test oracle. The green makes the oracles reject assertion-surviving mutants without accepting runner errors.",
+    "The complete-wave and early-orchestration red/green slices use actual saved JS with synthetic agent/parallel behavior, not native Workflow execution.",
+    "Worktree paths are normalized, long streams excerpted; earlier receipts remain historical and are not rewritten."
+  ],
+  "records": [
+    {
+      "step": "review guard-oracle red before fixture correction",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_mutations"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "FF\n======================================================================\nFAIL: test_remaining_findings_guard_is_decisive (tests.test_layer_verdict_mutations.LayerVerdictMutationTests.test_remaining_findings_guard_is_decisive)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_mutations.py\", line 28, in test_remaining_findings_guard_is_decisive\n    self.assert_mutant_rejected(\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        \"!requiredFindings(revisionVotes).length && \", \"\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        \"test_remaining_major_or_blocking_findings_prevent_sealing_a_revision\")\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<worktree>/tests/test_layer_verdict_mutations.py\", line 25, in assert_mutant_rejected\n    self.assertTrue(result.failures, f\"{method} accepted the weakened guard\")\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: [] is not true : test_remaining_major_or_blocking_findings_prevent_sealing_a_revision accepted the weakened guard\n\n======================================================================\nFAIL: test_round_completion_guard_is_decisive (tests.test_layer_verdict_mutations.LayerVerdictMutationTests.test_round_completion_guard_is_decisive)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_mutations.py\", line 33, in test_round_completion_guard_is_decisive\n    self.assert_mutant_rejected(\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        \"completeVotes(votes) && !stages.some((s) => s.round === round && s.status !== 'returned')\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        \"completeVotes(votes)\",\n        ^^^^^^^^^^^^^^^^^^^^^^^\n        \"test_orchestration_faults_keep_completed_votes_and_never_complete\")\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<worktree>/tests/test_layer_verdict_mutations.py\", line 25, in assert_mutant_rejected\n    self.assertTrue(result.failures, f\"{method} accepted the weakened guard\")\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: [] is not true : test_orchestration_faults_keep_completed_votes_and_never_complete accepted the weakened guard\n\n----------------------------------------------------------------------\nRan 2 tests in 0.282s\n\nFAILED (failures=2)\n",
+      "workflow_sha256": "0de995421ad47c43150d4104b07fb6832277f6b2bcfd9efa76d2d8db96d9b414",
+      "stdout_excerpted": false,
+      "stderr_excerpted": false,
+      "cwd_relative": "."
+    },
+    {
+      "step": "review guard-oracle green after fixture correction",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow",
+        "tests.test_layer_verdict_mutations"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "...................\n----------------------------------------------------------------------\nRan 19 tests in 2.298s\n\nOK\n",
+      "workflow_sha256": "0de995421ad47c43150d4104b07fb6832277f6b2bcfd9efa76d2d8db96d9b414",
+      "stdout_excerpted": false,
+      "stderr_excerpted": false,
+      "cwd_relative": "."
+    },
+    {
+      "step": "review wave compatibility and reporting red",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_complete_wave_keeps_both_packets_in_sequential_chains",
+        "tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_failed_packet_keeps_its_evidence_and_does_not_skip_the_next_packet",
+        "tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_round_refutations_are_reported_separately_from_unknown_judgments",
+        "tests.test_claude_lane.ClaudeLaneWriterTests.test_generated_args_workflow_and_collector_preserve_the_complete_wave"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "FFEFE\n======================================================================\nERROR: test_round_refutations_are_reported_separately_from_unknown_judgments (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_round_refutations_are_reported_separately_from_unknown_judgments)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 209, in test_round_refutations_are_reported_separately_from_unknown_judgments\n    self.assertEqual(got[\"round_refutation_counts\"], {\"proposal\": 1, \"revision\": 1})\n                     ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\nKeyError: 'round_refutation_counts'\n\n======================================================================\nERROR: test_generated_args_workflow_and_collector_preserve_the_complete_wave (tests.test_claude_lane.ClaudeLaneWriterTests.test_generated_args_workflow_and_collector_preserve_the_complete_wave) (second_packet_fails=True)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_claude_lane.py\", line 272, in test_generated_args_workflow_and_collector_preserve_the_complete_wave\n    self.assertEqual([r[\"layer_id\"] for r in result[\"layers\"]], [\"l1\", \"l2\"])\n                                             ~~~~~~^^^^^^^^^^\nKeyError: 'layers'\n\n======================================================================\nFAIL: test_complete_wave_keeps_both_packets_in_sequential_chains (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_complete_wave_keeps_both_packets_in_sequential_chains)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 178, in test_complete_wave_keeps_both_packets_in_sequential_chains\n    self.assertEqual(got[\"result\"][\"status\"], \"complete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'incomplete' != 'complete'\n- incomplete\n? --\n+ complete\n\n\n======================================================================\nFAIL: test_failed_packet_keeps_its_evidence_and_does_not_skip_the_next_packet (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_failed_packet_keeps_its_evidence_and_does_not_skip_the_next_packet)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 194, in test_failed_packet_keeps_its_evidence_and_does_not_skip_the_next_packet\n    self.assertEqual(got[\"result\"][\"stop_cause\"], \"proposal_votes_incomplete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'argument_rejected' != 'proposal_votes_incomplete'\n- argument_rejected\n+ proposal_votes_incomplete\n\n\n======================================================================\nFAIL: test_generated_args_workflow_and_collector_preserve_the_complete_wave (tests.test_claude_lane.ClaudeLaneWriterTests.test_generated_args_workflow_and_collector_preserve_the_complete_wave) (second_packet_fails=False)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_claude_lane.py\", line 271, in test_generated_args_workflow_and_collector_preserve_the_complete_wave\n    self.assertEqual(result[\"status\"], \"incomplete\" if failed else \"complete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'incomplete' != 'complete'\n- incomplete\n? --\n+ complete\n\n\n----------------------------------------------------------------------\nRan 4 tests in 0.227s\n\nFAILED (failures=3, errors=2)\n",
+      "workflow_sha256": "0de995421ad47c43150d4104b07fb6832277f6b2bcfd9efa76d2d8db96d9b414",
+      "stdout_excerpted": false,
+      "stderr_excerpted": false,
+      "cwd_relative": "."
+    },
+    {
+      "step": "review wave compatibility and reporting green",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow",
+        "tests.test_layer_verdict_mutations",
+        "tests.test_claude_lane"
+      ],
+      "exit_code": 0,
+      "stdout": "layer-verdict-lane.js\", \"workflow_sha256\": \"98be7cbabf065dabdeb2bc397d1c5a8950d86670a9db692031af8fcbb5c1daf1\"}, \"without_final\": [\"foundation__l2.json\"], \"written\": 1}\n{\"lost\": [\"us-equities/l3\"], \"provenance\": {\"agent_sha256\": \"a87a9883618b320c8b97a442a43c471c0994fb70ea9bb64ce0b5f513ba31500c\", \"agentlab_commit\": \"79c20ea082d95b8d35ec3089fc13fafc89a18ac3\", \"prompt_sha256\": \"d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4\", \"repo_tree_sha256\": \"7c4d7a46642a9fd0b20765bbb89fb63f7500ec8a27d2b293b793ce27469db48e\", \"transcript_audit_py_sha256\": \"af78e463833f5759dcc4d8a6d8b0738352b99ccba654792d1327ddc6a1b3c032\", \"workflow_path\": \".claude/workflows/layer-verdict-lane.js\", \"workflow_sha256\": \"98be7cbabf065dabdeb2bc397d1c5a8950d86670a9db692031af8fcbb5c1daf1\"}, \"without_final\": [\"foundation__l2.json\"], \"written\": 1}\n{\"lost\": [\"us-equities/l3\"], \"provenance\": {\"agent_sha256\": \"a87a9883618b320c8b97a442a43c471c0994fb70ea9bb64ce0b5f513ba31500c\", \"agentlab_commit\": \"79c20ea082d95b8d35ec3089fc13fafc89a18ac3\", \"prompt_sha256\": \"d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4\", \"repo_tree_sha256\": \"7c4d7a46642a9fd0b20765bbb89fb63f7500ec8a27d2b293b793ce27469db48e\", \"transcript_audit_py_sha256\": \"af78e463833f5759dcc4d8a6d8b0738352b99ccba654792d1327ddc6a1b3c032\", \"workflow_path\": \".claude/workflows/layer-verdict-lane.js\", \"workflow_sha256\": \"98be7cbabf065dabdeb2bc397d1c5a8950d86670a9db692031af8fcbb5c1daf1\"}, \"without_final\": [\"foundation__l2.json\"], \"written\": 1}\n",
+      "stderr": "...........................................claude/workflows/layer-verdict-lane.js sha256 a59cb4e6591ef63754cee60e5928eada9f58bbcdb9b38bf0e89c5dbd61fdefcd is not the vendored SHA256SUMS entry for layer-verdict-lane.js (98be7cbabf065dabdeb2bc397d1c5a8950d86670a9db692031af8fcbb5c1daf1); vendor the new bytes into the catalog first\n.claude/workflows/layer-verdict-lane.js sha256 a59cb4e6591ef63754cee60e5928eada9f58bbcdb9b38bf0e89c5dbd61fdefcd is not the vendored SHA256SUMS entry for layer-verdict-lane.js (98be7cbabf065dabdeb2bc397d1c5a8950d86670a9db692031af8fcbb5c1daf1); vendor the new bytes into the catalog first\n..\n----------------------------------------------------------------------\nRan 44 tests in 3.181s\n\nOK\n",
+      "workflow_sha256": "98be7cbabf065dabdeb2bc397d1c5a8950d86670a9db692031af8fcbb5c1daf1",
+      "stdout_excerpted": true,
+      "stderr_excerpted": false,
+      "cwd_relative": "."
+    },
+    {
+      "step": "review early-orchestration overlap red",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_early_parallel_failure_stops_wave_before_another_chain_starts"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "FFF\n======================================================================\nFAIL: test_early_parallel_failure_stops_wave_before_another_chain_starts (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_early_parallel_failure_stops_wave_before_another_chain_starts) (fault='reject_early')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 229, in test_early_parallel_failure_stops_wave_before_another_chain_starts\n    self.assertEqual(result[\"stop_cause\"], \"wave_orchestration_incomplete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'proposal_votes_incomplete' != 'wave_orchestration_incomplete'\n- proposal_votes_incomplete\n+ wave_orchestration_incomplete\n\n\n======================================================================\nFAIL: test_early_parallel_failure_stops_wave_before_another_chain_starts (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_early_parallel_failure_stops_wave_before_another_chain_starts) (fault='null_early')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 229, in test_early_parallel_failure_stops_wave_before_another_chain_starts\n    self.assertEqual(result[\"stop_cause\"], \"wave_orchestration_incomplete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'proposal_votes_incomplete' != 'wave_orchestration_incomplete'\n- proposal_votes_incomplete\n+ wave_orchestration_incomplete\n\n\n======================================================================\nFAIL: test_early_parallel_failure_stops_wave_before_another_chain_starts (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_early_parallel_failure_stops_wave_before_another_chain_starts) (fault='array_early')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 229, in test_early_parallel_failure_stops_wave_before_another_chain_starts\n    self.assertEqual(result[\"stop_cause\"], \"wave_orchestration_incomplete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'proposal_votes_incomplete' != 'wave_orchestration_incomplete'\n- proposal_votes_incomplete\n+ wave_orchestration_incomplete\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.162s\n\nFAILED (failures=3)\n",
+      "workflow_sha256": "98be7cbabf065dabdeb2bc397d1c5a8950d86670a9db692031af8fcbb5c1daf1",
+      "stdout_excerpted": false,
+      "stderr_excerpted": false,
+      "cwd_relative": "."
+    },
+    {
+      "step": "review early-orchestration overlap green",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow",
+        "tests.test_layer_verdict_mutations"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ".......................\n----------------------------------------------------------------------\nRan 23 tests in 2.528s\n\nOK\n",
+      "workflow_sha256": "09f03c824488ea37c4384c2d4bc867ecc2211d2fce4d50ba08c0dd8f91e7b289",
+      "stdout_excerpted": false,
+      "stderr_excerpted": false,
+      "cwd_relative": "."
+    }
+  ]
+}
