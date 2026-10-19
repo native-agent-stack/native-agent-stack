@@ -220,13 +220,22 @@ class FleetDataTests(unittest.TestCase):
         self.direct.update({"text": "PRIVATE-PROMPT", "prompt": "PRIVATE-PROMPT", "task": "PRIVATE-TASK"})
         self.direct["lanes_live"][0].update({"task": "PRIVATE-TASK", "account": "operator@example.test", "flags": ["operator@example.test", "PRIVATE PROMPT"], "subagent_models": {"abcdefghijklmnopqrstuvwx1234567890": 1}})
         self.direct["pool_accounts"].append({"account": "operator@example.test", "used_pct": 10})
-        self.runner.runs = [{"workflowName": "harness-audit", "status": "completed", "conclusion": "success", "databaseId": 123, "startedAt": "2026-10-08T21:00:00Z", "updatedAt": "2026-10-08T21:02:00Z", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/123", "displayTitle": "PRIVATE-PROMPT", "headBranch": "operator@example.test"}]
+        self.runner.runs = [{"workflowName": "harness-audit", "status": "completed", "conclusion": "success", "databaseId": 123, "startedAt": "2026-10-08T21:00:00Z", "updatedAt": "2026-10-08T21:02:00Z", "url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/123", "displayTitle": "PRIVATE-PROMPT", "headBranch": "operator@example.test"}]
         view = self.collect()
         serialized = json.dumps(view) + (self.cache / "fleet-actions.json").read_text()
         for text in ["PRIVATE-PROMPT", "PRIVATE-TASK", "operator@example.test", "abcdefghijklmnopqrstuvwx1234567890", "displayTitle", "headBranch"]:
             self.assertNotIn(text, serialized)
         self.assertEqual(len(view["actions"]["runs"]), 1)
         self.assertEqual(view["cc_agents"]["running"], [{"name": "review-a", "type": "Explore"}])
+
+    def test_a_run_url_is_kept_only_under_the_canonical_repository_path(self):
+        # gh run list reports the current name; the repository moved to its organization, and the old path is only a redirect.
+        row = {"workflowName": "harness-audit", "status": "completed", "conclusion": "success", "databaseId": 123}
+        canonical = "https://github.com/native-agent-stack/native-agent-stack/actions/runs/123"
+        legacy = "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/123"
+        self.assertEqual(fleet_data.REPO, "native-agent-stack/native-agent-stack")
+        self.assertEqual(fleet_data._run_row({**row, "url": canonical}, ["harness-audit"])["url"], canonical)
+        self.assertIsNone(fleet_data._run_row({**row, "url": legacy}, ["harness-audit"])["url"])
 
     def test_workflow_name_mentions_and_commented_invocations_are_excluded(self):
         workflows = self.root / ".github/workflows"

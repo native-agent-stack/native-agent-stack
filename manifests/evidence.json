@@ -5287,8 +5287,8 @@
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
-      "sha256": "edfec4da5226ef7d7dd614542c551a9060df55308c2a171dfc294fd16d388493",
-      "bytes": 20825
+      "sha256": "47c84a2cf7aaaed3d9d8ba6ed83bc48467327ee398132a990aa8c8ff340ef7fe",
+      "bytes": 20817
     },
     {
       "path": ".github/workflows/receipt-staleness.yml",
@@ -5737,8 +5737,8 @@
     },
     {
       "path": "adoption/scaffold/.github/workflows/sota-sources.yml.template",
-      "sha256": "9d6f5dbd746e9c0589ad26aa103ced6f2b1f1290a39a6beee7711efc3495db3c",
-      "bytes": 1107
+      "sha256": "bcfe5ea866c3af74bd48c8ad6081063c6861ebd2119fb8125840cc72fb850cba",
+      "bytes": 1099
     },
     {
       "path": "adoption/scaffold/AGENTS.md",
@@ -11748,8 +11748,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/host.py",
-      "sha256": "0bd757852494738de6d336f8c444ffac4625fdad6fe890c93b31621290d8068c",
-      "bytes": 104013
+      "sha256": "a1669528d743a5d52189228b10078a8ca3a9aa7b8fdb636c17278b3e0639e48d",
+      "bytes": 104009
     },
     {
       "path": "blueprints/runtime-workers/openhands/install-container.sh",
@@ -11803,8 +11803,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver.py",
-      "sha256": "9ca877e1fce797196a0b24980def08a812fade5366fbcedaa4f01caa7571610f",
-      "bytes": 103645
+      "sha256": "d464732cf198e3cd98ca4c68d012780d1f17373c7eec21c085dde053e38081a1",
+      "bytes": 104051
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gate_reads.py",
@@ -11813,8 +11813,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gh_harness.py",
-      "sha256": "7fa783ad5d2b9c99d9f82565718c12ccd7fc6a693f05e72c4f5e00686c52f600",
-      "bytes": 35857
+      "sha256": "4940ea3cb4efbb582651205f683327c3c9933192a3aecaaba788dc7587e5fe2e",
+      "bytes": 36194
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/outgoing_guard.py",
@@ -14848,8 +14848,8 @@
     },
     {
       "path": "blueprints/us-equities/catalyst-convergence/capture_sources.py",
-      "sha256": "1a8157ce0e851265e4df4323699c2a9dd6fa384595f5aafbf962f1b9d0d0712f",
-      "bytes": 6766
+      "sha256": "6d75e55f1940ef562ab05e45b53076fab40b86e62e14ec24d0496717953e7a0d",
+      "bytes": 6762
     },
     {
       "path": "blueprints/us-equities/catalyst-convergence/plan.json",
@@ -16653,8 +16653,8 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/data-tools/verify_fee_sources.py",
-      "sha256": "c9a1617b63d46bfda0af8f7c95efc14e3c935030b99f6a135d42d1274b5b6652",
-      "bytes": 5296
+      "sha256": "a0c53710670f2f3342671f5486d2ef8816ab04dcc30bb9fb31baa2ffab5a67d1",
+      "bytes": 5292
     },
     {
       "path": "blueprints/us-equities/mover-v3/data/fees-v3.json",
@@ -17128,8 +17128,8 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
-      "sha256": "587479df742819313788dceb4ca7a6e406e76915d8d7a1444f9f26121542095a",
-      "bytes": 21242
+      "sha256": "6c6814fd6eb285f85d8c7a8b5ffea5fd4c315228eb9232571afd9aaee0623837",
+      "bytes": 21222
     },
     {
       "path": "blueprints/us-equities/runtime-2604/receipts/acceptance-20261008.json",
@@ -63033,8 +63033,8 @@
     },
     {
       "path": "observability/claude-usage/claude-usage.service",
-      "sha256": "51de4e7b6f32b656156ae416cf0dbd98ca4b812b1ee8acd39cb895be28fc8cc3",
-      "bytes": 962
+      "sha256": "f4ee6903759cb84353f3b22e2ea72e9567951cb7ce3de0f2c6b0a0a094da8173",
+      "bytes": 958
     },
     {
       "path": "observability/claude-usage/claude-usage.timer",
@@ -64318,8 +64318,8 @@
     },
     {
       "path": "tests/test_claude_review_worker.py",
-      "sha256": "364005528d757e82d87dc5bb70e24104ef0033c78fe54db18ec2c361e707419c",
-      "bytes": 151108
+      "sha256": "19e7e375706f793c55fd8f61dc65f695b1305dc7669cc9e06fe2fc6d216c6a36",
+      "bytes": 155399
     },
     {
       "path": "tests/test_claude_spend_scan.py",
@@ -64818,8 +64818,8 @@
     },
     {
       "path": "tests/test_local_pages_fleet_data.py",
-      "sha256": "b3a17d47fdbf49ecce6bad308f3eab1979ca558843b7a03025c5fadff516865c",
-      "bytes": 34060
+      "sha256": "8fa4971277e88c634d9555a2ef6fe5dd3e9e5b5dceacac276d8ae38636ffd173",
+      "bytes": 34861
     },
     {
       "path": "tests/test_local_pages_fleet_regressions.py",
@@ -65368,8 +65368,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "6ee381d57efc9bf2d136da4de6c5aa63247a4bccc1424d997d1be232c888fe63",
-      "bytes": 276714
+      "sha256": "c5dbaaaaf4dcd39dc4322aedb8e1c1688fcc781b4000515b970ca958ba346089",
+      "bytes": 283484
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
@@ -65493,8 +65493,8 @@
     },
     {
       "path": "tests/test_sota_sources_gate.py",
-      "sha256": "869038ea7c6261e335e942934b335789e9f3e883ee172835a1c0828ea4afa870",
-      "bytes": 16230
+      "sha256": "98b3b1744885ea7147b37f3d57951b8c62c2753e4db49215e3a0f0336407f06b",
+      "bytes": 16226
     },
     {
       "path": "tests/test_spy_parity.py",
@@ -65908,8 +65908,8 @@
     },
     {
       "path": "tools/claude-review-worker/essential-paths.json",
-      "sha256": "68c9ea2f3f50d996da35491ff3a0d1892bb217b67006ca2fd07eae094030a9f3",
-      "bytes": 4190
+      "sha256": "3e6f92f8c4b9870b48ee92c1cf64be7b9914792ea54c2115a044345a292652ff",
+      "bytes": 4186
     },
     {
       "path": "tools/claude-review-worker/probes.py",
@@ -65918,8 +65918,8 @@
     },
     {
       "path": "tools/claude-review-worker/systemd/claude-review-worker.service",
-      "sha256": "b6b5268e4a4a0cdb91ce351cf2c8554a02fe2c466fe2740d7bad15d33207be18",
-      "bytes": 2680
+      "sha256": "a43e54cfb782c2ad4b33a03be45e081886555dc94b0c61407512762abbe48a23",
+      "bytes": 2676
     },
     {
       "path": "tools/claude-review-worker/systemd/claude-review-worker.timer",
@@ -65928,8 +65928,8 @@
     },
     {
       "path": "tools/claude-review-worker/worker.py",
-      "sha256": "f4f218b8921cc2ed79de894c059e1d1a217775b5b24b49e16de74fa1db0aac99",
-      "bytes": 141302
+      "sha256": "31e48ad392f1b1cfd5e62205fe4cc66a818272b572cc068893674dd5bbe5f85a",
+      "bytes": 143786
     },
     {
       "path": "tools/credentials/anthropic_key_health.py",
@@ -65983,8 +65983,8 @@
     },
     {
       "path": "tools/invocation-monitoring/claude_counter.py",
-      "sha256": "f869e2dd4a35e5f1b43550a27144c424a77b148cecf90dcfad15adb1cb4979ec",
-      "bytes": 35365
+      "sha256": "192ff7e6e0b5bb499092ab337855868abcd7f6051bfaf01a5bdf897551a716b3",
+      "bytes": 35361
     },
     {
       "path": "tools/invocation-monitoring/codex_counter.py",
@@ -66053,8 +66053,8 @@
     },
     {
       "path": "tools/local-pages/fleet_data.py",
-      "sha256": "4eb64c8766e3a5de0aa9aca5ca3272c415435d2d14f1d0db9569b80dbcd98e32",
-      "bytes": 62686
+      "sha256": "9627c4437db06d7992e55a385f2f5f2e92c87dd4cf22c19f1813ea47193ffb0e",
+      "bytes": 62682
     },
     {
       "path": "tools/local-pages/fleet_view.py",
@@ -66638,8 +66638,8 @@
     },
     {
       "path": "tools/token-report/token_manifest.full.html.in",
-      "sha256": "c9807a2c4996fa5ec1942eb950259feec38891574c5ff2e3e7f7b4fab33de516",
-      "bytes": 40182
+      "sha256": "8d13af20d780ba4096e9cf46b7f212630cb2427616dc006614063e0f1732fd08",
+      "bytes": 40178
     },
     {
       "path": "tools/token-report/token_manifest.html.in",

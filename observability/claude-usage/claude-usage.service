@@ -1,6 +1,6 @@
 [Unit]
 Description=Fenced Claude usage sampler and textfile publication
-Documentation=https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/claude-usage-observability.md
+Documentation=https://github.com/native-agent-stack/native-agent-stack/blob/main/docs/claude-usage-observability.md
 ConditionPathExists=%h/.config/native-agent-stack/claude-usage/accounts.json
 
 [Service]

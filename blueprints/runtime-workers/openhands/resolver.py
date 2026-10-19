@@ -43,7 +43,7 @@ import tempfile
 import time
 
 HERE = Path(__file__).resolve().parent
-REPO = "seathatflowsinourveins/native-agent-stack"
+REPO = "native-agent-stack/native-agent-stack"
 
 
 def _load(name):
@@ -82,16 +82,21 @@ class IssueRefused(ValueError):
 
 
 def owner_authored(item):
-    """The owner triple measured in docs/decisions/2026-09-25-host-request-lane.md:23-27.
+    """Only the authorized human's content on this organization-owned repository.
 
-    Owner-created issues and comments carry author_association OWNER, user.type User
-    and performed_via_github_app null; all three must hold.
+    Issues and comments must carry author_association MEMBER, user.type User, the
+    authorized human's login and performed_via_github_app null; all must hold.
     """
+    # github/docs@dae83f7d28f3b8e10015bd6b6d8b72267cedceca:
+    # src/graphql/data/fpt/schema.docs.graphql:5541-5554 defines MEMBER as a member
+    # of the owning organization and OWNER as the repository owner. The authorized
+    # human is a MEMBER after the transfer; the association never authorizes another login.
     if not isinstance(item, dict):
         return False
     user = item.get("user")
-    return (item.get("author_association") == "OWNER" and isinstance(user, dict)
-            and user.get("type") == "User" and item.get("performed_via_github_app") is None)
+    return (item.get("author_association") == "MEMBER" and isinstance(user, dict)
+            and user.get("type") == "User" and user.get("login") == gh_harness.AUTHORIZED_LOGIN
+            and item.get("performed_via_github_app") is None)
 
 
 def actor_class(actor):
@@ -100,7 +105,7 @@ def actor_class(actor):
     (schema.docs.graphql L252); `__typename` names its concrete type. Local composition."""
     if not isinstance(actor, dict) or not isinstance(actor.get("login"), str) or not actor["login"]:
         return "unknown"
-    return "owner" if actor.get("__typename") == "User" and actor["login"] == gh_harness.OWNER else "other"
+    return "owner" if actor.get("__typename") == "User" and actor["login"] == gh_harness.AUTHORIZED_LOGIN else "other"
 
 
 def _combined(classes, unknown=False):
@@ -210,8 +215,8 @@ def select_issue(issue, comments, number, *, provenance):
     are counted, never kept. Review item D2: repository writers can edit other
     people's issues and comments, so the content is taken from `provenance`
     (parse_issue_provenance), read in one query with its edit history, and used only
-    when the owner made every edit. The REST items supply the owner triple, which the
-    GraphQL schema lacks (it has no performed-via-app field on issues or comments).
+    when the owner made every edit. The REST items also check the association, account
+    and app provenance (GraphQL has no performed-via-app field on issues or comments).
     """
     if not isinstance(issue, dict) or type(number) is not int:
         raise IssueRefused("malformed_issue")
@@ -228,7 +233,7 @@ def select_issue(issue, comments, number, *, provenance):
         raise IssueRefused("provenance_mismatch")
     if provenance["state"] != "OPEN":
         raise IssueRefused("issue_not_open")
-    if provenance["authorAssociation"] != "OWNER" or actor_class(provenance["author"]) != "owner":
+    if provenance["authorAssociation"] != "MEMBER" or actor_class(provenance["author"]) != "owner":
         raise IssueRefused("issue_not_owner_authored")
     edited, renamed = edit_provenance(provenance), rename_provenance(provenance["titleRenames"])
     if edited == "other":
@@ -251,7 +256,7 @@ def select_issue(issue, comments, number, *, provenance):
             dropped["not_owner"] += 1
             continue
         record = records.get(str(comment["id"]))
-        if record is not None and (record["authorAssociation"] != "OWNER" or actor_class(record["author"]) != "owner"):
+        if record is not None and (record["authorAssociation"] != "MEMBER" or actor_class(record["author"]) != "owner"):
             dropped["not_owner"] += 1
             continue
         verdict = "unknown" if record is None else edit_provenance(record)

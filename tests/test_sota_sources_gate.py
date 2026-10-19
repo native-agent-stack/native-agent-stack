@@ -37,7 +37,7 @@ CALLER_TEMPLATE = SCAFFOLD / ".github/workflows/sota-sources.yml.template"
 PR_TEMPLATES = {"scaffold": SCAFFOLD / ".github/pull_request_template.md",
                 "repository": ROOT / ".github/pull_request_template.md"}
 JOB_ID = "sota-sources"
-GATE_REFERENCE = "seathatflowsinourveins/native-agent-stack/.github/workflows/sota-sources-gate.yml"
+GATE_REFERENCE = "native-agent-stack/native-agent-stack/.github/workflows/sota-sources-gate.yml"
 NODE = shutil.which("node")
 ZIZMOR = shutil.which("zizmor")
 A_COMMIT = "0123456789abcdef0123456789abcdef01234567"

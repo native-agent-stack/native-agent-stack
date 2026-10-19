@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   publish:
-    if: github.repository == 'seathatflowsinourveins/native-agent-stack' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
+    if: github.repository == 'native-agent-stack/native-agent-stack' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -295,7 +295,7 @@ jobs:
 
   release:
     # Tag pushes only: a main dispatch still attests and uploads artifacts but creates no release.
-    if: github.repository == 'seathatflowsinourveins/native-agent-stack' && startsWith(github.ref, 'refs/tags/v')
+    if: github.repository == 'native-agent-stack/native-agent-stack' && startsWith(github.ref, 'refs/tags/v')
     needs: publish
     runs-on: ubuntu-24.04
     timeout-minutes: 10

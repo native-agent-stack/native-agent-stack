@@ -27,7 +27,7 @@ from pathlib import Path
 
 FEES = Path(__file__).resolve().parent.parent / "data" / "fees-v3.json"
 FINRA_PAGE = "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees"
-USER_AGENT = "native-agent-stack-fee-source-check/1 (+https://github.com/seathatflowsinourveins/native-agent-stack)"
+USER_AGENT = "native-agent-stack-fee-source-check/1 (+https://github.com/native-agent-stack/native-agent-stack)"
 SCRIPTED = {"federalregister_text", "finra_revision_json", "ecfr_xml"}
 
 

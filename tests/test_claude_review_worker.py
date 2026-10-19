@@ -112,7 +112,8 @@ if method == "GET" and m:
     emit(pages(fx["repos"][m.group(1)]["files"].get(m.group(2), []))); sys.exit(0)
 m = re.fullmatch(r"repos/([^/]+/[^/]+)", path or "")
 if method == "GET" and m:
-    emit([{"full_name": m.group(1), "private": fx["repos"][m.group(1)]["private"]}]); sys.exit(0)
+    emit([{"full_name": fx["repos"][m.group(1)].get("full_name", m.group(1)),
+           "private": fx["repos"][m.group(1)]["private"]}]); sys.exit(0)
 if method == "GET" and path == "user":
     emit([{"login": "crw-poster"}]); sys.exit(0)
 m = re.fullmatch(r"repos/([^/]+/[^/]+)/pulls/([0-9]+)", path or "")
@@ -401,6 +402,67 @@ class SelectionTest(unittest.TestCase):
         heads = h.worker([repo]).list_heads()
         self.assertEqual([c.pr for c in heads], [2, 6, 1])
         self.assertTrue(heads[0].draft)
+
+    # ---- a repository that moved: the configured name is the old one, the API answers with the canonical one ----
+
+    def moved(self, configured="old-owner/pub", canonical="new-org/pub", **names):
+        """A repository configured under its old name whose REST answer (and its pulls' head and base) carry the
+        canonical name, as GitHub returns them after a transfer."""
+        h = Harness(self)
+        repo, _ = h.repo(configured, "public", every_pr=True)
+        h.fixtures["repos"][configured]["full_name"] = canonical
+        h.pulls(configured, [
+            pull(names.get("base", canonical), 1, "1" * 40, head_repo=names.get("head", canonical),
+                 updated="2026-10-09T01:00:00Z")])
+        return h, repo
+
+    def test_heads_named_by_the_canonical_name_are_kept_when_the_configuration_holds_the_old_name(self):
+        h, repo = self.moved()
+        worker = h.worker([repo])
+        self.assertEqual([c.pr for c in worker.list_heads()], [1])
+        self.assertEqual(worker.canonical, {"old-owner/pub": "new-org/pub"})
+        self.assertTrue(any("WARNING" in line and "new-org/pub" in line for line in h.logs), h.logs)
+
+    def test_a_case_difference_in_the_repository_name_is_the_same_repository(self):
+        h, repo = self.moved(configured="new-org/pub", canonical="new-org/pub", head="New-Org/Pub", base="NEW-ORG/PUB")
+        worker = h.worker([repo])
+        self.assertEqual([c.pr for c in worker.list_heads()], [1])
+        self.assertEqual(h.logs, [])  # same name apart from case: nothing to warn about
+
+    def test_another_repository_is_not_the_canonical_one(self):
+        for head, base in (("fork/pub", "new-org/pub"), ("new-org/other", "new-org/pub"),
+                           ("old-owner/pub", "new-org/pub"), ("new-org/pub", "other-org/pub")):
+            with self.subTest(head=head, base=base):
+                h, repo = self.moved(head=head, base=base)
+                self.assertEqual(h.worker([repo]).list_heads(), [])
+
+    def test_a_missing_or_malformed_canonical_name_skips_the_repository(self):
+        for value in ("", "not-a-name", None):
+            with self.subTest(full_name=value):
+                h, repo = self.moved()
+                h.fixtures["repos"]["old-owner/pub"]["full_name"] = value
+                worker = h.worker([repo])
+                summary = {"repos": {}}
+                self.assertEqual(worker.list_heads(summary), [])
+                self.assertTrue(summary["repos"]["old-owner/pub"]["error"])
+                self.assertEqual(worker.canonical, {})
+
+    def test_the_canonical_name_is_read_once_per_process(self):
+        h, repo = self.moved()
+        worker = h.worker([repo])
+        worker.list_heads()
+        h.fixtures["repos"]["old-owner/pub"]["full_name"] = "renamed-again/pub"
+        h.gh_fixtures.write_text(json.dumps(h.fixtures))
+        self.assertEqual([c.pr for c in worker.list_heads()], [1])  # the first answer stands until the next start
+        self.assertEqual(worker.canonical["old-owner/pub"], "new-org/pub")
+
+    def test_same_repository_compares_without_case_and_rejects_non_names(self):
+        self.assertTrue(crw.same_repository("native-agent-stack/native-agent-stack", "native-agent-stack/native-agent-stack"))
+        self.assertTrue(crw.same_repository("Native-Agent-Stack/NATIVE-agent-stack", "native-agent-stack/native-agent-stack"))
+        self.assertFalse(crw.same_repository("seathatflowsinourveins/native-agent-stack",
+                                             "native-agent-stack/native-agent-stack"))
+        self.assertFalse(crw.same_repository(None, "a/b"))
+        self.assertFalse(crw.same_repository({"full_name": "a/b"}, "a/b"))
 
     def test_an_essential_path_repository_keeps_only_heads_touching_its_paths(self):
         h = Harness(self)
@@ -1118,8 +1180,15 @@ class ReviewRunTest(unittest.TestCase):
         total = counts["cache_read_input_tokens"] + counts["cache_creation_input_tokens"] + counts["input_tokens"]
         self.assertEqual(settle["cache_hit_rate"], round(counts["cache_read_input_tokens"] / total, 6))
         self.assertEqual(settle["use_case"], "PR review pub#7")  # the test repository o/pub, PR 7
+        self.assertEqual(crw.use_case_of({"repo": "native-agent-stack/native-agent-stack", "pr": 953}),
+                         "PR review nas#953")
+        # A ledger row written before the move to the organization keeps its short name; uet did not move.
         self.assertEqual(crw.use_case_of({"repo": "seathatflowsinourveins/native-agent-stack", "pr": 953}),
                          "PR review nas#953")
+        self.assertEqual(crw.use_case_of({"repo": "Native-Agent-Stack/Native-Agent-Stack", "pr": 953}),
+                         "PR review nas#953")
+        self.assertEqual(crw.use_case_of({"repo": "seathatflowsinourveins/us-equities-trading", "pr": 46}),
+                         "PR review uet#46")
         self.assertEqual(crw.use_case_of({"probe": "facts-control", "pr": 1}), "review-worker probe (facts-control)")
 
     def test_a_journal_priority_prefix_stays_at_the_start_of_the_line(self):

@@ -18,7 +18,7 @@ SPEC = importlib.util.spec_from_file_location("capture_base", BASE)
 B = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(B)
 PLAN_SHA256 = "1324845825796e32b46d502884bf036e6b9211ca9976b7e9684dfda5b9b7f72b"
-PUBLIC_IDENTITY = "native-agent-stack research (+https://github.com/seathatflowsinourveins/native-agent-stack)"
+PUBLIC_IDENTITY = "native-agent-stack research (+https://github.com/native-agent-stack/native-agent-stack)"
 
 
 def native_session():

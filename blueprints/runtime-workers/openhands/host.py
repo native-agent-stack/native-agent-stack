@@ -42,7 +42,7 @@ DEFAULT_PORT = 3730
 # Resolver mode (RESOLVER.md "Stage 2"): its repository, the runtime-worker manifest that pins
 # tdd and search-first, and this recipe's resolver skill, which together are its skill set.
 RESOLVER_PORT = 3740
-RESOLVER_REPOSITORY = "seathatflowsinourveins/native-agent-stack"
+RESOLVER_REPOSITORY = "native-agent-stack/native-agent-stack"
 RESOLVER_ORIGIN = f"https://github.com/{RESOLVER_REPOSITORY}.git"
 RUNTIME_SKILLS_MANIFEST = "blueprints/runtime-workers/skills/manifest.json"
 RESOLVER_SKILLS = ("resolver", "search-first", "tdd")

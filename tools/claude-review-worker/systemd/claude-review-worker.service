@@ -22,7 +22,7 @@
 # (systemd.exec(5): settings from EnvironmentFile= override Environment=). python3 -I ignores PYTHON* variables.
 [Unit]
 Description=Claude local review worker (one tick)
-Documentation=https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/tools/claude-review-worker/README.md
+Documentation=https://github.com/native-agent-stack/native-agent-stack/blob/main/tools/claude-review-worker/README.md
 
 [Service]
 Type=oneshot
