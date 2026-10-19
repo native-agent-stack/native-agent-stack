@@ -33,7 +33,7 @@ jobs:
       sbom-artifact-id: ${{ steps.sbom-upload.outputs.artifact-id }}
     steps:
       - name: Harden the runner (audit-only network egress)
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
         with:
           egress-policy: audit
       - name: Prepare publication evidence
@@ -212,7 +212,7 @@ jobs:
             > "$PUBLICATION_DIR/verify-after-tamper.json" 2> "$PUBLICATION_DIR/verify-after-tamper.log"
       - name: Upload the verified archive without a ZIP wrapper
         id: archive
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: native-agent-stack-${{ github.sha }}-archive
           path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.tar.gz
@@ -235,7 +235,7 @@ jobs:
           printf 'sha256=%s\n' "$expected" >> "$GITHUB_OUTPUT"
       - name: Upload the SBOM next to the archive
         id: sbom-upload
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: native-agent-stack-${{ github.sha }}-sbom
           path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.spdx.json
@@ -263,7 +263,7 @@ jobs:
           create-storage-record: false
       - name: Upload the public explorer next to the archive
         id: explorer-upload
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: native-agent-stack-${{ github.sha }}-explorer
           path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.explorer.html
@@ -282,7 +282,7 @@ jobs:
           test "$UPLOADED_DIGEST" = "$expected"
       - name: Preserve publication success or failure evidence
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: catalog-publication-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
@@ -303,11 +303,11 @@ jobs:
       contents: write # create this tag's GitHub Release with both attested files attached; this job only
     steps:
       - name: Harden the runner (audit-only network egress)
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
         with:
           egress-policy: audit
       - name: Download the attested archive and SBOM by artifact ID
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           artifact-ids: ${{ needs.publish.outputs.archive-artifact-id }},${{ needs.publish.outputs.sbom-artifact-id }}
           path: ${{ runner.temp }}/release
