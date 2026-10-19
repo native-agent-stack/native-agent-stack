@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Write the Claude lane's returns from one layer-verdict-lane workflow result.
 
-The Claude lane runs as a Claude Code workflow (vendored byte for byte at
-``examples/claude-native/workflows/layer-verdict-lane.js``; its agent-lab source
-is ``.claude/workflows/layer-verdict-lane.js``). The workflow returns
+The Claude lane runs as a Claude Code workflow registered at
+``examples/claude-native/workflows/layer-verdict-lane.js``; its historical agent-lab
+source path is ``.claude/workflows/layer-verdict-lane.js``. NAS corrections are
+identified in ``vendored-lanes.json`` rather than asserted identical at the old
+agent-lab pin. Deployment needs a clean descendant checkout containing the current
+registered bytes; source registration alone supplies no such checkout. The workflow returns
 ``{lane, model, layers: [{catalog, layer_id, packet_sha256, final, ...}], lost}``
 and writes nothing itself. This script is the step that turns that result into
 ``<work-dir>/claude/<catalog>__<layer_id>.json`` files for ``record_verdicts.py``,
@@ -25,7 +28,8 @@ adding the two runner-owned fields a new-wave Claude return must carry
   recorded. The script refuses (exit 2) when the
   workflow file differs from ``HEAD`` or its sha256 is not the vendored
   ``examples/claude-native/workflows/SHA256SUMS`` entry, so a return always
-  names bytes a catalog-only host can rerun.
+  binds to the registered bytes; it does not establish that a deployed agent-lab
+  descendant containing a maintained correction exists.
 
 The workflow's per-layer ``refutation`` summary ({status, final_source,
 proposal_status, revision_status, votes}) is copied into the return as
@@ -99,7 +103,7 @@ def agent_sha256(agent_file: Path, vendored: Path = VENDORED_AGENT) -> str:
 
 
 def vendored_agentlab_commit(workflow: str):
-    """The agent-lab commit vendored-lanes.json verified ``workflow`` identical at, or None."""
+    """Historical source ancestry anchor, or None; not a current-byte identity claim."""
     try:
         files = json.loads(VENDORED_LANES.read_text(encoding="utf-8")).get("files") or []
     except (OSError, ValueError):

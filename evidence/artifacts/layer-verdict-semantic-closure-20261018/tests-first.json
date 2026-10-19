@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "fixture_class": "synthetic",
+  "scope": "Model-free injected agent/parallel/log stubs; not native Workflow execution or model/provider probes.",
+  "base_commit": "6f57256a6db754edb576519ed7803f202b5430a8",
+  "workflow_sha256": "0de995421ad47c43150d4104b07fb6832277f6b2bcfd9efa76d2d8db96d9b414",
+  "final_test_sha256": "852798fa1d4607ebec3b923a217250cd2df492f9613f27e7fccb43a713de25a5",
+  "limits": [
+    "These are sequential tests-first slices; suite size grew between slices. Red source/test snapshots were not separately committed.",
+    "Long failure streams are excerpts; command, exit code, failing assertions and summary remain. The local tool journal retains full streams.",
+    "Public paths use <worktree>; no native provenance or usage is synthesized."
+  ],
+  "records": [
+    {
+      "step": "semantic-closure red",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "FFFFFF\n======================================================================\nFAIL: test_clean_recheck_needs_explicit_evidence_backed_closure_of_prior_majors (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_clean_recheck_needs_explicit_evidence_backed_closure_of_prior_majors)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 86, in test_clean_recheck_needs_explicit_evidence_backed_closure_of_prior_majors\n    self.assertIsNone(row[\"final\"])\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\nAssertionError: {'fixture': 'revised'} is not None\n\n======================================================================\nFAIL: test_remaining_major_or_blocking_findings_prevent_sealing_a_revision (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_remaining_major_or_blocking_findings_prevent_sealing_a_revision) (severity='major')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 80, in test_remaining_major_or_blocking_findings_prevent_sealing_a_revision\n    self.assertIsNone(row[\"final\"])\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\nAssertionError: {'fixture': 'revised'} is not None\n\n======================================================================\nFAIL: test_remaining_major_or_blocking_findings_prevent_sealing_a_revision (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_remaining_major_or_blocking_findings_prevent_sealing_a_revision) (severity='blocking')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 80, in test_remaining_major_or_blocking_findings_prevent_sealing_a_revision\n    self.assertIsNone(row[\"final\"])\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\nAssertionError: {'fixture': 'revised'} is not None\n\n======================================================================\nFAIL: test_required_revision_never_falls_back_to_the_major_bearing_proposal (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_required_revision_never_falls_back_to_the_major_bearing_proposal) (case='null revision')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 69, in test_required_revision_never_falls_back_to_the_major_bearing_proposal\n    self.assertIsNone(row[\"final\"])\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\nAssertionError: {'fixture': 'original'} is not None\n\n======================================================================\nFAIL: test_required_revision_never_falls_back_to_the_major_bearing_proposal (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_required_revision_never_falls_back_to_the_major_bearing_proposal) (case='unknown recheck')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 69, in test_required_revision_never_falls_back_to_the_major_bearing_proposal\n    self.assertIsNone(row[\"final\"])\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\nAssertionError: {'fixture': 'original'} is not None\n\n======================================================================\nFAIL: test_required_revision_never_falls_back_to_the_major_bearing_proposal (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_required_revision_never_falls_back_to_the_major_bearing_proposal) (case='refuted recheck')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 69, in test_required_revision_never_falls_back_to_the_major_bearing_proposal\n    self.assertIsNone(row[\"final\"])\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\nAssertionError: {'fixture': 'original'} is not None\n\n----------------------------------------------------------------------\nRan 3 tests in 0.219s\n\nFAILED (failures=6)\n",
+      "cwd_relative": ".",
+      "stderr_excerpted": false
+    },
+    {
+      "step": "semantic-closure green",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "......\n----------------------------------------------------------------------\nRan 6 tests in 0.430s\n\nOK\n",
+      "cwd_relative": ".",
+      "stderr_excerpted": false
+    },
+    {
+      "step": "packet-admission red",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_admission_rejects_every_input_except_one_valid_raw_packet"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "FFEEEFFEEFFFFEE\n======================================================================\nERROR: test_admission_rejects_every_input_except_one_valid_raw_packet (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_admission_rejects_every_input_except_one_valid_raw_packet) (args={'repo': 'fixture-view', 'packets': [], 'prompt': 'Read {PACKET_PATH} under {REPO_ROOT} for {LANE}.'})\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 137, in test_admission_rejects_every_input_except_one_valid_raw_packet\n    self.assertEqual(got[\"result\"][\"stop_cause\"], \"argument_rejected\")\n                     ~~~~~~~~~~~~~^^^^^^^^^^^^^^\nKeyError: 'stop_cause'\n\n======================================================================\nERROR: test_admission_rejects_every_input_except_one_valid_raw_packet (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_admission_rejects_every_input_except_one_valid_raw_packet) (args={'repo': 'fixture-view', 'packets': {'catalog': 'foundation', 'layer_id': 'fixture-layer', 'path': 'packets/fixture.json', 'sha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}, 'prompt': 'Read {PACKET_PATH} under {REPO_ROOT} for {LANE}.'})\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 137, in test_admission_rejects_every_input_except_one_valid_raw_packet\n    self.assertEqual(got[\"result\"][\"stop_cause\"], \"argument_rejected\")\n                     ~~~~~~~~~~~~~^^^^^^^^^^^^^^\nKeyError: 'stop_cause'\n\n======================================================================\nERROR: test_admission_rejects_every_input_except_one_valid_raw_packet (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_admission_rejects_every_input_except_one_valid_raw_packet) (args={'repo': 'fixture-view', 'packets': [None], 'prompt': 'Read {PACKET_PATH} under {REPO_ROOT} for {LANE}.'})\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 137, in test_admission_rejects_every_input_except_one_valid_raw_packet\n    self.assertEqual(got[\"result\"][\"stop_cause\"], \"argument_rejected\")\n                     ~~~~~~~~~~~~~^^^^^^^^^^^^^^\nKeyError: 'stop_cause'\n\n======================================================================\nERROR: test_admission_rejects_every_input_except_one_valid_raw_packet (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_admission_rejects_every_input_except_one_valid_raw_packet) (args={'repo': 'fixture-view', 'packets': [{'catalog': 'foundation', 'layer_id': 'fixture-layer', 'path': ' ', 'sha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}], 'prompt': 'Read {PACKET_PATH} under {REPO_ROOT} for {LANE}.'})\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 137, in test_admission_rejects_every_input_except_one_valid_raw_packet\n    self.assertEqual(got[\"result\"][\"stop_cause\"], \"argument_rejected\")\n                     ~~~~~~~~~~~~~^^^^^^^^^^^^^^\nKeyError: 'stop_cause'\n\n======================================================================\nERROR: test_admission_rejects_every_input_except_one_valid_raw_pac\n[excerpt omitted]\n]}, 'evidence_refs': {'type': 'array', 'items': {'type': 'string'}}}, 'required': ['key', 'name', 'repository', 'disposition', 'why_not_default', 'evidence_class', 'evidence_refs']}, 'minItems': 1}, 'challenger_preferred': {'type': ['object', 'null'], 'properties': {'key': {'type': ['string', 'null']}, 'name': {'type': 'string'}, 'repository': {'type': 'string', 'pattern': '^https://[^ ;,]+$'}, 'why': {'type': 'string'}, 'required_comparison': {'type': 'string'}}, 'required': ['key', 'name', 'repository', 'why', 'required_comparison']}, 'overturn_when': {'type': 'string'}, 'overturn_protocol': {'type': 'object', 'properties': {'fixture_paths': {'type': 'array', 'items': {'type': 'string'}}, 'metric': {'type': 'string'}, 'arms': {'type': 'array', 'items': {'type': 'string'}}}, 'required': ['fixture_paths', 'metric', 'arms']}, 'open_gaps': {'type': 'array', 'items': {'type': 'string'}}, 'sources_read': {'type': 'array', 'items': {'type': 'string'}}, 'limits': {'type': 'array', 'items': {'type': 'string'}}}, 'required': ['schema_version', 'lane', 'catalog', 'layer_id', 'packet_sha256', 'model', 'winner_keys', 'why_selected', 'winner_evidence_class', 'winner_evidence_refs', 'alternatives', 'challenger_preferred', 'overturn_when', 'overturn_protocol', 'open_gaps', 'sources_read', 'limits']}}\n\nDiff is 10754 characters long. Set self.maxDiff to None to see it.\n\n----------------------------------------------------------------------\nRan 1 test in 0.541s\n\nFAILED (failures=8, errors=7)\n",
+      "cwd_relative": ".",
+      "stderr_excerpted": true
+    },
+    {
+      "step": "packet-admission green",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ".......\n----------------------------------------------------------------------\nRan 7 tests in 0.971s\n\nOK\n",
+      "cwd_relative": ".",
+      "stderr_excerpted": false
+    },
+    {
+      "step": "failure-envelope red",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "..FFFFFF.FFFF....F\n======================================================================\nFAIL: test_exceptions_keep_the_failed_stage_and_all_earlier_judgments (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_exceptions_keep_the_failed_stage_and_all_earlier_judgments) (stage='proposal')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 145, in test_exceptions_keep_the_failed_stage_and_all_earlier_judgments\n    self.assertEqual(got.get(\"status\"), \"incomplete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: None != 'incomplete'\n\n======================================================================\nFAIL: test_exceptions_keep_the_failed_stage_and_all_earlier_judgments (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_exceptions_keep_the_failed_stage_and_all_earlier_judgments) (stage='evidence')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 145, in test_exceptions_keep_the_failed_stage_and_all_earlier_judgments\n    self.assertEqual(got.get(\"status\"), \"incomplete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: None != 'incomplete'\n\n======================================================================\nFAIL: test_exceptions_keep_the_failed_stage_and_all_earlier_judgments (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_exceptions_keep_the_failed_stage_and_all_earlier_judgments) (stage='challenger')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 145, in test_exceptions_keep_the_failed_stage_and_all_earlier_judgments\n    self.assertEqual(got.get(\"status\"), \"incomplete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: None != 'incomplete'\n\n======================================================================\nFAIL: test_exceptions_keep_the_failed_stage_and_all_earlier_judgments (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_exceptions_keep_the_failed_stage_and_all_earlier_judgments) (stage='revision')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 145, in test_exceptions_keep_the_failed_stage_and_all_earlier_judgments\n    self.assertEqual(got.get(\"status\"), \"incomplete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: None != 'incomplete'\n\n======================================================================\nFAIL: test_exceptions_keep_the_failed_stage_and_all_earlier_judgments (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_exceptions_keep_the_failed_stage_and_all_earlier_judgments) (stage='revision_evidence')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 145, in test_exceptions_keep_the_failed_stage_and_all_earlier_judgments\n    self.assertEqual(got.get(\"status\"), \"incomplete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: None != 'incomplete'\n\n======================================================================\nFAIL: test_exceptions_keep_the_fai\n[excerpt omitted]\nkflowTests.test_malformed_votes_are_retained_but_never_count_as_a_success) (raw={'refuted': False, 'reason': 'fixture evidence checked', 'findings': [{'claim': 'challenger evidence omitted', 'evidence': 'fixtures/challenger.json:1', 'severity': 'unknown'}], 'paths_checked': ['fixtures/challenger.json'], 'resolutions': []})\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 162, in test_malformed_votes_are_retained_but_never_count_as_a_success\n    self.assertEqual(got.get(\"status\"), \"incomplete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: None != 'incomplete'\n\n======================================================================\nFAIL: test_top_level_status_distinguishes_closed_judgment_from_partial_run (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_top_level_status_distinguishes_closed_judgment_from_partial_run)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 171, in test_top_level_status_distinguishes_closed_judgment_from_partial_run\n    self.assertEqual(complete.get(\"status\"), \"complete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: None != 'complete'\n\n----------------------------------------------------------------------\nRan 10 tests in 1.359s\n\nFAILED (failures=11)\n",
+      "cwd_relative": ".",
+      "stderr_excerpted": true
+    },
+    {
+      "step": "failure-envelope green",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "..........\n----------------------------------------------------------------------\nRan 10 tests in 1.341s\n\nOK\n",
+      "cwd_relative": ".",
+      "stderr_excerpted": false
+    },
+    {
+      "step": "orchestration-and-role red",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": ".....FFFFFF.F...FFF.\n======================================================================\nFAIL: test_orchestration_faults_keep_completed_votes_and_never_complete (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_orchestration_faults_keep_completed_votes_and_never_complete) (round=1, fault='before')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 206, in test_orchestration_faults_keep_completed_votes_and_never_complete\n    got = self.major_run(_parallel=fault, _parallel_round=round_number)[\"result\"]\n          ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 68, in major_run\n    return self.run_lane(**returns)\n           ~~~~~~~~~~~~~^^^^^^^^^^^\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 61, in run_lane\n    self.assertEqual(result.returncode, 0, result.stderr)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 1 != 0 : Error: synthetic parallel failure before calls\n    at parallel ([eval]:20:33)\n    at eval (eval at <anonymous> ([eval]:25:13), <anonymous>:164:23)\n    at eval (eval at <anonymous> ([eval]:25:13), <anonymous>:173:3)\n    at [eval]:26:1\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [eval]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)\n    at evalTypeScript (node:internal/process/execution:295:3)\n\n\n======================================================================\nFAIL: test_orchestration_faults_keep_completed_votes_and_never_complete (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_orchestration_faults_keep_completed_votes_and_never_complete) (round=1, fault='after')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 206, in test_orchestration_faults_keep_completed_votes_and_never_complete\n    got = self.major_run(_parallel=fault, _parallel_round=round_number)[\"result\"]\n          ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 68, in major_run\n    return self.run_lane(**returns)\n           ~~~~~~~~~~~~~^^^^^^^^^^^\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 61, in run_lane\n    self.assertEqual(result.returncode, 0, result.stderr)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 1 != 0 : Error: synthetic parallel failure after calls\n    at parallel ([eval]:22:32)\n    at async eval (eval at <anonymous> ([eval]:25:13), <anonymous>:164:17)\n\n\n======================================================================\nFAIL: test_orchestration_faults_keep_completed_votes_and_never_complete (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_orchestration_faults_keep_completed_votes_and_never_complete) (round=1, fault='null_after')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 206, in test_orchestration_faults_keep_completed_votes_and_never_complete\n    got = self.major_run(_parallel=fault, _parallel_round=round_number)[\"result\"]\n          ~~~\n[excerpt omitted]\nt_errors_preserve_the_partial_chain\n    self.assertEqual(len(got[\"layers\"]), 1)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 0 != 1\n\n======================================================================\nFAIL: test_synchronous_agent_errors_preserve_the_partial_chain (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_synchronous_agent_errors_preserve_the_partial_chain) (stage='evidence')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 195, in test_synchronous_agent_errors_preserve_the_partial_chain\n    self.assertEqual(len(got[\"layers\"]), 1)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 0 != 1\n\n======================================================================\nFAIL: test_synchronous_agent_errors_preserve_the_partial_chain (tests.test_layer_verdict_workflow.LayerVerdictWorkflowTests.test_synchronous_agent_errors_preserve_the_partial_chain) (stage='revision')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_layer_verdict_workflow.py\", line 195, in test_synchronous_agent_errors_preserve_the_partial_chain\n    self.assertEqual(len(got[\"layers\"]), 1)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 0 != 1\n\n----------------------------------------------------------------------\nRan 13 tests in 1.859s\n\nFAILED (failures=10)\n",
+      "cwd_relative": ".",
+      "stderr_excerpted": true
+    },
+    {
+      "step": "orchestration-and-role green",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_layer_verdict_workflow"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ".............\n----------------------------------------------------------------------\nRan 13 tests in 1.813s\n\nOK\n",
+      "cwd_relative": ".",
+      "stderr_excerpted": false
+    }
+  ]
+}

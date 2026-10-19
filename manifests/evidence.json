@@ -17643,7 +17643,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "33dbd65ca5164dbbe1c51135ca1986ea5088a90b6a534f16ee461baff44c0d2c",
+      "sha256": "adf618a4c96e96573bcbd3f72b9805bd2ff0e42ac6e7ce2c79a3ede379653de8",
       "bytes": 193410
     },
     {
@@ -19485,6 +19485,11 @@
       "path": "docs/decisions/2026-10-18-codex-pin-retain-existing-pending-gates.md",
       "sha256": "d467c80c35538fc17ad7192422d444713fd4e2239d77925b971b33a3c78bf778",
       "bytes": 5644
+    },
+    {
+      "path": "docs/decisions/2026-10-18-layer-verdict-semantic-closure.md",
+      "sha256": "6cb19e2eca50dbde83fa0be1035d110e43df4b1102b49bda52a8d6f8e43c585d",
+      "bytes": 11917
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -39080,6 +39085,36 @@
       "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
       "sha256": "70d2df52a1dd02a3db0275d0116837cb1c213988f28d34812bb01413640705e0",
       "bytes": 363206
+    },
+    {
+      "path": "evidence/artifacts/layer-verdict-semantic-closure-20261018/review-amendment-source-review.md",
+      "sha256": "be4fdbd572082c9bf4b2eb50dff620aae2ee64a3167c2c6c31e64e195fcc02b7",
+      "bytes": 1491
+    },
+    {
+      "path": "evidence/artifacts/layer-verdict-semantic-closure-20261018/review-amendment-tests-first.json",
+      "sha256": "ab63b99b2b6806bc476c0aed42d872c190a8d2fbad7985dfcb51c749a255bf28",
+      "bytes": 16308
+    },
+    {
+      "path": "evidence/artifacts/layer-verdict-semantic-closure-20261018/review-amendment-verification.json",
+      "sha256": "d18a6891ef3410ab1019931baef5d63826188eff642e5567d0ff938952d24cd4",
+      "bytes": 18984
+    },
+    {
+      "path": "evidence/artifacts/layer-verdict-semantic-closure-20261018/source-review.md",
+      "sha256": "807a29039c6222ede20bcb17f2bcdfb25ba9ae3af87c43b95e8029ef4b5765c8",
+      "bytes": 1299
+    },
+    {
+      "path": "evidence/artifacts/layer-verdict-semantic-closure-20261018/tests-first.json",
+      "sha256": "a22760e1a6b28feb3e93222b05f1ea09dcd7c61633e6688e6b9eddaac26a4125",
+      "bytes": 23370
+    },
+    {
+      "path": "evidence/artifacts/layer-verdict-semantic-closure-20261018/verification.json",
+      "sha256": "b6145209254457cce556758206f1b3949491fe8f3bd30ecf3896fc7c074e7854",
+      "bytes": 13260
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",
@@ -62143,12 +62178,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "ac1fefa1799dc2f6d68052924554855ad104b2ff7e6e61b746f4e8c61e237401",
-      "bytes": 119189
+      "sha256": "41b686af675ebe6a9e70a53195d0a820dbbbdc0c40b81bf5a32539c0dfe71d28",
+      "bytes": 122390
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "f98e22c94c7009526fd29d9bab41c352a8670ed4d32ac027fe783baa2238f1e3",
+      "sha256": "ac628f40165837211e66d5c39a5546c96159525e8ff098eb5e16134be4805d4d",
       "bytes": 1217
     },
     {
@@ -62170,6 +62205,11 @@
       "path": "examples/claude-native/workflows/contract.config.json",
       "sha256": "ff73c08c0ec55af194794b614840575d32c9e4174371907e12bffb1aacff70ab",
       "bytes": 349
+    },
+    {
+      "path": "examples/claude-native/workflows/layer-verdict-lane.js",
+      "sha256": "09f03c824488ea37c4384c2d4bc867ecc2211d2fce4d50ba08c0dd8f91e7b289",
+      "bytes": 25322
     },
     {
       "path": "examples/claude-native/workflows/readiness-audit.js",
@@ -62203,13 +62243,18 @@
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "e0b640da73ceb36bad225db5c1ad00839c124547f0a0809cf9c18a90b4322f67",
-      "bytes": 59705
+      "sha256": "a62843aff13c7d4f0df532dc8ac9b9ca4f8f71335e47a33085b9a607794a80d3",
+      "bytes": 59972
     },
     {
       "path": "examples/claude-native/workflows/test-usage-receipts.mjs",
       "sha256": "2ed3323db76d0104327a0c0bb35f00cf6a05018bdd9f49982b0c279cf2540871",
       "bytes": 8495
+    },
+    {
+      "path": "examples/claude-native/workflows/vendored-lanes.json",
+      "sha256": "6be9ba39296a766a983af084417a84cca52cec8deceaf8f927f8a37e46db95a1",
+      "bytes": 3035
     },
     {
       "path": "examples/claude-runtime-sdk/README.md",
@@ -64257,6 +64302,11 @@
       "bytes": 4234
     },
     {
+      "path": "tests/test_claude_lane.py",
+      "sha256": "06199f90117a06e372cad3107f05198654c38b48d6fafe00480d75eea9d83a62",
+      "bytes": 27792
+    },
+    {
       "path": "tests/test_claude_recovery.py",
       "sha256": "cb8ca511c898a86de80bca24dd96bdabe9d4545883abf299e2a8b07e45a1859e",
       "bytes": 1379
@@ -64715,6 +64765,16 @@
       "path": "tests/test_lane_packets.py",
       "sha256": "f1e74add4e93c382c46e9df426d40a084fa327ebdbbda6873bb03740a42ce4cf",
       "bytes": 111632
+    },
+    {
+      "path": "tests/test_layer_verdict_mutations.py",
+      "sha256": "4bd3560f50298e791adf7089d86d74c7f967fe815c2ff34fbf52672ced06aabe",
+      "bytes": 1999
+    },
+    {
+      "path": "tests/test_layer_verdict_workflow.py",
+      "sha256": "73cab66112a01a920ef3d65fb4a28e59a3772ba57044525a72b64561dfb765f1",
+      "bytes": 20386
     },
     {
       "path": "tests/test_layer_verdicts.py",
@@ -66137,6 +66197,11 @@
       "bytes": 28095
     },
     {
+      "path": "tools/sota-convergence/claude_lane.py",
+      "sha256": "6db9674a490ad89fcb37c292942e5569ee1dd8bf23011b283001ae63220be9ae",
+      "bytes": 22255
+    },
+    {
       "path": "tools/sota-convergence/codex_lane.py",
       "sha256": "3ed9524ca7523b30a1258a18a06b1c7c7cc6d5f9826c2c14edfbc91394148d7a",
       "bytes": 86255
@@ -66303,8 +66368,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "f097b8c982e613d59e80e7213ae55a500dd615302dcedb65eb5deae8546f13fa",
-      "bytes": 19787
+      "sha256": "54da09fd259d63318973f58ea6b51c7bc38b9343ac189bac9d3ca0593d8e9108",
+      "bytes": 22013
     },
     {
       "path": "tools/sota-convergence/lane-return.schema.json",

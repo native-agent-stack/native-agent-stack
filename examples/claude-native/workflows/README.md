@@ -8,9 +8,12 @@ effort `max` ([decision](../../../docs/decisions/2026-09-23-max-effort-default.m
 2026-10-12 each agent definition carries the model and effort of the command center's routing table (`source-scout` excepted: Sonnet, medium, where the ruling's mechanical row says Haiku, low),
 the blind roles keeping their protocol's `max` ([decision](../../../docs/decisions/2026-10-12-model-effort-routing.md)).
 Gate verification, trading reads and sole Claude reads stay on Opus (routing run 5, unchanged by the ruling).
-`review-changes.js`, `readiness-audit.js` and `layer-verdict-lane.js` are
+`review-changes.js` and `readiness-audit.js` are
 byte-identical to agent-lab `b31f640` (the `max` change is agent-lab #43; the lane is
-pinned at agent-lab `e070125` in `vendored-lanes.json`). The
+pinned originally at agent-lab `e070125` in `vendored-lanes.json`). The lane now
+carries a [NAS-maintained semantic-closure correction](../../../docs/decisions/2026-10-18-layer-verdict-semantic-closure.md),
+with its original lineage and current bytes recorded separately; it is no longer
+byte-identical to that agent-lab revision. The
 qualification ran at the earlier efforts (Sonnet/medium, Opus/high); no native
 run at `max` is recorded yet. These are local integration assets, not upstream
 tests. The separate `semantic-evidence-reviewer` example received a later
@@ -120,18 +123,55 @@ names, vendored byte-identical from agent-lab `e070125` and pinned in
   missing or unverifiable evidence cannot complete the audit; a complete audit can
   conclude that the project is not ready.
 - `layer-verdict-lane`: this catalog's own Claude lane of the layer-verdict
-  convergence, vendored byte-identical under `SHA256SUMS`. After
+  convergence, maintained under `SHA256SUMS` with retained agent-lab lineage. After
   `tools/sota-convergence/lane_packets.py` writes the packets, pass `repo`,
-  `packets` (`{catalog, layer_id, path, sha256}`), the lane `prompt` and the
+  the complete nonempty `packets` list (`{catalog, layer_id, path, sha256}`), the lane `prompt` and the
   `launch` identity (`tools/sota-convergence/claude_lane_args.py` prints all
   four). Every stage runs as `blind-lane-reviewer` (Read, Glob and Grep, no
-  skills, no project instructions): per packet one proposal, two lenses that
-  try to refute it and one revision round after a refutation. It writes
+  skills, no project instructions). Packet chains run sequentially; each has one proposal, two lenses that
+  try to refute it and at most one revision round after a refutation or major/blocking finding.
+  A required revision cannot fall back to the original proposal. Both rechecks must
+  return valid, unrefuted votes with no remaining major/blocking finding; every
+  prior major/blocking finding needs an explicit, cited `resolutions` disposition from its
+  originating lens. An omitted finding does not establish resolution. Failed or
+  incomplete judgment returns `final: null` and `refutation.status: unknown`,
+  preserving both rounds, malformed values and stage/orchestration errors.
+  The top-level `status` is `complete` only when every packet has a closed judgment; otherwise it is
+  `incomplete` with a `stop_cause`. `stage_results`, `expected_roles`, `returned_roles`
+  and `not_started_roles` describe script-visible calls, not hidden native retries.
+  A failed judgment retains its evidence and the next packet still runs. If the
+  parallel group fails or returns before all lens outcomes are observed, remaining
+  packets are skipped and listed in both `lost` and `not_started_packets`; the
+  envelope reports `wave_orchestration_incomplete`. Started lenses may still be
+  running, so the script launches no further packet producers after that failure.
+  Malformed entries, duplicate catalog/layer identities, empty lists and the old
+  `docs` fallback refuse the entire wave before any agent call; no input is filtered.
+  `refutation_counts` retains final judgment statuses (unsuccessful required revisions
+  are unknown); `round_refutation_counts` separately reports observed refuted proposal
+  and revision rounds, including those within an unknown judgment.
+  It writes
   nothing; `tools/sota-convergence/claude_lane.py` collects the result and
   `record_verdicts.py` applies the rules (see
   `docs/decisions/2026-09-23-verdict-integrity.md`). It needs the vendored
   `examples/claude-native/agents/blind-lane-reviewer.md`, so a project that does
   not record layer verdicts can leave it out.
+
+This source correction does not qualify a native pilot. The caller must still bind
+the loaded script/role/prompt/packet/source-view bytes, admit exactly one packet
+before pilot dispatch, prove effective confinement,
+hold the global parent-plus-two producer lease, and bind native Workflow completion,
+all attempts, models/efforts/routes and terminal/usage closure to the same run.
+A completed script is not evidence that a headless parent waited for the Workflow.
+The pilot's one-packet admission gate is not implemented here; activation remains
+on HOLD. The reusable wave API preserves the args builder's complete list and the
+collector's existing provenance and stale-return rules. Collect a complete wave
+from one bound run: a hand-selected single-packet result against a larger work dir
+causes the collector to remove returns for the omitted packets.
+No verified clean agent-lab descendant containing this correction has been supplied.
+The historical anchor is `e070125dae03b4e44484ccb78d2d65057ad38f40`; deployment remains
+HOLD until such a checkout contains the exact committed registered bytes and role.
+Collector identity docstrings now distinguish that ancestry from byte identity;
+its enforcement and the FINAL-admission guard retain their existing rules.
 
 Both workflows retain native model/schema errors and missing results. Claims and
 returned source summaries remain model judgments; deterministic coverage checks

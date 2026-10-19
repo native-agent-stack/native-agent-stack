@@ -244,6 +244,47 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         failures = json.loads((self.work / "claude" / "failures.json").read_text(encoding="utf-8"))["failures"]
         self.assertIn(("foundation", "l9"), [(item["catalog"], item["layer_id"]) for item in failures])
 
+    def test_generated_args_workflow_and_collector_preserve_the_complete_wave(self):
+        # Execute the actual saved JS with synthetic agents, then bind its result to
+        # synthetic transcripts. This proves local API compatibility, not native admission.
+        from tests.test_layer_verdict_workflow import DRIVER, vote
+        spec = importlib.util.spec_from_file_location("claude_lane_args", claude_lane.HERE / "claude_lane_args.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with mock.patch.object(module.claude_lane, "vendored_agentlab_commit",
+                               side_effect=claude_lane.vendored_agentlab_commit):
+            args = module.lane_args(self.work, self.export, claude_lane.VENDORED_AGENT, self.agentlab)
+        for failed in (False, True):
+            with self.subTest(second_packet_fails=failed):
+                returns = {"evidence": vote(), "challenger": vote(), "_layers": {}}
+                for packet in args["packets"]:
+                    proposal = {"schema_version": 1, "lane": "claude", "catalog": packet["catalog"],
+                                "layer_id": packet["layer_id"], "packet_sha256": packet["sha256"],
+                                "model": {"name": "opus", "effort": "max"}}
+                    returns["_layers"][f"{packet['catalog']}/{packet['layer_id']}"] = {
+                        "proposal": None if failed and packet["layer_id"] == "l2" else proposal}
+                run = subprocess.run(["node", "-e", DRIVER, str(VENDORED)],
+                                     input=json.dumps({"args": args, "returns": returns}),
+                                     text=True, capture_output=True, timeout=15, cwd=ROOT)
+                self.assertEqual(run.returncode, 0, run.stderr)
+                result = json.loads(run.stdout)["result"]
+                self.assertEqual(result["status"], "incomplete" if failed else "complete")
+                self.assertEqual([r["layer_id"] for r in result["layers"]], ["l1", "l2"])
+                self.result.write_text(json.dumps(result), encoding="utf-8")
+                for layer_id in ("l1", "l2"):
+                    self.write_transcript(layer_id, [str(self.export / "evidence.json")])
+                self.assertEqual(self.run_main(), 0)
+                out_dir = self.work / "claude"
+                self.assertTrue((out_dir / "foundation__l1.json").exists())
+                self.assertEqual((out_dir / "foundation__l2.json").exists(), not failed)
+                if failed:
+                    failures = json.loads((out_dir / "failures.json").read_text())["failures"]
+                    self.assertEqual([(r["catalog"], r["layer_id"]) for r in failures], [("foundation", "l2")])
+                else:
+                    self.assertFalse((out_dir / "failures.json").exists())
+                audit = json.loads((out_dir / "transcript-audit.json").read_text())
+                self.assertFalse(audit["flagged_items"])
+
     def test_a_layer_run_on_another_packet_path_is_refused(self):
         # Codex review of #145: edited args could run another packet under the same hash.
         data = json.loads(self.result.read_text(encoding="utf-8"))

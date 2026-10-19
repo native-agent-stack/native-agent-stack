@@ -362,7 +362,10 @@ function agentOptionLiterals(src) {
     // a null-returning stub stops review-changes after its first stage.
     const minimal = (sc) => !sc ? null : sc.enum ? sc.enum[0] : sc.type === 'object' ? Object.fromEntries((sc.required || []).map((k) => [k, minimal(sc.properties[k])])) : sc.type === 'array' ? Array.from({ length: sc.minItems || 0 }, () => minimal(sc.items)) : sc.type === 'string' ? 'x' : sc.type === 'boolean' ? false : sc.type === 'number' || sc.type === 'integer' ? 0 : null
     const stub = async (prompt, opts) => { calls.push({ prompt, opts: opts || {} }); return minimal((opts || {}).schema) }
-    await load(f, { ...base, parallel, args: { base: 'HEAD', docs: ['a.md'], commands: ['true'], checks: ['true'] }, agent: stub })
+    const args = f === 'workflows/layer-verdict-lane.js'
+      ? { repo: 'fixture-view', packets: [{ catalog: 'foundation', layer_id: 'fixture-layer', path: 'packet.json', sha256: 'a'.repeat(64) }], prompt: 'Read {PACKET_PATH} under {REPO_ROOT} for {LANE}.' }
+      : { base: 'HEAD', docs: ['a.md'], commands: ['true'], checks: ['true'] }
+    await load(f, { ...base, parallel, args, agent: stub })
     const allowed = { model: ['haiku', 'sonnet', 'opus'], effort: ['low', 'medium', 'high', 'xhigh', 'max'] }
     const src = readFileSync(join(ROOT, f), 'utf8')
     const literals = agentOptionLiterals(src)

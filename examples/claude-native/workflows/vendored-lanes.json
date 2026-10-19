@@ -3,14 +3,31 @@
   {
    "agentlab_commit": "e070125dae03b4e44484ccb78d2d65057ad38f40",
    "path": "layer-verdict-lane.js",
-   "records_in_its_return": "model {name: 'opus', effort: 'max'}, prompt (args.prompt, required when packets are given), per layer packet_path (the packet its agents read), launch (args.launch echoed unchanged, null when absent; a launch whose repo is not args.repo stops the lane) and, per layer, refutation {status, final_source, proposal_status, revision_status, votes} (both lens votes are required on the sealed object; final is null when it was refuted or a vote is missing); tools/sota-convergence/claude_lane.py writes <work-dir>/claude/<catalog>__<layer_id>.json from the workflow result, copying refutation and adding model.family 'anthropic', the resolved model name (--resolved-model, for example claude-opus-5-5 from child-usage.mjs) and provenance {workflow_path, workflow_sha256, agentlab_commit, agent_sha256, prompt_sha256, repo_tree_sha256}, requiring the echoed launch to name the --repo export and its current tree digest, refusing workflow bytes that are uncommitted or differ from this SHA256SUMS entry, and lists every layer without a final in <work-dir>/claude/failures.json",
-   "sha256": "fd77b74945e9d2bd0b26b7822aabcde00e7e650c327da16d852fdbfd5984c0d6",
+   "records_in_its_return": "Nonempty all-valid unique packet waves in sequential chains; literal model/effort, prompt, launch and packet identity; top-level status/stop_cause; final judgment counts and observed round_refutation_counts; not_started_packets after orchestration failure; per layer both raw judgment rounds, required_findings, stage_results with retained errors/invalid values and role accounting. A required unsuccessful revision is unknown with final null; a final revision needs both clean rechecks and evidence-backed originating-lens closure of every prior serious finding. Pilot one-packet pre-dispatch admission is external and not implemented by this reusable wave API. Collector enforcement, provenance and complete-wave stale-return cleanup are unchanged; its historical identity docstrings are corrected. No native run or verified corrected agent-lab deployment is supplied.",
+   "sha256": "09f03c824488ea37c4384c2d4bc867ecc2211d2fce4d50ba08c0dd8f91e7b289",
    "source_path": ".claude/workflows/layer-verdict-lane.js",
    "source_repository": "agent-lab",
-   "supersedes_sha256": "f824999f81af9027c10c849cd050aac84e3ebcfcb5995bf4b5979bb486f27508",
-   "verified_identical_at_agentlab_commit": "e070125dae03b4e44484ccb78d2d65057ad38f40"
+   "supersedes_sha256": "0de995421ad47c43150d4104b07fb6832277f6b2bcfd9efa76d2d8db96d9b414",
+   "nas_correction": {
+    "repository": "https://github.com/native-agent-stack/native-agent-stack",
+    "base_commit": "6f57256a6db754edb576519ed7803f202b5430a8",
+    "base_sha256": "fd77b74945e9d2bd0b26b7822aabcde00e7e650c327da16d852fdbfd5984c0d6",
+    "record": "docs/decisions/2026-10-18-layer-verdict-semantic-closure.md",
+    "identical_to_agentlab_commit": false,
+    "lineage_note": "agentlab_commit, source_repository and source_path retain the original source/ancestry identity for the unchanged collector. The current NAS-maintained bytes are not asserted identical at that historical commit.",
+    "review_amendment": {
+     "base_commit": "2fcfaffcfb24e192d86744be2bab75946ed96103",
+     "base_sha256": "0de995421ad47c43150d4104b07fb6832277f6b2bcfd9efa76d2d8db96d9b414",
+     "record": "docs/decisions/2026-10-18-layer-verdict-semantic-closure.md",
+     "agentlab_deployment": {
+      "status": "HOLD",
+      "verified_descendant_commit": null,
+      "reason": "No verified clean descendant of the historical agent-lab anchor containing these corrected bytes is supplied. Mocked test ancestry is not deployment evidence."
+     }
+    }
+   }
   }
  ],
  "schema_version": 1,
- "scope": "Workflow files vendored byte for byte from agent-lab so a host holding only this catalog can rerun the layer-verdict Claude lane (2026-09-23 peer audit). tools/sota-convergence/record_verdicts.py accepts a new-wave Claude lane return only when its provenance.workflow_sha256 equals this directory's SHA256SUMS entry for the named workflow. The lane prompt it fills is tools/sota-convergence/lane-prompt.md, already in this catalog."
+ "scope": "Historical agent-lab lineage plus explicit NAS-maintained corrections. Current bytes are bound by SHA256SUMS; corrections state when historical byte identity no longer holds. tools/sota-convergence/record_verdicts.py accepts a new-wave Claude lane return only when its provenance.workflow_sha256 equals this directory's SHA256SUMS entry for the named workflow and its existing native provenance checks pass. Source registration is not native qualification or permission to record FINAL. The lane prompt is tools/sota-convergence/lane-prompt.md."
 }
