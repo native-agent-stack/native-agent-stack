@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "evidence_class": "synthetic",
+  "parent_commit": "d3c3a4e97b26482fdc94170cecb6d50d3ac68cb9",
+  "scope": "CC addendum-03: confirmed scale-in rearms a completed partial take-profit; all Controller fixture default STOP bindings isolated and filesystem access guarded.",
+  "review_records": [
+    {
+      "path": "coordination/command-center/research-cc-role-20261008/adjudication-pr1091-e2755161-20261014.addendum-03.md"
+    },
+    {
+      "path": "/var/tmp/cc-cc-work/pr1091-micro/MICRO-delta-d3c3a4e9.md"
+    },
+    {
+      "path": "/var/tmp/ns2604-local-review-20261013/pr1091-d3c3a4e9/review_output.json"
+    }
+  ],
+  "review_capture_boundary": "These are verified local review inputs, not claims of public preimages.",
+  "runtime": {
+    "python": "3.12.3",
+    "nautilus_trader": "2.0.0rc5",
+    "alpaca-py": "0.44.0",
+    "network": "fresh unshare -rn namespace per command",
+    "priority": "nice -n 19"
+  },
+  "tested_source_sha256": {
+    "blueprints/us-equities/adaptive-paper/safety.py": "140856337a13721c852c2c6bd30a2066712c46e3282273f2685ae54dcf6b781b",
+    "blueprints/us-equities/adaptive-paper/native_strategy.py": "178aa8c8b5a3ce5e2700578d959c577a96f48c7bba4d0139fd6dc35f077b7910",
+    "blueprints/us-equities/adaptive-paper/runner.py": "f0cc95c79f9bca4d6044a4081451a7fc3c4a1ace76eb368b9cfe7ee2733144b1",
+    "blueprints/us-equities/adaptive-paper/exits.py": "9fa99dc844de37eddb7c2b6de9cb07a3417e8452a9c39437330e5f7e0bdf9fff",
+    "tests/test_adaptive_paper_sell_chunks.py": "319f2c93eab3aa54eb418963d3de33f73ee0ea8feb8c22fe2a078bdd9b08bbe3",
+    "tests/adaptive_paper_hermetic.py": "ee3fe5d3f97143e9361281f2c4d95076b758ec8d245a942bd7470412673558cd"
+  },
+  "source_refs": [
+    "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/trading/models.py#L230-L231",
+    "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/trading/models.py#L633-L646",
+    "https://github.com/python/cpython/blob/v3.12.3/Lib/pathlib.py#L840",
+    "https://github.com/python/cpython/blob/v3.12.3/Lib/unittest/mock.py",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/d3c3a4e97b26482fdc94170cecb6d50d3ac68cb9/blueprints/us-equities/adaptive-paper/safety.py#L1610-L1721",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/d3c3a4e97b26482fdc94170cecb6d50d3ac68cb9/blueprints/us-equities/adaptive-paper/native_strategy.py#L1121-L1145",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/d3c3a4e97b26482fdc94170cecb6d50d3ac68cb9/blueprints/us-equities/adaptive-paper/runner.py#L950-L954"
+  ],
+  "upstream_verification": {
+    "path": "alpaca/trading/models.py",
+    "pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+    "sha256": "0a4296847ea46c434de3fe08ef6bb82519d9442705e59b4671127ffffad3855f",
+    "installed_source_byte_equal": true
+  },
+  "fail_first": {
+    "command": [
+      "unshare",
+      "-rn",
+      "--",
+      "nice",
+      "-n",
+      "19",
+      "<pinned-runtime-python>",
+      "-B",
+      "-m",
+      "unittest",
+      "-v",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_scale_in_rearms_completed_partial_take_profit",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_scale_in_after_reconciled_partial_fill_rearms_across_restart",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_unfilled_scale_in_does_not_rearm_partial_take_profit",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_scale_in_preserves_an_unfinished_partial_target",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_stop_loss_still_sells_after_partial_take_profit_and_scale_in",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_time_exit_still_sells_after_partial_take_profit_and_scale_in",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_final_wire_integrity_refusal_requires_a_fresh_recovery_session",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_controller_quote_not_fresh_refusal_retries_after_fresh_quotes",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_final_http_guard_stale_after_reservation_resumes_full_exit",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_1095_one_share_appreciated_exit_probe_is_accepted"
+    ],
+    "timestamp": "2026-10-15T11:50:57.754381+00:00",
+    "return_code": 1,
+    "wall_seconds": 4.364,
+    "tests_run": 10,
+    "test_seconds": 3.588,
+    "output": "evidence/artifacts/adaptive-paper-shared-runner-corrections-20261015/round3/red-tests.txt",
+    "failures": 6,
+    "errors": 1,
+    "skipped": 0,
+    "passing_controls": 4,
+    "explanation": "Production untouched at d3; six new test methods plus four existing Controller tests under a new filesystem guard. Two take-profit assertions fail, four Controller tests attempt a live-latch stat which is blocked before the syscall, and the expected module cleanup assertion reports those four attempts.",
+    "cases": [
+      {
+        "case": "100 -> 50 partial take-profit -> buy 50 -> take-profit",
+        "before": "second sell absent; all 100 held",
+        "after": "second sell 50; 50 held; duplicate cumulative buy does not rearm again"
+      },
+      {
+        "case": "partial sell reconciled without callback -> buy 25 -> restart -> take-profit",
+        "before": "sells only 25 back to stale target 50",
+        "after": "sells floor(75 * 0.5) = 37; 38 held"
+      },
+      {
+        "case": "four reviewed Controller fixture paths",
+        "before": "four stat calls blocked before filesystem access; cleanup assertion confirms attempts",
+        "after": "private defaults; zero blocked operations under module-wide guard"
+      }
+    ],
+    "controls": [
+      "Canceled zero-fill buy does not rearm",
+      "Unfinished target survives scale-in and finishes its original reduction",
+      "Stop-loss exits all owned shares after scale-in",
+      "Time exit exits all owned shares after scale-in"
+    ]
+  },
+  "focused_acceptance": {
+    "command": [
+      "unshare",
+      "-rn",
+      "--",
+      "nice",
+      "-n",
+      "19",
+      "<pinned-runtime-python>",
+      "-B",
+      "-m",
+      "unittest",
+      "-v",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_scale_in_rearms_completed_partial_take_profit",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_scale_in_after_reconciled_partial_fill_rearms_across_restart",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_unfilled_scale_in_does_not_rearm_partial_take_profit",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_scale_in_preserves_an_unfinished_partial_target",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_stop_loss_still_sells_after_partial_take_profit_and_scale_in",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_time_exit_still_sells_after_partial_take_profit_and_scale_in",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_final_wire_integrity_refusal_requires_a_fresh_recovery_session",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_controller_quote_not_fresh_refusal_retries_after_fresh_quotes",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_final_http_guard_stale_after_reservation_resumes_full_exit",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_1095_one_share_appreciated_exit_probe_is_accepted"
+    ],
+    "timestamp": "2026-10-15T11:51:36.849581+00:00",
+    "return_code": 0,
+    "wall_seconds": 5.901,
+    "tests_run": 10,
+    "test_seconds": 4.753,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "output": "evidence/artifacts/adaptive-paper-shared-runner-corrections-20261015/round3/focused-green-tests.txt"
+  },
+  "acceptance": {
+    "command": [
+      "unshare",
+      "-rn",
+      "--",
+      "nice",
+      "-n",
+      "19",
+      "<pinned-runtime-python>",
+      "-B",
+      "-m",
+      "unittest",
+      "-v",
+      "tests.test_adaptive_paper_sell_chunks",
+      "tests.test_adaptive_paper_recovery",
+      "tests.test_adaptive_paper_safety"
+    ],
+    "timestamp": "2026-10-15T11:53:12.573021+00:00",
+    "return_code": 0,
+    "wall_seconds": 47.107,
+    "tests_run": 201,
+    "test_seconds": 45.888,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "original_tests": 195,
+    "new_tests": 6,
+    "output": "evidence/artifacts/adaptive-paper-shared-runner-corrections-20261015/round3/green-tests.txt"
+  },
+  "adjacent_integration": {
+    "command": [
+      "unshare",
+      "-rn",
+      "--",
+      "nice",
+      "-n",
+      "19",
+      "<pinned-runtime-python>",
+      "-B",
+      "-m",
+      "unittest",
+      "-v",
+      "tests.test_adaptive_paper_runner.IntegratedRunner.test_native_adaptive_policy_reaches_ledger_and_flat_reconciliation",
+      "tests.test_adaptive_paper_stream_backpressure"
+    ],
+    "timestamp": "2026-10-15T11:53:42.766107+00:00",
+    "return_code": 0,
+    "wall_seconds": 3.595,
+    "tests_run": 24,
+    "test_seconds": 2.792,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "output": "evidence/artifacts/adaptive-paper-shared-runner-corrections-20261015/round3/integration-tests.txt"
+  },
+  "observations": [
+    "Rearm occurs only for a positive confirmed buy fill after the take-profit target has completed or the pre-fill owned quantity proves completion. Reservation alone, duplicate cumulative observations, absolute rebalance targets and unfinished partial targets retain their prior behavior.",
+    "Rearming removes only target/reason/completed and journals scale_in_rearms_take_profit within the existing fill transaction. Refusal state is retained.",
+    "The host latch is identified lexically only. os.stat/os.lstat/os.open/io.open/builtins.open guards raise before delegation and module cleanup asserts zero attempted accesses in passing runs.",
+    "Fourteen pre-existing temporary-directory ResourceWarnings remain in the full suite."
+  ],
+  "boundaries": [
+    "Synthetic quotes, orders and fills; no paper or broker acceptance.",
+    "No live unit, credential, STOP, ISSUER-HOLD or host runtime lock was accessed.",
+    "No recovery behavior was changed in this correction."
+  ],
+  "follow_ups": [
+    "Entry-side mover halted/resumed test: use a deadline-based wait; no mover test changed here.",
+    "Optional broker-stream rejection release remains a follow-up.",
+    "Any P1 of any class at the next delta triggers the recorded park and recovery/sell-chunk split."
+  ]
+}

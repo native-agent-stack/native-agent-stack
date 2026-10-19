@@ -1,0 +1,47 @@
+{
+  "evidence_class": "local_integration",
+  "runtime": {
+    "python": "3.12.3",
+    "nautilus_trader": "2.0.0rc5",
+    "alpaca_py": "0.44.0"
+  },
+  "isolation": "unshare -rn; nice -n 19; explicit checkout source root; private fixture state",
+  "runs": [
+    {
+      "group": "core",
+      "command": "unshare -rn -- env ADAPTIVE_SOURCE_ROOT=<checkout> nice -n 19 <pinned-runtime>/bin/python -m unittest -v tests.test_adaptive_paper_exit_priority tests.test_adaptive_paper_sell_chunks tests.test_adaptive_paper_recovery tests.test_adaptive_paper_safety",
+      "return_code": 0,
+      "tests": 217,
+      "seconds": 70.581,
+      "resource_warnings": 14,
+      "output": "test_a_home_path_and_a_long_token_cannot_shorten_each_other (tests.test_adaptive_paper_recovery.RecoveryTests.test_a_home_path_and_a_long_token_cannot_shorten_each_other) ... <python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmpm67350hv'>\n<python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmpoaqmvjbv'>\n<python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmpp9_tk0pl'>\n<python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmpn3k31rkh'>\n<python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmpnbv0c4q9'>\n<python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmp99dnrvpy'>\n<python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmp_h_gt36v'>\n<python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmpvrh_04cx'>\n<python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmp94axz6u_'>\ntest_readiness_failure_keeps_each_subscription_reason (tests.test_adaptive_paper_recovery.RecoveryTests.test_readiness_failure_keeps_each_subscription_reason) ... <python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmpisecozdd'>\n<python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmp236_76sd'>\n<python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmpceldcjkt'>\ntest_receipt_carries_the_message_and_its_context (tests.test_adaptive_paper_recovery.RecoveryTests.test_receipt_carries_the_message_and_its_context) ... <python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmp_3kf7moo'>\n<python-runtime>/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmp2p_8ium8'>\nRan 217 tests in 70.581s\nOK"
+    },
+    {
+      "group": "stream",
+      "command": "unshare -rn -- env ADAPTIVE_SOURCE_ROOT=<checkout> nice -n 19 <pinned-runtime>/bin/python -m unittest -v tests.test_adaptive_paper_transport tests.test_adaptive_paper_stream_backpressure tests.test_adaptive_paper_stream_followups tests.test_adaptive_paper_readiness_backpressure",
+      "return_code": 0,
+      "tests": 159,
+      "seconds": 5.126,
+      "resource_warnings": 0,
+      "output": "Ran 159 tests in 5.126s\nOK"
+    },
+    {
+      "group": "policy",
+      "command": "unshare -rn -- env ADAPTIVE_SOURCE_ROOT=<checkout> nice -n 19 <pinned-runtime>/bin/python -m unittest -v tests.test_adaptive_paper_exits tests.test_adaptive_paper_extended_exits tests.test_adaptive_paper_corporate_actions",
+      "return_code": 0,
+      "tests": 202,
+      "seconds": 1.611,
+      "resource_warnings": 0,
+      "output": "Ran 202 tests in 1.611s\nOK"
+    },
+    {
+      "group": "native",
+      "command": "unshare -rn -- env ADAPTIVE_SOURCE_ROOT=<checkout> nice -n 19 <pinned-runtime>/bin/python -m unittest -v tests.integration.stream_cancel_dispatch tests.integration.stream_integrity_followups tests.test_adaptive_paper_runner.IntegratedRunner.test_native_adaptive_policy_reaches_ledger_and_flat_reconciliation",
+      "return_code": 0,
+      "tests": 7,
+      "seconds": 9.437,
+      "resource_warnings": 0,
+      "output": "Ran 7 tests in 9.437s\nOK"
+    }
+  ]
+}

@@ -356,24 +356,26 @@ class MoverNativeEndToEnd(unittest.TestCase):
         self.assertEqual(receipt["unsellable_positions"], [])
 
     def test_a_share_worth_more_than_the_ledger_order_cap_ends_needs_attention_with_its_reason(self):
-        # A gap from 90 to 2100: one share is worth more than the 2000 USD ledger per-order cap,
-        # so no whole-share sell fits it (the position also breaches the gross cap, and the
-        # ledger halts). The book blocks the leg, hands it to recovery once the halt latches a
-        # force, and recovery cannot sell it either: the trial is needs_attention, and the
-        # receipt names the position and why.
+        # CC #1091 exit rule (2026-10-14 01:07): qty/notional entry caps never
+        # permanently block an ownership-bounded reduction; oversell stays refused.
+        # The gap still triggers the gross halt and mover handoff, but recovery's
+        # minimum whole-share chunks sell both owned shares above the entry cap.
+        # Flat recovery does not erase the trial's needs_attention risk outcome.
         before, after = piecewise_path({"AAA": flat("90.00")}), piecewise_path({"AAA": flat("2100.00")})
         receipt, port, held, unresolved = self.run_trial(
             [row("AAA", 1, "90.00")], {}, hold=30.0, flatten=20.0, window=25.0, block_sells=True,
             quote_path=lambda symbol, elapsed: (before if elapsed < 1.0 else after)(symbol, elapsed))
-        self.assertEqual((receipt["status"], receipt["flat"], held), ("needs_attention", False, {"AAA": "2"}))
+        self.assertEqual((receipt["status"], receipt["flat"], held), ("needs_attention", True, {}))
         leg = self.legs(receipt)["AAA"]
         self.assertEqual((leg["exit_blocked"], leg["exits"]), ("exit_share_exceeds_ledger_order_cap", []))
         self.assertEqual(self.outcome["handoff_to_recovery"]["reason"], "exits_blocked")
         self.assertEqual(receipt["ledger_risk"]["halted_reason"], "gross_exposure_cap_exceeded")
-        self.assertEqual(receipt["reconciliation"]["recovery"]["errors"], ["recovery_quantity_not_representable"])
-        self.assertEqual(receipt["unsellable_positions"],
-                         [{"symbol": "AAA", "qty": "2", "bid": "2099.99", "ledger_max_order_notional_usd": "2000",
-                           "reason": "share_exceeds_ledger_order_cap"}])
+        self.assertEqual(receipt["reconciliation"]["recovery"]["errors"], [])
+        self.assertEqual(receipt["unsellable_positions"], [])
+        self.assertEqual(unresolved, 0)
+        sells = [order for order in self.recovery_port.payloads if order["side"] == "sell"]
+        self.assertEqual([D(order["qty"]) for order in sells], [D(1), D(1)])
+        self.assertTrue(all(D(order["qty"]) * D(order["limit_price"]) > D(2000) for order in sells))
         self.assertLess(self.outcome["elapsed_seconds"], 10)          # handed off soon after the halt
 
     def test_the_mover_controller_holds_buys_to_the_entry_cap(self):

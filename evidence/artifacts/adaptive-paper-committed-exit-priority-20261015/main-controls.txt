@@ -1,0 +1,7 @@
+test_unfinished_full_take_profit_promotes_stop_at_zero_tolerance (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_unfinished_full_take_profit_promotes_stop_at_zero_tolerance) ... ok
+test_unfinished_full_take_profit_promotes_stop_inside_price_tolerance (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_unfinished_full_take_profit_promotes_stop_inside_price_tolerance) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.879s
+
+OK

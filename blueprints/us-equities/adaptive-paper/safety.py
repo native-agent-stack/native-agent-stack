@@ -39,6 +39,74 @@ RANK = {"reserved": 0, "pending_new": 1, "accepted": 2, "new": 2,
         "filled": 5, "canceled": 5, "expired": 5, "rejected": 5, "not_sent": 5, "broker_refused": 5}
 DEFAULT_STOP = Path.home() / ".local/state/native-agent-stack/alpaca-paper/STOP"
 DEFINITIVE_REFUSAL_STATUSES = (401, 403, 404)
+# Exit-only native reason bridge: a transport-proven no-HTTP refusal is retryable
+# except these named local permanent policies. Transient counts never block exits.
+EXIT_NOT_SENT_PREFIX = "exit_submission_not_sent:"
+PERMANENT_EXIT_LOCAL_REFUSALS = frozenset({
+    "global_stop_latched",                    # host STOP latch
+    "recovery_observation_integrity_lost",    # permanent for this observation session
+})
+SESSION_EXIT_LOCAL_REFUSALS = frozenset({"outside_allowed_session"})
+NAMED_EXIT_LOCAL_REFUSALS = PERMANENT_EXIT_LOCAL_REFUSALS | SESSION_EXIT_LOCAL_REFUSALS
+# Native OrderDeniedReason / OrderDeniedCode, nautilus_trader 1b0a49d2.
+# The publisher defines these as local, never-venue denials. Only the leading
+# code is canonical; diagnostic suffixes must not control policy.
+# Definitive rows are fixed order-contract/configuration failures requiring repair.
+NATIVE_DENIAL_POLICY = {
+    "PRICE_PRECISION_EXCEEDS_MAXIMUM": "definitive",
+    "PRICE_NOT_POSITIVE": "transient_with_reconcile",
+    "QUANTITY_PRECISION_EXCEEDS_MAXIMUM": "definitive",
+    "QUANTITY_CONVERSION_FAILED": "transient_with_reconcile",
+    "QUANTITY_EXCEEDS_MAXIMUM": "transient_with_reconcile",
+    "QUANTITY_BELOW_MINIMUM": "transient_with_reconcile",
+    "INVALID_MAX_NOTIONAL_PER_ORDER": "definitive",
+    "MISSING_EXPIRE_TIME": "definitive",
+    "EXPIRE_TIME_IN_PAST": "transient_with_reconcile",
+    "MISSING_TRAILING_OFFSET_TYPE": "definitive",
+    "UNSUPPORTED_TRAILING_OFFSET_TYPE": "definitive",
+    "MISSING_TRIGGER_TYPE": "definitive",
+    "MISSING_TRAILING_OFFSET": "definitive",
+    "INSTRUMENT_NOT_FOUND": "transient_with_reconcile",
+    "POSITION_NOT_FOUND": "transient_with_reconcile",
+    "MARKET_PRICE_UNAVAILABLE": "transient_with_reconcile",
+    "TRAILING_STOP_CALCULATION_FAILED": "transient_with_reconcile",
+    "NOTIONAL_CALCULATION_FAILED": "transient_with_reconcile",
+    "NOTIONAL_BELOW_MINIMUM": "transient_with_reconcile",
+    "NOTIONAL_EXCEEDS_MAXIMUM": "transient_with_reconcile",
+    "NOTIONAL_EXCEEDS_MAX_PER_ORDER": "transient_with_reconcile",
+    "NOTIONAL_EXCEEDS_FREE_BALANCE": "transient_with_reconcile",
+    "INITIAL_MARGIN_CALCULATION_FAILED": "transient_with_reconcile",
+    "INITIAL_MARGIN_EXCEEDS_FREE_BALANCE": "transient_with_reconcile",
+    "BETTING_BALANCE_LOCKED_CALCULATION_FAILED": "transient_with_reconcile",
+    "CUMULATIVE_NOTIONAL_EXCEEDS_FREE_BALANCE": "transient_with_reconcile",
+    "CUMULATIVE_INITIAL_MARGIN_CALCULATION_FAILED": "transient_with_reconcile",
+    "CUMULATIVE_INITIAL_MARGIN_EXCEEDS_FREE_BALANCE": "transient_with_reconcile",
+    "REDUCE_ONLY_WOULD_INCREASE_POSITION": "transient_with_reconcile",
+    "ORDER_LIST_INCOMPLETE": "transient_with_reconcile",
+    "ORDER_LIST_DENIED": "transient_with_reconcile",
+    "TRADING_HALTED": "transient_with_reconcile",
+    "TRADING_STATE_REDUCING": "transient_with_reconcile",
+    "RATE_LIMIT_EXCEEDED": "transient_with_reconcile",
+    "STREAM_RECONCILING": "transient_with_reconcile",
+    "NO_EXECUTION_CLIENT": "transient_with_reconcile",
+    "CLIENT_VENUE_MISMATCH": "definitive",
+    "SUBMIT_FAILED": "transient_with_reconcile",
+    "INVALID_CLIENT_ORDER_ID": "definitive",
+    "INVALID_POSITION_ID": "transient_with_reconcile",
+    "UNSUPPORTED_ORDER_LIST": "definitive",
+    "UNSUPPORTED_ORDER_TYPE": "definitive",
+    "UNSUPPORTED_REDUCE_ONLY": "definitive",
+    "UNSUPPORTED_TIME_IN_FORCE": "definitive",
+    "UNSUPPORTED_TP_SL": "definitive",
+    "VALIDATION_FAILED": "transient_with_reconcile",
+}
+DEFINITIVE_EXIT_REFUSALS = PERMANENT_EXIT_LOCAL_REFUSALS | frozenset({
+    "only_USD_equity_limit_DAY_supported", "invalid_price_increment", "RejectedSubmission",
+}) | frozenset(code for code, policy in NATIVE_DENIAL_POLICY.items() if policy == "definitive")
+TRANSIENT_EXIT_REFUSALS = frozenset({
+    "quote_stale", "quote_not_fresh", "outstanding_order_cap_reached", "submission_rate_exceeded",
+    "submission_rate_deferred", "request_budget_wait_exceeded", "order_size_cap_exceeded",
+}) | SESSION_EXIT_LOCAL_REFUSALS
 # The one 422 treated as a definitive refusal: Alpaca states that orders in excess
 # of the minimum price variance "will be rejected" and documents the body code
 # 42210000 with "sub-penny increment does not fulfill minimum pricing criteria".
@@ -96,6 +164,17 @@ def price_increment_valid(price):
 
 class SafetyError(RuntimeError):
     """Bounded reason code, safe to retain without broker/account secrets."""
+
+
+def exit_retry_seconds(value):
+    """Keep only a finite nonnegative duration across the no-HTTP bridge."""
+    if type(value) not in (int, float, Decimal):
+        return 0.0
+    try:
+        seconds = float(value)
+    except (ValueError, OverflowError):
+        return 0.0
+    return seconds if math.isfinite(seconds) and seconds > 0 else 0.0
 
 
 def decimal(value, *, zero=False, maximum=D("1000000000")):
@@ -1001,6 +1080,145 @@ class Ledger:
         if not price_increment_valid(price):
             raise SafetyError("invalid_price_increment")
 
+    def exit_state(self, symbol):
+        """Replayable committed target and refusal budget shared with recovery."""
+        with self._lock:
+            return json.loads(self._get("exit_state:" + symbol_name(symbol)) or "{}")
+
+    def record_exit_state(self, symbol, state, *, transition):
+        symbol = symbol_name(symbol)
+        with self._transaction():
+            self._set("exit_state:" + symbol, json.dumps(state, sort_keys=True, allow_nan=False))
+            self._event("exit_state_transition", symbol=symbol, transition=transition, state=state)
+
+    def reconcile_exit_refusal(self, symbol, *, reason):
+        """Explicit owner acknowledgement after reconciliation; never an automatic tick reset."""
+        if not isinstance(reason, str) or not reason.strip():
+            raise SafetyError("exit_reconciliation_reason_required")
+        if any(i.symbol == symbol and not i.terminal for i in self.intents()):
+            raise SafetyError("exit_reconciliation_has_outstanding_order")
+        state = self.exit_state(symbol)
+        state.pop("refusal", None)
+        self.record_exit_state(symbol, state, transition="explicit_reconciliation:" + reason)
+
+    def cancel_exit_commitment(self, symbol, *, reason):
+        """Explicit recorded owner policy; cancel outstanding orders first."""
+        if not isinstance(reason, str) or not reason.strip():
+            raise SafetyError("exit_cancel_reason_required")
+        if any(i.symbol == symbol and not i.terminal for i in self.intents()):
+            raise SafetyError("exit_cancel_has_outstanding_order")
+        state = self.exit_state(symbol)
+        for key in ("target", "reason", "completed"):
+            state.pop(key, None)
+        self.record_exit_state(symbol, state, transition="explicit_cancel:" + reason)
+
+    def exit_retry_allowed(self, symbol, now, *, market_open=False, session_close=None):
+        with self._lock:
+            state = self.exit_state(symbol)
+            refusal = state.get("refusal")
+            if not refusal:
+                return True
+            code = refusal["reason"].removeprefix(EXIT_NOT_SENT_PREFIX).partition(":retry_after=")[0]
+            if code in SESSION_EXIT_LOCAL_REFUSALS:
+                # Use the caller's validated session window, not a calendar or
+                # arbitrary delay guessed by this ledger. Also re-arm journals
+                # written by the earlier definitive-refusal classification.
+                if (market_open is True and session_close is not None
+                        and instant(session_close) - instant(now) >= 1):
+                    state.pop("refusal")
+                    self.record_exit_state(symbol, state, transition="exit_session_reopened")
+                    return True
+                return False
+            return (refusal["classification"] == "transient"
+                    and now >= refusal["retry_at"])
+
+    def record_exit_refusal(self, symbol, reason, now, *, reconcile_client_id=None, native_denied=False):
+        # Only explicitly known contract/policy failures are definitive. Unknown
+        # codes require reconciliation rather than acquiring a permanent fuse.
+        if reason.startswith("broker definitively rejected submission (HTTP "):
+            reason = "RejectedSubmission"
+        native_policy = None
+        if native_denied:
+            code = reason.partition(":")[0]
+            if code in NATIVE_DENIAL_POLICY:
+                reason = code
+                native_policy = NATIVE_DENIAL_POLICY[code]
+            elif (reason not in DEFINITIVE_EXIT_REFUSALS and reason not in TRANSIENT_EXIT_REFUSALS
+                  and not reason.startswith(EXIT_NOT_SENT_PREFIX)):
+                reason = "NATIVE_DENIAL_UNKNOWN"
+                native_policy = "transient_with_reconcile"
+        pre_wire = reason.startswith(EXIT_NOT_SENT_PREFIX)
+        local_reason = reason[len(EXIT_NOT_SENT_PREFIX):] if pre_wire else reason
+        wait = 0.0
+        if pre_wire:
+            local_reason, separator, duration = local_reason.partition(":retry_after=")
+            if separator:
+                try:
+                    wait = exit_retry_seconds(float(duration))
+                except ValueError:
+                    pass
+        if (pre_wire or native_denied) and local_reason == "recovery_observation_integrity_lost":
+            classification = "integrity_lost"
+        elif local_reason in SESSION_EXIT_LOCAL_REFUSALS:
+            classification = "session_closed"
+        elif local_reason in DEFINITIVE_EXIT_REFUSALS:
+            classification = "definitive"
+        elif pre_wire or reason in TRANSIENT_EXIT_REFUSALS:
+            classification = "transient"
+        else:
+            classification = "transient_with_reconcile"
+        reconciled = False
+        if native_denied and classification in {"transient", "transient_with_reconcile"}:
+            # The native event proves no venue submission. The callback retires
+            # a reservation first; absence means risk denied before reservation.
+            intent = next((i for i in self.intents() if i.client_id == reconcile_client_id), None)
+            reconciled = intent is None or (
+                intent.status == "not_sent" and intent.broker_id is None and not intent.filled_qty)
+            classification = "transient" if reconciled else "transient_with_reconcile"
+        state = self.exit_state(symbol)
+        previous = state.get("refusal", {})
+        attempts = previous.get("attempts", 0) + 1
+        attention = classification.startswith("transient") and attempts >= 3
+        state["refusal"] = {"reason": reason, "classification": classification,
+                            "attempts": attempts, "retry_at": float(now) + max(5, wait),
+                            "needs_attention": attention}
+        if reconcile_client_id is not None:
+            state["refusal"]["client_id"] = reconcile_client_id
+        if native_policy is not None:
+            state["refusal"]["denial_policy"] = native_policy
+        if reconciled:
+            state["refusal"]["reconciliation"] = "native_denied_never_sent"
+        self.record_exit_state(symbol, state, transition="native_refusal")
+        if attention and not previous.get("needs_attention"):
+            self._event("needs_attention", symbol=symbol, reason="exit_transient_refusals",
+                        attempts=attempts, retry_at=state["refusal"]["retry_at"])
+        return state["refusal"]
+
+    def record_exit_acceptance(self, symbol):
+        """An accepted exit resets consecutive transient attempts, not its target."""
+        with self._transaction():
+            self._record_exit_acceptance(symbol)
+
+    def _record_exit_acceptance(self, symbol):
+        # record_order owns its transaction; native accepted callbacks use the
+        # public wrapper. Both reset the same durable state before any fill.
+        state = self.exit_state(symbol)
+        if state.get("refusal", {}).get("classification") == "transient":
+            state.pop("refusal")
+            self._set("exit_state:" + symbol, json.dumps(state, sort_keys=True, allow_nan=False))
+            self._event("exit_state_transition", symbol=symbol, transition="exit_order_accepted", state=state)
+
+    def owned_exit_quantity(self, requested, owned, price, bid):
+        """Whole-share reduction; one owned share may exceed only the notional cap."""
+        requested, owned = (decimal(str(x), zero=True) for x in (requested, owned))
+        price, bid = (decimal(str(x)) for x in (price, bid))
+        capacity = (self.limits.max_order_notional_usd / price).to_integral_value(rounding="ROUND_DOWN")
+        if requested >= 1 and owned >= 1 \
+                and (capacity < 1 or self.limits.effective_max_order_qty(price, quote_price=bid) < 1):
+            return D(1)
+        return min(requested, owned, self.limits.effective_max_order_qty(price, quote_price=bid),
+                   capacity).to_integral_value(rounding="ROUND_DOWN")
+
     def reserve_intent(self, client_id, symbol, side, qty, limit_price, *, quote,
                        now, market_open, session_close, stop_file=None):
         if type(client_id) is not str or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,47}", client_id):
@@ -1034,8 +1252,9 @@ class Ledger:
             # (no quote_price given) is only exercised by a direct,
             # standalone caller of effective_max_order_qty itself.
             quote_price = quote.ask if side == "buy" else quote.bid
-            if (qty > self.limits.effective_max_order_qty(price, quote_price=quote_price)
-                    or qty * price > self.limits.max_order_notional_usd):
+            over_cap = (qty > self.limits.effective_max_order_qty(price, quote_price=quote_price)
+                        or qty * price > self.limits.max_order_notional_usd)
+            if side == "buy" and over_cap:
                 raise SafetyError("order_size_cap_exceeded")
             if side == "buy" and qty != qty.to_integral_value():
                 raise SafetyError("entry_requires_whole_shares")
@@ -1075,6 +1294,17 @@ class Ledger:
                     "status NOT IN ('filled','canceled','expired','rejected','not_sent','broker_refused')", (symbol,))), ZERO)
                 if held is None or qty > held.qty - pending_sell:
                     raise SafetyError("sell_exceeds_owned_unreserved_position")
+                if over_cap:
+                    self._event("exit_cap_exceeded_reduce_only", client_id, symbol=symbol,
+                                qty=qty, limit_price=price, cap=self.limits.max_order_notional_usd, at=now)
+            if side == "buy" and symbol not in self._positions():
+                previous_exit = json.loads(self._get("exit_state:" + symbol) or "{}")
+                if previous_exit.get("reason"):
+                    for key in ("target", "reason", "completed"):
+                        previous_exit.pop(key, None)
+                    self._set("exit_state:" + symbol, json.dumps(previous_exit, sort_keys=True))
+                    self._event("exit_state_transition", symbol=symbol, state=previous_exit,
+                                transition="flat_then_new_owned_entry")
             self.db.execute("INSERT INTO intents(client_id,symbol,side,qty,limit_price,status,updated_at) "
                             "VALUES (?,?,?,?,?,'reserved',?)", (client_id, symbol, side, str(qty), str(price), now))
             self._event("intent_reserved", client_id, symbol=symbol, side=side, qty=qty, limit_price=price, at=now)
@@ -1475,6 +1705,20 @@ class Ledger:
                 if old.side == "buy":
                     new_qty, cost = position.qty + delta, position.cost_basis_usd + delta_notional
                     cash_delta = -delta_notional
+                    previous_exit = json.loads(self._get("exit_state:" + old.symbol) or "{}")
+                    target = D(previous_exit.get("target", "0"))
+                    if (previous_exit.get("reason") == "take_profit" and target > 0
+                            and (previous_exit.get("completed") or position.qty <= target)):
+                        # A confirmed increase in exposure starts a new partial
+                        # take-profit cycle. Reservations and duplicate cumulative
+                        # fills do not; an unfinished target keeps its remainder.
+                        # The owned pre-fill quantity also proves completion when
+                        # reconciliation arrived without a native fill callback.
+                        for key in ("target", "reason", "completed"):
+                            previous_exit.pop(key, None)
+                        self._set("exit_state:" + old.symbol, json.dumps(previous_exit, sort_keys=True))
+                        self._event("exit_state_transition", symbol=old.symbol, state=previous_exit,
+                                    transition="scale_in_rearms_take_profit")
                 else:
                     if delta > position.qty:
                         raise SafetyError("fill_would_make_short_position")
@@ -1500,6 +1744,9 @@ class Ledger:
             self._event("order_observed", client_id, broker_id=broker_id, status=status, filled_qty=filled,
                         average_price=average, at=at, delta_qty=delta, delta_notional=delta_notional,
                         booking=booking)
+            if old.side == "sell" and status in {
+                    "pending_new", "accepted", "new", "accepted_for_bidding", "held", "partially_filled", "filled"}:
+                self._record_exit_acceptance(old.symbol)
             if recorded and delta:
                 self._reconcile_execution_accounting(client_id, filled)
             self._refresh_risk(at)

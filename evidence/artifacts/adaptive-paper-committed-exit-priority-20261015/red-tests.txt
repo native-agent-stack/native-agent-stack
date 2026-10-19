@@ -1,0 +1,83 @@
+test_completed_stop_allows_a_new_take_profit_cycle (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_completed_stop_allows_a_new_take_profit_cycle) ... ok
+test_lower_target_does_not_downgrade_stronger_reason (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_lower_target_does_not_downgrade_stronger_reason) ... FAIL
+test_stop_arriving_during_cancel_promotes_replacement_at_ack (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_stop_arriving_during_cancel_promotes_replacement_at_ack) ... FAIL
+test_stop_gap_and_corporate_action_strengthen_same_flat_target (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_stop_gap_and_corporate_action_strengthen_same_flat_target) ... FAIL
+test_stronger_reason_does_not_relax_committed_target (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_stronger_reason_does_not_relax_committed_target) ... FAIL
+test_unfinished_full_take_profit_promotes_stop_at_zero_tolerance (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_unfinished_full_take_profit_promotes_stop_at_zero_tolerance) ... FAIL
+test_unfinished_full_take_profit_promotes_stop_inside_price_tolerance (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_unfinished_full_take_profit_promotes_stop_inside_price_tolerance) ... FAIL
+
+======================================================================
+FAIL: test_lower_target_does_not_downgrade_stronger_reason (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_lower_target_does_not_downgrade_stronger_reason)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_exit_priority.py", line 136, in test_lower_target_does_not_downgrade_stronger_reason
+    self.assertEqual(t.ledger.exit_state('AAPL')['reason'], 'stop_loss')
+AssertionError: 'rebalance' != 'stop_loss'
+- rebalance
++ stop_loss
+
+
+======================================================================
+FAIL: test_stop_arriving_during_cancel_promotes_replacement_at_ack (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_stop_arriving_during_cancel_promotes_replacement_at_ack)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_exit_priority.py", line 89, in test_stop_arriving_during_cancel_promotes_replacement_at_ack
+    self.assertIn('reason=stop_loss', t.orders[-1].tags)
+AssertionError: 'reason=stop_loss' not found in ['strategy=take_profit', 'reason=take_profit', 'price_rule=take_profit']
+
+======================================================================
+FAIL: test_stop_gap_and_corporate_action_strengthen_same_flat_target (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_stop_gap_and_corporate_action_strengthen_same_flat_target)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_exit_priority.py", line 103, in test_stop_gap_and_corporate_action_strengthen_same_flat_target
+    self.assertEqual(t.ledger.exit_state('AAPL')['reason'], 'stop_loss')
+AssertionError: 'take_profit' != 'stop_loss'
+- take_profit
++ stop_loss
+
+
+======================================================================
+FAIL: test_stronger_reason_does_not_relax_committed_target (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_stronger_reason_does_not_relax_committed_target)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_exit_priority.py", line 151, in test_stronger_reason_does_not_relax_committed_target
+    self.assertEqual(state['reason'], 'stop_loss')
+AssertionError: 'take_profit' != 'stop_loss'
+- take_profit
++ stop_loss
+
+
+======================================================================
+FAIL: test_unfinished_full_take_profit_promotes_stop_at_zero_tolerance (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_unfinished_full_take_profit_promotes_stop_at_zero_tolerance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_exit_priority.py", line 71, in test_unfinished_full_take_profit_promotes_stop_at_zero_tolerance
+    self.assert_stop_replaces_unfinished_take_profit(0)
+  File "<checkout>/tests/test_adaptive_paper_exit_priority.py", line 60, in assert_stop_replaces_unfinished_take_profit
+    self.assertEqual(staged['reason'], 'stop_loss')
+AssertionError: 'take_profit' != 'stop_loss'
+- take_profit
++ stop_loss
+
+
+======================================================================
+FAIL: test_unfinished_full_take_profit_promotes_stop_inside_price_tolerance (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_unfinished_full_take_profit_promotes_stop_inside_price_tolerance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_exit_priority.py", line 74, in test_unfinished_full_take_profit_promotes_stop_inside_price_tolerance
+    self.assert_stop_replaces_unfinished_take_profit(100)
+  File "<checkout>/tests/test_adaptive_paper_exit_priority.py", line 57, in assert_stop_replaces_unfinished_take_profit
+    self.assertEqual(self.cancels, [str(order.client_order_id)])
+AssertionError: Lists differ: [] != ['adp-fixture-0000001']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'adp-fixture-0000001'
+
+- []
++ ['adp-fixture-0000001']
+
+----------------------------------------------------------------------
+Ran 7 tests in 2.393s
+
+FAILED (failures=6)

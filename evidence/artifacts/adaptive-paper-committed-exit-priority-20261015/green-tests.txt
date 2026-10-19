@@ -1,0 +1,12 @@
+test_completed_stop_allows_a_new_take_profit_cycle (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_completed_stop_allows_a_new_take_profit_cycle) ... ok
+test_lower_target_does_not_downgrade_stronger_reason (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_lower_target_does_not_downgrade_stronger_reason) ... ok
+test_stop_arriving_during_cancel_promotes_replacement_at_ack (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_stop_arriving_during_cancel_promotes_replacement_at_ack) ... ok
+test_stop_gap_and_corporate_action_strengthen_same_flat_target (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_stop_gap_and_corporate_action_strengthen_same_flat_target) ... ok
+test_stronger_reason_does_not_relax_committed_target (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_stronger_reason_does_not_relax_committed_target) ... ok
+test_unfinished_full_take_profit_promotes_stop_at_zero_tolerance (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_unfinished_full_take_profit_promotes_stop_at_zero_tolerance) ... ok
+test_unfinished_full_take_profit_promotes_stop_inside_price_tolerance (tests.test_adaptive_paper_exit_priority.CommittedExitPriority.test_unfinished_full_take_profit_promotes_stop_inside_price_tolerance) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 2.865s
+
+OK

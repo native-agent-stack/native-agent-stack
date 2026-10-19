@@ -23,6 +23,7 @@ from xml.etree import ElementTree
 from zoneinfo import ZoneInfo
 
 from feeds import DATA_FEEDS, is_qualified_feed
+from safety import EXIT_NOT_SENT_PREFIX, NAMED_EXIT_LOCAL_REFUSALS, SafetyError, exit_retry_seconds
 
 SDK_VERSION = "0.44.0"
 SDK_COMMIT = "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
@@ -140,6 +141,26 @@ class SubmissionNotSent(TransportError):
     definitive_rejection = True
     not_sent = True
 
+    def __init__(self, message, *, refusal_code=None, retry_after=0):
+        super().__init__(message)
+        # Keep only known value-free local codes across the privacy boundary.
+        # Their lifetime (permanent or session-scoped) belongs to the ledger.
+        code = message if refusal_code is None else refusal_code
+        self.refusal_code = code if isinstance(code, str) and code in NAMED_EXIT_LOCAL_REFUSALS else None
+        self.retry_after = exit_retry_seconds(retry_after)
+
+
+def exit_not_sent_reason(error):
+    """Bridge proven no-HTTP provenance into Nautilus' string reason field."""
+    if getattr(error, "not_sent", False) is not True:
+        raise TypeError("exit_not_sent_reason requires pre-wire not_sent proof")
+    code = getattr(error, "refusal_code", None)
+    if code is None and str(error) in NAMED_EXIT_LOCAL_REFUSALS:
+        code = str(error)
+    reason = EXIT_NOT_SENT_PREFIX + (code if isinstance(code, str) and code in NAMED_EXIT_LOCAL_REFUSALS else "temporary")
+    wait = exit_retry_seconds(getattr(error, "retry_after", 0))
+    return reason + (f":retry_after={wait}" if wait else "")
+
 
 class OrderContractRefused(SubmissionNotSent):
     """Local refusal by the order-contract boundary before any HTTP request.
@@ -153,7 +174,8 @@ class OrderContractRefused(SubmissionNotSent):
 
     def __init__(self, reason):
         self.refusal = str(reason)
-        super().__init__("order contract refused submission before HTTP: " + self.refusal)
+        super().__init__("order contract refused submission before HTTP: " + self.refusal,
+                         refusal_code=self.refusal)
 
 
 def order_envelope(intent, *, extended_hours_allowed=False):
@@ -964,20 +986,21 @@ class GuardedSession:
                     # The POST hook is an atomic admission check, never a wait.
                     # A positive delay leaves management calls free to proceed.
                     if reservation not in (None, 0):
-                        raise SubmissionNotSent("submission budget deferred")
+                        raise SubmissionNotSent("submission budget deferred", retry_after=reservation)
                     if self.before_send:
                         self.before_send(kwargs.get("json", {}))
-                except SubmissionNotSent as exc:
-                    # Preserve only the fixed local admission diagnoses.
-                    # Caller/provider exception text must still be masked.
-                    reason = str(exc)
-                    if reason in ("recovery_observation_integrity_lost",
-                                  "quote or stream readiness changed before submission",
-                                  "submission budget deferred"):
-                        raise SubmissionNotSent(reason) from None
-                    raise SubmissionNotSent("submission prevented before HTTP request") from None
-                except Exception:
-                    raise SubmissionNotSent("submission prevented before HTTP request") from None
+                except Exception as error:
+                    code = (error.refusal_code if isinstance(error, SubmissionNotSent)
+                            else str(error) if isinstance(error, SafetyError) else None)
+                    # Retain the fixed local diagnoses as well as typed provenance;
+                    # arbitrary caller/provider messages still cross no boundary.
+                    message = str(error) if isinstance(error, SubmissionNotSent) else ""
+                    if message not in ("recovery_observation_integrity_lost",
+                                       "quote or stream readiness changed before submission",
+                                       "submission budget deferred"):
+                        message = "submission prevented before HTTP request"
+                    raise SubmissionNotSent(message, refusal_code=code,
+                                            retry_after=getattr(error, "retry_after", 0)) from None
             elif kind == "cancel" and (named := self._cancel_client_id(path)):
                 # Only the DELETE for the announced broker order carries its client id.
                 self.before_request(kind, client_id=named)

@@ -1,0 +1,432 @@
+test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) ...
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='quote_stale', current='stop_loss', tolerance=0) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='quote_stale', current='stop_loss', tolerance=100) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='quote_stale', current='trailing_stop', tolerance=0) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='quote_stale', current='trailing_stop', tolerance=100) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='risk_off', current='stop_loss', tolerance=0) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='risk_off', current='stop_loss', tolerance=100) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='risk_off', current='trailing_stop', tolerance=0) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='risk_off', current='trailing_stop', tolerance=100) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='gap_risk_stop', current='stop_loss', tolerance=0) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='gap_risk_stop', current='stop_loss', tolerance=100) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='gap_risk_stop', current='trailing_stop', tolerance=0) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='gap_risk_stop', current='trailing_stop', tolerance=100) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='corporate_action_flatten', current='stop_loss', tolerance=0) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='corporate_action_flatten', current='stop_loss', tolerance=100) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='corporate_action_flatten', current='trailing_stop', tolerance=0) ... FAIL
+  test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='corporate_action_flatten', current='trailing_stop', tolerance=100) ... FAIL
+test_no_new_exit_keeps_the_last_basis_across_journal_reopen (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_no_new_exit_keeps_the_last_basis_across_journal_reopen) ...
+  test_no_new_exit_keeps_the_last_basis_across_journal_reopen (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_no_new_exit_keeps_the_last_basis_across_journal_reopen) (tolerance=0) ... FAIL
+  test_no_new_exit_keeps_the_last_basis_across_journal_reopen (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_no_new_exit_keeps_the_last_basis_across_journal_reopen) (tolerance=100) ... FAIL
+test_second_basis_change_during_cancel_uses_confirmed_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_second_basis_change_during_cancel_uses_confirmed_residual) ...
+  test_second_basis_change_during_cancel_uses_confirmed_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_second_basis_change_during_cancel_uses_confirmed_residual) (tolerance=0) ... FAIL
+  test_second_basis_change_during_cancel_uses_confirmed_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_second_basis_change_during_cancel_uses_confirmed_residual) (tolerance=100) ... FAIL
+test_stronger_target_during_cancel_rereads_the_entire_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_stronger_target_during_cancel_rereads_the_entire_residual) ...
+  test_stronger_target_during_cancel_rereads_the_entire_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_stronger_target_during_cancel_rereads_the_entire_residual) (tolerance=0) ... FAIL
+  test_stronger_target_during_cancel_rereads_the_entire_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_stronger_target_during_cancel_rereads_the_entire_residual) (tolerance=100) ... FAIL
+test_volatility_preset_stop_then_trailing_changes_price_basis (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_volatility_preset_stop_then_trailing_changes_price_basis) ...
+  test_volatility_preset_stop_then_trailing_changes_price_basis (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_volatility_preset_stop_then_trailing_changes_price_basis) (tolerance=0) ... FAIL
+  test_volatility_preset_stop_then_trailing_changes_price_basis (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_volatility_preset_stop_then_trailing_changes_price_basis) (tolerance=100) ... FAIL
+test_weaker_partial_profit_changes_basis_without_relaxing_full_stop (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_weaker_partial_profit_changes_basis_without_relaxing_full_stop) ...
+  test_weaker_partial_profit_changes_basis_without_relaxing_full_stop (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_weaker_partial_profit_changes_basis_without_relaxing_full_stop) (tolerance=0) ... FAIL
+  test_weaker_partial_profit_changes_basis_without_relaxing_full_stop (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_weaker_partial_profit_changes_basis_without_relaxing_full_stop) (tolerance=100) ... FAIL
+test_refusal_at_close_rearms_strategy_at_next_session_open (tests.test_adaptive_paper_exit_priority.ClosedSessionExitRegressions.test_refusal_at_close_rearms_strategy_at_next_session_open) ... FAIL
+test_close_refusal_rearms_next_session_recovery (tests.test_adaptive_paper_recovery.RecoveryTests.test_close_refusal_rearms_next_session_recovery) ... FAIL
+test_legacy_closed_session_refusal_rearms_after_journal_reopen (tests.test_adaptive_paper_recovery.RecoveryTests.test_legacy_closed_session_refusal_rearms_after_journal_reopen) ... FAIL
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='quote_stale', current='stop_loss', tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 236, in exercise_market_commitment
+    self.assertEqual(staged['price_rule'], expected_rule)
+AssertionError: 'market' != 'stop'
+- market
++ stop
+
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='quote_stale', current='stop_loss', tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 232, in exercise_market_commitment
+    self.assertEqual(cancels, [str(order.client_order_id)])
+AssertionError: Lists differ: [] != ['adp-fixture-0000001']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'adp-fixture-0000001'
+
+- []
++ ['adp-fixture-0000001']
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='quote_stale', current='trailing_stop', tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 236, in exercise_market_commitment
+    self.assertEqual(staged['price_rule'], expected_rule)
+AssertionError: 'market' != 'trailing'
+- market
++ trailing
+
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='quote_stale', current='trailing_stop', tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 232, in exercise_market_commitment
+    self.assertEqual(cancels, [str(order.client_order_id)])
+AssertionError: Lists differ: [] != ['adp-fixture-0000001']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'adp-fixture-0000001'
+
+- []
++ ['adp-fixture-0000001']
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='risk_off', current='stop_loss', tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 236, in exercise_market_commitment
+    self.assertEqual(staged['price_rule'], expected_rule)
+AssertionError: 'market' != 'stop'
+- market
++ stop
+
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='risk_off', current='stop_loss', tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 232, in exercise_market_commitment
+    self.assertEqual(cancels, [str(order.client_order_id)])
+AssertionError: Lists differ: [] != ['adp-fixture-0000001']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'adp-fixture-0000001'
+
+- []
++ ['adp-fixture-0000001']
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='risk_off', current='trailing_stop', tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 236, in exercise_market_commitment
+    self.assertEqual(staged['price_rule'], expected_rule)
+AssertionError: 'market' != 'trailing'
+- market
++ trailing
+
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='risk_off', current='trailing_stop', tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 232, in exercise_market_commitment
+    self.assertEqual(cancels, [str(order.client_order_id)])
+AssertionError: Lists differ: [] != ['adp-fixture-0000001']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'adp-fixture-0000001'
+
+- []
++ ['adp-fixture-0000001']
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='gap_risk_stop', current='stop_loss', tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 236, in exercise_market_commitment
+    self.assertEqual(staged['price_rule'], expected_rule)
+AssertionError: 'market' != 'stop'
+- market
++ stop
+
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='gap_risk_stop', current='stop_loss', tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 232, in exercise_market_commitment
+    self.assertEqual(cancels, [str(order.client_order_id)])
+AssertionError: Lists differ: [] != ['adp-fixture-0000001']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'adp-fixture-0000001'
+
+- []
++ ['adp-fixture-0000001']
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='gap_risk_stop', current='trailing_stop', tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 236, in exercise_market_commitment
+    self.assertEqual(staged['price_rule'], expected_rule)
+AssertionError: 'market' != 'trailing'
+- market
++ trailing
+
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='gap_risk_stop', current='trailing_stop', tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 232, in exercise_market_commitment
+    self.assertEqual(cancels, [str(order.client_order_id)])
+AssertionError: Lists differ: [] != ['adp-fixture-0000001']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'adp-fixture-0000001'
+
+- []
++ ['adp-fixture-0000001']
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='corporate_action_flatten', current='stop_loss', tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 236, in exercise_market_commitment
+    self.assertEqual(staged['price_rule'], expected_rule)
+AssertionError: 'market' != 'stop'
+- market
++ stop
+
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='corporate_action_flatten', current='stop_loss', tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 232, in exercise_market_commitment
+    self.assertEqual(cancels, [str(order.client_order_id)])
+AssertionError: Lists differ: [] != ['adp-fixture-0000001']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'adp-fixture-0000001'
+
+- []
++ ['adp-fixture-0000001']
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='corporate_action_flatten', current='trailing_stop', tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 236, in exercise_market_commitment
+    self.assertEqual(staged['price_rule'], expected_rule)
+AssertionError: 'market' != 'trailing'
+- market
++ trailing
+
+
+======================================================================
+FAIL: test_current_stop_and_trailing_replace_market_reason_commitments (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_current_stop_and_trailing_replace_market_reason_commitments) (durable='corporate_action_flatten', current='trailing_stop', tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 253, in test_current_stop_and_trailing_replace_market_reason_commitments
+    self.exercise_market_commitment(initial, current, tolerance)
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 232, in exercise_market_commitment
+    self.assertEqual(cancels, [str(order.client_order_id)])
+AssertionError: Lists differ: [] != ['adp-fixture-0000001']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'adp-fixture-0000001'
+
+- []
++ ['adp-fixture-0000001']
+
+======================================================================
+FAIL: test_no_new_exit_keeps_the_last_basis_across_journal_reopen (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_no_new_exit_keeps_the_last_basis_across_journal_reopen) (tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 423, in test_no_new_exit_keeps_the_last_basis_across_journal_reopen
+    self.assertEqual(pending['price_rule'], 'take_profit')
+AssertionError: 'market' != 'take_profit'
+- market
++ take_profit
+
+
+======================================================================
+FAIL: test_no_new_exit_keeps_the_last_basis_across_journal_reopen (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_no_new_exit_keeps_the_last_basis_across_journal_reopen) (tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 423, in test_no_new_exit_keeps_the_last_basis_across_journal_reopen
+    self.assertEqual(pending['price_rule'], 'take_profit')
+AssertionError: 'market' != 'take_profit'
+- market
++ take_profit
+
+
+======================================================================
+FAIL: test_second_basis_change_during_cancel_uses_confirmed_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_second_basis_change_during_cancel_uses_confirmed_residual) (tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 349, in test_second_basis_change_during_cancel_uses_confirmed_residual
+    self.assertIn('price_rule=trailing', t.orders[-1].tags)
+AssertionError: 'price_rule=trailing' not found in ['strategy=stop_loss', 'reason=stop_loss', 'price_rule=stop']
+
+======================================================================
+FAIL: test_second_basis_change_during_cancel_uses_confirmed_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_second_basis_change_during_cancel_uses_confirmed_residual) (tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 349, in test_second_basis_change_during_cancel_uses_confirmed_residual
+    self.assertIn('price_rule=trailing', t.orders[-1].tags)
+AssertionError: 'price_rule=trailing' not found in ['strategy=stop_loss', 'reason=stop_loss', 'price_rule=stop']
+
+======================================================================
+FAIL: test_stronger_target_during_cancel_rereads_the_entire_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_stronger_target_during_cancel_rereads_the_entire_residual) (tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 385, in test_stronger_target_during_cancel_rereads_the_entire_residual
+    self.assertEqual(D(str(t.orders[-1].quantity)), D(100))
+AssertionError: Decimal('50') != Decimal('100')
+
+======================================================================
+FAIL: test_stronger_target_during_cancel_rereads_the_entire_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_stronger_target_during_cancel_rereads_the_entire_residual) (tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 385, in test_stronger_target_during_cancel_rereads_the_entire_residual
+    self.assertEqual(D(str(t.orders[-1].quantity)), D(100))
+AssertionError: Decimal('50') != Decimal('100')
+
+======================================================================
+FAIL: test_volatility_preset_stop_then_trailing_changes_price_basis (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_volatility_preset_stop_then_trailing_changes_price_basis) (tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 287, in test_volatility_preset_stop_then_trailing_changes_price_basis
+    self.assertEqual(staged['price_rule'], 'trailing')
+AssertionError: 'stop' != 'trailing'
+- stop
++ trailing
+
+
+======================================================================
+FAIL: test_volatility_preset_stop_then_trailing_changes_price_basis (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_volatility_preset_stop_then_trailing_changes_price_basis) (tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 285, in test_volatility_preset_stop_then_trailing_changes_price_basis
+    self.assertEqual(cancels, [str(order.client_order_id)])
+AssertionError: Lists differ: [] != ['adp-fixture-0000001']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'adp-fixture-0000001'
+
+- []
++ ['adp-fixture-0000001']
+
+======================================================================
+FAIL: test_weaker_partial_profit_changes_basis_without_relaxing_full_stop (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_weaker_partial_profit_changes_basis_without_relaxing_full_stop) (tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 314, in test_weaker_partial_profit_changes_basis_without_relaxing_full_stop
+    self.assertEqual(staged['price_rule'], 'take_profit')
+AssertionError: 'stop' != 'take_profit'
+- stop
++ take_profit
+
+
+======================================================================
+FAIL: test_weaker_partial_profit_changes_basis_without_relaxing_full_stop (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_weaker_partial_profit_changes_basis_without_relaxing_full_stop) (tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 310, in test_weaker_partial_profit_changes_basis_without_relaxing_full_stop
+    self.assertEqual(cancels, [str(order.client_order_id)])
+AssertionError: Lists differ: [] != ['adp-fixture-0000001']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'adp-fixture-0000001'
+
+- []
++ ['adp-fixture-0000001']
+
+======================================================================
+FAIL: test_refusal_at_close_rearms_strategy_at_next_session_open (tests.test_adaptive_paper_exit_priority.ClosedSessionExitRegressions.test_refusal_at_close_rearms_strategy_at_next_session_open)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_exit_priority.py", line 473, in test_refusal_at_close_rearms_strategy_at_next_session_open
+    self.assertEqual(t.ledger.positions(), {})
+AssertionError: {'AAPL': Position(symbol='AAPL', qty=Decim[39 chars]0'))} != {}
++ {}
+- {'AAPL': Position(symbol='AAPL',
+-                   qty=Decimal('100'),
+-                   cost_basis_usd=Decimal('10000'))}
+
+======================================================================
+FAIL: test_close_refusal_rearms_next_session_recovery (tests.test_adaptive_paper_recovery.RecoveryTests.test_close_refusal_rearms_next_session_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_recovery.py", line 927, in test_close_refusal_rearms_next_session_recovery
+    self.close_refusal_then_next_session()
+  File "<red-control>/tests/test_adaptive_paper_recovery.py", line 921, in close_refusal_then_next_session
+    self.assertEqual(second['errors'], [])
+AssertionError: Lists differ: ['SafetyError'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'SafetyError'
+
+- ['SafetyError']
++ []
+
+======================================================================
+FAIL: test_legacy_closed_session_refusal_rearms_after_journal_reopen (tests.test_adaptive_paper_recovery.RecoveryTests.test_legacy_closed_session_refusal_rearms_after_journal_reopen)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-control>/tests/test_adaptive_paper_recovery.py", line 930, in test_legacy_closed_session_refusal_rearms_after_journal_reopen
+    self.close_refusal_then_next_session(legacy=True)
+  File "<red-control>/tests/test_adaptive_paper_recovery.py", line 921, in close_refusal_then_next_session
+    self.assertEqual(second['errors'], [])
+AssertionError: Lists differ: ['SafetyError'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'SafetyError'
+
+- ['SafetyError']
++ []
+
+----------------------------------------------------------------------
+Ran 9 tests in 12.131s
+
+FAILED (failures=29)

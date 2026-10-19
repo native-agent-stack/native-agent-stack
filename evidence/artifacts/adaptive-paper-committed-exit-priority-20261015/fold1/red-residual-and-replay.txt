@@ -1,0 +1,49 @@
+test_stronger_target_during_cancel_rereads_the_entire_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_stronger_target_during_cancel_rereads_the_entire_residual) ...
+  test_stronger_target_during_cancel_rereads_the_entire_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_stronger_target_during_cancel_rereads_the_entire_residual) (tolerance=0) ... FAIL
+  test_stronger_target_during_cancel_rereads_the_entire_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_stronger_target_during_cancel_rereads_the_entire_residual) (tolerance=100) ... FAIL
+test_no_new_exit_keeps_the_last_basis_across_journal_reopen (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_no_new_exit_keeps_the_last_basis_across_journal_reopen) ...
+  test_no_new_exit_keeps_the_last_basis_across_journal_reopen (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_no_new_exit_keeps_the_last_basis_across_journal_reopen) (tolerance=0) ... FAIL
+  test_no_new_exit_keeps_the_last_basis_across_journal_reopen (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_no_new_exit_keeps_the_last_basis_across_journal_reopen) (tolerance=100) ... FAIL
+
+======================================================================
+FAIL: test_stronger_target_during_cancel_rereads_the_entire_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_stronger_target_during_cancel_rereads_the_entire_residual) (tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_exit_priority.py", line 382, in test_stronger_target_during_cancel_rereads_the_entire_residual
+    self.assertEqual(D(str(t.orders[-1].quantity)), D(100))
+AssertionError: Decimal('50') != Decimal('100')
+
+======================================================================
+FAIL: test_stronger_target_during_cancel_rereads_the_entire_residual (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_stronger_target_during_cancel_rereads_the_entire_residual) (tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_exit_priority.py", line 382, in test_stronger_target_during_cancel_rereads_the_entire_residual
+    self.assertEqual(D(str(t.orders[-1].quantity)), D(100))
+AssertionError: Decimal('50') != Decimal('100')
+
+======================================================================
+FAIL: test_no_new_exit_keeps_the_last_basis_across_journal_reopen (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_no_new_exit_keeps_the_last_basis_across_journal_reopen) (tolerance=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_exit_priority.py", line 420, in test_no_new_exit_keeps_the_last_basis_across_journal_reopen
+    self.assertEqual(pending['price_rule'], 'take_profit')
+AssertionError: 'market' != 'take_profit'
+- market
++ take_profit
+
+
+======================================================================
+FAIL: test_no_new_exit_keeps_the_last_basis_across_journal_reopen (tests.test_adaptive_paper_exit_priority.ExitPricingBasisRegressions.test_no_new_exit_keeps_the_last_basis_across_journal_reopen) (tolerance=100)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_exit_priority.py", line 420, in test_no_new_exit_keeps_the_last_basis_across_journal_reopen
+    self.assertEqual(pending['price_rule'], 'take_profit')
+AssertionError: 'market' != 'take_profit'
+- market
++ take_profit
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.004s
+
+FAILED (failures=4)
