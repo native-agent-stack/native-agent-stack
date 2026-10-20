@@ -571,7 +571,9 @@ class CompleteBlindReadsetTests(unittest.TestCase):
         import sys
         sys.path.insert(0, str(TOOL_DIR))
         from readset_redaction import content_findings
+        import export_isolation_check as isolation
         lane = load_module("lane_readset_content", "lane_packets.py")
+        winners = isolation.ledger_winners(ROOT)
         with tempfile.TemporaryDirectory() as temporary:
             scratch = Path(temporary)
             builds = []
@@ -581,15 +583,16 @@ class CompleteBlindReadsetTests(unittest.TestCase):
                     for newcomers in (False, True):
                         packets = scratch / f"{manifest.stem}-{mode}-{newcomers}"
                         packets.mkdir()
+                        sealed = {}
                         texts = lane.build_all_packets(
                             ROOT, catalogs=["foundation", "us-equities"], seed=lane.DEFAULT_SEED,
                             checked_at=lane.DEFAULT_CHECKED_AT, manifest=manifest.relative_to(ROOT).as_posix(),
                             trading_candidates=mode, withhold=True, registered_receipts=True,
-                            manifest_newcomers_on=newcomers)
+                            manifest_newcomers_on=newcomers, sealed_keys=sealed)
                         for name, text in texts.items():
                             (packets / name).write_text(text, encoding="utf-8")
                         union.update(blind_checkout.build_allowlist(ROOT, packets)["files"])
-                        builds.append(packets)
+                        builds.append((packets, {"packets": sealed}))
             dest = scratch / "stripped"
             for relative in union:
                 target = dest / relative
@@ -599,7 +602,7 @@ class CompleteBlindReadsetTests(unittest.TestCase):
             (dest / "BLIND-MANIFEST.json").write_text(json.dumps(audit))
             complete = set()
             expected = set()
-            for packets in builds:
+            for packets, keys in builds:
                 with self.subTest(build=packets.name):
                     expected.update(blind_checkout.build_allowlist(dest, packets)["files"])
                     export = scratch / ("export-" + packets.name)
@@ -608,6 +611,10 @@ class CompleteBlindReadsetTests(unittest.TestCase):
                     files = {p.relative_to(export).as_posix() for p in export.rglob("*") if p.is_file()}
                     complete.update(files)
                     self.assertEqual(content_findings(export, files), [])
+                    exposure = isolation.prose_exposure(export, packets, winners, keys)
+                    self.assertTrue(any(row["scored"] for row in exposure.values()))
+                    self.assertEqual({layer: row["cited_files"] for layer, row in exposure.items()
+                                      if row["cited_files"]}, {})
             self.assertEqual(len(builds), 20)
             self.assertEqual(complete, expected | set(blind_checkout.ROOT_INSTRUCTION_STUBS))
             print(f"COMPLETE_READSET builds={len(builds)} files={len(complete)}")

@@ -58,10 +58,10 @@ def redact_tables(text, relative, stripped, key):
             columns = tables[relative].get(digest(line), [])
             # Identify selection columns from the original header, then mask separately reviewed
             # header adjectives without withholding their measurement/provenance body cells.
-            spans = {item["sha256"]: item for item in document["spans"] if item["path"] == relative}
-            line = redact_text(line, relative, "", stripped, key, classification(relative), spans)
         elif re.fullmatch(r"[\s|:-]+", line):
             continue
+        spans = {item["sha256"]: item for item in document["spans"] if item["path"] == relative}
+        line = redact_text(line, relative, "", stripped, key, classification(relative), spans)
         cells = line.rstrip("\n").split("|")
         for column in columns:
             if column < len(cells) and cells[column].strip() != "[withheld]":
@@ -77,6 +77,13 @@ def redact_tables(text, relative, stripped, key):
 def redact_text(text, relative, pointer, stripped, key, labels, spans):
     from blind_checkout import hmac_sha256_of
     edits = []
+    for line in re.finditer(r"[^\n]+", text):
+        value = line.group()
+        fragment = spans.get(digest(value))
+        if fragment and fragment.get("unit") == "line" and fragment["path"] == relative and hashlib.sha256(
+                value.encode()).hexdigest() == fragment["source_sha256"]:
+            for start, end in fragment["ranges"]:
+                edits.append((line.start() + start, line.start() + end, value[start:end]))
     for paragraph in re.finditer(r"\S[^\n]*(?:\n(?!\s*\n)[^\n]*)*", text):
         value = paragraph.group()
         fragment = spans.get(digest(value))
@@ -95,7 +102,7 @@ def redact_text(text, relative, pointer, stripped, key, labels, spans):
         if sha in spans and spans[sha]["path"] == relative and hashlib.sha256(
                 value.encode()).hexdigest() == spans[sha]["source_sha256"]:
             fragment = spans[sha]
-            if fragment.get("unit") == "paragraph":
+            if fragment.get("unit") in ("paragraph", "line"):
                 continue
             # Require the exact reviewed spacing before applying byte-positioned spans.
             offset = text[start:end].find(value)
@@ -106,7 +113,10 @@ def redact_text(text, relative, pointer, stripped, key, labels, spans):
     for start, end, value in sorted(edits, reverse=True):
         stripped.append({"path": f"{relative}{pointer}/@text/{start}",
                          "old_sha256": hmac_sha256_of(value, key)})
-        text = text[:start] + text[end:]
+        left, right = text[:start], text[end:]
+        if left.endswith((" ", "\t")) and right.startswith((" ", "\t")):
+            right = right.lstrip(" \t")
+        text = left + right
     return redact_text(text, relative, pointer, stripped, key, labels, spans) if edits else text
 
 
@@ -121,20 +131,27 @@ def redact_document(node, relative, pointer, stripped, key, labels, fields, span
                 del node[name]
                 continue
             if isinstance(value, str):
-                node[name] = redact_text(value, relative, child, stripped, key, labels, spans)
+                after = redact_text(value, relative, child, stripped, key, labels, spans)
+                node[name] = re.sub(r"[ \t]{2,}", " ", after).strip() if after != value else value
             else:
                 redact_document(value, relative, child, stripped, key, labels, fields, spans)
     elif isinstance(node, list):
+        emptied = []
         for index, value in enumerate(node):
             child = pointer + "/" + str(index)
             if relative + child in fields and (fields[relative + child] is None or fields[relative + child] ==
                     hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True).encode()).hexdigest()):
                 stripped.append({"path": relative + child, "old_sha256": hmac_sha256_of(value, key)})
-                node[index] = ""
+                emptied.append(index)
             elif isinstance(value, str):
-                node[index] = redact_text(value, relative, child, stripped, key, labels, spans)
+                after = redact_text(value, relative, child, stripped, key, labels, spans)
+                node[index] = re.sub(r"[ \t]{2,}", " ", after).strip() if after != value else value
+                if after != value and not node[index]:
+                    emptied.append(index)
             else:
                 redact_document(value, relative, child, stripped, key, labels, fields, spans)
+        for index in reversed(emptied):
+            del node[index]
 
 
 def redact_readset(root, stripped, key):

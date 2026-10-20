@@ -2,6 +2,16 @@
   "schema_version": 1,
   "data": [
     {
+      "path": "catalogs/us-equities/agents-operations.json",
+      "sha256": "446b98082decb71e7954daf85e31608ec9f57dc8da25c82eb60bca5add8b5072",
+      "reason": "The exact retained unit describes the selected_path schema field and negative local broker acceptance, without naming a candidate."
+    },
+    {
+      "path": "docs/memory-landscape-maintenance.md",
+      "sha256": "96df9e655139028d5131c5950e146df0ddf3fe31cf3058fb9ec5da0e463dfa95",
+      "reason": "The exact installation paragraph asks a new host to complete its adoption profile, native sign-in and project marker; it does not select a candidate."
+    },
+    {
       "path": "adoption/lifecycle.md",
       "sha256": "3a731d4297be7c90f47f993142b67457f8115e9ad3b7308d1b20d653b03ece1d",
       "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."

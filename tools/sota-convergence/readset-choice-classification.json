@@ -1700,7 +1700,7 @@
     {
       "sha256": "aba3b2c54b075bf04fca96e7436f84400f75256d2265b0a4a38d8de92a7f315d",
       "path": "evidence/receipts/mcporter-0142-qualification-20261004.json",
-      "disposition": "choice"
+      "disposition": "data"
     },
     {
       "sha256": "f54d5a6dd95bdc03b588bab2ace921371aaad5cd33a10ae24eaf264b5048da98",
@@ -3011,21 +3011,6 @@
       "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
     },
     {
-      "sha256": "48ecf3a8504f07e9ce245eb887f6a37d6e4edadd910611a6e0806be3b91c4d78",
-      "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
-      "source_sha256": "48ecf3a8504f07e9ce245eb887f6a37d6e4edadd910611a6e0806be3b91c4d78",
-      "unit": "paragraph",
-      "start": 228,
-      "end": 233,
-      "ranges": [
-        [
-          228,
-          233
-        ]
-      ],
-      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
-    },
-    {
       "sha256": "f5e9758bce3837d9c385bb2375c21d84f6944ab6e11a5d102db3c6c02ef405d1",
       "path": "evidence/receipts/mcporter-0142-qualification-20261004.json",
       "source_sha256": "f5e9758bce3837d9c385bb2375c21d84f6944ab6e11a5d102db3c6c02ef405d1",
@@ -3159,20 +3144,6 @@
       "reason": "Neutralize a provenance/procedure header; preserve every body cell."
     },
     {
-      "sha256": "14bd82a08d639758828a9c6706158de3b373077aa8f6224e49f39e72872e8ce6",
-      "path": "blueprints/convergence-practice/service-reboot/source-review.md",
-      "source_sha256": "14bd82a08d639758828a9c6706158de3b373077aa8f6224e49f39e72872e8ce6",
-      "start": 26,
-      "end": 33,
-      "ranges": [
-        [
-          26,
-          33
-        ]
-      ],
-      "reason": "Neutralize a provenance/procedure header; preserve every body cell."
-    },
-    {
       "sha256": "7985c5a4d4c4ffa3e813a0f15708a6ce78bab52320965e0dff83f12828555d92",
       "path": "blueprints/us-equities/runtime-2604/README.md",
       "source_sha256": "7985c5a4d4c4ffa3e813a0f15708a6ce78bab52320965e0dff83f12828555d92",
@@ -3273,6 +3244,108 @@
       "start": 186,
       "end": 500,
       "unit": "paragraph"
+    },
+    {
+      "sha256": "6c519c594d9a354056441ffc8f3442b638de059213f719fca44ee5091abd83b0",
+      "path": "docs/hosting-container-practice.md",
+      "source_sha256": "296fc84982a4b1f71b680f2b9d8e2e5a9dd692e081b439240316126caa3e043f",
+      "unit": "paragraph",
+      "start": 4,
+      "end": 13,
+      "ranges": [
+        [
+          4,
+          13
+        ]
+      ],
+      "reason": "V5 reviewed choice clauses only; retain source scope, measured outcomes and non-cue bytes."
+    },
+    {
+      "sha256": "825a742d6f8d1a845017d1f1dc9f0f2a7a164e1b96e246eb5962d0e7201fccb8",
+      "path": "docs/foundation-rd-readiness.md",
+      "source_sha256": "825a742d6f8d1a845017d1f1dc9f0f2a7a164e1b96e246eb5962d0e7201fccb8",
+      "unit": "line",
+      "start": 177,
+      "end": 223,
+      "ranges": [
+        [
+          177,
+          223
+        ]
+      ],
+      "reason": "V5 reviewed choice clauses only; retain source scope, measured outcomes and non-cue bytes."
+    },
+    {
+      "sha256": "30f97dd298680497a3b0060e96abb88a7d01549853c89ae599d256081a2e9dd3",
+      "path": "catalogs/us-equities/simulation-data-review.json",
+      "source_sha256": "30f97dd298680497a3b0060e96abb88a7d01549853c89ae599d256081a2e9dd3",
+      "unit": "paragraph",
+      "start": 112,
+      "end": 121,
+      "ranges": [
+        [
+          112,
+          121
+        ]
+      ],
+      "reason": "V5 reviewed choice clauses only; retain source scope, measured outcomes and non-cue bytes."
+    },
+    {
+      "sha256": "d827dbe39b7296114035239db9c8b4c76672f954a55a824751eb683eccf85ad0",
+      "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+      "source_sha256": "d827dbe39b7296114035239db9c8b4c76672f954a55a824751eb683eccf85ad0",
+      "unit": "paragraph",
+      "start": 4,
+      "end": 137,
+      "ranges": [
+        [
+          4,
+          13
+        ],
+        [
+          128,
+          137
+        ]
+      ],
+      "reason": "V5 reviewed choice clauses only; retain source scope, measured outcomes and non-cue bytes."
+    },
+    {
+      "sha256": "ed2f2c6332d8e8b9084a81cec896ebcfd1459560aef16dba557b7dde36707118",
+      "path": "evidence/receipts/mcporter-0142-qualification-20261003.json",
+      "source_sha256": "ed2f2c6332d8e8b9084a81cec896ebcfd1459560aef16dba557b7dde36707118",
+      "unit": "paragraph",
+      "start": 16,
+      "end": 383,
+      "ranges": [
+        [
+          16,
+          61
+        ],
+        [
+          295,
+          383
+        ]
+      ],
+      "reason": "V5 reviewed choice clauses only; retain source scope, measured outcomes and non-cue bytes."
+    },
+    {
+      "sha256": "871d38c1bd9530af36e299cb1130b176767da9460594580f815403260db2f8c8",
+      "path": "blueprints/convergence-practice/service-reboot/source-review.md",
+      "source_sha256": "45cb66c198b7790540ac15bfb1019accb73e08ec747c7c89da0ad17d810632a4",
+      "unit": "paragraph",
+      "start": 4,
+      "end": 135,
+      "ranges": [
+        [
+          4,
+          13
+        ],
+        [
+          126,
+          135
+        ]
+      ],
+      "reason": "V5 reviewed choice clauses only; retain source scope, measured outcomes and non-cue bytes."
     }
   ],
   "tables": {

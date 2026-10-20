@@ -53,6 +53,10 @@ class IndependentAuditTests(unittest.TestCase):
             "We keep Cedar.",
             "Cedar won.",
             "Cedar is the winner.",
+            "Host receipts do not bind to that winner.",
+            "The selected [Cedar source](https://example.org/source).",
+            "Native acceptance for the Cedar selected path.",
+            "Cedar remains the frozen historical comparator.",
             "Cedar took the slot.",
             "Native Codex SDK remains the incumbent.",
         ]
@@ -77,7 +81,7 @@ class IndependentAuditTests(unittest.TestCase):
             shutil.copyfile(ROOT / relative, target)
             blind.strip_worktree(root, b"k" * 32)
             document = json.loads(target.read_text())
-            self.assertEqual(document.get("discovery_provenance"), [""])
+            self.assertEqual(document.get("discovery_provenance"), [])
             self.assertEqual(redaction.content_findings(root, {relative}), [])
 
     def test_real_source_twin_is_redacted_and_restoring_it_fails_audit(self):
@@ -204,7 +208,10 @@ class PreservationTests(unittest.TestCase):
                 values = list(walk_strings(json.loads(text)))
             except ValueError:
                 values = [text]
-            if span.get("unit") == "paragraph":
+            if span.get("unit") == "line":
+                source = next(line for text in values for line in text.splitlines()
+                              if redaction.digest(line) == span["sha256"])
+            elif span.get("unit") == "paragraph":
                 source = next(part.group() for text in values
                               for part in re.finditer(r"\S[^\n]*(?:\n(?!\s*\n)[^\n]*)*", text)
                               if redaction.digest(part.group()) == span["sha256"])
@@ -217,7 +224,10 @@ class PreservationTests(unittest.TestCase):
             ranges = span.get("ranges", [[span["start"], span["end"]]])
             expected = source
             for start, end in sorted(ranges, reverse=True):
-                expected = expected[:start] + expected[end:]
+                left, right = expected[:start], expected[end:]
+                if left.endswith((" ", "\t")) and right.startswith((" ", "\t")):
+                    right = right.lstrip(" \t")
+                expected = left + right
             with self.subTest(path=span["path"]):
                 self.assertEqual(after, expected)
                 self.assertEqual(len(stripped), len(ranges))

@@ -19,7 +19,8 @@ CHOICE = re.compile(
     r"\b(?:gave|gives|goes|takes?|took)\s+the\s+slot\b|"
     r"\b(?:keep|retain|adopt)\s+(?:the\s+)?(?:current|native|catalog|installed)\b|"
     r"\b(?:selected|chosen|adopted|retained|accepted)\s+(?:destination|choice|stack|engine|runtime|component|candidate|executable)\b|"
-    r"\b(?:existing\s+selected|accepted\s+upstream|quality\s+default|keeps?\s+.{0,50}\s+as\s+the)\b",
+    r"\b(?:existing\s+selected|accepted\s+upstream|quality\s+default|keeps?\s+.{0,50}\s+as\s+the)\b|"
+    r"\bselected\s+(?:\[|path\b)|\bremains?\s+the\s+frozen\s+historical\s+comparator\b",
     re.I)
 
 

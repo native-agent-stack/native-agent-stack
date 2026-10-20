@@ -192,6 +192,29 @@ def winner_keys(adopted: list, winners: list) -> set:
     return keys
 
 
+def eligibility_accounting(candidates: list, winners: list) -> dict:
+    """Operator-only option-A accounting from this packet and the prior ledger.
+
+    Missing or ambiguous prior winners never manufacture an exact-pool success.
+    This is not a lane input and does not change candidate eligibility.
+    """
+    eligible = {candidate["key"] for candidate in candidates if candidate.get("adopted")}
+    matches = [winner_keys(candidates, [winner]) for winner in winners]
+    actual = set().union(*matches) if matches else set()
+    unmatched = sum(not match for match in matches)
+    ambiguous = sum(len(match) > 1 for match in matches)
+    exact = bool(eligible and winners) and not unmatched and not ambiguous and eligible == actual
+    near = len(eligible) <= 3 or len(eligible) == len(actual)
+    return {
+        "eligible_count": len(eligible), "winner_count": len(actual),
+        "unmatched_winner_count": unmatched, "ambiguous_winner_count": ambiguous,
+        "eligibility_determined": exact, "near_rule": near,
+        "blind_evidence_label": ("eligibility-determined" if exact else
+                                 "reduced-weight" if near else "not-eligibility-determined"),
+        "blind_evidence_excluded": exact,
+    }
+
+
 def isolation_hits(export_dir: Path, packets_dir: Path, winners: dict, packet_keys: dict = None) -> dict:
     """layer -> sorted {file, path, mode} of every container that isolates the layer's winners."""
     documents = []
@@ -414,7 +437,9 @@ def prose_statements(text: str):
             if cells and all(_TABLE_SEPARATOR.fullmatch(cell) for cell in cells if cell):
                 continue
             if header is None:
-                header = bool(TABLE_CHOICE_HEADER.search(" ".join(cells)))
+                # "Primary source basis" describes provenance, not a primary candidate.
+                heading = re.sub(r"\bprimary\s+source\s+basis\b", "source basis", " ".join(cells), flags=re.I)
+                header = bool(TABLE_CHOICE_HEADER.search(heading))
                 continue
             yield stripped, header
             continue
@@ -453,7 +478,10 @@ def _states_selection(statement: str, winners) -> bool:
     Not a bare selection word near a name, which also reads "`gh attestation verify` defaults ..." or "retained
     accepted SEC run" (round 7, BL7-1: false positives in 6 of the 18 layers)."""
     from lane_packets import CHOICE_PHRASE, STATUS_COPULA, opens_with_status
-    if CHOICE_PHRASE.search(statement) or STATUS_COPULA.search(statement) or opens_with_status(statement):
+    # The shared packet pattern lacks a terminal boundary: "lifecycle stages" is
+    # measured execution scope, not the singular adoption-status field.
+    if (any(not re.match(r"\w", statement[match.end():]) for match in CHOICE_PHRASE.finditer(statement))
+            or STATUS_COPULA.search(statement) or opens_with_status(statement)):
         return True
     for match in IMPERATIVE_CHOICE.finditer(statement):
         window = statement[match.end():match.end() + IMPERATIVE_REACH]
