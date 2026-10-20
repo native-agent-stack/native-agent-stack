@@ -62,7 +62,7 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
-      "sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989"
+      "sha256": "a1413f202937aa05625bad34b35d4ad75c9ab637805c3747abc4fb8b0f85634a"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/requirements.txt"
@@ -318,6 +318,11 @@
       "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
       "reason": "Captured evidence fixture of the preregistered 2026-09-26 SPY one_zero engine trial (#336, 20b52a5bbd132291dd6b7d49ae473789caa3362c; Lumibot 4.6.1 failed). It records that evaluated environment only. Owner native-agent-stack-5f confirmed at 2026-10-06T00:41:23Z, report-native-agent-stack-5f-20261006T0045Z-osv, that both lockchecks are not live inputs. Relocking would alter trial evidence. Before replay, adoption or a new consuming route, qualify a separately maintained environment and restore vulnerability scanning.",
       "evidence": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.json"
+    },
+    {
+      "path": "evidence/artifacts/trading-2604-aiohttp-repin-20261020/published-f451-trading-2604-runtime.lock",
+      "reason": "Retained evidence fixture: the byte-identical October 8 published trading-2604 lock f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989 (aiohttp 3.14.3, affected by GHSA-2g87-pp6c-29x5, GHSA-5wr8-gcqf-gqf3 and GHSA-494j-54xm-rwp3), reproduced with git show 30ab2e3a. It is not an install input. It is kept so the lock digests in the October 8 final-lock and 24/24 acceptance receipts stay checkable against tracked bytes, and as the recorded inverse of the aiohttp 3.14.4 re-pin. The active lock blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock (aiohttp 3.14.4) is scanned. Before any restore or new consuming route, relock and restore vulnerability scanning.",
+      "evidence": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json"
     }
   ]
 }
