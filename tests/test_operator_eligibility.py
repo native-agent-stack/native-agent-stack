@@ -43,6 +43,21 @@ class EligibilityAccountingTests(unittest.TestCase):
             with self.subTest(winners=winners):
                 self.assertFalse(isolation.eligibility_accounting(candidates, winners)["eligibility_determined"])
 
+    def test_ambiguous_winner_cannot_certify_an_equal_pool(self):
+        candidates = [{"key": key, "component_id": "cedar-" + key, "adopted": True,
+                       "repository": "https://github.com/example/cedar"} for key in ("a", "b")]
+        result = isolation.eligibility_accounting(candidates, [("github.com/example/cedar", "", "")])
+        self.assertEqual(result["ambiguous_winner_count"], 1)
+        self.assertFalse(result["eligibility_determined"])
+
+    def test_exact_pool_over_three_also_satisfies_near_rule(self):
+        candidates = [{"key": str(index), "component_id": "cedar-" + str(index), "adopted": True}
+                      for index in range(4)]
+        winners = [("", candidate["component_id"], candidate["component_id"]) for candidate in candidates]
+        result = isolation.eligibility_accounting(candidates, winners)
+        self.assertTrue(result["eligibility_determined"])
+        self.assertTrue(result["near_rule"])
+
 
 if __name__ == "__main__":
     unittest.main()

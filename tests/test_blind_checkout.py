@@ -599,6 +599,16 @@ class CompleteBlindReadsetTests(unittest.TestCase):
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(ROOT / relative, target)
             audit = blind_checkout.strip_worktree(dest, b"k" * 32)
+            for relative in sorted(union):
+                if not (dest / relative).is_file() or not relative.endswith(".md"):
+                    continue
+                original = (ROOT / relative).read_text().splitlines()
+                redacted = (dest / relative).read_text().splitlines()
+                original_rows = [line for line in original if line.lstrip().startswith("|")]
+                redacted_rows = [line for line in redacted if line.lstrip().startswith("|")]
+                with self.subTest(table_structure=relative):
+                    self.assertEqual([line.count("|") for line in redacted_rows],
+                                     [line.count("|") for line in original_rows])
             (dest / "BLIND-MANIFEST.json").write_text(json.dumps(audit))
             complete = set()
             expected = set()

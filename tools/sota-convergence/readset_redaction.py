@@ -61,7 +61,7 @@ def redact_tables(text, relative, stripped, key):
         elif re.fullmatch(r"[\s|:-]+", line):
             continue
         spans = {item["sha256"]: item for item in document["spans"] if item["path"] == relative}
-        line = redact_text(line, relative, "", stripped, key, classification(relative), spans)
+        line = redact_text(line, relative, "", stripped, key, {}, spans)
         cells = line.rstrip("\n").split("|")
         for column in columns:
             if column < len(cells) and cells[column].strip() != "[withheld]":
@@ -114,6 +114,8 @@ def redact_text(text, relative, pointer, stripped, key, labels, spans):
         stripped.append({"path": f"{relative}{pointer}/@text/{start}",
                          "old_sha256": hmac_sha256_of(value, key)})
         left, right = text[:start], text[end:]
+        if not left or left.endswith("\n"):
+            right = right.lstrip(" \t")
         if left.endswith((" ", "\t")) and right.startswith((" ", "\t")):
             right = right.lstrip(" \t")
         text = left + right
@@ -133,6 +135,8 @@ def redact_document(node, relative, pointer, stripped, key, labels, fields, span
             if isinstance(value, str):
                 after = redact_text(value, relative, child, stripped, key, labels, spans)
                 node[name] = re.sub(r"[ \t]{2,}", " ", after).strip() if after != value else value
+                if after != value and not node[name]:
+                    del node[name]
             else:
                 redact_document(value, relative, child, stripped, key, labels, fields, spans)
     elif isinstance(node, list):

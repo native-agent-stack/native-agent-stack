@@ -2,6 +2,461 @@
   "schema_version": 1,
   "data": [
     {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "7bdc5fb64a152ca02cacfa2d0df2cbca2bb76f4f5e7d06d64929cc6afc1c5c91",
+      "reason": "After masking the incumbent prefix, this exact unit retains workflow capability distinctions and explicitly says no comparison was executed and DBOS is not promoted to adopted. The matched keep-but-compare phrase states an unqualified research candidate, not a winner."
+    },
+    {
+      "path": "docs/token-native-saturation.md",
+      "sha256": "a5742e20d83ef76cc1968a060592dd5cb4b00f8efb579aeda004d27c50abf53c",
+      "reason": "The exact neutralized paragraph retains the six successful MCP calls, native connection scope and retrieval evidence; the jCodeMunch selection adjective is masked."
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/sources.json",
+      "sha256": "c70fb380382f8a59aeba5a665f5956759d1e9d831dede483558b8c9275627e70",
+      "reason": "The matched selection describes a toolchain, endpoint, source pin or acceptance input for the recorded procedure, not a NAS candidate choice; preserve provenance and limitations."
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/hosted-plan.json",
+      "sha256": "055502bc36dd903df10ce5572341b05bd7167105ac6870cf893da5f2008b45f1",
+      "reason": "The matched selection describes a toolchain, endpoint, source pin or acceptance input for the recorded procedure, not a NAS candidate choice; preserve provenance and limitations."
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/plan-extended.json",
+      "sha256": "a455b2258445588a4ae32c32293481b94cc50e0e366a8e7f854a254bf4e75da9",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/plan-extended.json",
+      "sha256": "d3c28b2c5aa978dc4bf2e886d7061328eec3811dd926f0c5b10f205378ec870d",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/strategies_v1.py",
+      "sha256": "f52d6bee4679d99b0f9dd76522b6526671edfc88f7f49e4478b0ffe44c607aa9",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/series-20261002/README.md",
+      "sha256": "653cf95caa4c2ec37bd0d66a713bf8e71a265122d106cf981fa5834c0cb8bd00",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+      "sha256": "ebbc7c8a371d1ad6a0e068bc8f84e6a58e382e682c0345dcb67216d228779aea",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/access-resolution.md",
+      "sha256": "fc1a0b4e478c0d93f8bff26554ef00d893b57588b22414f54e8a0c3da394418a",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/catalyst.py",
+      "sha256": "f1e17185fe65ce53a79fbc6ac390f6a25f521123afed473557f8ec6e8d27df3f",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
+      "sha256": "f7fcf4c2e2d2cd3a9b564ce012b562dec59db3d774eb8daf25460c2d21a3b187",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/new-host-native-network-20260924.json",
+      "sha256": "176f5f01c5bf514a22864bdfc6cfacf6cd6947dba48efe17d5527903e09639bb",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/native-receipt.json",
+      "sha256": "a014e4adcf56768f73d53f38e7160198e712f6f25ffd7a0217f0ce20f1fd2a70",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/native-receipt.json",
+      "sha256": "0b00d449f2440cacca96f7347b8f69efa1cddee880e6c75965a7513d4b7d66aa",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "blueprints/us-equities/research-evaluation/evaluate.py",
+      "sha256": "a95b83ac88c3fa9e96e8a005bb3640a8d776d4416f4cabedae33e7634a414eb9",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "blueprints/us-equities/research-evaluation/plan.json",
+      "sha256": "a455b2258445588a4ae32c32293481b94cc50e0e366a8e7f854a254bf4e75da9",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "blueprints/us-equities/research-evaluation/receipt.json",
+      "sha256": "fd80b97a3d6e6b3e655c98b186c1c5e479a9551f0fc475810f9b5b3a891bfb26",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "blueprints/us-equities/routing/README.md",
+      "sha256": "0b2b74b44d27eeb4ca642b8bc8c323ee07c87efb4326d286a88fb7c5b7993ab5",
+      "reason": "The matched selection describes a toolchain, endpoint, source pin or acceptance input for the recorded procedure, not a NAS candidate choice; preserve provenance and limitations."
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/README.md",
+      "sha256": "4038eb3535df2ac6711a52803e5f59d630a1c30b00c53021762d5e00811da3af",
+      "reason": "The matched selection describes a toolchain, endpoint, source pin or acceptance input for the recorded procedure, not a NAS candidate choice; preserve provenance and limitations."
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/README.md",
+      "sha256": "bb34e788533847433cc4b5a616d004b2b4a8296c095ebe82ff2c47edee44c350",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/README.md",
+      "sha256": "b08cbdc7d0afe998a7209675f5947873690900a91905bcb8ffd1255423902cc9",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "blueprints/us-equities/supply-chain/README.md",
+      "sha256": "22f3a1e692d50508a57be29ee4ba87d69d1f71aaee83d4fff9b5123257445b74",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "4a2a8ab6bda1623fe29d52f3f9644edcba93f8d111e603f00b296b92e20dffc4",
+      "reason": "The exact unit is a negative or bounded qualification statement, retaining open gates or absent capabilities rather than selecting a candidate."
+    },
+    {
+      "path": "catalogs/us-equities/agents-operations.json",
+      "sha256": "f8008bbcbb04129b5d56e5673c8803976c410273643ac54f127232db9c517e5f",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "catalogs/us-equities/data-research.json",
+      "sha256": "4de364e53c6cfdd0d391f5570bf1a2af8e5ab86ad83e85874d111e1b5c06cfba",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "catalogs/us-equities/data-research.json",
+      "sha256": "881715c60e2b4e53d7dc6b1d4c530bd31ea0198dca24698ed0978a5b5836ce23",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "catalogs/us-equities/engines-strategies.json",
+      "sha256": "52cb28d4b8aa14879593667247a445be18dfd471280e565271c5c1985b58f8e4",
+      "reason": "The exact unit is a negative or bounded qualification statement, retaining open gates or absent capabilities rather than selecting a candidate."
+    },
+    {
+      "path": "docs/dashboard-rendered-acceptance.md",
+      "sha256": "9f39dca525ea02ac186a153439d22d0a8bd81cd83e12be752889b2780eaf12e6",
+      "reason": "Selected denotes an observed UI tab or date preset and its recorded UI result, not a component choice."
+    },
+    {
+      "path": "docs/github-automation.md",
+      "sha256": "d532db1c9a8c9eea28629646bedf6e4f4c5a2788a8aa53ce42429bb39fbedff9",
+      "reason": "The matched selection describes a toolchain, endpoint, source pin or acceptance input for the recorded procedure, not a NAS candidate choice; preserve provenance and limitations."
+    },
+    {
+      "path": "docs/token-efficiency-stack.md",
+      "sha256": "7bfd881fe07c338f2d16d902becdba0b9ea403902b08d1b56ce2db840d3df764",
+      "reason": "Selected describes bounded content, tool calls or read guidance in a recorded procedure; retain actual operations, results and scope without asserting comparative adoption."
+    },
+    {
+      "path": "docs/token-efficiency-stack.md",
+      "sha256": "d57de0b3e225f11defc7888e5994b586820cbe2c88bbbb9b352dead6c4fd1f08",
+      "reason": "Selected describes bounded content, tool calls or read guidance in a recorded procedure; retain actual operations, results and scope without asserting comparative adoption."
+    },
+    {
+      "path": "docs/token-practice.md",
+      "sha256": "8f3cc34e0de9ad6d899f42e4e0a01fc3b3dff354c0a090627bb2177d684afd97",
+      "reason": "Selected describes bounded content, tool calls or read guidance in a recorded procedure; retain actual operations, results and scope without asserting comparative adoption."
+    },
+    {
+      "path": "docs/token-practice.md",
+      "sha256": "6cca9f90b03e2222aebd499d76f14d9996c1cafd0d17b4f798dce4800a54166f",
+      "reason": "The exact unit documents model/effort inheritance and override semantics. These runtime configuration values are not candidates or winners in the scored component pool."
+    },
+    {
+      "path": "docs/token-practice.md",
+      "sha256": "30726a9776b4a9c13edb185a1759a9b7cc644a595d6547aca9cd502d783715f0",
+      "reason": "The exact unit documents model/effort inheritance and override semantics. These runtime configuration values are not candidates or winners in the scored component pool."
+    },
+    {
+      "path": "docs/token-practice.md",
+      "sha256": "5c7512b187d6e4936b8b251cf90f89986771ad233ec00c65f2d4be976907dbc1",
+      "reason": "The exact unit documents model/effort inheritance and override semantics. These runtime configuration values are not candidates or winners in the scored component pool."
+    },
+    {
+      "path": "docs/token-practice.md",
+      "sha256": "2403a26e7f953ac88ed8f157a05129d26839256afd8d5c9b21fb86e274b71df0",
+      "reason": "The exact unit documents model/effort inheritance and override semantics. These runtime configuration values are not candidates or winners in the scored component pool."
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/qualification-record.json",
+      "sha256": "8640b0679fac4f8aee3057d42ccaa37cefc115f18c94a84ddf40b7cb3512414f",
+      "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
+    },
+    {
+      "path": "evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json",
+      "sha256": "6fbe4ab1bb0bbc07dae70094a32b463a5c2661268c2b7efd6e7ebea5ee8c5789",
+      "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/dashboard-results.json",
+      "sha256": "0dbcfc242dc9abdffbf5b1f8712daaba3921e44be323822928424b406c66df82",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json",
+      "sha256": "d8e62af30854f25d933b68dd387dd0c0bcc264c8a6fe456faacd573e0502eaa9",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/5-extended-reserved-significance.json",
+      "sha256": "52b0e896df89304373aff8f8e2bbcd169c1ef0a0dc0749dc2e2ef2c19c57f9fa",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/5-extended-reserved-significance.json",
+      "sha256": "d62e8b29bf72899a305b8e4fbe111773f0cb2cb7e57846962ed2409bbe2c9a58",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/qualification.json",
+      "sha256": "acd554bda0ee6ef815e6db93c79d3b5cba34db7b1aa61b3a8d82bf895fe957aa",
+      "reason": "Selected denotes an observed UI tab or date preset and its recorded UI result, not a component choice."
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/state-observation.json",
+      "sha256": "627afaf9de9abbc2d052dbc346903e3943cf08f0ab8c87d9ebe2ba977b7de228",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/qualification.json",
+      "sha256": "2931ded34a1b2cbcd48f94fe828f519f1b532032988a987bc45d47aa1a08ed18",
+      "reason": "Selected denotes an observed UI tab or date preset and its recorded UI result, not a component choice."
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/agentsview-selected-sync.json",
+      "sha256": "22bae569f7b45996895601b9dd5ef53e8a91f9761fd2ebb7a7aa6a9de804dbfc",
+      "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/README.md",
+      "sha256": "63bfd5d39a52305f09557879e227fd7f5b318ad7d35bed7fcfbda0c2706e7101",
+      "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/github-run.json",
+      "sha256": "600724ca07593a3737f09ed90190e4258f4c5e20b043438b957e2852f99f3dad",
+      "reason": "The matched selection describes a toolchain, endpoint, source pin or acceptance input for the recorded procedure, not a NAS candidate choice; preserve provenance and limitations."
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/github-run.json",
+      "sha256": "cce814b644d0434cef07ef9617953a9ff6847d480a33433091d8d8cae850e5d5",
+      "reason": "The matched selection describes a toolchain, endpoint, source pin or acceptance input for the recorded procedure, not a NAS candidate choice; preserve provenance and limitations."
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/role-packet-20260930.json",
+      "sha256": "17ba17e0be3e758b88c9c80489813b4beac76fe81da1a6af934f04c7e761b3b3",
+      "reason": "Selected describes bounded content, tool calls or read guidance in a recorded procedure; retain actual operations, results and scope without asserting comparative adoption."
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/role-packet-20260930.json",
+      "sha256": "ad564cde124549b5ce7f6a52b457789d076c08bce3ff706ae0a8d85d9b66d225",
+      "reason": "Selected describes bounded content, tool calls or read guidance in a recorded procedure; retain actual operations, results and scope without asserting comparative adoption."
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/README.md",
+      "sha256": "9bd0fb8c403cb67ba11ad8dac1c562ab1c090533659d80d436eb7488d972f609",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/README.md",
+      "sha256": "8adc2bad7cb9d86fdc939ba95739c30169ecddd1da2ddbbc2e5466f092dc4c23",
+      "reason": "The exact unit is a negative or bounded qualification statement, retaining open gates or absent capabilities rather than selecting a candidate."
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-role-mcp-followup-20261002/trials.json",
+      "sha256": "6448081b50cc3db2107b5e52ab1cde3133558ee7bdd2443e31ba8cf712f032b1",
+      "reason": "The exact unit is a negative or bounded qualification statement, retaining open gates or absent capabilities rather than selecting a candidate."
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-role-mcp-followup-20261002/trials.json",
+      "sha256": "ae48ab96c42baaa3a3ea08cd59be4a2ca47752f2d262188cee824ae804dc5612",
+      "reason": "The exact unit is a negative or bounded qualification statement, retaining open gates or absent capabilities rather than selecting a candidate."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "43cb168d4149d3ffb49e9ec2d831f242a88d301659e3e422e9926af522072bf9",
+      "reason": "The matched selection describes a toolchain, endpoint, source pin or acceptance input for the recorded procedure, not a NAS candidate choice; preserve provenance and limitations."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "c334e67f7b4bdd07550350a3d84fc440195a4874e9f23f330e4bdb480ce20953",
+      "reason": "The matched selection describes a toolchain, endpoint, source pin or acceptance input for the recorded procedure, not a NAS candidate choice; preserve provenance and limitations."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "a3e59b78958eda01e2635d85dd8e7b483877493c21d15fbd48786ecb5e7543c4",
+      "reason": "The matched selection describes a toolchain, endpoint, source pin or acceptance input for the recorded procedure, not a NAS candidate choice; preserve provenance and limitations."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "5620a148de01a31631348e28abc2e809208c01f4f4fcd8349d82914deb610dd9",
+      "reason": "The matched selection describes a toolchain, endpoint, source pin or acceptance input for the recorded procedure, not a NAS candidate choice; preserve provenance and limitations."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+      "sha256": "0a6f9eebfdbadeb8ce7055d323e9fafe3d098064aab3240e08cf95c247bc2ba0",
+      "reason": "The matched selection describes a toolchain, endpoint, source pin or acceptance input for the recorded procedure, not a NAS candidate choice; preserve provenance and limitations."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+      "sha256": "f53ab26f5622279c792179a136ac4f16f14cb2ce67fe1d4a337527ee01a0263d",
+      "reason": "The matched selection describes a toolchain, endpoint, source pin or acceptance input for the recorded procedure, not a NAS candidate choice; preserve provenance and limitations."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/slots.json",
+      "sha256": "4b497ece7b08ece87fc85edef638b799670d0db2e85d39dd9b0d10277441fac8",
+      "reason": "The exact unit is a negative or bounded qualification statement, retaining open gates or absent capabilities rather than selecting a candidate."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/README.md",
+      "sha256": "aaf6eef4a4198c3279a875989461a87947b06d3334a7f3c4bd9e49abc5f8e54d",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-enhancements-experiment.json.source.txt",
+      "sha256": "68fce4165f3513407cbc9e425763a1b094c5ed2dd54fa5f28ace07ac5dd48fdc",
+      "reason": "Selected describes bounded content, tool calls or read guidance in a recorded procedure; retain actual operations, results and scope without asserting comparative adoption."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-enhancements-experiment.json.source.txt",
+      "sha256": "a791cb8545daf0fcad2e6109b64bdfc07f50d82a64c40b0af230690e049ca61f",
+      "reason": "Selected describes bounded content, tool calls or read guidance in a recorded procedure; retain actual operations, results and scope without asserting comparative adoption."
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/README.md",
+      "sha256": "f8e91b91a86ee13d0c6691c79725cfde646ab3cbc6623ee51a14ba08c3474c07",
+      "reason": "The matched selected values are acquisition rows, ETF samples, query IDs or executable statistical sample variables; preserve the measured sample, count and computation, not a component verdict."
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/results.json",
+      "sha256": "5134e73d33b45b6fa9587b7bc7066473ed9e8d3baa53a5fcd4ccd9aaa5a0c226",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/results.json",
+      "sha256": "df3d2dea2de84146bd7f69442a29b9d55e79654328b800cf803e1ce0427095e3",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json",
+      "sha256": "e66bd132d5854d9da014c6becdbb8931c68c1beb232925e2198507e0527919ce",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "evidence/artifacts/usage-report.source.txt",
+      "sha256": "ec165ae9fb6b54c10c7d025d77e698ae3afa6fc8c174d36db55428de1f4313a8",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "evidence/receipts/codex-session-environment-20260920.json",
+      "sha256": "aca5367b07b0a76df98bed65481ad8c5d60caadd7bfe0eec9649383cb736d981",
+      "reason": "Selected describes bounded content, tool calls or read guidance in a recorded procedure; retain actual operations, results and scope without asserting comparative adoption."
+    },
+    {
+      "path": "evidence/receipts/current-session-observation-20260920.json",
+      "sha256": "27de468d860eaa15507a4dcd1a9aaf7b0ec9ef7d71fbb2026340f3a386bcdfee",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json",
+      "sha256": "6fbe4ab1bb0bbc07dae70094a32b463a5c2661268c2b7efd6e7ebea5ee8c5789",
+      "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
+    },
+    {
+      "path": "evidence/receipts/native-cli-gaps.json",
+      "sha256": "b0be21561d3825c0d4bcc6addcc65f50277b9315a59ab86aaaad51d36de40263",
+      "reason": "The exact unit is a negative or bounded qualification statement, retaining open gates or absent capabilities rather than selecting a candidate."
+    },
+    {
+      "path": "evidence/receipts/native-dashboard-data-20260921.json",
+      "sha256": "7aa02b287486719937b8b55290ec8ad75cc5fd1a534a166aeb0db1f7ff1becd0",
+      "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
+    },
+    {
+      "path": "evidence/receipts/native-dashboard-data-20260921.json",
+      "sha256": "7b67729801a31a05774810d46b40d8f3779100e909a7fdcd1bd0325dc2d6eaa4",
+      "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
+    },
+    {
+      "path": "evidence/receipts/native-dashboard-data-20260921.json",
+      "sha256": "4a9cea5dc1cf118372aebe7f0e3f96d22e2b84c38ccb37d990a2ca2bcfd15800",
+      "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
+    },
+    {
+      "path": "evidence/receipts/native-dashboard-data-20260921.json",
+      "sha256": "22bae569f7b45996895601b9dd5ef53e8a91f9761fd2ebb7a7aa6a9de804dbfc",
+      "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
+    },
+    {
+      "path": "evidence/receipts/native-sdk-acceptance-20261002.json",
+      "sha256": "a94813ffca73f2ae48bfdb61ddb2a3a383091928e64ad0fbfc0a001d91d1955e",
+      "reason": "The exact unit is a negative or bounded qualification statement, retaining open gates or absent capabilities rather than selecting a candidate."
+    },
+    {
+      "path": "evidence/receipts/native-sdk-role-mcp-followup-20261002.json",
+      "sha256": "436d1fb3e9b3ad71bed58168a236a29e4eb9bdadf40ac09e3a774232930f28e5",
+      "reason": "The exact unit is a negative or bounded qualification statement, retaining open gates or absent capabilities rather than selecting a candidate."
+    },
+    {
+      "path": "evidence/receipts/native-token-focus-clients-20260920.json",
+      "sha256": "1e2458b8d889f0422e5f280597be2cd1ab323423dd62ed4aeeb684e7b34a32dd",
+      "reason": "Selected describes bounded content, tool calls or read guidance in a recorded procedure; retain actual operations, results and scope without asserting comparative adoption."
+    },
+    {
+      "path": "evidence/receipts/native-token-focus-clients-20260920.json",
+      "sha256": "01f8bc5f369e69a85f82ceea60d15d2ab9b287d029f876482ed8abae5d0e0ca7",
+      "reason": "The exact unit is a negative or bounded qualification statement, retaining open gates or absent capabilities rather than selecting a candidate."
+    },
+    {
+      "path": "evidence/receipts/native-token-stack-final-20260920.json",
+      "sha256": "f63fae16cc839e889fa438169185885bf4b93b965d53adb5566a2b4fc176a3f6",
+      "reason": "The exact unit is a negative or bounded qualification statement, retaining open gates or absent capabilities rather than selecting a candidate."
+    },
+    {
+      "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json",
+      "sha256": "5ddf63b098d3601be81337f3a8db22c951d8bad70a94f32abc3baa12ab51c49c",
+      "reason": "Selected describes bounded content, tool calls or read guidance in a recorded procedure; retain actual operations, results and scope without asserting comparative adoption."
+    },
+    {
+      "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json",
+      "sha256": "a791cb8545daf0fcad2e6109b64bdfc07f50d82a64c40b0af230690e049ca61f",
+      "reason": "Selected describes bounded content, tool calls or read guidance in a recorded procedure; retain actual operations, results and scope without asserting comparative adoption."
+    },
+    {
+      "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
+      "sha256": "a94b247641b1767381f46450bfd8efaca203a92c0afc4e9139a49ecbe6dde714",
+      "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
+    },
+    {
+      "path": "recipes/README.md",
+      "sha256": "da0b03b7f78414d2bc701558572dbf9c58de2c989d013f67eda5eb2dee6b2b64",
+      "reason": "Selected describes bounded content, tool calls or read guidance in a recorded procedure; retain actual operations, results and scope without asserting comparative adoption."
+    },
+    {
+      "path": "recipes/README.md",
+      "sha256": "baccda6fc71ae827481cb8c82e90494ddd1725509d117b12c7cdc0c7034a23c2",
+      "reason": "The exact unit documents model/effort inheritance and override semantics. These runtime configuration values are not candidates or winners in the scored component pool."
+    },
+    {
+      "path": "recipes/README.md",
+      "sha256": "f4eb6204fd274d15f806b8e3b3b7f0f2c1460944f7460e20e550fb1ba3dd5db3",
+      "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
+    },
+    {
+      "path": "recipes/README.md",
+      "sha256": "de6632fcd8f705d0f897b875d944533a9b30b9b8a0b479156b6bec8388bcf05d",
+      "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
+    },
+    {
       "path": "catalogs/us-equities/agents-operations.json",
       "sha256": "446b98082decb71e7954daf85e31608ec9f57dc8da25c82eb60bca5add8b5072",
       "reason": "The exact retained unit describes the selected_path schema field and negative local broker acceptance, without naming a candidate."

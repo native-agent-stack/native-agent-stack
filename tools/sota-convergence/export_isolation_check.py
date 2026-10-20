@@ -430,13 +430,20 @@ def prose_statements(text: str):
     """(statement, choice_headed) pairs: each sentence of a paragraph or list item, and each table body row, marked
     when its table's header states a selection (round 7, BL7-1: a row was scored alone and its header lost)."""
     header = None
-    for block in _prose_blocks(text):
+    blocks = list(_prose_blocks(text))
+    for index, block in enumerate(blocks):
         stripped = block.strip()
         if stripped.startswith("|"):
             cells = [cell.strip() for cell in stripped.strip("|").split("|")]
             if cells and all(_TABLE_SEPARATOR.fullmatch(cell) for cell in cells if cell):
                 continue
             if header is None:
+                following = blocks[index + 1].strip() if index + 1 < len(blocks) else ""
+                if not following.startswith("|") or not all(
+                        _TABLE_SEPARATOR.fullmatch(cell.strip())
+                        for cell in following.strip("|").split("|") if cell.strip()):
+                    yield stripped, False
+                    continue
                 # "Primary source basis" describes provenance, not a primary candidate.
                 heading = re.sub(r"\bprimary\s+source\s+basis\b", "source basis", " ".join(cells), flags=re.I)
                 header = bool(TABLE_CHOICE_HEADER.search(heading))

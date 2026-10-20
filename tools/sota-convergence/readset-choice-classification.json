@@ -2077,6 +2077,630 @@
   ],
   "spans": [
     {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "1a0c1ff0cf5d568337948e3ef185ca9a80752a04a03d7fb21bf7828de22f8d6f",
+      "source_sha256": "1a0c1ff0cf5d568337948e3ef185ca9a80752a04a03d7fb21bf7828de22f8d6f",
+      "start": 11,
+      "end": 31,
+      "ranges": [
+        [
+          11,
+          31
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "9ae43983a88b35700e7e55fcf2d3fcbd4bd536c391755f338e2ddbf7b9ee7fa9",
+      "source_sha256": "9ae43983a88b35700e7e55fcf2d3fcbd4bd536c391755f338e2ddbf7b9ee7fa9",
+      "start": 87,
+      "end": 97,
+      "ranges": [
+        [
+          87,
+          97
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "927b1146038f0219eb2847bae05b0911078b3e822a135de394878d61b00e23d0",
+      "source_sha256": "927b1146038f0219eb2847bae05b0911078b3e822a135de394878d61b00e23d0",
+      "start": 0,
+      "end": 139,
+      "ranges": [
+        [
+          0,
+          139
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "3533a91a2e40eee0a1595c81f55f1e6e2560694507b6469fdae51f27aef30702",
+      "source_sha256": "3533a91a2e40eee0a1595c81f55f1e6e2560694507b6469fdae51f27aef30702",
+      "start": 0,
+      "end": 49,
+      "ranges": [
+        [
+          0,
+          49
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "927b1146038f0219eb2847bae05b0911078b3e822a135de394878d61b00e23d0",
+      "source_sha256": "927b1146038f0219eb2847bae05b0911078b3e822a135de394878d61b00e23d0",
+      "start": 0,
+      "end": 139,
+      "ranges": [
+        [
+          0,
+          139
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "3533a91a2e40eee0a1595c81f55f1e6e2560694507b6469fdae51f27aef30702",
+      "source_sha256": "3533a91a2e40eee0a1595c81f55f1e6e2560694507b6469fdae51f27aef30702",
+      "start": 0,
+      "end": 49,
+      "ranges": [
+        [
+          0,
+          49
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "docs/token-native-saturation.md",
+      "sha256": "e390ccfc64a6f670f1c9f82fbc83c1e0d6af7c3d957909d2b9ba93e748cff739",
+      "source_sha256": "e390ccfc64a6f670f1c9f82fbc83c1e0d6af7c3d957909d2b9ba93e748cff739",
+      "start": 4,
+      "end": 19,
+      "ranges": [
+        [
+          4,
+          19
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-workers-experiment.json.source.txt",
+      "sha256": "6cb6e305c30047520929cb9b5c981e0a3008af89f74695d6216edf8e190e750b",
+      "source_sha256": "6cb6e305c30047520929cb9b5c981e0a3008af89f74695d6216edf8e190e750b",
+      "start": 47,
+      "end": 56,
+      "ranges": [
+        [
+          47,
+          56
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-workers-experiment.json.source.txt",
+      "sha256": "d931a2071b0d6c4f33832b9bfa9d1eba2709bf888bcb369d97e5b4cc00676b65",
+      "source_sha256": "d931a2071b0d6c4f33832b9bfa9d1eba2709bf888bcb369d97e5b4cc00676b65",
+      "start": 40,
+      "end": 49,
+      "ranges": [
+        [
+          40,
+          49
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-enhancements-experiment.json.source.txt",
+      "sha256": "fdc3e78be5fdfefa03f9b244fb25f8559192006cf1babfddcd13f63a070f6f4c",
+      "source_sha256": "fdc3e78be5fdfefa03f9b244fb25f8559192006cf1babfddcd13f63a070f6f4c",
+      "start": 50,
+      "end": 59,
+      "ranges": [
+        [
+          50,
+          59
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "docs/github-automation.md",
+      "sha256": "9fa1a55b1f39e8cbe291ff2e6f2c7de558eb82e2c35f1bcf801f624cace659f8",
+      "source_sha256": "bede70171708fd83009d4e2c126d8c98ba9c8298d909ee380bc729150a58d430",
+      "start": 92,
+      "end": 114,
+      "ranges": [
+        [
+          92,
+          114
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance.",
+      "unit": "line"
+    },
+    {
+      "path": "docs/github-automation.md",
+      "sha256": "6b243ac02b2b887e6c07c3467de43c0d341fd7fc7b0faa1df222061f5a6e36b1",
+      "source_sha256": "22c92279dd789bbf504cd1619fdbf7c5610485c460c868c7be1273fdee214541",
+      "start": 4,
+      "end": 24,
+      "ranges": [
+        [
+          4,
+          24
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance.",
+      "unit": "line"
+    },
+    {
+      "path": "docs/foundation-closure-20260921.md",
+      "sha256": "debe6001ca99c967e43792f03047fa8447ae966695fe6eda2972b5e06dead71c",
+      "source_sha256": "debe6001ca99c967e43792f03047fa8447ae966695fe6eda2972b5e06dead71c",
+      "start": 0,
+      "end": 9,
+      "ranges": [
+        [
+          0,
+          9
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance.",
+      "unit": "line"
+    },
+    {
+      "path": "adoption/lifecycle.md",
+      "sha256": "6ef827f6358fbf61f4e5ca6d93c1e2aab282bd66d68aa8fdcf52d1f91226b0d3",
+      "source_sha256": "6ef827f6358fbf61f4e5ca6d93c1e2aab282bd66d68aa8fdcf52d1f91226b0d3",
+      "start": 69,
+      "end": 78,
+      "ranges": [
+        [
+          69,
+          78
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance.",
+      "unit": "line"
+    },
+    {
+      "path": "evidence/receipts/foundation-closure-20260921.json",
+      "sha256": "8b3285c948d11ccd31b49ca169487caa3ddd6d8b4939181124751908cd676d57",
+      "source_sha256": "8b3285c948d11ccd31b49ca169487caa3ddd6d8b4939181124751908cd676d57",
+      "start": 81,
+      "end": 90,
+      "ranges": [
+        [
+          81,
+          90
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "0207d3d462feab169a2a7103540a115e2eacd31cffbeaa0564d4c08a45ffd42e",
+      "source_sha256": "0207d3d462feab169a2a7103540a115e2eacd31cffbeaa0564d4c08a45ffd42e",
+      "start": 0,
+      "end": 49,
+      "ranges": [
+        [
+          0,
+          49
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "3d2a7abd32f9655b9e74ca8e945b77bf28aafaaeb6b30c9f6d3c1997247e7bbc",
+      "source_sha256": "3d2a7abd32f9655b9e74ca8e945b77bf28aafaaeb6b30c9f6d3c1997247e7bbc",
+      "start": 19,
+      "end": 51,
+      "ranges": [
+        [
+          19,
+          51
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json",
+      "sha256": "579a1966c1726cff01efd6076695f61602108251cf2b2d4d391b1afc10b98bae",
+      "source_sha256": "579a1966c1726cff01efd6076695f61602108251cf2b2d4d391b1afc10b98bae",
+      "start": 0,
+      "end": 24,
+      "ranges": [
+        [
+          0,
+          24
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "catalogs/foundation/community-practice-20260920.json",
+      "sha256": "64f6dbad9fcfc0903cf4a2808a840fb1141ea28f83ed94dc542aa06bc5bdb131",
+      "source_sha256": "64f6dbad9fcfc0903cf4a2808a840fb1141ea28f83ed94dc542aa06bc5bdb131",
+      "start": 133,
+      "end": 152,
+      "ranges": [
+        [
+          133,
+          152
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/receipts/native-claude-profile-20260920.json",
+      "sha256": "4eda002e8249805e41acd1de37571872fbf620a71de529b41de547c72c9510b7",
+      "source_sha256": "4eda002e8249805e41acd1de37571872fbf620a71de529b41de547c72c9510b7",
+      "start": 0,
+      "end": 9,
+      "ranges": [
+        [
+          0,
+          9
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
+      "sha256": "c5a35ba56e15b6335836bb717efb9b4c8b6d21a099ce5a131b81ada7057c0b1c",
+      "source_sha256": "c5a35ba56e15b6335836bb717efb9b4c8b6d21a099ce5a131b81ada7057c0b1c",
+      "start": 0,
+      "end": 49,
+      "ranges": [
+        [
+          0,
+          49
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/README.md",
+      "sha256": "6418516b1c7e4a76428c9e3cb1ea0913c13df43fbef61de07faa614a6777cf2e",
+      "source_sha256": "6418516b1c7e4a76428c9e3cb1ea0913c13df43fbef61de07faa614a6777cf2e",
+      "start": 0,
+      "end": 28,
+      "ranges": [
+        [
+          0,
+          28
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance.",
+      "unit": "line"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "352a8b316fb523a5213ac9f60a89669374324beb581d5f9dbf7721ef15914768",
+      "source_sha256": "352a8b316fb523a5213ac9f60a89669374324beb581d5f9dbf7721ef15914768",
+      "start": 0,
+      "end": 146,
+      "ranges": [
+        [
+          0,
+          146
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "6a0a0e7b3389ae103585e88cd838fa6288352f53ffe71d61a8dc55a1240fe57c",
+      "source_sha256": "6a0a0e7b3389ae103585e88cd838fa6288352f53ffe71d61a8dc55a1240fe57c",
+      "start": 30,
+      "end": 39,
+      "ranges": [
+        [
+          30,
+          39
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "9d9817d578ea45f853c8f237132cf8d7f8e4145fe0104231e381a8cb4575f4ba",
+      "source_sha256": "9d9817d578ea45f853c8f237132cf8d7f8e4145fe0104231e381a8cb4575f4ba",
+      "start": 30,
+      "end": 39,
+      "ranges": [
+        [
+          30,
+          39
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "352a8b316fb523a5213ac9f60a89669374324beb581d5f9dbf7721ef15914768",
+      "source_sha256": "352a8b316fb523a5213ac9f60a89669374324beb581d5f9dbf7721ef15914768",
+      "start": 0,
+      "end": 146,
+      "ranges": [
+        [
+          0,
+          146
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "6a0a0e7b3389ae103585e88cd838fa6288352f53ffe71d61a8dc55a1240fe57c",
+      "source_sha256": "6a0a0e7b3389ae103585e88cd838fa6288352f53ffe71d61a8dc55a1240fe57c",
+      "start": 30,
+      "end": 39,
+      "ranges": [
+        [
+          30,
+          39
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "00571c3ed74d029b65c3e292c66ffb61bc5e048fe65830569b0ef18c795865b0",
+      "source_sha256": "00571c3ed74d029b65c3e292c66ffb61bc5e048fe65830569b0ef18c795865b0",
+      "start": 0,
+      "end": 37,
+      "ranges": [
+        [
+          0,
+          37
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "84061872d94e9ab1f25df24f2d1a5c2819e20496136efc07fcda03517c8e4c8e",
+      "source_sha256": "84061872d94e9ab1f25df24f2d1a5c2819e20496136efc07fcda03517c8e4c8e",
+      "start": 19,
+      "end": 28,
+      "ranges": [
+        [
+          19,
+          28
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "84061872d94e9ab1f25df24f2d1a5c2819e20496136efc07fcda03517c8e4c8e",
+      "source_sha256": "84061872d94e9ab1f25df24f2d1a5c2819e20496136efc07fcda03517c8e4c8e",
+      "start": 19,
+      "end": 28,
+      "ranges": [
+        [
+          19,
+          28
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
+      "sha256": "84061872d94e9ab1f25df24f2d1a5c2819e20496136efc07fcda03517c8e4c8e",
+      "source_sha256": "84061872d94e9ab1f25df24f2d1a5c2819e20496136efc07fcda03517c8e4c8e",
+      "start": 19,
+      "end": 28,
+      "ranges": [
+        [
+          19,
+          28
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/fixes.json",
+      "sha256": "84061872d94e9ab1f25df24f2d1a5c2819e20496136efc07fcda03517c8e4c8e",
+      "source_sha256": "84061872d94e9ab1f25df24f2d1a5c2819e20496136efc07fcda03517c8e4c8e",
+      "start": 19,
+      "end": 28,
+      "ranges": [
+        [
+          19,
+          28
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "sha256": "1baac75e2ff1a89fee0725f0527b8b51bc924c88d46018676e493db8ba00125f",
+      "source_sha256": "9afb7bde0913ad2924047f71335b808ad7310be468db48bcdaf57254250e370e",
+      "start": 23,
+      "end": 32,
+      "ranges": [
+        [
+          23,
+          32
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance.",
+      "unit": "line"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "sha256": "6c1f94b948086ad033c868f3d38e97e2df414e9190e73cd6afaa2cc022720632",
+      "source_sha256": "b78ab06b65de628ea596822b12c57f54704d04cb98748ff1a81e42d56b0ffc1a",
+      "start": 23,
+      "end": 32,
+      "ranges": [
+        [
+          23,
+          32
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance.",
+      "unit": "line"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "sha256": "b429530642bee544eda163578bb1196b3836a36fb2d49652ae400112377b9f42",
+      "source_sha256": "9c5d62d91c5e391d947e078076cf053d2b4685ede43be253b3fb0ba3424650b0",
+      "start": 65,
+      "end": 74,
+      "ranges": [
+        [
+          65,
+          74
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance.",
+      "unit": "line"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/pre-dispatch-default-skill.md",
+      "sha256": "1c43f3101213e376746191e282022c08b44af90e5e54ac47b337d188602bf0dd",
+      "source_sha256": "1c43f3101213e376746191e282022c08b44af90e5e54ac47b337d188602bf0dd",
+      "start": 115,
+      "end": 124,
+      "ranges": [
+        [
+          115,
+          124
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance.",
+      "unit": "line"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-dispatcher.md",
+      "sha256": "1c43f3101213e376746191e282022c08b44af90e5e54ac47b337d188602bf0dd",
+      "source_sha256": "1c43f3101213e376746191e282022c08b44af90e5e54ac47b337d188602bf0dd",
+      "start": 115,
+      "end": 124,
+      "ranges": [
+        [
+          115,
+          124
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance.",
+      "unit": "line"
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "070e58cb68da669770bbbd7d7512b92fe3211ca528e0fec1272764d9dcb0a9ff",
+      "source_sha256": "070e58cb68da669770bbbd7d7512b92fe3211ca528e0fec1272764d9dcb0a9ff",
+      "start": 0,
+      "end": 60,
+      "ranges": [
+        [
+          0,
+          60
+        ],
+        [
+          74,
+          96
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "aaa8ac176c3c939fcf0d69610ac45a932312c77fb3d69b058c770457f6cef201",
+      "source_sha256": "aaa8ac176c3c939fcf0d69610ac45a932312c77fb3d69b058c770457f6cef201",
+      "start": 150,
+      "end": 172,
+      "ranges": [
+        [
+          150,
+          172
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "d033be386176575b1e675b90cb92df1d8bdd1ea791dcc5ed3f57cbfd19c057bb",
+      "source_sha256": "d033be386176575b1e675b90cb92df1d8bdd1ea791dcc5ed3f57cbfd19c057bb",
+      "start": 0,
+      "end": 94,
+      "ranges": [
+        [
+          0,
+          94
+        ],
+        [
+          108,
+          130
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "1e6760de39138900cee708a9d32a56583598b9fab1208808a4765be179e7bfe1",
+      "source_sha256": "1e6760de39138900cee708a9d32a56583598b9fab1208808a4765be179e7bfe1",
+      "start": 0,
+      "end": 44,
+      "ranges": [
+        [
+          0,
+          44
+        ],
+        [
+          58,
+          80
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "b2ca07e194ce5b4a5d9117a4ff069766ed21c4804baa15420320f9afab7a8293",
+      "source_sha256": "b2ca07e194ce5b4a5d9117a4ff069766ed21c4804baa15420320f9afab7a8293",
+      "start": 5,
+      "end": 27,
+      "ranges": [
+        [
+          5,
+          27
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "d8ddfeddeb4b187a364a709e0f5c5da2e0a3c5742c12682dc024b452a7364e09",
+      "source_sha256": "d8ddfeddeb4b187a364a709e0f5c5da2e0a3c5742c12682dc024b452a7364e09",
+      "start": 16,
+      "end": 27,
+      "ranges": [
+        [
+          16,
+          27
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
       "sha256": "6979c05f368c72cedf60e940eff899b35c816beed637d1fb0a20d5232aad4a61",
       "path": "evidence/artifacts/claude-upstream-checks-20260921/provenance.json",
       "source_sha256": "6979c05f368c72cedf60e940eff899b35c816beed637d1fb0a20d5232aad4a61",

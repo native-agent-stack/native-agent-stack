@@ -225,6 +225,8 @@ class PreservationTests(unittest.TestCase):
             expected = source
             for start, end in sorted(ranges, reverse=True):
                 left, right = expected[:start], expected[end:]
+                if not left or left.endswith("\n"):
+                    right = right.lstrip(" \t")
                 if left.endswith((" ", "\t")) and right.startswith((" ", "\t")):
                     right = right.lstrip(" \t")
                 expected = left + right

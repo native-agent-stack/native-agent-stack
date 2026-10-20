@@ -20,7 +20,11 @@ CHOICE = re.compile(
     r"\b(?:keep|retain|adopt)\s+(?:the\s+)?(?:current|native|catalog|installed)\b|"
     r"\b(?:selected|chosen|adopted|retained|accepted)\s+(?:destination|choice|stack|engine|runtime|component|candidate|executable)\b|"
     r"\b(?:existing\s+selected|accepted\s+upstream|quality\s+default|keeps?\s+.{0,50}\s+as\s+the)\b|"
-    r"\bselected\s+(?:\[|path\b)|\bremains?\s+the\s+frozen\s+historical\s+comparator\b",
+    r"\bselected\s+(?:\[|path\b)|\bremains?\s+the\s+frozen\s+historical\s+comparator\b|"
+    r"\bselection\s+(?:remains?|of\s+record\b|moves?|stays?)\b|"
+    r"\bselected\s+(?:(?-i:[A-Z][\w-]*)|source\s+remains?\b)|"
+    r"\(\s*selected\b|\bfor\s+this\s+selection\b|"
+    r"\bits\s+interim\b[^.!?\n]{0,120}\badds?\b",
     re.I)
 
 
