@@ -183,11 +183,12 @@ class CredentialStatusTests(unittest.TestCase):
         ]
         for mutate, message in cases:
             broken = copy.deepcopy(self.inventory)
-            mutate(next(e for e in broken["entries"] if e["id"] == "alpaca-paper"))
+            row = next(e for e in broken["entries"] if e["id"] == "alpaca-paper")
+            mutate(row)
             with self.subTest(message=message):
                 errors = cs.inventory_errors(broken, ROOT)
                 self.assertEqual(len(errors), 1, errors)
-                self.assertIn("entries[0]: ", errors[0])
+                self.assertIn(f"entries[{broken['entries'].index(row)}]: ", errors[0])
                 self.assertIn(message, errors[0])
         # A row without optional variables needs no classification; the field stays optional.
         tavily = copy.deepcopy(self.inventory)
@@ -221,11 +222,11 @@ class CredentialStatusTests(unittest.TestCase):
              lambda row: row["public_variables"].append("APCA_API_BASE_URL")),
         ]
         for message, mutate in cases:
-            broken, _row = planted(mutate)
+            broken, row = planted(mutate)
             with self.subTest(message=message):
                 errors = cs.inventory_errors(broken, ROOT)
                 self.assertEqual(len(errors), 1, errors)
-                self.assertIn("entries[0]: ", errors[0])
+                self.assertIn(f"entries[{broken['entries'].index(row)}]: ", errors[0])
                 self.assertIn(message, errors[0])
         # Whatever the schema check reports, the masked set is computed from the validated shape: a required variable
         # is masked even when a planted entry lists it as public, and a public name is only ever an optional one.
