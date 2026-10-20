@@ -64163,8 +64163,8 @@
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "8bfd38217d9759122787d511eb79e86e33fa68ec1c75e542ffbd121324f6caae",
-      "bytes": 24092
+      "sha256": "3a87dd7c2dcc56e3ec3433b76397c10bfb1443af11ae837cac863e1f4ee68fec",
+      "bytes": 28577
     },
     {
       "path": "tests/test_adoption_docs_consistency.py",

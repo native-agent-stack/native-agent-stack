@@ -9,6 +9,30 @@ from pathlib import Path
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
+# Security relocks of non-SDK distributions since the SDK qualification (evidence/artifacts/runtime-sdk-20261003). Each
+# names the version it moves from (the supply-chain inventory's), the version it moves to and the advisory. The
+# qualification receipt keeps the sha256 of the lock it qualified, retained byte-identical at SDK_QUALIFIED_LOCK, and the
+# current lock may differ from that lock only in these packages' blocks. Like IGNORE_ALLOWED_LOCKS in
+# test_osv_lockfile_coverage.py, an entry names the reviewed lock and its evidence; a re-qualification of the SDK pair
+# records the new lock's sha256 and inventory and empties this table.
+SDK_QUALIFIED_LOCK = ('evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/adoption/sdk/'
+                      'published-3a17fa09-requirements-linux-x86_64-py313.lock')
+SDK_SECURITY_RELOCKS = {
+    # https://github.com/advisories/GHSA-6q48-6c7w-9gw2: first patched version 2026.10.19 (PyPI certifi 2026.10.19).
+    'certifi': ('2026.7.22', '2026.10.19', 'GHSA-6q48-6c7w-9gw2'),
+}
+
+
+def lock_blocks(text):
+    """Map each normalized distribution name in a hash-pinned lock to (version, block text); '' keeps the preamble."""
+    blocks = {}
+    for block in re.split(r'(?=^[A-Za-z0-9_.-]+==)', text, flags=re.M):
+        match = re.match(r'([A-Za-z0-9_.-]+)==([^\s\\]+)', block)
+        if match:
+            blocks[re.sub(r'[-_.]+', '-', match[1]).lower()] = (match[2], block)
+        else:
+            blocks[''] = (None, block)
+    return blocks
 
 
 class AdoptionContractTests(unittest.TestCase):
@@ -114,6 +138,11 @@ class AdoptionContractTests(unittest.TestCase):
         # 0.160.0 requires openai-codex-cli-bin==0.160.0 (PyPI metadata).
         sdk_names = {'openai-codex', 'openai-codex-cli-bin'}
         self.assertEqual(set(pins), set(expected))
+        # A recorded security relock moves exactly one non-SDK pin off the inventory's version.
+        for name, (old, new, _advisory) in SDK_SECURITY_RELOCKS.items():
+            self.assertNotIn(name, sdk_names)
+            self.assertEqual(expected[name], old, f'the {name} relock starts from the inventory version')
+            expected[name] = new
         self.assertEqual(
             {name: version for name, version in pins.items() if name not in sdk_names},
             {name: version for name, version in expected.items() if name not in sdk_names},
@@ -137,7 +166,20 @@ class AdoptionContractTests(unittest.TestCase):
         qualification = json.loads((ROOT / 'evidence/artifacts/runtime-sdk-20261003/receipt.json').read_text())
         installation = qualification['installation']
         self.assertEqual(installation['lock'], self.adoption['toolchain']['sdk_lock'])
-        self.assertEqual(installation['lock_sha256'], hashlib.sha256(lock.read_bytes()).hexdigest())
+        if installation['lock_sha256'] != hashlib.sha256(lock.read_bytes()).hexdigest():
+            # The qualification ran on the retained pre-relock lock; the current lock may differ from it only in the
+            # recorded relocks' blocks.
+            qualified = ROOT / SDK_QUALIFIED_LOCK
+            self.assertEqual(installation['lock_sha256'], hashlib.sha256(qualified.read_bytes()).hexdigest(),
+                             'the qualification receipt names the retained qualified lock')
+            before, after = lock_blocks(qualified.read_text()), lock_blocks(text)
+            self.assertEqual(set(before), set(after))
+            for name in before:
+                if name in SDK_SECURITY_RELOCKS:
+                    self.assertEqual((before[name][0], after[name][0]), SDK_SECURITY_RELOCKS[name][:2], name)
+                else:
+                    self.assertEqual(before[name], after[name],
+                                     f'{name or "the preamble"} differs from the qualified lock beyond the recorded relocks')
         self.assertEqual(installation['distribution_count'], len(pins))
         for field in ['sdk', 'bundled_cli', 'selected_native_cli']:
             self.assertEqual(installation[field], client['version'], field)
@@ -172,6 +214,31 @@ class AdoptionContractTests(unittest.TestCase):
                 lock = candidate / self.adoption['toolchain']['sdk_lock']
                 qualification['installation']['lock_sha256'] = hashlib.sha256(lock.read_bytes()).hexdigest()
                 qualification_path.write_text(json.dumps(qualification))
+                with patch(__name__ + '.ROOT', candidate):
+                    with self.assertRaisesRegex(AssertionError, guard):
+                        self.test_lock_matches_accepted_inventory_and_all_pins_have_hashes()
+
+    def test_relocked_lock_differs_from_the_qualified_lock_only_in_recorded_relocks(self):
+        paths = ['blueprints/us-equities/supply-chain/receipt.json',
+                 'evidence/artifacts/runtime-sdk-20261003/receipt.json', SDK_QUALIFIED_LOCK]
+        paths.extend(self.adoption['toolchain'][key] for key in
+                     ['sdk_lock', 'sdk_direct_requirements', 'sdk_accepted_constraints'])
+        self.assertTrue(SDK_SECURITY_RELOCKS)
+        # Each case keeps every version, so only the qualified-lock binding can reject it.
+        cases = [(self.adoption['toolchain']['sdk_lock'], 'beyond the recorded relocks'),
+                 (SDK_QUALIFIED_LOCK, 'names the retained qualified lock')]
+        for relative_target, guard in cases:
+            with self.subTest(target=relative_target), tempfile.TemporaryDirectory() as directory:
+                candidate = Path(directory)
+                for relative in paths:
+                    target = candidate / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    target.write_bytes((ROOT / relative).read_bytes())
+                target = candidate / relative_target
+                text, count = re.subn(r'(^charset-normalizer==[^\s\\]+ \\\n    --hash=sha256:)[0-9a-f]{64}',
+                                      r'\g<1>' + '0' * 64, target.read_text(), flags=re.M)
+                self.assertEqual(count, 1)
+                target.write_text(text)
                 with patch(__name__ + '.ROOT', candidate):
                     with self.assertRaisesRegex(AssertionError, guard):
                         self.test_lock_matches_accepted_inventory_and_all_pins_have_hashes()
