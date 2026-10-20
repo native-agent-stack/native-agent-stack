@@ -95,9 +95,14 @@ jobs:
         env:
           MACOSX_DEPLOYMENT_TARGET: '14.0'
         run: |
+          # certifi alone moves past the 2026-09-23 cutoff, for GHSA-6q48-6c7w-9gw2: 2026.10.19's files reached PyPI at
+          # 2026-10-20T02:24:16Z (https://pypi.org/pypi/certifi/json). uv 0.12.17's --exclude-newer-package PACKAGE=DATE
+          # (crates/uv-cli/src/lib.rs:7158-7177, flattened into pip compile through ResolverArgs) applies that later date
+          # to certifi only, so every other pin keeps the original cutoff.
           "$UV" pip compile tools/mlx-smoke/requirements.in \
             --python-platform aarch64-apple-darwin --python-version 3.12 --generate-hashes \
             --no-header --exclude-newer 2026-09-23T00:00:00Z \
+            --exclude-newer-package certifi=2026-10-20T02:30:00Z \
             -o "$RUNNER_TEMP/hw-profile/requirements.lock.check.txt"
           diff -u tools/mlx-smoke/requirements.lock.txt "$RUNNER_TEMP/hw-profile/requirements.lock.check.txt"
       - name: Create an isolated virtual environment for the smoke test

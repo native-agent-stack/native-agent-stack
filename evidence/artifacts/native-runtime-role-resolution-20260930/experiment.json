@@ -133,7 +133,7 @@
         "sha256": "841fa9696a90f2b032291c20d9926179c9769f703d0ba0ef9f86868e34ac4bb2"
       },
       {
-        "path": "examples/deepagents-omniroute/requirements.lock",
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/examples/deepagents-omniroute/published-3832e6cc-requirements.lock",
         "sha256": "3832e6cc94f9108112a10ec0eb11b5b6b7dfc55d60fc4fada2f752d650879e11"
       },
       {

@@ -75,6 +75,25 @@ class LockedProjectAdmissionTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr.decode())
         self.assertEqual(after, self.current_lock, "an install at f451 moves to the current lock")
 
+    def test_pre_certifi_lock_is_admitted_and_replaced(self):
+        prior = ROOT / "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/runtime-2604/trading-2604-runtime/published-a1413f20-uv.lock"
+        seed = prior.read_bytes()
+        bound = re.search(r"(?m)^readonly pre_certifi_lock_hash=([0-9a-f]{64})$", self.installer)
+        self.assertIsNotNone(bound)
+        self.assertEqual(hashlib.sha256(seed).hexdigest(), bound[1])
+        result, after = self.admit(seed)
+        self.assertEqual(result.returncode, 0, result.stderr.decode())
+        self.assertEqual(after, self.current_lock)
+
+    def test_dropping_pre_certifi_admission_refuses_that_lock(self):
+        prior = ROOT / "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/runtime-2604/trading-2604-runtime/published-a1413f20-uv.lock"
+        line = "            ! printf '%s  %s\\n' \"$pre_certifi_hash\" \"$project/$filename\" | sha256sum --check --status &&\n"
+        self.assertEqual(self.installer.count(line), 1)
+        mutant = self.installer.replace(line, "")
+        result, after = self.admit(prior.read_bytes(), mutant)
+        self.assertEqual(result.returncode, 73)
+        self.assertEqual(after, prior.read_bytes())
+
     def test_current_lock_passes_unchanged(self):
         result, after = self.admit(self.current_lock)
         self.assertEqual(result.returncode, 0, result.stderr.decode())

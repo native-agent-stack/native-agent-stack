@@ -451,7 +451,7 @@ class ScheduledTrialRuntimeLock(unittest.TestCase):
             'project="$TASK_RUNTIME"; python="$project/.venv/bin/python"; '
             'adapter="$project/vendor/adaptive-paper"\n'
             'project_hash=aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b\n'
-            'lock_hash=a1413f202937aa05625bad34b35d4ad75c9ab637805c3747abc4fb8b0f85634a\n'
+            'lock_hash=2df713279918415554d7ba23972d3c9b8dc3a8762c52b36cfd31de53e92c22d7\n'
             'blocked() { echo "blocked runtime" >&2; exit 1; }\n' + block)
         installing = self.spawn(installer, dict(env, TASK_PAUSE_INSTALL="1"))
         self.wait_ready(ready)
