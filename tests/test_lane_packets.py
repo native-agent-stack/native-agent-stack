@@ -994,7 +994,7 @@ class RemovedSelectionRecordTests(unittest.TestCase):
                 self.assertIn(lane_packets.STRIPPED_REF_FIELDS_LABEL, built["withheld"])
                 self.assertEqual(lane_packets.withhold_removed_refs(built), (built, 0))
 
-    def test_selection_docs_are_withheld_from_every_reference_position(self):
+    def test_mixed_selection_docs_keep_every_reference_position(self):
         # Given: evidence refs and registered receipts in both supported collections.
         refs = ["docs/foundation-rd-readiness.md:27", "docs/token-native-saturation.md#accepted"]
         keep = "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json"
@@ -1007,11 +1007,12 @@ class RemovedSelectionRecordTests(unittest.TestCase):
         }
         # When: blind packet references are filtered.
         built, dropped = lane_packets.withhold_removed_refs(packet)
-        # Then: all removed docs disappear, but the sanitized evidence remains usable.
-        self.assertEqual(dropped, 6)
-        self.assertEqual(built["candidates"][0]["evidence_refs"], [keep])
+        # Then: mixed documents and receipts remain reachable; choice spans are withheld in their content.
+        self.assertEqual(dropped, 0)
+        self.assertEqual(built["candidates"][0]["evidence_refs"], refs + [keep])
         for collection in ("candidates", "sota_components_not_in_candidates"):
-            self.assertEqual(built[collection][0]["registered_receipts"], [{"path": keep}])
+            self.assertEqual(built[collection][0]["registered_receipts"],
+                             [{"path": ref} for ref in refs] + [{"path": keep}])
         self.assertIn(lane_packets.REMOVED_REFS_LABEL, built["withheld"])
 
 

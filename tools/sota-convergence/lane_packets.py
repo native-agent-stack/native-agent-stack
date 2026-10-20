@@ -1054,9 +1054,10 @@ def withhold_labels(packet: dict) -> dict:
 # references on the 2026-09-23 packets). The label is listed on every blind packet, dropped reference or not.
 REMOVED_REFS_LABEL = ("candidates[].evidence_refs[] and registered_receipts[] naming a file the blind export removes "
                       "(membership, selection or earlier-verdict records)")
-STRIPPED_REF_FIELDS_LABEL = ("referenced evidence JSON: decision, current_choice, selection, disposition, "
-                             "review_status, default_decision and earlier-verdict fields at any depth; "
-                             "verdict/status fields containing adoption labels (not execution outcomes)")
+STRIPPED_REF_FIELDS_LABEL = ("referenced evidence JSON: closed-vocabulary or pinned choice values under decision, "
+                             "current_choice, selection, disposition, review_status and default_decision; "
+                             "earlier-verdict fields and adoption verdict/status labels; reviewed choice spans "
+                             "in JSON and text, including one-level source twins (not measured/review outcomes)")
 
 
 def removed_reference(reference) -> bool:
