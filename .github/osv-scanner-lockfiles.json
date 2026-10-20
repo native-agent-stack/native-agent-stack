@@ -323,11 +323,6 @@
       "path": "evidence/artifacts/trading-2604-aiohttp-repin-20261020/published-f451-trading-2604-runtime.lock",
       "reason": "Retained evidence fixture: the byte-identical October 8 published trading-2604 lock f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989 (aiohttp 3.14.3, affected by GHSA-2g87-pp6c-29x5, GHSA-5wr8-gcqf-gqf3 and GHSA-494j-54xm-rwp3), reproduced with git show 30ab2e3a. It is not an install input. It is kept so the lock digests in the October 8 final-lock and 24/24 acceptance receipts stay checkable against tracked bytes, and as the recorded inverse of the aiohttp 3.14.4 re-pin. The active lock blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock (aiohttp 3.14.4) is scanned. Before any restore or new consuming route, relock and restore vulnerability scanning.",
       "evidence": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json"
-    },
-    {
-      "path": "evidence/artifacts/aiohttp-3.14.4-relock-20261020/historical/examples/openhands-native-capabilities/requirements.lock.source.txt",
-      "reason": "Retained evidence fixture: the byte-identical pre-bump examples/openhands-native-capabilities/requirements.lock (sha256 16e1a44ed7ca8b8333f2e2fca963efe544fad581198d1271d021b83b78a4bfe8, aiohttp 3.14.3, affected by GHSA-2g87-pp6c-29x5, GHSA-5wr8-gcqf-gqf3 and GHSA-494j-54xm-rwp3), reproduced with git show 30ab2e3a. It is not an install input. It is kept so the 2026-09-30 native-runtime-role-resolution convergence record's frozen input stays checkable against tracked bytes, as ecea2865 (#628) kept the OmniRoute records' frozen inputs. The active lock examples/openhands-native-capabilities/requirements.lock (aiohttp 3.14.4) is scanned.",
-      "evidence": "evidence/artifacts/native-runtime-role-resolution-20260930/experiment.json"
     }
   ]
 }
