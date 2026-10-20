@@ -5187,8 +5187,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "cba06a43e1b0c1fadaea82c75e412b4344fcf03f17bea3d0830bd765414ec6fb",
-      "bytes": 16138
+      "sha256": "36536b1bfa0cde65ec67d132f33c9d3a21cb07df277b7a109a8789f9e154e7b5",
+      "bytes": 17395
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -5487,8 +5487,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "9edb9ac1dea4b75b17883d7ba619129bd44a2a0f1c21314842cf2913d72f13a6",
-      "bytes": 45333
+      "sha256": "2ebb767c6e0719e0dfa98dbbc55adbef5f657d5d202b9eb02749c179abc96f1f",
+      "bytes": 47010
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -5502,7 +5502,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "b22e64c0eb6c9ea1f7593d747d1924d41ab0f9818599f2bbc9ccd3b0508d5378",
+      "sha256": "84510febcc3d73fc4541c70fbb2383f52820de6a79035d810dbf63942b481757",
       "bytes": 1229
     },
     {
@@ -10637,6 +10637,11 @@
       "bytes": 197870
     },
     {
+      "path": "blueprints/memory-stack/native-qualification/uv.lock",
+      "sha256": "28118b8f56b0d97356477f8120b3e0bab569e2756f30cf442b3cfeeef6000fa0",
+      "bytes": 615691
+    },
+    {
       "path": "blueprints/native-skill-practice/README.md",
       "sha256": "fef88277fccc88bc64f4c4337d9b7c2ede9ddf0f7626dbd811b97c36b6d595cb",
       "bytes": 14195
@@ -11778,7 +11783,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/pins.json",
-      "sha256": "3612b4b74a139b08a37736feb672fc1957f4d028e23f94a7293815cddd29ffd3",
+      "sha256": "1b1de8190c252a4b9545c2df3025bb83b74fc55921d12a9f7803ad1ba0c583d3",
       "bytes": 4460
     },
     {
@@ -11798,8 +11803,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/requirements.lock",
-      "sha256": "a3303759da2895ecb87e0a9fa7e45878bb2588208615e6a6059704a98e71e396",
-      "bytes": 106427
+      "sha256": "6045a575ada4f0ee7d06a741e40eeff3b08ea3fb5a2567eef57d36055ff81577",
+      "bytes": 107107
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
@@ -13698,7 +13703,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/scheduled_trial.sh",
-      "sha256": "8ed83e48dcc8106eda5e7cf3863b48cc2c6d68a79c029e17c461470564b1a475",
+      "sha256": "cfae08a5edc6c0bc43e64b7d3af41a9840f9dafc010bb29e0593d6c0e55c233c",
       "bytes": 4997
     },
     {
@@ -13718,7 +13723,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "9129f062b2ab3390e473f9c44235670b196d947c7331889722ae9582ce5c966d",
+      "sha256": "f91711014790585c0d5fad7ba6bc05822a6ae4319af91eb722de38f82e79db22",
       "bytes": 10600
     },
     {
@@ -17123,18 +17128,18 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "92c79556bbd2f67bd6ca122e04bbc13c3fe03f44a72332c9203569d2373762bb",
-      "bytes": 40284
+      "sha256": "13c722796576b3173ba8e0824697607893f95f768618830264cf4950dd1e9060",
+      "bytes": 42515
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
-      "sha256": "82aeca1aba94ac5bd38b30cd1409776f2d53b826156788de62e4a56fdb6c0ca6",
+      "sha256": "f38197a3ba4fa23f83b47babc0d2aa06b98bb2c2c20471ab569e073f5c6ead77",
       "bytes": 15244
     },
     {
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
-      "sha256": "587479df742819313788dceb4ca7a6e406e76915d8d7a1444f9f26121542095a",
-      "bytes": 21242
+      "sha256": "0fed2e5c651186cab1c2abc2673284def5e74b1e430dc0f141f5eef731020873",
+      "bytes": 21844
     },
     {
       "path": "blueprints/us-equities/runtime-2604/receipts/acceptance-20261008.json",
@@ -17158,8 +17163,8 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
-      "sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
-      "bytes": 308332
+      "sha256": "a1413f202937aa05625bad34b35d4ad75c9ab637805c3747abc4fb8b0f85634a",
+      "bytes": 308625
     },
     {
       "path": "blueprints/us-equities/security-identity/README.md",
@@ -17648,7 +17653,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "adf618a4c96e96573bcbd3f72b9805bd2ff0e42ac6e7ce2c79a3ede379653de8",
+      "sha256": "5aa8875be6ddffb7151adc7f55a157db72ee24fca740dc18bac6c73f6d14ff86",
       "bytes": 193410
     },
     {
@@ -17708,7 +17713,7 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "acc39e4c275b3c89453d8a592acde0ee3ca7ca9d600c1ff1fa4bb0ae847d975f",
+      "sha256": "8d714cd2179c3d530eba855302bfece533b25fedf342c77925a8a6885c18eafe",
       "bytes": 339603
     },
     {
@@ -19903,8 +19908,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "72e3d155a3e399ca2a4b9c97053ce2fee12827ef3cbf36a9dc6966f707708cc1",
-      "bytes": 210441
+      "sha256": "ff66e19c7dee953055a925c5e9e23f4eff93710ebf297602dcf4a07f65098860",
+      "bytes": 210769
     },
     {
       "path": "docs/stack.md",
@@ -20550,6 +20555,11 @@
       "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/codex_capture_count.py",
       "sha256": "0ab020d17171b4c51a31aa19a9349ec51cdd1afd8a7b732ee47d03df0a3ecd79",
       "bytes": 1244
+    },
+    {
+      "path": "evidence/artifacts/aiohttp-3.14.4-relock-20261020/historical/examples/openhands-native-capabilities/pinned-at-30ab2e3a.source.txt",
+      "sha256": "16e1a44ed7ca8b8333f2e2fca963efe544fad581198d1271d021b83b78a4bfe8",
+      "bytes": 296775
     },
     {
       "path": "evidence/artifacts/alpaca-platform-landscape-20260926/README.md",
@@ -43038,8 +43048,8 @@
     },
     {
       "path": "evidence/artifacts/native-runtime-role-resolution-20260930/experiment.json",
-      "sha256": "16f49752e540383339d8c338ef283a26e2809282bf6585a19de59c5db9cbafec",
-      "bytes": 36711
+      "sha256": "703837f451638a3a65f34f9d8094aa8676d830f4a54260b0694c36406acd9bf3",
+      "bytes": 36784
     },
     {
       "path": "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-install.json",
@@ -58922,6 +58932,11 @@
       "bytes": 8828
     },
     {
+      "path": "evidence/artifacts/trading-2604-aiohttp-repin-20261020/published-f451-trading-2604-runtime.lock",
+      "sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+      "bytes": 308332
+    },
+    {
       "path": "evidence/artifacts/trading-convergence-20260926/README.md",
       "sha256": "6a8e358162b0dbbed9b38e7136d6f74c365f0bbade6e272d7b4294c6601a9172",
       "bytes": 1955
@@ -62498,8 +62513,8 @@
     },
     {
       "path": "examples/openhands-native-capabilities/requirements.lock",
-      "sha256": "16e1a44ed7ca8b8333f2e2fca963efe544fad581198d1271d021b83b78a4bfe8",
-      "bytes": 296775
+      "sha256": "40c0ebc98b0492a0c773d77e789ab4695696d77dc3697003d5a5896013ec8db4",
+      "bytes": 300345
     },
     {
       "path": "examples/promptfoo-nemotron-upstream/promptfooconfig.yaml",
@@ -63433,8 +63448,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "d524c76b05164ee1870b7fe6e238d862036a2c8ef0a58ee53b91f58db3f334b5",
-      "bytes": 308159
+      "sha256": "3ef6eb742bb80e746ec0211167d1b76a5726004e3131349d6f8a43992b8d470b",
+      "bytes": 308186
     },
     {
       "path": "scripts/host_name_scan.py",
@@ -64438,8 +64453,8 @@
     },
     {
       "path": "tests/test_credential_run.py",
-      "sha256": "9e21fcab4591d2ee44cbd35ff6811ddba43b9766e8266ae0eb280a068a9725b9",
-      "bytes": 133229
+      "sha256": "93afb8a8c270314ab13453aaec867cfe99f5593cc06cff3482316c0873c76988",
+      "bytes": 133259
     },
     {
       "path": "tests/test_credential_status.py",
@@ -65403,7 +65418,7 @@
     },
     {
       "path": "tests/test_scheduled_trial.py",
-      "sha256": "85cac37a4230533135eb2c680430a814278ad578b90bc4e7a3f3ea5f02acf9ce",
+      "sha256": "aab2b57b49653acaf82f12670a774a37cae485f95e2365b3a4128a5bdd593bc6",
       "bytes": 30441
     },
     {
