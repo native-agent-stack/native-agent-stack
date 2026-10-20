@@ -1,12 +1,31 @@
-# NativeStack2604 offline research runtime — final lock binding, October 8, 2026
+# NativeStack2604 offline research runtime — aiohttp 3.14.4 re-pin, October 20, 2026
 
-The published bundle is the existing native runtime's measured final metadata:
-lock SHA256 `f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989`
+The published bundle is lock SHA256
+`a1413f202937aa05625bad34b35d4ad75c9ab637805c3747abc4fb8b0f85634a`
 and manifest SHA256 `aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b`.
 It contains EdgarTools **5.61.1**, skfolio **1.7.0**, LightGBM **4.7.0**, and the
 pytest **9.1.1** dev group (pluggy **1.6.0**, iniconfig **2.3.1**). CPython
 **3.12.3**, NautilusTrader **2.0.0rc5**, the adapter pins and their gates stay fixed.
-The lock/manifest were copied from the measured native pair without relocking.
+
+The manifest is unchanged from the measured October 8 native pair. The lock is
+that pair's lock `f451ef97…` relocked for GHSA-2g87-pp6c-29x5,
+GHSA-5wr8-gcqf-gqf3 and GHSA-494j-54xm-rwp3 (aiohttp <=3.14.3, fixed in 3.14.4).
+It was produced by `UV_PYTHON_DOWNLOADS=never uv lock --python <managed CPython 3.12.3>
+--upgrade-package aiohttp==3.14.4` with uv 0.13.1. Only the aiohttp entry moves,
+from **3.14.3** to **3.14.4** (its sdist and wheels; dependencies unchanged; yarl
+stays **1.25.1**); the other 191 entries and the lock `revision = 5` header are
+byte-identical. The installer's pinned uv **0.12.17** `uv --no-config lock --check`
+passes on the new lock. A relock with uv 0.12.17 itself resolves the same
+packages but rewrites the header to `revision = 3`, an unrelated change, so it
+was not used. No install, sync or acceptance ran for this re-pin.
+
+The 24/24 native acceptance below is bound to lock `f451ef97…` and does **not**
+transfer to this lock. Acceptance of `a1413f20…` is pending and runs under the
+North Star plan's C05, from this lock, on the destination host. The installer
+admits an existing runtime at the `f451ef97…`/`aa370e42…` pair as one more
+recorded migration input, like the earlier recorded pairs, never as acceptance.
+The offline acceptance script and scheduled trial require `a1413f20…` and refuse
+a runtime still at `f451ef97…`.
 
 Runtime users coordinate on `$HOME/projects/.us-equities-runtime.lock`, outside
 the venv, project adoption directory and trial output directories. The installer
@@ -46,7 +65,8 @@ The fresh [final-lock 24-case acceptance](../../../evidence/artifacts/runtime-fi
 ran once on **2026-10-08, 17:48:39Z–17:49:09Z**, after the authorized suite slot,
 and returned **24/24 PASS, rc 0**. Its own stdout printed the full `f451ef97…`
 lock SHA256 immediately before and after the unchanged retained 24-case script;
-both matched. This fresh run is the only acceptance claim bound to the final lock.
+both matched. This fresh run is the only acceptance claim bound to the October 8
+final lock `f451ef97…`; it is not an acceptance of the current aiohttp 3.14.4 lock.
 It performed no lock, sync, venv or installer change. It does not execute the
 publication's **28 prospective checks**, its three dev probes, an exact migration,
 or Layer1.5 historical E2E.
@@ -143,14 +163,17 @@ hashes are unchanged. The project's dev metadata changed and the prior global
 refuse the final native vector; its failed attempt remains in the imported receipt.
 
 The installer checks the exact final SHA256 pair and refuses arbitrary local
-metadata. It preserves the approved `1fb9f8ca…`/`30f47dfb…` and intermediate
+metadata. It preserves the October 8 published `f451ef97…`/`aa370e42…` pair, the
+approved `1fb9f8ca…`/`30f47dfb…` and intermediate
 `17221888…`/`25d95481…` migration inputs, alongside the older `4c98672d…` and
 `c6b5f25c…` records. Both files are validated before either atomic replacement;
 the only destination is the published final pair. These allowances do not
 authorize an uncoordinated host migration or overwrite another writer's changes.
 The installer keeps its native host, ownership, interpreter and Docker guards.
-The current installed pair already matches; **do not rerun installation** to
-republish its evidence. A future authorized new-prefix installation uses the
+A runtime installed at the October 8 `f451ef97…` pair no longer matches the
+published lock. Moving it to `a1413f20…` is a migration through this installer
+that runs only under the North Star plan's C05, followed by that plan's own
+acceptance from the new lock. A future authorized new-prefix installation uses the
 recipe's existing native route, then needs its own acceptance.
 
 The prospective shared vector checks the lock, performs
@@ -171,7 +194,8 @@ verified managed interpreter to create its venv. Index configuration comes from
 the exact manifest; no retired global cutoff or `--no-dev` override is added.
 The source publication itself runs neither operation; exact host migration and
 the prospective 28-case acceptance remain unexecuted. The separately authorized
-fresh 24-case run is the final-lock acceptance recorded above.
+fresh 24-case run is the `f451ef97…` final-lock acceptance recorded above; the
+aiohttp 3.14.4 lock has no acceptance yet.
 
 Both scripts require NativeStack2604, Linux x86_64 and a non-root user. Foundation
 prerequisites are uv **0.12.17**, Git, curl, core utilities, an already responding
@@ -218,6 +242,14 @@ dependencies removed from that environment; an inexact sync of the final pair
 cannot restore the old set. Preserve any later owner's changes when selecting
 the inverse. Neither exact migration nor this inverse has been executed here.
 Reverting this publication restores repository files, without changing host state.
+The aiohttp 3.14.4 re-pin adds the October 8 `f451ef97…`/`aa370e42…` pair as
+the inverse record for a runtime moved to `a1413f20…`; its locked sync restores
+aiohttp 3.14.3 only. The `f451ef97…` lock bytes are retained, byte-identical, as
+the excluded evidence fixture
+[`published-f451-trading-2604-runtime.lock`](../../../evidence/artifacts/trading-2604-aiohttp-repin-20261020/published-f451-trading-2604-runtime.lock),
+so the October 8 receipts' lock digests stay checkable. That lock is affected by
+the three aiohttp advisories above and is not an install input; that inverse has
+not been executed either.
 
 Rnd-r1 released the runtime writer to layer15-build for the dev addition;
 layer15-build returned it for rnd-r1's final locked sync/dependency check, and
