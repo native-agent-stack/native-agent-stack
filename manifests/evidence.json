@@ -65288,8 +65288,8 @@
     },
     {
       "path": "tests/test_record_verdicts.py",
-      "sha256": "84ccf80829c182203ce4bacacc88b0442d7ad56f070cd459a66021b1ec8220c7",
-      "bytes": 164909
+      "sha256": "2135bca57acb128c4503cb905362281a8fcd6bdf1f6b68e34f6def183211bc9b",
+      "bytes": 166615
     },
     {
       "path": "tests/test_registration_rules.py",
@@ -66458,8 +66458,8 @@
     },
     {
       "path": "tools/sota-convergence/record_verdicts.py",
-      "sha256": "742277546f2006070ed221137f775dd351ef9362040906ffe0fa91c9187b8a57",
-      "bytes": 94045
+      "sha256": "fdab8797ce37dc21689558d7f9baaf6db5c2b84b6f65c9cfde826bd559b73a9c",
+      "bytes": 95432
     },
     {
       "path": "tools/sota-convergence/schemas/compact-decision-start-closure-1.json",

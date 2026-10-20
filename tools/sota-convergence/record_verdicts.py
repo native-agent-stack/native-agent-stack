@@ -722,7 +722,8 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                  adjudications_dir, identities: set, aliases: dict, sha256sums: dict, rejections: list,
                  lane_roots=(), run_date: str = VERDICT_DATE, sealed_base: str = SEALED_BASE,
                  outcomes: dict = None, single_lane_decision: str = None, status_context=None,
-                 lane_code=None, failures: dict = None, packet_keys: dict = None, lane_root_trees=None) -> list:
+                 lane_code=None, failures: dict = None, packet_keys: dict = None, lane_root_trees=None,
+                 prior_winners=None) -> list:
     """Mutate ``row`` in place with whatever the valid lane returns for this
     layer establish; return the list of (absolute path, text) sealed/
     adjudication files this row's processing needs written. Returns an empty
@@ -764,6 +765,18 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
             if packet_mismatch is None:
                 packet = unseal_packet(packet, packet_keys, packet_filename)
     candidates_by_key = {c["key"]: c for c in packet.get("candidates", [])} if packet else {}
+    if not grandfathered and packet is not None and packet_mismatch is None:
+        import export_isolation_check
+        if prior_winners is None:
+            prior_winners = [(export_isolation_check.slug(winner.get("repository")),
+                              export_isolation_check.norm(winner.get("component_id") or ""),
+                              winner.get("component_id") or "") for winner in row.get("winners") or []]
+        # Keep option-A accounting beside each outcome, never in a packet or sealed lane return.
+        outcome["blind_evidence"] = export_isolation_check.eligibility_accounting(
+            list(candidates_by_key.values()), prior_winners)
+        # The ledger below will receive the new returns. Retain the actual baseline
+        # so --check evaluates the original question, not the post-verdict winners.
+        outcome["blind_evidence"]["prior_winners"] = prior_winners
     v1_candidates_by_repository = index_v1_candidates_by_repository(row)
 
     valid, lane_bytes = {}, {}
@@ -1170,6 +1183,8 @@ def run_manifest_document(work_dir: Path, run_date: str, sealed_base: str, outco
         digest = hashlib.sha256(packet_path.read_bytes()).hexdigest() if packet_path.is_file() else None
         entry = {"catalog": catalog, "layer_id": layer_id, "packet_sha256": digest,
                  "lanes": {lane: manifest_value(outcome[lane]) for lane in LANES}}
+        if "blind_evidence" in outcome:
+            entry["blind_evidence"] = dict(outcome["blind_evidence"])
         adjudication = [manifest_reason(item["reason"]) for item in rejections
                         if (item["catalog"], item["layer_id"], item["lane"]) == (catalog, layer_id, "adjudication")]
         if outcome.get("adjudication"):
@@ -1394,10 +1409,14 @@ def main(argv=None) -> int:
                          + ", ".join(name[:-len(".json")].replace("__", "/", 1) for name in absent_inputs))
     manifest_path = root / sealed_base / RUN_MANIFEST_NAME
     previous = None
+    prior_winners_by_packet = {}
     if not grandfathered and manifest_path.is_file():
         # A sealed new wave is never rewritten (review of #122, finding 3): a --write may only add rows
         # the existing manifest does not hold, and --check recomputes that same append.
         existing = json.loads(manifest_path.read_text(encoding="utf-8"))
+        prior_winners_by_packet = {
+            (entry["catalog"], entry["layer_id"]): entry["blind_evidence"]["prior_winners"]
+            for entry in existing.get("packets") or [] if "blind_evidence" in entry}
         held = {packet_name(entry.get("catalog"), entry.get("layer_id")) for entry in existing.get("packets") or []
                 if isinstance(entry, dict)}
         if write_mode:
@@ -1513,7 +1532,8 @@ def main(argv=None) -> int:
                                     for spelling in (os.path.abspath(root), str(Path(root).resolve())))),
                 run_date=run_date, sealed_base=sealed_base, outcomes=outcomes,
                 single_lane_decision=single_lane_decision, status_context=status_context,
-                lane_code=lane_code, failures=failures, packet_keys=packet_keys, lane_root_trees=lane_root_trees))
+                lane_code=lane_code, failures=failures, packet_keys=packet_keys, lane_root_trees=lane_root_trees,
+                prior_winners=prior_winners_by_packet.get((catalog, row["layer_id"]))))
 
     # Survivorship: every packet of the run and each lane's outcome (sealed, rejected with its
     # reasons, failed with its runner's reason, or missing) is sealed next to the returns, with the

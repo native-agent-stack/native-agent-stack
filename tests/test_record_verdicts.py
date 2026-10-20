@@ -2083,6 +2083,30 @@ class NewWaveProvenanceTests(NewWaveFixture):
 
 
 class NewWaveRunManifestTests(NewWaveFixture):
+    def test_exact_prior_pool_is_labelled_beside_both_returns_not_inside_them(self):
+        catalog = self.both_lanes("wave-same-layer")
+        c1, c2, _ = self.build_packet_pair(catalog, "wave-same-layer",
+                                          c1_component="wave-same-layer-c1")
+        relative = record_verdicts.LEDGER_FILES[catalog]
+        document = json.loads((self.root / relative).read_text())
+        row = next(row for row in document["layers"] if row["layer_id"] == "wave-same-layer")
+        row["winners"] = [{"repository": candidate["repository"], "component_id": candidate["component_id"]}
+                          for candidate in (c1, c2)]
+        self.write(relative, document)
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        entry = self.run_manifest()["packets"][0]
+        self.assertEqual(entry["blind_evidence"]["blind_evidence_label"], "eligibility-determined")
+        self.assertTrue(entry["blind_evidence"]["blind_evidence_excluded"])
+        for lane in ("claude", "codex"):
+            self.assertEqual(entry["lanes"][lane]["outcome"], "sealed")
+        for path in self.sealed_base().glob("*/*.json"):
+            self.assertNotIn("blind_evidence", json.loads(path.read_text()))
+        build_landscape(self.root)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_main(write=False, check=True, run_id=NEW_RUN), 0)
+        self.assertTrue(self.run_manifest()["packets"][0]["blind_evidence"]["eligibility_determined"])
+
     def test_the_run_manifest_accounts_for_every_packet_and_lane(self):
         catalog = self.both_lanes("wave-same-layer")
         # A second layer whose codex return is rejected (winner key not adopted) ...
@@ -2101,6 +2125,8 @@ class NewWaveRunManifestTests(NewWaveFixture):
                          (self.work_dir / "packets" / "SHA256SUMS").read_text(encoding="utf-8"))
         entries = {entry["layer_id"]: entry for entry in manifest["packets"]}
         self.assertEqual(set(entries), {"wave-same-layer", "wave-rejected-layer", "wave-missing-layer"})
+        self.assertIn("blind_evidence", entries["wave-same-layer"])
+        self.assertFalse(entries["wave-same-layer"]["blind_evidence"]["eligibility_determined"])
         row = self.load_row(catalog, "wave-same-layer")
         for lane in ("claude", "codex"):
             self.assertEqual(entries["wave-same-layer"]["lanes"][lane],
