@@ -1225,3 +1225,197 @@ Residuals from the re-check that this round does not fix:
 - The scan's own exit code comes from in-memory events that `Run.append` never
   validates (`scan` returns `report(..., exit_only=True)`). This round removes
   the one known disagreement (`inventory_unreconciled`), not the mechanism.
+
+## Addendum (2026-10-17): `override_variables`, a store directory's override
+
+An inventory row may now carry an optional `override_variables` list, beside
+`pointer_variables` (PR #1240, A2 finding G8-A02). The two fields differ:
+
+- A **pointer variable** holds the path of the row's store file
+  (`PAPER_ENV_FILE`, `HF_TOKEN_PATH`). The runner removes other rows'
+  pointers from a child's environment. The canary proof binds each pointer at
+  prepare and refuses a pointer that names a directory.
+- An **override variable** names the directory a native tool keeps the store
+  in. Today the only one is `AI_MEMORY_DATA_DIR`, ai-memory's data directory.
+  The `--data-dir` flag wins over it (akitaonrails/ai-memory v2.4.1, the
+  Linux pin, at `433a19f3`: `crates/ai-memory-cli/src/config.rs:1358-1364`,
+  with the variable read at `:573`; v2.3.2, the macOS pin, at `353841d9`:
+  `:1137-1143` and `:462`).
+  - **Without the flag or the variable**, a `config.toml` `data_dir` decides
+    (v2.4.1 `:1316`). Otherwise ai-memory's own default applies,
+    `dirs::data_local_dir()/ai-memory` (v2.4.1 `:2248-2252`, v2.3.2
+    `:1970-1974`).
+    - On Linux that is an absolute `$XDG_DATA_HOME`, else `~/.local/share`
+      (dirs 5.0.1 `src/lin.rs:11-12`).
+    - On macOS it is `~/Library/Application Support` (`src/mac.rs:7`, `:13`).
+  - **The row's `path_template`** is this stack's path,
+    `$HOME/.local/share/ai-memory`, which the settings template's hooks pass
+    as `--data-dir`. `scripts/credential_status.py` records it in
+    `OVERRIDE_DEFAULTS`. The `XDG_DATA_HOME`, macOS and `config.toml` moves
+    are not modelled.
+  - **An empty or blank value is not unset for ai-memory.**
+    - figment's Env provider keeps it (figment 0.10.19, the version
+      ai-memory's `Cargo.lock` pins at all three tags,
+      `src/providers/env.rs:504-519`; merged at v2.4.1 `config.rs:1318`).
+    - The trimming `env_string` branch (`:2086-2095`, used at `:1360-1364`)
+      does not replace it, and `canonicalise_or_keep` keeps `""`
+      (`:2254-2266`).
+    - So a run without the flag puts the data directory, token files
+      included, in its working directory. Measured with ai-memory 3.1.0
+      `init`, keyless, in a throwaway HOME, PR #1240 fold 6.
+  - **The checker** warns `store_path_overridden` for any set value other than
+    the default, empty and blank included.
+  - **The canary proof** refuses at prepare, with
+    `override_variable_not_absolute`, an empty, blank or relative value. For
+    an absolute value it also excludes the row's file, as written, as a key
+    path. No scan root moves.
+  - **Exclusions match on canonical forms on both sides** (fold 7; this
+    covers every exclusion, not only these rows):
+    - `scan_sink` builds these forms at each scan, against the live
+      filesystem (`canary_proof.py` `exclusions`); prepare only records a
+      digest of the list and stores no form that a scan reads. Beside each
+      literal exact exclusion it adds `realpath(dirname) + "/" + basename`,
+      and beside each glob exclusion's directory the realpath of the whole
+      directory (fold 8: the worker compares that directory with the fully
+      resolved parent of a matched name). The final component of an exact
+      rule is never resolved, so a symlink planted at a token name excludes
+      only itself.
+    - Residual, kept by the ruling (fold 8): a symlink at an excluded token
+      name keys only the link. If its target is an ordinary file inside a
+      covered root, that file is walked and scanned as itself; fold 6 had
+      excluded the resolved target. A target outside every root makes the
+      sink incomplete (`link_out`). A symlink to a directory at that name
+      leaves the directory walked, which is the ruling's purpose.
+    - The scan worker takes each walked root's canonical path from the
+      directory descriptor it opened (`/proc/self/fd/<fd>`; a file root uses
+      its parent's descriptor). It excludes an entry when either its literal
+      spelling or `canonical_root + "/" + rel` matches, and for a glob rule,
+      its parent either way. When the kernel gives no path for an opened
+      root's descriptor, the walk ends as `walk_error` and the sink is
+      incomplete (fold 8), never matched on the literal spelling alone; a
+      missing `/proc` fails closed earlier, at the scope check.
+    - The proof runs on Linux only (`canary_proof.py` `platform_check`,
+      called from prepare and scan). The ruling's macOS `F_GETPATH` branch is
+      not implemented: no macOS run is possible, and lifting that platform
+      gate needs the branch first.
+    - The same code serves `dir`, `glob`, `file`, `git` and `tasks` roots.
+      The tests exercise `dir`, `glob` and `file` roots through the worker's
+      own walk, and the ST9 end-to-end tests run only under a reviewed
+      ripgrep (14.1.0 or 15.2.0). The `git` and `tasks` roots are served and
+      untested.
+  - **The runner** leaves the variable in a child's environment.
+
+The settings template's hooks pass `--data-dir` with the default. Other
+documented ai-memory runs do not, so the canary exclusions cover the value
+exported to the proof itself instead of relying on the flag. A value exported
+only in the writer's shell is not caught: binding it at prepare is a recorded
+follow-up.
+
+### Fold 9 (2026-10-17): descriptor-path provenance (NC-1240-1)
+
+The canonical-exclusion mechanism above uses the kernel's descriptor path,
+including its ambiguous deletion suffix. This closes the missing provenance
+in `tools/credentials/canary_scan_worker.py:418-427` at `ac01e51b`; the
+ai-memory configuration sources establish data-directory resolution only.
+
+- The host reports `6.18.54.1-microsoft-standard-WSL2` from `uname -r`.
+  The supplied read-only Git checkout resolves
+  **microsoft/WSL2-Linux-Kernel@linux-msft-wsl-6.18.54.1 (d504d40a)**,
+  full commit `d504d40ab83839cb61942a812a99d183c42227b9`.
+  [`fs/proc/fd.c:174-189,211-214`](https://github.com/microsoft/WSL2-Linux-Kernel/blob/d504d40ab83839cb61942a812a99d183c42227b9/fs/proc/fd.c#L174)
+  binds descriptor links to the open file's path and the proc link operations;
+  [`fs/proc/base.c:1823,1838-1854`](https://github.com/microsoft/WSL2-Linux-Kernel/blob/d504d40ab83839cb61942a812a99d183c42227b9/fs/proc/base.c#L1823)
+  passes that path through `d_path` for `readlink`.
+  **microsoft/WSL2-Linux-Kernel@linux-msft-wsl-6.18.54.1 (d504d40a):fs/d_path.c:255-256**
+  explicitly calls the appended ` (deleted)` ambiguous;
+  [`fs/d_path.c:287-288`](https://github.com/microsoft/WSL2-Linux-Kernel/blob/d504d40ab83839cb61942a812a99d183c42227b9/fs/d_path.c#L287)
+  appends it for an unlinked dentry. `fs/d_path.c:318-325` also shows
+  `simple_dname` prepending that suffix at line 322.
+- The supplied man-pages Git checkout resolves
+  **kernel.org/pub/scm/docs/man-pages/man-pages@man-pages-6.19 (adb436b2)**,
+  full commit `adb436b2e4471218021d86f188fb58dec3946eb8`.
+  [`man/man5/proc_pid_fd.5:13-23`](https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git/tree/man/man5/proc_pid_fd.5?h=man-pages-6.19#n13)
+  documents descriptor entries as symbolic links to the actual file and
+  reading links with `readlink`. That page does **not** document the deletion
+  suffix at this release. The exact suffix documentation is
+  **kernel.org/pub/scm/docs/man-pages/man-pages@man-pages-6.19 (adb436b2):man/man5/proc_pid_exe.5:23-25**
+  for executable links and `man/man5/proc_pid_maps.5:151-153` for mappings,
+  which also states the ambiguity. These pages describe those interfaces;
+  the pinned kernel call chain above establishes descriptor-link behavior.
+
+`fd_path` already refuses every target ending in ` (deleted)` by returning
+`None`. It cannot distinguish an unlinked entry from a live file or directory
+whose actual name ends in that suffix, and it rejects both. It never strips
+the suffix or attempts to validate it with another path lookup. Its production
+callers use directory descriptors: a suffixed directory root, or a suffixed
+parent of a file root, therefore ends the walk as `walk_error` and makes the
+sink incomplete. A file root's own basename is joined to its accepted parent's
+path separately and preserved verbatim; a live file whose basename alone ends
+in the suffix is scanned under that full name. This is the existing fail-closed
+policy, with a conservative refusal for ambiguous directory-descriptor paths.
+
+Fold 9 changes the worker comments, this decision addendum and their two
+existing evidence rows. The PR description is carried on the PR.
+No executable behavior or test changes are needed. The existing
+`tests/test_canary_proof.py:967-997` checks missing canonical paths for both root
+forms and the real, removed and non-path descriptor cases. Its rerun is
+synthetic local verification; the kernel and manual citations are
+`source_review`, not an executed full proof or a new platform qualification.
+
+Verification recorded for Fold 9 (CI virtual environment on `PATH`;
+manifest counts below describe the final `f2462c37` head):
+
+- `python3 -m unittest tests.test_canary_proof.UnitTests.test_ai_memory_root_without_a_canonical_path_is_incomplete`:
+  exit 0, one existing test passed.
+- Comparing the worker's parsed AST with `ac01e51b` after removing docstrings:
+  exit 0, executable ASTs identical. No test file changed, so the verdict's
+  conditional fail-first requirement does not apply.
+- `git diff --exit-code` against each supplied upstream tag for all cited
+  kernel and man-page files: exit 0 for both repositories.
+- `python3 scripts/validate.py`: exit 0, 12,307 hashed files, 71 components,
+  four profiles and 243 manifest receipts. This checks integrity and scope.
+- `python3 scripts/evidence_manifest.py --check`: exit 0, 12,307 file rows.
+- `python3 scripts/host_receipts.py validate`: exit 0, 183 host receipts.
+
+Resolution boundary: `catalogs/landscape/foundation.json` still records the
+`secrets-credentials` verdict, with wave
+`catalogs/sota-convergence/layer-verdicts-20260922.json` indexed by
+`catalogs/sota-convergence/layer-verdict-waves.json`. The latest covering ledger
+row is `landscape-sweep-20260929` in `catalogs/saturation/ledger.json`, with
+`catalogs/sota-convergence/manifest-20260929.json` and retained
+`evidence/artifacts/landscape-sweep-20260929/returns.json`. Its Betterleaks,
+Noseyparker and ggshield survivor rows, earlier unresolved adjudications and
+the layer's existing gaps retain their status. The bounded action here is
+NC-1240-1's missing descriptor-path provenance; no candidate comparison or
+default selection is reopened.
+
+### Fold 10 (2026-10-17): final-head counts and scope (R-1240-1, R-1240-2)
+
+The sealed verdict at `f2462c3717fb30786d93ba433dda610129426a20`
+requires two corrections to Fold 9's record:
+
+- **R-1240-1 (P2), fixed:** the final-head checks above report 12,307 hashed
+  files and file rows. The 12,308 result belonged to the intermediate builder
+  tree that still included a PR-body file and its evidence row.
+- **R-1240-2 (P3), fixed:** Fold 9 consists of worker comments, this decision
+  addendum and their two existing evidence rows. The PR description is carried
+  on the PR. This correction fold changes the decision and refreshes its
+  existing evidence row; the corrected PR description is supplied separately.
+
+The deciding repository source is **native-agent-stack at
+f2462c3717fb30786d93ba433dda610129426a20**:
+`manifests/evidence.json:5012` begins the 12,307-entry `files` array, and
+`:18565` and `:65870` identify the decision and worker rows. Comparing that
+array with `ac01e51b4293b1bd6aa15e01f2611d5de5610a39` shows exactly those
+two changed file rows and no PR-body row. This is `source_review` evidence.
+
+**NC-1240-1** remains closed by Fold 9's pinned kernel and manual citations.
+**R-1240-3** remains refuted: those citations already give repository, tag,
+full commit, source path, line and URL. **F3** remains a recorded nonblocking
+follow-up: the earlier outside-root `link_out` claim does not account for the
+worker returning on an excluded entry before following its link. This fold
+does not close F3.
+
+No worker statement or test changes. Both corrections are documentation-only,
+so the verdict's conditional requirement for a new failing regression does
+not apply.
