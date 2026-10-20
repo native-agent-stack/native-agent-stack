@@ -1057,7 +1057,10 @@ REMOVED_REFS_LABEL = ("candidates[].evidence_refs[] and registered_receipts[] na
 STRIPPED_REF_FIELDS_LABEL = ("referenced evidence JSON: closed-vocabulary or pinned choice values under decision, "
                              "current_choice, selection, disposition, review_status and default_decision; "
                              "earlier-verdict fields and adoption verdict/status labels; reviewed choice spans "
-                             "in JSON and text, including one-level source twins (not measured/review outcomes)")
+                             "and membership-table cells in content-identified JSON/text, including one-level "
+                             "source twins (not measured/review outcomes); withheld reference routes are "
+                             "operator-only, source hashes do not authenticate rewritten views; evidence "
+                             "volume and candidates[].adopted remain possible prior-choice signals")
 
 
 def removed_reference(reference) -> bool:

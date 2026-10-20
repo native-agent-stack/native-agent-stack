@@ -1,0 +1,1335 @@
+{
+  "schema_version": 1,
+  "data": [
+    {
+      "path": "adoption/lifecycle.md",
+      "sha256": "3a731d4297be7c90f47f993142b67457f8115e9ad3b7308d1b20d653b03ece1d",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "adoption/lifecycle.md",
+      "sha256": "a9b8e8f0da626fa2e1bfc666fe40cbafd058fd572810c1f186172b7d2ca9194e",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "adoption/lifecycle.md",
+      "sha256": "791c26c4c5bb26472cb762618e1fdf578830b02e6b1bf14a70239d7cd017939d",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "adoption/research.json",
+      "sha256": "5bdc5283a0293f003fb8c218b6a3688fc9128b827ad63b2cabed0f4225fd26ac",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/README.md",
+      "sha256": "170f18cc4abe1f700bce02e9b97e12e9058360b0eed0eed40f984b269ddff26a",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
+      "sha256": "7478c357f6f49861ad2486ee8c69de993706f2eff531dca077f9d34d8a6a3bee",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/experiment.json",
+      "sha256": "64ff53579bb68d50c753fd0fda5d77cc1089e74002f518a1c32988e4db5e2aae",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/memory-oracle.json",
+      "sha256": "df4e3e93b3c13375cd6d256a3c0c468384e7c9a7fe345f485c586b198a915313",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json",
+      "sha256": "cdd6f8579350c7fa296a24eb3cc4df2ab5bc82e0a6cad57568a8ac9d0b64ddbf",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/write_receipts.py",
+      "sha256": "9dcc3b4a5eac6a89a8ba8c2ff805fa3f864c26a3cbdec35aa39cf31e22cf5f6f",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/memory-lifecycle-probe/README.md",
+      "sha256": "6a16a81293750e7367167d13014fd8cd15b2eb98e8412ef501d9e50963cffa4e",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "blueprints/native-skill-practice/native-receipt.json",
+      "sha256": "12de2ebc412f308d2fe7ea35d5dd0704a41ade2d56bc3aca568545b4646f5d20",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/README-mover.md",
+      "sha256": "2e6894a12a5228c90e85593f54cd117596ead1b098410d2a229ecab8059ca27a",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/mover_runner.py",
+      "sha256": "e4bbf80c0480f08963d04c5972167a3e2cc1024080dd1d82be3929414b75530b",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/README.md",
+      "sha256": "8387b983c55af50bfc65d057764ae0449f32f37cf211f7d8c08cb4fb9ad1a952",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/runner.py",
+      "sha256": "3348f8cc638a5277f9e95982a9ea1722c6706c76d25f63d4947f89cafb691193",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/selector.py",
+      "sha256": "a4f27ff990d2f66af80d070fe4e2caccd69e7da17eacc2025de995ddc2225aa2",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/selector.py",
+      "sha256": "326f2a18fe19538c18b6cf5fbfb9891852dde44820180dcb519ed6e5f1209579",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/selector.py",
+      "sha256": "6a2ebedfe8cbbb66dec6142906dc16116117618f0b723b4cab5686c18c3c2ff8",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/selector.py",
+      "sha256": "2980d0a29c9b27e4ee38de73d734e8902f7cbea6683d01142eaf5fd82da5437e",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/selector.py",
+      "sha256": "5bf538541a4d0744805161824bbd194f237e35e65c91d7086052077f0b4f8144",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/selector.py",
+      "sha256": "b8b930b6fed0a443a0e93c225893d82404d3cc8f245420a73875ae57f39c1ef2",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/selector.py",
+      "sha256": "100048112ecb2104506aa56b98dff7cafd5353e8cc6be00b2f773678b6e4b895",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/selector.py",
+      "sha256": "0fcf2c86c4df50888ebe1c61ba5dc941477eebcbc7460e9ab8c83031ce473835",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/selector.py",
+      "sha256": "47e0478452c59df09d53c2ea11c9bb25e949e3cf8277f6e9f27e8862b463adee",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/selector.py",
+      "sha256": "267a0779c3ca0c69afb693b32e662152f65028f611f114e22321d48bfc96338f",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/strategies.py",
+      "sha256": "7ab894235d48a79e0854ee6ec1ee52004fa2bd8fd111bd89ca7e84b08f68ca70",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/strategies_v1.py",
+      "sha256": "ad5217495e56fa5d57af8788db24ed2bda9e16e1efc827b8e610057d7ade227b",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/series-20261002/README.md",
+      "sha256": "9a436f1961c6a036bec3e34467662036155bf908a79b71e2e9f763c917705686",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/broad-universe/README.md",
+      "sha256": "abe8f9bb66ea8891750b525c7d380a524f1aefecb8de9d750459cb9b56bdf0e0",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-experiment/protocol.json",
+      "sha256": "24269a8af6be22644647c4988a71b0c01ff67a1d511dde593cd248624f6739f3",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/engine/resolution-receipt.json",
+      "sha256": "a38514a6504b02a59957ecfaeaf2b18a49e68f0361c4b730eb98c42e469f8d7e",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/engine/resolution-receipt.json",
+      "sha256": "2f0b21ce3287aeb092369345ce0733ec2b036a4e36fced240b0ef35b039df65f",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/execution-realism/run.py",
+      "sha256": "9ed3c6b777c887e95896687642e670a1e946108419f5dbf83986936acc3b5708",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/historical-simulation/plan.json",
+      "sha256": "e4cb70ea9070ee9220f8d28a51ff6317492c39b06ad697db9e776af1043f10dd",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/historical-simulation/receipt.json",
+      "sha256": "7017e9072c8e4ad8bf23a9a76b9b5e02fad9ad8017a72ad9f5d131f424bee194",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/historical-simulation/run.py",
+      "sha256": "e6fd492136431829a9c53dde3d49c00eb453c6f4bd89fa24bc722187712eaa09",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "blueprints/us-equities/hosting/README.md",
+      "sha256": "7e6fad617204864bb1f3fc13bcf5c101c8bd086aef73b427ac67169da9592dff",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/identity-readiness/native-receipt.json",
+      "sha256": "df02fe184104d120f022dcc9defd48bba9d53f2c6027bf1597b42a63cf109faf",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/memory-lifecycle/receipt.json",
+      "sha256": "8d0a8988fa9d776292e4f50c6e6cfab870094a84941429c44d02cc0d24f22bb6",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/order-contract/receipt.json",
+      "sha256": "a510b4ab244a077bac0eb5514bbcf4380fc58021111adf0598693460daf86d13",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/params.json",
+      "sha256": "c5c79cf1f75baa424b588c31759fc273e049f059e7c7bb58a48228b5730b471b",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/receipt.json",
+      "sha256": "3287401eb04c4715137de0e44f75567147b271aa16c071fbebb9d7ebcd411079",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/research-evaluation/receipt.json",
+      "sha256": "2bb74d8e54b26dcb2d9b2979ba12deeaa9f47bc00ecc3a1360cc7da2270eb4a0",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "blueprints/us-equities/workers/policy.md",
+      "sha256": "c5a33a271a9d625c6a049df9a4e7ac0bc5010e525045f5eb4de37657f1a8253f",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "catalogs/foundation/community-practice-20260920.json",
+      "sha256": "c05bb33df6d09f978ed971acac6a034ac373169f5838944077074b094f34b5cf",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "55aa6eaac14fb7dd687ee88672892187fe387c98d66bb06ab33dcd109b852888",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "708127c81fd2569b412a6ab83496ccafe9960ecc855359cbd09183c8d384e394",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "eb970150de3344ef1b40a35cad1aeea70b42e2885fd2cd17de9c98e6d26899cb",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "catalogs/landscape/native-practice.json",
+      "sha256": "e246cef20151f408f435c5b2777b74ecd33a7c55bc3cd1c342a1b1d191afb902",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "catalogs/us-equities/foundation-memory.json",
+      "sha256": "70b2c2f8236cf3e0640c3ebc32f452dc556f582d90a284306539f14b31f1f990",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "catalogs/us-equities/hosting-source-review.json",
+      "sha256": "6e17f6f7ffd757b4fb032abc81c25f139ab2b8e360501fe332ebbb5f224971e9",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "docs/blind-catalog-source-adjudication-20260921.md",
+      "sha256": "23d57d164337597851861ffad1d15b1d4901811f7fc14b166327f359a01d6c05",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "docs/catalog-provenance.md",
+      "sha256": "22566e718fd3e834f843befcb9f150482b11b0170393c5aa65e713306379c024",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "docs/dashboard-gap-resolution.md",
+      "sha256": "4da06fd8ad4b5fcc7392d4e3dd0cc8985c28c9deb0f622f590abba3556a2accb",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
+      "sha256": "247f2462fa49472d43fea58bb15d7d8c0206b717fb5bf0189cf09106022ae8e7",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "docs/full-stack-convergence.md",
+      "sha256": "cd0ccafcf6b6198e10c002b2905e82d9ba4b14d5048dfee66296046a4103df2a",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "docs/github-automation.md",
+      "sha256": "378e83c99af59cb45017607a0f1dfe18b6f1165f76af8a5c06dc93d49454067b",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "docs/github-automation.md",
+      "sha256": "67777ecae631a451a9724bdc3a5048f5bb4f81f4b01644052190a3f8a59b3fe0",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "docs/github-automation.md",
+      "sha256": "9c8ce224fab53dbc8085c18e317ef05f5c03d4d31b90677e42fcff2ae0bdd4c2",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "docs/github-automation.md",
+      "sha256": "7532747d742a8e20124e6b9e228fc64c09a7a0b731515fe35978e9ff5ea69cc5",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "docs/github-automation.md",
+      "sha256": "9dff2b4b21213aeae41435540ea9e6677013f96deca188258efeb15fbb79236a",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "docs/token-native-saturation.md",
+      "sha256": "2e33910e593782e8b5fa2b1ea7cb01a4765a33f853c2c6e4d76f73d554f3a14e",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "docs/token-practice.md",
+      "sha256": "1f1701365ae73269260a340807495a58525bd91edc93d95438bc059f029170f2",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "docs/token-practice.md",
+      "sha256": "282036755882447df5d2da60f37384a966bf6be6009bbb7a86abf82c865182b5",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "docs/token-practice.md",
+      "sha256": "c81440cf3939a4ae559c3dd57a2824a61aefaa1a1f4c71a69d41ace1ed64526c",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md",
+      "sha256": "4773a704eb3f95b2f054f81f20053389108157335c93d5b7d5241907d5ae0481",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/native-review.json",
+      "sha256": "53904386c39a06292949b6a551b1e006dee44158103c5a7102b58760c8cf2dbc",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/native-review.json",
+      "sha256": "39922bc9fb0b0969accbcc1307748172b7fe7fa4621e672f42d8fd4634908a7c",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/provenance.json",
+      "sha256": "6979c05f368c72cedf60e940eff899b35c816beed637d1fb0a20d5232aad4a61",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/acceptance.json",
+      "sha256": "8218ddfb1ef7fbc17e4d4a09a69d6c0c22f6b426e88470c782321d121d720cd2",
+      "reason": "Numeric summary key; the associated value is a count, not candidate membership."
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/qualification-record.json",
+      "sha256": "98a6d9b7e85380d4719cffbd3e0d25743679639e62c8039cf57009f10c11b6b4",
+      "reason": "Historical pin applicability or negative scope boundary; no affirmative candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/decision-records-20261008/index.json",
+      "sha256": "ca597d6b53ba96e5793b47d96c811cf0d076a93a30ab8349b9622c3e171d89ec",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json",
+      "sha256": "3671afe4761bd5bce91ede8dd363ccac2c4a269d0d2acb7985c27b9d9cab032f",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/validation-attempts.json",
+      "sha256": "a88ca82f61112c66628ce8a9256c25c319687d026d264f15796bfe98fb803403",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/verification.json",
+      "sha256": "98cfb6253f85392fda6d11fae5fc13a38e5854fdad99431a3260717588729f80",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/dashboard-results.json",
+      "sha256": "18e79781a62a802da7c7356a363e2cd6f70b7dd67e2747823981395c96bfe0e5",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/16-non-adopted-candidate-comparison.json",
+      "sha256": "f4f201eefa9a8881c364fe14a58483167dac7022db753ce0e63e7b87ecfb7c1c",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/6-openbao-secret-lifecycle.json",
+      "sha256": "b9f6a6ca12086cd6c0119ea1d921935ee8169444eb6084b5238adb799d3bb158",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/6-openbao-secret-lifecycle.json",
+      "sha256": "c2a9f451fd58f273b042087b0c0fd076205b1d7cb8657a5fb41a49baff7a9202",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/6-openbao-secret-lifecycle.json",
+      "sha256": "f73b5dbf395c1336b2dffed135f80d9e7b6ea5e0cbf42651505763ac0de82e7b",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/7-scanner-comparison.json",
+      "sha256": "9ba943ef4e56b204a6a3f2e26e4c4f0c035c8b1ccd097bcfdcde3bc9480fc8a1",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/raw/compare/osv-positive.json",
+      "sha256": "8d9ac492dc7b245bc94b28870c0ca3665c4ced855aef6186571a631a7842cf88",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/raw/compare/pip-audit-positive.json",
+      "sha256": "3d52e6172a2f027327ba205b912ff0e297b159218bdbc438d249bbcd073df00b",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/raw/compare/trivy-positive.json",
+      "sha256": "d80c5669a51dce153ba065ff9fbf1619211d34004065e5c14f3b63093eaf2ca4",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/raw/gitleaks/allrefs-repo-config-2mb.json",
+      "sha256": "9e7548730c37c3abd34c167bed77c9fd4e4e58c4639cda532c06501a9cd25d13",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/raw/grype-sdk/positive.grype.json",
+      "sha256": "d80c5669a51dce153ba065ff9fbf1619211d34004065e5c14f3b63093eaf2ca4",
+      "reason": "Measured experiment, strategy state, review result or native API procedure; not a catalog winner."
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/pyproject.toml",
+      "sha256": "df87030e98130c69fe9c19142fb35ce271e8360884c848fa8eb130c9565bd4af",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/role-packet-20260930.json",
+      "sha256": "e6351001d1216ada5033f2b3c36cf1ca1230cea13a26caca44df88f01722e199",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/claude-trial.json",
+      "sha256": "6e082f221889639d4d3849f5adb5cc6cc169cc67b73b48fc0006264cdcd5f487",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/source-suites.json",
+      "sha256": "ef4d7a9d01bfbb23bf20ac2071fa08995f518f5f8b22d1b81959787dfddaf5d5",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "f77937af5a374d14c9454d521f67125feb61ad089a104fdd828646a13738d1a7",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "dcc6e7b794b7b6ef1becaee30ebd47c4df29224ca9791955cf3c0e542be22b8a",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "b4dc4d74283692d7baac099c8f76bfefa248d97e2e77ef17813a24262036623c",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "e187df24692f5c7ce42e4cb5b2faf76580dddb40478ffabc19f9c8295ab4d98a",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "31936cee5098dd41b6acece3b289228281a726528625152a6277d4028cf21177",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "e7370935a73dbb159d23f4c5582b977e59f02ed3ad19a59162f063442d43497f",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "a1ed519a1c798d9fefd858b89b4d56030bd323759c01c55e6e2e2b7ee65d9c20",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "eef67f072ababf65f135d16e30cf0d2c196504455d774791b9e30f1db8fd1252",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "sha256": "763f11b99537b1ec0e3b42f4805c632bdf162fbfb77f98314813e586e496e1c6",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "e5b407f1e073e55796fa6b3ff0533b8d21d98da7929a10f7ed2f68dab509e335",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "c1463849b91ab816e494beedbfd9767786ce762569c0314ee478eee1c23881e2",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "b291e42fc7cc7afb63ca21ae19980885de0de3cca3c05622c56f0515aa6fcde8",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "ce36ca98ff711f63679bae2d9ca69b46aa5b24c0e48ab8f9027f4ec2355705c8",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "85899c7997209bdd348b9e066db7626eafa7e12e7d03a1a7da040388e260cc5a",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "e7370935a73dbb159d23f4c5582b977e59f02ed3ad19a59162f063442d43497f",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "e187df24692f5c7ce42e4cb5b2faf76580dddb40478ffabc19f9c8295ab4d98a",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "dcc6e7b794b7b6ef1becaee30ebd47c4df29224ca9791955cf3c0e542be22b8a",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json",
+      "sha256": "31936cee5098dd41b6acece3b289228281a726528625152a6277d4028cf21177",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/fixes.json",
+      "sha256": "a2c6ff247d278658e20bfed57e8072057d0acd0750ff3822cd33c848679e6e79",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/fixes.json",
+      "sha256": "fd5171f78e22d1e63b34c471ea1679bb499fc0bcd55cd2229e52c0c8326f519c",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/slots.json",
+      "sha256": "a2c6ff247d278658e20bfed57e8072057d0acd0750ff3822cd33c848679e6e79",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/slots.json",
+      "sha256": "fd5171f78e22d1e63b34c471ea1679bb499fc0bcd55cd2229e52c0c8326f519c",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "sha256": "be3b2b10de81e8305c6553d133ef62401178ad32c811cb5cb350685e714bfcb3",
+      "reason": "Historical pin applicability or negative scope boundary; no affirmative candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/pre-dispatch-default-skill.md",
+      "sha256": "fce91648ff7ea4bd214709a639b9e2edb48b112433e1cf25874ea5239cd63ba3",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-dispatcher.md",
+      "sha256": "33f8bad853549da106637ac4ec18111b89df21f39281bd0ba59f0627398860e0",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-test_worker.py.txt",
+      "sha256": "f6c8d97f9025c52ea9bda5e37489e45780fa3d50bf2bd97bfd67c82ce48c87d3",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-worker.py.txt",
+      "sha256": "ea9fc41d50d8db6b230857d9c873df475c7de9d6ef95916b96d265df3b9891c9",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-worker.py.txt",
+      "sha256": "497c0f69b996b55674e3fed84e546a70a8421db5136ef89ad3d6722705272001",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-test_worker.py.source.txt",
+      "sha256": "f6c8d97f9025c52ea9bda5e37489e45780fa3d50bf2bd97bfd67c82ce48c87d3",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-worker.py.source.txt",
+      "sha256": "ea9fc41d50d8db6b230857d9c873df475c7de9d6ef95916b96d265df3b9891c9",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-worker.py.source.txt",
+      "sha256": "c8dcad4e79a6432197a34f0baebd77b97e5ebc146a70b20a28122fe0cc13421b",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-worker.py.source.txt",
+      "sha256": "722b79918960c043501ef8d9e5aa804ced7e87ed5416cdb231a274c55dc978e5",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-claude-worker.py.source.txt",
+      "sha256": "1abd8885bf8622429a73e244cc9c8e58358ef577d20521acae02c4317ba0bd56",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-claude-worker.py.source.txt",
+      "sha256": "2debccc5a19998f67dc05eb19f199747907848a8e420f1384fed38d288a41191",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-codex-worker.py.source.txt",
+      "sha256": "ea9fc41d50d8db6b230857d9c873df475c7de9d6ef95916b96d265df3b9891c9",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-codex-worker.py.source.txt",
+      "sha256": "c8dcad4e79a6432197a34f0baebd77b97e5ebc146a70b20a28122fe0cc13421b",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-codex-worker.py.source.txt",
+      "sha256": "e87c164776017d3500e6ff229c5b98d7829f4b4133691d13797b7445fa66ac03",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b2-worker.py.source.txt",
+      "sha256": "ea9fc41d50d8db6b230857d9c873df475c7de9d6ef95916b96d265df3b9891c9",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b2-worker.py.source.txt",
+      "sha256": "c8dcad4e79a6432197a34f0baebd77b97e5ebc146a70b20a28122fe0cc13421b",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b2-worker.py.source.txt",
+      "sha256": "1e0bc2a0f20194ab3c3196de9b0990b6e165463afa588840097248d26d21e2c5",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b3-claude-worker.py.source.txt",
+      "sha256": "3935e2a691d1da2a50ff1bb8941871331ce18d41e72f649c3583b3a307ef726e",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b3-claude-worker.py.source.txt",
+      "sha256": "94ceeb584432d6a8cdfd53b00a0abc09f205ef3d559ea06a2fca0de6c60f56d2",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/checks.json.source.txt",
+      "sha256": "dcf629fa984168811dadfcc1ffdd71dd853f0c4ff13a30410625c1095547fdb8",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-enhancements-experiment.json.source.txt",
+      "sha256": "6a5bc9e18044cf3434e9747ae328e2b1490b3caf0a5996b141fe04056931ba6f",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-workers-experiment.json.source.txt",
+      "sha256": "a10d9c60ffa9363f61c0ef5534d399003e9222a8985023c99bec86d9622c4e3f",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/test_worker.py.source.txt",
+      "sha256": "f6c8d97f9025c52ea9bda5e37489e45780fa3d50bf2bd97bfd67c82ce48c87d3",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/worker.py.source.txt",
+      "sha256": "ea9fc41d50d8db6b230857d9c873df475c7de9d6ef95916b96d265df3b9891c9",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/worker.py.source.txt",
+      "sha256": "42fc5b8a3362f4a80236886f1edef4cf204424f4827f1fc10c59c5072ea69aef",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/worker.py.source.txt",
+      "sha256": "fe10e0affa0b6b21defb4e0eac74acf7dace7dac49dfd176bf685136dd9a25da",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/02-bootstrap-rootmapped.log",
+      "sha256": "0989d032d5c55587b26573a8f75f58570c276dbb396addb3e6245ab5e6a49a67",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/receipt.json",
+      "sha256": "aecb0131d347cf32ca4766696251d6daed2164fdfdd6ffd8ccfb4f2d9a975859",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "c36308329e80af4ed5350fa36a799ec5b9b918a529165adcd4412691e91352d2",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "25786427de0e94bff97870bc390615207ae892447dc669f9bbfcfafc4075b05e",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "8e5f28b270ee5d1bb85dee2e522d7a305572e8372ca9f68dae13565c2b91db40",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "818de85f655ed2bbfca9fffd0bf56597ff67d9f94a18e0f4730b249e71f92bf8",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "4dc978cb1d2d4e1fcb0184fce57f15c5a0f43089853e5abfaacb0592fcc916d8",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "ae53abdc75436f4718d7bf759df54949e3c0912d6f9659b7c80715cca11db956",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "1ac08c73a0eb650a7f126d9bf4caa405a21dc7ebde2c6e2c6d2498f72d5ae853",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "9861a8053c3bf2cacf2582df196815d09744b5e247eb4ecc5a1803e2122aeaa6",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "07e750a75511ecce4eea41e2f2868b6aee7c148585b48c6ca93b2d6ec6c3d2bf",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "3302f4ceea1c5111b9cd9cd575a2792fab5b54bae89c847f5b26add3ea49b237",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "f3878a3d0b4cf9b4939eec4b9573583203da2541700ffad270f8d7b1d373f12d",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "592137552cb108c5dd7e7beaf985df8534a3c008b4ea658948da4dec16520a7d",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "20d63b9809e1e9e48a48a93689f4780548e025cd8663e728f7d4999a3df25f14",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "4f0d2a96d71da424998c4281fe7b670a4b0b2105ce7d927d8297f6543bd77c11",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "e8256845e457d9a3b8b2e1e68992f64149f06b714e93ac6f3c782d0bf963196b",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "27c7ac5bf47c138178b8117f68381025b28681dc8ffbe5d0668495d95a96e9b1",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "8aeb38bcbe04484fc0528b81cd652c7ed4065f28091c45d3d136020ea015bb8a",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "667fc8247640587c1ef735a43fcb54acfe9702181c8428f8dfafbcab0ede4259",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "caecbddbc68fb85bb4f01c692bcbc8b138eaa1ece0373a8fa7f0d1886ae679ac",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "7e6f9d2d7ea41e15dd52f5d6ff41dfbdef1f9037eaec88245ebd8b55efe2dc0d",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "9b1eb3f2e3f90fd75c635f86e970e8fca590989f0a49da24489192db2f09cf1b",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "f53aeec752a19788a89a1f7ff541183a755189148a051127ee4203bac8d66ce5",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "b2b22326a1a5047e570c6654fb677aa0589bda23f762f2e3d3645b11d33e78ae",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "ae0c651fe9276bcb16d3bcdd6f5951513054663cf38a181676f7e379b868c2ec",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "f3088660ef8074696e0e6e4ec6c4303c0b360025e7ac6ab6bf115d6527c11854",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "a9923fea3a2295c14619554de8c35c7671aa57f023b8a122aed72d9b20e6d0d2",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "f99cc0ba2efaefe4839b7988a4345c40d6385794ccaf1a5e05c401588a1328bf",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "c066cac12bb2cec8ac15fecc5d637f46b5611a4a9d82dc6a3eba6a7f13eb309d",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "a7fd9921fcb4d8e8875578812cb52eba49360bb0982f4940591725e38bcdcf9d",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "efd36bf8536db015ddc9950834e997e17e64a7e10faf67be4c02520829034644",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "7db233cd14b4163f3867f25f29e5fe8aa54255999bc53490b5e4026496cdcb07",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "ebad4fe49307ba0e1273f198a91164cee3d608e7ababf17dae73d07e23140ed2",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "a132519aa4b2743814f63ebc6ce4740fe46f94432d43d4ca456f2dea09f4461f",
+      "reason": "Recorded source-review finding and capability comparison, not a promotion or adopted verdict."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json",
+      "sha256": "3f8575b60fb58cc4f94c1b93bed84f2f00401119c3680002e8454638897e9498",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json",
+      "sha256": "6b7f6349505dd3bde063a356c8d1540d9c3935af6352b32f1b6e9316fc48ece7",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results.json",
+      "sha256": "cfeaaa25271adf0c590aa5420ec8ae2a7125d806eabcd195b05d5fca13a378bb",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results.json",
+      "sha256": "5c9c0b58dcf5c059b4373d2a48281f385e436d055d201f06cceafe817af6677d",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "sha256": "ce5fe07a75712bcb6f2d8400ae730ce0341196440288e24a7c85aa67df3c44e9",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "sha256": "0417540ed0ae2160678b3fa52040fbe82d30caa61163e2ccdbc78bd3c1477074",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "sha256": "c5ac1f3f23112bead0a8ca1e8f23779fe77b0c6c656ab6107959ce21feecc69b",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "sha256": "3ea170f1ef27669b7443cdb5928de57bca679020453bf2b843919bba72f3e6c9",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "sha256": "bf9832d8a3b59aff98fad37976ebe26d23c3983494f9828080b0616da741b0ee",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "sha256": "ab9f536d3ad29d58ae8d81e68f87acadb4443236689ebcc9e2dc6bf3d2abb57d",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "sha256": "0b5d63f9e11b6c5a08c2100449c8203d0b2eec9f83bc8003a15acc1e405fb380",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "sha256": "5ba48706078b60b7411feb335587a93c0322d966dcfddeea86730f07c74ca757",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "sha256": "ce5fe07a75712bcb6f2d8400ae730ce0341196440288e24a7c85aa67df3c44e9",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "sha256": "0417540ed0ae2160678b3fa52040fbe82d30caa61163e2ccdbc78bd3c1477074",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "sha256": "66dc6fc8a3c829cd0365f95413bcc40d75c1671772bf629c27ece82ccc158617",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "sha256": "c5ac1f3f23112bead0a8ca1e8f23779fe77b0c6c656ab6107959ce21feecc69b",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "sha256": "a41b7e7a44dc694ca889f336ae4db4bf1f6dc93af797bd6ce7531b958f35b5dd",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "sha256": "3ea170f1ef27669b7443cdb5928de57bca679020453bf2b843919bba72f3e6c9",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "sha256": "5ba48706078b60b7411feb335587a93c0322d966dcfddeea86730f07c74ca757",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "sha256": "bf9832d8a3b59aff98fad37976ebe26d23c3983494f9828080b0616da741b0ee",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "sha256": "ab9f536d3ad29d58ae8d81e68f87acadb4443236689ebcc9e2dc6bf3d2abb57d",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "sha256": "66dc6fc8a3c829cd0365f95413bcc40d75c1671772bf629c27ece82ccc158617",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "sha256": "c5ac1f3f23112bead0a8ca1e8f23779fe77b0c6c656ab6107959ce21feecc69b",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "sha256": "a41b7e7a44dc694ca889f336ae4db4bf1f6dc93af797bd6ce7531b958f35b5dd",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "sha256": "0b5d63f9e11b6c5a08c2100449c8203d0b2eec9f83bc8003a15acc1e405fb380",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "sha256": "5ba48706078b60b7411feb335587a93c0322d966dcfddeea86730f07c74ca757",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "sha256": "ab9f536d3ad29d58ae8d81e68f87acadb4443236689ebcc9e2dc6bf3d2abb57d",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "sha256": "66dc6fc8a3c829cd0365f95413bcc40d75c1671772bf629c27ece82ccc158617",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "sha256": "c5ac1f3f23112bead0a8ca1e8f23779fe77b0c6c656ab6107959ce21feecc69b",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "sha256": "a41b7e7a44dc694ca889f336ae4db4bf1f6dc93af797bd6ce7531b958f35b5dd",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results.json",
+      "sha256": "5753b0c2834f32b565ce292bfd682059054db61a8ab57dca07edb3564f35d68c",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results.json",
+      "sha256": "3b88c27f94a4f5cbcea05eaa3c86628020c6ed988458a28bb1f458c54bf4bbf4",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results.json",
+      "sha256": "751d0404ec1864a6a657739a23198293d125605a384a8d8df007e750d13b718e",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/raw-outputs.json",
+      "sha256": "0417540ed0ae2160678b3fa52040fbe82d30caa61163e2ccdbc78bd3c1477074",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/raw-outputs.json",
+      "sha256": "c5ac1f3f23112bead0a8ca1e8f23779fe77b0c6c656ab6107959ce21feecc69b",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-vf.json",
+      "sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-vf.json",
+      "sha256": "0417540ed0ae2160678b3fa52040fbe82d30caa61163e2ccdbc78bd3c1477074",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-vf.json",
+      "sha256": "66dc6fc8a3c829cd0365f95413bcc40d75c1671772bf629c27ece82ccc158617",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-vs.json",
+      "sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/results.json",
+      "sha256": "514fe023a689bca2d5650be44407e4728fb4c55d3e728ca8835f8325b92b9a19",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/tavily-research-qualification-20260926/tavily_layer.sh",
+      "sha256": "c6a271ee55beae8ce749bd7a1bc31a9e488634ba0011491dcbfc21d6de19a335",
+      "reason": "Executable/native API behavior and algorithm state, not a catalog selection."
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/final-results.json",
+      "sha256": "41945ffc3fc76a40d2ce56c6ad5465c4f579bbb32f9b3c3d74d17b8337955793",
+      "reason": "Recorded implementation review and cancellation/descriptor behavior, not tool selection."
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/final-verification.json",
+      "sha256": "faf8271e7bb7090bded7098523950854c435e3ac01d670a7fd31394f64b4205c",
+      "reason": "Recorded implementation review and cancellation/descriptor behavior, not tool selection."
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/final-verification.json",
+      "sha256": "87917fe39c54ea1a698e6ec0c272462040077a4e9948dc0ba6a83ab32e877547",
+      "reason": "Recorded implementation review and cancellation/descriptor behavior, not tool selection."
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/postgpt-results.json",
+      "sha256": "2a2a7e4003f809f67ea59b4210b01b1d251ef83ca5de23d5264dd32e933261b3",
+      "reason": "Recorded implementation review and cancellation/descriptor behavior, not tool selection."
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/postgpt-results.json",
+      "sha256": "e5f707e214024995045d3f6d7489195307c625ac9545114c16baa5ad80031efa",
+      "reason": "Recorded implementation review and cancellation/descriptor behavior, not tool selection."
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/postgpt-results.json",
+      "sha256": "1dd3d8ff531d371a6a22bbcf3952b9c61c0aa0ce1cef28f39dc259c21e5b5ce0",
+      "reason": "Recorded implementation review and cancellation/descriptor behavior, not tool selection."
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/postgpt-results.json",
+      "sha256": "ef04efdaf12f2ed0856d51e125107b697c8a4bd264e454eb8225f810d0b3b94a",
+      "reason": "Recorded implementation review and cancellation/descriptor behavior, not tool selection."
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/postgpt-results.json",
+      "sha256": "067899d315d3b8e878e28f71d799220efc8d7bd970f8f018d87d3302dc829108",
+      "reason": "Recorded implementation review and cancellation/descriptor behavior, not tool selection."
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/results.json",
+      "sha256": "13e21bc8820b197555d7e9e8b9454b7ef5286e39aa00cac821a42fd1b125dc67",
+      "reason": "Recorded implementation review and cancellation/descriptor behavior, not tool selection."
+    },
+    {
+      "path": "evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json",
+      "sha256": "28d3481bf7f48a936ff47949f8d9f414e17518e3ea86b8806c4284e312e45baf",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--llama-cpp--install--20260926.json",
+      "sha256": "7e6df1d1a4e518df58083f7c134b5e1d9d13b133dcf132bc2e4ec3ec3610dbc6",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/claude-hud-0100-qualification-20261003.json",
+      "sha256": "0400652e05ab907ae37c6621c8c0c28bb8eea89cf91a7aa030f19032d47b3ac3",
+      "reason": "Historical pin applicability or negative scope boundary; no affirmative candidate selection."
+    },
+    {
+      "path": "evidence/receipts/claude-model-effort-probes-20260929.json",
+      "sha256": "a6eca96aab83ead8b9b895636d7fbe0afe35b6190845706b8780338b03bb75fc",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/dagu-mise-pin-qualification-20261005.json",
+      "sha256": "7a2192e258031e6976866309a67aeb86d9f7a88eb484fd1af4e2fcdf6adff183",
+      "reason": "Historical pin applicability or negative scope boundary; no affirmative candidate selection."
+    },
+    {
+      "path": "evidence/receipts/decision-record-index-20261008.json",
+      "sha256": "57e23cfd152a698576a6dbc13192ae5b3753bc56896b889981d84bb6aba8f752",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/foundation-native-20260920.json",
+      "sha256": "17960856ec9e6babfa221224bcc0bc6008bf304b9481ff43163d40938f0e9708",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/jcodemunch-1108327-qualification-20261003.json",
+      "sha256": "0400652e05ab907ae37c6621c8c0c28bb8eea89cf91a7aa030f19032d47b3ac3",
+      "reason": "Historical pin applicability or negative scope boundary; no affirmative candidate selection."
+    },
+    {
+      "path": "evidence/receipts/mcp-inspector-290-qualification-20261003.json",
+      "sha256": "0400652e05ab907ae37c6621c8c0c28bb8eea89cf91a7aa030f19032d47b3ac3",
+      "reason": "Historical pin applicability or negative scope boundary; no affirmative candidate selection."
+    },
+    {
+      "path": "evidence/receipts/mcporter-0142-qualification-20261003.json",
+      "sha256": "0400652e05ab907ae37c6621c8c0c28bb8eea89cf91a7aa030f19032d47b3ac3",
+      "reason": "Historical pin applicability or negative scope boundary; no affirmative candidate selection."
+    },
+    {
+      "path": "evidence/receipts/memory-lifecycle-probe-20260921.json",
+      "sha256": "4d6d305e144e152416fa34800cd708c983c88cddf8daad349a3458c503b425ae",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/native-claude-hud-interactive-20260920.json",
+      "sha256": "4d8b7df08180a9c0d9f2766d2e151c5ec29992236c1649c1cd57b8ee7060ba9d",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/native-cli-gaps.json",
+      "sha256": "63bd531b4b89c817d0be0108f618068ab284460e35bcd119a91e243085bc3161",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/native-returned-results-20260921.json",
+      "sha256": "46e62b9675b00e170332ef8712e377447982ea1c7e5d18f05654722d5545bb92",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/native-runtime-role-resolution-20260930.json",
+      "sha256": "a71afcc986db8f9e66c890be450cbddcaadef8114f4f69b8584b1caf5a268dba",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/native-runtime-role-resolution-20260930.json",
+      "sha256": "99bc39745ae141cc4a539457c781a692d1cbe43c0a0e9373f7b2edb166816539",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/native-sdk-acceptance-20261002.json",
+      "sha256": "360552db87d00e2ea696a1806da6294265d848cdd4b5468c30d18d52d34801be",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/native-token-stack-final-20260920.json",
+      "sha256": "0926b4a8b463d204ee945415e856f60fb5729e8409d308e1c753193c8861c539",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+      "sha256": "af972f876c120b0c7b34117544f05cd00c043213e0b36546c16a2046bb95fd9b",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json",
+      "sha256": "8218ddfb1ef7fbc17e4d4a09a69d6c0c22f6b426e88470c782321d121d720cd2",
+      "reason": "Numeric summary key; the associated value is a count, not candidate membership."
+    },
+    {
+      "path": "evidence/receipts/openresearch-0215-qualification-20261003.json",
+      "sha256": "0400652e05ab907ae37c6621c8c0c28bb8eea89cf91a7aa030f19032d47b3ac3",
+      "reason": "Historical pin applicability or negative scope boundary; no affirmative candidate selection."
+    },
+    {
+      "path": "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json",
+      "sha256": "0400652e05ab907ae37c6621c8c0c28bb8eea89cf91a7aa030f19032d47b3ac3",
+      "reason": "Historical pin applicability or negative scope boundary; no affirmative candidate selection."
+    },
+    {
+      "path": "evidence/receipts/playwright-cli-0122-qualification-20261003.json",
+      "sha256": "0400652e05ab907ae37c6621c8c0c28bb8eea89cf91a7aa030f19032d47b3ac3",
+      "reason": "Historical pin applicability or negative scope boundary; no affirmative candidate selection."
+    },
+    {
+      "path": "evidence/receipts/syft-1540-qualification-20261003.json",
+      "sha256": "0400652e05ab907ae37c6621c8c0c28bb8eea89cf91a7aa030f19032d47b3ac3",
+      "reason": "Historical pin applicability or negative scope boundary; no affirmative candidate selection."
+    },
+    {
+      "path": "evidence/receipts/token-practice-native-counters-20260920.json",
+      "sha256": "be88d442e576af566ee96cd1562af9750c2fa6b9d13caf47bfa74390e5960379",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/receipts/worktrunk-0800-qualification-20261003.json",
+      "sha256": "0400652e05ab907ae37c6621c8c0c28bb8eea89cf91a7aa030f19032d47b3ac3",
+      "reason": "Historical pin applicability or negative scope boundary; no affirmative candidate selection."
+    },
+    {
+      "path": "observability/restart-receipt.json",
+      "sha256": "f88f665461163b9220c7507c9f52f62f259613a615bf0e934b5a5425dcd2f37d",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "recipes/README.md",
+      "sha256": "8df5dbd77c05cc5d0473f4f518803dfd55d01eed2186307e448b495919bd0bcf",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "recipes/README.md",
+      "sha256": "f81b6d4ac786468780f1db3938b472692a1a872537c86189eb795b56b4560a1f",
+      "reason": "Procedural constraint, measured result or negative scope statement without a candidate selection."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "929175a89610df5a0ea0fb7f0758f59cc0af4c31b069230caa991e05d7b55c3c",
+      "reason": "Unrun acceptance procedure and native sign-in boundary; the redacted installation recommendation is absent."
+    },
+    {
+      "path": "adoption/paired/receipt.json",
+      "sha256": "b468d37030d0438fe35ec1cad58b90dc794568d516a540305edd2fa28bf9e8df",
+      "reason": "Cross-host prerequisite and nontransferable-acceptance boundary; no candidate identity or selection."
+    },
+    {
+      "path": "blueprints/us-equities/research-runtime/README.md",
+      "sha256": "1b0f3c81f92f89bb9ab88e451e52a52587bbab90d4bda5ceb56dd2d9597f1cf2",
+      "reason": "Worker isolation and report-checker limitations; native is an account context and chosen destination is a future requirement."
+    },
+    {
+      "path": "blueprints/us-equities/research-runtime/README.md",
+      "sha256": "7e40da4510bf852078e34a9d94b2e293bba71d275b7390f87516c4437c887f8e",
+      "reason": "Worker isolation and report-checker limitations; native is an account context and chosen destination is a future requirement."
+    },
+    {
+      "path": "catalogs/us-equities/data-research.json",
+      "sha256": "6900e4117915b245c9d5bf56fffe2c598d916fe94323e18fd7942bb13167770f",
+      "reason": "Installation-extra selection and private-state requirements, not component adoption."
+    },
+    {
+      "path": "catalogs/us-equities/engines-strategies.json",
+      "sha256": "699135a0aee8c839e85fb70f6d3a4eeedb731cc405d2a210e48fb944d172a20c",
+      "reason": "Historical-record guidance, upstream default-branch metadata, or missing adapter qualification; no current candidate selection."
+    },
+    {
+      "path": "catalogs/us-equities/engines-strategies.json",
+      "sha256": "b54f8a053fa8fc86a43ed17f0cd3aee7a3e671bfd209650052b3b401eb26754c",
+      "reason": "Historical-record guidance, upstream default-branch metadata, or missing adapter qualification; no current candidate selection."
+    },
+    {
+      "path": "catalogs/us-equities/engines-strategies.json",
+      "sha256": "061a8141d492b8141967007a8f4195ac8f31f06cb9f0d006e82b812b06a57d31",
+      "reason": "Historical-record guidance, upstream default-branch metadata, or missing adapter qualification; no current candidate selection."
+    },
+    {
+      "path": "docs/token-efficiency-stack.md",
+      "sha256": "8f5ff63832888b0963b2b7a61780721eb7e08ce58a9c969618563f34ef0b2210",
+      "reason": "Cross-host reproduction procedure, native sign-in isolation and measured compression limitations; no selection outcome."
+    }
+  ]
+}

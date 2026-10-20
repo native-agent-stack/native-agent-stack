@@ -555,7 +555,9 @@ class CompleteBlindReadsetTests(unittest.TestCase):
             measurement.write_text('{"exit_code": 0}\n')
             manifest = blind_checkout.strip_worktree(root, b"k" * 32)
             after = json.loads(target.read_text())
-            self.assertEqual(after, {"discovery": {"count": 1}, "withheld_choice_evidence_refs": [reference]})
+            self.assertEqual(after, {"discovery": {"count": 1}})
+            self.assertEqual(manifest["withheld_reference_routes"], {relative: [reference]})
+            (root / "BLIND-MANIFEST.json").write_text(json.dumps(manifest))
             self.assertEqual({entry["path"] for entry in manifest["stripped_fields"]},
                              {relative + "/votes", relative + "/raw"})
             packets = root / "packets"
@@ -593,7 +595,8 @@ class CompleteBlindReadsetTests(unittest.TestCase):
                 target = dest / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(ROOT / relative, target)
-            blind_checkout.strip_worktree(dest, b"k" * 32)
+            audit = blind_checkout.strip_worktree(dest, b"k" * 32)
+            (dest / "BLIND-MANIFEST.json").write_text(json.dumps(audit))
             complete = set()
             expected = set()
             for packets in builds:
@@ -632,7 +635,8 @@ class CompleteBlindReadsetTests(unittest.TestCase):
                     (packets / name).write_text(text, encoding="utf-8")
                 dest = scratch / "stripped"
                 shutil.copytree(fixture.root, dest)
-                blind_checkout.strip_worktree(dest, b"k" * 32)
+                audit = blind_checkout.strip_worktree(dest, b"k" * 32)
+                (dest / "BLIND-MANIFEST.json").write_text(json.dumps(audit))
                 export = scratch / "export"
                 result = blind_checkout.export_tree(dest, export, allow_from_packets=packets)
                 self.assertEqual(result["missing_refs"], [])
@@ -1113,7 +1117,7 @@ class RealExportIsolationTests(unittest.TestCase):
                 if winner[2]:
                     self.assertLessEqual(len(isolation.winner_keys(adopted.get(layer) or [], [winner])), 1,
                                          (layer, winner))
-        # Exported files are verbatim beyond label stripping (round 6, B6-4): a hash-bound listing keeps its bytes.
+        # B6-4 is superseded; this measured hash-bound listing remains outside the reviewed choice redactions.
         for relative in ("evidence/artifacts/usage-report.source.txt",):
             if (export / relative).is_file():
                 self.assertEqual((export / relative).read_bytes(), (ROOT / relative).read_bytes(), relative)

@@ -227,7 +227,7 @@
   {
     "path": "evidence/receipts/claude-hud-0100-qualification-20261004.json",
     "key": "/data/research/workflow",
-    "handling": "redact"
+    "handling": "preserve_data"
   },
   {
     "path": "evidence/receipts/claude-model-effort-probes-20260929.json",

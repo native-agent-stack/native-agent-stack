@@ -479,8 +479,9 @@ def prose_exposure(export_dir: Path, packets_dir: Path, winners: dict, packet_ke
     json_prose_statements) holding a statement that tells
     the layer's winners apart from its adopted non-winners (_statement_exposes), among the files its packet cites
     (directly or through a cited JSON file) and across the whole export, which a lane may also search. A layer
-    whose winners are not among its adopted candidates is not scored. Exported prose is never rewritten (round 6,
-    B6-4), so this is the exposure a wave discloses."""
+    whose winners are not among its adopted candidates is not scored. This measures the actual sanitized
+    view, including residual observational/procedural matches; B6-4's verbatim contract was superseded
+    by the dated blind-view contract in README.md."""
     here = str(Path(__file__).resolve().parent)
     if here not in sys.path:
         sys.path.insert(0, here)

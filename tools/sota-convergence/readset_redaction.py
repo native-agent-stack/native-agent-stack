@@ -1,4 +1,4 @@
-"""Pinned choice statements, with keyed redaction and an independent readset audit.
+"""Pinned, path-scoped choice statements with keyed redaction.
 
 Classification is by exact normalized statement digest, not by candidate identity.
 The public classification contains hashes and locators, never private evidence.
@@ -11,7 +11,6 @@ from pathlib import Path
 import re
 
 CLASSIFICATION = Path(__file__).with_name("readset-choice-classification.json")
-TEXT_SUFFIXES = frozenset({".md", ".txt", ".log", ".yaml", ".yml", ".toml", ".jsonl"})
 CHOICE_CUE = re.compile(
     r"\b(?:incumbents?|winners?|current (?:choice|selection|destination|default)|"
     r"(?:selected|chosen|adopted|retained|accepted) (?:destination|choice|stack|engine|runtime|component|candidate|executable)|"
@@ -32,14 +31,22 @@ def digest(text):
     return hashlib.sha256(" ".join(text.split()).encode("utf-8")).hexdigest()
 
 
-def classification():
+def classification(relative=None):
     document = json.loads(CLASSIFICATION.read_text(encoding="utf-8"))
-    return {item["sha256"]: item["disposition"] for item in document["statements"]}
+    labels = {item["sha256"]: item["disposition"] for item in document["statements"]
+              if relative is None or item["path"] == relative}
+    labels.update({"paragraph/" + item["sha256"]: item["disposition"]
+                   for item in document.get("paragraphs", [])
+                   if relative is None or item["path"] == relative})
+    return labels
 
 
 def redact_tables(text, relative, stripped, key):
     """Redact selection columns, retaining the table's other evidence columns."""
     from blind_checkout import hmac_sha256_of
+    tables = json.loads(CLASSIFICATION.read_text(encoding="utf-8")).get("tables", {})
+    if relative not in tables:
+        return text
     columns = []
     lines = text.splitlines(keepends=True)
     for index, line in enumerate(lines):
@@ -47,10 +54,8 @@ def redact_tables(text, relative, stripped, key):
             columns = []
             continue
         cells = line.rstrip("\n").split("|")
-        if index + 1 < len(lines) and re.fullmatch(r"[\s|:-]+", lines[index + 1]) and any(
-                re.search(r"\b(?:selected|current choice|retained choice)\b", cell, re.I) for cell in cells):
-            columns = [i for i, cell in enumerate(cells)
-                       if re.search(r"\b(?:selected|current choice|retained choice|decision)\b", cell, re.I)]
+        if index + 1 < len(lines) and re.fullmatch(r"[\s|:-]+", lines[index + 1]):
+            columns = tables[relative].get(digest(line), [])
         elif re.fullmatch(r"[\s|:-]+", line):
             continue
         for column in columns:
@@ -65,9 +70,21 @@ def redact_tables(text, relative, stripped, key):
 def redact_text(text, relative, pointer, stripped, key, labels, spans):
     from blind_checkout import hmac_sha256_of
     edits = []
+    for paragraph in re.finditer(r"\S[^\n]*(?:\n(?!\s*\n)[^\n]*)*", text):
+        value = paragraph.group()
+        fragment = spans.get(digest(value))
+        if fragment and fragment.get("unit") == "paragraph" and fragment["path"] == relative and hashlib.sha256(
+                value.encode()).hexdigest() == fragment["source_sha256"]:
+            edits.append((paragraph.start() + fragment["start"], paragraph.start() + fragment["end"],
+                          value[fragment["start"]:fragment["end"]]))
+        elif labels.get("paragraph/" + digest(value)) == "choice":
+            edits.append((paragraph.start(), paragraph.end(), paragraph.group()))
     for start, end, value in statements(text):
+        if any(first <= start and end <= last for first, last, _ in edits):
+            continue
         sha = digest(value)
-        if sha in spans and hashlib.sha256(value.encode()).hexdigest() == spans[sha]["source_sha256"]:
+        if sha in spans and spans[sha]["path"] == relative and hashlib.sha256(
+                value.encode()).hexdigest() == spans[sha]["source_sha256"]:
             fragment = spans[sha]
             # Require the exact reviewed spacing before applying byte-positioned spans.
             offset = text[start:end].find(value)
@@ -75,11 +92,11 @@ def redact_text(text, relative, pointer, stripped, key, labels, spans):
                           value[fragment["start"]:fragment["end"]]))
         elif labels.get(sha) == "choice":
             edits.append((start, end, value))
-    for start, end, value in reversed(edits):
+    for start, end, value in sorted(edits, reverse=True):
         stripped.append({"path": f"{relative}{pointer}/@text/{start}",
                          "old_sha256": hmac_sha256_of(value, key)})
         text = text[:start] + text[end:]
-    return text
+    return redact_text(text, relative, pointer, stripped, key, labels, spans) if edits else text
 
 
 def redact_document(node, relative, pointer, stripped, key, labels, fields, spans):
@@ -110,33 +127,29 @@ def redact_document(node, relative, pointer, stripped, key, labels, fields, span
 
 
 def redact_readset(root, stripped, key):
-    """Keep evidence files and reference routes; remove only reviewed choice statement spans."""
-    from blind_checkout import TRANSITIVE_PREFIXES, _string_values, bare_reference
-    labels = classification()
+    """Remove reviewed choice spans; reference routes belong only in the operator manifest."""
     document = json.loads(CLASSIFICATION.read_text(encoding="utf-8"))
     fields = {item["path"] + item["pointer"]: item["sha256"] for item in document["fields"]}
     spans = {item["sha256"]: item for item in document["spans"]}
     for path in sorted(root.rglob("*")):
-        if not path.is_file() or path.is_symlink() or ".git" in path.parts:
+        if not path.is_file() or path.is_symlink() or ".git" in path.parts or path.name == "BLIND-MANIFEST.json":
             continue
         relative = path.relative_to(root).as_posix()
-        if path.suffix != ".json" and path.suffix not in TEXT_SUFFIXES:
+        data = path.read_bytes()
+        if b"\0" in data:
             continue
-        before = path.read_text(encoding="utf-8", errors="replace")
         try:
-            document = json.loads(before) if path.suffix == ".json" or path.name.endswith(".json.source.txt") else None
+            before = data.decode("utf-8")
+        except UnicodeDecodeError:
+            continue
+        labels = classification(relative)
+        try:
+            document = json.loads(before)
         except ValueError:
             document = None
         count = len(stripped)
         if document is not None:
-            before_refs = {bare_reference(value) for value in _string_values(document)}
             redact_document(document, relative, "", stripped, key, labels, fields, spans)
-            if isinstance(document, dict):
-                after_refs = {bare_reference(value) for value in _string_values(document)}
-                retained = sorted(reference for reference in before_refs - after_refs
-                                  if reference and reference.startswith(TRANSITIVE_PREFIXES))
-                if retained:
-                    document["withheld_choice_evidence_refs"] = retained
             after = json.dumps(document, indent=2, ensure_ascii=False) + "\n"
         else:
             after = redact_text(redact_tables(before, relative, stripped, key),
@@ -146,26 +159,6 @@ def redact_readset(root, stripped, key):
 
 
 def content_findings(root, files):
-    """Fail closed on known choices or unclassified choice cues in the complete one-level readset."""
-    from blind_checkout import _string_values
-    labels = classification()
-    findings = []
-    for relative in sorted(files):
-        path = root / relative
-        if not path.is_file() or path.is_symlink():
-            continue
-        if path.suffix != ".json" and path.suffix not in TEXT_SUFFIXES:
-            continue
-        text = path.read_text(encoding="utf-8", errors="replace")
-        try:
-            values = list(_string_values(json.loads(text))) if (
-                path.suffix == ".json" or path.name.endswith(".json.source.txt")) else [text]
-        except ValueError:
-            values = [text]
-        for value in values:
-            for _start, _end, statement in statements(value):
-                sha = digest(statement)
-                disposition = labels.get(sha)
-                if disposition == "choice" or (CHOICE_CUE.search(statement) and disposition != "data"):
-                    findings.append({"path": relative, "sha256": sha, "excerpt": statement[:60]})
-    return findings
+    """Compatibility entry point for the separately implemented content audit."""
+    from readset_audit import audit_readset
+    return audit_readset(root, files)["findings"]
