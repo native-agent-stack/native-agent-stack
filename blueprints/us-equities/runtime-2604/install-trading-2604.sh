@@ -90,9 +90,13 @@ source "$script_directory/sync-trading-2604.sh"
 # END shared-sync-source
 readonly lock_bundle="$script_directory/trading-2604-runtime"
 readonly project_hash=aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b
-readonly lock_hash=f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989
+readonly lock_hash=a1413f202937aa05625bad34b35d4ad75c9ab637805c3747abc4fb8b0f85634a
 # Only exact recorded bundles may migrate toward the published final bundle.
 # Prior hashes are migration inputs and inverse records, never new acceptance.
+# The October 8 published pair (lock f451, aiohttp 3.14.3) holds the 24/24
+# lock-bound acceptance; that acceptance does not transfer to this aiohttp 3.14.4 lock.
+readonly published_project_hash=aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b
+readonly published_lock_hash=f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989
 readonly accepted_project_hash=30f47dfbcb247c01e8e3ed8733fbf63bf5de6ad4ea7e4c0807e3ea484b975958
 readonly accepted_lock_hash=1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c
 readonly intermediate_project_hash=25d95481cd5cf509ffd4ce60fc8848d489b53fc402ae4dbd3cc65d528354c270
@@ -206,8 +210,9 @@ requirements=(
     'purgedcv==0.1.10'
 )
 dev_requirements=('pytest==9.1.1') # https://pypi.org/pypi/pytest/9.1.1/json
-# These public metadata bytes were copied from the measured final native bundle.
-# Its locked dev sync and dependency check are imported evidence, not a new run.
+# The manifest bytes were copied from the measured final native bundle. The lock
+# is that bundle's lock relocked with `uv lock --upgrade-package aiohttp==3.14.4`
+# (aiohttp moves only); the earlier native dev sync and dependency check bind f451.
 # Copying the byte-verified metadata avoids another target-host resolution.
 # Both files are validated before either is replaced. Only
 # the exact approved metadata (including an interrupted migration) is accepted;
@@ -215,8 +220,8 @@ dev_requirements=('pytest==9.1.1') # https://pypi.org/pypi/pytest/9.1.1/json
 # https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/sync.md
 step=locked-project
 [[ ! -L "$lock_bundle" && -d "$lock_bundle" ]] || die 'Verified runtime lock bundle is missing or symlinked.' 65
-for entry in "pyproject.toml|$project_hash|$previous_project_hash|$recorded_project_hash|$accepted_project_hash|$intermediate_project_hash" "uv.lock|$lock_hash|$previous_lock_hash|$recorded_lock_hash|$accepted_lock_hash|$intermediate_lock_hash"; do
-    IFS='|' read -r filename expected_hash previous_hash recorded_hash accepted_hash intermediate_hash <<< "$entry"
+for entry in "pyproject.toml|$project_hash|$previous_project_hash|$recorded_project_hash|$accepted_project_hash|$intermediate_project_hash|$published_project_hash" "uv.lock|$lock_hash|$previous_lock_hash|$recorded_lock_hash|$accepted_lock_hash|$intermediate_lock_hash|$published_lock_hash"; do
+    IFS='|' read -r filename expected_hash previous_hash recorded_hash accepted_hash intermediate_hash published_hash <<< "$entry"
     [[ ! -L "$lock_bundle/$filename" && -f "$lock_bundle/$filename" ]] || die "Verified bundle file is unavailable: $filename" 65
     printf '%s  %s\n' "$expected_hash" "$lock_bundle/$filename" | sha256sum --check --status
     [[ ! -L "$project/$filename" ]] || die "Owned project file is symlinked: $filename" 73
@@ -226,7 +231,8 @@ for entry in "pyproject.toml|$project_hash|$previous_project_hash|$recorded_proj
             ! printf '%s  %s\n' "$previous_hash" "$project/$filename" | sha256sum --check --status &&
             ! printf '%s  %s\n' "$recorded_hash" "$project/$filename" | sha256sum --check --status &&
             ! printf '%s  %s\n' "$accepted_hash" "$project/$filename" | sha256sum --check --status &&
-            ! printf '%s  %s\n' "$intermediate_hash" "$project/$filename" | sha256sum --check --status; then
+            ! printf '%s  %s\n' "$intermediate_hash" "$project/$filename" | sha256sum --check --status &&
+            ! printf '%s  %s\n' "$published_hash" "$project/$filename" | sha256sum --check --status; then
             die "Owned project file differs from all verified bundles: $filename" 73
         fi
     fi
