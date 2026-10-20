@@ -14,7 +14,10 @@ ROOT = Path(__file__).resolve().parents[1]
 # qualification receipt keeps the sha256 of the lock it qualified, retained byte-identical at SDK_QUALIFIED_LOCK, and the
 # current lock may differ from that lock only in these packages' blocks. Like IGNORE_ALLOWED_LOCKS in
 # test_osv_lockfile_coverage.py, an entry names the reviewed lock and its evidence; a re-qualification of the SDK pair
-# records the new lock's sha256 and inventory and empties this table.
+# records the new lock's sha256 and inventory and empties this table. The dated receipts stay as they are: the move is
+# admitted only as SDK_RELOCK_RECORD records it (its prior and current lock sha256 and versions), and prior acceptance
+# does not transfer to the relocked lock.
+SDK_RELOCK_RECORD = 'evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json'
 SDK_QUALIFIED_LOCK = ('evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/adoption/sdk/'
                       'published-3a17fa09-requirements-linux-x86_64-py313.lock')
 SDK_SECURITY_RELOCKS = {
@@ -180,6 +183,20 @@ class AdoptionContractTests(unittest.TestCase):
                 else:
                     self.assertEqual(before[name], after[name],
                                      f'{name or "the preamble"} differs from the qualified lock beyond the recorded relocks')
+            # The move is exactly the one the repin record carries, and it transfers no prior acceptance.
+            record = json.loads((ROOT / SDK_RELOCK_RECORD).read_text())
+            entries = [e for e in record['inputs'] if e['current']['path'] == self.adoption['toolchain']['sdk_lock']]
+            self.assertEqual(len(entries), 1)
+            self.assertEqual(len(SDK_SECURITY_RELOCKS), 1)
+            (old, new, advisory), = SDK_SECURITY_RELOCKS.values()
+            self.assertEqual(
+                (entries[0]['prior']['path'], entries[0]['prior']['sha256'], entries[0]['current']['sha256'],
+                 entries[0]['from'], entries[0]['to'], record['advisory']),
+                (SDK_QUALIFIED_LOCK, installation['lock_sha256'], hashlib.sha256(lock.read_bytes()).hexdigest(),
+                 old, new, advisory),
+                'the repin record carries exactly this relock')
+            self.assertIn('Prior native acceptance does not transfer', record['method'],
+                          'the repin record states that prior acceptance does not transfer')
         self.assertEqual(installation['distribution_count'], len(pins))
         for field in ['sdk', 'bundled_cli', 'selected_native_cli']:
             self.assertEqual(installation[field], client['version'], field)
@@ -220,25 +237,40 @@ class AdoptionContractTests(unittest.TestCase):
 
     def test_relocked_lock_differs_from_the_qualified_lock_only_in_recorded_relocks(self):
         paths = ['blueprints/us-equities/supply-chain/receipt.json',
-                 'evidence/artifacts/runtime-sdk-20261003/receipt.json', SDK_QUALIFIED_LOCK]
+                 'evidence/artifacts/runtime-sdk-20261003/receipt.json', SDK_QUALIFIED_LOCK, SDK_RELOCK_RECORD]
         paths.extend(self.adoption['toolchain'][key] for key in
                      ['sdk_lock', 'sdk_direct_requirements', 'sdk_accepted_constraints'])
         self.assertTrue(SDK_SECURITY_RELOCKS)
-        # Each case keeps every version, so only the qualified-lock binding can reject it.
-        cases = [(self.adoption['toolchain']['sdk_lock'], 'beyond the recorded relocks'),
-                 (SDK_QUALIFIED_LOCK, 'names the retained qualified lock')]
-        for relative_target, guard in cases:
-            with self.subTest(target=relative_target), tempfile.TemporaryDirectory() as directory:
+
+        def zero_a_hash(text):
+            text, count = re.subn(r'(^charset-normalizer==[^\s\\]+ \\\n    --hash=sha256:)[0-9a-f]{64}',
+                                  r'\g<1>' + '0' * 64, text, flags=re.M)
+            self.assertEqual(count, 1)
+            return text
+
+        def unrecord(text, field):
+            record = json.loads(text)
+            entry = next(e for e in record['inputs'] if e['current']['path'] == self.adoption['toolchain']['sdk_lock'])
+            if field == 'method':
+                record['method'] = record['method'].replace('Prior native acceptance does not transfer', 'Accepted')
+            else:
+                entry['current']['sha256'] = '0' * 64
+            return json.dumps(record)
+
+        # Each case keeps every version, so only the qualified-lock binding or the repin record can reject it.
+        cases = [(self.adoption['toolchain']['sdk_lock'], zero_a_hash, 'beyond the recorded relocks'),
+                 (SDK_QUALIFIED_LOCK, zero_a_hash, 'names the retained qualified lock'),
+                 (SDK_RELOCK_RECORD, lambda text: unrecord(text, 'current'), 'carries exactly this relock'),
+                 (SDK_RELOCK_RECORD, lambda text: unrecord(text, 'method'), 'prior acceptance does not transfer')]
+        for relative_target, mutate, guard in cases:
+            with self.subTest(target=relative_target, guard=guard), tempfile.TemporaryDirectory() as directory:
                 candidate = Path(directory)
                 for relative in paths:
                     target = candidate / relative
                     target.parent.mkdir(parents=True, exist_ok=True)
                     target.write_bytes((ROOT / relative).read_bytes())
                 target = candidate / relative_target
-                text, count = re.subn(r'(^charset-normalizer==[^\s\\]+ \\\n    --hash=sha256:)[0-9a-f]{64}',
-                                      r'\g<1>' + '0' * 64, target.read_text(), flags=re.M)
-                self.assertEqual(count, 1)
-                target.write_text(text)
+                target.write_text(mutate(target.read_text()))
                 with patch(__name__ + '.ROOT', candidate):
                     with self.assertRaisesRegex(AssertionError, guard):
                         self.test_lock_matches_accepted_inventory_and_all_pins_have_hashes()

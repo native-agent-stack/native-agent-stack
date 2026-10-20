@@ -5247,8 +5247,8 @@
     },
     {
       "path": ".github/workflows/hardware-profile-smoke.yml",
-      "sha256": "17264678834e8c4ef47f0bc0820a980310eb71676db5f07500358119b53b3753",
-      "bytes": 5951
+      "sha256": "cdcf3511bd8838e15356d93af9c9f3633a280d14525f01afe8efe0c084b585e5",
+      "bytes": 6456
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -64163,8 +64163,8 @@
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "3a87dd7c2dcc56e3ec3433b76397c10bfb1443af11ae837cac863e1f4ee68fec",
-      "bytes": 28577
+      "sha256": "9fad9a9e553758e358faecd24b13cb210a4fb48fb02d5030f209ce995b3c5b14",
+      "bytes": 30771
     },
     {
       "path": "tests/test_adoption_docs_consistency.py",
