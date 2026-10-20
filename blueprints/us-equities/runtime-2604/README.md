@@ -1,7 +1,7 @@
 # NativeStack2604 offline research runtime — aiohttp 3.14.4 re-pin, October 20, 2026
 
 The published bundle is lock SHA256
-`a1413f202937aa05625bad34b35d4ad75c9ab637805c3747abc4fb8b0f85634a`
+`2df713279918415554d7ba23972d3c9b8dc3a8762c52b36cfd31de53e92c22d7`
 and manifest SHA256 `aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b`.
 It contains EdgarTools **5.61.1**, skfolio **1.7.0**, LightGBM **4.7.0**, and the
 pytest **9.1.1** dev group (pluggy **1.6.0**, iniconfig **2.3.1**). CPython
@@ -20,11 +20,11 @@ packages but rewrites the header to `revision = 3`, an unrelated change, so it
 was not used. No install, sync or acceptance ran for this re-pin.
 
 The 24/24 native acceptance below is bound to lock `f451ef97…` and does **not**
-transfer to this lock. Acceptance of `a1413f20…` is pending and runs under the
+transfer to this lock. Acceptance of `2df71327…` is pending and runs under the
 North Star plan's C05, from this lock, on the destination host. The installer
 admits an existing runtime at the `f451ef97…`/`aa370e42…` pair as one more
 recorded migration input, like the earlier recorded pairs, never as acceptance.
-The offline acceptance script and scheduled trial require `a1413f20…` and refuse
+The offline acceptance script and scheduled trial require `2df71327…` and refuse
 a runtime still at `f451ef97…`.
 
 Runtime users coordinate on `$HOME/projects/.us-equities-runtime.lock`, outside
@@ -171,7 +171,7 @@ the only destination is the published final pair. These allowances do not
 authorize an uncoordinated host migration or overwrite another writer's changes.
 The installer keeps its native host, ownership, interpreter and Docker guards.
 A runtime installed at the October 8 `f451ef97…` pair no longer matches the
-published lock. Moving it to `a1413f20…` is a migration through this installer
+published lock. Moving it to `2df71327…` is a migration through this installer
 that runs only under the North Star plan's C05, followed by that plan's own
 acceptance from the new lock. A future authorized new-prefix installation uses the
 recipe's existing native route, then needs its own acceptance.
@@ -243,7 +243,7 @@ cannot restore the old set. Preserve any later owner's changes when selecting
 the inverse. Neither exact migration nor this inverse has been executed here.
 Reverting this publication restores repository files, without changing host state.
 The aiohttp 3.14.4 re-pin adds the October 8 `f451ef97…`/`aa370e42…` pair as
-the inverse record for a runtime moved to `a1413f20…`; its locked sync restores
+the inverse record for a runtime moved to `2df71327…`; its locked sync restores
 aiohttp 3.14.3 only. The `f451ef97…` lock bytes are retained, byte-identical, as
 the excluded evidence fixture
 [`published-f451-trading-2604-runtime.lock`](../../../evidence/artifacts/trading-2604-aiohttp-repin-20261020/published-f451-trading-2604-runtime.lock),

@@ -262,7 +262,7 @@
       "sha256": "305cb82c09a77e1301396903ed2581474ac86d5c90a3528b52a535c973fbc56e"
     },
     {
-      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock",
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/published-19067f82-requirements-libs.lock",
       "sha256": "19067f822ff89f6694445e34b5c78da34cd7e4bbf781d1c352f507066f65a45e"
     }
   ],
