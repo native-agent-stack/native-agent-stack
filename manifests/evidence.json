@@ -5487,8 +5487,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "037c5e29bb487c7ba395b641dd9e1afe42f02e8e600d5593a78bc0f3880adbfb",
-      "bytes": 46701
+      "sha256": "2ebb767c6e0719e0dfa98dbbc55adbef5f657d5d202b9eb02749c179abc96f1f",
+      "bytes": 47010
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -19898,8 +19898,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "72e3d155a3e399ca2a4b9c97053ce2fee12827ef3cbf36a9dc6966f707708cc1",
-      "bytes": 210441
+      "sha256": "ff66e19c7dee953055a925c5e9e23f4eff93710ebf297602dcf4a07f65098860",
+      "bytes": 210769
     },
     {
       "path": "docs/stack.md",
@@ -64428,8 +64428,8 @@
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "ad8eb4e0cc69343fc67113f00ae943d375968709f647b73ecd49614189bffb12",
-      "bytes": 69754
+      "sha256": "18100204ae30f7284c716ee2df96c9d33c69d924e1d5ab025cd36319f017345b",
+      "bytes": 69673
     },
     {
       "path": "tests/test_credential_tools.py",
