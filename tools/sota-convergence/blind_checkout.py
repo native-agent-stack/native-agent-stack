@@ -24,6 +24,9 @@ What is stripped, and how each strip is recorded in
   ``docs/{component-evidence-matrix,new-host-grand-list}.md``,
   ``catalogs/sota-convergence/manifest-*.json`` and
   ``catalogs/sota-convergence/sdk-runtime-coverage-*``.
+  Mixed selection records identified by the pinned packet-reference sweep
+  are classified in ``REMOVE_GLOBS`` on the same basis; packet references
+  use that exact classification.
 - **Ledger candidate order**: each ledger row's ``candidates`` list is sorted
   by lowercased ``(repository, name)`` before anything else is stripped (the
   checked-in order lists the selected incumbent first), so every recorded
@@ -59,6 +62,11 @@ What is stripped, and how each strip is recorded in
   structure under one of these keys, or an unrelated data or procedural
   value such as ``"top_20"`` or ``"Submission is deferred by session, not by
   bar count..."``, is left untouched.
+- **Every JSON file under ``evidence/``**: the five catalog label keys and
+  ``default_decision`` are removed at every depth, alongside the existing
+  earlier-verdict keys. Adoption-valued ``verdict``/``status`` fields go;
+  execution outcomes and retrieval data such as ``selected_sources`` stay.
+  Each removed field retains the same keyed audit record.
 - **The lane-derived v2 verdict fields ``open_gaps`` and
   ``overturn_protocol``** on every ledger row (``PENDING_LANES`` below):
   these two are written from the lanes' own sealed returns exactly like
@@ -209,6 +217,92 @@ REMOVE_GLOBS = (
     "tests/test_catalogs.py",
     "tests/test_new_host_grand_list.py",
     "tests/test_handbook_summary.py",
+    # Pinned packet-reference sweep: these mixed prose/catalog/receipt records state a current
+    # selection outside structured label fields. Like the membership records above, remove the
+    # whole record rather than guess which free-text clauses are evidence. Packet refs use this
+    # same classification, including :line and #fragment suffixes.
+    "adoption/lifecycle.md",
+    "adoption/research.json",
+    "blueprints/us-equities/adaptive-paper/README.md",
+    "blueprints/us-equities/routing/README.md",
+    "blueprints/us-equities/routing/astra-receipt.json",
+    "catalogs/foundation/community-practice-20260920.json",
+    "catalogs/landscape/candidate-quality-review.json",
+    "catalogs/landscape/native-practice.json",
+    "catalogs/us-equities/agents-operations.json",
+    "catalogs/us-equities/data-research.json",
+    "catalogs/us-equities/engines-strategies.json",
+    "catalogs/us-equities/foundation-memory.json",
+    "catalogs/us-equities/hosting-source-review.json",
+    "catalogs/us-equities/simulation-data-review.json",
+    "docs/acceptance-evidence-policy.md",
+    "docs/blind-catalog-source-adjudication-20260921.md",
+    "docs/candidate-quality-review-20260921.md",
+    "docs/catalog-provenance.md",
+    "docs/decisions/2026-10-03-foundation-catalog-drift.md",
+    "docs/foundation-closure-20260921.md",
+    "docs/foundation-convergence-20260921.md",
+    "docs/foundation-rd-readiness.md",
+    "docs/full-stack-convergence.md",
+    "docs/github-automation.md",
+    "docs/hf-memory-model-qualification.md",
+    "docs/hosting-container-practice.md",
+    "docs/memory-landscape-maintenance.md",
+    "docs/native-memory-rag-lifecycle.md",
+    "docs/native-skill-practice-20260921.md",
+    "docs/portable-userspace-install-20260921.md",
+    "docs/token-efficiency-stack.md",
+    "docs/token-native-saturation.md",
+    "docs/token-practice.md",
+    "evidence/artifacts/landscape-sweep-20260926/returns.json",
+    "evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json",
+    "evidence/artifacts/trading-runtime-2604-20261004/diskcache-removal-20261005.json",
+    "evidence/receipts/agent-browser-0382-qualification-20261003.json",
+    "evidence/receipts/ai-memory-240-qualification-20260925.json",
+    "evidence/receipts/ai-memory-241-qualification-20260925.json",
+    "evidence/receipts/ao-bounded-effect-20261008.json",
+    "evidence/receipts/ccusage-20026-qualification-20260927.json",
+    "evidence/receipts/claude-hud-0100-qualification-20261004.json",
+    "evidence/receipts/claude-model-effort-probes-20260929.json",
+    "evidence/receipts/claude-spend-window-20261004.json",
+    "evidence/receipts/codex-01571-qualification-20260926.json",
+    "evidence/receipts/codex-01592-qualification-20260930.json",
+    "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json",
+    "evidence/receipts/codex-shell-snapshot-cleanup-20260930.json",
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/foundation-closure-20260921.json",
+    "evidence/receipts/foundation-convergence-20260921.json",
+    "evidence/receipts/grafana-1323-qualification-20261003.json",
+    "evidence/receipts/harbor-e2e-token-tools-20260930.json",
+    "evidence/receipts/headroom-039-qualification-20260925.json",
+    "evidence/receipts/local-inference-c2-serving-switch-20260926.json",
+    "evidence/receipts/login-shell-contract-20260929.json",
+    "evidence/receipts/markitdown-018-qualification-20260925.json",
+    "evidence/receipts/mcp-inspector-280-qualification-20260926.json",
+    "evidence/receipts/mcporter-0141-qualification-20260925.json",
+    "evidence/receipts/mcporter-0142-qualification-20261003.json",
+    "evidence/receipts/mcporter-0142-qualification-20261004.json",
+    "evidence/receipts/native-claude-profile-20260920.json",
+    "evidence/receipts/native-memory-rag-alignment-20260921.json",
+    "evidence/receipts/native-memory.json",
+    "evidence/receipts/native-sdk-acceptance-20261002.json",
+    "evidence/receipts/notification-types-20260929.json",
+    "evidence/receipts/omniroute-runtime-workers-20260930.json",
+    "evidence/receipts/prometheus-3150-qualification-20260926.json",
+    "evidence/receipts/runtime-sdk-20261003.json",
+    "evidence/receipts/socraticode-1150-qualification-20260927.json",
+    "evidence/receipts/socraticode-1160-qualification-20260929.json",
+    "evidence/receipts/terminal-experience-20260928.json",
+    "evidence/receipts/token-native-retained-functional-20260920.json",
+    "evidence/receipts/token-practice-catalog-toon-20260920.json",
+    "evidence/receipts/token-practice-confirmation-20260920.json",
+    "evidence/receipts/trading-unattended-hosting-recovery-r2-20261005.json",
+    "evidence/receipts/ultracode-token-routing-20260921.json",
+    "evidence/receipts/upstream-native-tools-20260920.json",
+    "evidence/receipts/vllm-030-switch-20260925.json",
+    "evidence/receipts/vllm-030-switch-laptop-20260926.json",
+    "evidence/receipts/worktrunk-0800-qualification-20261003.json",
+    "recipes/README.md",
 )
 
 # The closed-vocabulary enum labels found under selection/decision/disposition/
@@ -409,8 +503,9 @@ ROLE_KEY = re.compile(r"^(chosen|incumbents?|winners?|challengers?)(_|$)"
                       r"|current_selection|final_disposition|dual_lane_same_winner|^selected_component")
 # An object that records an observed run is evidence, whatever its key (R4-REG-1).
 EVIDENCE_OBJECT_KEYS = frozenset({"observed_at", "reported_on", "exit_code", "sha256", "source_sha256"})
-# Under evidence/, only an earlier run's verdict fields go: receipts use selected_* for data (selected files).
-EVIDENCE_VERDICT_KEYS = frozenset({
+# Under evidence/, selection/decision fields go, but selected_* retrieval data (selected files) stays.
+EVIDENCE_VERDICT_KEYS = CATALOGS_UNCONDITIONAL_KEYS | frozenset({
+    "default_decision",
     "sota_verdict", "primary_stack", "strongest_challengers", "why_primary_for_requirement",
     "strongest_case_for_challenger", "test_that_would_change_choice", "coordinator_disposition",
     "claude_final_disposition", "why_selected", "winners", "incumbents", "challenger_repositories"})
@@ -444,7 +539,14 @@ EVIDENCE_SELECTION_KEY = re.compile(r"^selected_(?:component|repositor|tool|cand
 
 
 def _evidence_verdict_key(key, value=None) -> bool:
-    return isinstance(key, str) and (key in EVIDENCE_VERDICT_KEYS or bool(EVIDENCE_SELECTION_KEY.match(key)))
+    if not isinstance(key, str):
+        return False
+    if key in EVIDENCE_VERDICT_KEYS or EVIDENCE_SELECTION_KEY.match(key):
+        return True
+    # Adoption labels are not observed execution outcomes (passed/FAIL/HTTP status).
+    return (key in {"verdict", "status"} or key.endswith("_status")) and isinstance(value, str) and value in {
+        "default", "selected", "retain", "retained", "keep_but_compare", "confirmed_default",
+        "selected_destination", "adopt_within_scope", "accepted_within_scope", "adopted", "not_adopted"}
 
 
 def strip_catalog_unconditional(document, relative_path: str, stripped: list, hmac_key: bytes) -> None:

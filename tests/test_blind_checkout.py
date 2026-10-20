@@ -172,6 +172,104 @@ class RemovedFilesTests(BlindCheckoutFixture):
         self.assertTrue((self.dest / "docs/keep-me.md").is_file())
 
 
+class EvidenceChoiceKeyTests(unittest.TestCase):
+    def test_every_pinned_selection_reference_is_blinded(self):
+        cases = json.loads((ROOT / "tests/fixtures/blind_current_choice_refs.json").read_text(encoding="utf-8"))
+        with tempfile.TemporaryDirectory() as temporary:
+            dest = Path(temporary)
+            for case in cases:
+                target = dest / case["path"]
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / case["path"], target)
+            manifest = blind_checkout.strip_worktree(dest, b"k" * 32)
+            stripped = {entry["path"] for entry in manifest["stripped_fields"]}
+            for case in cases:
+                with self.subTest(path=case["path"]):
+                    target = dest / case["path"]
+                    if case["handling"] == "remove_file":
+                        self.assertFalse(target.exists())
+                        self.assertIn(case["path"], manifest["removed_files"])
+                    else:
+                        document = json.loads(target.read_text(encoding="utf-8"))
+                        parts = case["key"].split("/")[1:]
+                        for part in parts[:-1]:
+                            document = document[int(part)] if isinstance(document, list) else document[part]
+                        self.assertNotIn(parts[-1], document)
+                        self.assertIn(case["path"] + case["key"], stripped)
+            self.assertEqual(blind_checkout.strip_worktree(dest, b"k" * 32),
+                             {"schema_version": 1, "removed_files": [], "stripped_fields": []})
+
+    def test_choice_keys_are_removed_at_every_evidence_depth(self):
+        # Given: selection labels alongside measured results and retrieval data.
+        document = {
+            "decision": "retain",
+            "runs": [{"nested": {"current_choice": "tool-a", "selection": "tool-a",
+                                  "disposition": "selected", "review_status": "accepted_within_scope"},
+                      "exit_code": 0, "selected_sources": ["source.txt"],
+                      "selected_primary_files": ["run.txt"], "retained_failure": {"exit_code": 1}}],
+        }
+        stripped = []
+        # When: the evidence receipt is put into blind form.
+        blind_checkout.strip_evidence_verdicts(document, "evidence/receipt.json", stripped, b"k" * 32)
+        # Then: the labels go, while the observations and data selections remain.
+        self.assertEqual(document, {"runs": [{"nested": {}, "exit_code": 0,
+                                             "selected_sources": ["source.txt"],
+                                             "selected_primary_files": ["run.txt"],
+                                             "retained_failure": {"exit_code": 1}}]})
+        self.assertEqual({entry["path"] for entry in stripped}, {
+            "evidence/receipt.json/decision", "evidence/receipt.json/runs/0/nested/current_choice",
+            "evidence/receipt.json/runs/0/nested/selection", "evidence/receipt.json/runs/0/nested/disposition",
+            "evidence/receipt.json/runs/0/nested/review_status"})
+        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{64}", entry["old_sha256"]) for entry in stripped))
+
+    def test_evidence_adoption_status_is_not_an_execution_status(self):
+        document = {"status": "accepted_within_scope", "nested": [
+            {"verdict": "keep_but_compare", "status": "not_adopted"},
+            {"status": "passed", "exit_code": 0, "verdict": "FAIL", "http_status": 200},
+            {"status": "fixed", "request_status": "rejected", "verdict": "supported"},
+        ]}
+        stripped = []
+        blind_checkout.strip_evidence_verdicts(document, "evidence/receipt.json", stripped, b"k" * 32)
+        self.assertEqual(document, {"nested": [{}, {
+            "status": "passed", "exit_code": 0, "verdict": "FAIL", "http_status": 200},
+            {"status": "fixed", "request_status": "rejected", "verdict": "supported"}]})
+        self.assertEqual({entry["path"] for entry in stripped}, {
+            "evidence/receipt.json/status", "evidence/receipt.json/nested/0/verdict",
+            "evidence/receipt.json/nested/0/status"})
+
+    def test_real_qmd_receipt_loses_decision_but_keeps_benchmark(self):
+        # Given: the actual gate-14 receipt, not a replacement fixture.
+        relative = "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json"
+        with tempfile.TemporaryDirectory() as temporary:
+            dest = Path(temporary)
+            path = dest / relative
+            path.parent.mkdir(parents=True)
+            shutil.copyfile(ROOT / relative, path)
+            before = json.loads(path.read_text(encoding="utf-8"))
+            # When: the real worktree sanitizer processes the receipt.
+            manifest = blind_checkout.strip_worktree(dest, b"k" * 32)
+            # Then: only the choice is withheld and its keyed record is present.
+            after = json.loads(path.read_text(encoding="utf-8"))
+            self.assertNotIn("decision", after)
+            self.assertEqual(after, {key: value for key, value in before.items() if key != "decision"})
+            self.assertIn(relative + "/decision", [entry["path"] for entry in manifest["stripped_fields"]])
+
+    def test_selection_record_docs_are_removed_from_blind_form(self):
+        # Given: the two actual gate-14 Markdown membership/selection records.
+        relatives = ("docs/foundation-rd-readiness.md", "docs/token-native-saturation.md")
+        with tempfile.TemporaryDirectory() as temporary:
+            dest = Path(temporary)
+            for relative in relatives:
+                target = dest / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
+            # When: blind form is built.
+            manifest = blind_checkout.strip_worktree(dest, b"k" * 32)
+            # Then: the removal is both effective and disclosed.
+            self.assertEqual(manifest["removed_files"], sorted(relatives))
+            self.assertTrue(all(not (dest / relative).exists() for relative in relatives))
+
+
 class LedgerV2ResetTests(BlindCheckoutFixture):
     def test_v2_verdict_fields_reset_to_pending_and_requirement_kept(self):
         self.run_checkout()
@@ -555,7 +653,7 @@ class CatalogWinnerKeyTests(BlindCheckoutFixture):
         self.write("catalogs/sota-convergence/manifest-20260923.json",
                    {"components": [{"id": "codex", "why_selected": "incumbent"}]})
         self.write("catalogs/sota-convergence/sdk-runtime-coverage-20260923.json", {"incumbents": ["codex"]})
-        self.write("catalogs/foundation/community-practice-20260920.json",
+        self.write("catalogs/other/winner-fields.json",
                    {"incumbent_decision_ids": ["d1"], "incumbent_decisions_path": "catalogs/x.json",
                     "items": [{"winners": [{"id": "codex"}], "why_selected": "chosen",
                                "claude_final_disposition": "codex", "current_selection_record": "r",
@@ -594,13 +692,13 @@ class CatalogWinnerKeyTests(BlindCheckoutFixture):
             scanned += 1
         self.assertGreater(scanned, 0)
         self.assertEqual(offending, [])
-        community = json.loads((export / "catalogs/foundation/community-practice-20260920.json").read_text("utf-8"))
+        community = json.loads((export / "catalogs/other/winner-fields.json").read_text("utf-8"))
         # Empty values state nothing and are kept, so a pending ledger row keeps winners: [].
         self.assertEqual(community["items"][0]["empty_winners"], [])
         on_disk = json.loads((self.dest / "BLIND-MANIFEST.json").read_text(encoding="utf-8"))
         paths = {entry["path"] for entry in on_disk["stripped_fields"]}
-        self.assertIn("catalogs/foundation/community-practice-20260920.json/items/0/why_selected", paths)
-        self.assertIn("catalogs/foundation/community-practice-20260920.json/incumbent_decision_ids", paths)
+        self.assertIn("catalogs/other/winner-fields.json/items/0/why_selected", paths)
+        self.assertIn("catalogs/other/winner-fields.json/incumbent_decision_ids", paths)
 
 
 class ExportTimestampTests(BlindCheckoutFixture):
@@ -807,8 +905,16 @@ class RealExportIsolationTests(unittest.TestCase):
         for relative in ("evidence/artifacts/usage-report.source.txt",):
             if (export / relative).is_file():
                 self.assertEqual((export / relative).read_bytes(), (ROOT / relative).read_bytes(), relative)
-        # Exercised checks survive role-key stripping (round 4, R4-REG-1).
-        practice = json.loads((export / "catalogs/landscape/native-practice.json").read_text(encoding="utf-8"))
+        # The mixed native-practice selection record is withheld as a whole. Its exercised-check
+        # keys are still data, not role labels, when they appear in an otherwise neutral record.
+        self.assertFalse((export / "catalogs/landscape/native-practice.json").exists())
+        practice = {"coordinator_owned_qualification": {"exit_code": 0},
+                    "skills": [{"retained_helper_check": {"exit_code": 1}}]}
+        original = json.loads(json.dumps(practice))
+        stripped = []
+        blind_checkout.strip_catalog_unconditional(practice, "catalogs/neutral.json", stripped, b"k" * 32)
+        self.assertEqual(practice, original)
+        self.assertEqual(stripped, [])
         self.assertIn("coordinator_owned_qualification", practice)
         self.assertTrue(any("retained_helper_check" in skill for skill in practice.get("skills") or []))
         for removed in ("adoption/manifest.json", "catalogs/foundation/decisions.json",

@@ -63622,6 +63622,11 @@
       "bytes": 341189
     },
     {
+      "path": "tests/fixtures/blind_current_choice_refs.json",
+      "sha256": "565042be4f3c0e2702db82596903d306ac8a7a737bff39a37a05d8470c9fdbdf",
+      "bytes": 11808
+    },
+    {
       "path": "tests/fixtures/codex-worker-lane/README.md",
       "sha256": "14f7463dcdc7180bc4c4c46aa8fb321a5f5494dafeb5d6e57ba2b58686ae5b63",
       "bytes": 1128
@@ -64183,8 +64188,8 @@
     },
     {
       "path": "tests/test_blind_checkout.py",
-      "sha256": "d27efdf89e9ff89b0bd50c03a59e4efad5529e617d77ead110621616c20800f8",
-      "bytes": 67881
+      "sha256": "567ed05e9d97814755ab247fb1908844104b3c79d8823d7392a0a1b06c814626",
+      "bytes": 74469
     },
     {
       "path": "tests/test_blind_layer_decisions.py",
@@ -64763,8 +64768,8 @@
     },
     {
       "path": "tests/test_lane_packets.py",
-      "sha256": "f1e74add4e93c382c46e9df426d40a084fa327ebdbbda6873bb03740a42ce4cf",
-      "bytes": 111632
+      "sha256": "51759348781982b4829943d73a09fb35cab4d3068f7f945b245ea6068c48a753",
+      "bytes": 114466
     },
     {
       "path": "tests/test_layer_verdict_mutations.py",
@@ -66183,8 +66188,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "3fcb2d2226ad02c1b41f1d8bc9d3108dc6b003a6c8b78bf0cabea23928217175",
-      "bytes": 56376
+      "sha256": "a83d5953ad630ddbf9f124e5d7a849c71876a0402477782c0ead62517c7c8d58",
+      "bytes": 62420
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
@@ -66375,6 +66380,11 @@
       "path": "tools/sota-convergence/lane-return.schema.json",
       "sha256": "2bf6d646da644cb417db663684efbdb76012a7dc3326e08e84fd49dfb90db392",
       "bytes": 7792
+    },
+    {
+      "path": "tools/sota-convergence/lane_packets.py",
+      "sha256": "a50b9fe09a2e8a12649a6bf5189ce73f002337035f50dcb19f82e58e872b12f4",
+      "bytes": 87489
     },
     {
       "path": "tools/sota-convergence/merge_fragments.py",

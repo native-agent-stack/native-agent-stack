@@ -1054,6 +1054,9 @@ def withhold_labels(packet: dict) -> dict:
 # references on the 2026-09-23 packets). The label is listed on every blind packet, dropped reference or not.
 REMOVED_REFS_LABEL = ("candidates[].evidence_refs[] and registered_receipts[] naming a file the blind export removes "
                       "(membership, selection or earlier-verdict records)")
+STRIPPED_REF_FIELDS_LABEL = ("referenced evidence JSON: decision, current_choice, selection, disposition, "
+                             "review_status, default_decision and earlier-verdict fields at any depth; "
+                             "verdict/status fields containing adoption labels (not execution outcomes)")
 
 
 def removed_reference(reference) -> bool:
@@ -1080,8 +1083,9 @@ def withhold_removed_refs(packet: dict) -> tuple:
                 dropped += len(item["registered_receipts"]) - len(kept)
                 item["registered_receipts"] = kept
     withheld = list(packet.get("withheld", []))
-    if REMOVED_REFS_LABEL not in withheld:
-        withheld.append(REMOVED_REFS_LABEL)
+    for label in (REMOVED_REFS_LABEL, STRIPPED_REF_FIELDS_LABEL):
+        if label not in withheld:
+            withheld.append(label)
     packet["withheld"] = withheld
     return packet, dropped
 

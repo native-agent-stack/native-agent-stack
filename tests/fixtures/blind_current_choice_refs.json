@@ -1,0 +1,442 @@
+[
+  {
+    "path": "adoption/lifecycle.md",
+    "line": 264,
+    "handling": "remove_file"
+  },
+  {
+    "path": "adoption/research.json",
+    "key": "/candidates/1/decision",
+    "handling": "remove_file"
+  },
+  {
+    "path": "blueprints/us-equities/adaptive-paper/README.md",
+    "line": 245,
+    "handling": "remove_file"
+  },
+  {
+    "path": "blueprints/us-equities/routing/astra-receipt.json",
+    "key": "/limitations/3",
+    "handling": "remove_file"
+  },
+  {
+    "path": "blueprints/us-equities/routing/README.md",
+    "line": 11,
+    "handling": "remove_file"
+  },
+  {
+    "path": "catalogs/foundation/community-practice-20260920.json",
+    "key": "/candidates/0/role",
+    "handling": "remove_file"
+  },
+  {
+    "path": "catalogs/landscape/candidate-quality-review.json",
+    "key": "/layer_coverage/20/requirement",
+    "handling": "remove_file"
+  },
+  {
+    "path": "catalogs/landscape/native-practice.json",
+    "key": "/scope",
+    "handling": "remove_file"
+  },
+  {
+    "path": "catalogs/us-equities/agents-operations.json",
+    "key": "/entries/37/limitations/3",
+    "handling": "remove_file"
+  },
+  {
+    "path": "catalogs/us-equities/data-research.json",
+    "key": "/entries/3/version_scope",
+    "handling": "remove_file"
+  },
+  {
+    "path": "catalogs/us-equities/engines-strategies.json",
+    "key": "/entries/38/limitations/2",
+    "handling": "remove_file"
+  },
+  {
+    "path": "catalogs/us-equities/foundation-memory.json",
+    "key": "/entries/0/source_pin_scope",
+    "handling": "remove_file"
+  },
+  {
+    "path": "catalogs/us-equities/hosting-source-review.json",
+    "key": "/candidates/3/net_value_vs_current_stack",
+    "handling": "remove_file"
+  },
+  {
+    "path": "catalogs/us-equities/simulation-data-review.json",
+    "key": "/decisions/4/reason",
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/acceptance-evidence-policy.md",
+    "line": 20,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/blind-catalog-source-adjudication-20260921.md",
+    "line": 42,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/candidate-quality-review-20260921.md",
+    "line": 42,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/catalog-provenance.md",
+    "line": 74,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
+    "line": 222,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/foundation-closure-20260921.md",
+    "line": 3,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/foundation-convergence-20260921.md",
+    "line": 19,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/foundation-rd-readiness.md",
+    "line": 29,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/full-stack-convergence.md",
+    "line": 47,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/github-automation.md",
+    "line": 904,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/hf-memory-model-qualification.md",
+    "line": 16,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/hosting-container-practice.md",
+    "line": 8,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/memory-landscape-maintenance.md",
+    "line": 29,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/native-memory-rag-lifecycle.md",
+    "line": 114,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/native-skill-practice-20260921.md",
+    "line": 143,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/portable-userspace-install-20260921.md",
+    "line": 3,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/token-efficiency-stack.md",
+    "line": 173,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/token-native-saturation.md",
+    "line": 16,
+    "handling": "remove_file"
+  },
+  {
+    "path": "docs/token-practice.md",
+    "line": 395,
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+    "key": "/decision",
+    "handling": "strip_field"
+  },
+  {
+    "path": "evidence/artifacts/harbor-0240-currency-20261009/receipt.json",
+    "key": "/decision",
+    "handling": "strip_field"
+  },
+  {
+    "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+    "key": "/votes/token-efficiency/1/fit/claude/reasoning",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json",
+    "key": "/decision",
+    "handling": "strip_field"
+  },
+  {
+    "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json",
+    "key": "/decision",
+    "handling": "strip_field"
+  },
+  {
+    "path": "evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json",
+    "key": "/items/5/outcome",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/artifacts/trading-runtime-2604-20261004/diskcache-removal-20261005.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/agent-browser-0382-qualification-20261003.json",
+    "key": "/data/independent_review_decision",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/ai-memory-240-qualification-20260925.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/ai-memory-241-qualification-20260925.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/ao-bounded-effect-20261008.json",
+    "key": "/decision",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/ccusage-20026-qualification-20260927.json",
+    "key": "/data/host_receipt_binding",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/claude-hud-0100-qualification-20261004.json",
+    "key": "/data/research/workflow",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/claude-model-effort-probes-20260929.json",
+    "key": "/provenance/scripts/run5.sh",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/claude-spend-window-20261004.json",
+    "key": "/data/anti_pattern_log/5/evidence",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/codex-01571-qualification-20260926.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/codex-01592-qualification-20260930.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/codex-shell-snapshot-cleanup-20260930.json",
+    "key": "/data/configuration",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/component-history.json",
+    "key": "/data/24/proof/current_desktop",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/foundation-closure-20260921.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/foundation-convergence-20260921.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/grafana-1323-qualification-20261003.json",
+    "key": "/data/independent_review_decision",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json",
+    "key": "/limitations/0",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/headroom-039-qualification-20260925.json",
+    "key": "/limitations/4",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/local-inference-c2-serving-switch-20260926.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/login-shell-contract-20260929.json",
+    "key": "/data/decisions/agent_view_adopted",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/mcp-inspector-280-qualification-20260926.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/mcporter-0142-qualification-20261003.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/mcporter-0142-qualification-20261004.json",
+    "key": "/data/research/workflow",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/native-claude-profile-20260920.json",
+    "key": "/scope",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
+    "key": "/limitations/5",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/native-memory.json",
+    "key": "/data/native_claude/result",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/native-sdk-acceptance-20261002.json",
+    "key": "/limitations/5",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/native-trading-runtime-2604-20261004.json",
+    "key": "/decision",
+    "handling": "strip_field"
+  },
+  {
+    "path": "evidence/receipts/notification-types-20260929.json",
+    "key": "/data/decisions/presence_check_override_adopted",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+    "key": "/limitations/2",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/prometheus-3150-qualification-20260926.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+    "key": "/results/default_decision",
+    "handling": "strip_field"
+  },
+  {
+    "path": "evidence/receipts/runtime-sdk-20261003.json",
+    "key": "/limitations/2",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/socraticode-1150-qualification-20260927.json",
+    "key": "/data/host_receipt_binding",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/socraticode-1160-qualification-20260929.json",
+    "key": "/data/host_receipt_binding",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/terminal-experience-20260928.json",
+    "key": "/data/sound_levels_dbfs/Windows Ding/verdict",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/token-native-retained-functional-20260920.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/token-practice-catalog-toon-20260920.json",
+    "key": "/data/guard_selection",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/token-practice-confirmation-20260920.json",
+    "key": "/data/release_checks/0/decision",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/trading-unattended-hosting-recovery-r2-20261005.json",
+    "key": "/upstream_glue_choices/0/decision",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/ultracode-token-routing-20260921.json",
+    "key": "/observations/first_prompt_tokens/adopted_reviewer_real_run",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/upstream-native-tools-20260920.json",
+    "key": "/data/components/0/project_adoption/status",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/vllm-030-switch-20260925.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/vllm-030-switch-laptop-20260926.json",
+    "key": "/claim",
+    "handling": "remove_file"
+  },
+  {
+    "path": "evidence/receipts/worktrunk-0800-qualification-20261003.json",
+    "key": "/limitations/1",
+    "handling": "remove_file"
+  },
+  {
+    "path": "recipes/README.md",
+    "line": 221,
+    "handling": "remove_file"
+  }
+]
