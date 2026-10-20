@@ -19,7 +19,8 @@
     },
     {
       "path": "examples/openhands-native-capabilities/requirements.lock",
-      "parser": "requirements.txt"
+      "parser": "requirements.txt",
+      "sha256": "40c0ebc98b0492a0c773d77e789ab4695696d77dc3697003d5a5896013ec8db4"
     },
     {
       "path": "examples/openhands-native-capabilities/cli-constraints.txt",
@@ -56,10 +57,12 @@
       "path": "blueprints/convergence-practice/application-delivery/uv.lock"
     },
     {
-      "path": "blueprints/memory-stack/native-qualification/uv.lock"
+      "path": "blueprints/memory-stack/native-qualification/uv.lock",
+      "sha256": "28118b8f56b0d97356477f8120b3e0bab569e2756f30cf442b3cfeeef6000fa0"
     },
     {
-      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+      "sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/requirements.txt"
@@ -78,7 +81,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/requirements.lock",
-      "parser": "requirements.txt"
+      "parser": "requirements.txt",
+      "sha256": "6045a575ada4f0ee7d06a741e40eeff3b08ea3fb5a2567eef57d36055ff81577"
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",

@@ -5187,8 +5187,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "cba06a43e1b0c1fadaea82c75e412b4344fcf03f17bea3d0830bd765414ec6fb",
-      "bytes": 16138
+      "sha256": "0dba1425f84709c3311f219fe9226f63e1c9a721a7d0a357cd4d75e478e0f8d0",
+      "bytes": 16474
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -10637,6 +10637,11 @@
       "bytes": 197870
     },
     {
+      "path": "blueprints/memory-stack/native-qualification/uv.lock",
+      "sha256": "28118b8f56b0d97356477f8120b3e0bab569e2756f30cf442b3cfeeef6000fa0",
+      "bytes": 615691
+    },
+    {
       "path": "blueprints/native-skill-practice/README.md",
       "sha256": "fef88277fccc88bc64f4c4337d9b7c2ede9ddf0f7626dbd811b97c36b6d595cb",
       "bytes": 14195
@@ -11773,7 +11778,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/pins.json",
-      "sha256": "3612b4b74a139b08a37736feb672fc1957f4d028e23f94a7293815cddd29ffd3",
+      "sha256": "1b1de8190c252a4b9545c2df3025bb83b74fc55921d12a9f7803ad1ba0c583d3",
       "bytes": 4460
     },
     {
@@ -11793,8 +11798,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/requirements.lock",
-      "sha256": "a3303759da2895ecb87e0a9fa7e45878bb2588208615e6a6059704a98e71e396",
-      "bytes": 106427
+      "sha256": "6045a575ada4f0ee7d06a741e40eeff3b08ea3fb5a2567eef57d36055ff81577",
+      "bytes": 107107
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
@@ -62493,8 +62498,8 @@
     },
     {
       "path": "examples/openhands-native-capabilities/requirements.lock",
-      "sha256": "16e1a44ed7ca8b8333f2e2fca963efe544fad581198d1271d021b83b78a4bfe8",
-      "bytes": 296775
+      "sha256": "40c0ebc98b0492a0c773d77e789ab4695696d77dc3697003d5a5896013ec8db4",
+      "bytes": 300345
     },
     {
       "path": "examples/promptfoo-nemotron-upstream/promptfooconfig.yaml",
