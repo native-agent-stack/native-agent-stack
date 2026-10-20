@@ -63643,8 +63643,8 @@
     },
     {
       "path": "tests/fixtures/blind_current_choice_refs.json",
-      "sha256": "2be523d68392bc2dd207686f1acd8fb51311ec6522c7bcd6e1c735e2529ae2d8",
-      "bytes": 11433
+      "sha256": "9b6e5cce6dbe2f07458e5330bfe45b259f9735d23d0fcdf841115fbbda41f0ca",
+      "bytes": 11440
     },
     {
       "path": "tests/fixtures/codex-worker-lane/README.md",
@@ -66263,8 +66263,8 @@
     },
     {
       "path": "tools/sota-convergence/export_isolation_check.py",
-      "sha256": "ef69fb23ff9c29f12f9b9f6521ac8dc1864c4749fc75c8f4039bab4e05496af6",
-      "bytes": 36481
+      "sha256": "6d4d43fc3aa4f96f38d3221a531c547afecb5a03f22acaab797f6a30b105576a",
+      "bytes": 36464
     },
     {
       "path": "tools/sota-convergence/extract_layers.py",

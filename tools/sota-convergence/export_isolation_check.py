@@ -478,9 +478,9 @@ def _states_selection(statement: str, winners) -> bool:
     Not a bare selection word near a name, which also reads "`gh attestation verify` defaults ..." or "retained
     accepted SEC run" (round 7, BL7-1: false positives in 6 of the 18 layers)."""
     from lane_packets import CHOICE_PHRASE, STATUS_COPULA, opens_with_status
-    # The shared packet pattern lacks a terminal boundary: "lifecycle stages" is
-    # measured execution scope, not the singular adoption-status field.
-    if (any(not re.match(r"\w", statement[match.end():]) for match in CHOICE_PHRASE.finditer(statement))
+    # Plural execution stages are not the singular adoption-status field.
+    # Other shared alternatives intentionally also match selected components.
+    if (CHOICE_PHRASE.search(re.sub(r"\blifecycle stages\b", "", statement, flags=re.I))
             or STATUS_COPULA.search(statement) or opens_with_status(statement)):
         return True
     for match in IMPERATIVE_CHOICE.finditer(statement):

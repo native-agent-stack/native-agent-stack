@@ -322,7 +322,7 @@
   {
     "path": "evidence/receipts/mcporter-0142-qualification-20261004.json",
     "key": "/data/research/workflow",
-    "handling": "redact"
+    "handling": "preserve_data"
   },
   {
     "path": "evidence/receipts/native-claude-profile-20260920.json",
