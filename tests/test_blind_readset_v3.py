@@ -28,6 +28,21 @@ def walk_strings(node):
 
 
 class IndependentAuditTests(unittest.TestCase):
+    def test_redacted_table_column_does_not_reintroduce_a_choice_heading(self):
+        import export_isolation_check as isolation
+        relative = "docs/foundation-closure-20260921.md"
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / relative
+            target.parent.mkdir(parents=True)
+            shutil.copyfile(ROOT / relative, target)
+            blind.strip_worktree(root, b"k" * 32)
+            rows = [(text, headed) for text, headed in isolation.prose_statements(target.read_text())
+                    if "developers.openai.com/codex/sdk" in text]
+            self.assertEqual(len(rows), 1)
+            self.assertFalse(rows[0][1], rows[0])
+            self.assertIn("0.155.1", rows[0][0])
+
     def test_every_text_encoding_and_json_keys_are_scanned(self):
         cases = [
             "The current\nchoice is Cedar.",
@@ -198,10 +213,14 @@ class PreservationTests(unittest.TestCase):
                               if redaction.digest(value) == span["sha256"])
             stripped = []
             after = redaction.redact_text(source, span["path"], "", stripped, b"k" * 32,
-                                         redaction.classification(), {span["sha256"]: span})
+                                          redaction.classification(span["path"]), {span["sha256"]: span})
+            ranges = span.get("ranges", [[span["start"], span["end"]]])
+            expected = source
+            for start, end in sorted(ranges, reverse=True):
+                expected = expected[:start] + expected[end:]
             with self.subTest(path=span["path"]):
-                self.assertEqual(after, source[:span["start"]] + source[span["end"]:])
-                self.assertEqual(len(stripped), 1)
+                self.assertEqual(after, expected)
+                self.assertEqual(len(stripped), len(ranges))
 
     def test_field_hash_mismatch_preserves_a_new_measured_value(self):
         field = next(item for item in json.loads(redaction.CLASSIFICATION.read_text())["fields"]

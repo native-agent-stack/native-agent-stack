@@ -2077,6 +2077,1116 @@
   ],
   "spans": [
     {
+      "sha256": "6979c05f368c72cedf60e940eff899b35c816beed637d1fb0a20d5232aad4a61",
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/provenance.json",
+      "source_sha256": "6979c05f368c72cedf60e940eff899b35c816beed637d1fb0a20d5232aad4a61",
+      "unit": "paragraph",
+      "start": 31,
+      "end": 39,
+      "ranges": [
+        [
+          31,
+          39
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "48ca603907afac68b976da59735a845f27b1abead01163b90ae8dde7deba9d84",
+      "path": "evidence/artifacts/ns2604-e2e-20261004/slots.json",
+      "source_sha256": "48ca603907afac68b976da59735a845f27b1abead01163b90ae8dde7deba9d84",
+      "unit": "paragraph",
+      "start": 442,
+      "end": 450,
+      "ranges": [
+        [
+          442,
+          450
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "e411ed5adee234f62d9db5b23c4934e475096ec2d40e2e5da341b71655711790",
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-observation.json",
+      "source_sha256": "e411ed5adee234f62d9db5b23c4934e475096ec2d40e2e5da341b71655711790",
+      "unit": "paragraph",
+      "start": 5,
+      "end": 13,
+      "ranges": [
+        [
+          5,
+          13
+        ],
+        [
+          14,
+          21
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "dcf629fa984168811dadfcc1ffdd71dd853f0c4ff13a30410625c1095547fdb8",
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/checks.json.source.txt",
+      "source_sha256": "dcf629fa984168811dadfcc1ffdd71dd853f0c4ff13a30410625c1095547fdb8",
+      "unit": "paragraph",
+      "start": 138,
+      "end": 144,
+      "ranges": [
+        [
+          138,
+          144
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "source_sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "unit": "paragraph",
+      "start": 587,
+      "end": 594,
+      "ranges": [
+        [
+          587,
+          594
+        ],
+        [
+          777,
+          783
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "a41b7e7a44dc694ca889f336ae4db4bf1f6dc93af797bd6ce7531b958f35b5dd",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "source_sha256": "a41b7e7a44dc694ca889f336ae4db4bf1f6dc93af797bd6ce7531b958f35b5dd",
+      "unit": "paragraph",
+      "start": 1274,
+      "end": 1280,
+      "ranges": [
+        [
+          1274,
+          1280
+        ],
+        [
+          1414,
+          1421
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "ab9f536d3ad29d58ae8d81e68f87acadb4443236689ebcc9e2dc6bf3d2abb57d",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "source_sha256": "debd9b75340e63d22f0993248b5ea8ea695d6f5e08c105579e943282a3221984",
+      "unit": "paragraph",
+      "start": 267,
+      "end": 273,
+      "ranges": [
+        [
+          267,
+          273
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "66dc6fc8a3c829cd0365f95413bcc40d75c1671772bf629c27ece82ccc158617",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "source_sha256": "66dc6fc8a3c829cd0365f95413bcc40d75c1671772bf629c27ece82ccc158617",
+      "unit": "paragraph",
+      "start": 262,
+      "end": 268,
+      "ranges": [
+        [
+          262,
+          268
+        ],
+        [
+          402,
+          409
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "5ba48706078b60b7411feb335587a93c0322d966dcfddeea86730f07c74ca757",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "source_sha256": "88c119e4957ad1525107c0504399170f1815be8ca1eeebee5f89e7e0106878d7",
+      "unit": "paragraph",
+      "start": 434,
+      "end": 440,
+      "ranges": [
+        [
+          434,
+          440
+        ],
+        [
+          574,
+          581
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "0b5d63f9e11b6c5a08c2100449c8203d0b2eec9f83bc8003a15acc1e405fb380",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "source_sha256": "575b6224121ec2dfef0755bfd02050adbdd39daa2a6c393e117d786d4dc8920a",
+      "unit": "paragraph",
+      "start": 348,
+      "end": 354,
+      "ranges": [
+        [
+          348,
+          354
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "c5ac1f3f23112bead0a8ca1e8f23779fe77b0c6c656ab6107959ce21feecc69b",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "source_sha256": "659b477150686be7cfce605fb720db75a718168594d77f90789d362a60bd222a",
+      "unit": "paragraph",
+      "start": 186,
+      "end": 192,
+      "ranges": [
+        [
+          186,
+          192
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "bf9832d8a3b59aff98fad37976ebe26d23c3983494f9828080b0616da741b0ee",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "source_sha256": "d8bbf0939548f95c43498f0281a2f4c09a0f2090b3b225b8d397deee17812211",
+      "unit": "paragraph",
+      "start": 250,
+      "end": 256,
+      "ranges": [
+        [
+          250,
+          256
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "0417540ed0ae2160678b3fa52040fbe82d30caa61163e2ccdbc78bd3c1477074",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/raw-outputs.json",
+      "source_sha256": "6fe93da000bdfe0815674cb3bb2123e254784341a55ebcd06b5d570853deac19",
+      "unit": "paragraph",
+      "start": 266,
+      "end": 272,
+      "ranges": [
+        [
+          266,
+          272
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "c5ac1f3f23112bead0a8ca1e8f23779fe77b0c6c656ab6107959ce21feecc69b",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/raw-outputs.json",
+      "source_sha256": "e53941168b7eb40dcb453443e5e61da107afd5d75dd824ac59cadd16bc96ba68",
+      "unit": "paragraph",
+      "start": 186,
+      "end": 192,
+      "ranges": [
+        [
+          186,
+          192
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-vf.json",
+      "source_sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "unit": "paragraph",
+      "start": 587,
+      "end": 594,
+      "ranges": [
+        [
+          587,
+          594
+        ],
+        [
+          777,
+          783
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "0417540ed0ae2160678b3fa52040fbe82d30caa61163e2ccdbc78bd3c1477074",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-vf.json",
+      "source_sha256": "f200605a0a808ee304468cb4b7f205cabfbed6b815af018dcdf05e2a22bdac4a",
+      "unit": "paragraph",
+      "start": 266,
+      "end": 272,
+      "ranges": [
+        [
+          266,
+          272
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "66dc6fc8a3c829cd0365f95413bcc40d75c1671772bf629c27ece82ccc158617",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-vf.json",
+      "source_sha256": "66dc6fc8a3c829cd0365f95413bcc40d75c1671772bf629c27ece82ccc158617",
+      "unit": "paragraph",
+      "start": 262,
+      "end": 268,
+      "ranges": [
+        [
+          262,
+          268
+        ],
+        [
+          402,
+          409
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-vs.json",
+      "source_sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "unit": "paragraph",
+      "start": 587,
+      "end": 594,
+      "ranges": [
+        [
+          587,
+          594
+        ],
+        [
+          777,
+          783
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "d4425666a6de56561e775a7cdfdb959e505de7dd56cc2f497938333f16fdcdd0",
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/final-results.json",
+      "source_sha256": "d4425666a6de56561e775a7cdfdb959e505de7dd56cc2f497938333f16fdcdd0",
+      "unit": "paragraph",
+      "start": 4,
+      "end": 12,
+      "ranges": [
+        [
+          4,
+          12
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "2bb74d8e54b26dcb2d9b2979ba12deeaa9f47bc00ecc3a1360cc7da2270eb4a0",
+      "path": "blueprints/us-equities/research-evaluation/receipt.json",
+      "source_sha256": "2bb74d8e54b26dcb2d9b2979ba12deeaa9f47bc00ecc3a1360cc7da2270eb4a0",
+      "unit": "paragraph",
+      "start": 135,
+      "end": 143,
+      "ranges": [
+        [
+          135,
+          143
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "278aa4f38a73f41dd0e041bfb49a98d049b5d39654cbfc6390fbb31fa1874200",
+      "path": "catalogs/foundation/community-practice-20260920.json",
+      "source_sha256": "278aa4f38a73f41dd0e041bfb49a98d049b5d39654cbfc6390fbb31fa1874200",
+      "unit": "paragraph",
+      "start": 95,
+      "end": 103,
+      "ranges": [
+        [
+          95,
+          103
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "687314651d4c22b1940330ea2844388c0da35b37f66cf5ebe618f95c1f45fdb5",
+      "path": "catalogs/us-equities/foundation-memory.json",
+      "source_sha256": "687314651d4c22b1940330ea2844388c0da35b37f66cf5ebe618f95c1f45fdb5",
+      "unit": "paragraph",
+      "start": 0,
+      "end": 7,
+      "ranges": [
+        [
+          0,
+          7
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "8d99a75d6221aa36d0582189067b2195dfcc4a3377bd4b658410d01b0b0f7141",
+      "path": "docs/native-skill-practice-20260921.md",
+      "source_sha256": "b3c4310d0347b5f1223e18c420b79900bb035c5505b032dbb24e60c11861e47b",
+      "unit": "paragraph",
+      "start": 109,
+      "end": 117,
+      "ranges": [
+        [
+          109,
+          117
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "c552e587bc2d7cee54c4219e16576e02154f82ff10b0b6d6075f70bd8c1c58d1",
+      "path": "docs/token-practice.md",
+      "source_sha256": "78adce9bc83c04bc347dc4ba85b5af3157ffddc94918cfa938025de2e78ee468",
+      "unit": "paragraph",
+      "start": 221,
+      "end": 229,
+      "ranges": [
+        [
+          221,
+          229
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "4773a704eb3f95b2f054f81f20053389108157335c93d5b7d5241907d5ae0481",
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md",
+      "source_sha256": "46079a9e00ed3360a5e200154a22b5f309d514756a5183700972d279e9489ece",
+      "unit": "paragraph",
+      "start": 479,
+      "end": 485,
+      "ranges": [
+        [
+          479,
+          485
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "bc892f1bc7ce896089fa367d5edbdbca416e1a920ae52e6ea5b08ba3d38fe3e1",
+      "path": "evidence/artifacts/currency-wave-w1-20261003/native-checks.json",
+      "source_sha256": "188cc3dea4db2dcff7706137697f8a79268152dfe93660d013c3abc8840d05bd",
+      "unit": "paragraph",
+      "start": 184,
+      "end": 190,
+      "ranges": [
+        [
+          184,
+          190
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "e25444809fcbe030aa05b22eb13d2a2385ca97a905ab6023471ab8baf913946c",
+      "path": "evidence/artifacts/currency-wave-w1-20261003/native-checks.json",
+      "source_sha256": "ddb5882d31897453b80aeff4d666c5639e6eb57f6fc52b8d561858db01e659fe",
+      "unit": "paragraph",
+      "start": 184,
+      "end": 190,
+      "ranges": [
+        [
+          184,
+          190
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "ba0a1a7f28c9d8e5e636378f95289e3009e2f6b2c829c91ba29d8c0a368ad45d",
+      "path": "evidence/artifacts/full-stack-convergence-20260921/upgrade-independent-review.json",
+      "source_sha256": "ba0a1a7f28c9d8e5e636378f95289e3009e2f6b2c829c91ba29d8c0a368ad45d",
+      "unit": "paragraph",
+      "start": 0,
+      "end": 8,
+      "ranges": [
+        [
+          0,
+          8
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "cace3f1850c135c5d27d3fdc3d9ad6f28f638320cfc87dabb5c62f68ced5aa5a",
+      "path": "evidence/artifacts/full-stack-convergence-20260921/upgrade-independent-review.json",
+      "source_sha256": "cace3f1850c135c5d27d3fdc3d9ad6f28f638320cfc87dabb5c62f68ced5aa5a",
+      "unit": "paragraph",
+      "start": 0,
+      "end": 8,
+      "ranges": [
+        [
+          0,
+          8
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "82a4f4f8987f5f8615aa1e463f6f8a624606b715e90bc339fcb3b70182a8f5cb",
+      "path": "evidence/artifacts/full-stack-convergence-20260921/upgrade-independent-review.json",
+      "source_sha256": "82a4f4f8987f5f8615aa1e463f6f8a624606b715e90bc339fcb3b70182a8f5cb",
+      "unit": "paragraph",
+      "start": 0,
+      "end": 8,
+      "ranges": [
+        [
+          0,
+          8
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "19a9b7ef9cb17778b64ca683f8f4cd0d86ee46cfce4604844b7489b1ab2f06e0",
+      "path": "evidence/artifacts/full-stack-convergence-20260921/upgrade-independent-review.json",
+      "source_sha256": "19a9b7ef9cb17778b64ca683f8f4cd0d86ee46cfce4604844b7489b1ab2f06e0",
+      "unit": "paragraph",
+      "start": 0,
+      "end": 8,
+      "ranges": [
+        [
+          0,
+          8
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "1b810cecf4da8aa6174b7e2fe7212a1b9ea0b956cb3bad7868af6098de12e217",
+      "path": "evidence/artifacts/full-stack-convergence-20260921/upgrade-independent-review.json",
+      "source_sha256": "1b810cecf4da8aa6174b7e2fe7212a1b9ea0b956cb3bad7868af6098de12e217",
+      "unit": "paragraph",
+      "start": 0,
+      "end": 8,
+      "ranges": [
+        [
+          0,
+          8
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "64cf6bb4d91b68387dffd49e35ee5c17a631b9806e2146dc84f960ba1f9260de",
+      "path": "evidence/artifacts/full-stack-convergence-20260921/upgrade-independent-review.json",
+      "source_sha256": "64cf6bb4d91b68387dffd49e35ee5c17a631b9806e2146dc84f960ba1f9260de",
+      "unit": "paragraph",
+      "start": 0,
+      "end": 8,
+      "ranges": [
+        [
+          0,
+          8
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "c0eddb23f1023eee814e2280e49e4714f2d1d274f385bf4e2eff13ba0608dea5",
+      "path": "evidence/artifacts/full-stack-convergence-20260921/upgrade-independent-review.json",
+      "source_sha256": "c0eddb23f1023eee814e2280e49e4714f2d1d274f385bf4e2eff13ba0608dea5",
+      "unit": "paragraph",
+      "start": 0,
+      "end": 8,
+      "ranges": [
+        [
+          0,
+          8
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "8154bce199ddf37b48593ffea88a9942b6262d3869e86ee416b3dc351e6ddf1b",
+      "path": "evidence/artifacts/full-stack-convergence-20260921/upgrade-independent-review.json",
+      "source_sha256": "8154bce199ddf37b48593ffea88a9942b6262d3869e86ee416b3dc351e6ddf1b",
+      "unit": "paragraph",
+      "start": 0,
+      "end": 8,
+      "ranges": [
+        [
+          0,
+          8
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "29dfc9a2c561c59ae2eb708fdab91dc179d10a8cba377ee064ea5ac572c0ff8a",
+      "path": "evidence/artifacts/full-stack-convergence-20260921/upgrade-independent-review.json",
+      "source_sha256": "29dfc9a2c561c59ae2eb708fdab91dc179d10a8cba377ee064ea5ac572c0ff8a",
+      "unit": "paragraph",
+      "start": 0,
+      "end": 8,
+      "ranges": [
+        [
+          0,
+          8
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "ab9f536d3ad29d58ae8d81e68f87acadb4443236689ebcc9e2dc6bf3d2abb57d",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "source_sha256": "9e1784ff84af214a779810e87fec5aec812a952f28c4e90718208d6b63136dd6",
+      "unit": "paragraph",
+      "start": 267,
+      "end": 273,
+      "ranges": [
+        [
+          267,
+          273
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "0417540ed0ae2160678b3fa52040fbe82d30caa61163e2ccdbc78bd3c1477074",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "source_sha256": "6fe93da000bdfe0815674cb3bb2123e254784341a55ebcd06b5d570853deac19",
+      "unit": "paragraph",
+      "start": 266,
+      "end": 272,
+      "ranges": [
+        [
+          266,
+          272
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "0b5d63f9e11b6c5a08c2100449c8203d0b2eec9f83bc8003a15acc1e405fb380",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "source_sha256": "f923b6772983512e1bcb01f9096de9ab0a3989e54f277f3f91b2f59d34ff8cb1",
+      "unit": "paragraph",
+      "start": 348,
+      "end": 354,
+      "ranges": [
+        [
+          348,
+          354
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "3ea170f1ef27669b7443cdb5928de57bca679020453bf2b843919bba72f3e6c9",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "source_sha256": "c43c3c909d1d3fbd47955ffb082fc59e8258affc754ddd03b2394f4007a258d1",
+      "unit": "paragraph",
+      "start": 347,
+      "end": 353,
+      "ranges": [
+        [
+          347,
+          353
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "c5ac1f3f23112bead0a8ca1e8f23779fe77b0c6c656ab6107959ce21feecc69b",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "source_sha256": "e53941168b7eb40dcb453443e5e61da107afd5d75dd824ac59cadd16bc96ba68",
+      "unit": "paragraph",
+      "start": 186,
+      "end": 192,
+      "ranges": [
+        [
+          186,
+          192
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "bf9832d8a3b59aff98fad37976ebe26d23c3983494f9828080b0616da741b0ee",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "source_sha256": "b93f9c29fcd9b1ffb0b33036e74f017c9a2038e8e95a72944de54ec10c146262",
+      "unit": "paragraph",
+      "start": 250,
+      "end": 256,
+      "ranges": [
+        [
+          250,
+          256
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "ce5fe07a75712bcb6f2d8400ae730ce0341196440288e24a7c85aa67df3c44e9",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "source_sha256": "2aa5af8a55fc8497de3627134dac099f0ee9e1a1da37a1eacc9370bdc56825ad",
+      "unit": "paragraph",
+      "start": 248,
+      "end": 254,
+      "ranges": [
+        [
+          248,
+          254
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "source_sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "unit": "paragraph",
+      "start": 587,
+      "end": 594,
+      "ranges": [
+        [
+          587,
+          594
+        ],
+        [
+          777,
+          783
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "a41b7e7a44dc694ca889f336ae4db4bf1f6dc93af797bd6ce7531b958f35b5dd",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "source_sha256": "a41b7e7a44dc694ca889f336ae4db4bf1f6dc93af797bd6ce7531b958f35b5dd",
+      "unit": "paragraph",
+      "start": 1274,
+      "end": 1280,
+      "ranges": [
+        [
+          1274,
+          1280
+        ],
+        [
+          1414,
+          1421
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "0417540ed0ae2160678b3fa52040fbe82d30caa61163e2ccdbc78bd3c1477074",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "source_sha256": "f200605a0a808ee304468cb4b7f205cabfbed6b815af018dcdf05e2a22bdac4a",
+      "unit": "paragraph",
+      "start": 266,
+      "end": 272,
+      "ranges": [
+        [
+          266,
+          272
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "66dc6fc8a3c829cd0365f95413bcc40d75c1671772bf629c27ece82ccc158617",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "source_sha256": "66dc6fc8a3c829cd0365f95413bcc40d75c1671772bf629c27ece82ccc158617",
+      "unit": "paragraph",
+      "start": 262,
+      "end": 268,
+      "ranges": [
+        [
+          262,
+          268
+        ],
+        [
+          402,
+          409
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "5ba48706078b60b7411feb335587a93c0322d966dcfddeea86730f07c74ca757",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "source_sha256": "88c119e4957ad1525107c0504399170f1815be8ca1eeebee5f89e7e0106878d7",
+      "unit": "paragraph",
+      "start": 434,
+      "end": 440,
+      "ranges": [
+        [
+          434,
+          440
+        ],
+        [
+          574,
+          581
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "3ea170f1ef27669b7443cdb5928de57bca679020453bf2b843919bba72f3e6c9",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "source_sha256": "2a3acd326a2bf59bcdb3f470d019e22ca5c146b8865765b85d66000391a82fbd",
+      "unit": "paragraph",
+      "start": 347,
+      "end": 353,
+      "ranges": [
+        [
+          347,
+          353
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "c5ac1f3f23112bead0a8ca1e8f23779fe77b0c6c656ab6107959ce21feecc69b",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "source_sha256": "659b477150686be7cfce605fb720db75a718168594d77f90789d362a60bd222a",
+      "unit": "paragraph",
+      "start": 186,
+      "end": 192,
+      "ranges": [
+        [
+          186,
+          192
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "ce5fe07a75712bcb6f2d8400ae730ce0341196440288e24a7c85aa67df3c44e9",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "source_sha256": "d3a9e3c10d4122af841f15b342366b5bb1d2278ecbccb76ba5ec79fcbd786d40",
+      "unit": "paragraph",
+      "start": 248,
+      "end": 254,
+      "ranges": [
+        [
+          248,
+          254
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "source_sha256": "c884abb83c23ed0e7242197f8111efaf6a8d487b34225736b41053944e819068",
+      "unit": "paragraph",
+      "start": 587,
+      "end": 594,
+      "ranges": [
+        [
+          587,
+          594
+        ],
+        [
+          777,
+          783
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "a41b7e7a44dc694ca889f336ae4db4bf1f6dc93af797bd6ce7531b958f35b5dd",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "source_sha256": "a41b7e7a44dc694ca889f336ae4db4bf1f6dc93af797bd6ce7531b958f35b5dd",
+      "unit": "paragraph",
+      "start": 1274,
+      "end": 1280,
+      "ranges": [
+        [
+          1274,
+          1280
+        ],
+        [
+          1414,
+          1421
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "ab9f536d3ad29d58ae8d81e68f87acadb4443236689ebcc9e2dc6bf3d2abb57d",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "source_sha256": "debd9b75340e63d22f0993248b5ea8ea695d6f5e08c105579e943282a3221984",
+      "unit": "paragraph",
+      "start": 267,
+      "end": 273,
+      "ranges": [
+        [
+          267,
+          273
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "66dc6fc8a3c829cd0365f95413bcc40d75c1671772bf629c27ece82ccc158617",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "source_sha256": "66dc6fc8a3c829cd0365f95413bcc40d75c1671772bf629c27ece82ccc158617",
+      "unit": "paragraph",
+      "start": 262,
+      "end": 268,
+      "ranges": [
+        [
+          262,
+          268
+        ],
+        [
+          402,
+          409
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "5ba48706078b60b7411feb335587a93c0322d966dcfddeea86730f07c74ca757",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "source_sha256": "88c119e4957ad1525107c0504399170f1815be8ca1eeebee5f89e7e0106878d7",
+      "unit": "paragraph",
+      "start": 434,
+      "end": 440,
+      "ranges": [
+        [
+          434,
+          440
+        ],
+        [
+          574,
+          581
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "c5ac1f3f23112bead0a8ca1e8f23779fe77b0c6c656ab6107959ce21feecc69b",
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "source_sha256": "659b477150686be7cfce605fb720db75a718168594d77f90789d362a60bd222a",
+      "unit": "paragraph",
+      "start": 186,
+      "end": 192,
+      "ranges": [
+        [
+          186,
+          192
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "95cebb63573bd2dde057459f4d86646dd2d166ba3440feed9fa205cf92642187",
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/results.json",
+      "source_sha256": "05ab52a5aa5c517d079b5b9f9a93149f46c17e6bc02220ba10262833547efa7a",
+      "unit": "paragraph",
+      "start": 320,
+      "end": 327,
+      "ranges": [
+        [
+          320,
+          327
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "48ecf3a8504f07e9ce245eb887f6a37d6e4edadd910611a6e0806be3b91c4d78",
+      "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
+      "source_sha256": "48ecf3a8504f07e9ce245eb887f6a37d6e4edadd910611a6e0806be3b91c4d78",
+      "unit": "paragraph",
+      "start": 228,
+      "end": 233,
+      "ranges": [
+        [
+          228,
+          233
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "f5e9758bce3837d9c385bb2375c21d84f6944ab6e11a5d102db3c6c02ef405d1",
+      "path": "evidence/receipts/mcporter-0142-qualification-20261004.json",
+      "source_sha256": "f5e9758bce3837d9c385bb2375c21d84f6944ab6e11a5d102db3c6c02ef405d1",
+      "unit": "paragraph",
+      "start": 4,
+      "end": 12,
+      "ranges": [
+        [
+          4,
+          12
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "494dda0e9ea9940b1b91203f6a1c21ea3c996d6751afa067034abc7b104f1a07",
+      "path": "evidence/receipts/native-service-reboot-20260920.json",
+      "source_sha256": "494dda0e9ea9940b1b91203f6a1c21ea3c996d6751afa067034abc7b104f1a07",
+      "unit": "paragraph",
+      "start": 46,
+      "end": 54,
+      "ranges": [
+        [
+          46,
+          54
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "2b44367e755d56345485ede366fc69293502667688a9f3abbd14820549cda451",
+      "path": "evidence/receipts/rtk-051-qualification-20261004.json",
+      "source_sha256": "2b44367e755d56345485ede366fc69293502667688a9f3abbd14820549cda451",
+      "unit": "paragraph",
+      "start": 4,
+      "end": 12,
+      "ranges": [
+        [
+          4,
+          12
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "311223dcd74523a6f1f28870fe8dd538aa8448e669c369551cbc50a102dbdc74",
+      "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+      "source_sha256": "311223dcd74523a6f1f28870fe8dd538aa8448e669c369551cbc50a102dbdc74",
+      "unit": "paragraph",
+      "start": 4,
+      "end": 12,
+      "ranges": [
+        [
+          4,
+          12
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "626daf5feb88a094d5f96b22822df8abebf04e012b7c9910261de6fae7c4a960",
+      "path": "evidence/receipts/socraticode-1150-qualification-20260927.json",
+      "source_sha256": "626daf5feb88a094d5f96b22822df8abebf04e012b7c9910261de6fae7c4a960",
+      "unit": "paragraph",
+      "start": 25,
+      "end": 33,
+      "ranges": [
+        [
+          25,
+          33
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "3701133a51b1ad9654b5d43d5988663354e9a0276c4d88aea92ce0876dd8674d",
+      "path": "recipes/README.md",
+      "source_sha256": "17c19f9d8cf88d9246c732e342d69782c5dff169829e7926b3aaeb20a3f549ef",
+      "unit": "paragraph",
+      "start": 170,
+      "end": 178,
+      "ranges": [
+        [
+          170,
+          178
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "23258aa0153869462ec6898d5dd8b222936de80619bd5984eb5d83f88ff9d9a6",
+      "path": "recipes/README.md",
+      "source_sha256": "23258aa0153869462ec6898d5dd8b222936de80619bd5984eb5d83f88ff9d9a6",
+      "unit": "paragraph",
+      "start": 50,
+      "end": 57,
+      "ranges": [
+        [
+          50,
+          57
+        ]
+      ],
+      "reason": "Mask status cues only; retain all measurements, hashes and non-cue bytes."
+    },
+    {
+      "sha256": "1ac0c9704c6e1b405254d158553b6559b02978098baebfeeb38f4a501f98ade0",
+      "path": "docs/native-memory-rag-lifecycle.md",
+      "source_sha256": "1ac0c9704c6e1b405254d158553b6559b02978098baebfeeb38f4a501f98ade0",
+      "start": 30,
+      "end": 37,
+      "ranges": [
+        [
+          30,
+          37
+        ]
+      ],
+      "reason": "Neutralize a provenance/procedure header; preserve every body cell."
+    },
+    {
+      "sha256": "a995b4a2846fd82fe4bac963888f9052f2d546fe234c97cb23b56629a1adbcb9",
+      "path": "docs/token-practice.md",
+      "source_sha256": "a995b4a2846fd82fe4bac963888f9052f2d546fe234c97cb23b56629a1adbcb9",
+      "start": 55,
+      "end": 62,
+      "ranges": [
+        [
+          55,
+          62
+        ]
+      ],
+      "reason": "Neutralize a provenance/procedure header; preserve every body cell."
+    },
+    {
+      "sha256": "14bd82a08d639758828a9c6706158de3b373077aa8f6224e49f39e72872e8ce6",
+      "path": "blueprints/convergence-practice/service-reboot/source-review.md",
+      "source_sha256": "14bd82a08d639758828a9c6706158de3b373077aa8f6224e49f39e72872e8ce6",
+      "start": 26,
+      "end": 33,
+      "ranges": [
+        [
+          26,
+          33
+        ]
+      ],
+      "reason": "Neutralize a provenance/procedure header; preserve every body cell."
+    },
+    {
+      "sha256": "7985c5a4d4c4ffa3e813a0f15708a6ce78bab52320965e0dff83f12828555d92",
+      "path": "blueprints/us-equities/runtime-2604/README.md",
+      "source_sha256": "7985c5a4d4c4ffa3e813a0f15708a6ce78bab52320965e0dff83f12828555d92",
+      "start": 30,
+      "end": 37,
+      "ranges": [
+        [
+          30,
+          37
+        ]
+      ],
+      "reason": "Neutralize a provenance/procedure header; preserve every body cell."
+    },
+    {
       "sha256": "63829725d7e2104e07f3d0b05d35ec397d9712403d528d6865a1f62b8d15a29b",
       "path": "docs/hf-memory-model-qualification.md",
       "start": 87,

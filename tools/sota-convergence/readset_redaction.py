@@ -44,7 +44,8 @@ def classification(relative=None):
 def redact_tables(text, relative, stripped, key):
     """Redact selection columns, retaining the table's other evidence columns."""
     from blind_checkout import hmac_sha256_of
-    tables = json.loads(CLASSIFICATION.read_text(encoding="utf-8")).get("tables", {})
+    document = json.loads(CLASSIFICATION.read_text(encoding="utf-8"))
+    tables = document.get("tables", {})
     if relative not in tables:
         return text
     columns = []
@@ -53,16 +54,22 @@ def redact_tables(text, relative, stripped, key):
         if not line.lstrip().startswith("|"):
             columns = []
             continue
-        cells = line.rstrip("\n").split("|")
         if index + 1 < len(lines) and re.fullmatch(r"[\s|:-]+", lines[index + 1]):
             columns = tables[relative].get(digest(line), [])
+            # Identify selection columns from the original header, then mask separately reviewed
+            # header adjectives without withholding their measurement/provenance body cells.
+            spans = {item["sha256"]: item for item in document["spans"] if item["path"] == relative}
+            line = redact_text(line, relative, "", stripped, key, classification(relative), spans)
         elif re.fullmatch(r"[\s|:-]+", line):
             continue
+        cells = line.rstrip("\n").split("|")
         for column in columns:
-            if column < len(cells) and cells[column].strip() != "[withheld choice]":
+            if column < len(cells) and cells[column].strip() != "[withheld]":
                 stripped.append({"path": f"{relative}/@table/{index + 1}/{column}",
                                  "old_sha256": hmac_sha256_of(cells[column], key)})
-                cells[column] = " [withheld choice] "
+                # The replacement is also used in header cells. Naming a choice there would
+                # turn every retained measurement row back into a selection statement.
+                cells[column] = " [withheld] "
         lines[index] = "|".join(cells) + ("\n" if line.endswith("\n") else "")
     return "".join(lines)
 
@@ -75,21 +82,25 @@ def redact_text(text, relative, pointer, stripped, key, labels, spans):
         fragment = spans.get(digest(value))
         if fragment and fragment.get("unit") == "paragraph" and fragment["path"] == relative and hashlib.sha256(
                 value.encode()).hexdigest() == fragment["source_sha256"]:
-            edits.append((paragraph.start() + fragment["start"], paragraph.start() + fragment["end"],
-                          value[fragment["start"]:fragment["end"]]))
+            for start, end in fragment.get("ranges", [[fragment["start"], fragment["end"]]]):
+                edits.append((paragraph.start() + start, paragraph.start() + end, value[start:end]))
         elif labels.get("paragraph/" + digest(value)) == "choice":
             edits.append((paragraph.start(), paragraph.end(), paragraph.group()))
     for start, end, value in statements(text):
-        if any(first <= start and end <= last for first, last, _ in edits):
+        # An exact reviewed span takes precedence over a coarser sentence classification.
+        # Applying both would delete measured bytes or apply the same edit twice.
+        if any(first < end and start < last for first, last, _ in edits):
             continue
         sha = digest(value)
         if sha in spans and spans[sha]["path"] == relative and hashlib.sha256(
                 value.encode()).hexdigest() == spans[sha]["source_sha256"]:
             fragment = spans[sha]
+            if fragment.get("unit") == "paragraph":
+                continue
             # Require the exact reviewed spacing before applying byte-positioned spans.
             offset = text[start:end].find(value)
-            edits.append((start + offset + fragment["start"], start + offset + fragment["end"],
-                          value[fragment["start"]:fragment["end"]]))
+            for first, last in fragment.get("ranges", [[fragment["start"], fragment["end"]]]):
+                edits.append((start + offset + first, start + offset + last, value[first:last]))
         elif labels.get(sha) == "choice":
             edits.append((start, end, value))
     for start, end, value in sorted(edits, reverse=True):
@@ -130,11 +141,12 @@ def redact_readset(root, stripped, key):
     """Remove reviewed choice spans; reference routes belong only in the operator manifest."""
     document = json.loads(CLASSIFICATION.read_text(encoding="utf-8"))
     fields = {item["path"] + item["pointer"]: item["sha256"] for item in document["fields"]}
-    spans = {item["sha256"]: item for item in document["spans"]}
+    reviewed_spans = document["spans"]
     for path in sorted(root.rglob("*")):
         if not path.is_file() or path.is_symlink() or ".git" in path.parts or path.name == "BLIND-MANIFEST.json":
             continue
         relative = path.relative_to(root).as_posix()
+        spans = {item["sha256"]: item for item in reviewed_spans if item["path"] == relative}
         data = path.read_bytes()
         if b"\0" in data:
             continue
