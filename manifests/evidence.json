@@ -64228,8 +64228,8 @@
     },
     {
       "path": "tests/test_blind_readset_v6.py",
-      "sha256": "c6da1605c01416ad5f0970af4633ca49d16b042edfcef0a1e707876207ee89e1",
-      "bytes": 9056
+      "sha256": "4cbe8fd368551b678bd54ceedbacc5e94db91412f2c059812a7c33a66946eb01",
+      "bytes": 9395
     },
     {
       "path": "tests/test_bootstrap_full_profile.py",
@@ -66443,8 +66443,8 @@
     },
     {
       "path": "tools/sota-convergence/readset-choice-classification.json",
-      "sha256": "1fd4a728830d1cbb39fcad178bdbaec39ad56d4876e7748064d61ede8cf31972",
-      "bytes": 160293
+      "sha256": "031f2fd824d8de5567ff885d4b34b04d616646b96a5acb03e362d7f77dfdb47e",
+      "bytes": 160818
     },
     {
       "path": "tools/sota-convergence/readset_audit.py",

@@ -16,6 +16,8 @@ class TableIntegrityTests(unittest.TestCase):
             "docs/candidate-quality-review-20260921.md",
             "docs/foundation-rd-readiness.md",
             "docs/memory-landscape-maintenance.md",
+            "evidence/artifacts/gap-wave2-20260923/"
+            "us-equities__security-supply-chain/README.md",
         ]
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -40,6 +42,9 @@ class TableIntegrityTests(unittest.TestCase):
             self.assertEqual(ecc.split("|")[3].strip(), "[withheld]")
             memory = (root / paths[3]).read_text()
             self.assertIn("One adopted project, allowlisted lifecycle capture", memory)
+            security = (root / paths[4]).read_text()
+            openbao = next(line for line in security.splitlines() if line.startswith("| 6 |"))
+            self.assertEqual(openbao.split("|")[4].strip(), "Dev mode only.")
 
     def test_every_registered_table_keeps_each_nondecision_cell(self):
         import json

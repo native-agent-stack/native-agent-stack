@@ -2077,6 +2077,20 @@
   ],
   "spans": [
     {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/README.md",
+      "sha256": "86b17dd5e9e9eee8008b9e50d1e94a93225faa3c4a74816db027c5883138244a",
+      "source_sha256": "86b17dd5e9e9eee8008b9e50d1e94a93225faa3c4a74816db027c5883138244a",
+      "start": 2,
+      "end": 49,
+      "ranges": [
+        [
+          2,
+          49
+        ]
+      ],
+      "reason": "N4: mask only the reviewed selection clause or adjective; preserve adjacent measurements, pins and provenance."
+    },
+    {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
       "sha256": "1a0c1ff0cf5d568337948e3ef185ca9a80752a04a03d7fb21bf7828de22f8d6f",
       "source_sha256": "1a0c1ff0cf5d568337948e3ef185ca9a80752a04a03d7fb21bf7828de22f8d6f",
