@@ -5487,8 +5487,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "9edb9ac1dea4b75b17883d7ba619129bd44a2a0f1c21314842cf2913d72f13a6",
-      "bytes": 45333
+      "sha256": "037c5e29bb487c7ba395b641dd9e1afe42f02e8e600d5593a78bc0f3880adbfb",
+      "bytes": 46701
     },
     {
       "path": "adoption/hardware-profiles.json",
