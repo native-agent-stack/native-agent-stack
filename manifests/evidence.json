@@ -37817,6 +37817,111 @@
       "bytes": 3826
     },
     {
+      "path": "evidence/artifacts/harness-screens-20261015/README-ops.md",
+      "sha256": "d51aa9bbb5e195568c76c728d22f05d036bb5c0dc0bb0dd71cab8a3200959344",
+      "bytes": 18863
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/candidate-facts-ops.json",
+      "sha256": "ff5eda515afb1a45e4b09cd2e8d85b587767d2d4be13b09ff5b7c3fbade3c6f3",
+      "bytes": 79707
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/isolation.anthropic.json",
+      "sha256": "ac5b9ce4cab0805003168c04a019bf1cfe79b141c21a02d1a7ed4960e8515c0c",
+      "bytes": 137642
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/isolation.anthropic.md",
+      "sha256": "e018da3281672a637c96f115d7289420f62a2e3754e246f3178c366b955a97ec",
+      "bytes": 77385
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/isolation.openai.json",
+      "sha256": "ea2d5ecd6bc7fc5a0c26fa8ac681e23a1eb439162f62f3d2ee232c1ad8f87e1f",
+      "bytes": 137378
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/isolation.openai.md",
+      "sha256": "f68534f9515c7fee02ef260d5d93e33577d761078bbca2f61c7a50097c58b58a",
+      "bytes": 77148
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/isolation.research.json",
+      "sha256": "c8cb8cfbd73c39fdd7b0f801b232b74aa2ac34142b58303b2ec26128b2186396",
+      "bytes": 136709
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/isolation.research.md",
+      "sha256": "84b86ef3bcf5ea6ce6445414815c3b947719aba09911843cc2dbacadab34f8b5",
+      "bytes": 76538
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+      "sha256": "354ef79ea12231bb908bf6e49a7990df85d2022257e8b0fea92b9ff9659b2b4a",
+      "bytes": 317476
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.md",
+      "sha256": "f01bee4af9fe9bf303749cb822b516546d8f38e86e1db85a86f401c6cc7cf07c",
+      "bytes": 186375
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/observation-inference.openai.json",
+      "sha256": "04fe04c4fc82b1759283b700fd565c117dc944479966afc3ef8e9bdd13e560b1",
+      "bytes": 315299
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/observation-inference.openai.md",
+      "sha256": "7787daeac65bee0af0fe703d23defc74e82e475e7c5f12e4af43cde42c0cb40b",
+      "bytes": 185050
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/observation-inference.research.json",
+      "sha256": "fc51aa9ca04906d988af847181f1eaa0d9131dc404467cc21873329604a54d81",
+      "bytes": 313365
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/observation-inference.research.md",
+      "sha256": "0c2d540b0842302b6f7424697057578b5e8c0f4ee7f59f593823953a7a98512d",
+      "bytes": 183389
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/scheduling-supervision.anthropic.json",
+      "sha256": "2f747395886a4d46452d6e7e1ad92e15fac206662fb73e7c98af1885516d216b",
+      "bytes": 143484
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/scheduling-supervision.anthropic.md",
+      "sha256": "763d1492a3647f015a89a3e37d4cf32006329308ea0af8233639b1b0bf88859f",
+      "bytes": 81834
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/scheduling-supervision.openai.json",
+      "sha256": "6e22e8f1ad13192b617cc85c03a47949b4d22a70a656536eba22da8ea4b8edf1",
+      "bytes": 143215
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/scheduling-supervision.openai.md",
+      "sha256": "f8f49e80bd169df3ac524c5085ec5a2a46e942f6256e99e1fcb7b09c9c3ae7dc",
+      "bytes": 81589
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/scheduling-supervision.research.json",
+      "sha256": "a347261f05331c13283f0efff9a6d3ba8ad0906c92bec61e8a65c79a0ef65954",
+      "bytes": 142913
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/scheduling-supervision.research.md",
+      "sha256": "d117512be688a3d84b795ac0ea5a4231b2020643259761408ab63ee5a5e0683d",
+      "bytes": 81271
+    },
+    {
+      "path": "evidence/artifacts/harness-screens-20261015/source-reads-ops.json",
+      "sha256": "a9db3a47ed45fba6b324033249e6b3098dfec77afeeb45b647b1e76729b8bc01",
+      "bytes": 62777
+    },
+    {
       "path": "evidence/artifacts/hcom-relaxation-20261006/README.md",
       "sha256": "f86c374341947023e1778c2a52f25371cc2c8189c9fec17db668805d8d744cc6",
       "bytes": 3341

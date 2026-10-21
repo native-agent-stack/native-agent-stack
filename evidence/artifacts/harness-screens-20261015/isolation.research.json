@@ -1,0 +1,2602 @@
+[
+  {
+    "candidate": {
+      "id": "anthropics/sandbox-runtime",
+      "name": "sandbox-runtime",
+      "repository_url": "https://github.com/anthropics/sandbox-runtime",
+      "package_or_plugin_ids": [
+        "@anthropic-ai/sandbox-runtime",
+        "srt"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "command wrapper",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/anthropics~1sandbox-runtime"
+    },
+    "layer": "isolation",
+    "family": "research",
+    "family_service": "served as a model-neutral command wrapper adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "v0.0.79",
+      "commit": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "OS filesystem and network restrictions around an arbitrary command; this row screens the restriction adjunct, not Git edit ownership.",
+        "sources": [
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:3-5",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L3-L5",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:115-126",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L115-L126",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "PASS",
+        "detail": "Linux x86-64 backend uses bubblewrap, socat and capability-bearing user namespaces. WSL2 follows this Linux route; its host prerequisites remain a trial preflight.",
+        "sources": [
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:546-579",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L546-L579",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:581-583",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L581-L583",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "PASS",
+        "detail": "macOS backend uses sandbox-exec; the JavaScript package has no CPU-specific native install in its declared files. Apple Silicon runtime acceptance is unmeasured.",
+        "sources": [
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:546-547",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L546-L547",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:package.json:2-12",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/package.json#L2-L12",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:package.json:53-59",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/package.json#L53-L59",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "srt wraps a command and exits with it; no interactive model/UI is required.",
+        "sources": [
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:162-174",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L162-L174",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:211-213",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L211-L213",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "PASS",
+        "detail": "Upstream explicitly prefers a non-root caller; host namespace prerequisites still apply.",
+        "sources": [
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:569-579",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L569-L579",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "--settings selects an explicit policy file per command; default ~/.srt-settings.json is shared if used.",
+        "sources": [
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:173-185",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L173-L185",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "filesystem_boundary": {
+        "result": "PASS",
+        "detail": "Read/write path policy is documented; defaults alone leave reads unrestricted, so a task must name its policy.",
+        "sources": [
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:115-126",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L115-L126",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:177-185",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L177-L185",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "network_boundary": {
+        "result": "PASS",
+        "detail": "Default-deny allowlist through host proxies; Linux namespace is removed, macOS allows the controlled loopback proxy port.",
+        "sources": [
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:122-126",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L122-L126",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:3-5",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L3-L5",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:115-126",
+            "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L115-L126",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "npm install -g @anthropic-ai/sandbox-runtime; package.json binds the screened source to 0.0.79. Vendor command floats; resolve that version before any trial.",
+      "sources": [
+        {
+          "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:11-15",
+          "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L11-L15",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:package.json:2-12",
+          "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/package.json#L2-L12",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "npm uninstall -g @anthropic-ai/sandbox-runtime removes the npm package. Owned policy files are separate state; no Linux/macOS config cleanup command is documented in the reviewed README.",
+      "sources": [
+        {
+          "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:11-15",
+          "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L11-L15",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://docs.npmjs.com/cli/v11/commands/npm-uninstall (read 2026-10-15)",
+          "url": "https://docs.npmjs.com/cli/v11/commands/npm-uninstall",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "srt PATH name; shared ~/.srt-settings.json; host proxy sockets/loopback ports and proxy/CA environment. A second wrapper or a global settings change can affect another session. No systemd unit or MCP registration is created by this CLI-only profile.",
+      "sources": [
+        {
+          "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:122-126",
+          "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L122-L126",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:173-185",
+          "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L173-L185",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:package.json:8-10",
+          "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/package.json#L8-L10",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "@anthropic-ai/sandbox-runtime",
+          "srt"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: OS filesystem and network restrictions around an arbitrary command; this row screens the restriction adjunct, not Git edit ownership.",
+      "sources": [
+        {
+          "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:3-5",
+          "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L3-L5",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:115-126",
+          "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L115-L126",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented command wrapper profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:162-174",
+          "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L162-L174",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:211-213",
+          "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L211-L213",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "9a277e5e04af1ab1b04feea4400a6ed8a5b72039",
+        "2026-10-14T02:11:46Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/anthropics~1sandbox-runtime"
+    },
+    "licence_note": {
+      "spdx": "Apache-2.0",
+      "source": "candidate-facts-ops.json#/candidates/anthropics~1sandbox-runtime",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "trial_eligible": true,
+      "disqualifier": null,
+      "reason": "Documented restriction adjunct on both host families; only a separately scoped trial is eligible.",
+      "cheapest_check": "Before trial, read host namespace and dependency readiness and bind an explicit permit/deny policy; then use upstream acceptance tests under the owning lane."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "apple/container",
+      "name": "Apple Container",
+      "repository_url": "https://github.com/apple/container",
+      "package_or_plugin_ids": [
+        "container",
+        "uninstall-container.sh"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "macOS VM container CLI",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/apple~1container"
+    },
+    "layer": "isolation",
+    "family": "research",
+    "family_service": "served as a model-neutral macOS VM container CLI adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "1.5.0",
+      "commit": "d265d669ecae041bf338cb3b39c4118316d138f0",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Each OCI container runs in a separate lightweight VM; host data is mounted selectively.",
+        "sources": [
+          {
+            "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:docs/technical-overview.md:24-32",
+            "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/docs/technical-overview.md#L24-L32",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "FAIL",
+        "detail": "Upstream requires a Mac with Apple silicon and macOS 26. Linux guests do not establish Linux/WSL2 host support.",
+        "sources": [
+          {
+            "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:README.md:18-20",
+            "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/README.md#L18-L20",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "PASS",
+        "detail": "Apple Silicon on macOS 26 is explicitly supported.",
+        "sources": [
+          {
+            "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:README.md:18-20",
+            "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/README.md#L18-L20",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "container run --rm alpine echo hello is a noninteractive command; initial signed-package installation uses an administrator prompt.",
+        "sources": [
+          {
+            "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:README.md:24-41",
+            "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/README.md#L24-L41",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "UNKNOWN",
+        "detail": "Runtime privilege model is not established by the reviewed overview; installation requires administrator permission under /usr/local.",
+        "sources": [
+          {
+            "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:README.md:24-26",
+            "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/README.md#L24-L26",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:docs/technical-overview.md:24-34",
+            "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/docs/technical-overview.md#L24-L34",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "UNKNOWN",
+        "detail": "Named containers/VMs are documented, but separate family state/config roots and ownership policy were not established.",
+        "sources": [
+          {
+            "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:docs/technical-overview.md:26-32",
+            "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/docs/technical-overview.md#L26-L32",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "filesystem_boundary": {
+        "result": "PASS",
+        "detail": "A VM per container and selective host mounts supply a documented filesystem boundary.",
+        "sources": [
+          {
+            "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:docs/technical-overview.md:26-29",
+            "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/docs/technical-overview.md#L26-L29",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "network_boundary": {
+        "result": "UNKNOWN",
+        "detail": "Networking documentation exposes same-network container reachability and published host ports; task-specific deny/allow egress policy remains unbound.",
+        "sources": [
+          {
+            "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:docs/networking.md:6-9",
+            "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/docs/networking.md#L6-L9",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:docs/networking.md:86-92",
+            "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/docs/networking.md#L86-L92",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:docs/technical-overview.md:24-32",
+            "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/docs/technical-overview.md#L24-L32",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "Download the signed 1.5.0 installer package from the release page and use the macOS package installer; container system start is the documented activation command. No Linux/WSL2 install path.",
+      "sources": [
+        {
+          "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:README.md:22-37",
+          "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/README.md#L22-L37",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "container system stop; /usr/local/bin/uninstall-container.sh -k retains user data, -d removes it.",
+      "sources": [
+        {
+          "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:README.md:49-63",
+          "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/README.md#L49-L63",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:README.md:73-84",
+          "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/README.md#L73-L84",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "/usr/local/bin/container and uninstall-container.sh; shared container system service; vmnet default network and explicitly published host ports. Mac-only service is not an isolation route for the WSL2 distro.",
+      "sources": [
+        {
+          "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:README.md:26-31",
+          "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/README.md#L26-L31",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:README.md:73-84",
+          "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/README.md#L73-L84",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:docs/networking.md:6-9",
+          "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/docs/networking.md#L6-L9",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:docs/networking.md:86-92",
+          "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/docs/networking.md#L86-L92",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "container",
+          "uninstall-container.sh"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Each OCI container runs in a separate lightweight VM; host data is mounted selectively.",
+      "sources": [
+        {
+          "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:docs/technical-overview.md:24-32",
+          "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/docs/technical-overview.md#L24-L32",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented macOS VM container CLI profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "apple/container@d265d669ecae041bf338cb3b39c4118316d138f0:README.md:24-41",
+          "url": "https://github.com/apple/container/blob/d265d669ecae041bf338cb3b39c4118316d138f0/README.md#L24-L41",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "22029b06867e46baf77b3404b849f4491739da3b",
+        "2026-10-14T22:47:52Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/apple~1container"
+    },
+    "licence_note": {
+      "spdx": "Apache-2.0",
+      "source": "candidate-facts-ops.json#/candidates/apple~1container",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "FAIL",
+      "trial_eligible": false,
+      "disqualifier": "missing_required_capability",
+      "reason": "Missing required Linux/WSL2 host capability in this dual-host screen; macOS capability is retained without promoting it.",
+      "cheapest_check": "No trial for the dual-host profile; a layer-owned macOS-only requirement would need separate qualification."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "boxlite-ai/boxlite",
+      "name": "BoxLite",
+      "repository_url": "https://github.com/boxlite-ai/boxlite",
+      "package_or_plugin_ids": [
+        "boxlite",
+        "@boxlite-ai/boxlite",
+        "boxlite-cli"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "embedded micro-VM runtime",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/boxlite-ai~1boxlite"
+    },
+    "layer": "isolation",
+    "family": "research",
+    "family_service": "served as a model-neutral embedded micro-VM runtime adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "v0.10.6",
+      "commit": "7873ae4995e171237a3342adbb84000c8ab9965b",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Hardware VM per box plus OS sandbox, resource limits and egress controls.",
+        "sources": [
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:README.md:26-33",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/README.md#L26-L33",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:README.md:163-167",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/README.md#L163-L167",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "PASS",
+        "detail": "README explicitly supports WSL2 x86_64 with KVM and kvm-group access; release wheels include Linux x86_64.",
+        "sources": [
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:README.md:227-239",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/README.md#L227-L239",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "PASS",
+        "detail": "Apple Silicon is supported; README says macOS 12+, while release 0.10.6 Python wheels are tagged macosx_14_0_arm64. CLI and Python host minima must not be conflated.",
+        "sources": [
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:README.md:227-239",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/README.md#L227-L239",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "CLI takes image plus command and propagates foreground exit status.",
+        "sources": [
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:docs/reference/cli/README.md:294-322",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/docs/reference/cli/README.md#L294-L322",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:docs/reference/cli/README.md:354",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/docs/reference/cli/README.md#L354",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "PASS",
+        "detail": "Daemonless library explicitly needs no root; Linux still requires access to /dev/kvm.",
+        "sources": [
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:README.md:31",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/README.md#L31",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:README.md:237-239",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/README.md#L237-L239",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "--home/BOXLITE_HOME, --config and named boxes scope runtime state; --profile selects REST credentials, not a model role.",
+        "sources": [
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:docs/reference/cli/README.md:132-152",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/docs/reference/cli/README.md#L132-L152",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "filesystem_boundary": {
+        "result": "PASS",
+        "detail": "Separate hardware VM and selective volumes; OS sandbox is documented.",
+        "sources": [
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:README.md:163-166",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/README.md#L163-L166",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:docs/reference/cli/README.md:328-334",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/docs/reference/cli/README.md#L328-L334",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "network_boundary": {
+        "result": "PASS",
+        "detail": "--network disabled removes the interface; --allow-net constrains egress; inbound defaults disabled.",
+        "sources": [
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:docs/reference/cli/README.md:818-820",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/docs/reference/cli/README.md#L818-L820",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:README.md:26-33",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/README.md#L26-L33",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:README.md:163-167",
+            "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/README.md#L163-L167",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "CLI: cargo install boxlite-cli (documented alternative); SDK: pip install boxlite or npm install @boxlite-ai/boxlite. Source/release pin is v0.10.6; resolve matching package/artifact before trial. Research can use the upstream named DeerFlow provider.",
+      "sources": [
+        {
+          "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:docs/reference/cli/README.md:60-81",
+          "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/docs/reference/cli/README.md#L60-L81",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:README.md:45-63",
+          "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/README.md#L45-L63",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:README.md:174-176",
+          "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/README.md#L174-L176",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "boxlite stop <owned-box>; boxlite rm <owned-box>. SDK package removal uses pip uninstall boxlite or npm uninstall @boxlite-ai/boxlite in the owned environment; no full CLI state-purge command established here.",
+      "sources": [
+        {
+          "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:docs/reference/cli/README.md:434-467",
+          "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/docs/reference/cli/README.md#L434-L467",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://docs.npmjs.com/cli/v11/commands/npm-uninstall (read 2026-10-15)",
+          "url": "https://docs.npmjs.com/cli/v11/commands/npm-uninstall",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://pip.pypa.io/en/stable/cli/pip_uninstall/ (read 2026-10-15)",
+          "url": "https://pip.pypa.io/en/stable/cli/pip_uninstall/",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "Shared default runtime/credential root unless --home is explicit; boxlite PATH name; local TCP port forwarding such as 8080:80; optional REST service is excluded from the embedded/CLI profile. Version-specific Python wheels require macOS 14 despite the broader README minimum.",
+      "sources": [
+        {
+          "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:docs/reference/cli/README.md:132-162",
+          "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/docs/reference/cli/README.md#L132-L162",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:docs/reference/cli/README.md:328-332",
+          "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/docs/reference/cli/README.md#L328-L332",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "boxlite",
+          "@boxlite-ai/boxlite",
+          "boxlite-cli"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Hardware VM per box plus OS sandbox, resource limits and egress controls.",
+      "sources": [
+        {
+          "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:README.md:26-33",
+          "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/README.md#L26-L33",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:README.md:163-167",
+          "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/README.md#L163-L167",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented embedded micro-VM runtime profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:docs/reference/cli/README.md:294-322",
+          "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/docs/reference/cli/README.md#L294-L322",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "boxlite-ai/boxlite@7873ae4995e171237a3342adbb84000c8ab9965b:docs/reference/cli/README.md:354",
+          "url": "https://github.com/boxlite-ai/boxlite/blob/7873ae4995e171237a3342adbb84000c8ab9965b/docs/reference/cli/README.md#L354",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "fdd6796fa3e7e135c3b1d97f58f83c7acec983d4",
+        "2026-10-14T12:38:34Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/boxlite-ai~1boxlite"
+    },
+    "licence_note": {
+      "spdx": "Apache-2.0",
+      "source": "candidate-facts-ops.json#/candidates/boxlite-ai~1boxlite",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "trial_eligible": true,
+      "disqualifier": null,
+      "reason": "Documented local, rootless VM restriction adjunct with an explicit WSL2 route and Apple Silicon support. Eligibility is conditional on documented host prerequisites.",
+      "cheapest_check": "Confirm /dev/kvm access and choose the actual CLI/SDK artifact's host minimum before the owning lane runs its trial."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "e2b-dev/e2b",
+      "name": "E2B",
+      "repository_url": "https://github.com/e2b-dev/e2b",
+      "package_or_plugin_ids": [
+        "e2b (Python 2.56.0 at source pin)",
+        "e2b (JavaScript)"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "cloud sandbox SDK",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/e2b-dev~1e2b"
+    },
+    "layer": "isolation",
+    "family": "research",
+    "family_service": "served as a model-neutral cloud sandbox SDK adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "@e2b/code-interpreter-python@2.11.0",
+      "commit": "62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Creates isolated cloud sandboxes and runs commands through Python/JavaScript SDKs; this is a remote boundary, not a local sandbox.",
+        "sources": [
+          {
+            "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:README.md:20-33",
+            "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/README.md#L20-L33",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:README.md:44-60",
+            "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/README.md#L44-L60",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "UNKNOWN",
+        "detail": "Python >=3.11 is declared, but requested WSL2 x86_64 client dependency support is not established by this bounded read.",
+        "sources": [
+          {
+            "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:packages/python-sdk/pyproject.toml:1-24",
+            "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/packages/python-sdk/pyproject.toml#L1-L24",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "UNKNOWN",
+        "detail": "Requested macOS arm64 dependency/artifact support is not established; cloud guest support is not client-host qualification.",
+        "sources": [
+          {
+            "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:packages/python-sdk/pyproject.toml:1-24",
+            "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/packages/python-sdk/pyproject.toml#L1-L24",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "Programmatic Sandbox.create and commands.run do not require an interactive UI.",
+        "sources": [
+          {
+            "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:README.md:44-60",
+            "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/README.md#L44-L60",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "PASS",
+        "detail": "SDK creates remote sandboxes; the documented host path is an ordinary package/library invocation, not a privileged local daemon.",
+        "sources": [
+          {
+            "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:README.md:24-60",
+            "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/README.md#L24-L60",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "Per-sandbox create API accepts metadata and network configuration; credential ownership/remote workspace mapping still needs a family-scoped proposal.",
+        "sources": [
+          {
+            "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:packages/python-sdk/e2b/sandbox_sync/main.py:169-198",
+            "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/packages/python-sdk/e2b/sandbox_sync/main.py#L169-L198",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "filesystem_boundary": {
+        "result": "PASS",
+        "detail": "Remote isolated sandbox is the documented execution boundary; host bind mounts are not the SDK quickstart route.",
+        "sources": [
+          {
+            "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:README.md:20",
+            "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/README.md#L20",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "network_boundary": {
+        "result": "PASS",
+        "detail": "allow_internet_access=False denies outbound IPv4; allow_out/deny_out and authenticated-public-access controls are documented, with allow taking precedence.",
+        "sources": [
+          {
+            "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:packages/python-sdk/e2b/sandbox_sync/main.py:169-198",
+            "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/packages/python-sdk/e2b/sandbox_sync/main.py#L169-L198",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:packages/python-sdk/e2b/api/client/models/sandbox_network_config.py:23-43",
+            "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/packages/python-sdk/e2b/api/client/models/sandbox_network_config.py#L23-L43",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:README.md:20-33",
+            "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/README.md#L20-L33",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:README.md:44-60",
+            "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/README.md#L44-L60",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "pip install e2b or npm i e2b in the owned SDK environment. Latest release tag is code-interpreter-python@2.11.0, but the base Python SDK at that commit declares 2.56.0; do not equate these versions. E2B_API_KEY is required; no credential was read.",
+      "sources": [
+        {
+          "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:README.md:24-41",
+          "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/README.md#L24-L41",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:packages/python-sdk/pyproject.toml:1-8",
+          "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/packages/python-sdk/pyproject.toml#L1-L8",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "Sandbox.kill()/context-manager exit terminates the owned remote sandbox; pip uninstall e2b or npm uninstall e2b removes the client package. Remote persistent resources require their own ownership check.",
+      "sources": [
+        {
+          "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:packages/python-sdk/e2b/sandbox_sync/main.py:510-541",
+          "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/packages/python-sdk/e2b/sandbox_sync/main.py#L510-L541",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://docs.npmjs.com/cli/v11/commands/npm-uninstall (read 2026-10-15)",
+          "url": "https://docs.npmjs.com/cli/v11/commands/npm-uninstall",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://pip.pypa.io/en/stable/cli/pip_uninstall/ (read 2026-10-15)",
+          "url": "https://pip.pypa.io/en/stable/cli/pip_uninstall/",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "Remote E2B endpoint and E2B_API_KEY; public sandbox URLs default allow_public_traffic=True; ports refer to remote services, not shared WSL listeners. Terms/budget entitlement and retention settings remain unknown.",
+      "sources": [
+        {
+          "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:README.md:36-41",
+          "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/README.md#L36-L41",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:packages/python-sdk/e2b/api/client/models/sandbox_network_config.py:23-36",
+          "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/packages/python-sdk/e2b/api/client/models/sandbox_network_config.py#L23-L36",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "e2b (Python 2.56.0 at source pin)",
+          "e2b (JavaScript)"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Creates isolated cloud sandboxes and runs commands through Python/JavaScript SDKs; this is a remote boundary, not a local sandbox.",
+      "sources": [
+        {
+          "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:README.md:20-33",
+          "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/README.md#L20-L33",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:README.md:44-60",
+          "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/README.md#L44-L60",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented cloud sandbox SDK profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "e2b-dev/e2b@62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3:README.md:44-60",
+          "url": "https://github.com/e2b-dev/e2b/blob/62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3/README.md#L44-L60",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3",
+        "2026-10-13T15:01:41Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/e2b-dev~1e2b"
+    },
+    "licence_note": {
+      "spdx": "Apache-2.0",
+      "source": "candidate-facts-ops.json#/candidates/e2b-dev~1e2b",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "trial_eligible": false,
+      "disqualifier": null,
+      "reason": "Client architecture support and the cloud entitlement/locality requirement are unverified; absence of authorization evidence is not a terms conflict.",
+      "cheapest_check": "Read the version-matched client platform/dependency metadata and the service's current entitlement/locality terms; no keyed probe is needed."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "google/gvisor",
+      "name": "gVisor",
+      "repository_url": "https://github.com/google/gvisor",
+      "package_or_plugin_ids": [
+        "runsc",
+        "containerd-shim-runsc-v1"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "OCI application-kernel runtime",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/google~1gvisor"
+    },
+    "layer": "isolation",
+    "family": "research",
+    "family_service": "served as a model-neutral OCI application-kernel runtime adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "release-20261005.0",
+      "commit": "97e8e896904cb364319cd9758241d3f0bd27a6f4",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "OCI runsc isolates Linux applications with an application kernel and integrates with container runtimes.",
+        "sources": [
+          {
+            "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:README.md:12-27",
+            "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/README.md#L12-L27",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "PASS",
+        "detail": "Linux >=5.6 source prerequisite and rootless OCI user namespaces are documented; WSL2 kernel/config acceptance remains a preflight.",
+        "sources": [
+          {
+            "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:README.md:57-76",
+            "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/README.md#L57-L76",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:g3doc/user_guide/rootless.md:95-108",
+            "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/g3doc/user_guide/rootless.md#L95-L108",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "FAIL",
+        "detail": "Runtime requires Linux; macOS support in the README is restricted to some development test packages, not runsc workloads.",
+        "sources": [
+          {
+            "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:README.md:68-76",
+            "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/README.md#L68-L76",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:README.md:126-133",
+            "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/README.md#L126-L133",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "runsc is a programmatic OCI runtime, separate from a terminal/model harness.",
+        "sources": [
+          {
+            "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:README.md:15-17",
+            "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/README.md#L15-L17",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "PASS",
+        "detail": "Rootless operation with user namespaces and UID/GID mappings is documented.",
+        "sources": [
+          {
+            "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:g3doc/user_guide/rootless.md:5-12",
+            "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/g3doc/user_guide/rootless.md#L5-L12",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:g3doc/user_guide/rootless.md:95-139",
+            "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/g3doc/user_guide/rootless.md#L95-L139",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "OCI config.json scopes each container's process/namespace configuration; no model-family profile adapter is claimed.",
+        "sources": [
+          {
+            "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:g3doc/user_guide/rootless.md:105-139",
+            "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/g3doc/user_guide/rootless.md#L105-L139",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "filesystem_boundary": {
+        "result": "PASS",
+        "detail": "Application-kernel sandbox is documented; owned OCI filesystem policy still belongs to the caller.",
+        "sources": [
+          {
+            "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:README.md:12-27",
+            "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/README.md#L12-L27",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "network_boundary": {
+        "result": "UNKNOWN",
+        "detail": "A task-specific outbound allow/deny policy was not established in the reviewed install/rootless material.",
+        "sources": [
+          {
+            "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:g3doc/user_guide/rootless.md:105-139",
+            "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/g3doc/user_guide/rootless.md#L105-L139",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:README.md:12-27",
+            "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/README.md#L12-L27",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "After the upstream signed apt repository setup: sudo apt-get update && sudo apt-get install -y runsc; manual release tarball instructions are also documented. Both commands can float and require artifact/version binding.",
+      "sources": [
+        {
+          "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:g3doc/user_guide/install.md:21-59",
+          "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/g3doc/user_guide/install.md#L21-L59",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "None documented in the inspected install/rootless pages for restoring Docker runtime registration or fully removing the binary set; this is an inverse finding.",
+      "sources": [
+        {
+          "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:g3doc/user_guide/install.md:31-59",
+          "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/g3doc/user_guide/install.md#L31-L59",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "runsc and containerd shim PATH names; package install automatically configures Docker; shared OCI runtime configuration and host namespace prerequisites. This row does not add a Docker/VM product to obtain macOS support.",
+      "sources": [
+        {
+          "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:g3doc/user_guide/install.md:31-59",
+          "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/g3doc/user_guide/install.md#L31-L59",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "runsc",
+          "containerd-shim-runsc-v1"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: OCI runsc isolates Linux applications with an application kernel and integrates with container runtimes.",
+      "sources": [
+        {
+          "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:README.md:12-27",
+          "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/README.md#L12-L27",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented OCI application-kernel runtime profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "google/gvisor@97e8e896904cb364319cd9758241d3f0bd27a6f4:README.md:15-17",
+          "url": "https://github.com/google/gvisor/blob/97e8e896904cb364319cd9758241d3f0bd27a6f4/README.md#L15-L17",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "c6112880b448df3cd3c939dbbcf65e8d78836eb2",
+        "2026-10-15T19:54:21Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/google~1gvisor"
+    },
+    "licence_note": {
+      "spdx": "Apache-2.0",
+      "source": "candidate-facts-ops.json#/candidates/google~1gvisor",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "FAIL",
+      "trial_eligible": false,
+      "disqualifier": "missing_required_capability",
+      "reason": "Missing native macOS arm64 host capability for the requested dual-host profile.",
+      "cheapest_check": "A Linux-only task boundary requires the layer owner to state that narrower requirement and qualify OCI/network cleanup separately."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "max-sixty/worktrunk",
+      "name": "Worktrunk",
+      "repository_url": "https://github.com/max-sixty/worktrunk",
+      "package_or_plugin_ids": [
+        "worktrunk",
+        "wt"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "Git edit-ownership CLI",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/max-sixty~1worktrunk"
+    },
+    "layer": "isolation",
+    "family": "research",
+    "family_service": "not served: a supported DeerFlow/GPT Researcher route is not established in the reused wave-1 profile",
+    "pin": {
+      "tag": "v0.80.0",
+      "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "selection": "reused wave-1 PR #1185 at c6a0004525aef204b92caf1a0e4b405478bb0fb1",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Separate Git worktrees preserve edit ownership; this is the edit-separation arm and makes no filesystem/network sandbox claim.",
+        "sources": [
+          {
+            "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:README.md:18-35",
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L18-L35",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "PASS",
+        "detail": "Reuse wave-1 exact v0.80.0 release-artifact evidence for Linux x86_64; no binary was run.",
+        "sources": [
+          {
+            "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:README.md:108-121",
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L108-L121",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "PASS",
+        "detail": "Reuse wave-1 exact v0.80.0 release-artifact evidence for macOS arm64.",
+        "sources": [
+          {
+            "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:README.md:108-121",
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L108-L121",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "Execute-on-switch launch command and documented --yes controls support scripted use.",
+        "sources": [
+          {
+            "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:README.md:64-68",
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L64-L68",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:docs/src/content/docs/config.md:741-882",
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/docs/src/content/docs/config.md#L741-L882",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "PASS",
+        "detail": "The documented CLI operates on user-owned Git worktrees and config; no privileged daemon is installed by this profile.",
+        "sources": [
+          {
+            "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:README.md:18-35",
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L18-L35",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:docs/src/content/docs/config.md:25-75",
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/docs/src/content/docs/config.md#L25-L75",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "User/project .config/wt.toml and XDG_CONFIG_HOME are documented.",
+        "sources": [
+          {
+            "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:docs/src/content/docs/config.md:25-75",
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/docs/src/content/docs/config.md#L25-L75",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "filesystem_boundary": {
+        "result": "UNKNOWN",
+        "detail": "Not a security boundary; restrictions are outside this edit-ownership profile.",
+        "sources": [
+          {
+            "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:README.md:32-35",
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L32-L35",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": false
+      },
+      "network_boundary": {
+        "result": "UNKNOWN",
+        "detail": "No network restriction boundary is claimed for Git worktree management.",
+        "sources": [
+          {
+            "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:README.md:32-35",
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L32-L35",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": false
+      },
+      "family_route": {
+        "result": "UNKNOWN",
+        "detail": "not served: a supported DeerFlow/GPT Researcher route is not established in the reused wave-1 profile",
+        "sources": [
+          {
+            "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:README.md:18-35",
+            "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L18-L35",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "brew install worktrunk && wt config shell install; alternative cargo install worktrunk && wt config shell install. Reused from wave-1; optional agent plugin is not part of this CLI profile.",
+      "sources": [
+        {
+          "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:README.md:108-121",
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L108-L121",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "wt config shell uninstall removes shell integration; brew uninstall worktrunk removes a Homebrew install. Owned worktree cleanup uses wt remove and must preserve dirty edits.",
+      "sources": [
+        {
+          "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:docs/src/content/docs/shell-integration.md:54",
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/docs/src/content/docs/shell-integration.md#L54",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:docs/src/content/docs/remove.md:164-167",
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/docs/src/content/docs/remove.md#L164-L167",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://docs.brew.sh/Manpage (read 2026-10-15)",
+          "url": "https://docs.brew.sh/Manpage",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "wt PATH collision with Windows Terminal alias; shell configuration edits; shared user config and executable project hooks. Optional model-generated commits and agent plugin injection are excluded from this profile.",
+      "sources": [
+        {
+          "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:README.md:113-134",
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L113-L134",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:docs/src/content/docs/config.md:25-75",
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/docs/src/content/docs/config.md#L25-L75",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "worktrunk",
+          "wt"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Separate Git worktrees preserve edit ownership; this is the edit-separation arm and makes no filesystem/network sandbox claim.",
+      "sources": [
+        {
+          "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:README.md:18-35",
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L18-L35",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented Git edit-ownership CLI profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:README.md:64-68",
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md#L64-L68",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:docs/src/content/docs/config.md:741-882",
+          "url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/docs/src/content/docs/config.md#L741-L882",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "4227ba4627e7a5423bbb28532f313feba4a71cba",
+        "2026-10-15T00:19:19Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/max-sixty~1worktrunk"
+    },
+    "licence_note": {
+      "spdx": "NOASSERTION",
+      "source": "candidate-facts-ops.json#/candidates/max-sixty~1worktrunk",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "trial_eligible": false,
+      "disqualifier": null,
+      "reason": "Reused wave-1 research-family route remains unestablished; generic Git use does not itself establish the runtime integration.",
+      "cheapest_check": "Read a supported research-runtime/worktree binding before proposing a trial."
+    },
+    "evidence_class": "source_review",
+    "reused_evidence": {
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/c6a0004525aef204b92caf1a0e4b405478bb0fb1/evidence/artifacts/harness-screens-20261015/candidate-facts-runtime.json",
+      "row": "workers.research.json",
+      "fields": [
+        "pin",
+        "maintenance",
+        "licence",
+        "platform",
+        "installation",
+        "inverse",
+        "CLI startup estimate"
+      ],
+      "note": "Family-independent facts reused, not re-derived. Layer-specific requirement judgment is new."
+    }
+  },
+  {
+    "candidate": {
+      "id": "moby/moby",
+      "name": "Docker Engine / Moby",
+      "repository_url": "https://github.com/moby/moby",
+      "package_or_plugin_ids": [
+        "dockerd",
+        "docker",
+        "docker.service",
+        "dockerd-rootless-setuptool.sh"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "Linux rootless OCI engine",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/moby~1moby"
+    },
+    "layer": "isolation",
+    "family": "research",
+    "family_service": "served as a model-neutral Linux rootless OCI engine adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "docker-v29.9.1",
+      "commit": "b26fb77d3e7b01f9d21b89539c1ab428f5ca431f",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Moby supplies the Docker Engine codebase; rootless dockerd is an explicitly supported mode.",
+        "sources": [
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:README.md:52-62",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/README.md#L52-L62",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless.sh:1-8",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless.sh#L1-L8",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "PASS",
+        "detail": "Rootless setup explicitly accepts Linux, requires user namespace helpers/subuid/subgid and a writable XDG_RUNTIME_DIR; WSL2 prerequisites are not measured.",
+        "sources": [
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless-setuptool.sh:43-54",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless-setuptool.sh#L43-L54",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless.sh:1-24",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless.sh#L1-L24",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "FAIL",
+        "detail": "Pinned rootless engine setup rejects every non-Linux host. Docker Desktop is a separate product, not established by this engine screen.",
+        "sources": [
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless-setuptool.sh:43-51",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless-setuptool.sh#L43-L51",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:README.md:41",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/README.md#L41",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "dockerd-rootless.sh accepts daemon options; the setup tool creates a user service.",
+        "sources": [
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless.sh:1-8",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless.sh#L1-L8",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless.sh:29-35",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless.sh#L29-L35",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "PASS",
+        "detail": "Setup refuses root and uses unprivileged namespaces; administrator provisioning of subordinate IDs/helpers may be required.",
+        "sources": [
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless-setuptool.sh:55-63",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless-setuptool.sh#L55-L63",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless.sh:6-8",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless.sh#L6-L8",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "UNKNOWN",
+        "detail": "Shared docker.service, rootless CLI context and default data/socket roots are explicit; family-specific daemon separation is not established by the setup recipe.",
+        "sources": [
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless-setuptool.sh:24-26",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless-setuptool.sh#L24-L26",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless-setuptool.sh:89-115",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless-setuptool.sh#L89-L115",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "filesystem_boundary": {
+        "result": "PASS",
+        "detail": "Rootless user namespace is documented; bind-mounted data policy remains workload-specific.",
+        "sources": [
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless.sh:1-8",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless.sh#L1-L8",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "network_boundary": {
+        "result": "PASS",
+        "detail": "RootlessKit network/port drivers and disabled host loopback by default are documented; selected egress policy remains workload-specific.",
+        "sources": [
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless.sh:10-27",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless.sh#L10-L27",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:README.md:52-62",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/README.md#L52-L62",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless.sh:1-8",
+            "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless.sh#L1-L8",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "After obtaining matching Docker Engine binaries, dockerd-rootless-setuptool.sh install is the pinned setup tool's supported entry point. Binary acquisition/version binding is not established by the Moby README.",
+      "sources": [
+        {
+          "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless-setuptool.sh:1-7",
+          "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless-setuptool.sh#L1-L7",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:README.md:55-62",
+          "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/README.md#L55-L62",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "dockerd-rootless-setuptool.sh uninstall stops/disables and removes the user docker.service, deletes its CLI context and returns to default; data deletion is separate.",
+      "sources": [
+        {
+          "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless-setuptool.sh:475-507",
+          "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless-setuptool.sh#L475-L507",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "docker.service, rootless CLI context, PATH docker/dockerd, rootful /var/run/docker.sock and containerd-rootless state can conflict; user data/socket defaults must not be shared accidentally across families.",
+      "sources": [
+        {
+          "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless-setuptool.sh:24-26",
+          "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless-setuptool.sh#L24-L26",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless-setuptool.sh:89-115",
+          "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless-setuptool.sh#L89-L115",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "dockerd",
+          "docker",
+          "docker.service",
+          "dockerd-rootless-setuptool.sh"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Moby supplies the Docker Engine codebase; rootless dockerd is an explicitly supported mode.",
+      "sources": [
+        {
+          "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:README.md:52-62",
+          "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/README.md#L52-L62",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless.sh:1-8",
+          "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless.sh#L1-L8",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented Linux rootless OCI engine profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless.sh:1-8",
+          "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless.sh#L1-L8",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "moby/moby@b26fb77d3e7b01f9d21b89539c1ab428f5ca431f:contrib/dockerd-rootless.sh:29-35",
+          "url": "https://github.com/moby/moby/blob/b26fb77d3e7b01f9d21b89539c1ab428f5ca431f/contrib/dockerd-rootless.sh#L29-L35",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "2c78eb06fa8edfcff7d11a5bc6c17ca9d194b36b",
+        "2026-10-15T19:56:32Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/moby~1moby"
+    },
+    "licence_note": {
+      "spdx": "Apache-2.0",
+      "source": "candidate-facts-ops.json#/candidates/moby~1moby",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "FAIL",
+      "trial_eligible": false,
+      "disqualifier": "missing_required_capability",
+      "reason": "Missing native macOS capability for the screened rootless engine profile; Linux host capability is separately documented.",
+      "cheapest_check": "A different macOS product/VM route requires its own pinned layer resolution; do not silently substitute it."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "podman-container-tools/podman",
+      "name": "Podman / Quadlet",
+      "repository_url": "https://github.com/podman-container-tools/podman",
+      "package_or_plugin_ids": [
+        "podman",
+        "podman machine",
+        "Quadlet .container/.service"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "rootless OCI CLI and user-service generator",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/podman-container-tools~1podman"
+    },
+    "layer": "isolation",
+    "family": "research",
+    "family_service": "served as a model-neutral rootless OCI CLI and user-service generator adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "v6.1.4",
+      "commit": "464c15fec06f0074c916f9eff87c4806869c2833",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Rootless containers, lifecycle management and networking are documented; macOS uses a managed Linux VM.",
+        "sources": [
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:README.md:16-42",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/README.md#L16-L42",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:README.md:77-87",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/README.md#L77-L87",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "PASS",
+        "detail": "Linux rootless route is documented; the official install page also documents WSLv2 and direct Linux-prompt access.",
+        "sources": [
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:README.md:16-42",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/README.md#L16-L42",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "PASS",
+        "detail": "Podman machine is rootless-only and supports macOS VM providers; v6.1.4 exposes podman-installer-macos-arm64.pkg.",
+        "sources": [
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:docs/source/markdown/podman-machine.1.md:13-32",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/docs/source/markdown/podman-machine.1.md#L13-L32",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "Container CLI and Quadlet-generated service units support noninteractive commands under systemd.",
+        "sources": [
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:docs/source/markdown/podman-systemd.unit.5.md:55-65",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/docs/source/markdown/podman-systemd.unit.5.md#L55-L65",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "PASS",
+        "detail": "Rootless mode cannot exceed the launching user's privileges; administrator provisioning may still be necessary.",
+        "sources": [
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:README.md:77-87",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/README.md#L77-L87",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "--root/--runroot select storage; per-user Quadlet search paths and machine XDG_CONFIG_HOME exist. Quadlet is Linux-only; Mac uses the machine CLI.",
+        "sources": [
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:docs/source/markdown/podman.1.md:123-169",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/docs/source/markdown/podman.1.md#L123-L169",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:docs/source/markdown/podman-systemd.unit.5.md:35-44",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/docs/source/markdown/podman-systemd.unit.5.md#L35-L44",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:docs/source/markdown/podman-machine.1.md:13-21",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/docs/source/markdown/podman-machine.1.md#L13-L21",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "filesystem_boundary": {
+        "result": "PASS",
+        "detail": "Rootless user namespaces restrict privilege; volumes/mounts remain caller-selected.",
+        "sources": [
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:README.md:77-87",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/README.md#L77-L87",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "network_boundary": {
+        "result": "PASS",
+        "detail": "Netavark and rootless pasta provide the documented network layer; workload-specific firewall/egress policy is not inferred.",
+        "sources": [
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:README.md:34-37",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/README.md#L34-L37",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:README.md:109",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/README.md#L109",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:README.md:16-42",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/README.md#L16-L42",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:README.md:77-87",
+            "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/README.md#L77-L87",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "Linux/WSL Ubuntu: sudo apt-get update; sudo apt-get -y install podman. macOS: vendor v6.1.4 arm64 package installer, then podman machine init and podman machine start. Distro package version must be bound before trial. Upstream discourages the community Homebrew route.",
+      "sources": [
+        {
+          "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:install.md:1-5",
+          "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/install.md#L1-L5",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "https://podman.io/docs/installation (read 2026-10-15)",
+          "url": "https://podman.io/docs/installation",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "podman machine rm <owned-name> removes that VM and generated connection/files. Quadlet-generated units can be controlled with systemctl --user; full distro/pkg uninstall is not established by the pinned pages.",
+      "sources": [
+        {
+          "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:docs/source/markdown/podman-machine-rm.1.md:7-28",
+          "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/docs/source/markdown/podman-machine-rm.1.md#L7-L28",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:docs/source/markdown/podman-systemd.unit.5.md:55-65",
+          "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/docs/source/markdown/podman-systemd.unit.5.md#L55-L65",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "podman PATH, Docker-compatible socket/client settings, machine storage under XDG_CONFIG_HOME, Quadlet filenames mapped to same-name .service units and generated units shadowing existing units. All-users Quadlet directories affect every login session.",
+      "sources": [
+        {
+          "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:docs/source/markdown/podman-machine.1.md:13-21",
+          "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/docs/source/markdown/podman-machine.1.md#L13-L21",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:docs/source/markdown/podman-systemd.unit.5.md:55-85",
+          "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/docs/source/markdown/podman-systemd.unit.5.md#L55-L85",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "podman",
+          "podman machine",
+          "Quadlet .container/.service"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Rootless containers, lifecycle management and networking are documented; macOS uses a managed Linux VM.",
+      "sources": [
+        {
+          "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:README.md:16-42",
+          "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/README.md#L16-L42",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:README.md:77-87",
+          "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/README.md#L77-L87",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented rootless OCI CLI and user-service generator profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "podman-container-tools/podman@464c15fec06f0074c916f9eff87c4806869c2833:docs/source/markdown/podman-systemd.unit.5.md:55-65",
+          "url": "https://github.com/podman-container-tools/podman/blob/464c15fec06f0074c916f9eff87c4806869c2833/docs/source/markdown/podman-systemd.unit.5.md#L55-L65",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "aa8f8452ab7eaa0f367319cac87d87f1f5577ded",
+        "2026-10-15T15:01:08Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/podman-container-tools~1podman"
+    },
+    "licence_note": {
+      "spdx": "Apache-2.0",
+      "source": "candidate-facts-ops.json#/candidates/podman-container-tools~1podman",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "trial_eligible": false,
+      "disqualifier": null,
+      "reason": "Capability is documented, but exact Linux v6.1.4 package acquisition and complete owned disable/uninstall mapping are not bound; no host trial admitted yet.",
+      "cheapest_check": "Read supported distro artifact/version selection and package inverse; bind unique user service/storage names and verify the non-global disable route from vendor docs."
+    },
+    "evidence_class": "source_review"
+  },
+  {
+    "candidate": {
+      "id": "superradcompany/microsandbox",
+      "name": "Microsandbox",
+      "repository_url": "https://github.com/superradcompany/microsandbox",
+      "package_or_plugin_ids": [
+        "microsandbox",
+        "msb"
+      ],
+      "inventory_status": "frozen_inventory",
+      "component_kind": "local micro-VM CLI/SDK",
+      "family_independent_facts_ref": "candidate-facts-ops.json#/candidates/superradcompany~1microsandbox"
+    },
+    "layer": "isolation",
+    "family": "research",
+    "family_service": "served as a model-neutral local micro-VM CLI/SDK adjunct; named family integration remains a CANDIDATE, not a default",
+    "pin": {
+      "tag": "v0.7.8",
+      "commit": "7b7b9dc89e9a1c77801918f7833c3381d1754579",
+      "selection": "frozen GitHub facts latest release at 2026-10-15T20:03Z",
+      "package_pin_note": "Release labels can identify a monorepo subpackage. The documented command is source evidence only; any floating package/artifact must be resolved to the screened component before installation."
+    },
+    "requirements_result": {
+      "layer_capability": {
+        "result": "PASS",
+        "detail": "Local microVMs run untrusted workloads; YAML separates filesystem, network, resources and runtime settings.",
+        "sources": [
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:28-41",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L28-L41",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:docs/cli/configuration.mdx:67-79",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/docs/cli/configuration.mdx#L67-L79",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "linux_wsl2_x86_64": {
+        "result": "UNKNOWN",
+        "detail": "Release exposes Linux x86_64; README requires KVM but does not establish WSL2-specific support/prerequisites.",
+        "sources": [
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:109-113",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L109-L113",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "macos_arm64": {
+        "result": "PASS",
+        "detail": "Apple Silicon is explicit; release includes darwin-aarch64 artifacts.",
+        "sources": [
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:109-111",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L109-L111",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "headless": {
+        "result": "PASS",
+        "detail": "Named sandbox CLI exec and detached operation are documented.",
+        "sources": [
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:130-158",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L130-L158",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "rootless_operation": {
+        "result": "UNKNOWN",
+        "detail": "Daemonless embedding is documented, but rootless KVM/host prerequisite contract was not established by the reviewed pages.",
+        "sources": [
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:38-40",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L38-L40",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:109-113",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L109-L113",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "per_profile_scoping": {
+        "result": "PASS",
+        "detail": "Explicit --conf/--net-conf/--resource-conf/--runtime-conf/--fs-conf files scope command policy; family assignment is external.",
+        "sources": [
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:docs/cli/configuration.mdx:67-79",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/docs/cli/configuration.mdx#L67-L79",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "filesystem_boundary": {
+        "result": "PASS",
+        "detail": "MicroVM boundary and mount-scoped filesystem settings are documented.",
+        "sources": [
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:28-38",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L28-L38",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:docs/cli/configuration.mdx:73-77",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/docs/cli/configuration.mdx#L73-L77",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "network_boundary": {
+        "result": "PASS",
+        "detail": "Config exposes network allow/deny, ports, DNS and policy; README contains an allowlisted sandbox example.",
+        "sources": [
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:169-182",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L169-L182",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:docs/cli/configuration.mdx:73-79",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/docs/cli/configuration.mdx#L73-L79",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      },
+      "family_route": {
+        "result": "PASS",
+        "detail": "CANDIDATE: the documented model-neutral interface can serve the family at the process/service boundary. PROPOSAL: the owned research profile supplies its command or telemetry configuration; no native family adapter is asserted.",
+        "sources": [
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:28-41",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L28-L41",
+            "evidence_class": "source_review"
+          },
+          {
+            "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:docs/cli/configuration.mdx:67-79",
+            "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/docs/cli/configuration.mdx#L67-L79",
+            "evidence_class": "source_review"
+          }
+        ],
+        "required": true
+      }
+    },
+    "install_path": {
+      "detail": "npm i -g microsandbox; alternatives curl -fsSL https://install.microsandbox.dev | sh, uv tool install microsandbox or cargo install microsandbox are documented. Screened source is v0.7.8; no command was executed.",
+      "sources": [
+        {
+          "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:47-74",
+          "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L47-L74",
+          "evidence_class": "source_review"
+        }
+      ],
+      "family_profile": "PROPOSAL: DeerFlow and GPT Researcher; dedicated owned environment/configuration and only the explicitly screened interface.",
+      "executed": false
+    },
+    "inverse": {
+      "detail": "msb stop <owned-name>; msb rm <owned-name>; msb self uninstall --yes removes CLI/runtime/command links. msb uninstall <name> removes a generated sandbox command, not the CLI.",
+      "sources": [
+        {
+          "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:155-158",
+          "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L155-L158",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:docs/cli/management.mdx:52-87",
+          "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/docs/cli/management.mdx#L52-L87",
+          "evidence_class": "source_review"
+        }
+      ],
+      "executed": false
+    },
+    "conflicts": {
+      "detail": "msb PATH and generated ~/.microsandbox/bin commands; explicit port mappings; shared runtime state. Optional microsandbox MCP/agent skills are separate upstream packages and not included in the CLI context estimate.",
+      "sources": [
+        {
+          "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:docs/cli/management.mdx:19-28",
+          "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/docs/cli/management.mdx#L19-L28",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:docs/cli/configuration.mdx:73-79",
+          "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/docs/cli/configuration.mdx#L73-L79",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:41",
+          "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L41",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:451",
+          "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L451",
+          "evidence_class": "source_review"
+        }
+      ],
+      "fenced_sessions": "Never enable or collect fenced trading, judge or review sessions. Unfenced engineering reviewer roles are separate.",
+      "profile_policy": "PROPOSAL: role activation, endpoint allocation and family profile names require layer convergence. WSL2 distributions share one network namespace; port conflicts cross distribution boundaries (task constraint). No existing session, service or global configuration was changed.",
+      "coverage": {
+        "ports": "See detail; absent fixed listener is not a promise about workload ports.",
+        "systemd_user_units": "See detail; no unit is created by this research.",
+        "shared_config": "See detail; caller-owned state must be explicit.",
+        "PATH_binaries": [
+          "microsandbox",
+          "msb"
+        ],
+        "telemetry_endpoints": "See detail; any family-specific forwarding remains unmeasured.",
+        "MCP_names": "No MCP registration in the selected non-MCP profile unless explicitly documented above."
+      }
+    },
+    "suited_roles": {
+      "roles": [
+        "builder",
+        "reviewer (unfenced)",
+        "auditor",
+        "researcher",
+        "CC",
+        "co-op",
+        "runtime workers per profile"
+      ],
+      "reason": "PROPOSAL routed to the layer-resolution protocol: assign only an unfenced owned research profile after convergence. Candidate function: Local microVMs run untrusted workloads; YAML separates filesystem, network, resources and runtime settings.",
+      "sources": [
+        {
+          "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:28-41",
+          "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L28-L41",
+          "evidence_class": "source_review"
+        },
+        {
+          "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:docs/cli/configuration.mdx:67-79",
+          "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/docs/cli/configuration.mdx#L67-L79",
+          "evidence_class": "source_review"
+        }
+      ],
+      "status": "CANDIDATE / PROPOSAL"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_total_tokens": 0,
+      "total_scope": "Incremental automatic model-session-start injection from the documented local micro-VM CLI/SDK profile only.",
+      "method": "Empty injected-text set: 0 UTF-8 bytes; ceil(bytes/4)=0. No tokenizer or model session was run.",
+      "counted_components": [],
+      "included_categories": [
+        "skill descriptions: none installed in this profile",
+        "startup instructions: none installed in this profile",
+        "hook text: none installed in this profile",
+        "MCP schemas: none registered in this profile"
+      ],
+      "missing_categories": [],
+      "note": "CANDIDATE estimate, not measured. The command/service/library is external to model startup; caller prompts, optional plugins/MCP and baseline model context are excluded.",
+      "sources": [
+        {
+          "citation": "superradcompany/microsandbox@7b7b9dc89e9a1c77801918f7833c3381d1754579:README.md:130-158",
+          "url": "https://github.com/superradcompany/microsandbox/blob/7b7b9dc89e9a1c77801918f7833c3381d1754579/README.md#L130-L158",
+          "evidence_class": "source_review"
+        }
+      ]
+    },
+    "maintenance": {
+      "archived": false,
+      "newest_default_branch_commit": [
+        "0feec23228e3fd2a94ae5e4719acf5e5667365ec",
+        "2026-10-15T17:31:07Z"
+      ],
+      "abandonment": "No deterministic maintenance failure in supplied facts; this is not an A2 score.",
+      "source": "candidate-facts-ops.json#/candidates/superradcompany~1microsandbox"
+    },
+    "licence_note": {
+      "spdx": "Apache-2.0",
+      "source": "candidate-facts-ops.json#/candidates/superradcompany~1microsandbox",
+      "read_at": "2026-10-15T20:03Z (supplied snapshot)",
+      "effect": "Compliance note only; never a verdict ground."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "trial_eligible": false,
+      "disqualifier": null,
+      "reason": "WSL2 and rootless host prerequisites remain unverified; platform assets alone do not qualify host virtualization.",
+      "cheapest_check": "Read pinned host setup/doctor implementation for WSL2 KVM and non-root device access; no candidate execution is required for this next check."
+    },
+    "evidence_class": "source_review"
+  }
+]

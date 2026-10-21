@@ -1,0 +1,2915 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "read_date": "2026-10-15",
+  "method": "Read exact Git objects from existing local mirrors with lazy fetch/optional locks disabled; otherwise anonymous GitHub raw at the same full commit. Read bytes only; no candidate code executed.",
+  "purpose": "Reproducible source custody and citation-range validation; this does not mechanically validate the semantic judgment in each row.",
+  "source_files": [
+    {
+      "repository": "anthropics/sandbox-runtime",
+      "commit": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "path": "README.md",
+      "line_count": 908,
+      "sha256": "2b18ce30672734247519435d5755875ed5f962ef9d0dbfe00994f6097bbe4b93",
+      "read_method": "pinned local mirror",
+      "cited_ranges": [
+        [
+          3,
+          5
+        ],
+        [
+          11,
+          15
+        ],
+        [
+          115,
+          126
+        ],
+        [
+          122,
+          126
+        ],
+        [
+          162,
+          174
+        ],
+        [
+          173,
+          185
+        ],
+        [
+          177,
+          185
+        ],
+        [
+          211,
+          213
+        ],
+        [
+          546,
+          547
+        ],
+        [
+          546,
+          579
+        ],
+        [
+          569,
+          579
+        ],
+        [
+          581,
+          583
+        ]
+      ]
+    },
+    {
+      "repository": "anthropics/sandbox-runtime",
+      "commit": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "path": "package.json",
+      "line_count": 88,
+      "sha256": "a311b4277529c52b73105618b33c0b4d4eef3658693829534717dc6a354f7112",
+      "read_method": "pinned local mirror",
+      "cited_ranges": [
+        [
+          2,
+          12
+        ],
+        [
+          8,
+          10
+        ],
+        [
+          53,
+          59
+        ]
+      ]
+    },
+    {
+      "repository": "apple/container",
+      "commit": "d265d669ecae041bf338cb3b39c4118316d138f0",
+      "path": "docs/technical-overview.md",
+      "line_count": 77,
+      "sha256": "64c59aef1c21aa22d4ba8ac70ab87f58edc4b124bf52fd72e5d01f5f8c04cb8c",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          24,
+          32
+        ],
+        [
+          24,
+          34
+        ],
+        [
+          26,
+          29
+        ],
+        [
+          26,
+          32
+        ]
+      ]
+    },
+    {
+      "repository": "apple/container",
+      "commit": "d265d669ecae041bf338cb3b39c4118316d138f0",
+      "path": "README.md",
+      "line_count": 109,
+      "sha256": "e139019fdc5c1e828bea3cb9ff477685ced6163691ac1107afdb01bf5d7e8bb7",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          18,
+          20
+        ],
+        [
+          22,
+          37
+        ],
+        [
+          24,
+          26
+        ],
+        [
+          24,
+          41
+        ],
+        [
+          26,
+          31
+        ],
+        [
+          49,
+          63
+        ],
+        [
+          73,
+          84
+        ]
+      ]
+    },
+    {
+      "repository": "apple/container",
+      "commit": "d265d669ecae041bf338cb3b39c4118316d138f0",
+      "path": "docs/networking.md",
+      "line_count": 221,
+      "sha256": "b7566a1a20c7d533551d5f6fe98f1059058629b3b5fd1c71498d9784e6e85c84",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          6,
+          9
+        ],
+        [
+          86,
+          92
+        ]
+      ]
+    },
+    {
+      "repository": "boxlite-ai/boxlite",
+      "commit": "7873ae4995e171237a3342adbb84000c8ab9965b",
+      "path": "README.md",
+      "line_count": 254,
+      "sha256": "a520ee7ec30cd1984e81c0ac709856a784870195d933aa33ece9db72d942cedc",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          26,
+          33
+        ],
+        [
+          31,
+          31
+        ],
+        [
+          45,
+          63
+        ],
+        [
+          163,
+          166
+        ],
+        [
+          163,
+          167
+        ],
+        [
+          174,
+          176
+        ],
+        [
+          227,
+          239
+        ],
+        [
+          237,
+          239
+        ]
+      ]
+    },
+    {
+      "repository": "boxlite-ai/boxlite",
+      "commit": "7873ae4995e171237a3342adbb84000c8ab9965b",
+      "path": "docs/reference/cli/README.md",
+      "line_count": 1004,
+      "sha256": "d107a4635006302c69daf1e67b83003e0d92fb9a8bc53274e4e718e9c6c65182",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          60,
+          81
+        ],
+        [
+          132,
+          152
+        ],
+        [
+          132,
+          162
+        ],
+        [
+          294,
+          322
+        ],
+        [
+          328,
+          332
+        ],
+        [
+          328,
+          334
+        ],
+        [
+          354,
+          354
+        ],
+        [
+          434,
+          467
+        ],
+        [
+          818,
+          820
+        ]
+      ]
+    },
+    {
+      "repository": "e2b-dev/e2b",
+      "commit": "62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3",
+      "path": "README.md",
+      "line_count": 112,
+      "sha256": "5951729113017efbe02952b197a3ad61d0014cfaba3e6b1aad37a25a5b97b0c2",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          20,
+          20
+        ],
+        [
+          20,
+          33
+        ],
+        [
+          24,
+          41
+        ],
+        [
+          24,
+          60
+        ],
+        [
+          36,
+          41
+        ],
+        [
+          44,
+          60
+        ]
+      ]
+    },
+    {
+      "repository": "e2b-dev/e2b",
+      "commit": "62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3",
+      "path": "packages/python-sdk/pyproject.toml",
+      "line_count": 80,
+      "sha256": "8ca2ba052b9edec6f642e37ab6acdb4bb7f030e7aa7058e4d2b0cd90fa2e69f9",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          1,
+          8
+        ],
+        [
+          1,
+          24
+        ]
+      ]
+    },
+    {
+      "repository": "e2b-dev/e2b",
+      "commit": "62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3",
+      "path": "packages/python-sdk/e2b/sandbox_sync/main.py",
+      "line_count": 1240,
+      "sha256": "65e5579660921993fac7cf131adff7aa47a1166c8c4e5d2e6b7edbcd8b31cad4",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          169,
+          198
+        ],
+        [
+          510,
+          541
+        ]
+      ]
+    },
+    {
+      "repository": "e2b-dev/e2b",
+      "commit": "62a17dfc3f11439d1d06bfb9bb515eadc5adfcd3",
+      "path": "packages/python-sdk/e2b/api/client/models/sandbox_network_config.py",
+      "line_count": 181,
+      "sha256": "bcedefe376716cd6bd2e0e9eb3b225cd454a52842f80a7167715d90464c2e025",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          23,
+          36
+        ],
+        [
+          23,
+          43
+        ]
+      ]
+    },
+    {
+      "repository": "google/gvisor",
+      "commit": "97e8e896904cb364319cd9758241d3f0bd27a6f4",
+      "path": "README.md",
+      "line_count": 184,
+      "sha256": "193a47b3fe5124e1393903402017cee4764c90f99e195d4a359b362418e0dd90",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          12,
+          27
+        ],
+        [
+          15,
+          17
+        ],
+        [
+          57,
+          76
+        ],
+        [
+          68,
+          76
+        ],
+        [
+          126,
+          133
+        ]
+      ]
+    },
+    {
+      "repository": "google/gvisor",
+      "commit": "97e8e896904cb364319cd9758241d3f0bd27a6f4",
+      "path": "g3doc/user_guide/rootless.md",
+      "line_count": 150,
+      "sha256": "a7964582ff62d32fb3a3f6998ae98ed66bcd94bef399af5769f23447f5184bbb",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          5,
+          12
+        ],
+        [
+          95,
+          108
+        ],
+        [
+          95,
+          139
+        ],
+        [
+          105,
+          139
+        ]
+      ]
+    },
+    {
+      "repository": "google/gvisor",
+      "commit": "97e8e896904cb364319cd9758241d3f0bd27a6f4",
+      "path": "g3doc/user_guide/install.md",
+      "line_count": 218,
+      "sha256": "44f2b58e8bde4089c28219a41e02b4e06d1d82ff6ffaf3842bc57f7d3d45bbea",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          21,
+          59
+        ],
+        [
+          31,
+          59
+        ]
+      ]
+    },
+    {
+      "repository": "max-sixty/worktrunk",
+      "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "README.md",
+      "line_count": 267,
+      "sha256": "e627eb18fd1f383a0bbdc43531675fc2c93e6c8ab2290bc54c817ae23f4ad0aa",
+      "read_method": "pinned local mirror",
+      "cited_ranges": [
+        [
+          18,
+          35
+        ],
+        [
+          32,
+          35
+        ],
+        [
+          64,
+          68
+        ],
+        [
+          108,
+          121
+        ],
+        [
+          113,
+          134
+        ]
+      ]
+    },
+    {
+      "repository": "max-sixty/worktrunk",
+      "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "docs/src/content/docs/config.md",
+      "line_count": 1365,
+      "sha256": "d96a260c3b56f8ff4787768b580b2e2d1c3b61f45adfa40b9839647fe799c8dd",
+      "read_method": "pinned local mirror",
+      "cited_ranges": [
+        [
+          25,
+          75
+        ],
+        [
+          741,
+          882
+        ]
+      ]
+    },
+    {
+      "repository": "max-sixty/worktrunk",
+      "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "docs/src/content/docs/shell-integration.md",
+      "line_count": 259,
+      "sha256": "e955e171906712b1d3014df0e52c6b354f30502a000dbea178b7d76be39597b6",
+      "read_method": "pinned local mirror",
+      "cited_ranges": [
+        [
+          54,
+          54
+        ]
+      ]
+    },
+    {
+      "repository": "max-sixty/worktrunk",
+      "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "path": "docs/src/content/docs/remove.md",
+      "line_count": 204,
+      "sha256": "540cf7016461797821805b449577020f9499699053990b04b05e3ae7e6cd99c9",
+      "read_method": "pinned local mirror",
+      "cited_ranges": [
+        [
+          164,
+          167
+        ]
+      ]
+    },
+    {
+      "repository": "moby/moby",
+      "commit": "b26fb77d3e7b01f9d21b89539c1ab428f5ca431f",
+      "path": "README.md",
+      "line_count": 101,
+      "sha256": "97dff8df1c816b0c115f7fcd976bbaaf9106edc0f5d8c8559c74a6bcac285b04",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          41,
+          41
+        ],
+        [
+          52,
+          62
+        ],
+        [
+          55,
+          62
+        ]
+      ]
+    },
+    {
+      "repository": "moby/moby",
+      "commit": "b26fb77d3e7b01f9d21b89539c1ab428f5ca431f",
+      "path": "contrib/dockerd-rootless.sh",
+      "line_count": 256,
+      "sha256": "200203633806081a401e60aefdf68a8fa73fc7dc80aa854c52a69d47710a3488",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          1,
+          8
+        ],
+        [
+          1,
+          24
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          10,
+          27
+        ],
+        [
+          29,
+          35
+        ]
+      ]
+    },
+    {
+      "repository": "moby/moby",
+      "commit": "b26fb77d3e7b01f9d21b89539c1ab428f5ca431f",
+      "path": "contrib/dockerd-rootless-setuptool.sh",
+      "line_count": 572,
+      "sha256": "1c9f0dc93ebb3d75255254ec760d26a912affba7f329ab8abffe8e25eb0b3f94",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          1,
+          7
+        ],
+        [
+          24,
+          26
+        ],
+        [
+          43,
+          51
+        ],
+        [
+          43,
+          54
+        ],
+        [
+          55,
+          63
+        ],
+        [
+          89,
+          115
+        ],
+        [
+          475,
+          507
+        ]
+      ]
+    },
+    {
+      "repository": "podman-container-tools/podman",
+      "commit": "464c15fec06f0074c916f9eff87c4806869c2833",
+      "path": "README.md",
+      "line_count": 221,
+      "sha256": "a4bd359952bca78617cd03900fc27da6f16028fae7acc88628100254b32bcf5e",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          16,
+          42
+        ],
+        [
+          34,
+          37
+        ],
+        [
+          77,
+          87
+        ],
+        [
+          109,
+          109
+        ]
+      ]
+    },
+    {
+      "repository": "podman-container-tools/podman",
+      "commit": "464c15fec06f0074c916f9eff87c4806869c2833",
+      "path": "docs/source/markdown/podman-machine.1.md",
+      "line_count": 63,
+      "sha256": "7e90a3a486bc70066d107df17b2a82084c1937b0eab44217a2e795b3c81a84d9",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          13,
+          21
+        ],
+        [
+          13,
+          32
+        ]
+      ]
+    },
+    {
+      "repository": "podman-container-tools/podman",
+      "commit": "464c15fec06f0074c916f9eff87c4806869c2833",
+      "path": "docs/source/markdown/podman-systemd.unit.5.md",
+      "line_count": 2579,
+      "sha256": "5b1f681f6358d8715057b52f5b4d29c13530f2ed2fa507f7f9437f86361bac33",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          35,
+          44
+        ],
+        [
+          55,
+          65
+        ],
+        [
+          55,
+          85
+        ]
+      ]
+    },
+    {
+      "repository": "podman-container-tools/podman",
+      "commit": "464c15fec06f0074c916f9eff87c4806869c2833",
+      "path": "docs/source/markdown/podman.1.md",
+      "line_count": 520,
+      "sha256": "5b8f0f4bf7cac3dc4f08ab6611518b3275f96fc5cfdc5012adaace8570a6d77d",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          123,
+          169
+        ]
+      ]
+    },
+    {
+      "repository": "podman-container-tools/podman",
+      "commit": "464c15fec06f0074c916f9eff87c4806869c2833",
+      "path": "install.md",
+      "line_count": 5,
+      "sha256": "1308b2612e81512e6a4290bd650d99b91d4f9573b9c308c5c55cdf2a8c511499",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          1,
+          5
+        ]
+      ]
+    },
+    {
+      "repository": "podman-container-tools/podman",
+      "commit": "464c15fec06f0074c916f9eff87c4806869c2833",
+      "path": "docs/source/markdown/podman-machine-rm.1.md",
+      "line_count": 66,
+      "sha256": "cd1dc9e2d6106314c88c91197d22ffe619dc11ccb86ab6515552f0725f3aa4e0",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          7,
+          28
+        ]
+      ]
+    },
+    {
+      "repository": "superradcompany/microsandbox",
+      "commit": "7b7b9dc89e9a1c77801918f7833c3381d1754579",
+      "path": "README.md",
+      "line_count": 488,
+      "sha256": "396e70bf5d041ab393612ec4935782a14a3311a1dd66bbe7b9b90b46fcc4dd89",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          28,
+          38
+        ],
+        [
+          28,
+          41
+        ],
+        [
+          38,
+          40
+        ],
+        [
+          41,
+          41
+        ],
+        [
+          47,
+          74
+        ],
+        [
+          109,
+          111
+        ],
+        [
+          109,
+          113
+        ],
+        [
+          130,
+          158
+        ],
+        [
+          155,
+          158
+        ],
+        [
+          169,
+          182
+        ],
+        [
+          451,
+          451
+        ]
+      ]
+    },
+    {
+      "repository": "superradcompany/microsandbox",
+      "commit": "7b7b9dc89e9a1c77801918f7833c3381d1754579",
+      "path": "docs/cli/configuration.mdx",
+      "line_count": 340,
+      "sha256": "cc9c19e5030fb0f5044cc3bf71729d462b159afcf1e9d93e0624de966a4f2b67",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          67,
+          79
+        ],
+        [
+          73,
+          77
+        ],
+        [
+          73,
+          79
+        ]
+      ]
+    },
+    {
+      "repository": "superradcompany/microsandbox",
+      "commit": "7b7b9dc89e9a1c77801918f7833c3381d1754579",
+      "path": "docs/cli/management.mdx",
+      "line_count": 109,
+      "sha256": "9ea26f52692820a0ed5259b66d4926ee43fe21dc550d3e65daa588319674d2db",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          19,
+          28
+        ],
+        [
+          52,
+          87
+        ]
+      ]
+    },
+    {
+      "repository": "conductor-oss/conductor",
+      "commit": "49f972398e533441ba851e2b578a8b96d748a770",
+      "path": "README.md",
+      "line_count": 396,
+      "sha256": "8950bb0cbbe0de5ad7ffeab66ee8a95f8f7dc1dca9527b547e28c4042e522141",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          31,
+          44
+        ],
+        [
+          40,
+          44
+        ],
+        [
+          47,
+          70
+        ],
+        [
+          63,
+          67
+        ],
+        [
+          79,
+          90
+        ],
+        [
+          85,
+          90
+        ],
+        [
+          167,
+          179
+        ],
+        [
+          173,
+          179
+        ],
+        [
+          309,
+          309
+        ],
+        [
+          339,
+          339
+        ],
+        [
+          345,
+          345
+        ]
+      ]
+    },
+    {
+      "repository": "conductor-oss/conductor",
+      "commit": "49f972398e533441ba851e2b578a8b96d748a770",
+      "path": "docs/documentation/configuration/appconf.md",
+      "line_count": 192,
+      "sha256": "be143f1fa00ec5d82a42e5ad6679b06e9ba9cccd1071182dde52f76e76eb337b",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          31,
+          41
+        ],
+        [
+          40,
+          41
+        ]
+      ]
+    },
+    {
+      "repository": "conductor-oss/conductor",
+      "commit": "49f972398e533441ba851e2b578a8b96d748a770",
+      "path": "docs/documentation/configuration/taskdef.md",
+      "line_count": 200,
+      "sha256": "01874fe5e9ad592a306c6ab85582bf26125532b9ef470db5fcec4c9575200963",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          18,
+          27
+        ],
+        [
+          23,
+          33
+        ]
+      ]
+    },
+    {
+      "repository": "conductor-oss/conductor",
+      "commit": "49f972398e533441ba851e2b578a8b96d748a770",
+      "path": "rest/src/main/java/com/netflix/conductor/rest/controllers/WorkflowResource.java",
+      "line_count": 491,
+      "sha256": "6a63bce7898362ce94aedaacfcbbe4ac28ebe11f4082476b01735958d97aa477",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          252,
+          325
+        ]
+      ]
+    },
+    {
+      "repository": "dagster-io/dagster",
+      "commit": "fb6aeab1df0f2dc72cac644ba1fa332dbfa18593",
+      "path": "python_modules/dagster/README.md",
+      "line_count": 149,
+      "sha256": "c67be78a0355a34b38964ba3e64fa615604e175afbc00bef4506afd4bf0a0b34",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          31,
+          35
+        ]
+      ]
+    },
+    {
+      "repository": "dagster-io/dagster",
+      "commit": "fb6aeab1df0f2dc72cac644ba1fa332dbfa18593",
+      "path": "docs/docs/deployment/oss/oss-instance-configuration.md",
+      "line_count": 396,
+      "sha256": "b7117d0089e1d5c0c41976d28ff03b715909011f80277a61770e548ff8e2c608",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          9,
+          23
+        ],
+        [
+          17,
+          23
+        ],
+        [
+          47,
+          63
+        ],
+        [
+          54,
+          63
+        ]
+      ]
+    },
+    {
+      "repository": "dagster-io/dagster",
+      "commit": "fb6aeab1df0f2dc72cac644ba1fa332dbfa18593",
+      "path": "docs/docs/getting-started/installation.md",
+      "line_count": 144,
+      "sha256": "1d2e3304498482db76a99a8914ce1e374f111b40f5442e9e453403cc3ce6be13",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          11,
+          15
+        ],
+        [
+          63,
+          72
+        ]
+      ]
+    },
+    {
+      "repository": "dagster-io/dagster",
+      "commit": "fb6aeab1df0f2dc72cac644ba1fa332dbfa18593",
+      "path": "docs/docs/deployment/execution/run-monitoring.md",
+      "line_count": 106,
+      "sha256": "752723bdea299ed956acc0b4a86dd3acb2f8ae48a3ecc57fb1affdb5c791ba5f",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          7,
+          15
+        ],
+        [
+          24,
+          34
+        ],
+        [
+          28,
+          34
+        ],
+        [
+          69,
+          80
+        ],
+        [
+          82,
+          106
+        ]
+      ]
+    },
+    {
+      "repository": "dagster-io/dagster",
+      "commit": "fb6aeab1df0f2dc72cac644ba1fa332dbfa18593",
+      "path": "python_modules/dagster/dagster/_core/launcher/default_run_launcher.py",
+      "line_count": 212,
+      "sha256": "6984c02920f1af7c2374492ef49c5c84739c794938b490fd6bacf43e4a15be30",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          153,
+          178
+        ]
+      ]
+    },
+    {
+      "repository": "dagster-io/dagster",
+      "commit": "fb6aeab1df0f2dc72cac644ba1fa332dbfa18593",
+      "path": "docs/docs/deployment/execution/run-retries.md",
+      "line_count": 96,
+      "sha256": "30812d7552139063bb441f9b457df4a3400dee89d21ef5fa006ca806585aca79",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          45,
+          59
+        ]
+      ]
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "225d4ee26017f32391ba8d8119c37c392b839614",
+      "path": "README.md",
+      "line_count": 1145,
+      "sha256": "acec0f2393267643e3773b7f9980d522269f5138f351f38bf3ec3c0bfb975aed",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          18,
+          26
+        ],
+        [
+          18,
+          31
+        ],
+        [
+          33,
+          33
+        ],
+        [
+          61,
+          76
+        ],
+        [
+          109,
+          118
+        ],
+        [
+          109,
+          148
+        ],
+        [
+          148,
+          148
+        ],
+        [
+          172,
+          172
+        ],
+        [
+          833,
+          853
+        ],
+        [
+          843,
+          845
+        ],
+        [
+          843,
+          853
+        ],
+        [
+          844,
+          845
+        ],
+        [
+          848,
+          853
+        ],
+        [
+          901,
+          915
+        ],
+        [
+          909,
+          914
+        ],
+        [
+          988,
+          1005
+        ],
+        [
+          988,
+          1007
+        ],
+        [
+          992,
+          1004
+        ],
+        [
+          998,
+          1007
+        ],
+        [
+          1004,
+          1004
+        ]
+      ]
+    },
+    {
+      "repository": "microsoft/pg_durable",
+      "commit": "2ccb746756e1071b24172b541f7af130166c0c6b",
+      "path": "README.md",
+      "line_count": 420,
+      "sha256": "f685146d809bc9d282b3eed82e4171ebf84b0387ff395d9a7c517bbd7e879edc",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          14,
+          16
+        ],
+        [
+          89,
+          92
+        ],
+        [
+          89,
+          101
+        ],
+        [
+          104,
+          110
+        ],
+        [
+          104,
+          124
+        ],
+        [
+          134,
+          140
+        ],
+        [
+          134,
+          158
+        ],
+        [
+          142,
+          158
+        ],
+        [
+          159,
+          162
+        ]
+      ]
+    },
+    {
+      "repository": "microsoft/pg_durable",
+      "commit": "2ccb746756e1071b24172b541f7af130166c0c6b",
+      "path": "USER_GUIDE.md",
+      "line_count": 3687,
+      "sha256": "e724c661d813293c3f01d2a36e4c3c6977526b3f40e37c1c533f12cb9b2398f1",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          80,
+          90
+        ],
+        [
+          287,
+          289
+        ],
+        [
+          900,
+          913
+        ],
+        [
+          1867,
+          1879
+        ],
+        [
+          1873,
+          1879
+        ],
+        [
+          2750,
+          2750
+        ],
+        [
+          3011,
+          3023
+        ]
+      ]
+    },
+    {
+      "repository": "prefecthq/prefect",
+      "commit": "b73b09dc3699489c799dbb40ac5ed2da459e391c",
+      "path": "README.md",
+      "line_count": 164,
+      "sha256": "14f29745d486b0164ba9dd70be925289e119d5bb3115b39c0329ceeb6df75830",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          54,
+          63
+        ],
+        [
+          58,
+          60
+        ],
+        [
+          58,
+          63
+        ],
+        [
+          60,
+          60
+        ],
+        [
+          69,
+          76
+        ],
+        [
+          104,
+          107
+        ],
+        [
+          104,
+          118
+        ]
+      ]
+    },
+    {
+      "repository": "prefecthq/prefect",
+      "commit": "b73b09dc3699489c799dbb40ac5ed2da459e391c",
+      "path": "pyproject.toml",
+      "line_count": 408,
+      "sha256": "a78fbe412a72994e75cdee333e3a0219a35892b942aeca6d701a5821610b663c",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          10,
+          23
+        ]
+      ]
+    },
+    {
+      "repository": "prefecthq/prefect",
+      "commit": "b73b09dc3699489c799dbb40ac5ed2da459e391c",
+      "path": "docs/v3/get-started/install.mdx",
+      "line_count": 129,
+      "sha256": "3068cd156444048c0b8b8566fd4ea8475557974199cca71e3ea5d241e512337a",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          9,
+          9
+        ]
+      ]
+    },
+    {
+      "repository": "prefecthq/prefect",
+      "commit": "b73b09dc3699489c799dbb40ac5ed2da459e391c",
+      "path": "docs/v3/advanced/cancel-workflows.mdx",
+      "line_count": 131,
+      "sha256": "589a9d001863221f8593e0839ac7be1a659fdf7b197c28b160197d55abebcbc4",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          7,
+          30
+        ],
+        [
+          13,
+          17
+        ],
+        [
+          27,
+          30
+        ],
+        [
+          36,
+          57
+        ],
+        [
+          61,
+          74
+        ],
+        [
+          61,
+          83
+        ],
+        [
+          77,
+          83
+        ]
+      ]
+    },
+    {
+      "repository": "prefecthq/prefect",
+      "commit": "b73b09dc3699489c799dbb40ac5ed2da459e391c",
+      "path": "docs/v3/concepts/settings-and-profiles.mdx",
+      "line_count": 224,
+      "sha256": "71ec63a4b41a58ca707bd8319ca4c0daccf57fe6f79f2183bfa8095f34ccc557",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          45,
+          68
+        ],
+        [
+          145,
+          147
+        ]
+      ]
+    },
+    {
+      "repository": "restatedev/restate",
+      "commit": "bc456b30db5316ba34dc78c07bc9878cc9ffa31d",
+      "path": "README.md",
+      "line_count": 129,
+      "sha256": "96b4a6b53bbe1fcab157154f064f1e64829e61363261369a2036154d814c4558",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          19,
+          40
+        ],
+        [
+          33,
+          40
+        ],
+        [
+          43,
+          45
+        ],
+        [
+          43,
+          81
+        ],
+        [
+          49,
+          64
+        ],
+        [
+          49,
+          81
+        ],
+        [
+          61,
+          64
+        ]
+      ]
+    },
+    {
+      "repository": "restatedev/restate",
+      "commit": "bc456b30db5316ba34dc78c07bc9878cc9ffa31d",
+      "path": "crates/types/src/config/common.rs",
+      "line_count": 1779,
+      "sha256": "61a8380535a9da737735a97f93af098e0c9aeda1acf813f1d274911edc587550",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          49,
+          49
+        ],
+        [
+          356,
+          356
+        ],
+        [
+          953,
+          961
+        ],
+        [
+          953,
+          967
+        ]
+      ]
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "8cc40e0c5e9234bf45084751ac53b1fbfe70b492",
+      "path": "man/systemd-run.xml",
+      "line_count": 814,
+      "sha256": "a4bced6f776449de6acee0c8b0dca4143484a666bd1958b2350714c6a04f82a8",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          73,
+          98
+        ],
+        [
+          115,
+          165
+        ],
+        [
+          127,
+          165
+        ],
+        [
+          165,
+          165
+        ]
+      ]
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "8cc40e0c5e9234bf45084751ac53b1fbfe70b492",
+      "path": "man/systemd.kill.xml",
+      "line_count": 209,
+      "sha256": "448322830dbbd02c64cca99941ba92705afe9648241fc917db7a8d6ae7910e72",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          63,
+          84
+        ]
+      ]
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "8cc40e0c5e9234bf45084751ac53b1fbfe70b492",
+      "path": "man/systemd.service.xml",
+      "line_count": 1977,
+      "sha256": "12770f86a26dcdf32873225669f5aa9421283c303bbc72bddb04530850f66d44",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          876,
+          899
+        ]
+      ]
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "8cc40e0c5e9234bf45084751ac53b1fbfe70b492",
+      "path": "README",
+      "line_count": 493,
+      "sha256": "018db30a03b270acc02b7ef9ef996113e008375920d42cc26694c817b90d8eab",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          31,
+          70
+        ]
+      ]
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "8cc40e0c5e9234bf45084751ac53b1fbfe70b492",
+      "path": "man/systemctl.xml",
+      "line_count": 3118,
+      "sha256": "caca7b87ae3bc8730b070a38d814c698acf82c596df9cb47a58fc7510c7b765c",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          444,
+          444
+        ],
+        [
+          962,
+          983
+        ],
+        [
+          962,
+          997
+        ],
+        [
+          992,
+          997
+        ]
+      ]
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "8cc40e0c5e9234bf45084751ac53b1fbfe70b492",
+      "path": "docs/HACKING.md",
+      "line_count": 345,
+      "sha256": "16974f3019bf2cbd357fbed97bdbd77869aef9a4b049bfa0a76fa9a93eeeb23f",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          29,
+          56
+        ]
+      ]
+    },
+    {
+      "repository": "temporalio/temporal",
+      "commit": "af08a5e5f2dd40f545f2afac7780daaa6987001e",
+      "path": "README.md",
+      "line_count": 80,
+      "sha256": "269838d3de5da90d4c2c0b45bf7fc745b384a5a05c0932582e923638e8994189",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          23,
+          24
+        ],
+        [
+          33,
+          42
+        ],
+        [
+          33,
+          64
+        ],
+        [
+          51,
+          55
+        ],
+        [
+          51,
+          60
+        ],
+        [
+          51,
+          64
+        ],
+        [
+          64,
+          64
+        ]
+      ]
+    },
+    {
+      "repository": "arize-ai/phoenix",
+      "commit": "cdb8e400908245c6669918d4f7d9462e11093c12",
+      "path": "README.md",
+      "line_count": 316,
+      "sha256": "87b63a292686d2e4bb60791680496dbf3839cea582e905cfc879f4640b52c7fe",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          49,
+          64
+        ],
+        [
+          56,
+          56
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          81,
+          94
+        ],
+        [
+          81,
+          105
+        ],
+        [
+          266,
+          271
+        ]
+      ]
+    },
+    {
+      "repository": "arize-ai/phoenix",
+      "commit": "cdb8e400908245c6669918d4f7d9462e11093c12",
+      "path": "pyproject.toml",
+      "line_count": 520,
+      "sha256": "d0e609a2afb8492e2ffee9b2f9c6d93bd0bb6f33f02d359411fd89f7ee5eb492",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          5,
+          21
+        ]
+      ]
+    },
+    {
+      "repository": "arize-ai/phoenix",
+      "commit": "cdb8e400908245c6669918d4f7d9462e11093c12",
+      "path": "src/phoenix/config.py",
+      "line_count": 3902,
+      "sha256": "88f69c5284c3857c3479e0510562b13b76bcb29407b470e9c0140e602c5cc5a0",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          139,
+          144
+        ],
+        [
+          1157,
+          1160
+        ],
+        [
+          3121,
+          3127
+        ]
+      ]
+    },
+    {
+      "repository": "arize-ai/phoenix",
+      "commit": "cdb8e400908245c6669918d4f7d9462e11093c12",
+      "path": "docs/phoenix/self-hosting/security/privacy.mdx",
+      "line_count": 53,
+      "sha256": "bfdee3ab5a0e501cc7b1e5249b53d89b9da9b1c6142373ef74ca1c1f68f1b286",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          8,
+          24
+        ],
+        [
+          20,
+          41
+        ],
+        [
+          33,
+          53
+        ]
+      ]
+    },
+    {
+      "repository": "arize-ai/phoenix",
+      "commit": "cdb8e400908245c6669918d4f7d9462e11093c12",
+      "path": "docs/phoenix/tracing/how-to-tracing/advanced/masking-span-attributes.mdx",
+      "line_count": 123,
+      "sha256": "1de85cbac15885002695412d1e40dd873a829f86de513787c79b691a0faa0067",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          14,
+          27
+        ]
+      ]
+    },
+    {
+      "repository": "binwiederhier/ntfy",
+      "commit": "9abbad763008f4fb1ec49dbe5cd2c604b04e33c3",
+      "path": "README.md",
+      "line_count": 257,
+      "sha256": "e24232130b01c53a8ddc17f265fe01953c590ebee418f0cf190fd08e53c28d95",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          15,
+          19
+        ],
+        [
+          39,
+          39
+        ]
+      ]
+    },
+    {
+      "repository": "binwiederhier/ntfy",
+      "commit": "9abbad763008f4fb1ec49dbe5cd2c604b04e33c3",
+      "path": "docs/install.md",
+      "line_count": 756,
+      "sha256": "56b5aae839e94fb2b83a3f628286db008a6eeaec9991684173dbbaf7ba3ddaa0",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          12,
+          19
+        ],
+        [
+          16,
+          19
+        ],
+        [
+          19,
+          19
+        ],
+        [
+          35,
+          41
+        ],
+        [
+          302,
+          303
+        ],
+        [
+          302,
+          321
+        ],
+        [
+          302,
+          329
+        ],
+        [
+          323,
+          329
+        ],
+        [
+          386,
+          424
+        ]
+      ]
+    },
+    {
+      "repository": "binwiederhier/ntfy",
+      "commit": "9abbad763008f4fb1ec49dbe5cd2c604b04e33c3",
+      "path": "server/server.yml",
+      "line_count": 551,
+      "sha256": "a8dc6d726b7575f2c5ca55f65d66dd3cc3a701abb6063eeadfa8e23d67b6f169",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          16,
+          23
+        ],
+        [
+          42,
+          46
+        ],
+        [
+          102,
+          144
+        ]
+      ]
+    },
+    {
+      "repository": "ggml-org/llama.cpp",
+      "commit": "620d2225cc436ab0b001e3200e590e3b286ef9ab",
+      "path": "README.md",
+      "line_count": 134,
+      "sha256": "dc2d34687c844ecf929d9e9a9c9c78e8023b52abf3b2b3d039600c79016673b6",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          22,
+          29
+        ],
+        [
+          37,
+          44
+        ],
+        [
+          43,
+          44
+        ],
+        [
+          66,
+          72
+        ]
+      ]
+    },
+    {
+      "repository": "ggml-org/llama.cpp",
+      "commit": "620d2225cc436ab0b001e3200e590e3b286ef9ab",
+      "path": "docs/build.md",
+      "line_count": 876,
+      "sha256": "97a58a014be2386c149a4c754003cdb2b480e484049477758fa933774d77049b",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          38,
+          39
+        ],
+        [
+          108,
+          112
+        ]
+      ]
+    },
+    {
+      "repository": "ggml-org/llama.cpp",
+      "commit": "620d2225cc436ab0b001e3200e590e3b286ef9ab",
+      "path": "tools/server/README.md",
+      "line_count": 2361,
+      "sha256": "6c08fc3b3929bd0c6ca0b3b65ca9fd3b36c6d30f1e7b627d78c1d6b69feffc99",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          106,
+          114
+        ],
+        [
+          193,
+          194
+        ],
+        [
+          193,
+          214
+        ],
+        [
+          193,
+          225
+        ],
+        [
+          223,
+          225
+        ],
+        [
+          228,
+          228
+        ]
+      ]
+    },
+    {
+      "repository": "grafana/grafana",
+      "commit": "af4a33e3786594ad72f72d97e6744010330c2977",
+      "path": "README.md",
+      "line_count": 50,
+      "sha256": "fc8a867bf09f319b9288746ab0148faff2e92ed39cd702252ce59161e576c019",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          8,
+          15
+        ],
+        [
+          15,
+          15
+        ]
+      ]
+    },
+    {
+      "repository": "grafana/grafana",
+      "commit": "af4a33e3786594ad72f72d97e6744010330c2977",
+      "path": "docs/sources/setup-grafana/installation/debian/index.md",
+      "line_count": 221,
+      "sha256": "7e25faeb25b19821d26ced7cb45e85e4841b4dfc637e1dcf00c0143a35a2299d",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          15,
+          22
+        ]
+      ]
+    },
+    {
+      "repository": "grafana/grafana",
+      "commit": "af4a33e3786594ad72f72d97e6744010330c2977",
+      "path": "docs/sources/setup-grafana/installation/mac/index.md",
+      "line_count": 89,
+      "sha256": "9cc5007efe8976ebdf510bfb561a81c3335c6c6976455f6f441eea3417b1e900",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          22,
+          44
+        ],
+        [
+          41,
+          44
+        ]
+      ]
+    },
+    {
+      "repository": "grafana/grafana",
+      "commit": "af4a33e3786594ad72f72d97e6744010330c2977",
+      "path": "conf/defaults.ini",
+      "line_count": 2674,
+      "sha256": "0c0ba9bee1b78e02dfbcb95cae457e2985cf5946bb57a84f78c43723a7d5cd4f",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          17,
+          29
+        ],
+        [
+          50,
+          63
+        ],
+        [
+          388,
+          398
+        ],
+        [
+          489,
+          489
+        ]
+      ]
+    },
+    {
+      "repository": "grafana/loki",
+      "commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "path": "README.md",
+      "line_count": 140,
+      "sha256": "af9e356ba4d99300f4e145be9c0b5885587b2ba8dbba89e2a5f149cd3572c04a",
+      "read_method": "pinned local mirror",
+      "cited_ranges": [
+        [
+          10,
+          30
+        ],
+        [
+          23,
+          30
+        ]
+      ]
+    },
+    {
+      "repository": "grafana/loki",
+      "commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "path": "docs/sources/setup/install/local.md",
+      "line_count": 113,
+      "sha256": "670a06f958891b00f39d03c038a85d0c90c0eb210afacc833c2d663ed6710dbd",
+      "read_method": "pinned local mirror",
+      "cited_ranges": [
+        [
+          17,
+          17
+        ],
+        [
+          17,
+          74
+        ],
+        [
+          54,
+          74
+        ],
+        [
+          71,
+          74
+        ]
+      ]
+    },
+    {
+      "repository": "grafana/loki",
+      "commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "path": "cmd/loki/loki-local-config.yaml",
+      "line_count": 65,
+      "sha256": "b0512247b74062a2df69acdd26f1292fb7750d41330b3ee34d36d7511456ef90",
+      "read_method": "pinned local mirror",
+      "cited_ranges": [
+        [
+          1,
+          19
+        ],
+        [
+          9,
+          19
+        ]
+      ]
+    },
+    {
+      "repository": "grafana/loki",
+      "commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "path": "docs/sources/get-started/labels/_index.md",
+      "line_count": 301,
+      "sha256": "8197ebcc7fddad1938d3b3bdb6aac454bf307b8552eeb2f8136cecd0bd5d4406",
+      "read_method": "pinned local mirror",
+      "cited_ranges": [
+        [
+          12,
+          17
+        ]
+      ]
+    },
+    {
+      "repository": "jarrodwatts/claude-hud",
+      "commit": "ad322b8d9016816a1858334ba57a085512110e83",
+      "path": "README.md",
+      "line_count": 300,
+      "sha256": "1f0d0711efff9c9f73fb10ecf2a95acee943456bfda4eb796de7042e88869603",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          3,
+          3
+        ],
+        [
+          12,
+          33
+        ],
+        [
+          66,
+          66
+        ],
+        [
+          76,
+          78
+        ],
+        [
+          250,
+          264
+        ],
+        [
+          250,
+          268
+        ],
+        [
+          252,
+          258
+        ],
+        [
+          260,
+          264
+        ],
+        [
+          262,
+          262
+        ],
+        [
+          268,
+          268
+        ]
+      ]
+    },
+    {
+      "repository": "jarrodwatts/claude-hud",
+      "commit": "ad322b8d9016816a1858334ba57a085512110e83",
+      "path": "commands/setup.md",
+      "line_count": 102,
+      "sha256": "72f9404b7c7e1037b9da17ee825fd4b09b00917db3986f5d20b52a8b0845cfe5",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          1,
+          4
+        ],
+        [
+          10,
+          16
+        ],
+        [
+          10,
+          18
+        ]
+      ]
+    },
+    {
+      "repository": "jarrodwatts/claude-hud",
+      "commit": "ad322b8d9016816a1858334ba57a085512110e83",
+      "path": ".claude-plugin/plugin.json",
+      "line_count": 17,
+      "sha256": "1209bdf3d085d236d23d80b86672192c18069cd5f5ee86af2fc47135a542fb35",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          2,
+          11
+        ],
+        [
+          9,
+          11
+        ]
+      ]
+    },
+    {
+      "repository": "jarrodwatts/claude-hud",
+      "commit": "ad322b8d9016816a1858334ba57a085512110e83",
+      "path": "commands/configure.md",
+      "line_count": 77,
+      "sha256": "732bcda734089c5cdb229bd03dc8adee45bc289b58fad81de554b182f4319035",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          1,
+          4
+        ]
+      ]
+    },
+    {
+      "repository": "kenn-io/agentsview",
+      "commit": "b9d0a207f51ff27b84adbaae2a91b344247079b3",
+      "path": "README.md",
+      "line_count": 860,
+      "sha256": "8fdf7ef81a654aca46effae1fec2e0f0a4e72cfe8682e9ba586e6de9e7e324b1",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          20,
+          23
+        ],
+        [
+          20,
+          39
+        ],
+        [
+          56,
+          74
+        ],
+        [
+          56,
+          77
+        ],
+        [
+          56,
+          86
+        ],
+        [
+          65,
+          67
+        ],
+        [
+          65,
+          77
+        ],
+        [
+          65,
+          86
+        ],
+        [
+          104,
+          108
+        ],
+        [
+          121,
+          125
+        ],
+        [
+          345,
+          348
+        ],
+        [
+          345,
+          365
+        ]
+      ]
+    },
+    {
+      "repository": "kenn-io/agentsview",
+      "commit": "b9d0a207f51ff27b84adbaae2a91b344247079b3",
+      "path": "docs/configuration.md",
+      "line_count": 1873,
+      "sha256": "071fd44246b6c6dfff639a59b9ac5716b8ee01a37810a75c8a422e59ca921d15",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          8,
+          14
+        ],
+        [
+          8,
+          25
+        ],
+        [
+          50,
+          80
+        ],
+        [
+          60,
+          64
+        ],
+        [
+          136,
+          148
+        ],
+        [
+          903,
+          911
+        ],
+        [
+          1017,
+          1023
+        ]
+      ]
+    },
+    {
+      "repository": "ml-explore/mlx-lm",
+      "commit": "a9bd8af5c02118882af735cef60705d2efce9fd0",
+      "path": "README.md",
+      "line_count": 290,
+      "sha256": "fc4dc67d70ca364ef8c2f94e84d170072d3c5f4fdfd2aa7a7be7a38a6b3d0008",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          3,
+          4
+        ],
+        [
+          16,
+          27
+        ],
+        [
+          47,
+          58
+        ]
+      ]
+    },
+    {
+      "repository": "ml-explore/mlx-lm",
+      "commit": "a9bd8af5c02118882af735cef60705d2efce9fd0",
+      "path": "mlx_lm/server.py",
+      "line_count": 1945,
+      "sha256": "57392576de114af80ede723976b9dd156dc234f856b9943b8b44b8b78bc27f79",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          14,
+          14
+        ],
+        [
+          1105,
+          1106
+        ],
+        [
+          1776,
+          1795
+        ],
+        [
+          1786,
+          1795
+        ]
+      ]
+    },
+    {
+      "repository": "ml-explore/mlx-lm",
+      "commit": "a9bd8af5c02118882af735cef60705d2efce9fd0",
+      "path": "pyproject.toml",
+      "line_count": 83,
+      "sha256": "120d277fb8e34c388d0696a0be8bb900189344f159a1c66f463521298e2b9b4d",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          14,
+          45
+        ],
+        [
+          24,
+          31
+        ],
+        [
+          39,
+          45
+        ]
+      ]
+    },
+    {
+      "repository": "mostlygeek/llama-swap",
+      "commit": "d1e743fea64324c990e16e951ac2ea1678f02228",
+      "path": "README.md",
+      "line_count": 405,
+      "sha256": "a72e7644254751dbb15c5793e74186ba0288e1f672d52c4772f63d45dc9d4ffb",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          8,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          17,
+          69
+        ],
+        [
+          51,
+          69
+        ],
+        [
+          58,
+          59
+        ],
+        [
+          58,
+          69
+        ],
+        [
+          69,
+          69
+        ],
+        [
+          144,
+          150
+        ],
+        [
+          252,
+          256
+        ],
+        [
+          322,
+          322
+        ],
+        [
+          405,
+          405
+        ]
+      ]
+    },
+    {
+      "repository": "nvidia/dcgm-exporter",
+      "commit": "fafd151148052628061a80450b4ee037a5fa0c3c",
+      "path": "README.md",
+      "line_count": 49,
+      "sha256": "8a68f72d5bc59cc237dea6734218ce871261d2382a5adeb8509961fb39c42034",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          1,
+          18
+        ],
+        [
+          1,
+          25
+        ],
+        [
+          12,
+          25
+        ],
+        [
+          23,
+          25
+        ]
+      ]
+    },
+    {
+      "repository": "nvidia/dcgm-exporter",
+      "commit": "fafd151148052628061a80450b4ee037a5fa0c3c",
+      "path": "docker/Dockerfile",
+      "line_count": 413,
+      "sha256": "c3cc3d3ca1e781e040f05ef25bd08e20a616927c513391af17cf9bb6c2d50ced",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          160,
+          167
+        ]
+      ]
+    },
+    {
+      "repository": "ollama/ollama",
+      "commit": "d919272e53593d1d55d40e1180eaa06dfbede3ac",
+      "path": "README.md",
+      "line_count": 357,
+      "sha256": "9e5a7d406950fdd2742084065ab38a3ea09b5aab5e2f13ef7d64147229ae0d8b",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          13,
+          18
+        ],
+        [
+          13,
+          35
+        ],
+        [
+          90,
+          105
+        ]
+      ]
+    },
+    {
+      "repository": "ollama/ollama",
+      "commit": "d919272e53593d1d55d40e1180eaa06dfbede3ac",
+      "path": "docs/linux.mdx",
+      "line_count": 199,
+      "sha256": "3b46d2673d7682367bbe1c3941421d94cd80defe6a714f7bc16a254481db2690",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          20,
+          30
+        ],
+        [
+          27,
+          30
+        ],
+        [
+          57,
+          82
+        ],
+        [
+          171,
+          199
+        ]
+      ]
+    },
+    {
+      "repository": "ollama/ollama",
+      "commit": "d919272e53593d1d55d40e1180eaa06dfbede3ac",
+      "path": "envconfig/config.go",
+      "line_count": 468,
+      "sha256": "0b0ea669b31cfe2b54313427257326a2b7a909bbc7bf8a671035efc446fb1895",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          20,
+          42
+        ],
+        [
+          111,
+          114
+        ],
+        [
+          203,
+          226
+        ]
+      ]
+    },
+    {
+      "repository": "open-telemetry/opentelemetry-collector-contrib",
+      "commit": "df849b5403c041d5e799e7846392a6f18b0b55ae",
+      "path": "README.md",
+      "line_count": 171,
+      "sha256": "c0b7fa32a3473bd79797464263d8acca1b0d76aa3b317abed2d79f51bbe31add",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          40,
+          44
+        ],
+        [
+          40,
+          58
+        ]
+      ]
+    },
+    {
+      "repository": "open-telemetry/opentelemetry-collector-contrib",
+      "commit": "df849b5403c041d5e799e7846392a6f18b0b55ae",
+      "path": "processor/redactionprocessor/README.md",
+      "line_count": 360,
+      "sha256": "57b9a4f68bfe7a151300d3e2715bf682423d33334a927cd86d9e8b2273f8a0fe",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          4,
+          12
+        ],
+        [
+          60,
+          66
+        ]
+      ]
+    },
+    {
+      "repository": "open-telemetry/opentelemetry-collector-contrib",
+      "commit": "df849b5403c041d5e799e7846392a6f18b0b55ae",
+      "path": "processor/resourceprocessor/README.md",
+      "line_count": 75,
+      "sha256": "49c236801aec8ffa238627b14218bf428610c3fa5bc52c54aa4c327ed305a3c3",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          19,
+          32
+        ]
+      ]
+    },
+    {
+      "repository": "openlit/openlit",
+      "commit": "4605c7fe4c00a80567ab35c499cbec41cb052b7b",
+      "path": "README.md",
+      "line_count": 680,
+      "sha256": "5b3ecdcdef1091bbd67fdc37b364a1eddea4edc56f5b22743645d6e31f98eee5",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          89,
+          100
+        ],
+        [
+          89,
+          122
+        ],
+        [
+          103,
+          122
+        ],
+        [
+          115,
+          122
+        ],
+        [
+          119,
+          122
+        ],
+        [
+          165,
+          177
+        ]
+      ]
+    },
+    {
+      "repository": "openlit/openlit",
+      "commit": "4605c7fe4c00a80567ab35c499cbec41cb052b7b",
+      "path": "sdk/python/pyproject.toml",
+      "line_count": 55,
+      "sha256": "3d9adc393d2fe45f1d0f2740f63152ffd39aaa6932300040f2eeff98800c1e82",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          1,
+          4
+        ],
+        [
+          1,
+          12
+        ]
+      ]
+    },
+    {
+      "repository": "openlit/openlit",
+      "commit": "4605c7fe4c00a80567ab35c499cbec41cb052b7b",
+      "path": "sdk/python/src/openlit/__init__.py",
+      "line_count": 1059,
+      "sha256": "b0d12b508ff5c3ffc0b6cff992ef94aebe00f5ce7f161a2e4164386fa87c27c4",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          185,
+          224
+        ]
+      ]
+    },
+    {
+      "repository": "openlit/openlit",
+      "commit": "4605c7fe4c00a80567ab35c499cbec41cb052b7b",
+      "path": "cli/internal/coding/install/marketplace/plugins/claude-code/hooks/hooks.json",
+      "line_count": 83,
+      "sha256": "1f12849c2bebbf92de284118e6ee32448c675c5b1d4668ff9c80ed3ae1fda6a6",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          3,
+          13
+        ]
+      ]
+    },
+    {
+      "repository": "openlit/openlit",
+      "commit": "4605c7fe4c00a80567ab35c499cbec41cb052b7b",
+      "path": "cli/internal/coding/install/marketplace/plugins/codex/plugins/openlit/hooks/hooks.json",
+      "line_count": 62,
+      "sha256": "307cc9ceda520f96bb3a9d6d67da6ac54291e063fc812d154f8a3f6088b62460",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          3,
+          14
+        ]
+      ]
+    },
+    {
+      "repository": "prometheus/alertmanager",
+      "commit": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+      "path": "README.md",
+      "line_count": 414,
+      "sha256": "815b847f34bd84afc784d2bdf77060e3a7099da36766ac1dacfa0c76fcc5f3e5",
+      "read_method": "pinned local mirror",
+      "cited_ranges": [
+        [
+          6,
+          6
+        ],
+        [
+          14,
+          19
+        ],
+        [
+          25,
+          29
+        ],
+        [
+          94,
+          108
+        ]
+      ]
+    },
+    {
+      "repository": "prometheus/alertmanager",
+      "commit": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+      "path": "cmd/alertmanager/main.go",
+      "line_count": 203,
+      "sha256": "fc4197506dc6f8ba05cbde3b7b49b4141db1b0139acff849c34d82ce5382f1d4",
+      "read_method": "pinned local mirror",
+      "cited_ranges": [
+        [
+          51,
+          52
+        ],
+        [
+          51,
+          72
+        ],
+        [
+          129,
+          132
+        ]
+      ]
+    },
+    {
+      "repository": "prometheus/prometheus",
+      "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "path": "README.md",
+      "line_count": 231,
+      "sha256": "9ef538829dfc934d7ef53c62bafb3a2ea78b0cab432b2bbf47e84192abf6fddb",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          21,
+          34
+        ],
+        [
+          27,
+          32
+        ],
+        [
+          44,
+          51
+        ],
+        [
+          60,
+          63
+        ],
+        [
+          99,
+          102
+        ]
+      ]
+    },
+    {
+      "repository": "prometheus/prometheus",
+      "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "path": "docs/configuration/configuration.md",
+      "line_count": 4287,
+      "sha256": "d7403d2e6c06b7fad6ebf0ce8326d10580ffe835f7101d0ad6f2d00b61928ab9",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          307,
+          316
+        ],
+        [
+          349,
+          362
+        ],
+        [
+          542,
+          542
+        ],
+        [
+          3654,
+          3681
+        ]
+      ]
+    },
+    {
+      "repository": "prometheus/prometheus",
+      "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "path": "cmd/prometheus/main.go",
+      "line_count": 2297,
+      "sha256": "b667907e4784c06d3c05706a12a8aebaf53f229b55245f5249cc598fc2d8c445",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          423,
+          432
+        ],
+        [
+          470,
+          470
+        ],
+        [
+          470,
+          500
+        ],
+        [
+          500,
+          500
+        ],
+        [
+          1273,
+          1273
+        ]
+      ]
+    },
+    {
+      "repository": "sgl-project/sglang",
+      "commit": "e00930c5489053f26d86b179cee0d087f846acbb",
+      "path": "README.md",
+      "line_count": 99,
+      "sha256": "0dc41a02fb7d12818d8a9f5ebc2af38e56ec84b7163e344af6b0f3d7590d31c8",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          66,
+          71
+        ],
+        [
+          70,
+          71
+        ]
+      ]
+    },
+    {
+      "repository": "sgl-project/sglang",
+      "commit": "e00930c5489053f26d86b179cee0d087f846acbb",
+      "path": "docs/docs/hardware-platforms/apple_metal.mdx",
+      "line_count": 135,
+      "sha256": "5e04304fb5c01f1cdc3adfa5cb092c3fc992fd19aaeac62b15232f06aab5a067",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          7,
+          19
+        ],
+        [
+          7,
+          31
+        ],
+        [
+          14,
+          31
+        ],
+        [
+          33,
+          50
+        ]
+      ]
+    },
+    {
+      "repository": "sgl-project/sglang",
+      "commit": "e00930c5489053f26d86b179cee0d087f846acbb",
+      "path": "docs/docs/get-started/install.mdx",
+      "line_count": 234,
+      "sha256": "989f104a8403ec2be5bb7b0ef596ec924d645fb558919e04b0c236d6924b30cf",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          12,
+          35
+        ],
+        [
+          18,
+          35
+        ],
+        [
+          29,
+          35
+        ]
+      ]
+    },
+    {
+      "repository": "traceloop/openllmetry",
+      "commit": "be498301c40c55155e6d0678b63943093cda14d1",
+      "path": "README.md",
+      "line_count": 198,
+      "sha256": "cc23a623407899839e861f65140e97870c168ed44c0c66c1498bc84e171f10a4",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          66,
+          85
+        ],
+        [
+          105,
+          118
+        ]
+      ]
+    },
+    {
+      "repository": "traceloop/openllmetry",
+      "commit": "be498301c40c55155e6d0678b63943093cda14d1",
+      "path": "packages/traceloop-sdk/pyproject.toml",
+      "line_count": 190,
+      "sha256": "0520646694bf0a997862adf275c614a1601eae42e12d00ab3d1115e0deaaffc0",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          1,
+          12
+        ]
+      ]
+    },
+    {
+      "repository": "traceloop/openllmetry",
+      "commit": "be498301c40c55155e6d0678b63943093cda14d1",
+      "path": "packages/traceloop-sdk/traceloop/sdk/__init__.py",
+      "line_count": 316,
+      "sha256": "3b0ec10fb22cd60be2084b8131aa90f147820030bf0bbde9bc619b7f6f8989b6",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          50,
+          70
+        ]
+      ]
+    },
+    {
+      "repository": "traceloop/openllmetry",
+      "commit": "be498301c40c55155e6d0678b63943093cda14d1",
+      "path": "packages/traceloop-sdk/traceloop/sdk/config/__init__.py",
+      "line_count": 17,
+      "sha256": "cf9e077c2c404fb293976dd2ddeaca3c783899654724c88e99fca1ac49798511",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          4,
+          17
+        ]
+      ]
+    },
+    {
+      "repository": "utkuozdemir/nvidia_gpu_exporter",
+      "commit": "87afc069c5ce6a37b13db58989ec0f30d9b87217",
+      "path": "README.md",
+      "line_count": 225,
+      "sha256": "30d9eaa7d345fee920d647900c4654435d4e1d7d9d32786e2bb2b2cfeacef924",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          17,
+          34
+        ],
+        [
+          39,
+          45
+        ]
+      ]
+    },
+    {
+      "repository": "utkuozdemir/nvidia_gpu_exporter",
+      "commit": "87afc069c5ce6a37b13db58989ec0f30d9b87217",
+      "path": "docs/INSTALL.md",
+      "line_count": 616,
+      "sha256": "0b1d16fdd771f1e1827d5ce9f597a42b9f18a252cf74465ad1a99fd9c3f30304",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          17,
+          24
+        ],
+        [
+          39,
+          48
+        ],
+        [
+          88,
+          98
+        ],
+        [
+          88,
+          113
+        ],
+        [
+          102,
+          113
+        ],
+        [
+          513,
+          523
+        ]
+      ]
+    },
+    {
+      "repository": "ymtdzzz/otel-tui",
+      "commit": "3b25779a083469b732e3c628b4a412ee05cf9948",
+      "path": "README.md",
+      "line_count": 225,
+      "sha256": "96aa696bbf4a4403c039d142e384565090c560f7f1dc637d2beb4927914418fe",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          3,
+          26
+        ],
+        [
+          20,
+          46
+        ],
+        [
+          37,
+          46
+        ],
+        [
+          37,
+          58
+        ],
+        [
+          41,
+          58
+        ],
+        [
+          49,
+          58
+        ],
+        [
+          85,
+          92
+        ]
+      ]
+    },
+    {
+      "repository": "ymtdzzz/otel-tui",
+      "commit": "3b25779a083469b732e3c628b4a412ee05cf9948",
+      "path": "main.go",
+      "line_count": 168,
+      "sha256": "c2370ac1047c13b93e03d0977251d4147646632380095f1b2e3ea4c5e52b2b62",
+      "read_method": "anonymous pinned GitHub raw",
+      "cited_ranges": [
+        [
+          101,
+          118
+        ],
+        [
+          115,
+          137
+        ],
+        [
+          118,
+          137
+        ]
+      ]
+    }
+  ],
+  "checks": {
+    "unique_pinned_files": 115,
+    "invalid_ranges": 0,
+    "candidate_rows": 108,
+    "inventory_coverage": "9/19/8 candidates per family",
+    "families": [
+      "anthropic",
+      "openai",
+      "research"
+    ],
+    "schema_required_fields": "passed",
+    "pass_required_capability_consistency": "passed",
+    "readiness_table_copies": "byte-identical to announced layer files",
+    "source_citation_pins": "full 40-character commits",
+    "home_path_scan": "no /home/ paths in new evidence text"
+  },
+  "repository_validation": {
+    "command": "python3 scripts/validate.py",
+    "exit_code": 0,
+    "result": {
+      "components": 71,
+      "hashed_files": 12159,
+      "profiles": 4,
+      "receipts": 240,
+      "status": "passed"
+    },
+    "scope": "Integrity and scope checks only; no live provider or GPU execution. This first run preceded adding this source-read receipt; final pre-commit validation is reported in the PR."
+  }
+}
