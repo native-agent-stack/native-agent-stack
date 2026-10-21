@@ -363,6 +363,12 @@
       "kind": "catalog_card"
     },
     {
+      "path": "catalogs/us-equities/edgartools-562-screen-20261015.json",
+      "collection": "/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/engines-strategies.json",
       "collection": "/entries",
       "repository_field": "repository",
@@ -447,7 +453,7 @@
     "repositories": 901,
     "public_star_repositories": 373,
     "beyond_public_stars": 528,
-    "references": 2847,
+    "references": 2848,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 71,
@@ -7944,6 +7950,12 @@
           "id": "data-edgartools",
           "decision": "default",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/edgartools-562-screen-20261015.json",
+          "pointer": "/candidates/0",
+          "decision": "screen_passed_for_native_fixture_parsing"
         },
         {
           "kind": "research_supplement",
