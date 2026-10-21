@@ -1,0 +1,354 @@
+{
+  "schema_version": 1,
+  "kind": "authored_resolution_analysis",
+  "catalog": "foundation",
+  "layer_id": "isolation",
+  "source_main": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+  "receipt_boundary": "This file is authored analysis with exact source locators, not native command output. Native captures live only under masked/.",
+  "f1": [
+    {
+      "component": "worktrunk",
+      "proposal": {
+        "version": "0.80.0",
+        "source_commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "judgment": "Propose the existing main run pin for review. No upgrade or historical verdict rewrite."
+      },
+      "run_version": {
+        "value": "0.80.0",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 11393,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "run_source_commit": {
+        "value": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 11395,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "run_record_version": {
+        "value": "0.80.0",
+        "source": {
+          "path": "manifests/stack.json",
+          "line": 1073,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "run_record_source_commit": {
+        "value": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "source": {
+          "path": "manifests/stack.json",
+          "line": 1095,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "historical_verdict": {
+        "value": "0.79.0",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 6284,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "reported_drift": {
+        "value": "differs",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 6276,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "catalog_winner_pin": {
+        "value": "0.79.0",
+        "source": {
+          "path": "catalogs/landscape/foundation.json",
+          "line": 1091,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "clean_install_layer_row": {
+        "source": {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 137,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        },
+        "interpretation": "Names the winner pair and two pin drifts, but no separate version value."
+      },
+      "clean_install_selected_version": {
+        "value": "0.80.0",
+        "source": {
+          "path": "adoption/new-wsl-profile.json",
+          "line": 807,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "last_direct_native_evidence_version": {
+        "value": "0.80.0",
+        "source": {
+          "path": "evidence/receipts/worktrunk-0800-qualification-20261003.json",
+          "line": 19,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "installed_readback": {
+        "output": {
+          "path": "evidence/artifacts/isolation-native-captures-20261016/masked/host-wt-version.stdout.txt",
+          "line": 1
+        },
+        "exit_code": {
+          "path": "evidence/artifacts/isolation-native-captures-20261016/masked/host-wt-version.json",
+          "line": 45
+        }
+      },
+      "reason": "The run record, clean-install selected version and fresh native readback agree; historical verdicts differ and remain historical."
+    },
+    {
+      "component": "sandbox-runtime",
+      "proposal": {
+        "version": "0.0.79",
+        "source_commit": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+        "judgment": "Propose the existing main run pin for review. No upgrade or historical verdict rewrite."
+      },
+      "run_version": {
+        "value": "0.0.79",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 11214,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "run_source_commit": {
+        "value": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 11216,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "run_record_version": {
+        "value": "0.0.79",
+        "source": {
+          "path": "manifests/stack.json",
+          "line": 871,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "run_record_source_commit": {
+        "value": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+        "source": {
+          "path": "manifests/stack.json",
+          "line": 888,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "historical_verdict": {
+        "value": "0.0.77",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 6306,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "reported_drift": {
+        "value": "differs",
+        "source": {
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 6298,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "catalog_winner_pin": {
+        "value": "0.0.77",
+        "source": {
+          "path": "catalogs/landscape/foundation.json",
+          "line": 1112,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "clean_install_layer_row": {
+        "source": {
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 137,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        },
+        "interpretation": "Names the winner pair and two pin drifts, but no separate version value."
+      },
+      "clean_install_selected_version": {
+        "value": "0.0.79",
+        "source": {
+          "path": "adoption/new-wsl-profile.json",
+          "line": 750,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "last_direct_native_evidence_version": {
+        "value": "0.0.79",
+        "source": {
+          "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json",
+          "line": 19,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "installed_readback": {
+        "output": {
+          "path": "evidence/artifacts/isolation-native-captures-20261016/masked/host-srt-version.stdout.txt",
+          "line": 1
+        },
+        "exit_code": {
+          "path": "evidence/artifacts/isolation-native-captures-20261016/masked/host-srt-version.json",
+          "line": 45
+        }
+      },
+      "reason": "The run record, clean-install selected version and fresh native readback agree; historical verdicts differ and remain historical."
+    }
+  ],
+  "resolution_inputs": [
+    {
+      "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
+      "line": 29,
+      "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdict-waves.json",
+      "line": 9,
+      "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+    },
+    {
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 6240,
+      "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+    },
+    {
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 6257,
+      "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+    },
+    {
+      "path": "catalogs/saturation/ledger.json",
+      "line": 8163,
+      "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+    },
+    {
+      "path": "catalogs/saturation/ledger.json",
+      "line": 8167,
+      "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+    }
+  ],
+  "carried_survivors": [
+    {
+      "repository": {
+        "value": "https://github.com/boxlite-ai/boxlite",
+        "source": {
+          "path": "catalogs/saturation/ledger.json",
+          "line": 8200,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "facts_vote": {
+        "value": "not_refuted",
+        "source": {
+          "path": "catalogs/saturation/ledger.json",
+          "line": 8202,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "fit_vote": {
+        "value": "not_refuted",
+        "source": {
+          "path": "catalogs/saturation/ledger.json",
+          "line": 8206,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "source_commit": {
+        "value": "91655df3f172812c56465f96a9dac79f9b193f9f",
+        "source": {
+          "path": "evidence/artifacts/landscape-sweep-20260929/boxlite-ai-boxlite.json",
+          "line": 7,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "disposition": "Unresolved targeted survivor; no native trial in this window."
+    },
+    {
+      "repository": {
+        "value": "https://github.com/superradcompany/microsandbox",
+        "source": {
+          "path": "catalogs/saturation/ledger.json",
+          "line": 8212,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "facts_vote": {
+        "value": "not_refuted",
+        "source": {
+          "path": "catalogs/saturation/ledger.json",
+          "line": 8214,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "fit_vote": {
+        "value": "not_refuted",
+        "source": {
+          "path": "catalogs/saturation/ledger.json",
+          "line": 8218,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "source_commit": {
+        "value": "2110af1e5cc965c57539815a432d6b055ba6a023",
+        "source": {
+          "path": "evidence/artifacts/landscape-sweep-20260929/superradcompany-microsandbox.json",
+          "line": 7,
+          "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+        }
+      },
+      "disposition": "Unresolved keep-but-compare survivor; no native trial in this window."
+    }
+  ],
+  "additional_drift": [
+    {
+      "source": {
+        "path": "adoption/new-wsl-profile.json",
+        "line": 843,
+        "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+      },
+      "interpretation": "Historical Worktrunk observed-host sentence still names 0.79.0; this window reads 0.80.0. The unrun cargo/shell scope remains a gap."
+    },
+    {
+      "source": {
+        "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json",
+        "line": 14,
+        "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+      },
+      "interpretation": "Older 0.0.77 filesystem/network policy results do not become 0.0.79 qualification."
+    },
+    {
+      "source": {
+        "path": "evidence/receipts/srt-source-citations-20261008.json",
+        "line": 12,
+        "revision": "65d66a370d9a5f129662d14c84f2820e940b3a83"
+      },
+      "interpretation": "Later reference-only repair is not a new native install or E2E receipt."
+    }
+  ],
+  "generator": {
+    "command": {
+      "path": "evidence/artifacts/isolation-native-captures-20261016/masked/lane-packet-generation.json",
+      "line": 20
+    },
+    "exit_code": {
+      "path": "evidence/artifacts/isolation-native-captures-20261016/masked/lane-packet-generation.json",
+      "line": 57
+    },
+    "native_summary": {
+      "path": "evidence/artifacts/isolation-native-captures-20261016/masked/lane-packet-generation.stdout.txt",
+      "line": 1
+    },
+    "private_input_name": "foundation__isolation.json",
+    "interpretation": "Existing generator used with the latest committed covering manifest. Its catalog-wide output is not a new survey; the authored draft below is restricted to the two existing winners and two carried survivors."
+  }
+}

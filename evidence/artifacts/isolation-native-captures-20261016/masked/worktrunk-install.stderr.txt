@@ -1,0 +1,2 @@
+downloading worktrunk 0.80.0 x86_64-unknown-linux-musl-static
+WARN: The following commands are shadowed by other commands in your PATH: git-wt wt

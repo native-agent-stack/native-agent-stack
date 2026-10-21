@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "kind": "masked_native_capture",
+  "capture_name": "host-wt-version",
+  "private_raw_reference": "host-wt-version",
+  "masking": {
+    "rule": "capture.py:mask_bytes",
+    "mode": "simultaneous literal byte replacement",
+    "placeholders": [
+      "<FIXTURE_OBJECT>",
+      "<FIXTURE_SHORT_OBJECT>",
+      "<REPO>",
+      "<SCRATCH>",
+      "<UPSTREAM_BUILD_PATH>",
+      "<UPSTREAM_PUBLISHER_ID>",
+      "<USER_HOME>"
+    ],
+    "raw_reference_policy": "Private capture is named only; raw hashes stay private."
+  },
+  "argv": [
+    "wt",
+    "--version"
+  ],
+  "cwd": "<SCRATCH>",
+  "environment": {
+    "PATH": "<USER_HOME>/.local/share/codex-ecosystem/bin:<USER_HOME>/.local/bin:<USER_HOME>/.codex/packages/standalone/releases/0.162.1-x86_64-unknown-linux-musl/codex-path:<USER_HOME>/.local/share/mise/installs/ast-grep/0.45.3:<USER_HOME>/.local/share/mise/installs/betterleaks/1.9.0:<USER_HOME>/.local/share/mise/installs/bun/1.4.2/bin:<USER_HOME>/.local/share/mise/installs/difftastic/0.71.0/.mise-bins:<USER_HOME>/.local/share/mise/installs/github-cli/2.102.0/gh_2.102.0_linux_amd64/bin:<USER_HOME>/.local/share/mise/installs/github-kjanat-actionlint/1.17.0:<USER_HOME>/.local/share/mise/installs/gitleaks/8.30.1:<USER_HOME>/.local/share/mise/installs/node/24.21.0/bin:<USER_HOME>/.local/share/mise/installs/ollama/0.35.0/bin:<USER_HOME>/.local/share/mise/installs/python/3.13.16/bin:<USER_HOME>/.local/share/mise/installs/restic/0.19.1:<USER_HOME>/.local/share/mise/installs/syft/1.54.1:<USER_HOME>/.local/share/mise/installs/uv/0.12.22/.mise-bins:<USER_HOME>/.local/share/mise/installs/worktrunk/0.80.0/.mise-bins:<USER_HOME>/.local/share/mise/installs/zizmor/1.30.1:<USER_HOME>/.local/share/mise/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+    "LANG": "C.UTF-8",
+    "NO_COLOR": "1",
+    "XDG_CONFIG_HOME": "<SCRATCH>/config",
+    "XDG_CACHE_HOME": "<SCRATCH>/cache",
+    "XDG_DATA_HOME": "<SCRATCH>/data",
+    "TMPDIR": "<SCRATCH>/tmp",
+    "WORKTRUNK_CONFIG_PATH": "<SCRATCH>/config/wt.toml",
+    "WORKTRUNK_SYSTEM_CONFIG_PATH": "<SCRATCH>/config/wt-system.toml",
+    "GIT_CONFIG_GLOBAL": "/dev/null",
+    "GIT_CONFIG_NOSYSTEM": "1",
+    "GIT_AUTHOR_NAME": "Isolation fixture",
+    "GIT_COMMITTER_NAME": "Isolation fixture",
+    "GIT_AUTHOR_EMAIL": "234074349+seathatflowsinourveins@users.noreply.github.com",
+    "GIT_COMMITTER_EMAIL": "234074349+seathatflowsinourveins@users.noreply.github.com"
+  },
+  "started_at_utc": "2026-10-16T06:21:51.181344+00:00",
+  "finished_at_utc": "2026-10-16T06:21:51.198331+00:00",
+  "elapsed_seconds": 0.01699,
+  "exit_code": 0,
+  "streams": {
+    "stdout": {
+      "path": "host-wt-version.stdout.txt",
+      "bytes": 11,
+      "sha256": "322de99d4f0079c1e23f2078197eeab386189b25790619554c654a40a5290ff9",
+      "hash_scope": "published bytes"
+    },
+    "stderr": {
+      "path": "host-wt-version.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hash_scope": "published bytes"
+    }
+  }
+}

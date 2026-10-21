@@ -1,0 +1,8 @@
+{
+  "network": {"allowedDomains": [], "deniedDomains": []},
+  "filesystem": {
+    "denyRead": ["/home", "/root"],
+    "allowWrite": ["."],
+    "denyWrite": ["./denied.txt"]
+  }
+}

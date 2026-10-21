@@ -1,0 +1,125 @@
+{
+  "sha": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+  "node_id": "C_kwDOQEkLn9oAKGI0OWNhN2VlYTliMDMxNDU3OTFhNWI5NGVjY2FmOWM1OTQxMmVkMzc",
+  "commit": {
+    "author": {
+      "name": "Maximilian Roos",
+      "email": "5635139+max-sixty@users.noreply.github.com",
+      "date": "2026-09-27T20:55:48Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-09-27T20:55:48Z"
+    },
+    "message": "Release v0.80.0 (#4306)\n\nBumps 0.79.0 → 0.80.0 and adds the `## 0.80.0` changelog section, cut\nfrom `12efb5159`. The bump is minor because the library API breaks (see\nVerification).\n\n## Verification\n\n- `cargo run -- hook pre-merge --yes` on the cut tip: 4985 passed.\n- `nightly.yaml` on `12efb5159`, all jobs green including\nfeature-powerset:\nhttps://github.com/max-sixty/worktrunk/actions/runs/36338233859\n- `cargo semver-checks check-release -p worktrunk` reports five\nmajor-level lints, the removals and signature changes listed in the\nInternal entry.\n- Changelog: repeated verification passes against source until one came\nback clean. Fixed headlines name the condition a bug needed rather than\nits worst case, and near-zero-reach fixes are folded into two roll-up\nbullets, per #4295.\n- Data-loss surface review over `v0.79.0..HEAD` with independent\nfinders. The one real finding, a nested stale detached worktree read as\nthe enclosing repo's rebase so `wt step prune` could unregister it, was\nfixed in #4302. The review also found a squash regression in the backup\npath, fixed in #4303. The remaining candidates were adjudicated\nacceptable and signed off: #4228 unregistering stale worktrees whose\ndirectory remains (files stay on disk; the branch is deleted only if\nintegrated), #4206 leaving a detached `HEAD` on Ctrl-C during a slow\ncommit hook, #4251 allowing `--no-squash` merges with untracked files,\n#4219 dropping `--no-hooks` from the skill example, and #4279's `docker\nstop` recipe. #4252 closes a submodule data-loss path.\n\n> _This was written by Claude Code on behalf of max-sixty_\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-authored-by: Claude Opus 5.5 (1M context) <noreply@anthropic.com>",
+    "tree": {
+      "sha": "c93d269dcbd19c02b1f04a0a4c56d17fe680d734",
+      "url": "https://api.github.com/repos/max-sixty/worktrunk/git/trees/c93d269dcbd19c02b1f04a0a4c56d17fe680d734"
+    },
+    "url": "https://api.github.com/repos/max-sixty/worktrunk/git/commits/b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+    "comment_count": 0,
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJquYLUCRC1aQ7uu5UhlAAAY+wQADMpgGETTVdzOIIZ3xeUdD5A\nPX8lsSMOkrNXNJlI1XPjnc7j9ialwg+ktYXVmQ86jIjvGa3AH55YDaRa36TfC7/e\nFMBqu6Qxli2OpJ0wdRf0C5R7b9fThboqvW+N76z3QpYbLj6bynmKJ/7kn8cbXPqI\ntVJ93piDIR/VxJAnFqYL+PmO0wGd5Mk+cxXMU7ryhVOPQbFepXPZTzE3f+LeML8o\nS43yFRwCM3p9WjezBWqiGUX/jYxWjF3A3f4R6Pl57bMvTQhAs4IzCZjSLhu2QT8k\nGZXpFRhaUq9bMOghF/4fIN8sb1Zams3ru1F5lBR19VBWwhIh0rGFPPsuy6A83NXT\narkKJjczKY+ycK3IJsbC4mnF1sdPcfl6bQQVeAT9AnuGY6wstCZH7AoJD5TvYizy\nqI4qPf3CLb4B4zDrRrj0VjAqLTLRbiEdtgZGjIxNeNGA/Pb45TKjBCtV1z92jvuy\nwUzNeK9o7NEVzoxu6KO2nYVCMFelOvvyYsceBPsVqrfO3DcFCVOCDExW0kvggS+m\n1r8zbs/g6h8gc8WO3Pe+Q6MNfOMSFNPpx6uaSUOsQ5nhGmwgAiSmxYHvGAPu7aDW\nxHeSRRCxBiTt3yJ0y9plG9vASxtDdscZZl+VXNQ3RzMP1S87iehA/IMKiKt42xkO\nhdtU3RABxg3SgkwSKp1g\n=gh7D\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree c93d269dcbd19c02b1f04a0a4c56d17fe680d734\nparent 12efb51591a9203040f35fee696109856af96469\nauthor Maximilian Roos <5635139+max-sixty@users.noreply.github.com> 1790542548 -0700\ncommitter GitHub <noreply@github.com> 1790542548 -0700\n\nRelease v0.80.0 (#4306)\n\nBumps 0.79.0 → 0.80.0 and adds the `## 0.80.0` changelog section, cut\nfrom `12efb5159`. The bump is minor because the library API breaks (see\nVerification).\n\n## Verification\n\n- `cargo run -- hook pre-merge --yes` on the cut tip: 4985 passed.\n- `nightly.yaml` on `12efb5159`, all jobs green including\nfeature-powerset:\nhttps://github.com/max-sixty/worktrunk/actions/runs/36338233859\n- `cargo semver-checks check-release -p worktrunk` reports five\nmajor-level lints, the removals and signature changes listed in the\nInternal entry.\n- Changelog: repeated verification passes against source until one came\nback clean. Fixed headlines name the condition a bug needed rather than\nits worst case, and near-zero-reach fixes are folded into two roll-up\nbullets, per #4295.\n- Data-loss surface review over `v0.79.0..HEAD` with independent\nfinders. The one real finding, a nested stale detached worktree read as\nthe enclosing repo's rebase so `wt step prune` could unregister it, was\nfixed in #4302. The review also found a squash regression in the backup\npath, fixed in #4303. The remaining candidates were adjudicated\nacceptable and signed off: #4228 unregistering stale worktrees whose\ndirectory remains (files stay on disk; the branch is deleted only if\nintegrated), #4206 leaving a detached `HEAD` on Ctrl-C during a slow\ncommit hook, #4251 allowing `--no-squash` merges with untracked files,\n#4219 dropping `--no-hooks` from the skill example, and #4279's `docker\nstop` recipe. #4252 closes a submodule data-loss path.\n\n> _This was written by Claude Code on behalf of max-sixty_\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-authored-by: Claude Opus 5.5 (1M context) <noreply@anthropic.com>",
+      "verified_at": "2026-09-27T20:55:48Z"
+    }
+  },
+  "url": "https://api.github.com/repos/max-sixty/worktrunk/commits/b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+  "html_url": "https://github.com/max-sixty/worktrunk/commit/b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+  "comments_url": "https://api.github.com/repos/max-sixty/worktrunk/commits/b49ca7eea9b03145791a5b94eccaf9c59412ed37/comments",
+  "author": {
+    "login": "max-sixty",
+    "id": 5635139,
+    "node_id": "MDQ6VXNlcjU2MzUxMzk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5635139?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/max-sixty",
+    "html_url": "https://github.com/max-sixty",
+    "followers_url": "https://api.github.com/users/max-sixty/followers",
+    "following_url": "https://api.github.com/users/max-sixty/following{/other_user}",
+    "gists_url": "https://api.github.com/users/max-sixty/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/max-sixty/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/max-sixty/subscriptions",
+    "organizations_url": "https://api.github.com/users/max-sixty/orgs",
+    "repos_url": "https://api.github.com/users/max-sixty/repos",
+    "events_url": "https://api.github.com/users/max-sixty/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/max-sixty/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "committer": {
+    "login": "web-flow",
+    "id": 19864447,
+    "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/web-flow",
+    "html_url": "https://github.com/web-flow",
+    "followers_url": "https://api.github.com/users/web-flow/followers",
+    "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+    "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+    "organizations_url": "https://api.github.com/users/web-flow/orgs",
+    "repos_url": "https://api.github.com/users/web-flow/repos",
+    "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/web-flow/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "parents": [
+    {
+      "sha": "12efb51591a9203040f35fee696109856af96469",
+      "url": "https://api.github.com/repos/max-sixty/worktrunk/commits/12efb51591a9203040f35fee696109856af96469",
+      "html_url": "https://github.com/max-sixty/worktrunk/commit/12efb51591a9203040f35fee696109856af96469"
+    }
+  ],
+  "stats": {
+    "total": 50,
+    "additions": 48,
+    "deletions": 2
+  },
+  "files": [
+    {
+      "sha": "45671985ec3564700009c98c5201edcbdaafb347",
+      "filename": "CHANGELOG.md",
+      "status": "modified",
+      "additions": 46,
+      "deletions": 0,
+      "changes": 46,
+      "blob_url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/CHANGELOG.md",
+      "raw_url": "https://github.com/max-sixty/worktrunk/raw/b49ca7eea9b03145791a5b94eccaf9c59412ed37/CHANGELOG.md",
+      "contents_url": "https://api.github.com/repos/max-sixty/worktrunk/contents/CHANGELOG.md?ref=b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "patch": "@@ -1,5 +1,51 @@\n # Changelog\n \n+## 0.80.0\n+\n+### Improved\n+\n+- **`wt list` and the `wt switch` picker settle faster in repos with many worktrees**: rows fill from the top down, and on macOS with `core.fsmonitor=true` no daemon start is forked for a worktree whose daemon is already running. On a 50-worktree repo the picker's per-row work starts at 47ms, down from 120ms. ([#4286](https://github.com/max-sixty/worktrunk/pull/4286), [#4290](https://github.com/max-sixty/worktrunk/pull/4290), [#4288](https://github.com/max-sixty/worktrunk/pull/4288), [#4284](https://github.com/max-sixty/worktrunk/pull/4284))\n+\n+- **CI status skips branches that were never pushed**: `wt list --full`, the picker, and the statusline no longer query the forge for a local branch no remote has, so a repo with 239 local branches made 25 `gh` calls instead of 249. A PR opened from a branch another clone pushed shows once you fetch. GitLab looks up its project ID once per command, not per row. ([#4289](https://github.com/max-sixty/worktrunk/pull/4289), [#4216](https://github.com/max-sixty/worktrunk/pull/4216))\n+\n+- **Leaner Codex commit generation**: the recommended Codex command moves to `gpt-6-luna` with reasoning off and unneeded Codex features disabled, so each message sends fewer input tokens. Accepting the first-run Codex prompt now also creates `~/.codex/worktrunk-commit-instructions.txt`, which the command reads. [Docs](https://worktrunk.dev/llm-commits/) ([#4261](https://github.com/max-sixty/worktrunk/pull/4261))\n+\n+- **Releases ship a signed packslip**: each GitHub release includes `packslip.sigstore.json`, a manifest of the archives' digests, platforms, completions, and agent skills, signed by the release workflow so installers such as mise can verify downloads before unpacking. ([#4301](https://github.com/max-sixty/worktrunk/pull/4301), thanks @jdx)\n+\n+### Fixed\n+\n+- **A squash whose commit fails keeps the branch**: when a git commit hook or signing stopped the commit in `wt merge` or `wt step squash`, the branch was left at the merge base with its changes staged, recoverable from the reflog. Now the branch is untouched. (Breaking: git commit hooks run on a detached `HEAD` during a squash.) ([#4206](https://github.com/max-sixty/worktrunk/pull/4206), thanks @Bennyjitsu for finding it in [#4193](https://github.com/max-sixty/worktrunk/pull/4193))\n+\n+- **`wt step diff` when local `main` lags `origin/main`**: for a branch built on the newer `origin/main`, the diff included the upstream commits in between. It now uses the same base as `wt merge`. ([#4281](https://github.com/max-sixty/worktrunk/pull/4281), thanks @starlightromero, whose [#3519](https://github.com/max-sixty/worktrunk/issues/3519) reported the same case for `wt merge`)\n+\n+- **Submodules with an `ignore` setting**: when `submodule.<name>.ignore` or `diff.ignoreSubmodules` hid uncommitted changes inside a submodule, `wt remove` and `wt step prune` read the worktree as clean and removed it along with them; they now keep it. With `ignore=all`, `wt step commit` and squashes now commit a staged submodule pointer instead of leaving it staged. ([#4252](https://github.com/max-sixty/worktrunk/pull/4252), [#4192](https://github.com/max-sixty/worktrunk/pull/4192), [#4206](https://github.com/max-sixty/worktrunk/pull/4206), [#4303](https://github.com/max-sixty/worktrunk/pull/4303), thanks @Duang777)\n+\n+- **Worktrees whose `.git` was deleted but whose directory remains** (macOS `$TMPDIR` cleanup can do this): `wt remove <branch>` failed, and `wt step prune` skipped or errored on them. Both now unregister the worktree and leave its files; one with staged changes or an operation in progress is kept by `wt step prune`, and refused by `wt remove` without `--force`. ([#4228](https://github.com/max-sixty/worktrunk/pull/4228), [#4226](https://github.com/max-sixty/worktrunk/pull/4226), [#4302](https://github.com/max-sixty/worktrunk/pull/4302))\n+\n+- **`wt merge --no-squash` with a stage mode that stages nothing**: with `--stage=none` and only unstaged changes, `--stage=tracked` and only untracked files, or only dirty submodule contents, it stopped at \"Nothing to commit\"; it now merges the branch's commits. ([#4251](https://github.com/max-sixty/worktrunk/pull/4251), thanks @Duang777)\n+\n+- **Nushell 0.116**: the first `wt` tab completion in each session printed a `Positional completer input deprecated` warning. The completer now takes Nushell's new input and still works on older versions. ([#4297](https://github.com/max-sixty/worktrunk/pull/4297))\n+\n+- **Hook-log JSON's `branch` field**: `wt config state logs --format=json` put the sanitized log directory name (`feature-x-x2d`) there; it now holds `feature/x`, or `null` when no local branch owns the directory. (Breaking: filters on the sanitized form need updating.) ([#4279](https://github.com/max-sixty/worktrunk/pull/4279))\n+\n+- **`wt config show --full` outside a git repository**: it printed only a `git rev-parse` failure; it now shows the user config and diagnostics. ([#4255](https://github.com/max-sixty/worktrunk/pull/4255))\n+\n+- **Fixes for unusual git setups**: `--no-ff` merges are signed when `commit.gpgSign` is set without a value or only for one worktree; after `git worktree repair`, `--separate-git-dir` repos put worktrees beside the work tree and `wt remove` works (fixes [#4235](https://github.com/max-sixty/worktrunk/issues/4235)); removing an orphan worktree before its first commit no longer errors; with a custom merge driver, leaving the picker during a conflict check no longer strands `.merge_file_*` files (fixes [#4273](https://github.com/max-sixty/worktrunk/issues/4273)). ([#4206](https://github.com/max-sixty/worktrunk/pull/4206), [#4236](https://github.com/max-sixty/worktrunk/pull/4236), [#4233](https://github.com/max-sixty/worktrunk/pull/4233), [#4274](https://github.com/max-sixty/worktrunk/pull/4274), thanks @zengzheqing and @brndnmtthws for reporting)\n+\n+- **Fixes for unusual names and values**: branch and remote names starting with `-`; non-UTF-8 file names in `wt step copy-ignored`, `promote`, `push`, and `merge`; a bare `~` in `CLAUDE_CONFIG_DIR`, or Windows `HOME` differing from `USERPROFILE`; post-remove hooks after a pre-remove hook breaks the user config; multiline `wt config state vars` values, which `vars list` and `{{ vars.* }}` truncated and `wt config state clear` failed on. ([#4253](https://github.com/max-sixty/worktrunk/pull/4253), [#4267](https://github.com/max-sixty/worktrunk/pull/4267), [#4277](https://github.com/max-sixty/worktrunk/pull/4277), [#4257](https://github.com/max-sixty/worktrunk/pull/4257), [#4259](https://github.com/max-sixty/worktrunk/pull/4259), [#4262](https://github.com/max-sixty/worktrunk/pull/4262), [#4247](https://github.com/max-sixty/worktrunk/pull/4247), [#4276](https://github.com/max-sixty/worktrunk/pull/4276), [#4272](https://github.com/max-sixty/worktrunk/pull/4272), thanks @Duang777 and @hiro-nikaitou)\n+\n+### Documentation\n+\n+- **Help and recipe corrections**: `wt step squash --stage=none` and the `wt step prune` skip list now describe what they do, and the \"Database per worktree\" and \"Monitor hook logs\" tips use commands `wt` accepts. ([#4268](https://github.com/max-sixty/worktrunk/pull/4268), [#4279](https://github.com/max-sixty/worktrunk/pull/4279))\n+\n+- **The worktrunk skill's sub-Agent example runs hooks**: it dropped `--no-hooks`, so `pre-start` provisioning runs in agent-spawned worktrees, with guidance on when to add it back. ([#4219](https://github.com/max-sixty/worktrunk/pull/4219), thanks @passitalong)\n+\n+### Internal\n+\n+- **Library API changes** (Breaking library API): `LocalBranch` gains `push_remote`; `GitError` gains `StaleWorktreeHoldsWork` and a `repairable_at` field on `WorktreeMissing`; `Repository::capture_refs_with_ahead_behind` is removed; `git::parse_porcelain_z` and `Repository::changed_files` now use bytes. ([#4228](https://github.com/max-sixty/worktrunk/pull/4228), [#4259](https://github.com/max-sixty/worktrunk/pull/4259), [#4289](https://github.com/max-sixty/worktrunk/pull/4289), [#4290](https://github.com/max-sixty/worktrunk/pull/4290))\n+\n+- **Agent guidance moved to `AGENTS.md`**, shared by Claude Code and Codex, and trimmed from 2,763 lines to 382. ([#4245](https://github.com/max-sixty/worktrunk/pull/4245), [#4246](https://github.com/max-sixty/worktrunk/pull/4246), [#4287](https://github.com/max-sixty/worktrunk/pull/4287))\n+\n ## 0.79.0\n \n ### Improved"
+    },
+    {
+      "sha": "ddfcc0483569b16dc7a833ccde9c29a0b3c3f6da",
+      "filename": "Cargo.lock",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/Cargo.lock",
+      "raw_url": "https://github.com/max-sixty/worktrunk/raw/b49ca7eea9b03145791a5b94eccaf9c59412ed37/Cargo.lock",
+      "contents_url": "https://api.github.com/repos/max-sixty/worktrunk/contents/Cargo.lock?ref=b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "patch": "@@ -4657,7 +4657,7 @@ dependencies = [\n \n [[package]]\n name = \"worktrunk\"\n-version = \"0.79.0\"\n+version = \"0.80.0\"\n dependencies = [\n  \"ansi-str\",\n  \"ansi-to-tui\","
+    },
+    {
+      "sha": "49d9631867811d957f4ba60a5b0cecfe0dd79c5f",
+      "filename": "Cargo.toml",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/Cargo.toml",
+      "raw_url": "https://github.com/max-sixty/worktrunk/raw/b49ca7eea9b03145791a5b94eccaf9c59412ed37/Cargo.toml",
+      "contents_url": "https://api.github.com/repos/max-sixty/worktrunk/contents/Cargo.toml?ref=b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "patch": "@@ -56,7 +56,7 @@ filterset = \"test(/aur_pkgbuild/)\"\n \n [package]\n name = \"worktrunk\"\n-version = \"0.79.0\"\n+version = \"0.80.0\"\n edition = \"2024\"\n rust-version = \"1.97\"\n build = \"build.rs\""
+    }
+  ]
+}

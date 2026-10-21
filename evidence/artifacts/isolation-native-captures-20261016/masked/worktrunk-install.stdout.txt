@@ -1,0 +1,4 @@
+installing to <SCRATCH>/wt-prefix
+  git-wt
+  wt
+Run 'wt config shell install' for shell integration.
