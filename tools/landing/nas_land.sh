@@ -21,7 +21,8 @@
 # policy, 9 the Codex gate (codex_gate.py) gave neither 0 nor 5 (a 5
 # proceeds here): a review running or not finished since its latest trigger (its 3, after the 20-minute wait, before the validation or at
 # the final gate), a review that ended other than Completed or a summary last edited by another account (its 4), a gate that failed or is
-# missing, 10 the merge onto CURRENT origin/main fails scripts/validate.py or does not merge cleanly (2026-10-10).
+# missing, 10 the merge onto CURRENT origin/main fails scripts/validate.py or does not merge cleanly (2026-10-10), or GitHub reports
+# DIRTY during the CI wait (the CC's follow-up of 2026-10-16; nothing merged, the lock freed with the script).
 # 11 the no-reply author address could not be formed (nothing merged), 12 merged, but the merge commit's author is not that address (correction #148).
 # 13 origin/main moved after each of three validations, moved after the last validation (final gate) or is unreadable (nothing merged; #975).
 # 14 another landing of this repository holds the landing lock, or the lock cannot be taken (nothing merged; #975 round 4).
@@ -268,11 +269,14 @@ lg_author_email() {  # <owner/repo> : the account's no-reply address; rc 1 and n
   case "$id" in ''|*[!0-9]*) return 1 ;; esac
   printf '%s+%s@users.noreply.github.com\n' "$id" "$login"
 }
+# #1194's GPT reads (P3-1 at b4489b15, 4fad2736 and 967d068a): the merge commit is taken only from a read whose call exited 0, and only as
+# 40 hex digits (lg_hex40, below); a failed call's stdout, or another reply, is no merge commit, so five such reads are exit 12 with nothing
+# of them printed.
 lg_author_check() {  # <owner/repo> <pr> <no-reply address> : after the merge, the merge commit's author is that address; prints text only, never the stored address
   local mc="" ok="" i
   for i in 1 2 3 4 5; do
-    mc=$(gh pr view "$2" -R "$1" --json mergeCommit --jq '.mergeCommit.oid // empty' 2>/dev/null)
-    [ -n "$mc" ] && break
+    mc=$(gh pr view "$2" -R "$1" --json mergeCommit --jq '.mergeCommit.oid // empty' 2>/dev/null) && lg_hex40 "$mc" && break
+    mc=""
     sleep 3
   done
   [ -n "$mc" ] || { echo "#$2 author address NOT CHECKED: the merge commit is unreadable (correction #148)"; return 1; }
@@ -623,6 +627,12 @@ for i in $(seq 1 25); do
     echo "#$N head moved to ${1:0:8} and carries the read head's change: following it"
     cur=$1; follows=$((follows + 1)); sleep 20; continue
   fi
+  # The CC's follow-up of 2026-10-16 (#1167 and #1180 each held the landing lock about 45-50 minutes in this wait; #1180 stopped with 6):
+  # DIRTY is "The merge commit cannot be cleanly created." (github/docs@be38ec5d schema.docs.graphql:26528-26530), a merge conflict that
+  # waiting does not resolve, and "Workflows will not run on `pull_request` activity if the pull request has a merge conflict" (only
+  # pull_request_target workflows do; events-that-trigger-workflows.md:466). So the wait stops at once with 10, merge_validate's exit for
+  # a merge that does not apply cleanly.
+  [ "${5:-}" = DIRTY ] && { echo "#$N GitHub reports DIRTY during the CI wait: the merge commit cannot be created cleanly; a native rebase is needed: stop, nothing merged"; exit 10; }
   if [ "${2:-1}" = 0 ] && [ "${4:-0}" -gt 0 ] && { [ "${vok:-0}" -gt 0 ] || [ "${3:-0}" -gt 0 ]; }; then
     [ "$3" = 0 ] || { echo "#$N CI failing=$3 of $4: stop"; exit 5; }
     [ "${5:-}" = BLOCKED ] && { echo "#$N BLOCKED by policy with CI green (open threads or required review): stop"; exit 8; }

@@ -610,6 +610,7 @@ PUBLIC_COMMITS = {
     "ca6f880b57f3011d799260161c6b4580ecf7b4d8": "native-agent-stack/native-agent-stack: #1075's second commit",
     "f3f1cabe8235d082c39d817db452378598dc55de": "native-agent-stack/native-agent-stack: #1075's third commit",
     "cbc944f4bc59639a444dd971c737788ba2283a91": "python/cpython: v3.13.16, the upstream mirror",
+    "28b6856d7b215bf844b4223589cb54ade84f5223": "uutils/coreutils: tag 0.10.0, the installed ln's source (src/uu/ln/src/ln.rs)",
     "b2b4370b5bf021b98ee7adc92233e8de3f2de792": "KokaKiwi/rust-hex: v0.4.3",
     "58b1e0c00b39b9e46c24dc4a0ba6a2669c90e9c1": "github/rest-api-description",
     "be38ec5d78e24172587e61b3c6ff40ace1865c71": "github/docs",
@@ -630,6 +631,12 @@ PUBLIC_COMMITS = {
                                                 "https://github.com/native-agent-stack/native-agent-stack/commit/b4489b15b307d81e4bb9f1a43c2348aed22b697b",
     "4fad2736c45469362a376c791296eacf1c87fe47": "native-agent-stack/native-agent-stack: #1194's third head (fold 2), "
                                                 "https://github.com/native-agent-stack/native-agent-stack/commit/4fad2736c45469362a376c791296eacf1c87fe47",
+    "967d068a9aa0d4e3f025a12266055b63cb6d256e": "native-agent-stack/native-agent-stack: #1194's fourth head (fold 3), "
+                                                "https://github.com/native-agent-stack/native-agent-stack/commit/967d068a9aa0d4e3f025a12266055b63cb6d256e",
+    "65d66a370d9a5f129662d14c84f2820e940b3a83": "native-agent-stack/native-agent-stack: #1194's merge commit, "
+                                                "https://github.com/native-agent-stack/native-agent-stack/commit/65d66a370d9a5f129662d14c84f2820e940b3a83",
+    "1b633d861518fa0d299279b1cfaec11d0fb47f82": "native-agent-stack/native-agent-stack: #1163's merge commit, #1229's base, "
+                                                "https://github.com/native-agent-stack/native-agent-stack/commit/1b633d861518fa0d299279b1cfaec11d0fb47f82",
 }
 HEX_FULL = re.compile(r"(?<![0-9A-Fa-f])[0-9A-Fa-f]{64}(?![0-9A-Fa-f])")
 HEX_MARKED = re.compile(r"(?<![0-9A-Fa-f])([0-9A-Fa-f]{6,})…")  # a prefix written `<hex>…`
@@ -1272,15 +1279,54 @@ class ScriptTextTests(LandingCase):
                       "rests on a lag measured on us-equities-trading #58, not documented by GitHub: there an update-branch's head reached",
                       "This script is the required local workflow (#1195's decision record", "Decision 4", "PROPOSAL self-audit",
                       "docs/decisions/2026-10-15-horizon-runtime-ecosystem-repository.md",
-                      # the bash(1) texts for trap '' and for noclobber, and what was only measured
+                      # the bash(1) text for trap '', and what was only measured
                       "If action is the null string the signal specified by each sigspec is ignored by the shell and by the commands it invokes",
-                      "exists and is a regular file\" (bash(1), REDIRECTION, Redirecting Output", "and a write through a dangling symlink"):
+                      # #1194's GPT read at 967d068a, P3-2: the receipt hard-linked from a temporary file (uutils coreutils 0.10.0, the
+                      # installed ln; Rust's std::fs::hard_link), measured on six kinds of entry at its place
+                      "src/uu/ln/src/ln.rs:414-431, :475", "library/std/src/fs.rs:2780, :2794", "The 'link' path already exists.",
+                      "a regular file, a symlink to /dev/null, a dangling symlink, a directory, a symlink to a directory and a FIFO"):
             with self.subTest(cited=cited):
                 self.assertIn(cited, " ".join(line.lstrip("# ") for line in self.horizon.lines))
         own = " ".join(line.lstrip("# ") for line in self.horizon.lines)
-        for retired in ("the merge path", "planned self-audit", "PROPOSAL (the enforcement design", "That it lags is measured on"):
+        for retired in ("the merge path", "planned self-audit", "PROPOSAL (the enforcement design", "That it lags is measured on",
+                        "set -C"):
             with self.subTest(retired=retired):
                 self.assertNotIn(retired, own)
+
+    def test_horizon_documents_its_recovery_and_its_bash_wording_with_pinned_sources(self):
+        # #1194's GPT read at 967d068a, P3-3 to P3-5: the corrected Word Splitting and pipefail texts had no focused assertion (fail-first: they
+        # fail against horizon_land.sh at 4fad2736); the header's exit codes lacked 17 and its revocation summaries the unknown outcome that
+        # keeps the statuses (HZ_KEEP); and the merge-outcome reads cited no primary source for the error that reaches the lander or the
+        # fields it reads, nor said that the three reads are this lander's policy, not a consistency GitHub documents.
+        own = " ".join(" ".join(line.lstrip("# ") for line in self.horizon.lines).split())
+        readme = " ".join((LANDING / "README.md").read_text(encoding="utf-8").split())
+        for phrase in ('EXPANSION, Word Splitting, says why: the shell uses each IFS character "as field terminators"',
+                       '"adjacent non-IFS-whitespace delimiters produce a null field"',
+                       "\"the pipeline's return status is the value of the last (rightmost) command to exit with a non-zero status, or zero if "
+                       'all commands exit successfully" (the installed bash 5.3 bash(1), SHELL GRAMMAR, Pipelines)',
+                       "17 the merge call failed and its outcome could not be read (the statuses kept, nothing revoked",
+                       "unless the merge succeeded or its outcome is unknown (exit 17, HZ_KEEP)",
+                       "pkg/cmd/pr/merge/http.go:98-103", "pkg/cmd/pr/merge/merge.go:348-350", "pkg/cmd/pr/view/view.go:84",
+                       "api/query_builder.go:329, :365", "schema.docs.graphql:47277-47292",
+                       "three reads two seconds apart are this lander's policy, not a consistency GitHub documents"):
+            with self.subTest(script=phrase):
+                self.assertIn(phrase, own)
+        self.assertEqual(own.count("unless the merge succeeded or its outcome is unknown (exit 17, HZ_KEEP)"), 2, "the header and hz_revoke")
+        for phrase in ("unless the merge succeeded or its outcome is unknown (exit 17, which keeps them)",
+                       # the CC's micro at 54376798 (P3-3 and P3-4 partial): the README's summary of horizon's codes names 17, and the
+                       # recovery and residual disclosures stay
+                       "while 17 leaves the outcome unknown: the statuses are kept and the pull request is checked by hand",
+                       "a clone path with whitespace breaks both scripts",
+                       "The final gate narrows each local gate to the seconds between its read and the merge call, and does not close them",
+                       "A revocation POST that fails (the API refusing, the network lost) leaves that context's success standing",
+                       "made in a temporary file in that directory and hard-linked to its name", "src/uu/ln/src/ln.rs:414-431, :475",
+                       "library/std/src/fs.rs:2780, :2794", "pkg/cmd/pr/merge/http.go:98-103", "schema.docs.graphql:47277-47292"):
+            with self.subTest(readme=phrase):
+                self.assertIn(phrase, readme)
+        for retired in ("written under bash's noclobber", "The EXIT trap is set right before the first POST: unless the merge succeeded, it",
+                        "the sha256 the lander posts"):
+            with self.subTest(retired=retired):
+                self.assertNotIn(retired, readme)
 
     def test_horizon_carries_correction_121_with_nas_phrases_and_the_full_head(self):
         # The CC's ruling of 2026-10-15: correction #121 as nas_land.sh carries it, its four phrases and its receipt rule (the shared block's
@@ -3251,6 +3297,24 @@ class EndToEndTests(LandingCase):
                 self.assertEqual(code, 12, out)
                 self.assertIn("author address NOT CHECKED", out)
 
+    def test_the_author_check_uses_the_merge_commit_only_from_a_call_that_succeeded_and_as_40_hex(self):
+        # #1194's GPT reads (P3-1 at b4489b15, 4fad2736 and 967d068a): the shared block's lg_author_check took any non-empty reply of its
+        # merge-commit read, so a failed call whose stdout held a sentinel exited 0 and printed it ("author address on <sentinel>"). The
+        # call's exit code is checked and the reply must be 40 hex digits, else exit 12, nothing of it printed (the three blocks are equal).
+        sentinel = "STDOUT-SENTINEL-6c2e"
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key, case="the call fails with a sentinel on stdout"):
+                code, out, log = self.land(script, FAKE_FAIL="pr view * --json mergeCommit *", FAKE_FAIL_STDOUT=sentinel,
+                                           FAKE_FAIL_STDERR=f"gh: {sentinel}")
+                self.assertEqual((code, len(self.merge_calls(log))), (12, 1), out)
+                self.assertIn("author address NOT CHECKED", out)
+                self.assertNotIn(sentinel, out)
+            with self.subTest(script=script.key, case="the call succeeds with a reply that is not 40 hex digits"):
+                code, out, log = self.land(script, merge_commit=sentinel)
+                self.assertEqual((code, len(self.merge_calls(log))), (12, 1), out)
+                self.assertIn("author address NOT CHECKED", out)
+                self.assertNotIn(f"author address on {sentinel[:8]}", out)
+
     def test_a_draft_is_marked_ready_before_codex_is_asked(self):
         for script, repo in ((self.uet, UET_REPO), (self.nas, NAS_REPO)):
             with self.subTest(script=script.key):
@@ -3876,6 +3940,52 @@ class EndToEndTests(LandingCase):
                 self.assertEqual((code, log), (14, []), out)
                 self.assertIn("the landing lock cannot be opened (path withheld): stop, nothing merged", out)
                 self.assertNotIn("/home/example", out)
+
+    def test_a_dirty_pull_request_stops_the_nas_ci_wait_at_once_and_frees_the_lock(self):
+        # The CC's follow-up of 2026-10-16 (#1167 and #1180 each held the landing lock about 45-50 minutes, and #1180's lander stopped
+        # with 6, a CI timeout): a DIRTY pull request runs only a few checks, so the CI wait never ended. GitHub's DIRTY is "The merge
+        # commit cannot be cleanly created." (schema.docs.graphql:26528-26530), so the loop stops at once with 10, the exit of a merge that
+        # does not apply cleanly, before any sleep, and the lock is free.
+        import fcntl
+        running = [nas_run("validate", "2026-10-10T10:00:00Z", status="in_progress")]
+        code, out, log = self.land(self.nas, merge_state="DIRTY", checkruns=running)
+        self.assertEqual((code, self.merge_calls(log)), (10, []), out)
+        # The CC's micro at 54376798, P2: the reason is the documented one, a merge conflict (events-that-trigger-workflows.md:466), not
+        # that a DIRTY pull request "never completes" its checks (pull_request_target workflows and runs already started still do).
+        readme = " ".join((LANDING / "README.md").read_text(encoding="utf-8").split())
+        for name, text in (("nas_land.sh", " ".join(self.nas.text.split())), ("README.md", readme)):
+            with self.subTest(text=name):
+                self.assertIn("events-that-trigger-workflows.md:466", text)
+                self.assertNotIn("never completes", text)
+        self.assertIn("GitHub reports DIRTY during the CI wait: the merge commit cannot be created cleanly; a native rebase is needed: stop", out)
+        self.assertNotIn("sleep 120", log)
+        self.assertNotIn("CI timeout", out)
+        with open(self.lock_path(self.nas), "a", encoding="utf-8") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        with self.subTest(control="CLEAN with checks still running waits and times out (6), as before"):
+            code, out, log = self.land(self.nas, merge_state="CLEAN", checkruns=running)
+            self.assertEqual((code, self.merge_calls(log)), (6, []), out)
+            self.assertIn("sleep 120", log)
+
+    def test_a_dirty_pull_request_stops_the_uet_ci_wait_at_once_and_frees_the_lock(self):
+        # The CC's ruling of 2026-10-16 on #1229: uet_land.sh's CI wait had the same exposure as nas's (above): a DIRTY pull request
+        # (schema.docs.graphql:26528-26530) with a check still running polled 25 times and stopped with 6. Now 10 at once, as nas, before
+        # any sleep 120, nothing merged, and the lock free.
+        import fcntl
+        running = [check_run("ci-gate", status="IN_PROGRESS", conclusion=None)]
+        code, out, log = self.land(self.uet, merge_state="DIRTY", rollup=running)
+        self.assertEqual((code, self.merge_calls(log)), (10, []), out)
+        self.assertIn("events-that-trigger-workflows.md:466", " ".join(self.uet.text.split()))
+        self.assertNotIn("never completes", self.uet.text)
+        self.assertIn("GitHub reports DIRTY during the CI wait: the merge commit cannot be created cleanly; a native rebase is needed: stop", out)
+        self.assertNotIn("sleep 120", log)
+        self.assertNotIn("CI timeout", out)
+        with open(self.lock_path(self.uet), "a", encoding="utf-8") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        with self.subTest(control="CLEAN with a check still running waits and times out (6), as before"):
+            code, out, log = self.land(self.uet, merge_state="CLEAN", rollup=running)
+            self.assertEqual((code, self.merge_calls(log)), (6, []), out)
+            self.assertIn("sleep 120", log)
 
     def test_a_child_that_outlives_the_landing_does_not_keep_the_lock(self):
         # The lock is descriptor 9, and every child that can outlive the script runs with it closed (git's detached maintenance keeps
@@ -5393,6 +5503,30 @@ class HorizonEndToEndTests(LandingCase):
             code, out, log, run = self.land(FAKE_GH_HOOK_ON="pr merge *", FAKE_GH_HOOK=hook)
             self.assertEqual((code, len(self.merges(log)), self.revoked(log)), (16, 1, []), out)
             self.assertIn(f"merged, but the landing receipt {PR}-{self.head[:12]}.json could not be written", out)
+        # #1194's GPT reads (P3-2 at b4489b15, 4fad2736 and 967d068a): noclobber refuses only an existing REGULAR file, so a symlink to
+        # /dev/null put at the receipt's place after the check took the write, and the landing exited 0 with no receipt. The receipt is
+        # made in a temporary file and hard-linked to its name, which never follows or replaces what is there: any entry is exit 16.
+        for name, make in (("a symlink to /dev/null", 'ln -s /dev/null "$p"'), ("a dangling symlink", 'ln -s nowhere "$p"'),
+                           ("a directory", 'mkdir "$p"'), ("a symlink to a directory", 'mkdir "$p.d" && ln -s "$p.d" "$p"')):
+            with self.subTest(case=f"{name} put at the receipt's place after the merge: exit 16, merged, the statuses kept"):
+                coord = self.dir / f"late-{next(self.counter)}"
+                hook = f'p="$LANDING_COORD/horizon-landings/{PR}-{self.head[:12]}.json"; {make}'
+                code, out, log, run = self.land(coord=coord, FAKE_GH_HOOK_ON="pr merge *", FAKE_GH_HOOK=hook)
+                self.assertEqual((code, len(self.merges(log)), self.revoked(log)), (16, 1, []), out)
+                self.assertIn(f"merged, but the landing receipt {PR}-{self.head[:12]}.json could not be written", out)
+                place = coord / f"horizon-landings/{PR}-{self.head[:12]}.json"
+                self.assertTrue(place.is_symlink() or place.is_dir(), "what was put there is left as it was")
+                self.assertEqual([p.name for p in (coord / "horizon-landings").iterdir() if p.name.startswith(".")], [],
+                                 "no temporary file is left")
+        with self.subTest(control="a landing writes one regular file, 0400, with one link, and leaves no temporary file"):
+            coord = self.dir / f"clean-{next(self.counter)}"
+            code, out, log, run = self.land(coord=coord)
+            self.assertEqual((code, len(self.merges(log))), (0, 1), out)
+            place = coord / f"horizon-landings/{PR}-{self.head[:12]}.json"
+            st = os.lstat(place)
+            self.assertEqual((stat.S_ISREG(st.st_mode), stat.S_IMODE(st.st_mode), st.st_nlink), (True, 0o400, 1))
+            self.assertEqual(json.loads(place.read_text(encoding="utf-8"))["head"], self.head)
+            self.assertEqual(sorted(p.name for p in (coord / "horizon-landings").iterdir()), [place.name])
 
     def test_a_pull_request_whose_base_is_not_main_is_refused_before_the_posts(self):
         # #1194's GPT read, P2: CODEOWNERS and the ancestry are read at main, while the merge pins the head alone (cli v2.102.0
@@ -5445,6 +5579,17 @@ class HorizonEndToEndTests(LandingCase):
                 self.assertIn("merged, but the merge commit could not be read (output withheld)", out)
                 self.assertNotIn(sentinel, out)
                 self.assertIsNone(self.receipt(run)[1]["merge_commit"])
+
+    def test_the_author_checks_failed_merge_commit_read_is_exit_12_and_prints_nothing_of_it(self):
+        # #1194's GPT reads (P3-1 at b4489b15, 4fad2736 and 967d068a): after the validated view, the shared block's lg_author_check read the
+        # merge commit again and took any non-empty reply; a failed call with a sentinel on stdout exited 0 and printed it. Now 12, the
+        # receipt written with the merge commit and the statuses kept.
+        sentinel = "STDOUT-SENTINEL-6c2e"
+        code, out, log, run = self.land(FAKE_FAIL="pr view * --json mergeCommit *", FAKE_FAIL_STDOUT=sentinel, FAKE_FAIL_STDERR=f"gh: {sentinel}")
+        self.assertEqual((code, len(self.merges(log)), self.revoked(log)), (12, 1, []), out)
+        self.assertIn("author address NOT CHECKED", out)
+        self.assertNotIn(sentinel, out)
+        self.assertEqual(self.receipt(run)[1]["merge_commit"], "f" * 40)
 
     def test_a_second_signal_during_the_revocation_does_not_cut_it(self):
         # #1194's CC read, P3: hz_revoke ignores HUP, INT and TERM first. Here the landing stops with 8 (BLOCKED after the posts), and while its
