@@ -66188,8 +66188,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "ddf8b2d0c2724063847c9c91067bf3ef43c2cb66b6a3bf460bd3dd54aafd6f79",
-      "bytes": 765601
+      "sha256": "c60523df14d63ee95824d515e0699090a0cdd8d9e48be67dfb5cc06194a48a76",
+      "bytes": 765679
     },
     {
       "path": "tools/muse_file_fence.py",
