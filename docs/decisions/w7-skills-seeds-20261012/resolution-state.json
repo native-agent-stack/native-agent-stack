@@ -1,0 +1,602 @@
+{
+  "schema_version": 1,
+  "source_commit": "5421e5d67017a1c366ee599c97c93e17ca38878e",
+  "kind": "retrospective-source-intake-resolution-snapshot",
+  "boundary": "Records the missing protocol state at the reviewed input head; it does not claim the original metadata recovery obeyed pre-dispatch ordering. W7 S1 research remains parked.",
+  "source_bindings": {
+    "catalogs/landscape/foundation.json": {
+      "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+      "bytes": 479154
+    },
+    "catalogs/landscape/us-equities.json": {
+      "sha256": "6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e",
+      "bytes": 457364
+    },
+    "catalogs/sota-convergence/layer-verdict-waves.json": {
+      "sha256": "7f7056066fec1d5ea6e6cc5e243a668e509b1d74add94ec3d74cbd3025ebc756",
+      "bytes": 651
+    },
+    "catalogs/sota-convergence/layer-verdicts-20260922.json": {
+      "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de",
+      "bytes": 609126
+    },
+    "catalogs/saturation/ledger.json": {
+      "sha256": "b6ca3220516a515bd6dec13f122f48acdd8ef738565f9c0145839d99dd0c21f2",
+      "bytes": 413173
+    },
+    "docs/decisions/w6-practice-closeout-20261011/inputs-and-dispositions.json": {
+      "sha256": "e02cb6e0d669f7adc4450804a8308aa2e1037a2f7c39ed0b45378b7e8bcdf538",
+      "bytes": 81266
+    },
+    "catalogs/landscape/skills-lifecycle.json": {
+      "sha256": "4167b554698d7d6a8a60ebe7928d9b9b998ac2f47b4cd5d598c22a39c92f0db6",
+      "bytes": 27733
+    },
+    "catalogs/landscape/research-state.json": {
+      "sha256": "fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a",
+      "bytes": 21449
+    },
+    "catalogs/sota-convergence/manifest-20260929.json": {
+      "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee",
+      "bytes": 1149103
+    },
+    "evidence/artifacts/landscape-sweep-20260929/returns.json": {
+      "sha256": "2f93067652c0f1e8e4f3d726895d2017eafef018412e47e9bc9b48e7ef931a9c",
+      "bytes": 2378440
+    }
+  },
+  "instructions_skills": {
+    "catalog": "foundation",
+    "layer_id": "instructions-skills",
+    "closeout_path": "docs/decisions/w6-practice-closeout-20261011/inputs-and-dispositions.json",
+    "closeout_ref": "docs/decisions/w6-practice-closeout-20261011/inputs-and-dispositions.json#/layers/2",
+    "verdict_ref": "catalogs/landscape/foundation.json#/layers/1",
+    "wave_ref": "catalogs/sota-convergence/layer-verdict-waves.json#/waves/0",
+    "verdict_detail_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/7",
+    "verdict_status": "recorded",
+    "prior_winners": [
+      {
+        "component_id": "affaan-m/ECC",
+        "repository": "https://github.com/affaan-m/ECC",
+        "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+        "evidence_class": "local_integration"
+      },
+      {
+        "component_id": "candidate:typesafe-ai-skills",
+        "repository": "https://github.com/typesafe-ai/skills",
+        "pin": "unpinned",
+        "evidence_class": "local_integration"
+      },
+      {
+        "component_id": "candidate:openai-skills",
+        "repository": "https://github.com/openai/skills",
+        "pin": "unpinned",
+        "evidence_class": "local_integration",
+        "terminal_state": "RETIRED",
+        "retirement_ref": "docs/decisions/w6-practice-closeout-20261011/arm-dispositions.json#/component_retirements/0"
+      }
+    ],
+    "latest_sweep": {
+      "id": "landscape-sweep-20260929",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
+      "returns_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+      "ledger_ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/1"
+    },
+    "reopen": [
+      {
+        "trigger": "pin_moved",
+        "ref": "receipt_staleness:linux-wsl2-x86_64/ai-memory"
+      },
+      {
+        "trigger": "pin_moved",
+        "ref": "receipt_staleness:linux-wsl2-x86_64/codex"
+      },
+      {
+        "trigger": "pin_moved",
+        "ref": "receipt_staleness:macos-arm64/ai-memory"
+      },
+      {
+        "trigger": "pin_moved",
+        "ref": "receipt_staleness:macos-arm64/claude-code"
+      },
+      {
+        "trigger": "pin_moved",
+        "ref": "receipt_staleness:macos-arm64/codex"
+      }
+    ],
+    "retained_failure_ref": null,
+    "survivor_count": 1,
+    "missing_vote_pending_count": 0,
+    "unresolved": [
+      {
+        "repository": "https://github.com/mattpocock/skills",
+        "unresolved_kind": "survived",
+        "latest_sweep": "landscape-sweep-20260929",
+        "latest_vote_refs": {
+          "repo": "https://github.com/mattpocock/skills",
+          "facts": {
+            "vote": "not_refuted",
+            "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/instructions-skills/2/facts"
+          },
+          "fit": {
+            "vote": "not_refuted",
+            "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/instructions-skills/2/fit"
+          },
+          "source_review": "evidence/artifacts/landscape-sweep-20260929/mattpocock-skills.json"
+        },
+        "history": [
+          {
+            "sweep_id": "landscape-sweep-20260926",
+            "ledger_bucket": "refuted",
+            "vote_refs": {
+              "repo": "https://github.com/mattpocock/skills",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/0/facts"
+              },
+              "fit": {
+                "vote": "refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/0/fit"
+              }
+            }
+          },
+          {
+            "sweep_id": "landscape-sweep-20260929",
+            "ledger_bucket": "survived",
+            "vote_refs": {
+              "repo": "https://github.com/mattpocock/skills",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/instructions-skills/2/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/instructions-skills/2/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20260929/mattpocock-skills.json"
+            }
+          }
+        ],
+        "primary_source": {
+          "mirror": null,
+          "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+        },
+        "disposition": {
+          "action": "include_in_frozen_comparison",
+          "comparison_id": "w6-instructions-skills-20261011",
+          "scenario_roles": [
+            "selected-skills"
+          ],
+          "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/1/candidates/0/comparison_that_would_overturn",
+          "retained_proposal_label": "targeted_candidate",
+          "retained_disposition": "targeted_candidate",
+          "missing_vote_boundary": "Retained substantive vote evidence is unchanged."
+        }
+      }
+    ],
+    "terminal_state": "SCHEDULED",
+    "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/1",
+    "retained_completed_boundary_ref": "docs/decisions/w6-practice-closeout-20261011/inputs-and-dispositions.json#/stopped_sweep_boundary",
+    "latest_boundary": "Latest covering retained sweep is the W6 closeout's 09-29 source; newer other-layer sweeps do not replace it. Retain unresolved survivors, missing votes and stopped-attempt boundaries; refresh pending completed-source/append evidence before any resumed dispatch.",
+    "next_delta": "Use the existing survivor disposition/comparison and role-specific source gaps. Filter retained W7 subjects against prior evidence before S1; no survey or execution is authorized by this snapshot."
+  },
+  "slots": [
+    {
+      "layer_id": "skills-design-intake",
+      "catalog": "skills-lifecycle",
+      "lifecycle_ref": "catalogs/landscape/skills-lifecycle.json#/tasks/2",
+      "verdict": {
+        "state": "ABSENT",
+        "searched_paths": [
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "reason": "Lifecycle task requirements/gaps are not a dedicated layer verdict."
+      },
+      "wave": {
+        "state": "ABSENT",
+        "registry_ref": "catalogs/sota-convergence/layer-verdict-waves.json",
+        "searched_paths": [
+          "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        ]
+      },
+      "latest_covering_sweep": {
+        "state": "ABSENT",
+        "searched_ref": "catalogs/saturation/ledger.json#/sweeps",
+        "completed_unappended_sources": "UNRESOLVED; no dedicated-layer completed source is bound by this packet"
+      },
+      "cumulative_survivors": {
+        "state": "UNRESOLVED_NO_DEDICATED_LAYER_ADJUDICATION",
+        "items": null,
+        "reason": "Missing dedicated evidence is not an empty survivor set or refutation."
+      },
+      "shared_parent_resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/instructions_skills",
+      "next_delta": "Retain and register the named slot's missing verdict/wave/sweep evidence or explicitly adopt the parent's role-scoped disposition before S1. Preserve cumulative parent survivors and unresolved source/vote gaps; current metadata never supplies a new verdict."
+    },
+    {
+      "layer_id": "skills-security",
+      "catalog": "skills-lifecycle",
+      "lifecycle_ref": "catalogs/landscape/skills-lifecycle.json#/tasks/8",
+      "verdict": {
+        "state": "ABSENT",
+        "searched_paths": [
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "reason": "Lifecycle task requirements/gaps are not a dedicated layer verdict."
+      },
+      "wave": {
+        "state": "ABSENT",
+        "registry_ref": "catalogs/sota-convergence/layer-verdict-waves.json",
+        "searched_paths": [
+          "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        ]
+      },
+      "latest_covering_sweep": {
+        "state": "ABSENT",
+        "searched_ref": "catalogs/saturation/ledger.json#/sweeps",
+        "completed_unappended_sources": "UNRESOLVED; no dedicated-layer completed source is bound by this packet"
+      },
+      "cumulative_survivors": {
+        "state": "UNRESOLVED_NO_DEDICATED_LAYER_ADJUDICATION",
+        "items": null,
+        "reason": "Missing dedicated evidence is not an empty survivor set or refutation."
+      },
+      "shared_parent_resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/instructions_skills",
+      "next_delta": "Retain and register the named slot's missing verdict/wave/sweep evidence or explicitly adopt the parent's role-scoped disposition before S1. Preserve cumulative parent survivors and unresolved source/vote gaps; current metadata never supplies a new verdict."
+    },
+    {
+      "layer_id": "skills-ci-pr",
+      "catalog": "skills-lifecycle",
+      "lifecycle_ref": "catalogs/landscape/skills-lifecycle.json#/tasks/9",
+      "verdict": {
+        "state": "ABSENT",
+        "searched_paths": [
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "reason": "Lifecycle task requirements/gaps are not a dedicated layer verdict."
+      },
+      "wave": {
+        "state": "ABSENT",
+        "registry_ref": "catalogs/sota-convergence/layer-verdict-waves.json",
+        "searched_paths": [
+          "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        ]
+      },
+      "latest_covering_sweep": {
+        "state": "ABSENT",
+        "searched_ref": "catalogs/saturation/ledger.json#/sweeps",
+        "completed_unappended_sources": "UNRESOLVED; no dedicated-layer completed source is bound by this packet"
+      },
+      "cumulative_survivors": {
+        "state": "UNRESOLVED_NO_DEDICATED_LAYER_ADJUDICATION",
+        "items": null,
+        "reason": "Missing dedicated evidence is not an empty survivor set or refutation."
+      },
+      "shared_parent_resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/instructions_skills",
+      "next_delta": "Retain and register the named slot's missing verdict/wave/sweep evidence or explicitly adopt the parent's role-scoped disposition before S1. Preserve cumulative parent survivors and unresolved source/vote gaps; current metadata never supplies a new verdict."
+    },
+    {
+      "layer_id": "skills-skill-lifecycle",
+      "catalog": "skills-lifecycle",
+      "lifecycle_ref": "catalogs/landscape/skills-lifecycle.json#/tasks/1",
+      "verdict": {
+        "state": "ABSENT",
+        "searched_paths": [
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "reason": "Lifecycle task requirements/gaps are not a dedicated layer verdict."
+      },
+      "wave": {
+        "state": "ABSENT",
+        "registry_ref": "catalogs/sota-convergence/layer-verdict-waves.json",
+        "searched_paths": [
+          "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        ]
+      },
+      "latest_covering_sweep": {
+        "state": "ABSENT",
+        "searched_ref": "catalogs/saturation/ledger.json#/sweeps",
+        "completed_unappended_sources": "UNRESOLVED; no dedicated-layer completed source is bound by this packet"
+      },
+      "cumulative_survivors": {
+        "state": "UNRESOLVED_NO_DEDICATED_LAYER_ADJUDICATION",
+        "items": null,
+        "reason": "Missing dedicated evidence is not an empty survivor set or refutation."
+      },
+      "shared_parent_resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/instructions_skills",
+      "next_delta": "Retain and register the named slot's missing verdict/wave/sweep evidence or explicitly adopt the parent's role-scoped disposition before S1. Preserve cumulative parent survivors and unresolved source/vote gaps; current metadata never supplies a new verdict."
+    },
+    {
+      "layer_id": "skills-agent-docs",
+      "catalog": "skills-lifecycle",
+      "lifecycle_ref": "catalogs/landscape/skills-lifecycle.json#/tasks/10",
+      "verdict": {
+        "state": "ABSENT",
+        "searched_paths": [
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "reason": "Lifecycle task requirements/gaps are not a dedicated layer verdict."
+      },
+      "wave": {
+        "state": "ABSENT",
+        "registry_ref": "catalogs/sota-convergence/layer-verdict-waves.json",
+        "searched_paths": [
+          "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        ]
+      },
+      "latest_covering_sweep": {
+        "state": "ABSENT",
+        "searched_ref": "catalogs/saturation/ledger.json#/sweeps",
+        "completed_unappended_sources": "UNRESOLVED; no dedicated-layer completed source is bound by this packet"
+      },
+      "cumulative_survivors": {
+        "state": "UNRESOLVED_NO_DEDICATED_LAYER_ADJUDICATION",
+        "items": null,
+        "reason": "Missing dedicated evidence is not an empty survivor set or refutation."
+      },
+      "shared_parent_resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/instructions_skills",
+      "next_delta": "Retain and register the named slot's missing verdict/wave/sweep evidence or explicitly adopt the parent's role-scoped disposition before S1. Preserve cumulative parent survivors and unresolved source/vote gaps; current metadata never supplies a new verdict."
+    },
+    {
+      "layer_id": "skills-architecture",
+      "catalog": "skills-lifecycle",
+      "lifecycle_ref": "catalogs/landscape/skills-lifecycle.json#/tasks/3",
+      "verdict": {
+        "state": "ABSENT",
+        "searched_paths": [
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "reason": "Lifecycle task requirements/gaps are not a dedicated layer verdict."
+      },
+      "wave": {
+        "state": "ABSENT",
+        "registry_ref": "catalogs/sota-convergence/layer-verdict-waves.json",
+        "searched_paths": [
+          "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        ]
+      },
+      "latest_covering_sweep": {
+        "state": "ABSENT",
+        "searched_ref": "catalogs/saturation/ledger.json#/sweeps",
+        "completed_unappended_sources": "UNRESOLVED; no dedicated-layer completed source is bound by this packet"
+      },
+      "cumulative_survivors": {
+        "state": "UNRESOLVED_NO_DEDICATED_LAYER_ADJUDICATION",
+        "items": null,
+        "reason": "Missing dedicated evidence is not an empty survivor set or refutation."
+      },
+      "shared_parent_resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/instructions_skills",
+      "next_delta": "Retain and register the named slot's missing verdict/wave/sweep evidence or explicitly adopt the parent's role-scoped disposition before S1. Preserve cumulative parent survivors and unresolved source/vote gaps; current metadata never supplies a new verdict."
+    },
+    {
+      "layer_id": "skills-browser",
+      "catalog": "skills-lifecycle",
+      "lifecycle_ref": "catalogs/landscape/skills-lifecycle.json#/tasks/11",
+      "verdict": {
+        "state": "ABSENT",
+        "searched_paths": [
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "reason": "Lifecycle task requirements/gaps are not a dedicated layer verdict."
+      },
+      "wave": {
+        "state": "ABSENT",
+        "registry_ref": "catalogs/sota-convergence/layer-verdict-waves.json",
+        "searched_paths": [
+          "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        ]
+      },
+      "latest_covering_sweep": {
+        "state": "ABSENT",
+        "searched_ref": "catalogs/saturation/ledger.json#/sweeps",
+        "completed_unappended_sources": "UNRESOLVED; no dedicated-layer completed source is bound by this packet"
+      },
+      "cumulative_survivors": {
+        "state": "UNRESOLVED_NO_DEDICATED_LAYER_ADJUDICATION",
+        "items": null,
+        "reason": "Missing dedicated evidence is not an empty survivor set or refutation."
+      },
+      "shared_parent_resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/instructions_skills",
+      "next_delta": "Retain and register the named slot's missing verdict/wave/sweep evidence or explicitly adopt the parent's role-scoped disposition before S1. Preserve cumulative parent survivors and unresolved source/vote gaps; current metadata never supplies a new verdict."
+    },
+    {
+      "layer_id": "skills-debug",
+      "catalog": "skills-lifecycle",
+      "lifecycle_ref": "catalogs/landscape/skills-lifecycle.json#/tasks/6",
+      "verdict": {
+        "state": "ABSENT",
+        "searched_paths": [
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "reason": "Lifecycle task requirements/gaps are not a dedicated layer verdict."
+      },
+      "wave": {
+        "state": "ABSENT",
+        "registry_ref": "catalogs/sota-convergence/layer-verdict-waves.json",
+        "searched_paths": [
+          "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        ]
+      },
+      "latest_covering_sweep": {
+        "state": "ABSENT",
+        "searched_ref": "catalogs/saturation/ledger.json#/sweeps",
+        "completed_unappended_sources": "UNRESOLVED; no dedicated-layer completed source is bound by this packet"
+      },
+      "cumulative_survivors": {
+        "state": "UNRESOLVED_NO_DEDICATED_LAYER_ADJUDICATION",
+        "items": null,
+        "reason": "Missing dedicated evidence is not an empty survivor set or refutation."
+      },
+      "shared_parent_resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/instructions_skills",
+      "next_delta": "Retain and register the named slot's missing verdict/wave/sweep evidence or explicitly adopt the parent's role-scoped disposition before S1. Preserve cumulative parent survivors and unresolved source/vote gaps; current metadata never supplies a new verdict."
+    },
+    {
+      "layer_id": "skills-implement",
+      "catalog": "skills-lifecycle",
+      "lifecycle_ref": "catalogs/landscape/skills-lifecycle.json#/tasks/4",
+      "verdict": {
+        "state": "ABSENT",
+        "searched_paths": [
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "reason": "Lifecycle task requirements/gaps are not a dedicated layer verdict."
+      },
+      "wave": {
+        "state": "ABSENT",
+        "registry_ref": "catalogs/sota-convergence/layer-verdict-waves.json",
+        "searched_paths": [
+          "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        ]
+      },
+      "latest_covering_sweep": {
+        "state": "ABSENT",
+        "searched_ref": "catalogs/saturation/ledger.json#/sweeps",
+        "completed_unappended_sources": "UNRESOLVED; no dedicated-layer completed source is bound by this packet"
+      },
+      "cumulative_survivors": {
+        "state": "UNRESOLVED_NO_DEDICATED_LAYER_ADJUDICATION",
+        "items": null,
+        "reason": "Missing dedicated evidence is not an empty survivor set or refutation."
+      },
+      "shared_parent_resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/instructions_skills",
+      "next_delta": "Retain and register the named slot's missing verdict/wave/sweep evidence or explicitly adopt the parent's role-scoped disposition before S1. Preserve cumulative parent survivors and unresolved source/vote gaps; current metadata never supplies a new verdict."
+    },
+    {
+      "layer_id": "skills-mcp-build",
+      "catalog": "skills-lifecycle",
+      "lifecycle_ref": "catalogs/landscape/skills-lifecycle.json#/tasks/12",
+      "verdict": {
+        "state": "ABSENT",
+        "searched_paths": [
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "reason": "Lifecycle task requirements/gaps are not a dedicated layer verdict."
+      },
+      "wave": {
+        "state": "ABSENT",
+        "registry_ref": "catalogs/sota-convergence/layer-verdict-waves.json",
+        "searched_paths": [
+          "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        ]
+      },
+      "latest_covering_sweep": {
+        "state": "ABSENT",
+        "searched_ref": "catalogs/saturation/ledger.json#/sweeps",
+        "completed_unappended_sources": "UNRESOLVED; no dedicated-layer completed source is bound by this packet"
+      },
+      "cumulative_survivors": {
+        "state": "UNRESOLVED_NO_DEDICATED_LAYER_ADJUDICATION",
+        "items": null,
+        "reason": "Missing dedicated evidence is not an empty survivor set or refutation."
+      },
+      "shared_parent_resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/instructions_skills",
+      "next_delta": "Retain and register the named slot's missing verdict/wave/sweep evidence or explicitly adopt the parent's role-scoped disposition before S1. Preserve cumulative parent survivors and unresolved source/vote gaps; current metadata never supplies a new verdict."
+    },
+    {
+      "layer_id": "skills-research",
+      "catalog": "skills-lifecycle",
+      "lifecycle_ref": "catalogs/landscape/skills-lifecycle.json#/tasks/0",
+      "verdict": {
+        "state": "ABSENT",
+        "searched_paths": [
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "reason": "Lifecycle task requirements/gaps are not a dedicated layer verdict."
+      },
+      "wave": {
+        "state": "ABSENT",
+        "registry_ref": "catalogs/sota-convergence/layer-verdict-waves.json",
+        "searched_paths": [
+          "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        ]
+      },
+      "latest_covering_sweep": {
+        "state": "ABSENT",
+        "searched_ref": "catalogs/saturation/ledger.json#/sweeps",
+        "completed_unappended_sources": "UNRESOLVED; no dedicated-layer completed source is bound by this packet"
+      },
+      "cumulative_survivors": {
+        "state": "UNRESOLVED_NO_DEDICATED_LAYER_ADJUDICATION",
+        "items": null,
+        "reason": "Missing dedicated evidence is not an empty survivor set or refutation."
+      },
+      "shared_parent_resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/instructions_skills",
+      "next_delta": "Retain and register the named slot's missing verdict/wave/sweep evidence or explicitly adopt the parent's role-scoped disposition before S1. Preserve cumulative parent survivors and unresolved source/vote gaps; current metadata never supplies a new verdict."
+    },
+    {
+      "layer_id": "skills-review",
+      "catalog": "skills-lifecycle",
+      "lifecycle_ref": "catalogs/landscape/skills-lifecycle.json#/tasks/7",
+      "verdict": {
+        "state": "ABSENT",
+        "searched_paths": [
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "reason": "Lifecycle task requirements/gaps are not a dedicated layer verdict."
+      },
+      "wave": {
+        "state": "ABSENT",
+        "registry_ref": "catalogs/sota-convergence/layer-verdict-waves.json",
+        "searched_paths": [
+          "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        ]
+      },
+      "latest_covering_sweep": {
+        "state": "ABSENT",
+        "searched_ref": "catalogs/saturation/ledger.json#/sweeps",
+        "completed_unappended_sources": "UNRESOLVED; no dedicated-layer completed source is bound by this packet"
+      },
+      "cumulative_survivors": {
+        "state": "UNRESOLVED_NO_DEDICATED_LAYER_ADJUDICATION",
+        "items": null,
+        "reason": "Missing dedicated evidence is not an empty survivor set or refutation."
+      },
+      "shared_parent_resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/instructions_skills",
+      "next_delta": "Retain and register the named slot's missing verdict/wave/sweep evidence or explicitly adopt the parent's role-scoped disposition before S1. Preserve cumulative parent survivors and unresolved source/vote gaps; current metadata never supplies a new verdict."
+    },
+    {
+      "layer_id": "skills-test",
+      "catalog": "skills-lifecycle",
+      "lifecycle_ref": "catalogs/landscape/skills-lifecycle.json#/tasks/5",
+      "verdict": {
+        "state": "ABSENT",
+        "searched_paths": [
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "reason": "Lifecycle task requirements/gaps are not a dedicated layer verdict."
+      },
+      "wave": {
+        "state": "ABSENT",
+        "registry_ref": "catalogs/sota-convergence/layer-verdict-waves.json",
+        "searched_paths": [
+          "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        ]
+      },
+      "latest_covering_sweep": {
+        "state": "ABSENT",
+        "searched_ref": "catalogs/saturation/ledger.json#/sweeps",
+        "completed_unappended_sources": "UNRESOLVED; no dedicated-layer completed source is bound by this packet"
+      },
+      "cumulative_survivors": {
+        "state": "UNRESOLVED_NO_DEDICATED_LAYER_ADJUDICATION",
+        "items": null,
+        "reason": "Missing dedicated evidence is not an empty survivor set or refutation."
+      },
+      "shared_parent_resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/instructions_skills",
+      "next_delta": "Retain and register the named slot's missing verdict/wave/sweep evidence or explicitly adopt the parent's role-scoped disposition before S1. Preserve cumulative parent survivors and unresolved source/vote gaps; current metadata never supplies a new verdict."
+    }
+  ],
+  "reviewed_head": "29f28d4e6be6a615c5b4f5fc54384a7f2b482f1e"
+}

@@ -19577,6 +19577,21 @@
       "bytes": 11215
     },
     {
+      "path": "docs/decisions/w7-skills-seeds-20261012/README.md",
+      "sha256": "f097c8fff4966ad8ca7bb3f9b06d866a6b9a3a8523fd4985356fde3c3c408248",
+      "bytes": 10315
+    },
+    {
+      "path": "docs/decisions/w7-skills-seeds-20261012/intake.json",
+      "sha256": "db67acdd75b1c28a320c0b820e44de19b3b2d6f284d37934b9a05e10d2cd36ad",
+      "bytes": 293781
+    },
+    {
+      "path": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json",
+      "sha256": "90013e750a09c056aec527ce989a89fe5a073e063e76daf4370fe9cd648bdd15",
+      "bytes": 28264
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -65800,6 +65815,11 @@
       "path": "tests/test_w6_observability_hosting_records.py",
       "sha256": "2a3482173600f7c787588a6e8a0550a18b12020089e8dfeb97cb907793863548",
       "bytes": 6130
+    },
+    {
+      "path": "tests/test_w7_skills_seed_bindings.py",
+      "sha256": "db084a20f623ad368b5b336ed92a8b135ce64eb5822f2822aaba57fd6813177a",
+      "bytes": 6982
     },
     {
       "path": "tests/test_windows_terminal_defaults.py",
