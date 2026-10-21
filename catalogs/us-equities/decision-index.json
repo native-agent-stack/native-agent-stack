@@ -17381,6 +17381,24 @@
       ]
     },
     {
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "catalog_card"
+      ],
+      "references": [
+        {
+          "kind": "catalog_card",
+          "path": "catalogs/us-equities/engines-strategies.json",
+          "pointer": "/entries/39",
+          "id": "adaptive-paper-alpaca-adapter",
+          "decision": "default",
+          "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/nautechsystems/nautilus_ibapi",
       "aliases": [],
       "public_star": false,
@@ -23514,24 +23532,6 @@
           "decision": "Qualify and reuse the existing upstream 31-factor interface through supported native tests and original-release, identity, actions and coverage checks. No scanner rebuild or owner code copy. Fixed secondary diagnostics are source-bound; prior fit and performance are unaccepted.",
           "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
           "evidence_level": "source review without empirical acceptance"
-        }
-      ]
-    },
-    {
-      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
-      "aliases": [],
-      "public_star": false,
-      "record_types": [
-        "catalog_card"
-      ],
-      "references": [
-        {
-          "kind": "catalog_card",
-          "path": "catalogs/us-equities/engines-strategies.json",
-          "pointer": "/entries/39",
-          "id": "adaptive-paper-alpaca-adapter",
-          "decision": "default",
-          "evidence_level": "source_review"
         }
       ]
     },

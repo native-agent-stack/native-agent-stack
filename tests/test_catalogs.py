@@ -496,7 +496,7 @@ class Pr4CardsReconciliationTests(unittest.TestCase):
         self.assertTrue(any("not_established" in item for item in ibkr["limitations"]))
 
         alpaca = self.entry(data, "adaptive-paper-alpaca-adapter")
-        self.assertEqual(alpaca["repository"], "https://github.com/seathatflowsinourveins/native-agent-stack")
+        self.assertEqual(alpaca["repository"], "https://github.com/native-agent-stack/native-agent-stack")
         self.assertEqual(alpaca["decision"], "default")
         self.assertEqual(alpaca["evidence_level"], "source_review")
         self.assertTrue(any("no live broker fills claimed" in item.lower() for item in alpaca["limitations"]))
@@ -571,7 +571,7 @@ class Pr4CardsReconciliationTests(unittest.TestCase):
         }
         self.assertEqual(
             alpaca_adapter_repos,
-            {"https://github.com/seathatflowsinourveins/native-agent-stack"},
+            {"https://github.com/native-agent-stack/native-agent-stack"},
         )
         manifest = self.load(f"{BASE}/manifest.json")
         self.assertEqual(

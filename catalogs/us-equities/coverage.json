@@ -2854,7 +2854,7 @@
       ]
     },
     {
-      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
       "catalog_entry_ids": [
         "adaptive-paper-alpaca-adapter"
       ]

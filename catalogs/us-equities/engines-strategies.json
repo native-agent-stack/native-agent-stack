@@ -1784,7 +1784,7 @@
     },
     {
       "id": "adaptive-paper-alpaca-adapter",
-      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
       "layers": [
         "broker-adapter",
         "execution"
@@ -1817,7 +1817,7 @@
         "broker_readiness in the same receipt records status not_started (regular_session_window_unavailable); continuous operation and native broker fault behavior remain unqualified."
       ],
       "sources": [
-        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/7e7eefe28315f3de3aa4dc75cc8b6524f70829cb/blueprints/us-equities/adaptive-paper/README.md",
+        "https://github.com/native-agent-stack/native-agent-stack/blob/7e7eefe28315f3de3aa4dc75cc8b6524f70829cb/blueprints/us-equities/adaptive-paper/README.md",
         "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/alpaca/trading/client.py"
       ]
     }

@@ -18028,8 +18028,8 @@
     },
     {
       "path": "catalogs/us-equities/coverage.json",
-      "sha256": "7b355f4c1f8cbfead4ad315d4ddc79f0efd5cd75e3bcb7812db4e7f509bf04a5",
-      "bytes": 85355
+      "sha256": "2d43328bcc52791399f699eb9bccf12f77f3e0ce6eb3c7dc8b0a0d86ee21d9c6",
+      "bytes": 85351
     },
     {
       "path": "catalogs/us-equities/data-evaluation-followup.json",
@@ -18058,13 +18058,13 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "23d750c008debcc0ffb59b6460869397a705ff56c728a0328c3c9cb2f1974a03",
-      "bytes": 1158790
+      "sha256": "befa9cc5aee4e216fe1cd4766ebf2d90d8cd8fbf130354becdae40f8d00cb0aa",
+      "bytes": 1158786
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
-      "sha256": "048967637d3bd0e7f429d564ad1b9da0d070b49d0ca81e2404a9a4584b66f118",
-      "bytes": 113507
+      "sha256": "193c02a69a834dffcfe8c10fd1d1a1198cffe9e261d69bde0396ac91d823ed55",
+      "bytes": 113499
     },
     {
       "path": "catalogs/us-equities/engines-strategies.md",
@@ -64387,9 +64387,14 @@
       "bytes": 35494
     },
     {
+      "path": "tests/test_catalog_repository_transfer.py",
+      "sha256": "d470d2f0c158b3609cb863d613e8e1d419d9778215f7ac31dd6bfde702eb9363",
+      "bytes": 6446
+    },
+    {
       "path": "tests/test_catalogs.py",
-      "sha256": "9508a99fb8ccc157aaab16788b90d3b05b85c36cfa0afa8de53a39bebaacd075",
-      "bytes": 31942
+      "sha256": "cd08d2ac9a97b0780f26b652ac3161c485a32160b799f693739bdc012525f718",
+      "bytes": 31934
     },
     {
       "path": "tests/test_catalyst_dataset.py",
@@ -66513,8 +66518,8 @@
     },
     {
       "path": "tools/sota-convergence/reconciliations-20260922.json",
-      "sha256": "a512097b7dc9b912e2e9efec0027f9d28cb9e836ee0c2d9ed93c97a81b9a1b5a",
-      "bytes": 7097
+      "sha256": "501481ae29c2e20dbd8f0180ec6c44b445bea1ac83f0e5c58d951f60fd511605",
+      "bytes": 7085
     },
     {
       "path": "tools/sota-convergence/record_verdicts.py",
