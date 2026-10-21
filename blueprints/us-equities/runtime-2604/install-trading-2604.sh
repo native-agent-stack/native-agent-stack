@@ -90,11 +90,13 @@ source "$script_directory/sync-trading-2604.sh"
 # END shared-sync-source
 readonly lock_bundle="$script_directory/trading-2604-runtime"
 readonly project_hash=aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b
-readonly lock_hash=2df713279918415554d7ba23972d3c9b8dc3a8762c52b36cfd31de53e92c22d7
+readonly lock_hash=9d8350a6773437a6890808c5b6ae61d98d305021b16ea0a4b4e753dd2f4f6223
 # Only exact recorded bundles may migrate toward the published final bundle.
 # Prior hashes are migration inputs and inverse records, never new acceptance.
 # The October 8 published pair (lock f451, aiohttp 3.14.3) holds the 24/24
-# lock-bound acceptance; that acceptance does not transfer to this certifi 2026.10.19 lock.
+# lock-bound acceptance; that acceptance does not transfer to this Pillow 13 / certifi 2026.10.19 lock.
+readonly pre_pillow_project_hash=aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b
+readonly pre_pillow_lock_hash=2df713279918415554d7ba23972d3c9b8dc3a8762c52b36cfd31de53e92c22d7
 readonly pre_certifi_project_hash=aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b
 readonly pre_certifi_lock_hash=a1413f202937aa05625bad34b35d4ad75c9ab637805c3747abc4fb8b0f85634a
 readonly published_project_hash=aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b
@@ -213,8 +215,8 @@ requirements=(
 )
 dev_requirements=('pytest==9.1.1') # https://pypi.org/pypi/pytest/9.1.1/json
 # The manifest bytes were copied from the measured final native bundle. The lock
-# is that bundle's lock relocked with `uv lock --upgrade-package aiohttp==3.14.4`
-# (aiohttp moves only); the earlier native dev sync and dependency check bind f451.
+# is the accepted certifi bundle relocked with `uv lock --upgrade-package pillow==13.0.0`
+# (Pillow moves only; reviewed certifi timestamp precision is preserved); the earlier native dev sync and dependency check bind f451.
 # Copying the byte-verified metadata avoids another target-host resolution.
 # Both files are validated before either is replaced. Only
 # the exact approved metadata (including an interrupted migration) is accepted;
@@ -222,8 +224,8 @@ dev_requirements=('pytest==9.1.1') # https://pypi.org/pypi/pytest/9.1.1/json
 # https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/sync.md
 step=locked-project
 [[ ! -L "$lock_bundle" && -d "$lock_bundle" ]] || die 'Verified runtime lock bundle is missing or symlinked.' 65
-for entry in "pyproject.toml|$project_hash|$previous_project_hash|$recorded_project_hash|$accepted_project_hash|$intermediate_project_hash|$published_project_hash|$pre_certifi_project_hash" "uv.lock|$lock_hash|$previous_lock_hash|$recorded_lock_hash|$accepted_lock_hash|$intermediate_lock_hash|$published_lock_hash|$pre_certifi_lock_hash"; do
-    IFS='|' read -r filename expected_hash previous_hash recorded_hash accepted_hash intermediate_hash published_hash pre_certifi_hash <<< "$entry"
+for entry in "pyproject.toml|$project_hash|$previous_project_hash|$recorded_project_hash|$accepted_project_hash|$intermediate_project_hash|$published_project_hash|$pre_certifi_project_hash|$pre_pillow_project_hash" "uv.lock|$lock_hash|$previous_lock_hash|$recorded_lock_hash|$accepted_lock_hash|$intermediate_lock_hash|$published_lock_hash|$pre_certifi_lock_hash|$pre_pillow_lock_hash"; do
+    IFS='|' read -r filename expected_hash previous_hash recorded_hash accepted_hash intermediate_hash published_hash pre_certifi_hash pre_pillow_hash <<< "$entry"
     [[ ! -L "$lock_bundle/$filename" && -f "$lock_bundle/$filename" ]] || die "Verified bundle file is unavailable: $filename" 65
     printf '%s  %s\n' "$expected_hash" "$lock_bundle/$filename" | sha256sum --check --status
     [[ ! -L "$project/$filename" ]] || die "Owned project file is symlinked: $filename" 73
@@ -233,6 +235,7 @@ for entry in "pyproject.toml|$project_hash|$previous_project_hash|$recorded_proj
             ! printf '%s  %s\n' "$previous_hash" "$project/$filename" | sha256sum --check --status &&
             ! printf '%s  %s\n' "$recorded_hash" "$project/$filename" | sha256sum --check --status &&
             ! printf '%s  %s\n' "$accepted_hash" "$project/$filename" | sha256sum --check --status &&
+            ! printf '%s  %s\n' "$pre_pillow_hash" "$project/$filename" | sha256sum --check --status &&
             ! printf '%s  %s\n' "$pre_certifi_hash" "$project/$filename" | sha256sum --check --status &&
             ! printf '%s  %s\n' "$intermediate_hash" "$project/$filename" | sha256sum --check --status &&
             ! printf '%s  %s\n' "$published_hash" "$project/$filename" | sha256sum --check --status; then

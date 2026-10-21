@@ -42,7 +42,7 @@
     },
     {
       "current": {
-        "path": "examples/openhands-native-capabilities/requirements.lock",
+        "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/examples/openhands-native-capabilities/published-e0c3539d.source.txt",
         "sha256": "e0c3539df8b0ccacff5853df46b3c8fbfff3569cb73525dfc51bee3c9a19c08e"
       },
       "prior": {
@@ -54,7 +54,7 @@
     },
     {
       "current": {
-        "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
+        "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/blueprints/us-equities/sim-crosscheck-hftbacktest/published-fd0eec4f.source.txt",
         "sha256": "fd0eec4f5839985f46a8d1984c55792d0c89136105211b7e44005fa63301f618"
       },
       "prior": {
@@ -102,7 +102,7 @@
     },
     {
       "current": {
-        "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+        "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/blueprints/us-equities/runtime-2604/trading-2604-runtime/published-2df71327.source.txt",
         "sha256": "2df713279918415554d7ba23972d3c9b8dc3a8762c52b36cfd31de53e92c22d7"
       },
       "prior": {
@@ -126,7 +126,7 @@
     },
     {
       "current": {
-        "path": "blueprints/runtime-workers/openhands/requirements.lock",
+        "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/blueprints/runtime-workers/openhands/published-096f6255.source.txt",
         "sha256": "096f6255391e56270df7843cb6739d1e373012d6a54e38d7fd7813e0b9e6a96a"
       },
       "prior": {
@@ -150,7 +150,7 @@
     },
     {
       "current": {
-        "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock",
+        "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/published-ba1b090b.source.txt",
         "sha256": "ba1b090b5a868b456614c704cd4d626b2fe381ecd0d228757d5338e91e2deda3"
       },
       "prior": {
