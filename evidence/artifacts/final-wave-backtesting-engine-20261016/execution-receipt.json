@@ -1,0 +1,155 @@
+{
+  "schema_version": 2,
+  "representation": "source_and_capture_index; NOT a native run receipt",
+  "layer": "us-equities/backtesting-engine",
+  "base_reference": {
+    "value": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+    "kind": "frozen repository reference for F1 source locators"
+  },
+  "native_receipts": "native/*.capture: recorder header contains exact command with marked private-path placeholders, footer contains native COMMAND_EXIT_CODE",
+  "masking": {
+    "representation": "deterministic masked derivative of retained raw native capture",
+    "rule": "mask_capture.py",
+    "tests": "tests/test_final_backtesting_capture_mask.py",
+    "metadata": "masked-capture-metadata.records",
+    "raw_custody": "Private initial/<stream> and recapture/<capture> names in co-op handoff; no raw hash or prefix published",
+    "source": "native/README.md:3",
+    "checks": "co-op privately reproduces each derivative; no source/result is inferred from a driver summary",
+    "context": "explicit private JSON, named in co-op handoff; no implicit host/user/home discovery",
+    "helper_pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1; exact helper/direct-import byte checks guard the publication CLI only, not ordinary mask_bytes calls"
+  },
+  "run_pin_proposals": [
+    {
+      "component": "NautilusTrader",
+      "version": {
+        "value": "2.0.0rc5",
+        "source_at": "catalogs/landscape/lockfile-source-identities.json:8"
+      },
+      "commit": {
+        "value": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+        "source_at": "catalogs/landscape/lockfile-source-identities.json:17",
+        "native_source_at": "native/nautilus-tag.capture:3"
+      },
+      "disposition": "PROPOSAL: retain the committed run; no admission or upgrade"
+    },
+    {
+      "component": "LEAN",
+      "commit": {
+        "value": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+        "source_at": "manifests/stack.json:1393",
+        "native_reference_at": "native/lean-source-download.capture:1"
+      },
+      "disposition": "PROPOSAL: retain historical comparator source; fresh source attempt does not reproduce historical dependency remediation"
+    }
+  ],
+  "bounded_smoke": {
+    "label": "BOUNDED SMOKE, simulated upstream test inputs; NOT full E2E",
+    "native_install_at": [
+      "native/nautilus-venv-install.capture:1",
+      "native/nautilus-wheel-install.capture:19",
+      "native/nautilus-wheel-install.capture:32"
+    ],
+    "native_test_result_at": "native/nautilus-fresh-smoke.capture:3",
+    "native_test_rc_at": "native/nautilus-fresh-smoke.capture:5",
+    "source_provenance_at": [
+      "native/nautilus-source-download.capture:1",
+      "native/nautilus-source-extract.capture:1",
+      "native/nautilus-test-source-match.capture:1"
+    ],
+    "scope": "Selected vendor test modules only; unchanged test preimages retained. No complete vendor suite, historical equity backtest or broker qualification."
+  },
+  "full_E2E": {
+    "status": "GAP",
+    "missing_capture": "Complete at-pin native backtest through declared retained data and its accounting/recovery contract. Selected tests and an empty simulation do not supply that result."
+  },
+  "invoke": {
+    "label": "NATIVE EMPTY-ENGINE SIMULATION INVOKE, not sustained usage or historical E2E",
+    "source_call_at": "native/nautilus-native-simulation-invoke.capture:1",
+    "native_data_at": "native/nautilus-native-simulation-invoke.capture:98",
+    "native_orders_at": "native/nautilus-native-simulation-invoke.capture:119",
+    "native_rc_at": "native/nautilus-native-simulation-invoke.capture:331",
+    "upstream_call_at": [
+      "nautechsystems/nautilus_trader@1b0a49d2792a9432a3aca3fcb617ce7a630d905e:python/tests/unit/backtest/test_backtest_engine_statistics.py:74",
+      "nautechsystems/nautilus_trader@1b0a49d2792a9432a3aca3fcb617ce7a630d905e:python/tests/unit/backtest/test_backtest_engine_statistics.py:87"
+    ],
+    "missing_capture": "Useful production invocation window/denominator and historical-data E2E. Fresh capture has native engine logs, not a driver-generated status object."
+  },
+  "lean": {
+    "status": "GAP: no successful E2E or native engine invoke",
+    "evidence_class": "native_proven",
+    "outcome": "Observed failure only; not a successful E2E",
+    "source_pin_at": "manifests/stack.json:1393",
+    "native_failure_at": "native/lean-host-failure.capture:5",
+    "native_rc_at": "native/lean-host-failure.capture:12",
+    "historical_native_TRX_at": "native/lean-initial-host-abort.trx:12",
+    "TRX_scope": "Original failed run's native TRX, not a generated counter receipt or a replay result",
+    "SDK_version_at": "native/dotnet-invariant-version.capture:2",
+    "mode": "DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1; exact process command in native capture header",
+    "mode_source_at": "upstream/microsoft-globalization.json:5",
+    "source_provenance_at": [
+      "native/lean-source-download.capture:1",
+      "native/lean-source-extract.capture:1",
+      "native/lean-selected-source-match.capture:1"
+    ],
+    "missing_capture": "Successful at-pin E2E and invoke; ICU/culture acceptance; independent SDK/archive-to-binary provenance; reproduction of historical dependency-remediated artifact. No failure is counted as a pass."
+  },
+  "F1_record": "docs/decisions/2026-10-16-backtesting-engine-final-preparation.md:15",
+  "multi_angle_record": {
+    "path": "multi-angle-draft.json",
+    "kind": "UNADJUDICATED source draft plus explicit named missing captures; no scores, votes or convergence claim",
+    "survivor_pin_sources": "Seven retained source reviews at reviewed_commit:7; unresolved companion run pins remain explicit gaps."
+  },
+  "packet": {
+    "path": "layer-packet.json",
+    "representation": "exact file emitted by supported lane_packets CLI, not an authored summary",
+    "generator_input": "native/lane-packets-oct13.capture:1",
+    "native_result_at": "native/lane-packets-oct13.capture:2",
+    "native_rc_at": "native/lane-packets-oct13.capture:4",
+    "source_at": "native-agent-stack/native-agent-stack@a049170124469c7cdbdff532135ea1fe46401b81:catalogs/sota-convergence/manifest-20261013.json#/trading/5",
+    "verbatim_latest_candidate_fields": "latest-sweep-candidates.json",
+    "earlier_survivors": "multi-angle-draft.json retains seven earlier unresolved source-reviewed survivors separately"
+  },
+  "mask_tests": {
+    "synthetic": true,
+    "scope": "Unit fixtures test the publication rule; not engine E2E or invocation evidence",
+    "held_head_missing_rule_red_at": "native/mask-rule-held-head-red.capture:18",
+    "XML_masking_red": "native/mask-xml-red.capture",
+    "native_green": "native/mask-final-seven-green.capture",
+    "native_byte_preservation_red": "native/mask-git-bytes-red.capture",
+    "ruled_regressions_red": "native/landing-regressions-red.capture",
+    "ruled_regressions_green": "native/landing-current-main-green.capture",
+    "regression_scope": "Two landing regressions fail with the final test file against pre-fix f2ccc114 masker, then pass after repair. Earlier ruled-regressions-red capture ran a pre-edit test file and overmasked assertion text; it is retained privately only and is not evidence for the final tests.",
+    "test_file": "tests/test_final_backtesting_capture_mask.py",
+    "test_file_sha256": "fa6987fac8462838a6ea18ff1d71f9a5bbc3b090b2cd657f077ade61b2d06eab"
+  },
+  "legacy_streams": {
+    "representation": "Masked original command streams, not command/rc receipts by themselves",
+    "path": "logs/",
+    "full_output": "No published tail substitutes for a capture. Original large LEAN compilation stdout remains private, named initial/lean-tests-invariant.stdout only; no compilation success is claimed. Fresh compact native failure capture is complete. Driver JSON and generated summaries are not measured run oracles.",
+    "historical_metadata": "The initial manually assembled command/rc summary is superseded by this index and native recorder captures; historical tool observations are not reconstructed as native recorder documents."
+  },
+  "provenance_limit": "Fresh download/extraction and selected-file byte comparisons are captured natively. Source-to-wheel reproducible build and complete runtime binary provenance are not claimed.",
+  "publication_check_policy": "No validator or scan pass is inferred from this index. Native captures below observe the tree before registering their own capture; exact final publication is checked again privately before committing.",
+  "publication_check_captures": [
+    "native/publication-body-scan-rebased.capture",
+    "native/publication-text-scan-rebased.capture",
+    "native/publication-validator.capture",
+    "native/publication-validator-final-byte-check.capture",
+    "native/publication-text-scan.capture",
+    "native/publication-body-scan.capture",
+    "native/publication-body-scan-ruled.capture",
+    "native/publication-text-scan-ruled.capture"
+  ],
+  "scope_boundary": {
+    "FINAL_admission": "none",
+    "run_default_change": "none",
+    "broker_order_or_account_run": "none; only native backtest fixtures and simulations",
+    "comparison_phase2": "NOT RUN; engine-compare-20261015/PHASE1.md and RESUME.md by name only",
+    "installation_scope": "All new runtimes/cache/source/result prefixes remain isolated scratch; no global host tool or service install"
+  },
+  "source_custody": {
+    "public_source_identities": "source-pins.json",
+    "code_bytes": "private horizon vendor custody, named only; no verbatim third-party code in this artifact tree",
+    "old_history": "The rebuilt branch is one fixed-tree commit on main. Prior third-party copies remain reachable from the PR timeline and may remain in GitHub caches or local backup refs; no global erasure claimed."
+  }
+}

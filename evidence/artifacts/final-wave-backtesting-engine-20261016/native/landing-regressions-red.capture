@@ -1,0 +1,35 @@
+Script started on 2026-10-16 10:05:50-04:00 [COMMAND="cd [WORKTREE] && PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_final_backtesting_capture_mask.py -k test_mask_bytes_tolerates_unrelated_live_dependency_edits -k test_host_mask_preserves_assertion_diagnostics -v" <not executed on terminal>]
+test_host_mask_preserves_assertion_diagnostics (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_host_mask_preserves_assertion_diagnostics) ... FAIL
+test_mask_bytes_tolerates_unrelated_live_dependency_edits (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_mask_bytes_tolerates_unrelated_live_dependency_edits) ... ERROR
+
+======================================================================
+ERROR: test_mask_bytes_tolerates_unrelated_live_dependency_edits (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_mask_bytes_tolerates_unrelated_live_dependency_edits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "[WORKTREE]/tests/test_final_backtesting_capture_mask.py", line 54, in test_mask_bytes_tolerates_unrelated_live_dependency_edits
+    self.assertEqual(b'47 passed\r\n', module.mask_bytes(
+                                       ~~~~~~~~~~~~~~~~~^
+        b'47 passed\r\n', hostname='fixture-host'))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[WORKTREE]/evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py", line 72, in mask_bytes
+    text = load_sanitizer(home=home, username=username)(text)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[WORKTREE]/evidence/artifacts/final-wave-backtesting-engine-20261016/mask_capture.py", line 36, in load_sanitizer
+    raise ValueError("sanitizer source dependency differs from cited pin: " + relative)
+ValueError: sanitizer source dependency differs from cited pin: scripts/validate.py
+
+======================================================================
+FAIL: test_host_mask_preserves_assertion_diagnostics (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_host_mask_preserves_assertion_diagnostics)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "[WORKTREE]/tests/test_final_backtesting_capture_mask.py", line 59, in test_host_mask_preserves_assertion_diagnostics
+    self.assertEqual(raw, load_mask().mask_bytes(raw, hostname='fixture-host'))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"AssertionError: b'CPU(s): 7 @ 19 MHz\\r\\nTotal orders: 0'\n" != b"AssertionError: b'CPU(s): [HOST_SPEC]\n"
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.028s
+
+FAILED (failures=1, errors=1)
+
+Script done on 2026-10-16 10:05:50-04:00 [COMMAND_EXIT_CODE="1"]

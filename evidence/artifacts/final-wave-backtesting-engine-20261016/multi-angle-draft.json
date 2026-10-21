@@ -1,0 +1,598 @@
+{
+  "schema_version": 1,
+  "catalog": "us-equities",
+  "layer_id": "backtesting-engine",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "status": "DRAFT, preparation only; proposed GAP rather than FINAL",
+  "method": "Delta over2existing winners and cumulative unresolved survivors. No re-survey, model route, self-read, default/admission change or numerical ranking.",
+  "input_packet": "layer-packet.json",
+  "axis_contract": [
+    "capability_at_pin",
+    "upstream_engineering_quality",
+    "community_consensus",
+    "net_usage",
+    "published_evaluations",
+    "own_measured_runs"
+  ],
+  "existing_winners": [
+    {
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "role": "existing destination, proposed run pin retained",
+      "pin": {
+        "version": "2.0.0rc5",
+        "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
+      },
+      "angles": {
+        "capability_at_pin": {
+          "status": "partial; disputed",
+          "evidence_class": "source_review",
+          "evidence": [
+            "catalogs/us-equities/runtime-target.json:55",
+            "catalogs/us-equities/runtime-target.json:57",
+            "catalogs/us-equities/runtime-target.json:65",
+            "catalogs/us-equities/runtime-target.json:203",
+            "docs/decisions/2026-10-13-engine-currency.md:65"
+          ],
+          "finding": "The selected native IBKR path has not established rc5 local broker acceptance; the older Python-adapter paper receipt does not establish it. The retained one_zero parity case is bounded historical evidence, not complete fill/dividend/broker qualification. The later IBKR transport port is a separate source delta.",
+          "pending_input": "engine-compare-20261015/PHASE1.md and phase2 result, by name only"
+        },
+        "upstream_engineering_quality": {
+          "status": "BOUNDED SMOKE / SIMULATION INVOKE only; full E2E GAP",
+          "evidence_class": "native_proven",
+          "evidence": [
+            "native/nautilus-fresh-smoke.capture:3",
+            "native/nautilus-native-simulation-invoke.capture:1"
+          ],
+          "finding": "Native recorder captures fresh selected upstream47-test smoke and empty-engine simulation invoke. This is not full E2E, historical backtest, production wiring or sustained usage."
+        },
+        "community_consensus": {
+          "status": "gap",
+          "evidence_class": "source_review",
+          "finding": "No independent pin-specific community outcome measurement added. Existing two-family internal agreement is not community consensus; repository popularity is not a decision."
+        },
+        "net_usage": {
+          "status": "gap",
+          "evidence_class": "source_review",
+          "finding": "Installed rc5 plus one preparation-window native invoke does not measure sustained adopted use or useful net workload. No before/after usage denominator retained."
+        },
+        "published_evaluations": {
+          "status": "gap/disputed applicability",
+          "evidence_class": "source_review",
+          "evidence": [
+            "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/us-equities/1",
+            "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json"
+          ],
+          "finding": "Retained local engineering comparisons are dated diagnostics, not independent published matched engine superiority or strategy evaluation."
+        },
+        "own_measured_runs": {
+          "status": "BOUNDED SMOKE / SIMULATION INVOKE only; full E2E GAP",
+          "evidence_class": "native_proven",
+          "evidence": [
+            "native/nautilus-fresh-smoke.capture:3",
+            "native/nautilus-native-simulation-invoke.capture:1"
+          ],
+          "finding": "Native recorder captures fresh selected upstream47-test smoke and empty-engine simulation invoke. This is not full E2E, historical backtest, production wiring or sustained usage."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/QuantConnect/Lean",
+      "role": "existing retained historical comparator, proposed exact source pin",
+      "pin": {
+        "commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+        "artifact_scope": "Historical dependency remediation remains separate; clean-source attempt does not reproduce it"
+      },
+      "angles": {
+        "capability_at_pin": {
+          "status": "partial/disputed",
+          "evidence_class": "source_review",
+          "evidence": [
+            "blueprints/us-equities/engine/receipt.json",
+            "blueprints/us-equities/historical-simulation/receipt.json"
+          ],
+          "finding": "Historical source-build and SPY accounting oracle remain scoped evidence; no contemporary IB/Alpaca adapter or paired same-task advantage established."
+        },
+        "upstream_engineering_quality": {
+          "status": "GAP: native failed test-host execution, not successful E2E",
+          "evidence_class": "native_proven",
+          "outcome": "Observed failure; E2E GAP",
+          "evidence": [
+            "native/lean-host-failure.capture:1",
+            "native/lean-initial-host-abort.trx:1"
+          ],
+          "finding": "The native test host aborts; original native TRX has no executed/passing tests. Generated summaries are not evidence substitutes; no successful LEAN E2E or native engine invoke."
+        },
+        "community_consensus": {
+          "status": "gap",
+          "evidence_class": "source_review",
+          "finding": "No independent pin-specific community result added; activity/popularity and historical internal verdict do not settle this angle."
+        },
+        "net_usage": {
+          "status": "gap",
+          "evidence_class": "source_review",
+          "finding": "SDK/restore/build are not native LEAN engine invokes. Filtered test host aborts before any test; fresh F2 remains GAP. Historical oracle invocation is dated evidence only."
+        },
+        "published_evaluations": {
+          "status": "gap/disputed applicability",
+          "evidence_class": "source_review",
+          "evidence": [
+            "blueprints/us-equities/historical-simulation/receipt.json",
+            "engine-compare-20261015/PHASE1.md (co-op record by name only)"
+          ],
+          "finding": "Dated local stresses do not provide independent matched backtest-to-paper/latency/agent-workflow ranking. Phase2 not run."
+        },
+        "own_measured_runs": {
+          "status": "GAP: native failed test-host execution, not successful E2E",
+          "evidence_class": "native_proven",
+          "outcome": "Observed failure; E2E GAP",
+          "evidence": [
+            "native/lean-host-failure.capture:1",
+            "native/lean-initial-host-abort.trx:1"
+          ],
+          "finding": "The native test host aborts; original native TRX has no executed/passing tests. Generated summaries are not evidence substitutes; no successful LEAN E2E or native engine invoke."
+        }
+      }
+    }
+  ],
+  "carried_survivors": [
+    {
+      "repository": "https://github.com/folknor/pine-oracle",
+      "pin": "a8df6386b6b4fc24f8851070c33f6c24703c522d",
+      "pin_source_at": "evidence/artifacts/landscape-sweep-20261009-pine/folknor-pine-oracle.json:7",
+      "status": "carried unresolved; source review only, no new native candidate trial",
+      "angles": {
+        "capability_at_pin": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/folknor/pine-oracle@a8df6386b6b4fc24f8851070c33f6c24703c522d: native requirement screen distinguishing this Pine companion role from event-engine accounting",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/folknor-pine-oracle.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension.",
+          "inherited_source_claim_at": "evidence/artifacts/landscape-sweep-20261009-pine/folknor-pine-oracle.json:13",
+          "qualification": "An inherited source claim is available; the named native screen is not."
+        },
+        "upstream_engineering_quality": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/folknor/pine-oracle@a8df6386b6b4fc24f8851070c33f6c24703c522d: upstream tests/CI and recovery-quality evidence at the reviewed commit",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/folknor-pine-oracle.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/folknor/pine-oracle@a8df6386b6b4fc24f8851070c33f6c24703c522d: independent community consensus beyond the internal sweep votes",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/folknor-pine-oracle.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/folknor/pine-oracle@a8df6386b6b4fc24f8851070c33f6c24703c522d: measured useful invocation window and usage denominator",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/folknor-pine-oracle.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/folknor/pine-oracle@a8df6386b6b4fc24f8851070c33f6c24703c522d: independent matched evaluation relevant to the frozen engine requirement",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/folknor-pine-oracle.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/folknor/pine-oracle@a8df6386b6b4fc24f8851070c33f6c24703c522d: native comparative run on the same retained contract",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/folknor-pine-oracle.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/arose26/pinescript-langium",
+      "pin": "152d3e8a5fa31c68c27499ece17c1d8216640a0e",
+      "pin_source_at": "evidence/artifacts/landscape-sweep-20261009-pine/arose26-pinescript-langium.json:7",
+      "status": "carried unresolved; source review only, no new native candidate trial",
+      "angles": {
+        "capability_at_pin": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/arose26/pinescript-langium@152d3e8a5fa31c68c27499ece17c1d8216640a0e: native requirement screen distinguishing this Pine companion role from event-engine accounting",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/arose26-pinescript-langium.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension.",
+          "inherited_source_claim_at": "evidence/artifacts/landscape-sweep-20261009-pine/arose26-pinescript-langium.json:13",
+          "qualification": "An inherited source claim is available; the named native screen is not."
+        },
+        "upstream_engineering_quality": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/arose26/pinescript-langium@152d3e8a5fa31c68c27499ece17c1d8216640a0e: upstream tests/CI and recovery-quality evidence at the reviewed commit",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/arose26-pinescript-langium.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/arose26/pinescript-langium@152d3e8a5fa31c68c27499ece17c1d8216640a0e: independent community consensus beyond the internal sweep votes",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/arose26-pinescript-langium.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/arose26/pinescript-langium@152d3e8a5fa31c68c27499ece17c1d8216640a0e: measured useful invocation window and usage denominator",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/arose26-pinescript-langium.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/arose26/pinescript-langium@152d3e8a5fa31c68c27499ece17c1d8216640a0e: independent matched evaluation relevant to the frozen engine requirement",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/arose26-pinescript-langium.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/arose26/pinescript-langium@152d3e8a5fa31c68c27499ece17c1d8216640a0e: native comparative run on the same retained contract",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/arose26-pinescript-langium.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/elbakramer/pynescript",
+      "pin": "0b9b4d0b0cd40d7d98c939830ccd06527a90c4d5",
+      "pin_source_at": "evidence/artifacts/landscape-sweep-20261009-pine/elbakramer-pynescript.json:7",
+      "status": "carried unresolved; source review only, no new native candidate trial",
+      "angles": {
+        "capability_at_pin": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/elbakramer/pynescript@0b9b4d0b0cd40d7d98c939830ccd06527a90c4d5: native requirement screen distinguishing this Pine companion role from event-engine accounting",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/elbakramer-pynescript.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension.",
+          "inherited_source_claim_at": "evidence/artifacts/landscape-sweep-20261009-pine/elbakramer-pynescript.json:13",
+          "qualification": "An inherited source claim is available; the named native screen is not."
+        },
+        "upstream_engineering_quality": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/elbakramer/pynescript@0b9b4d0b0cd40d7d98c939830ccd06527a90c4d5: upstream tests/CI and recovery-quality evidence at the reviewed commit",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/elbakramer-pynescript.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/elbakramer/pynescript@0b9b4d0b0cd40d7d98c939830ccd06527a90c4d5: independent community consensus beyond the internal sweep votes",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/elbakramer-pynescript.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/elbakramer/pynescript@0b9b4d0b0cd40d7d98c939830ccd06527a90c4d5: measured useful invocation window and usage denominator",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/elbakramer-pynescript.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/elbakramer/pynescript@0b9b4d0b0cd40d7d98c939830ccd06527a90c4d5: independent matched evaluation relevant to the frozen engine requirement",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/elbakramer-pynescript.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/elbakramer/pynescript@0b9b4d0b0cd40d7d98c939830ccd06527a90c4d5: native comparative run on the same retained contract",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/elbakramer-pynescript.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/pynesys/pynecore",
+      "pin": "cab1266911a31245e885dc06789f900717be9e98",
+      "pin_source_at": "evidence/artifacts/landscape-sweep-20261009-pine/pynesys-pynecore.json:7",
+      "status": "carried unresolved; source review only, no new native candidate trial",
+      "angles": {
+        "capability_at_pin": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/pynesys/pynecore@cab1266911a31245e885dc06789f900717be9e98: native requirement screen distinguishing this Pine companion role from event-engine accounting",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/pynesys-pynecore.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension.",
+          "inherited_source_claim_at": "evidence/artifacts/landscape-sweep-20261009-pine/pynesys-pynecore.json:13",
+          "qualification": "An inherited source claim is available; the named native screen is not."
+        },
+        "upstream_engineering_quality": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/pynesys/pynecore@cab1266911a31245e885dc06789f900717be9e98: upstream tests/CI and recovery-quality evidence at the reviewed commit",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/pynesys-pynecore.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/pynesys/pynecore@cab1266911a31245e885dc06789f900717be9e98: independent community consensus beyond the internal sweep votes",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/pynesys-pynecore.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/pynesys/pynecore@cab1266911a31245e885dc06789f900717be9e98: measured useful invocation window and usage denominator",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/pynesys-pynecore.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/pynesys/pynecore@cab1266911a31245e885dc06789f900717be9e98: independent matched evaluation relevant to the frozen engine requirement",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/pynesys-pynecore.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/pynesys/pynecore@cab1266911a31245e885dc06789f900717be9e98: native comparative run on the same retained contract",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/pynesys-pynecore.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/luxalgo/pinets",
+      "pin": "c5e6b0efee7e42d78b42d96f14173f38be082551",
+      "pin_source_at": "evidence/artifacts/landscape-sweep-20261009-pine/luxalgo-pinets.json:7",
+      "status": "carried unresolved; source review only, no new native candidate trial",
+      "angles": {
+        "capability_at_pin": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/luxalgo/pinets@c5e6b0efee7e42d78b42d96f14173f38be082551: native requirement screen distinguishing this Pine companion role from event-engine accounting",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/luxalgo-pinets.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension.",
+          "inherited_source_claim_at": "evidence/artifacts/landscape-sweep-20261009-pine/luxalgo-pinets.json:13",
+          "qualification": "An inherited source claim is available; the named native screen is not."
+        },
+        "upstream_engineering_quality": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/luxalgo/pinets@c5e6b0efee7e42d78b42d96f14173f38be082551: upstream tests/CI and recovery-quality evidence at the reviewed commit",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/luxalgo-pinets.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/luxalgo/pinets@c5e6b0efee7e42d78b42d96f14173f38be082551: independent community consensus beyond the internal sweep votes",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/luxalgo-pinets.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/luxalgo/pinets@c5e6b0efee7e42d78b42d96f14173f38be082551: measured useful invocation window and usage denominator",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/luxalgo-pinets.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/luxalgo/pinets@c5e6b0efee7e42d78b42d96f14173f38be082551: independent matched evaluation relevant to the frozen engine requirement",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/luxalgo-pinets.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/luxalgo/pinets@c5e6b0efee7e42d78b42d96f14173f38be082551: native comparative run on the same retained contract",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/luxalgo-pinets.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/pineforge-4pass/pineforge-codegen-oss",
+      "pin": "15294ebb3a03035876674c476d81b3dd2ba73d81",
+      "pin_source_at": "evidence/artifacts/landscape-sweep-20261009-pine/pineforge-4pass-pineforge-codegen-oss.json:7",
+      "status": "carried unresolved; source review only, no new native candidate trial",
+      "angles": {
+        "capability_at_pin": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/pineforge-4pass/pineforge-codegen-oss@15294ebb3a03035876674c476d81b3dd2ba73d81: native requirement screen distinguishing this Pine companion role from event-engine accounting",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/pineforge-4pass-pineforge-codegen-oss.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension.",
+          "inherited_source_claim_at": "evidence/artifacts/landscape-sweep-20261009-pine/pineforge-4pass-pineforge-codegen-oss.json:13",
+          "qualification": "An inherited source claim is available; the named native screen is not."
+        },
+        "upstream_engineering_quality": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/pineforge-4pass/pineforge-codegen-oss@15294ebb3a03035876674c476d81b3dd2ba73d81: upstream tests/CI and recovery-quality evidence at the reviewed commit",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/pineforge-4pass-pineforge-codegen-oss.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/pineforge-4pass/pineforge-codegen-oss@15294ebb3a03035876674c476d81b3dd2ba73d81: independent community consensus beyond the internal sweep votes",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/pineforge-4pass-pineforge-codegen-oss.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/pineforge-4pass/pineforge-codegen-oss@15294ebb3a03035876674c476d81b3dd2ba73d81: measured useful invocation window and usage denominator",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/pineforge-4pass-pineforge-codegen-oss.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/pineforge-4pass/pineforge-codegen-oss@15294ebb3a03035876674c476d81b3dd2ba73d81: independent matched evaluation relevant to the frozen engine requirement",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/pineforge-4pass-pineforge-codegen-oss.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/pineforge-4pass/pineforge-codegen-oss@15294ebb3a03035876674c476d81b3dd2ba73d81: native comparative run on the same retained contract",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/pineforge-4pass-pineforge-codegen-oss.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/s7cret/backtest_engine",
+      "pin": "0a8a6a62e3556e9c3ef4cd0b5bcd048ce3cd62a0",
+      "pin_source_at": "evidence/artifacts/landscape-sweep-20261009-pine/s7cret-backtest-engine.json:7",
+      "status": "carried unresolved; source review only, no new native candidate trial",
+      "angles": {
+        "capability_at_pin": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/s7cret/backtest_engine@0a8a6a62e3556e9c3ef4cd0b5bcd048ce3cd62a0: native requirement screen distinguishing this Pine companion role from event-engine accounting",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/s7cret-backtest-engine.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension.",
+          "inherited_source_claim_at": "evidence/artifacts/landscape-sweep-20261009-pine/s7cret-backtest-engine.json:13",
+          "qualification": "An inherited source claim is available; the named native screen is not."
+        },
+        "upstream_engineering_quality": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/s7cret/backtest_engine@0a8a6a62e3556e9c3ef4cd0b5bcd048ce3cd62a0: upstream tests/CI and recovery-quality evidence at the reviewed commit",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/s7cret-backtest-engine.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/s7cret/backtest_engine@0a8a6a62e3556e9c3ef4cd0b5bcd048ce3cd62a0: independent community consensus beyond the internal sweep votes",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/s7cret-backtest-engine.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/s7cret/backtest_engine@0a8a6a62e3556e9c3ef4cd0b5bcd048ce3cd62a0: measured useful invocation window and usage denominator",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/s7cret-backtest-engine.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/s7cret/backtest_engine@0a8a6a62e3556e9c3ef4cd0b5bcd048ce3cd62a0: independent matched evaluation relevant to the frozen engine requirement",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/s7cret-backtest-engine.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/s7cret/backtest_engine@0a8a6a62e3556e9c3ef4cd0b5bcd048ce3cd62a0: native comparative run on the same retained contract",
+          "source_boundary_at": "evidence/artifacts/landscape-sweep-20261009-pine/s7cret-backtest-engine.json:13",
+          "source_scope": "Retained source/documentation review explicitly records no native install/run/comparison; not evidence for this missing dimension."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/cli/cli",
+      "pin": null,
+      "pin_status": "GAP: no run pin adopted or installed for this companion in this preparation",
+      "source_at": "a049170124469c7cdbdff532135ea1fe46401b81:catalogs/sota-convergence/manifest-20261013.json:4333",
+      "status": "carried companion-role proposal, not an engine winner",
+      "angles": {
+        "capability_at_pin": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/cli/cli: exact-pin capability at pin capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "upstream_engineering_quality": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/cli/cli: exact-pin upstream engineering quality capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/cli/cli: exact-pin community consensus capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/cli/cli: exact-pin net usage capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/cli/cli: exact-pin published evaluations capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/cli/cli: exact-pin own measured runs capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/shopify/toxiproxy",
+      "pin": null,
+      "pin_status": "GAP: no run pin adopted or installed for this companion in this preparation",
+      "source_at": "a049170124469c7cdbdff532135ea1fe46401b81:catalogs/sota-convergence/manifest-20261013.json:4434",
+      "status": "carried companion-role proposal, not an engine winner",
+      "angles": {
+        "capability_at_pin": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/shopify/toxiproxy: exact-pin capability at pin capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "upstream_engineering_quality": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/shopify/toxiproxy: exact-pin upstream engineering quality capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/shopify/toxiproxy: exact-pin community consensus capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/shopify/toxiproxy: exact-pin net usage capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/shopify/toxiproxy: exact-pin published evaluations capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/shopify/toxiproxy: exact-pin own measured runs capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/slsa-framework/slsa-verifier",
+      "pin": null,
+      "pin_status": "GAP: no run pin adopted or installed for this companion in this preparation",
+      "source_at": "a049170124469c7cdbdff532135ea1fe46401b81:catalogs/sota-convergence/manifest-20261013.json:4482",
+      "status": "carried companion-role proposal, not an engine winner",
+      "angles": {
+        "capability_at_pin": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/slsa-framework/slsa-verifier: exact-pin capability at pin capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "upstream_engineering_quality": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/slsa-framework/slsa-verifier: exact-pin upstream engineering quality capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "community_consensus": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/slsa-framework/slsa-verifier: exact-pin community consensus capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "net_usage": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/slsa-framework/slsa-verifier: exact-pin net usage capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "published_evaluations": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/slsa-framework/slsa-verifier: exact-pin published evaluations capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        },
+        "own_measured_runs": {
+          "status": "GAP",
+          "missing_capture": "https://github.com/slsa-framework/slsa-verifier: exact-pin own measured runs capture for its companion role",
+          "boundary": "Retained survivor identity/source-fit lead only; no dimension is treated as measured."
+        }
+      }
+    }
+  ],
+  "overlap": "Nautilus is both existing winner and Oct13 survivor; represented once in existing_winners, role still reopened",
+  "phase2_comparison": {
+    "status": "NOT_RUN",
+    "source": "engine-compare-20261015/PHASE1.md and RESUME.md, co-op records by name only",
+    "authority_boundary": "Co-op189682 confirms phase1 pins/costs, phase2 owner credential prerequisites. No phase2 execution delegated.",
+    "role": "One pending capability/own-run input; order timing/fill parity alone does not decide engine layer"
+  },
+  "disputed_dimensions": [
+    "Exact adoption pin versus newer source-watch/comparison pin",
+    "Historical remediated LEAN artifact versus clean-source reproduction",
+    "Nautilus official IB adapter versus local direct-IB native port",
+    "Matched order/fill/cash/dividend semantics and broker recovery",
+    "Paired agent workflow and complete supported host install",
+    "Independent community consensus/net usage/published evaluation evidence",
+    "All cumulative survivor roles and explicit latest adjudications",
+    "Culture-sensitive LEAN behavior under invariant-mode prerequisite workaround"
+  ],
+  "adjudication_request": "Co-op dispatches two families only on named disputed dimensions and retained evidence; draft supplies no votes. If comparison/usage/evidence cannot settle the layer, record GAP or preregistered comparison through the existing protocol rather than fabricate FINAL.",
+  "no_numeric_strategy_claim": true,
+  "integrity_status": "Explicit named missing captures replace template findings. No inferred scores or convergence; all candidate native screens remain pending."
+}

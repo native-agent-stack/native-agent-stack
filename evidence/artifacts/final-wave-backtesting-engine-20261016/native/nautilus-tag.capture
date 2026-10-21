@@ -1,0 +1,5 @@
+Script started on 2026-10-16 01:43:53-04:00 [COMMAND="git ls-remote https://github.com/nautechsystems/nautilus_trader.git refs/tags/v2.0.0rc5 refs/tags/v2.0.0rc5^{}" <not executed on terminal>]
+34de0d6f886a9fe8359f9d6590f43f53c86b1d32	refs/tags/v2.0.0rc5
+1b0a49d2792a9432a3aca3fcb617ce7a630d905e	refs/tags/v2.0.0rc5^{}
+
+Script done on 2026-10-16 01:43:53-04:00 [COMMAND_EXIT_CODE="0"]

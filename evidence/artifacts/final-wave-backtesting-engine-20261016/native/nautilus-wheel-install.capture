@@ -1,0 +1,32 @@
+Script started on 2026-10-16 01:47:15-04:00 [COMMAND="env UV_CACHE_DIR=[RECAPTURE]/uv-cache uv pip install --python [RECAPTURE]/runtime/bin/python nautilus-trader==2.0.0rc5 pytest==9.1.1 pandas pytest-asyncio msgspec fsspec pyarrow" <not executed on terminal>]
+Using Python 3.12.3 environment at: [RECAPTURE]/runtime
+Resolved 15 packages in 267ms
+Downloading pygments (1.2MiB)
+Downloading pyarrow (47.8MiB)
+Downloading nautilus-trader (66.7MiB)
+Downloading numpy (16.0MiB)
+Downloading pandas (10.3MiB)
+ Downloaded pygments
+ Downloaded pandas
+ Downloaded numpy
+ Downloaded pyarrow
+ Downloaded nautilus-trader
+Prepared 15 packages in 1.08s
+Installed 15 packages in 213ms
+ + fsspec==2026.9.0
+ + iniconfig==2.3.0
+ + msgspec==0.22.0
+ + nautilus-trader==2.0.0rc5
+ + numpy==2.5.4
+ + packaging==26.3
+ + pandas==3.0.6
+ + pluggy==1.7.0
+ + pyarrow==25.0.1
+ + pygments==2.21.0
+ + pytest==9.1.1
+ + pytest-asyncio==1.4.0
+ + python-dateutil==2.9.0.post0
+ + six==1.17.0
+ + typing-extensions==4.16.0
+
+Script done on 2026-10-16 01:47:17-04:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,4 @@
+Script started on 2026-10-16 01:51:13-04:00 [COMMAND="cd [WORKTREE] && PYTHONDONTWRITEBYTECODE=1 python3 tools/sota-convergence/lane_packets.py --catalog us-equities --trading-candidates manifest --manifest catalogs/sota-convergence/manifest-20261009.json --registered-receipts --gap-receipts --out [RECAPTURE]/generated-packets --checked-at 2026-10-16" <not executed on terminal>]
+{"status": "written", "packet_count": 12, "out_dir": "[RECAPTURE]/generated-packets/packets", "unmatched_sota_components": {}, "dropped_removed_file_refs": {}}
+
+Script done on 2026-10-16 01:51:13-04:00 [COMMAND_EXIT_CODE="0"]

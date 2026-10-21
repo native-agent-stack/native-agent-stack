@@ -1,0 +1,4 @@
+# Keep final blank lines in these normalized native diagnostics unchanged.
+# git/git@67ad42147a7acc2af6074753ebd03d904476118f:Documentation/gitattributes.adoc:1199
+lean-tests-invariant.stdout.log whitespace=-blank-at-eof
+nautilus-statistics.stderr.log whitespace=-blank-at-eof

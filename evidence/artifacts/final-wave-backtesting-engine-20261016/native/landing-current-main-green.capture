@@ -1,0 +1,22 @@
+Script started on 2026-10-16 10:07:45-04:00 [COMMAND="cd [LANDING] && PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p "test_final_backtesting*.py" -v" <not executed on terminal>]
+test_cli_hashes_only_deterministic_published_bytes_and_keeps_raw (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_cli_hashes_only_deterministic_published_bytes_and_keeps_raw) ... ok
+test_cli_rejects_unpinned_source_before_publishing (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_cli_rejects_unpinned_source_before_publishing) ... ok
+test_declared_host_spec_fields_are_masked_without_losing_results (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_declared_host_spec_fields_are_masked_without_losing_results) ... ok
+test_empty_mapping_refuses (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_empty_mapping_refuses) ... ok
+test_host_mask_preserves_assertion_diagnostics (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_host_mask_preserves_assertion_diagnostics) ... ok
+test_hostname_is_required_instead_of_implicit_host_discovery (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_hostname_is_required_instead_of_implicit_host_discovery) ... ok
+test_mask_bytes_tolerates_unrelated_live_dependency_edits (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_mask_bytes_tolerates_unrelated_live_dependency_edits) ... ok
+test_masks_only_declared_identity_fields_preserving_observation (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_masks_only_declared_identity_fields_preserving_observation) ... ok
+test_native_xml_counter_capture_stays_parseable_after_identity_mask (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_native_xml_counter_capture_stays_parseable_after_identity_mask) ... ok
+test_publication_contains_the_masking_rule (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_publication_contains_the_masking_rule) ... ok
+test_published_native_bytes_survive_git_eol_filters (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_published_native_bytes_survive_git_eol_filters) ... ok
+test_untouched_native_bytes_are_not_summarized_or_truncated (test_final_backtesting_capture_mask.NativeCaptureMaskTests.test_untouched_native_bytes_are_not_summarized_or_truncated) ... ok
+test_packet_is_the_current_manifest_generator_output (test_final_backtesting_publication.BacktestingPublicationTests.test_packet_is_the_current_manifest_generator_output) ... ok
+test_third_party_code_copies_are_excluded_from_public_artifacts (test_final_backtesting_publication.BacktestingPublicationTests.test_third_party_code_copies_are_excluded_from_public_artifacts) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.151s
+
+OK
+
+Script done on 2026-10-16 10:07:45-04:00 [COMMAND_EXIT_CODE="0"]

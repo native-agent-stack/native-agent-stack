@@ -1,0 +1,7 @@
+Script started on 2026-10-16 02:18:16-04:00 [COMMAND="cd [WORKTREE] && PYTHONDONTWRITEBYTECODE=1 TMPDIR=/var/tmp python3 scripts/validate.py" <not executed on terminal>]
+Publication validation failed:
+evidence/artifacts/final-wave-backtesting-engine-20261016/logs/lean-tests-invariant.stdout.gz: cannot inspect as UTF-8 publication text
+evidence/artifacts/final-wave-backtesting-engine-20261016/logs/lean-tests-invariant.stdout.log: evidence file is not hash-listed
+evidence/artifacts/final-wave-backtesting-engine-20261016/logs/lean-tests-invariant.stdout.log: file missing
+
+Script done on 2026-10-16 02:19:18-04:00 [COMMAND_EXIT_CODE="1"]

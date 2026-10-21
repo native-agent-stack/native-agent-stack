@@ -1,0 +1,5 @@
+Script started on 2026-10-16 10:08:10-04:00 [COMMAND="cd [LANDING] && gitleaks dir --redact --no-banner --exit-code 1 evidence/artifacts/final-wave-backtesting-engine-20261016" <not executed on terminal>]
+10:08AM INF scanned ~328660 bytes (328.66 KB) in 43.4ms
+10:08AM INF no leaks found
+
+Script done on 2026-10-16 10:08:11-04:00 [COMMAND_EXIT_CODE="0"]
