@@ -53317,6 +53317,36 @@
       "bytes": 20488
     },
     {
+      "path": "evidence/artifacts/runtime-worker-context-engineering-20261015/README.md",
+      "sha256": "9d1667260d235192e2435edb32986b30d395c84ff6a84f038de62cacc9846667",
+      "bytes": 4883
+    },
+    {
+      "path": "evidence/artifacts/runtime-worker-context-engineering-20261015/comparison.md",
+      "sha256": "41ead92009cae90405c114353fff80ae42b4dc05c6ea24788dd2ea06520bd693",
+      "bytes": 9787
+    },
+    {
+      "path": "evidence/artifacts/runtime-worker-context-engineering-20261015/mechanisms.md",
+      "sha256": "340d82b9a43bc1529103e7f76497ca13d943a986a52ccb11c69a9b93faa0efc9",
+      "bytes": 18779
+    },
+    {
+      "path": "evidence/artifacts/runtime-worker-context-engineering-20261015/policy-trial.md",
+      "sha256": "968e4ce95570da39e711ca5ebf6cae43f86b101b8cad8a5989680f2c25b98cd6",
+      "bytes": 11733
+    },
+    {
+      "path": "evidence/artifacts/runtime-worker-context-engineering-20261015/protocol.md",
+      "sha256": "0645794e94b8188a3dea190b5e49e7c3e80245abab1758621d8f2a0e09fc5d94",
+      "bytes": 8409
+    },
+    {
+      "path": "evidence/artifacts/runtime-worker-context-engineering-20261015/survivors.md",
+      "sha256": "61c11ca1f493be487b49212aae7c1f1e297bd5b235d5a4ab625859d86d658da4",
+      "bytes": 12793
+    },
+    {
       "path": "evidence/artifacts/s4-record-corrections-20261008/README.md",
       "sha256": "1ee7ec996cb72c7efb43e501c84585939e1389a521552625b2234419e4ef8704",
       "bytes": 4423
