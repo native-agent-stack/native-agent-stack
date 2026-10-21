@@ -1,0 +1,101 @@
+{
+  "kind": "derived_metadata_not_native_output",
+  "source_pin": {
+    "value": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "citation": {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-02.txt",
+      "line": 1
+    }
+  },
+  "version": {
+    "value": "codex-cli 0.160.0",
+    "citation": {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-05.txt",
+      "line": 1
+    }
+  },
+  "frozen_lock_install": {
+    "citation": {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-04.txt",
+      "line": 2
+    },
+    "command_source": "runtime-receipt.json"
+  },
+  "suite_counts": {
+    "passed": 5,
+    "total": 5,
+    "citation": {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-09.txt",
+      "line": 11
+    }
+  },
+  "test_counts": {
+    "passed": 48,
+    "total": 48,
+    "citation": {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-09.txt",
+      "line": 12
+    }
+  },
+  "binary": {
+    "observed_sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+    "citation": {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-07.txt",
+      "line": 1
+    },
+    "comparison_source": "adoption/pins-linux-x86_64.json:59",
+    "limit": "Byte identity with prior public pinned binary; no independent release-signing attestation claim"
+  },
+  "source_unchanged": {
+    "outputs": [
+      "output-08.txt",
+      "output-11.txt"
+    ],
+    "support": "Both full native git diff --exit-code outputs are empty and each rc is0 in runtime-receipt.json"
+  },
+  "vendor_contracts": [
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": ".github/workflows/sdk.yml",
+      "line": 127,
+      "claim": "frozen-lockfile install"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": ".github/workflows/sdk.yml",
+      "line": 136,
+      "claim": "full SDK package test target"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "sdk/typescript/tests/testCodex.ts",
+      "line": 7,
+      "claim": "CODEX_EXEC_PATH override"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "sdk/typescript/tests/testCodex.ts",
+      "line": 24,
+      "claim": "mock-provider fixture"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/app-server/tests/suite/v2/connection_handling_stdio_tests.rs",
+      "line": 72,
+      "claim": "initialize contract"
+    }
+  ],
+  "gaps": [
+    "Full production/adoption-window F2",
+    "Matched comparative A6",
+    "Survivor runtime qualification",
+    "Undated community snapshot capture metadata",
+    "Exact-pin net usage",
+    "Matched published evaluations"
+  ]
+}

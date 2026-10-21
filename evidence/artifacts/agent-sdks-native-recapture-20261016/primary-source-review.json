@@ -1,0 +1,121 @@
+{
+  "kind": "source_review",
+  "official_docs": null,
+  "official_docs_gap": "No retained native official-document fetch capture; no fetched-document claim used.",
+  "omitted_snapshots_gap": "CI/community/registry summaries dropped: original response bytes, read times and transformation provenance were not captured. No findings from those summaries are retained.",
+  "pin_rule": "Check installed/version-pinned source before mutable official docs; snapshots at other times do not prove pin capability",
+  "pin_rule_citation": {
+    "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+    "line": 6,
+    "path": "AGENTS.md"
+  },
+  "public_snapshots": [],
+  "sources": [
+    {
+      "evidence_class": "source_review",
+      "excerpts": [
+        {
+          "line": 5,
+          "text": "The TypeScript SDK wraps the `codex` CLI from `@openai/codex`. It spawns the CLI and exchanges JSONL events over stdin/stdout."
+        },
+        {
+          "line": 10,
+          "text": "npm install @openai/codex-sdk"
+        },
+        {
+          "line": 21,
+          "text": "const thread = codex.startThread();"
+        },
+        {
+          "line": 22,
+          "text": "const turn = await thread.run(\"Diagnose the test failure and propose a fix\");"
+        },
+        {
+          "line": 31,
+          "text": "const nextTurn = await thread.run(\"Implement the fix\");"
+        },
+        {
+          "line": 100,
+          "text": "Threads are persisted in `~/.codex/sessions`. If you lose the in-memory `Thread` object, reconstruct it with `resumeThread()` and keep going."
+        },
+        {
+          "line": 104,
+          "text": "const thread = codex.resumeThread(savedThreadId);"
+        },
+        {
+          "line": 105,
+          "text": "await thread.run(\"Implement the fix\");"
+        }
+      ],
+      "path": "sdk/typescript/README.md",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "pin_citation": null,
+      "repository": "openai/codex",
+      "target_installed": true
+    },
+    {
+      "evidence_class": "source_review",
+      "excerpts": [
+        {
+          "line": 5,
+          "text": "agentproto runs Claude Code, Codex, Hermes, opencode, Mastra, and any other"
+        },
+        {
+          "line": 26,
+          "text": "Mastra, Vercel AI SDK). Files with contracts is what lets any runtime load"
+        },
+        {
+          "line": 52,
+          "text": "  adapters (Claude Code, Claude SDK, Codex, Gemini, Grok CLI, Hermes, jcode, opencode, Mastra Code +"
+        },
+        {
+          "line": 169,
+          "text": "adapters/claude-sdk/          @agentproto/adapter-claude-sdk    AIP-45 adapter for Claude SDK (Anthropic/Moonshot/OpenRouter gateway modes)"
+        },
+        {
+          "line": 170,
+          "text": "adapters/codex/                @agentproto/adapter-codex          AIP-45 adapter for Codex"
+        }
+      ],
+      "path": "README.md",
+      "pin": "08605fbe43a5c71e65f9561fd1d2b92abcbe9c4c",
+      "pin_citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 7,
+        "path": "evidence/artifacts/landscape-sweep-20260929/agentproto-ts.json"
+      },
+      "repository": "agentproto/ts",
+      "target_installed": false
+    },
+    {
+      "evidence_class": "source_review",
+      "excerpts": [
+        {
+          "line": 14,
+          "text": "Embed Copilot's agentic workflows in your application with the GitHub Copilot SDK for Python, TypeScript, Go, .NET, Java, and Rust."
+        },
+        {
+          "line": 16,
+          "text": "The GitHub Copilot SDK exposes the same engine behind Copilot CLI: a production-tested agent runtime you can invoke programmatically. No need to build your own orchestration\u2014you define agent behavior, Copilot handles planning, tool invocation, file edits, and more."
+        },
+        {
+          "line": 22,
+          "text": "| **Node.js / TypeScript** | [`nodejs/`](./nodejs/)                                                  | [Cookbook](https://github.com/github/awesome-copilot/blob/main/cookbook/copilot-sdk/nodejs/README.md) | `npm install @github/copilot-sdk`                                                                                                                                                                                                          |                                                                                |"
+        },
+        {
+          "line": 23,
+          "text": "| **Python**               | [`python/`](./python/)                                                  | [Cookbook](https://github.com/github/awesome-copilot/blob/main/cookbook/copilot-sdk/python/README.md) | `pip install github-copilot-sdk`                                                                                                                                                                                                           |                                                                                |"
+        }
+      ],
+      "path": "README.md",
+      "pin": "f5d9685f55286061e12763ed15a73c4469609881",
+      "pin_citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 7,
+        "path": "evidence/artifacts/landscape-sweep-20260929/github-copilot-sdk.json"
+      },
+      "repository": "github/copilot-sdk",
+      "target_installed": false
+    }
+  ]
+}

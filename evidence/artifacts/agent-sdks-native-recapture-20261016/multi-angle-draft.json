@@ -1,0 +1,268 @@
+{
+  "adjudication": "NOT_RUN; two-family reads owned by co-op",
+  "candidates": [
+    {
+      "angles": {
+        "A1": {
+          "disputed": false,
+          "note": "Codex source and five-suite fixture execution support the narrow TypeScript CLI seam; complete production harness qualification remains unmeasured.",
+          "score": "U",
+          "sources": [
+            "primary-source-review.json",
+            "runtime-receipt.json"
+          ],
+          "observation_citations": []
+        },
+        "A2": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        },
+        "A3": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        },
+        "A4": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        },
+        "A5": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "uncertainty_policy_citation": {
+            "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+            "line": 32,
+            "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+          },
+          "observation_citations": []
+        },
+        "A6": {
+          "classification_policy_citation": {
+            "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+            "line": 15,
+            "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+          },
+          "disputed": false,
+          "note": "Codex fixture tests and local initialize capture are A1/local integration, not a matched comparison.",
+          "score": "U",
+          "sources": [
+            "runtime-receipt.json",
+            "invoke.json"
+          ],
+          "observation_citations": []
+        }
+      },
+      "final_admitted": false,
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "pin_citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 46,
+        "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json"
+      },
+      "proposed_disposition": "GAP pending two-family review, exact pin E2E scope and measured adoption invoke",
+      "repository": "https://github.com/openai/codex",
+      "role": "existing winner, pin drift under qualification",
+      "score_computed": false,
+      "screen_status": "narrow SDK source screen and credential-free execution only"
+    },
+    {
+      "angles": {
+        "A1": {
+          "disputed": false,
+          "note": "agentproto source review names runtime adapters; no agentproto native installation or worker execution is qualified here.",
+          "score": "U",
+          "sources": [
+            "primary-source-review.json"
+          ],
+          "observation_citations": []
+        },
+        "A2": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        },
+        "A3": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        },
+        "A4": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        },
+        "A5": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "uncertainty_policy_citation": {
+            "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+            "line": 32,
+            "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+          },
+          "observation_citations": []
+        },
+        "A6": {
+          "classification_policy_citation": {
+            "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+            "line": 15,
+            "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+          },
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        }
+      },
+      "final_admitted": false,
+      "pin": "08605fbe43a5c71e65f9561fd1d2b92abcbe9c4c",
+      "pin_citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 7,
+        "path": "evidence/artifacts/landscape-sweep-20260929/agentproto-ts.json"
+      },
+      "proposed_disposition": "GAP pending two-family review, exact pin E2E scope and measured adoption invoke",
+      "repository": "https://github.com/agentproto/ts",
+      "role": "cumulative survivor, unqualified alternative",
+      "score_computed": false,
+      "screen_status": "retained source review; no new installation screen or runtime test"
+    },
+    {
+      "angles": {
+        "A1": {
+          "disputed": false,
+          "note": "Copilot SDK pinned README describes programmatic agent workflows; no Copilot SDK runtime or full application acceptance is qualified here.",
+          "score": "U",
+          "sources": [
+            "primary-source-review.json"
+          ],
+          "observation_citations": []
+        },
+        "A2": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        },
+        "A3": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        },
+        "A4": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        },
+        "A5": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "uncertainty_policy_citation": {
+            "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+            "line": 32,
+            "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+          },
+          "observation_citations": []
+        },
+        "A6": {
+          "classification_policy_citation": {
+            "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+            "line": 15,
+            "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+          },
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        }
+      },
+      "final_admitted": false,
+      "pin": "f5d9685f55286061e12763ed15a73c4469609881",
+      "pin_citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 7,
+        "path": "evidence/artifacts/landscape-sweep-20260929/github-copilot-sdk.json"
+      },
+      "proposed_disposition": "GAP pending two-family review, exact pin E2E scope and measured adoption invoke",
+      "repository": "https://github.com/github/copilot-sdk",
+      "role": "cumulative survivor, unqualified alternative",
+      "score_computed": false,
+      "screen_status": "retained source review; no new installation screen or runtime test"
+    }
+  ],
+  "catalog": "foundation",
+  "dispute_rule": "disputed=true requires retained opposing angle conclusions; missing/unverified evidence alone is a gap. No opposing conclusions established in this draft.",
+  "existing_record_gap": "Committed angle file covers deep-agents and strands, not the Codex winner plus carried survivors. Preserve it, propose this role-complete delta to co-op.",
+  "kind": "multi_angle_record_draft",
+  "layer_id": "agent-sdks",
+  "new_weight_choice": false,
+  "published_evaluations_available": null,
+  "rule_version": "angle-convergence/2",
+  "supersedes_existing_verdict": false,
+  "weight_citations": {
+    "A1": {
+      "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+      "line": 6,
+      "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+    },
+    "A2": {
+      "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+      "line": 7,
+      "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+    },
+    "A3": {
+      "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+      "line": 8,
+      "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+    },
+    "A4": {
+      "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+      "line": 9,
+      "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+    },
+    "A5": {
+      "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+      "line": 10,
+      "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+    },
+    "A6": {
+      "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+      "line": 11,
+      "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+    }
+  },
+  "weights": {
+    "A1": 0.2,
+    "A2": 0.2,
+    "A3": 0.15,
+    "A4": 0.15,
+    "A5": 0.2,
+    "A6": 0.1
+  }
+}

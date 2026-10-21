@@ -1,0 +1,22 @@
+{
+  "kind": "derived_native_invoke_index",
+  "evidence_class": "local_integration",
+  "component_id": "codex",
+  "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+  "native_capture": "output-10.txt",
+  "native_capture_citation": {
+    "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/output-10.txt",
+    "line": 1
+  },
+  "output_sha256": "0f0ea4fc6b37b5e10a444e81184c67cfa14781ca2629039ea026c6b17afb46dc",
+  "capture_class": "deterministically_masked_native_capture",
+  "command_with_marked_placeholders": "python3 <SCRATCH_ARM>/bin/native_invoke.py <SCRATCH_ARM>",
+  "exit_code": 0,
+  "started": "2026-10-16T06:24:03Z",
+  "ended": "2026-10-16T06:24:04Z",
+  "driver_source": "native_invoke.py",
+  "recorder_source": "recorder.py",
+  "qualifies_adoption_window": false,
+  "gap": "No production SDK worker invocation with all converged harness layers; no account/model/thread/turn request.",
+  "boundary": "Captured initialize bytes only; driver rc0 is distinct from terminated app-server process status"
+}
