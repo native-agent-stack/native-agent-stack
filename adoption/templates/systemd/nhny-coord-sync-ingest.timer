@@ -1,0 +1,16 @@
+# Mirrors the timer installed on NativeHorizonNY beside
+# nhny-coord-sync-ingest.service; see that service template in this directory
+# for the placeholder and install notes that also apply here. The next run is
+# 60 s after the previous one finishes (OnUnitInactiveSec=), so runs never
+# overlap, and nothing needs catching up: every run re-reads the whole
+# staging root.
+[Unit]
+Description=Poll the coordination-sync staging root for new batches (an input-existence trigger, every 60 s)
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=60s
+AccuracySec=5s
+
+[Install]
+WantedBy=timers.target

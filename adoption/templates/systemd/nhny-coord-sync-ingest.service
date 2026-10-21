@@ -1,0 +1,44 @@
+# One ingest run of the NativeHorizonNY half of the Phase 2(b) coordination sync
+# (tools/coord-sync/README.md). This template mirrors the user unit installed on
+# NativeHorizonNY, rendered into the repository on 2026-10-17; it is not
+# installed as it is.
+#
+# @REPOSITORY@ is the checkout that holds tools/coord-sync/ at every run. On
+# NativeHorizonNY that is the live clone, %h/code/native-agent-stack-live, as
+# for the other @REPOSITORY@ templates in this directory; never a working
+# checkout, whose revision moves, and never a build worktree, which a merge
+# deletes. @WINDOWS_TEMP@ is the WSL path of the Windows TEMP folder, rendered
+# on the host at install time; it sets COORD_SYNC_STAGING, which the script
+# requires and refuses without (exit 3, before touching anything).
+# tools/coord-sync/README.md gives the wslpath command that yields the value;
+# the rendered value itself never belongs in the repository. Substitute both
+# before installing, then verify both units together:
+#   render both placeholders with the python3 command in tools/coord-sync/README.md (Install), writing to ~/.config/systemd/user/nhny-coord-sync-ingest.service
+#   cp adoption/templates/systemd/nhny-coord-sync-ingest.timer ~/.config/systemd/user/
+#   systemd-analyze --user verify ~/.config/systemd/user/nhny-coord-sync-ingest.service ~/.config/systemd/user/nhny-coord-sync-ingest.timer
+# %h is systemd's own specifier for the invoking user's home directory and needs
+# no substitution.
+#
+# HCOM_DIR names the hcom-x directory the refusal alert is sent through; the
+# script uses the same default when the variable is unset. TimeoutStartSec=
+# bounds one run: a oneshot has no start timeout by default
+# (systemd.service(5)). This unit has no [Install] section: it is triggered
+# only by nhny-coord-sync-ingest.timer, matching this directory's
+# timer-triggered oneshot convention (codex-broker-reaper.service).
+[Unit]
+Description=NativeHorizonNY CC: ingest Phase 2(b) coordination-sync batches from 2604 (append-only, verified)
+Documentation=https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/tools/coord-sync/README.md
+
+[Service]
+Type=oneshot
+Environment="COORD_SYNC_STAGING=@WINDOWS_TEMP@/nhny-coord-sync"
+Environment=HCOM_DIR=/mnt/wsl/hcom-x
+# PATH: a user manager's PATH lacks ~/.local/bin (measured on systemd 259), so
+# name it here; the scripts also resolve hcom by absolute path (hcom_bin()).
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/python3 -I @REPOSITORY@/tools/coord-sync/ingest_coord_sync.py
+CPUWeight=idle
+IOWeight=10
+Nice=19
+MemoryMax=1G
+TimeoutStartSec=15min
