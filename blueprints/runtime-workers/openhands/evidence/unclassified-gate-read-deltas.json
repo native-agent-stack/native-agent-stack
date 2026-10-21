@@ -44,6 +44,14 @@
     {
       "date": "2026-10-14",
       "path": "unclassified-gate-reads-20261014-pr1094-rebase-delta.json"
+    },
+    {
+      "date": "2026-10-20",
+      "path": "unclassified-gate-reads-20261020-nas-blinding-v3-delta.json"
+    },
+    {
+      "date": "2026-10-21",
+      "path": "unclassified-gate-reads-20261021-nas-blinding-v9-delta.json"
     }
   ]
 }

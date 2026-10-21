@@ -2180,6 +2180,21 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `component_id` or `pin` of the wrong type is a clean refusal.
 - **Independent round-6 review of fe5143e2 (integrity, Codex-isolation, blindness, regressions and operability
   lenses):**
+  - **B6-4 supersession, 2026-10-20 (NAS blinding v3).** The verbatim-export decision below is historical,
+    not the current export contract. Reviewed choice clauses and membership-table cells are now withheld
+    in blind views. Raw measurements, execution/review outcomes and unclassified text are not blanket
+    redaction targets. Classification is path-bound; the independent content audit imports no redactor
+    helpers or classifier and inspects text by bytes, including JSON keys and nonstandard suffixes.
+    Every retained hash assertion in every exported binder continues to describe its original source
+    artifact. It is not asserted to match rewritten view bytes. Both instruction stubs carry the same
+    notice in every export. The operator-only `BLIND-MANIFEST.json` records keyed original/view whole-file
+    bindings for each rewritten source file and the lost reference routes; neither is lane-visible.
+    Per-export operator measurements enumerate every visible source-hash binding and every changed target,
+    including bindings not mentioned in the original B6-4 examples. Original hashes are never rehashed
+    to make rewritten evidence impersonate the original. The two terminal B6-4 originals remain exact.
+    One-level reference coverage is retained through the operator routes without publishing a conditional
+    marker in candidate evidence. This supersession does not assert perfect blindness: evidence-volume
+    asymmetry and `candidates[].adopted` remain disclosed signals.
   - **Exported files are verbatim; the exposure is disclosed (design decision, 2026-09-24; B6-4, B6-2).** Six
     rounds showed sentence redaction inside exported files to be a moving target, and at fe5143e2 it did harm: it
     rewrote 60 of 87 exported prose files, removed 14,647 words, broke the sha256 of 30 hash-bound files and

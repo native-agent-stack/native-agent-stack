@@ -1,0 +1,1715 @@
+{
+  "schema_version": 1,
+  "kind": "gate_read_accounting_delta",
+  "date": "2026-10-21",
+  "source_commit": "9c8c0e10096445ea29d1840a6f04b776306ebd2b",
+  "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr1016.json",
+  "baseline_sha256": "6df6bb62e1bde5843ba77a800af2e889a4affb1c4c4bb6389234697c2755df05",
+  "mode": "monitoring_only",
+  "added_by_script": {
+    "examples/omniroute-codex-sdk/worker.py": 1,
+    "observability/grand-dashboard/progress.py": 4,
+    "scripts/adoption_status.py": 4,
+    "scripts/validate.py": 1,
+    "tests/adaptive_paper_hermetic.py": 2,
+    "tools/adoption/codex_hook_trust.py": 23,
+    "tools/credentials/set_credential.py": 4,
+    "tools/sota-convergence/blind_checkout.py": 3,
+    "tools/sota-convergence/readset_audit.py": 1
+  },
+  "removed_by_script": {
+    "scripts/skills_status.py": 2
+  },
+  "added_shapes": [
+    {
+      "script": "scripts/validate.py",
+      "shape": [
+        "*:",
+        "*:*"
+      ],
+      "count": 1
+    },
+    {
+      "script": "tools/credentials/set_credential.py",
+      "shape": [
+        ".*.*.tmp"
+      ],
+      "count": 1
+    }
+  ],
+  "removed_shapes": [],
+  "added_locations": [
+    "examples/omniroute-codex-sdk/worker.py:414",
+    "observability/grand-dashboard/progress.py:290",
+    "observability/grand-dashboard/progress.py:291",
+    "observability/grand-dashboard/progress.py:292",
+    "observability/grand-dashboard/progress.py:52",
+    "scripts/adoption_status.py:1019",
+    "scripts/adoption_status.py:1107",
+    "scripts/adoption_status.py:1280",
+    "scripts/adoption_status.py:1396",
+    "scripts/adoption_status.py:1399",
+    "scripts/adoption_status.py:1448",
+    "scripts/adoption_status.py:1496",
+    "scripts/adoption_status.py:1497",
+    "scripts/adoption_status.py:1499",
+    "scripts/adoption_status.py:1515",
+    "scripts/adoption_status.py:1518",
+    "scripts/adoption_status.py:1521",
+    "scripts/adoption_status.py:953",
+    "scripts/component_matrix.py:1025",
+    "scripts/component_matrix.py:241",
+    "scripts/component_matrix.py:244",
+    "scripts/component_matrix.py:303",
+    "scripts/component_matrix.py:304",
+    "scripts/component_matrix.py:308",
+    "scripts/component_matrix.py:309",
+    "scripts/component_matrix.py:315",
+    "scripts/component_matrix.py:676",
+    "scripts/component_matrix.py:677",
+    "scripts/component_matrix.py:684",
+    "scripts/component_matrix.py:685",
+    "scripts/credential_status.py:347",
+    "scripts/credential_status.py:493",
+    "scripts/credential_status.py:550",
+    "scripts/credential_status.py:557",
+    "scripts/credential_status.py:560",
+    "scripts/landscape.py:1482",
+    "scripts/landscape.py:1590",
+    "scripts/landscape.py:813",
+    "scripts/landscape.py:814",
+    "scripts/landscape.py:827",
+    "scripts/landscape.py:828",
+    "scripts/landscape.py:840",
+    "scripts/landscape.py:841",
+    "scripts/landscape.py:844",
+    "scripts/landscape.py:853",
+    "scripts/landscape.py:854",
+    "scripts/landscape.py:860",
+    "scripts/landscape.py:861",
+    "scripts/landscape.py:863",
+    "scripts/landscape.py:866",
+    "scripts/landscape.py:890",
+    "scripts/landscape.py:891",
+    "scripts/landscape.py:892",
+    "scripts/skills_status.py:245",
+    "scripts/skills_status.py:382",
+    "scripts/skills_status.py:383",
+    "scripts/skills_status.py:384",
+    "scripts/skills_status.py:388",
+    "scripts/skills_status.py:786",
+    "scripts/skills_status.py:871",
+    "scripts/skills_status.py:976",
+    "scripts/validate.py:795",
+    "scripts/validate_foundation.py:116",
+    "scripts/validate_foundation.py:162",
+    "scripts/validate_foundation.py:163",
+    "scripts/validate_foundation.py:165",
+    "scripts/validate_foundation.py:168",
+    "scripts/validate_foundation.py:170",
+    "scripts/validate_foundation.py:171",
+    "scripts/validate_foundation.py:174",
+    "scripts/validate_foundation.py:176",
+    "scripts/validate_foundation.py:181",
+    "scripts/validate_foundation.py:182",
+    "scripts/validate_foundation.py:184",
+    "scripts/validate_foundation.py:196",
+    "scripts/validate_foundation.py:200",
+    "scripts/validate_foundation.py:201",
+    "scripts/validate_foundation.py:208",
+    "scripts/validate_foundation.py:210",
+    "scripts/validate_foundation.py:211",
+    "scripts/validate_foundation.py:213",
+    "scripts/validate_foundation.py:214",
+    "scripts/validate_foundation.py:217",
+    "scripts/validate_foundation.py:218",
+    "scripts/validate_foundation.py:244",
+    "scripts/validate_foundation.py:245",
+    "scripts/validate_foundation.py:246",
+    "scripts/validate_foundation.py:250",
+    "scripts/validate_foundation.py:251",
+    "scripts/verdict_review_gate.py:1561",
+    "scripts/verdict_review_gate.py:433",
+    "scripts/verdict_review_gate.py:434",
+    "tests/adaptive_paper_hermetic.py:76",
+    "tests/adaptive_paper_hermetic.py:81",
+    "tools/adoption/codex_hook_trust.py:259",
+    "tools/adoption/codex_hook_trust.py:260",
+    "tools/adoption/codex_hook_trust.py:262",
+    "tools/adoption/codex_hook_trust.py:264",
+    "tools/adoption/codex_hook_trust.py:267",
+    "tools/adoption/codex_hook_trust.py:320",
+    "tools/adoption/codex_hook_trust.py:322",
+    "tools/adoption/codex_hook_trust.py:324",
+    "tools/adoption/codex_hook_trust.py:325",
+    "tools/adoption/codex_hook_trust.py:330",
+    "tools/adoption/codex_hook_trust.py:360",
+    "tools/adoption/codex_hook_trust.py:361",
+    "tools/adoption/codex_hook_trust.py:362",
+    "tools/adoption/codex_hook_trust.py:365",
+    "tools/adoption/codex_hook_trust.py:366",
+    "tools/adoption/codex_hook_trust.py:380",
+    "tools/adoption/codex_hook_trust.py:381",
+    "tools/adoption/codex_hook_trust.py:384",
+    "tools/adoption/codex_hook_trust.py:387",
+    "tools/adoption/codex_hook_trust.py:415",
+    "tools/adoption/codex_hook_trust.py:416",
+    "tools/adoption/codex_hook_trust.py:423",
+    "tools/adoption/codex_hook_trust.py:434",
+    "tools/adoption/install_skills.py:319",
+    "tools/adoption/install_skills.py:320",
+    "tools/adoption/install_skills.py:832",
+    "tools/adoption/install_skills.py:859",
+    "tools/adoption/install_skills.py:860",
+    "tools/credentials/credential_run.py:172",
+    "tools/credentials/credential_run.py:213",
+    "tools/credentials/credential_run.py:229",
+    "tools/credentials/credential_run.py:663",
+    "tools/credentials/credential_run.py:777",
+    "tools/credentials/set_credential.py:105",
+    "tools/credentials/set_credential.py:133",
+    "tools/credentials/set_credential.py:160",
+    "tools/credentials/set_credential.py:213",
+    "tools/credentials/set_credential.py:297",
+    "tools/credentials/set_credential.py:323",
+    "tools/credentials/set_credential.py:347",
+    "tools/credentials/set_credential.py:84",
+    "tools/sota-convergence/blind_checkout.py:1098",
+    "tools/sota-convergence/blind_checkout.py:1101",
+    "tools/sota-convergence/blind_checkout.py:1106",
+    "tools/sota-convergence/blind_checkout.py:533",
+    "tools/sota-convergence/blind_checkout.py:562",
+    "tools/sota-convergence/blind_checkout.py:586",
+    "tools/sota-convergence/blind_checkout.py:605",
+    "tools/sota-convergence/blind_checkout.py:613",
+    "tools/sota-convergence/blind_checkout.py:623",
+    "tools/sota-convergence/blind_checkout.py:634",
+    "tools/sota-convergence/blind_checkout.py:658",
+    "tools/sota-convergence/blind_checkout.py:662",
+    "tools/sota-convergence/blind_checkout.py:796",
+    "tools/sota-convergence/blind_checkout.py:797",
+    "tools/sota-convergence/blind_checkout.py:798",
+    "tools/sota-convergence/blind_checkout.py:842",
+    "tools/sota-convergence/blind_checkout.py:878",
+    "tools/sota-convergence/build_verdicts.py:210",
+    "tools/sota-convergence/build_verdicts.py:548",
+    "tools/sota-convergence/export_isolation_check.py:532",
+    "tools/sota-convergence/export_isolation_check.py:534",
+    "tools/sota-convergence/export_isolation_check.py:550",
+    "tools/sota-convergence/export_isolation_check.py:558",
+    "tools/sota-convergence/export_isolation_check.py:563",
+    "tools/sota-convergence/lane_packets.py:1367",
+    "tools/sota-convergence/readset_audit.py:109",
+    "tools/sota-convergence/record_verdicts.py:1298",
+    "tools/sota-convergence/record_verdicts.py:1300",
+    "tools/sota-convergence/record_verdicts.py:1301",
+    "tools/sota-convergence/record_verdicts.py:1410",
+    "tools/sota-convergence/record_verdicts.py:1413",
+    "tools/sota-convergence/record_verdicts.py:1416",
+    "tools/sota-convergence/record_verdicts.py:1458",
+    "tools/sota-convergence/record_verdicts.py:1459",
+    "tools/sota-convergence/record_verdicts.py:1462",
+    "tools/sota-convergence/record_verdicts.py:1463",
+    "tools/sota-convergence/record_verdicts.py:1464",
+    "tools/sota-convergence/record_verdicts.py:1467",
+    "tools/sota-convergence/record_verdicts.py:1479",
+    "tools/sota-convergence/record_verdicts.py:1514",
+    "tools/sota-convergence/record_verdicts.py:1567",
+    "tools/sota-convergence/record_verdicts.py:1568",
+    "tools/sota-convergence/record_verdicts.py:1575",
+    "tools/sota-convergence/record_verdicts.py:1577",
+    "tools/sota-convergence/record_verdicts.py:1600",
+    "tools/sota-convergence/record_verdicts.py:1601",
+    "tools/sota-convergence/record_verdicts.py:180",
+    "tools/sota-convergence/record_verdicts.py:660",
+    "tools/sota-convergence/record_verdicts.py:669",
+    "tools/sota-convergence/record_verdicts.py:717",
+    "tools/sota-convergence/record_verdicts.py:843",
+    "tools/sota-convergence/record_verdicts.py:896",
+    "tools/sota-convergence/record_verdicts.py:980",
+    "tools/sota-convergence/record_verdicts.py:987"
+  ],
+  "removed_locations": [
+    "scripts/adoption_status.py:1032",
+    "scripts/adoption_status.py:1034",
+    "scripts/adoption_status.py:1083",
+    "scripts/adoption_status.py:1131",
+    "scripts/adoption_status.py:1132",
+    "scripts/adoption_status.py:1134",
+    "scripts/adoption_status.py:1150",
+    "scripts/adoption_status.py:1153",
+    "scripts/adoption_status.py:1156",
+    "scripts/component_matrix.py:1020",
+    "scripts/component_matrix.py:239",
+    "scripts/component_matrix.py:240",
+    "scripts/component_matrix.py:301",
+    "scripts/component_matrix.py:302",
+    "scripts/component_matrix.py:306",
+    "scripts/component_matrix.py:307",
+    "scripts/component_matrix.py:313",
+    "scripts/component_matrix.py:671",
+    "scripts/component_matrix.py:672",
+    "scripts/component_matrix.py:674",
+    "scripts/component_matrix.py:680",
+    "scripts/credential_status.py:346",
+    "scripts/credential_status.py:492",
+    "scripts/credential_status.py:549",
+    "scripts/credential_status.py:556",
+    "scripts/credential_status.py:559",
+    "scripts/landscape.py:1395",
+    "scripts/landscape.py:1503",
+    "scripts/landscape.py:738",
+    "scripts/landscape.py:739",
+    "scripts/landscape.py:740",
+    "scripts/landscape.py:752",
+    "scripts/landscape.py:753",
+    "scripts/landscape.py:765",
+    "scripts/landscape.py:766",
+    "scripts/landscape.py:769",
+    "scripts/landscape.py:778",
+    "scripts/landscape.py:779",
+    "scripts/landscape.py:785",
+    "scripts/landscape.py:786",
+    "scripts/landscape.py:788",
+    "scripts/landscape.py:791",
+    "scripts/landscape.py:816",
+    "scripts/landscape.py:817",
+    "scripts/skills_status.py:223",
+    "scripts/skills_status.py:346",
+    "scripts/skills_status.py:347",
+    "scripts/skills_status.py:348",
+    "scripts/skills_status.py:352",
+    "scripts/skills_status.py:604",
+    "scripts/skills_status.py:612",
+    "scripts/skills_status.py:614",
+    "scripts/skills_status.py:682",
+    "scripts/skills_status.py:785",
+    "scripts/validate_foundation.py:139",
+    "scripts/validate_foundation.py:140",
+    "scripts/validate_foundation.py:142",
+    "scripts/validate_foundation.py:145",
+    "scripts/validate_foundation.py:147",
+    "scripts/validate_foundation.py:148",
+    "scripts/validate_foundation.py:151",
+    "scripts/validate_foundation.py:153",
+    "scripts/validate_foundation.py:154",
+    "scripts/validate_foundation.py:158",
+    "scripts/validate_foundation.py:159",
+    "scripts/validate_foundation.py:161",
+    "scripts/validate_foundation.py:173",
+    "scripts/validate_foundation.py:178",
+    "scripts/validate_foundation.py:185",
+    "scripts/validate_foundation.py:187",
+    "scripts/validate_foundation.py:188",
+    "scripts/validate_foundation.py:190",
+    "scripts/validate_foundation.py:191",
+    "scripts/validate_foundation.py:194",
+    "scripts/validate_foundation.py:195",
+    "scripts/validate_foundation.py:219",
+    "scripts/validate_foundation.py:220",
+    "scripts/validate_foundation.py:221",
+    "scripts/validate_foundation.py:225",
+    "scripts/validate_foundation.py:226",
+    "scripts/validate_foundation.py:93",
+    "scripts/verdict_review_gate.py:1557",
+    "scripts/verdict_review_gate.py:430",
+    "scripts/verdict_review_gate.py:431",
+    "tools/adoption/install_skills.py:294",
+    "tools/adoption/install_skills.py:295",
+    "tools/adoption/install_skills.py:721",
+    "tools/adoption/install_skills.py:748",
+    "tools/adoption/install_skills.py:749",
+    "tools/credentials/credential_run.py:169",
+    "tools/credentials/credential_run.py:210",
+    "tools/credentials/credential_run.py:226",
+    "tools/credentials/credential_run.py:660",
+    "tools/credentials/credential_run.py:774",
+    "tools/credentials/set_credential.py:103",
+    "tools/credentials/set_credential.py:129",
+    "tools/credentials/set_credential.py:153",
+    "tools/credentials/set_credential.py:69",
+    "tools/sota-convergence/blind_checkout.py:1003",
+    "tools/sota-convergence/blind_checkout.py:1006",
+    "tools/sota-convergence/blind_checkout.py:1011",
+    "tools/sota-convergence/blind_checkout.py:491",
+    "tools/sota-convergence/blind_checkout.py:520",
+    "tools/sota-convergence/blind_checkout.py:545",
+    "tools/sota-convergence/blind_checkout.py:553",
+    "tools/sota-convergence/blind_checkout.py:563",
+    "tools/sota-convergence/blind_checkout.py:574",
+    "tools/sota-convergence/blind_checkout.py:704",
+    "tools/sota-convergence/blind_checkout.py:705",
+    "tools/sota-convergence/blind_checkout.py:706",
+    "tools/sota-convergence/blind_checkout.py:747",
+    "tools/sota-convergence/blind_checkout.py:783",
+    "tools/sota-convergence/build_verdicts.py:206",
+    "tools/sota-convergence/build_verdicts.py:540",
+    "tools/sota-convergence/export_isolation_check.py:496",
+    "tools/sota-convergence/export_isolation_check.py:498",
+    "tools/sota-convergence/export_isolation_check.py:514",
+    "tools/sota-convergence/export_isolation_check.py:522",
+    "tools/sota-convergence/export_isolation_check.py:527",
+    "tools/sota-convergence/lane_packets.py:1359",
+    "tools/sota-convergence/record_verdicts.py:1274",
+    "tools/sota-convergence/record_verdicts.py:1276",
+    "tools/sota-convergence/record_verdicts.py:1277",
+    "tools/sota-convergence/record_verdicts.py:1386",
+    "tools/sota-convergence/record_verdicts.py:1388",
+    "tools/sota-convergence/record_verdicts.py:1391",
+    "tools/sota-convergence/record_verdicts.py:1430",
+    "tools/sota-convergence/record_verdicts.py:1431",
+    "tools/sota-convergence/record_verdicts.py:1434",
+    "tools/sota-convergence/record_verdicts.py:1435",
+    "tools/sota-convergence/record_verdicts.py:1436",
+    "tools/sota-convergence/record_verdicts.py:1439",
+    "tools/sota-convergence/record_verdicts.py:1451",
+    "tools/sota-convergence/record_verdicts.py:1486",
+    "tools/sota-convergence/record_verdicts.py:1538",
+    "tools/sota-convergence/record_verdicts.py:1539",
+    "tools/sota-convergence/record_verdicts.py:1543",
+    "tools/sota-convergence/record_verdicts.py:1546",
+    "tools/sota-convergence/record_verdicts.py:1548",
+    "tools/sota-convergence/record_verdicts.py:1571",
+    "tools/sota-convergence/record_verdicts.py:179",
+    "tools/sota-convergence/record_verdicts.py:658",
+    "tools/sota-convergence/record_verdicts.py:668",
+    "tools/sota-convergence/record_verdicts.py:716",
+    "tools/sota-convergence/record_verdicts.py:828",
+    "tools/sota-convergence/record_verdicts.py:874",
+    "tools/sota-convergence/record_verdicts.py:958",
+    "tools/sota-convergence/record_verdicts.py:965"
+  ],
+  "derived_count": 385,
+  "derivation": {
+    "source": "blueprints/runtime-workers/openhands/resolver/push_gate.py:derive_ci_protected",
+    "base_commit": "9c8c0e10096445ea29d1840a6f04b776306ebd2b",
+    "contract": "blueprints/runtime-workers/openhands/evidence/advisory-gate-deltas.md",
+    "method": "Native committed GitTree; exact script counters, shape multiplicities and location sets against the immutable baseline",
+    "interpretation": "Monitoring accounting only; no permission or execution authority added"
+  },
+  "read_classifications": [
+    {
+      "location": "examples/omniroute-codex-sdk/worker.py:414",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "observability/grand-dashboard/progress.py:290",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "observability/grand-dashboard/progress.py:291",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "observability/grand-dashboard/progress.py:292",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "observability/grand-dashboard/progress.py:52",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1019",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1107",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1280",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1396",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1399",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1448",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1496",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1497",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1499",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1515",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1518",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1521",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:953",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:1025",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:241",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:244",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:303",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:304",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:308",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:309",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:315",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:676",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:677",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:684",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:685",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:347",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:493",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:550",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:557",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:560",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:1482",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:1590",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:813",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:814",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:827",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:828",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:840",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:841",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:844",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:853",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:854",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:860",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:861",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:863",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:866",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:890",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:891",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:892",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:245",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:382",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:383",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:384",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:388",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:786",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:871",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:976",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate.py:795",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:116",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:162",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:163",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:165",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:168",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:170",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:171",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:174",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:176",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:181",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:182",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:184",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:196",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:200",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:201",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:208",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:210",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:211",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:213",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:214",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:217",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:218",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:244",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:245",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:246",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:250",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:251",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/verdict_review_gate.py:1561",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/verdict_review_gate.py:433",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/verdict_review_gate.py:434",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tests/adaptive_paper_hermetic.py:76",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tests/adaptive_paper_hermetic.py:81",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:259",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:260",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:262",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:264",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:267",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:320",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:322",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:324",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:325",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:330",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:360",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:361",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:362",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:365",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:366",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:380",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:381",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:384",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:387",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:415",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:416",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:423",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/codex_hook_trust.py:434",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:319",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:320",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:832",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:859",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:860",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/credential_run.py:172",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/credential_run.py:213",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/credential_run.py:229",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/credential_run.py:663",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/credential_run.py:777",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:105",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:133",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:160",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:213",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:297",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:323",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:347",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:84",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:1098",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:1101",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:1106",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:533",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:562",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:586",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:605",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:613",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:623",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:634",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:658",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:662",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:796",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:797",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:798",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:842",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/blind_checkout.py:878",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/build_verdicts.py:210",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/build_verdicts.py:548",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/export_isolation_check.py:532",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/export_isolation_check.py:534",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/export_isolation_check.py:550",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/export_isolation_check.py:558",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/export_isolation_check.py:563",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/lane_packets.py:1367",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/readset_audit.py:109",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Monitoring-only native CI dependency observation; no worker permission or execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1298",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1300",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1301",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1410",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1413",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1416",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1458",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1459",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1462",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1463",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1464",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1467",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1479",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1514",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1567",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1568",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1575",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1577",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1600",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1601",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:180",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:660",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:669",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:717",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:843",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:896",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:980",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:987",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "Existing advisory read moved within the same script",
+      "permission_change": false
+    }
+  ]
+}

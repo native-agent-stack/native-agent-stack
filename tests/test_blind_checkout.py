@@ -172,6 +172,206 @@ class RemovedFilesTests(BlindCheckoutFixture):
         self.assertTrue((self.dest / "docs/keep-me.md").is_file())
 
 
+class EvidenceChoiceKeyTests(unittest.TestCase):
+    def test_real_measured_and_review_decisions_survive(self):
+        relatives = (
+            "evidence/artifacts/currency-sweep-20261017/currency-rtk-20261017T081134Z.json",
+            "evidence/artifacts/observability-metrics.source.json",
+            "evidence/artifacts/terminal-lane-cross-family-review-20260930/findings.json",
+            "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/notification_types_scan_2.1.285.json",
+            "evidence/artifacts/ns2604-requalification-20261005/roadmap-observation.json",
+            "evidence/receipts/harbor-smoke-20261012.json",
+            "evidence/receipts/nextjs-1638-qualification-20261001.json",
+        )
+        for relative in relatives:
+            with self.subTest(path=relative):
+                # Given: actual observed decisions/dispositions, not renamed synthetic data.
+                document = json.loads((ROOT / relative).read_text(encoding="utf-8"))
+                original = json.loads(json.dumps(document))
+                def observations(node, prefix=""):
+                    found = {}
+                    if isinstance(node, dict):
+                        for key, value in node.items():
+                            pointer = prefix + "/" + key
+                            if key in {"decision", "disposition", "selection", "current_choice", "review_status"} or (
+                                    key == "status" and "__name__" in node):
+                                found[pointer] = value
+                            found.update(observations(value, pointer))
+                    elif isinstance(node, list):
+                        for index, value in enumerate(node):
+                            found.update(observations(value, prefix + "/" + str(index)))
+                    return found
+                expected = observations(original)
+                self.assertTrue(expected)
+                # When: the evidence classifier visits the real record.
+                stripped = []
+                blind_checkout.strip_evidence_verdicts(document, relative, stripped, b"k" * 32)
+                # Then: every measured or review datum keeps its original value.
+                self.assertEqual(observations(document), expected)
+
+    def test_real_bound_scan_and_findings_keep_their_bytes(self):
+        # Given: the actual binder and the two targets changed by v1.
+        binder = json.loads((ROOT / "evidence/receipts/cross-family-review-terminal-lane-20260930.json").read_text())
+        bindings = binder["artifacts"] if "artifacts" in binder else binder
+        with tempfile.TemporaryDirectory() as temporary:
+            dest = Path(temporary)
+            relatives = (
+                "evidence/artifacts/terminal-lane-cross-family-review-20260930/findings.json",
+                "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/notification_types_scan_2.1.285.json",
+            )
+            for relative in relatives:
+                target = dest / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
+            # When: the native worktree sanitizer runs.
+            blind_checkout.strip_worktree(dest, b"k" * 32)
+            # Then: both original sha256 bindings still verify.
+            for relative in relatives:
+                data = (dest / relative).read_bytes()
+                self.assertEqual(data, (ROOT / relative).read_bytes())
+                self.assertIn(hashlib.sha256(data).hexdigest(), json.dumps(bindings))
+
+    def test_suffix_adoption_status_is_withheld_without_losing_measured_status(self):
+        document = {"first_round_status": "selected", "http_status": 200,
+                    "scan_status": "passed", "request_status": "rejected"}
+        stripped = []
+        blind_checkout.strip_evidence_verdicts(document, "evidence/receipt.json", stripped, b"k" * 32)
+        self.assertEqual(document, {"http_status": 200, "scan_status": "passed", "request_status": "rejected"})
+        self.assertEqual([x["path"] for x in stripped], ["evidence/receipt.json/first_round_status"])
+
+    def test_real_exercised_checks_are_not_role_labels(self):
+        # Given: the real R4-REG-1 values, including the non-evidence-object-shaped qualification.
+        document = json.loads((ROOT / "catalogs/landscape/native-practice.json").read_text())
+        qualification = document["coordinator_owned_qualification"]
+        helpers = [s["retained_helper_check"] for s in document["skills"] if "retained_helper_check" in s]
+        self.assertFalse(blind_checkout._is_evidence_object(qualification))
+        # When: the real catalog classifier runs.
+        blind_checkout.strip_catalog_unconditional(document, "catalogs/landscape/native-practice.json", [], b"k" * 32)
+        # Then: exercised checks retain their real values.
+        self.assertEqual(document["coordinator_owned_qualification"], qualification)
+        self.assertEqual([s["retained_helper_check"] for s in document["skills"] if "retained_helper_check" in s], helpers)
+
+    def test_every_pinned_selection_reference_is_blinded(self):
+        cases = json.loads((ROOT / "tests/fixtures/blind_current_choice_refs.json").read_text(encoding="utf-8"))
+        with tempfile.TemporaryDirectory() as temporary:
+            dest = Path(temporary)
+            for case in cases:
+                target = dest / case["path"]
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / case["path"], target)
+            manifest = blind_checkout.strip_worktree(dest, b"k" * 32)
+            stripped = {entry["path"] for entry in manifest["stripped_fields"]}
+            for case in cases:
+                with self.subTest(path=case["path"]):
+                    target = dest / case["path"]
+                    if case["handling"] == "remove_file":
+                        self.assertFalse(target.exists())
+                        self.assertIn(case["path"], manifest["removed_files"])
+                    elif case["handling"] == "strip_field":
+                        document = json.loads(target.read_text(encoding="utf-8"))
+                        parts = case["key"].split("/")[1:]
+                        for part in parts[:-1]:
+                            document = document[int(part)] if isinstance(document, list) else document[part]
+                        self.assertNotIn(parts[-1], document)
+                        self.assertIn(case["path"] + case["key"], stripped)
+                    elif "key" in case:
+                        def pointed(document):
+                            for part in case["key"].split("/")[1:]:
+                                part = part.replace("~1", "/").replace("~0", "~")
+                                if isinstance(document, dict):
+                                    document = document.get(part)
+                                elif isinstance(document, list):
+                                    document = document[int(part)]
+                                else:
+                                    return None
+                            return document
+                        before = pointed(json.loads((ROOT / case["path"]).read_text()))
+                        after = pointed(json.loads(target.read_text()))
+                        if case["handling"] == "preserve_data":
+                            self.assertEqual(after, before)
+                        else:
+                            self.assertNotEqual(after, before)
+                    else:
+                        self.assertTrue(target.is_file())
+                        original = (ROOT / case["path"]).read_text().splitlines()[case["line"] - 1]
+                        self.assertNotIn(original.strip(), target.read_text())
+            self.assertEqual(blind_checkout.strip_worktree(dest, b"k" * 32),
+                             {"schema_version": 1, "removed_files": [], "stripped_fields": []})
+
+    def test_choice_keys_are_removed_at_every_evidence_depth(self):
+        # Given: selection labels alongside measured results and retrieval data.
+        document = {
+            "decision": "retain",
+            "runs": [{"nested": {"current_choice": "selected", "selection": "selected",
+                                  "disposition": "selected", "review_status": "accepted_within_scope"},
+                      "exit_code": 0, "selected_sources": ["source.txt"],
+                      "selected_primary_files": ["run.txt"], "retained_failure": {"exit_code": 1}}],
+        }
+        stripped = []
+        # When: the evidence receipt is put into blind form.
+        blind_checkout.strip_evidence_verdicts(document, "evidence/receipt.json", stripped, b"k" * 32)
+        # Then: the labels go, while the observations and data selections remain.
+        self.assertEqual(document, {"runs": [{"nested": {}, "exit_code": 0,
+                                             "selected_sources": ["source.txt"],
+                                             "selected_primary_files": ["run.txt"],
+                                             "retained_failure": {"exit_code": 1}}]})
+        self.assertEqual({entry["path"] for entry in stripped}, {
+            "evidence/receipt.json/decision", "evidence/receipt.json/runs/0/nested/current_choice",
+            "evidence/receipt.json/runs/0/nested/selection", "evidence/receipt.json/runs/0/nested/disposition",
+            "evidence/receipt.json/runs/0/nested/review_status"})
+        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{64}", entry["old_sha256"]) for entry in stripped))
+
+    def test_evidence_adoption_status_is_not_an_execution_status(self):
+        document = {"status": "accepted_within_scope", "nested": [
+            {"verdict": "keep_but_compare", "status": "not_adopted"},
+            {"status": "passed", "exit_code": 0, "verdict": "FAIL", "http_status": 200},
+            {"status": "fixed", "request_status": "rejected", "verdict": "supported"},
+        ]}
+        stripped = []
+        blind_checkout.strip_evidence_verdicts(document, "evidence/receipt.json", stripped, b"k" * 32)
+        self.assertEqual(document, {"nested": [{}, {
+            "status": "passed", "exit_code": 0, "verdict": "FAIL", "http_status": 200},
+            {"status": "fixed", "request_status": "rejected", "verdict": "supported"}]})
+        self.assertEqual({entry["path"] for entry in stripped}, {
+            "evidence/receipt.json/status", "evidence/receipt.json/nested/0/verdict",
+            "evidence/receipt.json/nested/0/status"})
+
+    def test_real_qmd_receipt_loses_decision_but_keeps_benchmark(self):
+        # Given: the actual gate-14 receipt, not a replacement fixture.
+        relative = "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json"
+        with tempfile.TemporaryDirectory() as temporary:
+            dest = Path(temporary)
+            path = dest / relative
+            path.parent.mkdir(parents=True)
+            shutil.copyfile(ROOT / relative, path)
+            before = json.loads(path.read_text(encoding="utf-8"))
+            # When: the real worktree sanitizer processes the receipt.
+            manifest = blind_checkout.strip_worktree(dest, b"k" * 32)
+            # Then: only the choice is withheld and its keyed record is present.
+            after = json.loads(path.read_text(encoding="utf-8"))
+            self.assertNotIn("decision", after)
+            self.assertEqual(after, {key: value for key, value in before.items() if key != "decision"})
+            self.assertIn(relative + "/decision", [entry["path"] for entry in manifest["stripped_fields"]])
+
+    def test_mixed_selection_docs_keep_evidence_and_disclose_redactions(self):
+        # Given: the two actual gate-14 Markdown membership/selection records.
+        relatives = ("docs/foundation-rd-readiness.md", "docs/token-native-saturation.md")
+        with tempfile.TemporaryDirectory() as temporary:
+            dest = Path(temporary)
+            for relative in relatives:
+                target = dest / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
+            # When: blind form is built.
+            manifest = blind_checkout.strip_worktree(dest, b"k" * 32)
+            # Then: the files stay, and only the keyed spans are withheld.
+            self.assertEqual(manifest["removed_files"], [])
+            self.assertTrue(all((dest / relative).is_file() for relative in relatives))
+            for relative in relatives:
+                self.assertTrue(any(entry["path"].startswith(relative + "/")
+                                    for entry in manifest["stripped_fields"]))
+
+
 class LedgerV2ResetTests(BlindCheckoutFixture):
     def test_v2_verdict_fields_reset_to_pending_and_requirement_kept(self):
         self.run_checkout()
@@ -339,6 +539,142 @@ class IdempotenceTests(BlindCheckoutFixture):
         second_manifest = json.loads((second_dest / "BLIND-MANIFEST.json").read_text(encoding="utf-8"))
         self.assertEqual(second_manifest["stripped_fields"], third["stripped_fields"])
         self.assertNotEqual(third["stripped_fields"], first["stripped_fields"])
+
+
+class CompleteBlindReadsetTests(unittest.TestCase):
+    def test_redaction_keeps_transitive_routes_from_prior_verdict_subtrees(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            relative = "evidence/artifacts/landscape-sweep-20260926/returns.json"
+            target = root / relative
+            target.parent.mkdir(parents=True)
+            reference = "evidence/artifacts/measurement.json"
+            target.write_text(json.dumps({"discovery": {"count": 1},
+                                          "votes": {"proof": reference}, "raw": {"choice": "old return"}}))
+            measurement = root / reference
+            measurement.write_text('{"exit_code": 0}\n')
+            manifest = blind_checkout.strip_worktree(root, b"k" * 32)
+            after = json.loads(target.read_text())
+            self.assertEqual(after, {"discovery": {"count": 1}})
+            self.assertEqual(manifest["withheld_reference_routes"], {relative: [reference]})
+            (root / "BLIND-MANIFEST.json").write_text(json.dumps(manifest))
+            self.assertEqual({entry["path"] for entry in manifest["stripped_fields"]},
+                             {relative + "/votes", relative + "/raw"})
+            packets = root / "packets"
+            packets.mkdir()
+            (packets / "foundation__test.json").write_text(
+                json.dumps({"candidates": [{"evidence_refs": [relative]}]}))
+            self.assertIn(reference, blind_checkout.build_allowlist(root, packets)["files"])
+
+    def test_all_packet_variants_have_clean_complete_readsets(self):
+        """CI checks every builder variant, including directory expansion and one-level JSON references."""
+        import sys
+        sys.path.insert(0, str(TOOL_DIR))
+        from readset_redaction import content_findings
+        import export_isolation_check as isolation
+        import winner_asymmetry
+        lane = load_module("lane_readset_content", "lane_packets.py")
+        winners = isolation.ledger_winners(ROOT)
+        with tempfile.TemporaryDirectory() as temporary:
+            scratch = Path(temporary)
+            builds = []
+            union = set()
+            for manifest in sorted((ROOT / "catalogs/sota-convergence").glob("manifest-*.json")):
+                for mode in ("ledger", "manifest"):
+                    for newcomers in (False, True):
+                        packets = scratch / f"{manifest.stem}-{mode}-{newcomers}"
+                        packets.mkdir()
+                        sealed = {}
+                        texts = lane.build_all_packets(
+                            ROOT, catalogs=["foundation", "us-equities"], seed=lane.DEFAULT_SEED,
+                            checked_at=lane.DEFAULT_CHECKED_AT, manifest=manifest.relative_to(ROOT).as_posix(),
+                            trading_candidates=mode, withhold=True, registered_receipts=True,
+                            manifest_newcomers_on=newcomers, sealed_keys=sealed)
+                        for name, text in texts.items():
+                            (packets / name).write_text(text, encoding="utf-8")
+                        union.update(blind_checkout.build_allowlist(ROOT, packets)["files"])
+                        builds.append((packets, {"packets": sealed}))
+            dest = scratch / "stripped"
+            for relative in union:
+                target = dest / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
+            audit = blind_checkout.strip_worktree(dest, b"k" * 32)
+            for relative in sorted(union):
+                if not (dest / relative).is_file() or not relative.endswith(".md"):
+                    continue
+                original = (ROOT / relative).read_text().splitlines()
+                redacted = (dest / relative).read_text().splitlines()
+                original_rows = [line for line in original if line.lstrip().startswith("|")]
+                redacted_rows = [line for line in redacted if line.lstrip().startswith("|")]
+                with self.subTest(table_structure=relative):
+                    self.assertEqual([line.count("|") for line in redacted_rows],
+                                     [line.count("|") for line in original_rows])
+            (dest / "BLIND-MANIFEST.json").write_text(json.dumps(audit))
+            complete = set()
+            expected = set()
+            for packets, keys in builds:
+                with self.subTest(build=packets.name):
+                    expected.update(blind_checkout.build_allowlist(dest, packets)["files"])
+                    export = scratch / ("export-" + packets.name)
+                    result = blind_checkout.export_tree(dest, export, allow_from_packets=packets)
+                    self.assertEqual(result["missing_refs"], [])
+                    files = {p.relative_to(export).as_posix() for p in export.rglob("*") if p.is_file()}
+                    complete.update(files)
+                    self.assertEqual(content_findings(export, files), [])
+                    exposure = isolation.prose_exposure(export, packets, winners, keys)
+                    self.assertTrue(any(row["scored"] for row in exposure.values()))
+                    self.assertEqual({layer: row["cited_files"] for layer, row in exposure.items()
+                                      if row["cited_files"]}, {})
+                    bindings = winner_asymmetry.audit_export(export, packets, winners, keys)
+                    self.assertEqual(
+                        {layer: row for layer, row in bindings.items() if row["scored"]
+                         and (row["separating"] or row["correlating"])}, {})
+            self.assertEqual(len(builds), 20)
+            self.assertEqual(complete, expected | set(blind_checkout.ROOT_INSTRUCTION_STUBS))
+            print(f"COMPLETE_READSET builds={len(builds)} files={len(complete)}")
+
+    def test_builder_fixture_readsets_have_no_choice_content(self):
+        import sys
+        sys.path.insert(0, str(TOOL_DIR))
+        from readset_redaction import content_findings
+        from tests.test_lane_packets import LanePacketsFixture, ManifestTradingCandidatesTests
+        lane = load_module("lane_fixture_content", "lane_packets.py")
+        for fixture_class, mode in ((LanePacketsFixture, "ledger"), (ManifestTradingCandidatesTests, "manifest")):
+            fixture = fixture_class()
+            fixture.setUp()
+            self.addCleanup(fixture.doCleanups)
+            with tempfile.TemporaryDirectory() as temporary:
+                scratch = Path(temporary)
+                packets = scratch / "packets"
+                packets.mkdir()
+                manifest = next((fixture.root / "catalogs/sota-convergence").glob("manifest-*.json"))
+                texts = lane.build_all_packets(
+                    fixture.root, catalogs=["foundation", "us-equities"], seed=lane.DEFAULT_SEED,
+                    checked_at=lane.DEFAULT_CHECKED_AT, manifest=manifest.relative_to(fixture.root).as_posix(),
+                    trading_candidates=mode, withhold=True, registered_receipts=False)
+                for name, text in texts.items():
+                    (packets / name).write_text(text, encoding="utf-8")
+                dest = scratch / "stripped"
+                shutil.copytree(fixture.root, dest)
+                audit = blind_checkout.strip_worktree(dest, b"k" * 32)
+                (dest / "BLIND-MANIFEST.json").write_text(json.dumps(audit))
+                export = scratch / "export"
+                result = blind_checkout.export_tree(dest, export, allow_from_packets=packets)
+                self.assertEqual(result["missing_refs"], [])
+                files = {p.relative_to(export).as_posix() for p in export.rglob("*") if p.is_file()}
+                self.assertEqual(content_findings(export, files), [])
+        print("FIXTURE_READSET builds=2 packets=4")
+
+    def test_unclassified_new_choice_text_fails_the_content_gate(self):
+        import sys
+        sys.path.insert(0, str(TOOL_DIR))
+        from readset_redaction import content_findings
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "new.md"
+            path.write_text("The current choice is a previously unseen runtime.\n", encoding="utf-8")
+            self.assertEqual(len(content_findings(root, {"new.md"})), 1)
 
 
 class RepositoryClassificationTests(unittest.TestCase):
@@ -555,7 +891,7 @@ class CatalogWinnerKeyTests(BlindCheckoutFixture):
         self.write("catalogs/sota-convergence/manifest-20260923.json",
                    {"components": [{"id": "codex", "why_selected": "incumbent"}]})
         self.write("catalogs/sota-convergence/sdk-runtime-coverage-20260923.json", {"incumbents": ["codex"]})
-        self.write("catalogs/foundation/community-practice-20260920.json",
+        self.write("catalogs/other/winner-fields.json",
                    {"incumbent_decision_ids": ["d1"], "incumbent_decisions_path": "catalogs/x.json",
                     "items": [{"winners": [{"id": "codex"}], "why_selected": "chosen",
                                "claude_final_disposition": "codex", "current_selection_record": "r",
@@ -594,13 +930,13 @@ class CatalogWinnerKeyTests(BlindCheckoutFixture):
             scanned += 1
         self.assertGreater(scanned, 0)
         self.assertEqual(offending, [])
-        community = json.loads((export / "catalogs/foundation/community-practice-20260920.json").read_text("utf-8"))
+        community = json.loads((export / "catalogs/other/winner-fields.json").read_text("utf-8"))
         # Empty values state nothing and are kept, so a pending ledger row keeps winners: [].
         self.assertEqual(community["items"][0]["empty_winners"], [])
         on_disk = json.loads((self.dest / "BLIND-MANIFEST.json").read_text(encoding="utf-8"))
         paths = {entry["path"] for entry in on_disk["stripped_fields"]}
-        self.assertIn("catalogs/foundation/community-practice-20260920.json/items/0/why_selected", paths)
-        self.assertIn("catalogs/foundation/community-practice-20260920.json/incumbent_decision_ids", paths)
+        self.assertIn("catalogs/other/winner-fields.json/items/0/why_selected", paths)
+        self.assertIn("catalogs/other/winner-fields.json/incumbent_decision_ids", paths)
 
 
 class ExportTimestampTests(BlindCheckoutFixture):
@@ -803,14 +1139,17 @@ class RealExportIsolationTests(unittest.TestCase):
                 if winner[2]:
                     self.assertLessEqual(len(isolation.winner_keys(adopted.get(layer) or [], [winner])), 1,
                                          (layer, winner))
-        # Exported files are verbatim beyond label stripping (round 6, B6-4): a hash-bound listing keeps its bytes.
+        # B6-4 is superseded; this measured hash-bound listing remains outside the reviewed choice redactions.
         for relative in ("evidence/artifacts/usage-report.source.txt",):
             if (export / relative).is_file():
                 self.assertEqual((export / relative).read_bytes(), (ROOT / relative).read_bytes(), relative)
-        # Exercised checks survive role-key stripping (round 4, R4-REG-1).
-        practice = json.loads((export / "catalogs/landscape/native-practice.json").read_text(encoding="utf-8"))
-        self.assertIn("coordinator_owned_qualification", practice)
-        self.assertTrue(any("retained_helper_check" in skill for skill in practice.get("skills") or []))
+        # R4-REG-1: real exercised checks survive the actual export, including the value without an
+        # evidence-object marker. A coordinator_* prefix mutant must fail this assertion.
+        practice = json.loads((export / "catalogs/landscape/native-practice.json").read_text())
+        original = json.loads((ROOT / "catalogs/landscape/native-practice.json").read_text())
+        self.assertEqual(practice["coordinator_owned_qualification"], original["coordinator_owned_qualification"])
+        self.assertEqual([s["retained_helper_check"] for s in practice["skills"] if "retained_helper_check" in s],
+                         [s["retained_helper_check"] for s in original["skills"] if "retained_helper_check" in s])
         for removed in ("adoption/manifest.json", "catalogs/foundation/decisions.json",
                         "catalogs/us-equities/runtime-target.json", "blueprints/us-equities/north-star.md"):
             self.assertFalse((export / removed).exists(), removed)
