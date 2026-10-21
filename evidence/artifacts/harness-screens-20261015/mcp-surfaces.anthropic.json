@@ -1,0 +1,1043 @@
+[
+  {
+    "candidate": {
+      "repository": "https://github.com/modelcontextprotocol/inspector",
+      "ids": []
+    },
+    "pin": {
+      "commit": "074b8108f340590268f2900741403755e923a11c",
+      "tag": "2.11.0",
+      "read_at": "2026-10-15T20:17:13.995982+00:00"
+    },
+    "family": "anthropic",
+    "layer": "mcp-surfaces",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-frameworks.json#/candidates/modelcontextprotocol~1inspector",
+    "requirements_result": [
+      {
+        "id": "layer-capability",
+        "result": "PASS",
+        "reason": "Inspect stdio, HTTP and SSE; tools/list and initialize from CLI; read-only config or owned editable catalog.",
+        "citations": [
+          {
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "commit": "074b8108f340590268f2900741403755e923a11c",
+            "path": "README.md",
+            "lines": [
+              3,
+              28
+            ],
+            "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/README.md#L3"
+          },
+          {
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "commit": "074b8108f340590268f2900741403755e923a11c",
+            "path": "docs/cli-smoke-testing.md",
+            "lines": [
+              18,
+              28
+            ],
+            "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/docs/cli-smoke-testing.md#L18"
+          }
+        ]
+      },
+      {
+        "id": "selective-surfaces",
+        "result": "PASS",
+        "reason": "Select one server from a named --config; no registry adoption.",
+        "citations": [
+          {
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "commit": "074b8108f340590268f2900741403755e923a11c",
+            "path": "docs/mcp-server-configuration.md",
+            "lines": [
+              17,
+              30
+            ],
+            "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/docs/mcp-server-configuration.md#L17"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "Node >=22.19 CLI route; platform-neutral JavaScript. WSL2 is Linux for this path; source inference, not a host run.",
+        "citations": [
+          {
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "commit": "074b8108f340590268f2900741403755e923a11c",
+            "path": "README.md",
+            "lines": [
+              13,
+              28
+            ],
+            "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/README.md#L13"
+          },
+          {
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "commit": "074b8108f340590268f2900741403755e923a11c",
+            "path": "package.json",
+            "lines": [
+              19,
+              35
+            ],
+            "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/package.json#L19"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "Same Node CLI route; no architecture-specific executable selected; optional keychain behavior is separate.",
+        "citations": [
+          {
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "commit": "074b8108f340590268f2900741403755e923a11c",
+            "path": "README.md",
+            "lines": [
+              13,
+              28
+            ],
+            "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/README.md#L13"
+          },
+          {
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "commit": "074b8108f340590268f2900741403755e923a11c",
+            "path": "package.json",
+            "lines": [
+              19,
+              35
+            ],
+            "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/package.json#L19"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "--cli, --yes and explicit method documented for CI.",
+        "citations": [
+          {
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "commit": "074b8108f340590268f2900741403755e923a11c",
+            "path": "docs/cli-smoke-testing.md",
+            "lines": [
+              18,
+              28
+            ],
+            "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/docs/cli-smoke-testing.md#L18"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scope",
+        "result": "PASS",
+        "reason": "Explicit read-only --config, --server and --cwd; isolate catalog and secret paths for each profile.",
+        "citations": [
+          {
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "commit": "074b8108f340590268f2900741403755e923a11c",
+            "path": "docs/mcp-server-configuration.md",
+            "lines": [
+              17,
+              30
+            ],
+            "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/docs/mcp-server-configuration.md#L17"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "External shell CLI callable on demand from this family's shell-capable Claude Code/Codex, Pi or OpenCode workers; does not alter provider transport or native MCP settings.",
+        "citations": [
+          {
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "commit": "074b8108f340590268f2900741403755e923a11c",
+            "path": "README.md",
+            "lines": [
+              3,
+              28
+            ],
+            "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/README.md#L3"
+          },
+          {
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "commit": "074b8108f340590268f2900741403755e923a11c",
+            "path": "docs/cli-smoke-testing.md",
+            "lines": [
+              18,
+              28
+            ],
+            "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/docs/cli-smoke-testing.md#L18"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; a recent default-branch commit and released source are retained in the supplied deterministic facts. Recency is capability maintenance evidence only, not quality ranking.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/modelcontextprotocol/inspector",
+            "read_at": "2026-10-15T20:03:33Z"
+          },
+          {
+            "url": "https://github.com/modelcontextprotocol/inspector/commit/074b8108f340590268f2900741403755e923a11c",
+            "read_at": "2026-10-15"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "npx --yes @modelcontextprotocol/inspector@2.11.0 --cli --config ./mcp.json --server <screened-server> --method initialize"
+      ],
+      "scope": "On-demand CLI in the chosen profile. Original vendor examples use unpinned package or 2.5.0; exact 2.11.0 is substituted using its documented pin syntax. No command was run.",
+      "citations": [
+        {
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "commit": "074b8108f340590268f2900741403755e923a11c",
+          "path": "docs/cli-smoke-testing.md",
+          "lines": [
+            18,
+            28
+          ],
+          "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/docs/cli-smoke-testing.md#L18"
+        },
+        {
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "commit": "074b8108f340590268f2900741403755e923a11c",
+          "path": "docs/cli-smoke-testing.md",
+          "lines": [
+            78,
+            90
+          ],
+          "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/docs/cli-smoke-testing.md#L78"
+        }
+      ]
+    },
+    "inverse": {
+      "commands": [],
+      "finding": "No Inspector-specific uninstall command documented in the read README and CLI configuration guide. Stop the one-shot CLI; npx cache is outside session enablement. No permanent client registration is proposed.",
+      "citations": [
+        {
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "commit": "074b8108f340590268f2900741403755e923a11c",
+          "path": "README.md",
+          "lines": [
+            3,
+            28
+          ],
+          "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/README.md#L3"
+        },
+        {
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "commit": "074b8108f340590268f2900741403755e923a11c",
+          "path": "docs/cli-smoke-testing.md",
+          "lines": [
+            18,
+            28
+          ],
+          "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/docs/cli-smoke-testing.md#L18"
+        }
+      ]
+    },
+    "conflicts": {
+      "summary": "npx exposes inspector/mcp-inspector/mcpdo. Default catalog and secret store share ~/.mcp-inspector; --config is read-only. No mandatory SessionStart hook, instruction-file write or agent MCP registration in this CLI route; optional mcpdo skill is excluded. Server names can collide within an imported config.",
+      "citations": [
+        {
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "commit": "074b8108f340590268f2900741403755e923a11c",
+          "path": "package.json",
+          "lines": [
+            19,
+            35
+          ],
+          "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/package.json#L19"
+        },
+        {
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "commit": "074b8108f340590268f2900741403755e923a11c",
+          "path": "README.md",
+          "lines": [
+            20,
+            24
+          ],
+          "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/README.md#L20"
+        },
+        {
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "commit": "074b8108f340590268f2900741403755e923a11c",
+          "path": "docs/mcp-server-configuration.md",
+          "lines": [
+            17,
+            30
+          ],
+          "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/docs/mcp-server-configuration.md#L17"
+        }
+      ],
+      "protected_sessions": "Never enable or invoke from fenced trading, judge or review sessions."
+    },
+    "suited_roles": {
+      "not_enabled": [
+        "Muse through its current fence",
+        "fenced trading, judge and review sessions"
+      ],
+      "reason": "Role inference from vendor CLI inspection/bridging tasks; tool labels do not grant read-only behavior or authorize calls.",
+      "citations": [
+        {
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "commit": "074b8108f340590268f2900741403755e923a11c",
+          "path": "README.md",
+          "lines": [
+            3,
+            28
+          ],
+          "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/README.md#L3"
+        },
+        {
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "commit": "074b8108f340590268f2900741403755e923a11c",
+          "path": "docs/cli-smoke-testing.md",
+          "lines": [
+            18,
+            28
+          ],
+          "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/docs/cli-smoke-testing.md#L18"
+        }
+      ],
+      "candidate_role_recommendations": [
+        "builder: MCP integration/debugging",
+        "reviewer/auditor outside fenced review sessions: inspect explicitly approved servers",
+        "researcher: inspect an approved research server",
+        "CC/co-op: configure and diagnose MCP surfaces",
+        "Claude Code workers (Anthropic) or Codex workers (OpenAI), Pi/OpenCode with a shell-capable selected profile"
+      ],
+      "status": "Candidate role recommendations; not converged practice or an enablement decision"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": 0,
+      "method": "ceil(UTF-8 bytes/4); empty startup payload = 0 bytes",
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "commit": "074b8108f340590268f2900741403755e923a11c",
+          "path": "package.json",
+          "lines": [
+            19,
+            35
+          ],
+          "url": "https://github.com/modelcontextprotocol/inspector/blob/074b8108f340590268f2900741403755e923a11c/package.json#L19"
+        }
+      ],
+      "scope": "CLI-only route adds no skill description, startup instruction, injected hook text, or MCP schema to the model at session start. Selected command output enters only on demand.",
+      "unmeasured": "No session start measured; on-demand command output and downstream server schemas are excluded."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "meaning": "TRIAL-eligible only; no default promotion",
+      "reason": "Documented headless CLI contribution to the layer, with explicitly scoped configuration. PASS applies to on-demand generic transports; no new server, authentication flow, shared Chrome owner, or daemon lifecycle is certified.",
+      "cheapest_check": "NativeHorizonNY: verify installed package/version and both host platforms, scoped config and cleanup, then measure actual session-start overhead; no model call is needed for the CLI smoke."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions.",
+    "service_status": "served: standalone on-demand CLI"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/openclaw/mcporter",
+      "ids": []
+    },
+    "pin": {
+      "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+      "tag": "v0.14.3",
+      "read_at": "2026-10-15T20:18:07.392625+00:00"
+    },
+    "family": "anthropic",
+    "layer": "mcp-surfaces",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-frameworks.json#/candidates/openclaw~1mcporter",
+    "requirements_result": [
+      {
+        "id": "layer-capability",
+        "result": "PASS",
+        "reason": "Bridge MCP calls through CLI/runtime; configure/import explicit servers. Complements Inspector.",
+        "citations": [
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "README.md",
+            "lines": [
+              15,
+              31
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/README.md#L15"
+          },
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "README.md",
+            "lines": [
+              61,
+              98
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/README.md#L61"
+          }
+        ]
+      },
+      {
+        "id": "selective-surfaces",
+        "result": "PASS",
+        "reason": "Use explicit --config and imports:[] to avoid importing unrelated clients; each downstream server remains separately screened.",
+        "citations": [
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "docs/config.md",
+            "lines": [
+              35,
+              57
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/config.md#L35"
+          },
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "docs/config.md",
+            "lines": [
+              61,
+              79
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/config.md#L61"
+          },
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "docs/daemon.md",
+            "lines": [
+              87,
+              91
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/daemon.md#L87"
+          },
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "src/config.ts",
+            "lines": [
+              43,
+              54
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/src/config.ts#L43"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "Node >=24 npm route; README documents Linux CI. WSL2 path is Linux; source inference, not a host run.",
+        "citations": [
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "README.md",
+            "lines": [
+              105,
+              111
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/README.md#L105"
+          },
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "docs/install.md",
+            "lines": [
+              22,
+              44
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/install.md#L22"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "Vendor supplies macOS arm64 binary and Node package.",
+        "citations": [
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "docs/install.md",
+            "lines": [
+              32,
+              47
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/install.md#L32"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "CLI declines interactive elicitation in headless/daemon calls; pre-authorized server access remains a prerequisite.",
+        "citations": [
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "README.md",
+            "lines": [
+              98,
+              98
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/README.md#L98"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scope",
+        "result": "PASS",
+        "reason": "Explicit --config isolates file selection; imports:[] isolates imports. MCPORTER_DAEMON_DIR selects a generic-transport namespace; HOME/XDG alone do not isolate the production singleton.",
+        "citations": [
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "docs/config.md",
+            "lines": [
+              35,
+              57
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/config.md#L35"
+          },
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "docs/config.md",
+            "lines": [
+              61,
+              79
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/config.md#L61"
+          },
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "docs/daemon.md",
+            "lines": [
+              87,
+              91
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/daemon.md#L87"
+          },
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "src/config.ts",
+            "lines": [
+              43,
+              54
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/src/config.ts#L43"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "External shell CLI callable on demand from this family's shell-capable Claude Code/Codex, Pi or OpenCode workers; does not alter provider transport or native MCP settings.",
+        "citations": [
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "README.md",
+            "lines": [
+              15,
+              31
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/README.md#L15"
+          },
+          {
+            "repository": "https://github.com/openclaw/mcporter",
+            "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+            "path": "README.md",
+            "lines": [
+              61,
+              98
+            ],
+            "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/README.md#L61"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; a recent default-branch commit and released source are retained in the supplied deterministic facts. Recency is capability maintenance evidence only, not quality ranking.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/openclaw/mcporter",
+            "read_at": "2026-10-15T20:03:33Z"
+          },
+          {
+            "url": "https://github.com/openclaw/mcporter/commit/6cdb023fe935f39934564804a4e9c1c13cd63aaf",
+            "read_at": "2026-10-15"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "npm install -g mcporter@0.14.3"
+      ],
+      "scope": "Vendor npm route with exact screened release. Run with --config <profile-file>, imports:[], and a dedicated MCPORTER_DAEMON_DIR for generic transports; no shared Chrome owner in this trial.",
+      "citations": [
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "docs/install.md",
+          "lines": [
+            22,
+            32
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/install.md#L22"
+        },
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "docs/config.md",
+          "lines": [
+            35,
+            57
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/config.md#L35"
+        },
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "docs/config.md",
+          "lines": [
+            61,
+            79
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/config.md#L61"
+        },
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "docs/daemon.md",
+          "lines": [
+            87,
+            91
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/daemon.md#L87"
+        },
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "src/config.ts",
+          "lines": [
+            43,
+            54
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/src/config.ts#L43"
+        }
+      ]
+    },
+    "inverse": {
+      "commands": [
+        "npm uninstall -g mcporter",
+        "mcporter daemon stop",
+        "mcporter config --config <profile-file> remove <name>"
+      ],
+      "finding": "Stop only the dedicated namespace; draining active calls is required. Removing the package does not itself erase config/cache/state.",
+      "citations": [
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "docs/install.md",
+          "lines": [
+            64,
+            68
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/install.md#L64"
+        },
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "docs/daemon.md",
+          "lines": [
+            22,
+            35
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/daemon.md#L22"
+        },
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "docs/config.md",
+          "lines": [
+            69,
+            79
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/config.md#L69"
+        }
+      ]
+    },
+    "conflicts": {
+      "summary": "PATH binary mcporter; default imports cover Claude/Codex/OpenCode and other clients. Default daemon uses OS-account home, unaffected by HOME/XDG. Explicit generic namespace is required; Chrome ownership stays canonical and is outside this screen's trial scope. No automatic skill/hook/instruction-file injection.",
+      "citations": [
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "docs/config.md",
+          "lines": [
+            35,
+            57
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/config.md#L35"
+        },
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "docs/config.md",
+          "lines": [
+            61,
+            79
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/config.md#L61"
+        },
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "docs/daemon.md",
+          "lines": [
+            87,
+            91
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/daemon.md#L87"
+        },
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "src/config.ts",
+          "lines": [
+            43,
+            54
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/src/config.ts#L43"
+        }
+      ],
+      "protected_sessions": "Never enable or invoke from fenced trading, judge or review sessions."
+    },
+    "suited_roles": {
+      "not_enabled": [
+        "Muse through its current fence",
+        "fenced trading, judge and review sessions"
+      ],
+      "reason": "Role inference from vendor CLI inspection/bridging tasks; tool labels do not grant read-only behavior or authorize calls.",
+      "citations": [
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "README.md",
+          "lines": [
+            15,
+            31
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/README.md#L15"
+        },
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "README.md",
+          "lines": [
+            61,
+            98
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/README.md#L61"
+        }
+      ],
+      "candidate_role_recommendations": [
+        "builder: MCP integration/debugging",
+        "reviewer/auditor outside fenced review sessions: inspect explicitly approved servers",
+        "researcher: inspect an approved research server",
+        "CC/co-op: configure and diagnose MCP surfaces",
+        "Claude Code workers (Anthropic) or Codex workers (OpenAI), Pi/OpenCode with a shell-capable selected profile"
+      ],
+      "status": "Candidate role recommendations; not converged practice or an enablement decision"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": 0,
+      "method": "ceil(UTF-8 bytes/4); empty startup payload = 0 bytes",
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/openclaw/mcporter",
+          "commit": "1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc",
+          "path": "docs/agent-skills.md",
+          "lines": [
+            8,
+            13
+          ],
+          "url": "https://github.com/openclaw/mcporter/blob/1e3fa8a893e3245a0843f714f81bfdf3b0ad5dbc/docs/agent-skills.md#L8"
+        }
+      ],
+      "scope": "CLI-only route adds no skill description, startup instruction, injected hook text, or MCP schema to the model at session start. Selected command output enters only on demand.",
+      "unmeasured": "No session start measured; on-demand command output and downstream server schemas are excluded."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "meaning": "TRIAL-eligible only; no default promotion",
+      "reason": "Documented headless CLI contribution to the layer, with explicitly scoped configuration. PASS applies to on-demand generic transports; no new server, authentication flow, shared Chrome owner, or daemon lifecycle is certified.",
+      "cheapest_check": "NativeHorizonNY: verify installed package/version and both host platforms, scoped config and cleanup, then measure actual session-start overhead; no model call is needed for the CLI smoke."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions.",
+    "service_status": "served: standalone on-demand CLI"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+      "ids": []
+    },
+    "pin": {
+      "commit": "8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+      "tag": null,
+      "read_at": "2026-10-15T20:17:16.975859+00:00"
+    },
+    "family": "anthropic",
+    "layer": "mcp-surfaces",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "facts-frameworks.json#/candidates/punkpeye~1awesome-mcp-servers",
+    "requirements_result": [
+      {
+        "id": "layer-capability",
+        "result": "FAIL",
+        "reason": "Discovery only; no executable bridge/inspection/configuration capability.",
+        "citations": [
+          {
+            "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+            "commit": "8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+            "path": "README.md",
+            "lines": [
+              16,
+              38
+            ],
+            "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236/README.md#L16"
+          }
+        ]
+      },
+      {
+        "id": "selective-surfaces",
+        "result": "FAIL",
+        "reason": "Registry entries need their own screen.",
+        "citations": [
+          {
+            "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+            "commit": "8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+            "path": "README.md",
+            "lines": [
+              16,
+              38
+            ],
+            "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236/README.md#L16"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "UNKNOWN",
+        "reason": "Static list can be read anywhere but supplies no runtime.",
+        "citations": [
+          {
+            "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+            "commit": "8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+            "path": "README.md",
+            "lines": [
+              16,
+              38
+            ],
+            "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236/README.md#L16"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "UNKNOWN",
+        "reason": "No runtime.",
+        "citations": [
+          {
+            "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+            "commit": "8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+            "path": "README.md",
+            "lines": [
+              16,
+              38
+            ],
+            "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236/README.md#L16"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "FAIL",
+        "reason": "No executable.",
+        "citations": [
+          {
+            "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+            "commit": "8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+            "path": "README.md",
+            "lines": [
+              16,
+              38
+            ],
+            "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236/README.md#L16"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scope",
+        "result": "FAIL",
+        "reason": "No installable surface.",
+        "citations": [
+          {
+            "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+            "commit": "8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+            "path": "README.md",
+            "lines": [
+              16,
+              38
+            ],
+            "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236/README.md#L16"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "FAIL",
+        "reason": "No installable route.",
+        "citations": [
+          {
+            "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+            "commit": "8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+            "path": "README.md",
+            "lines": [
+              16,
+              38
+            ],
+            "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236/README.md#L16"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; a recent default-branch commit and released source are retained in the supplied deterministic facts. Recency is capability maintenance evidence only, not quality ranking.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/punkpeye/awesome-mcp-servers",
+            "read_at": "2026-10-15T20:03:33Z"
+          },
+          {
+            "url": "https://github.com/punkpeye/awesome-mcp-servers/commit/8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+            "read_at": "2026-10-15"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [],
+      "reason": "None: browse the pinned list only.",
+      "citations": [
+        {
+          "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+          "commit": "8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+          "path": "README.md",
+          "lines": [
+            16,
+            38
+          ],
+          "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236/README.md#L16"
+        }
+      ]
+    },
+    "inverse": {
+      "commands": [],
+      "finding": "No installed surface to remove.",
+      "citations": [
+        {
+          "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+          "commit": "8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+          "path": "README.md",
+          "lines": [
+            16,
+            38
+          ],
+          "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236/README.md#L16"
+        }
+      ]
+    },
+    "conflicts": {
+      "summary": "No hooks, PATH binaries or MCP names because nothing is installed. Do not treat registry contents as trusted configuration.",
+      "citations": [
+        {
+          "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+          "commit": "8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+          "path": "README.md",
+          "lines": [
+            16,
+            38
+          ],
+          "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236/README.md#L16"
+        }
+      ],
+      "protected_sessions": "Never enable or invoke from fenced trading, judge or review sessions."
+    },
+    "suited_roles": {
+      "not_enabled": [
+        "Muse through its current fence",
+        "fenced trading, judge and review sessions"
+      ],
+      "reason": "Role inference from vendor CLI inspection/bridging tasks; tool labels do not grant read-only behavior or authorize calls.",
+      "citations": [
+        {
+          "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+          "commit": "8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+          "path": "README.md",
+          "lines": [
+            16,
+            38
+          ],
+          "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236/README.md#L16"
+        }
+      ],
+      "candidate_role_recommendations": [],
+      "status": "Candidate role recommendations; not converged practice or an enablement decision"
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": 0,
+      "method": "ceil(UTF-8 bytes/4); empty startup payload = 0 bytes",
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+          "commit": "8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236",
+          "path": "README.md",
+          "lines": [
+            16,
+            38
+          ],
+          "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/8a8b37d9a4c1c5e4fda88e6a56ba23d7755f6236/README.md#L16"
+        }
+      ],
+      "scope": "CLI-only route adds no skill description, startup instruction, injected hook text, or MCP schema to the model at session start. Selected command output enters only on demand.",
+      "unmeasured": "No session start measured; on-demand command output and downstream server schemas are excluded."
+    },
+    "screen_verdict": {
+      "result": "FAIL",
+      "meaning": "Not TRIAL-eligible",
+      "reason": "missing_required_capability: this candidate is a curated discovery list, not a bridge, inspector or server-configuration implementation. A listed server is not inherited as screened.",
+      "cheapest_check": "No check can turn this repository's list into a bridge/inspector. Screen a specifically named implementation only on a separate authorized delta."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions.",
+    "service_status": "not served in this family under the screened route"
+  }
+]
