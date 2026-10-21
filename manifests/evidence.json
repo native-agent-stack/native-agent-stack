@@ -65043,8 +65043,8 @@
     },
     {
       "path": "tests/test_muse_file_fence.py",
-      "sha256": "12e498dc0c7c0d04b9553326e29c73d618d39bd82fc3a9860f69e50295e18edb",
-      "bytes": 34078
+      "sha256": "be9fa9e6673dfe0d25b592759adba79ccfe2300063cd618d2ed5e494f74e86a9",
+      "bytes": 34490
     },
     {
       "path": "tests/test_muse_runtime_currency.py",
