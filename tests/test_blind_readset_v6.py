@@ -231,7 +231,8 @@ class V7SelectionBoundaryTests(unittest.TestCase):
                     for field in ("default", "definitive", "state"):
                         self.assertFalse(field in after, (before["slot_id"], field))
                     self.assertEqual(after["measurement"], before["measurement"])
-                    self.assertEqual(after["repository"], before["repository"])
+                    self.assertNotIn("repository", after)
+                    self.assertNotIn("slot_id", after)
             self.assertFalse("interim install on the owner's decisions" in target.read_text().lower())
 
     def test_each_pin_note_is_audited_when_restored_and_keeps_inventory_when_masked(self):
@@ -280,6 +281,151 @@ class V7SelectionBoundaryTests(unittest.TestCase):
             text = (root / paths[1]).read_text()
             self.assertNotIn("dagu-org/dagu ,", text)
             self.assertNotIn("Omitting a from", text)
+
+
+class V8SelectionIdentityTests(unittest.TestCase):
+    def test_structural_selections_need_no_removed_decision_keys(self):
+        positive = [
+            {"layer_id": "retrieval", "slot_id": "cedar", "repository": "example/cedar"},
+            {"layer": "retrieval", "slot": "retriever", "owner": "Cedar", "installed": True},
+            {"layer_id": "retrieval", "owns": ["Cedar"], "uses": []},
+            {"slot_id": "search", "interim": {"repository": "example/cedar", "pin": "1.2"}},
+            {"slot_id": "search", "label": "both families", "claude": "returned", "gpt": "returned"},
+        ]
+        negative = [
+            {"repository": "example/cedar", "samples": 18, "latency_ms": 4},
+            {"ui": {"default": "Cedar"}, "owner": "benchmark author"},
+            {"layer_id": "retrieval", "measurement": {"recall": 0.9}},
+            {"slot_id": "sample", "samples": 18},
+        ]
+        for node in positive:
+            with self.subTest(positive=node):
+                self.assertTrue(any(audit.CHOICE.search(u) for u in audit.units(json.dumps(node))))
+        for node in negative:
+            with self.subTest(negative=node):
+                self.assertFalse(any(audit.CHOICE.search(u) for u in audit.units(json.dumps(node))))
+
+    def test_all_slot_owner_and_consensus_records_withhold_selection_not_measurement(self):
+        paths = [
+            "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+            "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+            "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
+            "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+            "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+        ]
+        def slots(node):
+            if isinstance(node, dict):
+                if "slot_id" in node:
+                    yield node
+                for value in node.values():
+                    yield from slots(value)
+            elif isinstance(node, list):
+                for value in node:
+                    yield from slots(value)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for relative in paths:
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
+            records = blind.strip_worktree(root, b"k" * 32)
+            for relative in paths:
+                with self.subTest(path=relative):
+                    text = (root / relative).read_text()
+                    self.assertEqual(audit.audit_readset(root, [relative])["findings"], [])
+                    if relative.endswith(".json"):
+                        document = json.loads(text)
+                        self.assertEqual(list(slots(document)), [])
+                        if "owners" in document:
+                            self.assertEqual(document["owners"], [])
+                        if "slots" in document:
+                            original = json.loads((ROOT / relative).read_text())
+                            self.assertEqual([s["measurement"] for s in document["slots"]],
+                                             [s["measurement"] for s in original["slots"]])
+                            for slot in document["slots"]:
+                                for field in ("default", "repository", "label", "claude", "gpt"):
+                                    self.assertNotIn(field, slot)
+            self.assertTrue(records["stripped_fields"])
+            self.assertTrue(all(len(r["old_sha256"]) == 64 for r in records["stripped_fields"]))
+
+    def test_every_registered_body_decision_cell_including_last_is_masked(self):
+        registry = json.loads(redaction.CLASSIFICATION.read_text())
+        separator = re.compile(r"\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*)*\|?\s*")
+        for relative, tables in registry["tables"].items():
+            original = (ROOT / relative).read_text()
+            masked = redaction.redact_tables(original, relative, [], b"k" * 32)
+            columns = []
+            for before, after in zip(original.splitlines(), masked.splitlines(), strict=True):
+                if not before.lstrip().startswith("|"):
+                    columns = []
+                    continue
+                if redaction.digest(before) in tables:
+                    columns = tables[redaction.digest(before)]
+                    continue
+                if separator.fullmatch(before):
+                    continue
+                for column in columns:
+                    with self.subTest(path=relative, row=redaction.digest(before), column=column):
+                        self.assertEqual(after.split("|")[column].strip(), "[withheld]")
+
+    def test_memory_record_no_longer_assigns_alternatives_or_accepted_status(self):
+        relative = "evidence/artifacts/memory-rag-lifecycle-20260921/native-client.json"
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / relative
+            target.parent.mkdir(parents=True)
+            shutil.copyfile(ROOT / relative, target)
+            blind.strip_worktree(root, b"k" * 32)
+            text = target.read_text()
+            for selection in ("remain workload-specific alternatives", "**Status:** accepted", "## Decision"):
+                self.assertNotIn(selection, text)
+            for measured in ("384-dimensional", "observation_count", "exact_stored_final_match"):
+                self.assertIn(measured, text)
+
+    def test_m1_exemption_never_covers_install_selection(self):
+        relative = "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json"
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / relative
+            target.parent.mkdir(parents=True)
+            shutil.copyfile(ROOT / relative, target)
+            blind.strip_worktree(root, b"k" * 32)
+            self.assertNotIn("ccusage and session-analytics install their owner defaults", target.read_text())
+            self.assertNotIn("tobi-qmd and gpt-gateway are revised", target.read_text())
+            original = json.loads((ROOT / relative).read_text())
+            registry = json.loads(redaction.CLASSIFICATION.read_text())
+            earlier_spans = {s["sha256"]: s for s in registry["spans"]
+                             if s["path"] == relative and s.get("unit") != "line"}
+            restored = redaction.redact_text(original["status"], relative, "", [], b"k" * 32,
+                                             redaction.classification(relative), earlier_spans)
+            target.write_text(json.dumps({"restored": restored}))
+            self.assertTrue(audit.audit_readset(root, [relative])["findings"])
+
+    def test_normalized_rewrites_keep_measurements_without_fragment_marks(self):
+        cases = {
+            "evidence/artifacts/ns2604-e2e-20261004/slots.json": ["project-specific -skill"],
+            "evidence/artifacts/new-wsl-install-plan-20261002/install.sh":
+                ["# Planned. refused", "# Wave 2 (2026-10-03):\n", "# manifest's decision rule)"],
+            "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json":
+                [". the frozen code-search"],
+            "evidence/artifacts/memory-rag-lifecycle-20260921/native-client.json":
+                ["## Decision\\nthe existing", "## Decision\nthe existing"],
+            "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json":
+                ["dagu-org/dagu, is", "dagu-org/dagu, not"],
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for relative in cases:
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
+            blind.strip_worktree(root, b"k" * 32)
+            for relative, fragments in cases.items():
+                for fragment in fragments:
+                    with self.subTest(path=relative, fragment=fragment):
+                        self.assertNotIn(fragment, (root / relative).read_text())
+            self.assertIn("nine retained runs", (root / next(p for p in cases if p.endswith("durable-runtimes.json"))).read_text())
 
 
 if __name__ == "__main__":

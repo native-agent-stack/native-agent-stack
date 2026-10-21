@@ -2,6 +2,11 @@
   "schema_version": 1,
   "data": [
     {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "b756654f3e9be07bd0d0e05ea703bba9fef8a1737481f810393c82619e8f3157",
+      "reason": "M1 narrowed unit: dated execution counts and UNRUN history only; named owner-default and revised-candidate clauses have been masked."
+    },
+    {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
       "sha256": "7bdc5fb64a152ca02cacfa2d0df2cbca2bb76f4f5e7d06d64929cc6afc1c5c91",
       "reason": "After masking the incumbent prefix, this exact unit retains workflow capability distinctions and explicitly says no comparison was executed and DBOS is not promoted to adopted. The matched keep-but-compare phrase states an unqualified research candidate, not a winner."
@@ -1850,11 +1855,6 @@
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
       "sha256": "15924b2acfb867220abff898be5cc288b3621434eb9abe8b29eb0edae5d10296",
       "reason": "Native cross-family review procedure, unchanged client account boundaries and unqualified gates; selected built-ins describes an allowed tool set, not a NAS candidate winner."
-    },
-    {
-      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "9e1c81da8a380ad6fc1289e099e8981c9f2cbe75b025727ae8a8e66f23f9480d",
-      "reason": "Dated installation-plan execution counts and unrun batch inventory, without assigning candidate identities to the interim slot names; preserves historical execution and explicit unrun limits."
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",

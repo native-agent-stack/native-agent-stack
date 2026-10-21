@@ -64323,8 +64323,8 @@
     },
     {
       "path": "tests/test_blind_readset_v3.py",
-      "sha256": "34af64ccff898fe0aec3f78d515ce4878ec2b9ed82af0de9b3bb448966c8eb50",
-      "bytes": 13447
+      "sha256": "da42f8f842f3523550fe356fd216df0f228dc09c75de3ad69120bd6f03143c99",
+      "bytes": 13477
     },
     {
       "path": "tests/test_blind_readset_v5.py",
@@ -64333,8 +64333,8 @@
     },
     {
       "path": "tests/test_blind_readset_v6.py",
-      "sha256": "b045c54e386a31057aaff903f3b724b1dad17dbc6282222cf10e5eccf19ea478",
-      "bytes": 16139
+      "sha256": "ab5a526fda6e5be26ff335fa4e8241219f639e1b146a9b099b2698dfc0c64b3b",
+      "bytes": 24566
     },
     {
       "path": "tests/test_bootstrap_full_profile.py",
@@ -66548,23 +66548,23 @@
     },
     {
       "path": "tools/sota-convergence/readset-audit-data.json",
-      "sha256": "7592a3186dec53156e5c87275854902e309f7a59f419d2f8f267a0ff3cf369cc",
-      "bytes": 117993
+      "sha256": "e327c2b67535475f4bb3d53af99c933b3ac99912c04b81adaa6913e72e1196ae",
+      "bytes": 117934
     },
     {
       "path": "tools/sota-convergence/readset-choice-classification.json",
-      "sha256": "734cfbe84c3c40569d6f7c28533e26969ccaca78fc273c954a93e1b69671beb1",
-      "bytes": 549547
+      "sha256": "6bc4b0883fee804092dd83c7573021e1737fd322cb789af32bd2dd66889d224b",
+      "bytes": 1031052
     },
     {
       "path": "tools/sota-convergence/readset_audit.py",
-      "sha256": "b38e5e18d13a15b49131f813ae88383c46c3bdea61c5e39dfe6e815ef22f8a36",
-      "bytes": 4920
+      "sha256": "16e9f4d5186ea0cac655df07c466956dd8dda37f69317b0cba1e2ab7f368542c",
+      "bytes": 5781
     },
     {
       "path": "tools/sota-convergence/readset_redaction.py",
-      "sha256": "aeeab10341a07fae72d9cca705c1ff2a1fdf2098ce17fe5f0a60815ebf036cec",
-      "bytes": 10301
+      "sha256": "2f50895e441b402fb4465abd9f6c60fbbf4c1fa609b62098238817aeec6c22a9",
+      "bytes": 10887
     },
     {
       "path": "tools/sota-convergence/reconciliations-20260922.json",

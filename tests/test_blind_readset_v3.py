@@ -231,7 +231,7 @@ class PreservationTests(unittest.TestCase):
                     right = right.lstrip(" \t")
                 if left.endswith((" ", "\t")) and right.startswith((" ", "\t")):
                     right = right.lstrip(" \t")
-                expected = left + right
+                expected = left + span.get("replacement", "") + right
             with self.subTest(path=span["path"]):
                 self.assertEqual(after, expected)
                 self.assertEqual(len(stripped), len(ranges))

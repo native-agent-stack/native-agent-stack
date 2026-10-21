@@ -51,7 +51,7 @@ def text_content(data: bytes) -> str | None:
         return text if controls / max(1, len(text)) < 0.01 else None
 
 
-def units(text: str):
+def units(text: str, container=""):
     """Read JSON keys and strings, otherwise paragraphs and individual table rows."""
     try:
         document = json.loads(text)
@@ -59,20 +59,29 @@ def units(text: str):
         document = None
     if isinstance(document, dict):
         if (document.get("default") and ("layer_id" in document or "slot_id" in document)
-                or document.get("decision") == "keep"):
+                or document.get("decision") == "keep"
+                or ("slot_id" in document and any(name in document for name in (
+                    "layer_id", "repository", "pin", "interim", "owner_default", "label", "claude", "gpt",
+                    "amendment", "amendments", "package", "current_pin")))
+                or ("layer_id" in document and (document.get("owns") or document.get("uses")))
+                or ("owner" in document and ("layer" in document or "slot" in document)
+                    and any(name in document for name in ("installed", "repository", "route")))
+                or (container in ("slots", "add_rows", "amend_rows", "owner_defaults")
+                    and any(document.get(name) for name in ("repository", "interim", "owner_default",
+                                                            "label", "claude", "gpt", "default")))):
             yield "selection of record: " + json.dumps(document, ensure_ascii=False, sort_keys=True)
         for name, value in document.items():
             yield name
             if isinstance(value, str):
                 yield from units(value)
             elif isinstance(value, (dict, list)):
-                yield from units(json.dumps(value, ensure_ascii=False))
+                yield from units(json.dumps(value, ensure_ascii=False), name)
     elif isinstance(document, list):
         for value in document:
             if isinstance(value, str):
                 yield from units(value)
             elif isinstance(value, (dict, list)):
-                yield from units(json.dumps(value, ensure_ascii=False))
+                yield from units(json.dumps(value, ensure_ascii=False), container)
     else:
         for paragraph in re.split(r"\n\s*\n", text):
             if paragraph.lstrip().startswith("|"):

@@ -54,7 +54,8 @@ def redact_tables(text, relative, stripped, key):
         if not line.lstrip().startswith("|"):
             columns = []
             continue
-        if index + 1 < len(lines) and re.fullmatch(r"[\s|:-]+", lines[index + 1]):
+        if index + 1 < len(lines) and re.fullmatch(
+                r"\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*)*\|?\s*", lines[index + 1]):
             columns = tables[relative].get(digest(line), [])
             # Identify selection columns from the original header, then mask separately reviewed
             # header adjectives without withholding their measurement/provenance body cells.
@@ -83,20 +84,22 @@ def redact_text(text, relative, pointer, stripped, key, labels, spans):
         if fragment and fragment.get("unit") == "line" and fragment["path"] == relative and hashlib.sha256(
                 value.encode()).hexdigest() == fragment["source_sha256"]:
             for start, end in fragment["ranges"]:
-                edits.append((line.start() + start, line.start() + end, value[start:end]))
+                edits.append((line.start() + start, line.start() + end, value[start:end],
+                              fragment.get("replacement", "")))
     for paragraph in re.finditer(r"\S[^\n]*(?:\n(?!\s*\n)[^\n]*)*", text):
         value = paragraph.group()
         fragment = spans.get(digest(value))
         if fragment and fragment.get("unit") == "paragraph" and fragment["path"] == relative and hashlib.sha256(
                 value.encode()).hexdigest() == fragment["source_sha256"]:
             for start, end in fragment.get("ranges", [[fragment["start"], fragment["end"]]]):
-                edits.append((paragraph.start() + start, paragraph.start() + end, value[start:end]))
+                edits.append((paragraph.start() + start, paragraph.start() + end, value[start:end],
+                              fragment.get("replacement", "")))
         elif labels.get("paragraph/" + digest(value)) == "choice":
-            edits.append((paragraph.start(), paragraph.end(), paragraph.group()))
+            edits.append((paragraph.start(), paragraph.end(), paragraph.group(), ""))
     for start, end, value in statements(text):
         # An exact reviewed span takes precedence over a coarser sentence classification.
         # Applying both would delete measured bytes or apply the same edit twice.
-        if any(first < end and start < last for first, last, _ in edits):
+        if any(first < end and start < last for first, last, _, _ in edits):
             continue
         sha = digest(value)
         if sha in spans and spans[sha]["path"] == relative and hashlib.sha256(
@@ -107,10 +110,11 @@ def redact_text(text, relative, pointer, stripped, key, labels, spans):
             # Require the exact reviewed spacing before applying byte-positioned spans.
             offset = text[start:end].find(value)
             for first, last in fragment.get("ranges", [[fragment["start"], fragment["end"]]]):
-                edits.append((start + offset + first, start + offset + last, value[first:last]))
+                edits.append((start + offset + first, start + offset + last, value[first:last],
+                              fragment.get("replacement", "")))
         elif labels.get(sha) == "choice":
-            edits.append((start, end, value))
-    for start, end, value in sorted(edits, reverse=True):
+            edits.append((start, end, value, ""))
+    for start, end, value, replacement in sorted(edits, reverse=True):
         stripped.append({"path": f"{relative}{pointer}/@text/{start}",
                          "old_sha256": hmac_sha256_of(value, key)})
         left, right = text[:start], text[end:]
@@ -120,7 +124,7 @@ def redact_text(text, relative, pointer, stripped, key, labels, spans):
             right = right.lstrip(" \t")
         if left.endswith((" ", "\t")) and right.startswith((" ", "\t")):
             right = right.lstrip(" \t")
-        text = left + right
+        text = left + replacement + right
     return redact_text(text, relative, pointer, stripped, key, labels, spans) if edits else text
 
 
@@ -140,7 +144,10 @@ def redact_document(node, relative, pointer, stripped, key, labels, fields, span
                 if after != value and not node[name]:
                     del node[name]
             else:
+                had_content = bool(value)
                 redact_document(value, relative, child, stripped, key, labels, fields, spans)
+                if had_content and isinstance(value, dict) and not value and name != "measurement":
+                    del node[name]
     elif isinstance(node, list):
         emptied = []
         for index, value in enumerate(node):
@@ -155,7 +162,10 @@ def redact_document(node, relative, pointer, stripped, key, labels, fields, span
                 if after != value and not node[index]:
                     emptied.append(index)
             else:
+                had_content = bool(value)
                 redact_document(value, relative, child, stripped, key, labels, fields, spans)
+                if had_content and not value:
+                    emptied.append(index)
         for index in reversed(emptied):
             del node[index]
 
