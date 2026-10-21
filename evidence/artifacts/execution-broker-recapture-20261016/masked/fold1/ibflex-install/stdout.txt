@@ -1,0 +1,77 @@
+Obtaining file://<FOLD_SCRATCH>/sources/ibflex
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Collecting pytest
+  Downloading pytest-9.1.1-py3-none-any.whl.metadata (7.6 kB)
+Collecting mypy
+  Downloading mypy-2.4.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+Collecting types-requests
+  Downloading types_requests-2.33.0.20261006-py3-none-any.whl.metadata (2.2 kB)
+Collecting ruff
+  Downloading ruff-0.17.1-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (20 kB)
+Collecting requests (from ibflex==1.1)
+  Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+Collecting iniconfig>=1.0.1 (from pytest)
+  Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+Collecting packaging>=22 (from pytest)
+  Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting pluggy<2,>=1.5 (from pytest)
+  Downloading pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+Collecting pygments>=2.7.2 (from pytest)
+  Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting typing_extensions>=4.6.0 (from mypy)
+  Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting mypy_extensions>=1.0.0 (from mypy)
+  Downloading mypy_extensions-1.1.0-py3-none-any.whl.metadata (1.1 kB)
+Collecting pathspec>=1.0.0 (from mypy)
+  Downloading pathspec-1.1.1-py3-none-any.whl.metadata (14 kB)
+Collecting librt>=0.16.0 (from mypy)
+  Downloading librt-0.16.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (1.3 kB)
+Collecting ast-serialize<1.0.0,>=0.11.2 (from mypy)
+  Downloading ast_serialize-0.13.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.4 kB)
+Collecting urllib3>=2 (from types-requests)
+  Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+Collecting charset_normalizer<4,>=2 (from requests->ibflex==1.1)
+  Downloading charset_normalizer-3.5.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (46 kB)
+Collecting idna<4,>=2.5 (from requests->ibflex==1.1)
+  Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+Collecting certifi>=2023.5.7 (from requests->ibflex==1.1)
+  Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+Downloading pytest-9.1.1-py3-none-any.whl (386 kB)
+Downloading pluggy-1.7.0-py3-none-any.whl (27 kB)
+Downloading mypy-2.4.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (15.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15.5/15.5 MB 62.2 MB/s  0:00:00
+Downloading ast_serialize-0.13.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 14.5 MB/s  0:00:00
+Downloading types_requests-2.33.0.20261006-py3-none-any.whl (21 kB)
+Downloading ruff-0.17.1-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (10.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.4/10.4 MB 81.5 MB/s  0:00:00
+Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+Downloading librt-0.16.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (531 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 531.7/531.7 kB 5.9 MB/s  0:00:00
+Downloading mypy_extensions-1.1.0-py3-none-any.whl (5.0 kB)
+Downloading packaging-26.3-py3-none-any.whl (129 kB)
+Downloading pathspec-1.1.1-py3-none-any.whl (57 kB)
+Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 19.8 MB/s  0:00:00
+Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+Downloading charset_normalizer-3.5.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (254 kB)
+Downloading idna-3.20-py3-none-any.whl (69 kB)
+Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+Building wheels for collected packages: ibflex
+  Building editable for ibflex (pyproject.toml): started
+  Building editable for ibflex (pyproject.toml): finished with status 'done'
+  Created wheel for ibflex: filename=ibflex-1.1-0.editable-py3-none-any.whl size=8320 sha256=<UNPUBLISHED_BUILD_SHA256>
+  Stored in directory: <FOLD_SCRATCH>/tmp/pip-ephem-wheel-cache-at4xz32s/wheels/<PRIVATE_SOURCE_CACHE_KEY>
+Successfully built ibflex
+Installing collected packages: urllib3, typing_extensions, ruff, pygments, pluggy, pathspec, packaging, mypy_extensions, librt, iniconfig, idna, ibflex, charset_normalizer, certifi, ast-serialize, types-requests, requests, pytest, mypy
+
+Successfully installed ast-serialize-0.13.0 certifi-2026.7.22 charset_normalizer-3.5.2 ibflex-1.1 idna-3.20 iniconfig-2.3.1 librt-0.16.0 mypy-2.4.0 mypy_extensions-1.1.0 packaging-26.3 pathspec-1.1.1 pluggy-1.7.0 pygments-2.21.0 pytest-9.1.1 requests-2.34.2 ruff-0.17.1 types-requests-2.33.0.20261006 typing_extensions-4.16.0 urllib3-2.8.0

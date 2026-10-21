@@ -1,0 +1,17 @@
+test_cli_preserves_bytes_except_exact_private_path_substitutions (tests.test_execution_broker_capture_mask.CaptureMask.test_cli_preserves_bytes_except_exact_private_path_substitutions) ... ok
+test_invalid_map_refuses_without_emitting_derivative (tests.test_execution_broker_capture_mask.CaptureMask.test_invalid_map_refuses_without_emitting_derivative) ... ok
+test_literal_engine_does_not_rescan_inserted_replacement_bytes (tests.test_execution_broker_capture_mask.CaptureMask.test_literal_engine_does_not_rescan_inserted_replacement_bytes) ... ERROR
+
+======================================================================
+ERROR: test_literal_engine_does_not_rescan_inserted_replacement_bytes (tests.test_execution_broker_capture_mask.CaptureMask.test_literal_engine_does_not_rescan_inserted_replacement_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_execution_broker_capture_mask.py", line 44, in test_literal_engine_does_not_rescan_inserted_replacement_bytes
+    self.assertEqual(module.replace_literals(b'/a /b untouched', {b'/a': b'/b', b'/b': b'<B>'}),
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'capture_mask' has no attribute 'replace_literals'
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.092s
+
+FAILED (errors=1)

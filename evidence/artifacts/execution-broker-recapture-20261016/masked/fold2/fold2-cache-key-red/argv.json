@@ -1,0 +1,11 @@
+[
+  "python3",
+  "-m",
+  "unittest",
+  "discover",
+  "-s",
+  "tests",
+  "-p",
+  "test_execution_broker_capture_mask.py",
+  "-v"
+]
