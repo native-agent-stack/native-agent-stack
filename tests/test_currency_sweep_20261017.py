@@ -339,7 +339,10 @@ class CurrencySweepRepin(unittest.TestCase):
 
     def test_the_rtk_pin_names_the_other_consumer_of_the_old_version(self):
         source = (ROOT / "tools/adoption/runtime_profiles.py").read_text(encoding="utf-8").splitlines()
-        self.assertIn('rtk 0.51.0', source[561], "the line the record cites no longer holds the 0.51.0 check")
+        # The record's owed repin of runtime_profiles.py:562 is done: that line now holds the 1.0.1 check (rtk-ai/rtk
+        # v1.0.1 = 4ef8730c), and the locator the record cites still names the profile build's version check.
+        self.assertIn('rtk 1.0.1', source[561], "the line the record cites no longer holds the version check")
+        self.assertNotIn('rtk 0.51.0', source[561])
         gaps = " ".join(rows()["RTK"]["blocking_gaps"])
         decision = DECISION.read_text(encoding="utf-8")
         self.assertIn("tools/adoption/runtime_profiles.py:562", gaps)

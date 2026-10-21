@@ -1,4 +1,4 @@
-"""Hermetic installed OpenCode53d1eabb directory/instruction/read contract.
+"""Hermetic installed OpenCode e3c4eb24 directory/instruction/read contract.
 
 No credential, provider or network leaves the namespace. A local fixture
 endpoint captures one request and rejects it; no inference or W6 arm runs.
@@ -95,10 +95,10 @@ class NativeOpenCodeContractTests(unittest.TestCase):
             unrelated.parent.mkdir(); unrelated.write_text("UNRELATED_FILE_MARKER\n")
             state = home / ".local/state/profiles"
             with mock.patch.object(module, "canonical_servers", return_value={"context-mode": {"command": "node"}}), \
-                    mock.patch.object(module, "verify_runtime_binary", return_value="1.18.35", create=True), \
+                    mock.patch.object(module, "verify_runtime_binary", return_value="1.19.3", create=True), \
                     mock.patch.object(module.shutil, "which", return_value="/fixture/rtk"), \
                     mock.patch.object(module.subprocess, "check_output", side_effect=[
-                        "rtk 0.51.0\n", "e001f773f80b22b7dc4c7a79521b30e35aaef026\n"]), \
+                        "rtk 1.0.1\n", "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100\n"]), \
                     mock.patch.object(module.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)):
                 module.render("opencode-gpt", state=state, home=home, eco_root=scratch, templates=[],
                     pi_bin=Path("/fixture/pi"), opencode_bin=Path(binary), rtk_source=scratch, role_scope="reviewer")
@@ -118,8 +118,8 @@ class NativeOpenCodeContractTests(unittest.TestCase):
             unselected.parent.mkdir(); unselected.write_text("UNSELECTED_VENDOR_MARKER\n")
             config_dir = config_path.parent
             (config_dir / "node_modules").mkdir()
-            (config_dir / "package.json").write_text('{"dependencies":{"@opencode-ai/plugin":"1.18.35"}}')
-            (config_dir / "package-lock.json").write_text('{"packages":{"":{"dependencies":{"@opencode-ai/plugin":"1.18.35"}}}}')
+            (config_dir / "package.json").write_text('{"dependencies":{"@opencode-ai/plugin":"1.19.3"}}')
+            (config_dir / "package-lock.json").write_text('{"packages":{"":{"dependencies":{"@opencode-ai/plugin":"1.19.3"}}}}')
             args = argparse.Namespace(profile="opencode-gpt", state_root=state, repository=primary,
                 role="evidence-reviewer", print=True, prompt="Read owned.txt", timeout_seconds=25)
             launch = {}
@@ -128,7 +128,7 @@ class NativeOpenCodeContractTests(unittest.TestCase):
                 return subprocess.CompletedProcess(command, 0)
             with mock.patch.dict(os.environ, {"PWD": str(primary)}), \
                     mock.patch.object(module, "opencode_sandbox_command", side_effect=lambda command, *args: command, create=True), \
-                    mock.patch.object(module, "verify_runtime_binary", return_value="1.18.35", create=True), \
+                    mock.patch.object(module, "verify_runtime_binary", return_value="1.19.3", create=True), \
                     mock.patch.object(module, "fresh_worktree", return_value=workspace), \
                     mock.patch.object(module.subprocess, "run", side_effect=record), \
                     mock.patch.object(module.subprocess, "check_output", return_value="a" * 40), \
@@ -153,7 +153,7 @@ class NativeOpenCodeContractTests(unittest.TestCase):
                 return subprocess.run(command, env=env, stdin=subprocess.DEVNULL,
                                       capture_output=True, text=True, timeout=35)
             version = native([binary, "--version"])
-            self.assertEqual(version.stdout.strip(), "1.18.35", "test binary does not match installed source pin")
+            self.assertEqual(version.stdout.strip(), "1.19.3", "test binary does not match installed source pin")
             if uv_layout:
                 uv_bin = home / (".local/bin" if uv_layout == "local" else "bin")
                 uv_bin.mkdir(parents=True)

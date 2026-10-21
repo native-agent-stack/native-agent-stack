@@ -65283,8 +65283,8 @@
     },
     {
       "path": "tests/test_pi_builder_output_budget.py",
-      "sha256": "9f887c3788c4fe0a097a826e5367ba771718e425735df1b56f821da104b9dcdc",
-      "bytes": 3086
+      "sha256": "a6e0a3e1d1131b77679fe406d79332990c4c1c1bcc3b89a884f407eb87e71e71",
+      "bytes": 3085
     },
     {
       "path": "tests/test_pin_holds.py",
@@ -65443,8 +65443,8 @@
     },
     {
       "path": "tests/test_runtime_database_isolation.py",
-      "sha256": "1dff0cfa903b3a4468a2a687c619786bfcb26edd8197dc5720b9a71dce728b6a",
-      "bytes": 10935
+      "sha256": "f3abcdb80cca399801fd291c7f37e3c07ab5b9e9bbc16375edf470f080368ca4",
+      "bytes": 10933
     },
     {
       "path": "tests/test_runtime_directory_identity.py",
@@ -65453,18 +65453,18 @@
     },
     {
       "path": "tests/test_runtime_opencode_native.py",
-      "sha256": "72c3f3ef5027aeb36b6f0581c3eb8e7c08bad29c5a4ef4d395e324927f386e6c",
-      "bytes": 17037
+      "sha256": "0a52db909096e9adc950d1d136837635d53f6c880f3c41e6abd052b3dacc3177",
+      "bytes": 17032
     },
     {
       "path": "tests/test_runtime_profile_readiness.py",
-      "sha256": "ea6904016837c15760f1d7f96d27c7d81d897fdb865e8aaa9d3b176ec9db8ae7",
-      "bytes": 8473
+      "sha256": "468547da6f15b0337747c7782dc1fb32abff10f4eff7c623d12fb44795f64a92",
+      "bytes": 11982
     },
     {
       "path": "tests/test_runtime_profiles.py",
-      "sha256": "c9af3264e0fbb911e9d8fcabb0e951231328f9c2ec23ea802788c7ee370e842d",
-      "bytes": 91228
+      "sha256": "190dc631f28b92d349c97c9c255117dfaf995a1f4ff15f61827f3f8064e36ff9",
+      "bytes": 91225
     },
     {
       "path": "tests/test_runtime_publication.py",
@@ -65948,8 +65948,8 @@
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "cfd44384626f7213f00fe18a139867e544acc46d1a8952c5dff5bf6a64bedc84",
-      "bytes": 105522
+      "sha256": "a1336220c2487e1e232f230949942140126b4f3e0a81f5417264adeecebe3808",
+      "bytes": 106335
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",

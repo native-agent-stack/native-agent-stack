@@ -2,10 +2,10 @@
 """Render and launch isolated *trial* Pi/OpenCode profiles from canonical inputs.
 
 Vendor mechanisms (not a replacement model loop):
-earendil-works/pi@04566631:packages/coding-agent/docs/configuration.md:9,
+earendil-works/pi@71023aec:packages/coding-agent/docs/configuration.md:9,
 docs/models.md:21, docs/mcp.md:104, docs/cli.md:47, docs/prompt-templates.md:51.
-anomalyco/opencode@53d1eabb:packages/web/src/content/docs/{config,providers,
-agents,mcp-servers,skills}.mdx; current mirror 4d9678a7 retains the v1 contract.
+anomalyco/opencode@e3c4eb24:packages/web/src/content/docs/{config,providers,
+agents,mcp-servers,skills}.mdx.
 RTK owns shell rewriting; native MCP, model transports and sessions stay native.
 Generated profile files and Context Mode's persistent stores use private roots;
 launchers/Terminal fragments use their documented locations. Other MCP services
@@ -77,11 +77,11 @@ def profile_name(value):
 def verify_runtime_binary(runtime: str, executable: Path) -> str:
     """Native version admission in an empty fixture HOME, without credentials.
 
-    earendil-works/pi@04566631:packages/coding-agent/docs/cli.md:245;
-    anomalyco/opencode@53d1eabb:packages/opencode/src/index.ts:51.
+    earendil-works/pi@71023aec:packages/coding-agent/docs/cli.md:245;
+    anomalyco/opencode@e3c4eb24:packages/opencode/src/index.ts:51.
     Configuration/permissions/events are qualified only at these releases.
     """
-    expected = {"pi": "1.1.0", "opencode": "1.18.35"}[runtime]
+    expected = {"pi": "1.3.0", "opencode": "1.19.3"}[runtime]
     path = executable.resolve()
     if not path.is_file() or not os.access(path, os.X_OK):
         raise ProfileError("runtime executable unavailable; preparation/launch refused")
@@ -129,7 +129,7 @@ def owned_destination(path: Path):
 
 
 def native_name(value: str, runtime="pi", *, pattern=False) -> str:
-    # OpenCode 53d1eabb mcp/catalog.ts:117 retains hyphens. Role wildcard
+    # OpenCode e3c4eb24 mcp/catalog.ts:117 retains hyphens. Role wildcard
     # grants must remain patterns rather than being converted to underscores.
     allowed = r"a-zA-Z0-9_" + (r"\-" if runtime == "opencode" else "")
     if pattern:
@@ -144,7 +144,7 @@ def agent_vendor_skills(name: str) -> list[str]:
 def opencode_role_skill_directories(destination: Path, role_scope: str | None, agent_name=None) -> list[Path]:
     """Pinned native Linux plugin layout, narrowed to the selected role skills.
 
-    OpenCode53d1eabb core/src/global.ts:12 resolves XDG_CACHE_HOME/opencode;
+    OpenCode e3c4eb24 core/src/global.ts:12 resolves XDG_CACHE_HOME/opencode;
     core/src/npm.ts:45-50,87,133 uses packages/sanitize(spec)/node_modules/name
     (sanitize is identity on Linux). plugin/shared.ts:207-212 passes this exact
     pinned Git spec. Superpowersbb92a777 .opencode/plugins/superpowers.js:25,223
@@ -211,8 +211,8 @@ def role_source(name: str) -> tuple[dict, str]:
 def granted_tools(metadata: dict, runtime: str) -> tuple[list[str], list[str]]:
     """Translate only known exact grants; an absent equivalent is omitted.
 
-    Pi docs/mcp.md:77 names tools mcp__<server>__<tool>. OpenCode's native
-    MCP names are sanitized <server>_<tool> (53d1eabb, src/mcp/index.ts).
+    Pi (71023aec) docs/mcp.md:77 names tools mcp__<server>__<tool>. OpenCode's native
+    MCP names are sanitized <server>_<tool> (e3c4eb24, src/mcp/index.ts).
     Neither runtime gains a wildcard MCP grant from a discovery/Search tool.
     """
     builtins = {"Read": "read", "Grep": "grep", "Glob": "find" if runtime == "pi" else "glob",
@@ -294,10 +294,10 @@ def opencode_mcp(servers: dict) -> dict:
 
 
 def pi_models(route: str, *, role_scope=None) -> dict:
-    # earendil-works/pi@04566631 packages/coding-agent/docs/models.md:67;
+    # earendil-works/pi@71023aec packages/coding-agent/docs/models.md:67;
     # schemas/models.schema.json:107-110,272-275 accepts native maxTokens.
     # packages/ai/src/api/simple-options.ts:46 forwards the model ceiling;
-    # anthropic-messages.ts:1162 and openai-responses.ts:340-341 send it.
+    # anthropic-messages.ts:1222 and openai-responses.ts:368-369 send it.
     # Claude Opus5.5 vendor overview max output128K; OmniRoute /v1/models
     # cx/gpt-6.1-sol max_output_tokens128000. Use a bounded32K builder/researcher budget.
     max_tokens = 32768 if role_scope in ("builder", "researcher") else 8192
@@ -368,10 +368,10 @@ def profile_environment(profile: str, state: Path, role_scope: str | None = None
         return {**telemetry, "PI_CODING_AGENT_DIR": str(root / "agent")}
     return {**telemetry, "XDG_CONFIG_HOME": str(root / "config"), "XDG_DATA_HOME": str(root / "data"),
             "XDG_CACHE_HOME": str(root / "cache"), "XDG_STATE_HOME": str(root / "state"),
-            # anomalyco/opencode@53d1eabb:packages/core/src/flag/flag.ts:47;
-            # packages/core/src/database/database.ts:43-55. Explicit DB
-            # overrides outrank XDG; bind every native child/collector to its
-            # profile-owned path through this shared environment policy.
+            # anomalyco/opencode@e3c4eb24:packages/core/src/flag/flag.ts:47 (DB),
+            # :29 (MODELS_FETCH; models-dev.ts:222,255); database/database.ts:43-55.
+            # Explicit DB overrides outrank XDG; bind every native child/collector
+            # to its profile-owned path through this shared environment policy.
             "OPENCODE_DB": str(root.absolute() / "data/opencode/opencode.db"),
             "OPENCODE_CONFIG": str(root / "config/opencode/opencode.json"),
             "OPENCODE_CONFIG_DIR": str(root / "config/opencode"),
@@ -448,7 +448,7 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
         else:
             permissions = {"*": "deny", **{tool: "allow" for tool in tools}}
             if "read" in tools:
-                # OpenCode 53d1eabb session/tools.ts:172,255,343 asks read
+                # OpenCode e3c4eb24 session/tools.ts:172,255,343 asks read
                 # on mcp:<server>:<uri> for resource helpers. Native ordered
                 # permission patterns keep filesystem reads and deny the
                 # ungranted resource surface; no custom permission hook.
@@ -500,7 +500,7 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
                   "skills": {"paths": [str(context_mode_package(destination) / "skills/context-mode")]},
                   "model": "anthropic/" + CLAUDE_MODEL if route == "claude" else "omniroute/" + GPT_MODEL,
                   "enabled_providers": ["anthropic" if route == "claude" else "omniroute"],
-                  "share": "disabled", "snapshot": False, "autoupdate": False,
+                  "share": "disabled", "snapshot": False, "autoupdate": False,  # e3c4eb24 cli/upgrade.ts:23
                   "mcp": opencode_mcp(servers),
                   "plugin": [(destination / "rtk-home/.config/opencode/plugins/rtk.ts").as_uri()],
                   "agent": {name: value["agent"] for name, value in roles.items()}}
@@ -550,17 +550,21 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
     subprocess.run(["npm", "rebuild", "--prefix", str(destination / "vendor/context-mode"),
                     "better-sqlite3"], env=install_env, check=True,
                    stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-    # RTK 0.51.0 e001f773 src/hooks/init/{pi,opencode}.rs: vendor installer
-    # owns these extension bytes. Pi honors its agent-dir override; OpenCode's
-    # installer uses HOME/.config, so give *that installer only* a private HOME
-    # and reference its installed plugin through OpenCode's native file URI.
+    # RTK 1.0.1 4ef8730c src/hooks/init/{pi,opencode}.rs (Apache-2.0: LICENSE:1-2, Cargo.toml:30): vendor installer
+    # owns these extension bytes. Pi honors its agent-dir override (pi.rs:82-84); OpenCode's installer uses
+    # HOME/.config (opencode.rs:77-86), so give *that installer only* a private HOME and reference its installed
+    # plugin through OpenCode's native file URI. Details of the 1.0.1 installer follow the version check.
     rtk = shutil.which("rtk")
     if not rtk:
         raise ProfileError("the selected RTK vendor CLI is required")
     version = subprocess.check_output([rtk, "--version"], text=True).strip()
     pin = subprocess.check_output(["git", "-C", str(rtk_source), "rev-parse", "HEAD"], text=True).strip()
-    if version != "rtk 0.51.0" or pin != "e001f773f80b22b7dc4c7a79521b30e35aaef026":
+    if version != "rtk 1.0.1" or pin != "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100":
         raise ProfileError("RTK installer/source version mismatch")
+    # rtk-ai/rtk@4ef8730c: `--opencode` no longer implies opencode-only mode (lib.rs:2951), so hook-only mode also
+    # runs the Claude branch (init/claude.rs:894-974), which under --no-patch writes no Claude settings and only
+    # prints the manual step; measured with the installed rtk 1.0.1 in a private HOME. The OpenCode plugin is skipped, silently under
+    # our stdout redirect, when `opencode` on PATH is older than 1.18.29 (init/opencode.rs:14,96-150).
     if runtime == "pi":
         command = [rtk, "init", "--global", "--agent", "pi", "--hook-only", "--no-patch"]
         environment = {**os.environ, **profile_environment(profile, state, role_scope)}
@@ -628,14 +632,14 @@ def choose_slot(after: str | None = None) -> str:
 def first_call_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None:
     """(status, text) of the run's first model call when it was refused before any billed output, else None.
 
-    Pi 1.1.0 (earendil-works/pi@04566631): a refused request ends the stream with stopReason "error" and errorMessage
-    set to the SDK error's message (packages/ai/src/api/anthropic-messages.ts:893-895), on an assistant message whose
-    usage starts at zero (:589-596); the agent loop emits it as message_end (packages/agent/src/agent-loop.ts:443-455)
+    Pi 1.3.0 (earendil-works/pi@71023aec): a refused request ends the stream with stopReason "error" and errorMessage
+    set to the SDK error's message (packages/ai/src/api/anthropic-messages.ts:929-931), on an assistant message whose
+    usage starts at zero (:591-598); the agent loop emits it as message_end (packages/agent/src/agent-loop.ts:443-455)
     and print mode writes each event as a JSON line (packages/coding-agent/src/modes/print-mode.ts:108-112).
     That message is "<status> <body>": @anthropic-ai/sdk 0.129.0 (pinned at packages/ai/package.json:70),
     src/core/error.ts:40-50.
-    OpenCode 1.18.35 (anomalyco/opencode@53d1eabb): `run --format json` emits step_finish for each finished step
-    (packages/opencode/src/cli/cmd/run.ts:750) and an error event carrying the session error (:789), which for a
+    OpenCode 1.19.3 (anomalyco/opencode@e3c4eb24): `run --format json` emits step_finish for each finished step
+    (packages/opencode/src/cli/cmd/run.ts:740) and an error event carrying the session error (:779), which for a
     provider refusal is {name, data: {statusCode, ...}} (packages/opencode/src/session/message-v2.ts:707-717,
     packages/core/src/util/error.ts:55-60). Any completed step first means the run was billed, so nothing is retried."""
     for line in log.read_text().split("\n"):
@@ -744,8 +748,8 @@ def attempt_outcome(log: Path, runtime: str, route: str, exit_code: int | None) 
 def response_in_flight(log: Path, runtime: str) -> bool:
     """True when the log ends inside a model response: billed tokens may have streamed with no usage reported yet. Pi
     emits an assistant message_start when a response starts and message_end only when it is done or refused
-    (pi@04566631 packages/agent/src/agent-loop.ts:420 and :454); OpenCode pairs step_start with step_finish
-    (anomalyco/opencode@53d1eabb packages/opencode/src/cli/cmd/run.ts:746-750)."""
+    (pi@71023aec packages/agent/src/agent-loop.ts:420 and :454); OpenCode pairs step_start with step_finish
+    (anomalyco/opencode@e3c4eb24 packages/opencode/src/cli/cmd/run.ts:736-740)."""
     open_response = False
     for line in log.read_text().split("\n"):
         try:
@@ -932,8 +936,10 @@ def cut_short(exit_code: int) -> bool:
     """True when the attempt did not end on its own, so nothing in its log authorizes another slot: timeout's statuses
     (124 timed out, 125 timeout failed, 126 and 127 command not run, 137 killed; the installed `timeout --help`, "Exit
     status"), the credential runner's 128+N for a command that died of a signal (tools/credentials/credential_run.py,
-    "Exit status"), or subprocess's negative status for a signal. A native refusal ends on its own below those: Pi exits
-    0, OpenCode 1 (anomalyco/opencode@53d1eabb:packages/opencode/src/cli/cmd/run.ts:842)."""
+    "Exit status"), or subprocess's negative status for a signal. A native refusal ends on its own below those: Pi in
+    --mode json exits 0 (earendil-works/pi@71023aec:packages/coding-agent/src/modes/print-mode.ts:35,139-162; only text mode
+    exits 1, on error, aborted or, new in 1.3.0, length), OpenCode 1
+    (anomalyco/opencode@e3c4eb24:packages/opencode/src/cli/cmd/run.ts:832)."""
     return exit_code < 0 or exit_code >= 124
 
 
@@ -1020,7 +1026,7 @@ def fresh_worktree(repository: Path, profile: str) -> Path:
 def worktree_permissions(root: Path, workspace: Path) -> dict:
     """Native last-loaded config, paired with an explicitly bound run directory.
 
-    anomalyco/opencode@53d1eabb: tool/read.ts:250-258;
+    anomalyco/opencode@e3c4eb24: tool/read.ts:250-258;
     project/instance-store.ts:54-58; config/config.ts:482-489;
     permission/index.ts:28-38. No permission extension or evaluator is shipped.
     Selected vendor directories remain readable; generic host directories do not.
@@ -1044,7 +1050,7 @@ def worktree_permissions(root: Path, workspace: Path) -> dict:
             scoped_read[os.path.relpath(target, workspace) + "/*"] = "allow"
         agents[name] = {"permission": {**permission, "read": scoped_read,
                                        "external_directory": scoped_external}}
-    # OpenCode53 instruction.ts:135-150 loads absolute instructions even
+    # OpenCode e3c4eb24 instruction.ts:135-150 loads absolute instructions even
     # when project config is disabled. Preserve the repository's root rules
     # without loading project agents/plugins or merging additional tool grants.
     instructions = [str(workspace / "AGENTS.md")] if (workspace / "AGENTS.md").is_file() else []
@@ -1238,7 +1244,7 @@ def launch(args):
     runtime_env["CONTEXT_MODE_PROJECT_DIR"] = str(workspace)
     runtime_env["CLAUDE_PROJECT_DIR"] = str(workspace)
     if runtime == "opencode":
-        # OpenCode53 run.ts:333-340 takes its session directory from PWD,
+        # OpenCode e3c4eb24 run.ts:334-341 takes its session directory from PWD,
         # not subprocess cwd. Bind both routes, including credential_run's
         # child env prefix; --dir below also binds effect-cmd's instance.
         runtime_env["PWD"] = str(workspace)
@@ -1268,7 +1274,7 @@ def launch(args):
             grant = meta["roles"][args.role]["tools"]
             for preload in meta["roles"][args.role].get("preloads", []):
                 # Each canonical role currently has exactly one preload;
-                # Pi045 docs/cli.md:231 supports native file input here.
+                # Pi 71023aec docs/cli.md:231 supports native file input here.
                 command += ["--append-system-prompt", preload["path"]]
             command += ["--tools", ",".join(grant)]
             if not any(tool.startswith("mcp__") for tool in grant):
@@ -1298,7 +1304,7 @@ def launch(args):
         command = ["script", "--quiet", "--return", "--command", shlex.join(command), "/dev/null"]
     runtime_command, slot = command, None
     first_prompt = (("/" + args.role + " " if args.role else "") + args.prompt) if args.prompt else None
-    # pi@04566631 packages/coding-agent/src/main.ts:436-448 (docs/cli.md:92): --session-id reopens the session with that
+    # pi@71023aec packages/coding-agent/src/main.ts:436-448 (docs/cli.md:92): --session-id reopens the session with that
     # exact id for this worktree, or creates it. A fresh start takes a new id; a mid-run failover and --resume reuse one.
     session_id = uuid.uuid4().hex if runtime == "pi" and args.print else None
     if resumed:
@@ -1331,7 +1337,7 @@ def launch(args):
         # the run starts again on the next usable slot of the order (the review worker's DEFAULT_KEYS and classifier).
         # A slot whose credit runs out MID-RUN (after billed output; measured 2026-10-15, when two researcher arms lost
         # $5.44 and $2.85 of work) continues the same pi session on the next slot. pi skips the refused turn when it
-        # rebuilds the context (pi@04566631 packages/ai/src/api/transform-messages.ts:195-202). With no slot left, or on
+        # rebuilds the context (pi@71023aec packages/ai/src/api/transform-messages.ts:216-223). With no slot left, or on
         # OpenCode, the run stops resumable: its worktree and session are kept and the receipt names them.
         refused_slots, attempts, facts, logs, resume, continuing = [], [], [], [], None, bool(resumed)
         if resumed:

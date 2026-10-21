@@ -397,7 +397,7 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
 
     def test_an_ordinary_error_inside_a_response_settles_as_unknown_spend(self):
         # The GPT read and the local review at 64f41af3/5bea71f9: a step that started and never finished, ended by a
-        # non-credit API error (OpenCode exits 1: anomalyco/opencode@53d1eabb run.ts:842), left its usage unreported;
+        # non-credit API error (OpenCode exits 1: anomalyco/opencode@e3c4eb24 run.ts:832), left its usage unreported;
         # it was settled as known spend because the outcome was "ended".
         step = {"type": "step_finish", "sessionID": "ses_fixture1", "part": {"tokens": {"total": 9}, "cost": 0.5}}
         start = {"type": "step_start", "sessionID": "ses_fixture1", "part": {}}
@@ -981,7 +981,7 @@ process.stdin.on('end', () => {
             with mock.patch.object(profiles, "canonical_servers", return_value=servers), \
                     mock.patch.object(profiles.shutil, "which", return_value="/fixture/rtk"), \
                     mock.patch.object(profiles.subprocess, "check_output", side_effect=[
-                        "rtk 0.51.0\n", "e001f773f80b22b7dc4c7a79521b30e35aaef026\n"]), \
+                        "rtk 1.0.1\n", "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100\n"]), \
                     mock.patch.object(profiles.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)):
                 profiles.render("opencode-gpt", state=state, home=state, eco_root=state, templates=[],
                                 pi_bin=state / "pi", opencode_bin=state / "opencode", rtk_source=state,
@@ -1198,7 +1198,7 @@ let input=''; process.stdin.on('data',x=>input+=x); process.stdin.on('end',()=>{
             with mock.patch.object(profiles, "canonical_servers", return_value=servers), \
                     mock.patch.object(profiles.shutil, "which", return_value="/fixture/rtk"), \
                     mock.patch.object(profiles.subprocess, "check_output", side_effect=[
-                        "rtk 0.51.0\n", "e001f773f80b22b7dc4c7a79521b30e35aaef026\n"]), \
+                        "rtk 1.0.1\n", "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100\n"]), \
                     mock.patch.object(profiles.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)):
                 profiles.render("opencode-gpt", state=state, home=state, eco_root=state, templates=[],
                                 pi_bin=state / "pi", opencode_bin=state / "opencode", rtk_source=state,
@@ -1233,7 +1233,7 @@ let input=''; process.stdin.on('data',x=>input+=x); process.stdin.on('end',()=>{
                 with mock.patch.object(profiles, "canonical_servers", return_value=servers), \
                         mock.patch.object(profiles.shutil, "which", return_value="/fixture/rtk"), \
                         mock.patch.object(profiles.subprocess, "check_output", side_effect=[
-                            "rtk 0.51.0\n", "e001f773f80b22b7dc4c7a79521b30e35aaef026\n"]), \
+                            "rtk 1.0.1\n", "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100\n"]), \
                         mock.patch.object(profiles.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)) as installs:
                     profiles.render(profile, state=state, home=state, eco_root=state, templates=[],
                                     pi_bin=state / "pi", opencode_bin=state / "opencode", rtk_source=state)
