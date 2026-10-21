@@ -163,11 +163,6 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "8f3cc34e0de9ad6d899f42e4e0a01fc3b3dff354c0a090627bb2177d684afd97",
-      "reason": "Selected describes bounded content, tool calls or read guidance in a recorded procedure; retain actual operations, results and scope without asserting comparative adoption."
-    },
-    {
-      "path": "docs/token-practice.md",
       "sha256": "6cca9f90b03e2222aebd499d76f14d9996c1cafd0d17b4f798dce4800a54166f",
       "reason": "The exact unit documents model/effort inheritance and override semantics. These runtime configuration values are not candidates or winners in the scored component pool."
     },
@@ -189,11 +184,6 @@
     {
       "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/qualification-record.json",
       "sha256": "8640b0679fac4f8aee3057d42ccaa37cefc115f18c94a84ddf40b7cb3512414f",
-      "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
-    },
-    {
-      "path": "evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json",
-      "sha256": "6fbe4ab1bb0bbc07dae70094a32b463a5c2661268c2b7efd6e7ebea5ee8c5789",
       "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
     },
     {
@@ -365,11 +355,6 @@
       "path": "evidence/receipts/current-session-observation-20260920.json",
       "sha256": "27de468d860eaa15507a4dcd1a9aaf7b0ec9ef7d71fbb2026340f3a386bcdfee",
       "reason": "The exact unit reports sanitization, fixture scope, inventory, schema behavior or dated observations. Selected names identify the measured inputs and do not declare a NAS winner."
-    },
-    {
-      "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json",
-      "sha256": "6fbe4ab1bb0bbc07dae70094a32b463a5c2661268c2b7efd6e7ebea5ee8c5789",
-      "reason": "The matched text is a schema identifier, local placeholder, file/link spelling or source-home variable. It names no chosen NAS candidate and must remain functional."
     },
     {
       "path": "evidence/receipts/native-cli-gaps.json",
@@ -1795,6 +1780,126 @@
       "path": "docs/token-efficiency-stack.md",
       "sha256": "8f5ff63832888b0963b2b7a61780721eb7e08ce58a9c969618563f34ef0b2210",
       "reason": "Cross-host reproduction procedure, native sign-in isolation and measured compression limitations; no selection outcome."
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/receipt.json",
+      "sha256": "0df15aa342f780cf1297c9e43a56e2d49ef42f6961a55b58e75a5f24b333df87",
+      "reason": "PBO synthetic trial selection and exact expected statistics, not a selected NAS component or runtime."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "4aa8cfd5a542b295cbd18e7d6fb5a680771a099052bf406a57752ef5e7eae4f3",
+      "reason": "AGPL license review and unspecified provider/network deployment profile; names no chosen NAS candidate."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "783cde7f3d18367afb2e69dac234655a7ab11ffc1cf061d3bc027d9e6382b4f6",
+      "reason": "Apache license review and unspecified provider/network deployment profile; names no chosen NAS candidate."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "d19c6899384394abfdb96f200a55a8d20f5924ee8970662cfc9c2c8d079bd4c4",
+      "reason": "MIT license review and unspecified provider/network deployment profile; names no chosen NAS candidate."
+    },
+    {
+      "path": "catalogs/landscape/native-practice.json",
+      "sha256": "acc18fd0e2af8f5523f3bb12f8323c85062f72ed13596f4de381dc55e50764b0",
+      "reason": "The selected native-agent-stack worktree is an execution input, not a candidate selection; preserves the unchanged-script check and no-install boundary."
+    },
+    {
+      "path": "docs/candidate-quality-review-20260921.md",
+      "sha256": "c6a0fabdac9377e209548777fd48476bfd2cfce0f26a8a2e2cafcd5527743d9f",
+      "reason": "Generic evaluation questions about task capability and deployment profile, without naming a selected candidate."
+    },
+    {
+      "path": "evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json",
+      "sha256": "e84144043abb0ec830ce0e73904c529d56289c82170199b220ad085219a2f3c6",
+      "reason": "Post-mask pin and inventory provenance only: the live-selection assertion is removed; selected_version is a source schema locator, with source revisions and historical endpoint scope retained."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "08bed34598881474b5eaa2d7dde8ce11dc88c89ad46193e491f1e1451deaf346",
+      "reason": "Amendment rule definition explaining when an unspecified interim may exist; does not assign a candidate to a layer."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "3a0688afbaf9c24093ed844d2c0ed8c768b24035fe83c5b5ccdffe41bbf03bf4",
+      "reason": "Aggregate batch counts, date and no-comparison/no-host-change boundary; names no selected candidate."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "6c5e09b7bdb8b6fef954844a0d6bfb271b1adf2ceb736b8cbd2e21d0536a2829",
+      "reason": "General decision and amendment procedure, with no candidate identity assigned by the rule."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "2b9cee13d8ca66014ae664cf154d70b0584df7193885a74f0b9c96816ff745e2",
+      "reason": "The selected release/source pins are unspecified source-review inputs; the commands are explicitly unrun and no candidate is named."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "705a0a193f1a1f2715b1acca1cdbfa3ca1c8e6f70679b6c018b6830e030fdc06",
+      "reason": "A generic section heading naming the amendment category, not a selected candidate."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "c7a894daab5785df9b004efa42ffdbf3c0be734aabeeb6498d776530d82965ef",
+      "reason": "Batch provenance and explicit UNRUN boundary; no candidate identity or winner assignment in this unit."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "15924b2acfb867220abff898be5cc288b3621434eb9abe8b29eb0edae5d10296",
+      "reason": "Native cross-family review procedure, unchanged client account boundaries and unqualified gates; selected built-ins describes an allowed tool set, not a NAS candidate winner."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "9e1c81da8a380ad6fc1289e099e8981c9f2cbe75b025727ae8a8e66f23f9480d",
+      "reason": "Dated installation-plan execution counts and unrun batch inventory, without assigning candidate identities to the interim slot names; preserves historical execution and explicit unrun limits."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "9eeb138d93172eb2add630973fd4337fb1f3cc81f962a6289ab0a8dfed6b2ce2",
+      "reason": "A placeholder for operator-provided notification destination and custody rules; no provider or candidate is chosen."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "sha256": "95305d080c5c96c727ac81d18afeade03a58571e1367ceddf07d160a6b70cac0",
+      "reason": "Shell dispatcher, apt package metadata selection, service-port allocation and a generic acknowledgement guard; selected allocation is a variable, not a chosen NAS candidate."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "3a0688afbaf9c24093ed844d2c0ed8c768b24035fe83c5b5ccdffe41bbf03bf4",
+      "reason": "Aggregate batch counts and no-host-change boundary, with no selected candidate identity."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "3a3edf263362224bd876ca27bc8c77cf8737ea74eb37c2849c0972715fa6b6d6",
+      "reason": "An abstract interim amendment rule, not a candidate assignment; no installed tool name appears in the rule."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "d4a2cbfd873ccc055b6abbcd8bbb99c1f1600f2df0dba75e9764d12235160a8e",
+      "reason": "No-install rule and its abstract interim exception, without a candidate identity."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-observation.json",
+      "sha256": "b9d081e7bf87f64120e0f53597b2ed641f3678dd22c4e731546ee99886d40a6e",
+      "reason": "Selected non-conversation inputs are the source-review input set, not a NAS candidate; returned readiness output is explicitly missing."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "sha256": "7f2edcefe6447f3f3afb7df710f93142eeb2e94ad33e031476ff1c34f8c0d590",
+      "reason": "Dated pre-merge currency metadata and the unclosed D04 acceptance gate; selected status does not identify a candidate winner."
+    },
+    {
+      "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json",
+      "sha256": "e84144043abb0ec830ce0e73904c529d56289c82170199b220ad085219a2f3c6",
+      "reason": "Post-mask version and inventory provenance; original selection-mirror assertion is gone, while selected_version remains a schema locator and the older endpoint is expressly historical."
+    },
+    {
+      "path": "recipes/claude-codex-foreground-review.md",
+      "sha256": "443e635b956f0ca2ae8372518fabeb469bb98f10307190e3619c0753e6b4b83c",
+      "reason": "The selected branch/base is a review input; preserves native companion procedure and worktree isolation without asserting a candidate comparison winner."
     }
   ]
 }

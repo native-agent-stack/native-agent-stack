@@ -24,7 +24,12 @@ CHOICE = re.compile(
     r"\bselection\s+(?:remains?|of\s+record\b|moves?|stays?)\b|"
     r"\bselected\s+(?:(?-i:[A-Z][\w-]*)|source\s+remains?\b)|"
     r"\(\s*selected\b|\bfor\s+this\s+selection\b|"
-    r"\bits\s+interim\b[^.!?\n]{0,120}\badds?\b",
+    r"\bits\s+interim\b[^.!?\n]{0,120}\badds?\b|"
+    r"\bmemory\s+of\s+record\b|\binterim\s+installs?\b|"
+    r"\b(?:retain|keep)\s+(?:(?-i:[A-Z][\w./-]*)|[a-z][\w.]*[-/][\w./-]+)"
+    r"(?:\s+v?[\d.]+)?\s+as\s+the\b|"
+    r"\bthe\s+selected\s+(?:(?-i:[A-Z][\w./-]*)|[a-z][\w.]*[-/][\w./-]+)\b|"
+    r"\bcurrent\s+host\s+uses\b",
     re.I)
 
 
@@ -53,6 +58,9 @@ def units(text: str):
     except ValueError:
         document = None
     if isinstance(document, dict):
+        if (document.get("default") and ("layer_id" in document or "slot_id" in document)
+                or document.get("decision") == "keep"):
+            yield "selection of record: " + json.dumps(document, ensure_ascii=False, sort_keys=True)
         for name, value in document.items():
             yield name
             if isinstance(value, str):

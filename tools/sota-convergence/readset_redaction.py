@@ -114,6 +114,8 @@ def redact_text(text, relative, pointer, stripped, key, labels, spans):
         stripped.append({"path": f"{relative}{pointer}/@text/{start}",
                          "old_sha256": hmac_sha256_of(value, key)})
         left, right = text[:start], text[end:]
+        if not right or right.startswith(("\n", ",", ".", ";", ":")):
+            left = left.rstrip(" \t")
         if not left or left.endswith("\n"):
             right = right.lstrip(" \t")
         if left.endswith((" ", "\t")) and right.startswith((" ", "\t")):

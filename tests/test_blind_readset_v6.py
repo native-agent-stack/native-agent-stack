@@ -1,5 +1,7 @@
 """Table integrity, preservation and independent cue regressions for v6."""
 from pathlib import Path
+import json
+import re
 import shutil
 import tempfile
 import unittest
@@ -164,6 +166,120 @@ class SelectionCueTests(unittest.TestCase):
             with self.subTest(cue=positive):
                 self.assertIsNotNone(audit.CHOICE.search(positive))
                 self.assertIsNone(audit.CHOICE.search(negative))
+
+
+class V7SelectionBoundaryTests(unittest.TestCase):
+    def test_memory_and_interim_forms_distinguish_records_from_data(self):
+        cases = [
+            ("Cedar is the memory of record.", "The memory of records is 18 bytes."),
+            ("Retain ai-memory 2.3.2 as the shared store.", "Retain five rows as the sample."),
+            ("The interim install uses Cedar.", "The interim installation time was 4 ms."),
+            ("The interim installs both arms.", "Interim installment counts are measured."),
+            ("It overlaps the selected `dagu-org/dagu`.", "The selected source files hold 18 rows."),
+            ("The current host uses ai-memory.", "The current host measures 18 samples."),
+        ]
+        for positive, negative in cases:
+            with self.subTest(cue=positive):
+                plain = re.sub(r"[`*]", "", positive)
+                self.assertIsNotNone(audit.CHOICE.search(plain))
+                self.assertIsNone(audit.CHOICE.search(negative))
+
+    def test_key_borne_slot_decisions_are_audited_without_matching_ui_defaults(self):
+        selected = {"layer_id": "native-clients", "default": "Cedar",
+                    "definitive": True, "state": "definitive",
+                    "resolution": {"outcome": "final", "by": "both families"}}
+        data = {"ui": {"default": "Cedar"}, "measurement": {"returned": True}}
+        self.assertTrue(any(audit.CHOICE.search(unit) for unit in audit.units(json.dumps(selected))))
+        self.assertFalse(any(audit.CHOICE.search(unit) for unit in audit.units(json.dumps(data))))
+
+    def test_cited_memory_records_keep_measurements_but_not_selection(self):
+        cases = [
+            ("evidence/artifacts/memory-rag-lifecycle-20260921/native-client.json",
+             "memory of record", "384-dimensional"),
+            ("docs/dashboard-rendered-acceptance.md", "memory of record", "Zero Serena memories"),
+            ("docs/memory-landscape-maintenance.md", "the current host uses", "vLLM 0.30.0"),
+            ("docs/token-practice.md", "durable decisions with scoped ai-memory", "2,731"),
+            ("evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+             "the selected `dagu-org/dagu`", "nine retained runs"),
+        ]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for relative, _, _ in cases:
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
+            blind.strip_worktree(root, b"k" * 32)
+            for relative, cue, measured in cases:
+                with self.subTest(path=relative):
+                    text = (root / relative).read_text()
+                    self.assertFalse(cue in text, (relative, cue))
+                    self.assertIn(measured, text)
+
+    def test_slot_fields_are_withheld_but_measurements_and_sources_survive(self):
+        relative = ("evidence/artifacts/new-wsl-definitive-defaults-20261001/"
+                    "definitive-manifest.json")
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / relative
+            target.parent.mkdir(parents=True)
+            shutil.copyfile(ROOT / relative, target)
+            original = json.loads(target.read_text())
+            blind.strip_worktree(root, b"k" * 32)
+            masked = json.loads(target.read_text())
+            for before, after in zip(original["slots"], masked["slots"], strict=True):
+                with self.subTest(slot=before["slot_id"]):
+                    for field in ("default", "definitive", "state"):
+                        self.assertFalse(field in after, (before["slot_id"], field))
+                    self.assertEqual(after["measurement"], before["measurement"])
+                    self.assertEqual(after["repository"], before["repository"])
+            self.assertFalse("interim install on the owner's decisions" in target.read_text().lower())
+
+    def test_each_pin_note_is_audited_when_restored_and_keeps_inventory_when_masked(self):
+        paths = [
+            "evidence/receipts/edgartools-5600-pin-move-20261004.json",
+            "evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json",
+        ]
+        digest = "6fbe4ab1bb0bbc07dae70094a32b463a5c2661268c2b7efd6e7ebea5ee8c5789"
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for relative in paths:
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
+            blind.strip_worktree(root, b"k" * 32)
+            for relative in paths:
+                with self.subTest(path=relative):
+                    target = root / relative
+                    view = target.read_text()
+                    self.assertFalse("are live selection mirrors" in view)
+                    for retained in ("5.60.0", "95cf94ca4", "29da752f5",
+                                     "saturation-audit.json:3209", "upstream-snapshot.json:3524"):
+                        self.assertIn(retained, view)
+                    original = json.loads((ROOT / relative).read_text())
+                    note = next(value for value in original.values() if isinstance(value, str)
+                                and "five sites previously" in value)
+                    target.write_text(json.dumps({"restored": note}))
+                    findings = audit.audit_readset(root, [relative])["findings"]
+                    self.assertIn(digest, [finding["sha256"] for finding in findings])
+                    target.write_text(view)
+
+    def test_new_masks_leave_no_trailing_comma_or_lost_noun_artifacts(self):
+        paths = ["docs/github-automation.md",
+                 "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json"]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for relative in paths:
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
+            blind.strip_worktree(root, b"k" * 32)
+            markdown = (root / paths[0]).read_text()
+            original = (ROOT / paths[0]).read_text()
+            self.assertEqual(sum(line.endswith(" ") for line in markdown.splitlines()),
+                             sum(line.endswith(" ") for line in original.splitlines()))
+            text = (root / paths[1]).read_text()
+            self.assertNotIn("dagu-org/dagu ,", text)
+            self.assertNotIn("Omitting a from", text)
 
 
 if __name__ == "__main__":
