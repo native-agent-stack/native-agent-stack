@@ -1,0 +1,12 @@
+[Unit]
+Description=Native engine delay sidecar: the live E4 delay log as node exporter textfile metrics (read-only, idle class)
+Documentation=file:%h/.local/share/native-agent-stack/host-observers/README.md
+# Inverse: systemctl --user disable --now native-engine-delay-prom.timer; remove this file and the timer; remove engine-delay.prom from the textfile directory.
+# Reads only the tail of the newest engine-delay-*.csv in --dir; writes one file by rename.
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -I %h/.local/share/native-agent-stack/host-observers/engine_delay_prom.py --dir %h/.local/state/native-agent-stack/host-observers --out %h/.config/native-agent-stack/monitoring/textfile/engine-delay.prom --window 300
+Nice=19
+CPUWeight=idle
+TimeoutStartSec=20

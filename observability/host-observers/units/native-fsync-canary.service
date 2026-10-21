@@ -1,0 +1,13 @@
+[Unit]
+Description=Native fsync canary: one short sync-latency probe of the root disk, written as a node exporter textfile (idle class)
+Documentation=file:%h/.local/share/native-agent-stack/host-observers/README.md
+# Inverse: systemctl --user disable --now native-fsync-canary.timer; remove this file and the timer; remove fsync-canary.prom from the textfile directory.
+# Command center ruling 3, 2026-10-14: at most one probe a minute, because every probe adds synchronous writes to the saturated flush path.
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -I %h/.local/share/native-agent-stack/host-observers/fsync_canary.py /var/tmp %h/.config/native-agent-stack/monitoring/textfile/fsync-canary.prom --seconds 3 --rate 10 --label /var/tmp
+Nice=19
+CPUWeight=idle
+IOSchedulingClass=idle
+TimeoutStartSec=30
