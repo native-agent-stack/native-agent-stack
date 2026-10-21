@@ -19487,6 +19487,11 @@
       "bytes": 30434
     },
     {
+      "path": "docs/decisions/2026-10-17-maintenance-consolidation-cycle.md",
+      "sha256": "8966dd47992b69837577f179cf50db21aac19559b63b711780c97d8dda31fa66",
+      "bytes": 28293
+    },
+    {
       "path": "docs/decisions/2026-10-17-zero-tolerance-currency.md",
       "sha256": "00eb7228052fb3b1afeb1e92b81e2108412d4f74f544aab042dda14a7c1eee1c",
       "bytes": 18602
@@ -64525,6 +64530,11 @@
       "path": "tests/test_component_matrix.py",
       "sha256": "31e1c3314133e06751107d66c1ce401d9c3cad70e1048fd5e0174ee700ab845f",
       "bytes": 84996
+    },
+    {
+      "path": "tests/test_consolidation_cycle_record.py",
+      "sha256": "be59c54d7e753b85747514cc4162ac2e4c5e7b8ec704718e24de16c0e1efa11d",
+      "bytes": 9204
     },
     {
       "path": "tests/test_context_mode_practice_docs.py",
