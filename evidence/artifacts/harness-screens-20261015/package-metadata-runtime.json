@@ -1,0 +1,253 @@
+{
+  "evidence_class": "source_review",
+  "measurement": false,
+  "scope": "Public package metadata only; no artifacts downloaded, installed, imported or executed. Universal-wheel compatibility is source evidence, not a transitive-dependency smoke.",
+  "packages": [
+    {
+      "registry": "pypi",
+      "package": "openhands-sdk",
+      "version": "1.55.0",
+      "url": "https://pypi.org/pypi/openhands-sdk/1.55.0/json",
+      "read_at": "2026-10-15T21:04:53.793493+00:00",
+      "response_sha256": "aec68788e1fd25a064bbd2b32e0b15a9402888d32f50669a265ca4e8e7a4fd23",
+      "requires_python": ">=3.12",
+      "wheels": [
+        "openhands_sdk-1.55.0-py3-none-any.whl"
+      ],
+      "classifiers": []
+    },
+    {
+      "registry": "pypi",
+      "package": "claude-agent-sdk",
+      "version": "0.2.167",
+      "url": "https://pypi.org/pypi/claude-agent-sdk/0.2.167/json",
+      "read_at": "2026-10-15T21:04:53.746283+00:00",
+      "response_sha256": "4f41982ce6b093b248fd4bda4f962198ac2474898ba1a3b9ce07902dc31d26e6",
+      "requires_python": ">=3.10",
+      "wheels": [
+        "claude_agent_sdk-0.2.167-py3-none-macosx_11_0_arm64.whl",
+        "claude_agent_sdk-0.2.167-py3-none-macosx_11_0_x86_64.whl",
+        "claude_agent_sdk-0.2.167-py3-none-manylinux_2_17_aarch64.whl",
+        "claude_agent_sdk-0.2.167-py3-none-manylinux_2_17_x86_64.whl",
+        "claude_agent_sdk-0.2.167-py3-none-win_amd64.whl"
+      ],
+      "classifiers": []
+    },
+    {
+      "registry": "pypi",
+      "package": "openai-agents",
+      "version": "0.24.0",
+      "url": "https://pypi.org/pypi/openai-agents/0.24.0/json",
+      "read_at": "2026-10-15T21:04:53.806011+00:00",
+      "response_sha256": "6dd21b93b6ca62492f8b7b502dd72282b068c65d6cae640512a12bdf9bfb58fa",
+      "requires_python": ">=3.10",
+      "wheels": [
+        "openai_agents-0.24.0-py3-none-any.whl"
+      ],
+      "classifiers": [
+        "Operating System :: OS Independent"
+      ]
+    },
+    {
+      "registry": "pypi",
+      "package": "langgraph",
+      "version": "1.2.15",
+      "url": "https://pypi.org/pypi/langgraph/1.2.15/json",
+      "read_at": "2026-10-15T21:04:53.778668+00:00",
+      "response_sha256": "23702b461f71333917fd3018097f4ee0b036d7eeafbe2b09584dca144490a67a",
+      "requires_python": ">=3.10",
+      "wheels": [
+        "langgraph-1.2.15-py3-none-any.whl"
+      ],
+      "classifiers": []
+    },
+    {
+      "registry": "pypi",
+      "package": "strands-harness",
+      "version": "0.3.1",
+      "url": "https://pypi.org/pypi/strands-harness/0.3.1/json",
+      "read_at": "2026-10-15T21:04:53.851022+00:00",
+      "response_sha256": "9a298cdedfd0c9310a31f9c995f16925cf1e2df675279f233c337ecca6d124c6",
+      "requires_python": ">=3.10",
+      "wheels": [
+        "strands_harness-0.3.1-py3-none-any.whl"
+      ],
+      "classifiers": [
+        "Operating System :: OS Independent"
+      ]
+    },
+    {
+      "registry": "pypi",
+      "package": "typesafe-sdk",
+      "version": "0.7.5",
+      "url": "https://pypi.org/pypi/typesafe-sdk/0.7.5/json",
+      "read_at": "2026-10-15T21:04:53.779348+00:00",
+      "response_sha256": "72f74d874ca910fb0098b633f4547ed4e36b467747257eaf5508a61b4fd549de",
+      "requires_python": ">=3.10",
+      "wheels": [
+        "typesafe_sdk-0.7.5-py3-none-any.whl"
+      ],
+      "classifiers": [
+        "Operating System :: MacOS",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: OS Independent",
+        "Operating System :: POSIX",
+        "Operating System :: POSIX :: Linux"
+      ]
+    },
+    {
+      "registry": "pypi",
+      "package": "agent-framework",
+      "version": "1.22.0",
+      "url": "https://pypi.org/pypi/agent-framework/1.22.0/json",
+      "read_at": "2026-10-15T21:04:53.835011+00:00",
+      "response_sha256": "210da9d1cf834d17bd47993c8e97e33d70b869a843946673a982c425e6ef3079",
+      "requires_python": ">=3.10",
+      "wheels": [
+        "agent_framework-1.22.0-py3-none-any.whl"
+      ],
+      "classifiers": []
+    },
+    {
+      "registry": "pypi",
+      "package": "deepagents",
+      "version": "0.7.26",
+      "url": "https://pypi.org/pypi/deepagents/0.7.26/json",
+      "read_at": "2026-10-15T21:04:53.860864+00:00",
+      "response_sha256": "b6f37cb3f87333e424b109dedbb10ae330e5baf47f43e59c18d5a9ef185b0fe2",
+      "requires_python": "<4.0,>=3.11",
+      "wheels": [
+        "deepagents-0.7.26-py3-none-any.whl"
+      ],
+      "classifiers": []
+    },
+    {
+      "registry": "pypi",
+      "package": "openai-codex",
+      "version": "0.162.1",
+      "url": "https://pypi.org/pypi/openai-codex/0.162.1/json",
+      "read_at": "2026-10-15T21:04:53.948060+00:00",
+      "response_sha256": "aa5a5d1caf74fa6d2ef6e366840adafca28d9ce4e9394e904835782e0528a35d",
+      "requires_python": ">=3.10",
+      "wheels": [
+        "openai_codex-0.162.1-py3-none-any.whl"
+      ],
+      "classifiers": []
+    },
+    {
+      "registry": "npm",
+      "package": "@kilocode/cli",
+      "version": "7.8.12",
+      "url": "https://registry.npmjs.org/%40kilocode%2Fcli/7.8.12",
+      "read_at": "2026-10-15T21:06:56.882656+00:00",
+      "response_sha256": "ceabc7ddfeff9e2db96ebaaf19d252168bcacce87a5c6b917f04971a0a368128",
+      "os": [
+        "darwin",
+        "linux",
+        "win32"
+      ],
+      "cpu": [
+        "arm64",
+        "x64"
+      ],
+      "optional_dependencies": {
+        "@kilocode/cli-linux-x64": "7.8.12",
+        "@kilocode/cli-darwin-x64": "7.8.12",
+        "@kilocode/cli-linux-arm64": "7.8.12",
+        "@kilocode/cli-windows-x64": "7.8.12",
+        "@kilocode/cli-darwin-arm64": "7.8.12",
+        "@kilocode/cli-windows-arm64": "7.8.12",
+        "@kilocode/cli-linux-x64-musl": "7.8.12",
+        "@kilocode/cli-linux-arm64-musl": "7.8.12",
+        "@kilocode/cli-linux-x64-baseline": "7.8.12",
+        "@kilocode/cli-darwin-x64-baseline": "7.8.12",
+        "@kilocode/cli-windows-x64-baseline": "7.8.12",
+        "@kilocode/cli-linux-x64-baseline-musl": "7.8.12"
+      },
+      "engines": null,
+      "git_head": null,
+      "tarball_integrity": "sha512-QA/OspZWFHVJjGrDnO2FklII0NKgmhumsdg3UKH2oWWCwdgJQNQkKFfi7eeKqgOZk1mcG/B/sUzRmBql+ixFOQ==",
+      "retrieval_note": "Initial request received HTTP 406 with a GitHub-specific Accept header; corrected to application/json. No package-absence finding was inferred."
+    },
+    {
+      "registry": "npm",
+      "package": "@qwen-code/qwen-code",
+      "version": "0.25.2",
+      "url": "https://registry.npmjs.org/%40qwen-code%2Fqwen-code/0.25.2",
+      "read_at": "2026-10-15T21:06:56.896742+00:00",
+      "response_sha256": "eabb695825942e338c612339119993315d2ad1fb92666b7ae8b799664fc0e46c",
+      "os": null,
+      "cpu": null,
+      "optional_dependencies": {
+        "sharp": "0.35.4",
+        "@lydell/node-pty": "1.2.0-beta.10",
+        "@teddyzhu/clipboard": "0.0.5",
+        "@qwen-code/audio-capture": "0.25.2",
+        "@lydell/node-pty-linux-x64": "1.2.0-beta.10",
+        "@lydell/node-pty-win32-x64": "1.2.0-beta.10",
+        "@lydell/node-pty-darwin-x64": "1.2.0-beta.10",
+        "@lydell/node-pty-linux-arm64": "1.2.0-beta.10",
+        "@lydell/node-pty-win32-arm64": "1.2.0-beta.10",
+        "@lydell/node-pty-darwin-arm64": "1.2.0-beta.10",
+        "@teddyzhu/clipboard-darwin-x64": "0.0.5",
+        "@teddyzhu/clipboard-darwin-arm64": "0.0.5",
+        "@teddyzhu/clipboard-linux-x64-gnu": "0.0.5",
+        "@teddyzhu/clipboard-win32-x64-msvc": "0.0.5",
+        "@teddyzhu/clipboard-linux-arm64-gnu": "0.0.5",
+        "@teddyzhu/clipboard-win32-arm64-msvc": "0.0.5"
+      },
+      "engines": {
+        "node": ">=22.0.0"
+      },
+      "git_head": null,
+      "tarball_integrity": "sha512-Why8rpC3RY20L07sqwsFph/BMjzCDxF0HMmqyIl4mfhCVLCHWnD/swVIwSN/iUugqEWnm2G5Zrl+qwndprN9kQ==",
+      "retrieval_note": "Initial request received HTTP 406 with a GitHub-specific Accept header; corrected to application/json. No package-absence finding was inferred."
+    },
+    {
+      "registry": "npm",
+      "package": "cline",
+      "version": "3.0.71",
+      "url": "https://registry.npmjs.org/cline/3.0.71",
+      "read_at": "2026-10-15T21:06:56.887307+00:00",
+      "response_sha256": "3a3a704c43996e749d39001d6bd45630b828e8b5ebee692569a567e2ebe3f2ad",
+      "os": null,
+      "cpu": null,
+      "optional_dependencies": {
+        "@cline/cli-linux-x64": "3.0.71",
+        "@cline/cli-darwin-x64": "3.0.71",
+        "@cline/cli-linux-arm64": "3.0.71",
+        "@cline/cli-windows-x64": "3.0.71",
+        "@cline/cli-darwin-arm64": "3.0.71",
+        "@cline/cli-windows-arm64": "3.0.71"
+      },
+      "engines": null,
+      "git_head": null,
+      "tarball_integrity": "sha512-THSCuQrVPi5w48tyXaZrdUr4EnPQMMgsQN0moYxODl0LJveOeRytMyHx+WfzCY5NdPi1TzjDozFGn0uNVbK/fg==",
+      "retrieval_note": "Initial request received HTTP 406 with a GitHub-specific Accept header; corrected to application/json. No package-absence finding was inferred."
+    },
+    {
+      "registry": "npm",
+      "package": "@github/copilot",
+      "version": "1.0.98",
+      "url": "https://registry.npmjs.org/%40github%2Fcopilot/1.0.98",
+      "read_at": "2026-10-15T21:06:56.891832+00:00",
+      "response_sha256": "cf7b8bb61f86be03d3546371ae0f6224c9a3c69084339b5984a5e80e387d375a",
+      "os": null,
+      "cpu": null,
+      "optional_dependencies": {
+        "@github/copilot-linux-x64": "1.0.98",
+        "@github/copilot-win32-x64": "1.0.98",
+        "@github/copilot-darwin-x64": "1.0.98",
+        "@github/copilot-linux-arm64": "1.0.98",
+        "@github/copilot-win32-arm64": "1.0.98",
+        "@github/copilot-darwin-arm64": "1.0.98",
+        "@github/copilot-linuxmusl-x64": "1.0.98",
+        "@github/copilot-linuxmusl-arm64": "1.0.98"
+      },
+      "engines": null,
+      "git_head": null,
+      "tarball_integrity": "sha512-zpXwyI8hLUM/0r9DqSRqxemRBIewLrUzTH+5sQXVH7/VKUaC4SbtbG0YHj1gpjH4YDZOvHZAl9taFQa9Kwl+Pg==",
+      "retrieval_note": "Initial request received HTTP 406 with a GitHub-specific Accept header; corrected to application/json. No package-absence finding was inferred."
+    }
+  ]
+}

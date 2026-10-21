@@ -1,0 +1,151 @@
+{
+  "evidence_class": "source_review",
+  "measurement": false,
+  "releases": [
+    {
+      "candidate": "anomalyco/opencode",
+      "tag": "v1.19.1",
+      "commit": "4a929747483f9e19b05c7cf944fc0aca6e5111b0",
+      "url": "https://api.github.com/repos/anomalyco/opencode/releases/tags/v1.19.1",
+      "read_at": "2026-10-15T21:04:10.333392+00:00",
+      "response_sha256": "5f289894d62494cd70c18599b7a40c65db856f613b9150e0243bd75f2bc8e0ec",
+      "release_id": 414161505,
+      "selected_platform_assets": [
+        "opencode-darwin-arm64.zip",
+        "opencode-desktop-linux-amd64.deb",
+        "opencode-desktop-linux-x86_64.AppImage",
+        "opencode-desktop-linux-x86_64.rpm",
+        "opencode-linux-x64-baseline-musl.tar.gz",
+        "opencode-linux-x64-baseline.tar.gz",
+        "opencode-linux-x64-musl.tar.gz",
+        "opencode-linux-x64.tar.gz"
+      ],
+      "total_assets": 37,
+      "finding": "public asset identity only; no download, installation or platform execution"
+    },
+    {
+      "candidate": "aaif-goose/goose",
+      "tag": "v1.54.0",
+      "commit": "cd643d2126fffab4c6a6186905211ba868d6a657",
+      "url": "https://api.github.com/repos/aaif-goose/goose/releases/tags/v1.54.0",
+      "read_at": "2026-10-15T21:04:10.335033+00:00",
+      "response_sha256": "e9cd7d4ad458b1d31f85930addd9989c1c36efdab7192fba8006f3e751be7557",
+      "release_id": 407155143,
+      "selected_platform_assets": [
+        "goose-aarch64-apple-darwin.tar.bz2",
+        "goose-aarch64-apple-darwin.tar.gz",
+        "Goose-darwin-arm64.zip",
+        "goose-x86_64-unknown-linux-gnu-vulkan.tar.bz2",
+        "goose-x86_64-unknown-linux-gnu-vulkan.tar.gz",
+        "goose-x86_64-unknown-linux-gnu.tar.bz2",
+        "goose-x86_64-unknown-linux-gnu.tar.gz",
+        "goose-x86_64-unknown-linux-musl.tar.bz2",
+        "goose-x86_64-unknown-linux-musl.tar.gz"
+      ],
+      "total_assets": 40,
+      "finding": "public asset identity only; no download, installation or platform execution"
+    },
+    {
+      "candidate": "1jehuang/jcode",
+      "tag": "v0.98.1",
+      "commit": "1c7426eb1925a1167eb56011fa479ad707cc28b6",
+      "url": "https://api.github.com/repos/1jehuang/jcode/releases/tags/v0.98.1",
+      "read_at": "2026-10-15T21:04:10.276474+00:00",
+      "response_sha256": "e4f265ecc1e69181e8fce4ca695a366e05c833098fa447e6f0ff2033a9c62827",
+      "release_id": 413240485,
+      "selected_platform_assets": [
+        "jcode-linux-x86_64.tar.gz",
+        "jcode-macos-aarch64.tar.gz"
+      ],
+      "total_assets": 11,
+      "finding": "public asset identity only; no download, installation or platform execution"
+    },
+    {
+      "candidate": "max-sixty/worktrunk",
+      "tag": "v0.80.0",
+      "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "url": "https://api.github.com/repos/max-sixty/worktrunk/releases/tags/v0.80.0",
+      "read_at": "2026-10-15T21:04:10.289654+00:00",
+      "response_sha256": "516b917afe203c2aae80a2971e3f702e35deeecc5b20fa6e055781b90dc3d0b4",
+      "release_id": 397816806,
+      "selected_platform_assets": [
+        "worktrunk-aarch64-apple-darwin.tar.xz",
+        "worktrunk-aarch64-apple-darwin.tar.xz.sha256",
+        "worktrunk-x86_64-unknown-linux-musl.tar.xz",
+        "worktrunk-x86_64-unknown-linux-musl.tar.xz.sha256"
+      ],
+      "total_assets": 18,
+      "finding": "public asset identity only; no download, installation or platform execution"
+    },
+    {
+      "candidate": "gastownhall/beads",
+      "tag": "v1.3.1",
+      "commit": "c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c",
+      "url": "https://api.github.com/repos/gastownhall/beads/releases/tags/v1.3.1",
+      "read_at": "2026-10-15T21:04:10.285783+00:00",
+      "response_sha256": "0348838d5abc21b4062cfc850a79ce406c9a60d57d4624fcc04d77ef702b6c1d",
+      "release_id": 400512291,
+      "selected_platform_assets": [
+        "beads_1.3.1_darwin_arm64.tar.gz",
+        "beads_1.3.1_linux_amd64.tar.gz"
+      ],
+      "total_assets": 11,
+      "finding": "public asset identity only; no download, installation or platform execution"
+    },
+    {
+      "candidate": "can1357/oh-my-pi",
+      "tag": "v18.11.1",
+      "commit": "7cc912940b107eb2d771b0d106c640a8eddc9edf",
+      "url": "https://api.github.com/repos/can1357/oh-my-pi/releases/tags/v18.11.1",
+      "read_at": "2026-10-15T21:04:10.498548+00:00",
+      "response_sha256": "fafc281b207e5aa66261538ca568d5c64bca435df9dfb1a601181f91c5b8caa6",
+      "release_id": 413945676,
+      "selected_platform_assets": [
+        "omp-darwin-arm64",
+        "omp-linux-musl-x64",
+        "omp-linux-x64"
+      ],
+      "total_assets": 12,
+      "finding": "public asset identity only; no download, installation or platform execution"
+    },
+    {
+      "candidate": "kilo-org/kilocode",
+      "tag": "jetbrains/v7.1.10",
+      "commit": "807d2e263759cee44315275f0cf40e6e129886b4",
+      "url": "https://api.github.com/repos/kilo-org/kilocode/releases/tags/jetbrains/v7.1.10",
+      "read_at": "2026-10-15T21:04:10.452983+00:00",
+      "response_sha256": "0ca3e0893dd7e2bc5c95975a3fb9e9cacf4043e6c99b80a3532388e19d91f5ff",
+      "release_id": 414180480,
+      "selected_platform_assets": [],
+      "total_assets": 6,
+      "finding": "public asset identity only; no download, installation or platform execution"
+    },
+    {
+      "candidate": "qwenlm/qwen-code",
+      "tag": "sdk-typescript-v0.1.20",
+      "commit": "bcc8de151cd0eb3e37ee507f5439eb091e9016df",
+      "url": "https://api.github.com/repos/qwenlm/qwen-code/releases/tags/sdk-typescript-v0.1.20",
+      "read_at": "2026-10-15T21:04:10.501536+00:00",
+      "response_sha256": "248207f7b3c4282318bfcffc7c74cbc01eea8c066370305459db6c16daa50fec",
+      "release_id": 414023479,
+      "selected_platform_assets": [],
+      "total_assets": 0,
+      "finding": "public asset identity only; no download, installation or platform execution"
+    },
+    {
+      "candidate": "openhands/openhands-cli",
+      "tag": "1.16.0",
+      "commit": "2963442dacc7cea44e39b7c4e73724295c853465",
+      "url": "https://api.github.com/repos/openhands/openhands-cli/releases/tags/1.16.0",
+      "read_at": "2026-10-15T21:04:10.547173+00:00",
+      "response_sha256": "dee8b7ac4b3c64eb6c039528607cfecb1f0088f439a90bc779ff411d5a51fef5",
+      "release_id": 319587177,
+      "selected_platform_assets": [
+        "openhands-linux-x86_64",
+        "openhands-macos-arm64"
+      ],
+      "total_assets": 4,
+      "finding": "public asset identity only; no download, installation or platform execution"
+    }
+  ]
+}

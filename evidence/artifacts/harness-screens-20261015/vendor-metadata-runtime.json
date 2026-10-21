@@ -1,0 +1,32 @@
+{
+  "evidence_class": "source_review",
+  "measurement": false,
+  "scope": "Anonymous public channel/manifest metadata only; no binary or credentials read, downloaded or executed.",
+  "reads": [
+    {
+      "url": "https://api.meta.ai/muse-code/channels/muse-stable",
+      "read_at": "2026-10-15T21:09:15.640225+00:00",
+      "response_sha256": "4fa068b6470631c8617877709de886fd8e63e75d47158f464320e50a7997d1d0",
+      "version": "1.4.9-R6297.1",
+      "channel": "muse-stable",
+      "state": "public"
+    },
+    {
+      "url": "https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=1.4.9-R6297.1&file=manifest.json",
+      "read_at": "2026-10-15T21:09:15.805291+00:00",
+      "response_sha256": "4be6f4d958172cdf425ab3c44c41b650547806931c5de9eaa87f9637ae7511cb",
+      "version": "1.4.9-R6297.1",
+      "artifact_platforms": [
+        "x86_macos",
+        "aarch64_macos",
+        "x86_linux",
+        "aarch64_linux",
+        "universal_macos_pkg",
+        "x86_windows",
+        "aarch64_windows"
+      ],
+      "checksum_algorithm": "sha256",
+      "msp_schema_fingerprint": "sha256:5d3b43e5ccdb7dc4f5a32c380f5f2cde0f10e3059b93610afb2e73f73b1d914c"
+    }
+  ]
+}

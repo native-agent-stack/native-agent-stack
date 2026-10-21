@@ -1,0 +1,66 @@
+# Runtime-family A1 screens — 2026-10-15
+
+This record screens the frozen workers, native-clients and agent-sdks inventory against candidate-owned documentation and source. It is **source_review**, not runtime evidence. A PASS makes only the stated profile TRIAL-eligible. It does not select a default, prove endpoint/account operation, authorize activation, or satisfy the other convergence angles.
+
+The family split follows the subsequent dispatch addendum: `anthropic`, `openai`, `meta`, and `research`. Every inventory candidate appears in each family table, including an explicit **not served** disposition. A candidate outside a family's established route stays disabled. Missing route evidence alone yields INCOMPLETE; an independently established missing layer capability still yields FAIL. Neither disposition establishes abandonment. Install commands are documentation, not commands run during this review.
+
+| Layer | Anthropic PASS / FAIL / INCOMPLETE | OpenAI PASS / FAIL / INCOMPLETE | Meta PASS / FAIL / INCOMPLETE | Research PASS / FAIL / INCOMPLETE |
+| --- | --- | --- | --- | --- |
+| workers (13 inventory + 4 supplements) | 4 / 0 / 13 | 4 / 0 / 13 | 0 / 0 / 17 | 0 / 0 / 17 |
+| native-clients (21 inventory) | 3 / 1 / 17 | 2 / 1 / 18 | 0 / 1 / 20 | 0 / 1 / 20 |
+| agent-sdks (10 inventory) | 2 / 0 / 8 | 3 / 0 / 7 | 0 / 0 / 10 | 0 / 0 / 10 |
+
+These are family-row counts, not distinct-project rankings. All four FAIL entries are the same MCPorter native-client mismatch: its documented tool transport is not an autonomous model conversation client. Other incomplete rows include not-served family dispositions as well as specific source gaps. Neither this mismatch nor an incomplete screen changes another layer's disposition.
+
+## Files and coverage
+
+Each layer has `<layer>.<family>.json` (array of complete screen rows) and the corresponding Markdown table. Shared pinned identity/maintenance facts are in `candidate-facts-runtime.json`; static text calculations are in `context-counts-runtime.json`. Each row references the shared facts and also retains direct citations, so its JSON copy remains useful without an external index. `platform-assets-runtime.json`, `package-metadata-runtime.json` and `vendor-metadata-runtime.json` bind subsequent public metadata reads and response digests. Every candidate has explicit platform, headless, model/effort, isolation, scoping, role, inverse, conflict and startup-cost fields.
+
+The frozen inventory contains 13 workers, 21 native-clients and 10 agent-sdks rows. The workers tables additionally identify Pi, OpenCode, Muse Code and Jev as **supplemental_primary_named**, separate from those 13. Pi/OpenCode are named as worker backends by OpenHands at `f07aebdf5cdd71f4a05ebcf30f8bef5e4e3b70b9`, `README.md:10,37-46`; Muse's vendor docs explicitly describe CI/headless automation; TypeSafe's System One docs explicitly describe Jev's typed-decision role. These also resolve the task's explicit runtime names. Jev is a typed classifier adjunct: no autonomous coding loop or skill framework is assigned to it.
+
+Other newly encountered primary-source names are recorded as omissions/leads only, with no trial admission: the [Muse TypeScript SDK](https://dev.meta.ai/docs/muse-code#sdk), `@muse-code/sdk`, is named by the vendor overview read 2026-10-15; [Temporal's language SDKs](https://github.com/temporalio/temporal/blob/af08a5e5f2dd40f545f2afac7780daaa6987001e/README.md#L64) are distinct from the inventory's server repository. This is not a discovery sweep. The research-family definition names GPT Researcher, but it is absent from this three-layer inventory; no additional GPT Researcher trial is inferred.
+
+## Inputs and resolution
+
+Base: `origin/main` at `8053f14e7`; branch `codex/harness-screens-runtime-20261015`. The following immutable inputs were read and their SHA256 values checked:
+
+| Input | SHA256 |
+| --- | --- |
+| `inventory-8053f14e7.json` | `a95affd3270f14f737a1efa63cc4d184f5475b019c162a9e70034d4550139dc5` |
+| `gh-facts-20261015T2003Z.json` | `06ba47908d8506a777478d9331da7a2487225c555addd9519510a550fd07140c` |
+| `screens-plan-20261015T2007Z.md` | `7da92c9717f1c10df3b4a373bc76684fc07e1b3a6d5df61b607c968e9186cea0` |
+| `screens-plan-20261015T2007Z.addendum-01.md` | `742481e59cf025805926df0d91f2692e58fc615e25bc43eca6304d649d573c82` |
+
+The coordination inputs remain read-only outside the repository. Dispatch provenance, without reproducing private direction text: base direction digest `464f655d433817e25349ec7cbe335d6d4b3793b0c08a39c9a0fb2697d823b6f9`; addendum-03 `bcf3b0ae2e721778ffb49d01edb6201fc12832a253e3d8e6d569521d86b2f044`; addendum-04 `7ddd99fb5d9a50367062f854deb3b071077dc5de123b2b2a5270a4e24e01913d`; family addendum-05 `66cae758e0416f1951f065363b685aa687f3b09fc8af3968e4e7e3e5efbaa438`. Those direction digests were supplied as provenance; the private documents are not published or quoted here.
+
+Resolution inputs read at the base: `AGENTS.md`; decisions `2026-10-11-layer-resolution-protocol`, `2026-10-12-converged-candidates-only`, and `2026-10-12-angle-records-final-check`; angle schema and the three foundation angle records; `foundation.json`, `final-stack.json`, `layer-verdict-waves.json`, and the saturation ledger. All three layers are **reopened**, not FINAL. Their carried catalog verdict wave is `20260922`, latest covering retained sweep is `landscape-sweep-20260929`; the later ledger entry for another layer does not supersede it. The frozen inventory carries the unresolved winners/alternatives/survivors. The bounded delta is today's A1 capability/pin screen; no catalog, angle, verdict or ledger is edited.
+
+Five earlier flags are revisited explicitly in each applicable row: workers/OpenHands SDK and mini-SWE-agent; native-clients/Claude Code, Codex and Pi. All five documented capability screens still hold for the applicable provider profiles at the pins recorded here, after the package/platform source checks. This does not extend the old screen to other families or inherit old smokes as evidence at a new pin. A narrower earlier capability statement can remain supported even when a different family/profile is INCOMPLETE.
+
+## Source method and verdicts
+
+Maintained local mirrors listed by `~/code/upstream/MIRRORS.json` were preferred. `git show <commit>:<path>`, `git ls-tree` and bounded literal searches only read Git objects; absent mirrors were read through anonymous pinned GitHub raw/tree requests. No clone, candidate installation, candidate test, candidate CLI invocation, model request, keyed candidate API request, credential inspection or `muse_lane.sh` execution occurred. Read-only anonymous public HTTP was used for vendor documentation, package metadata and the specific maintenance recheck. Authenticated Git operations for the requested PR are publication operations, not candidate trials. The existing repository validation/receipt tools validate these artifacts, not candidate execution.
+
+A source pin is the frozen latest-release tag and resolved commit where available; otherwise it is the frozen default-branch commit. A monorepo tag may belong to a different component: package identity/version drift is stated instead of silently attributing that tag's version to every package. Vendor pages are dated 2026-10-15; rolling documentation is not an immutable binary pin. Platform PASS means an explicit source package/asset/interface supports the target architecture/userspace; it never means an actual WSL or macOS smoke ran. Unknown architecture, provider, profile or containment evidence stays UNKNOWN with a bounded next check.
+
+The hard disqualifiers are only missing required capability (including an entitlement/terms conflict) and abandonment. Licence is a dated compliance note and never changes a result. Stars were discarded. The anonymous primary endpoint [`openai/codex-plugin-cc/commits?per_page=1`](https://api.github.com/repos/openai/codex-plugin-cc/commits?per_page=1), read 2026-10-15, confirms newest default-branch commit `db52e28f4d9ded852ab3942cea316258ae4ef346` at `2026-07-08T00:17:00Z`. Its lack of post-cutoff commits is real; age alone does not establish abandonment. Current-client compatibility remains a separate source gap.
+
+Roles are proposed enable policies inferred from documented capabilities, not evidence of use. The requested role/context columns are reporting fields, not adopted practice. The subsequent practice-by-convergence correction (`ROW-cc-20261015T2048Z-correction-practice-by-convergence.md`, supplied digest `c75fd83da2664e94ff3064ff9d938ac36b9bde85a733803c3f0ebe4b6d98455c`) is reflected here: role assignments and orchestration mechanics remain candidates until upstream evidence and measured runs agree. No context-lead, halt-aware, lane-charter or horizon implementation is introduced. Reviewer means an **unfenced engineering** profile. Fenced trading, judge and review sessions never receive these additions. Installation and enabling are separate. Scoped configuration does not by itself provide OS isolation; worktrees separate edits, not credentials/processes/services. Third-party Claude clients are screened only for entitled API-slot routes, not portable use of a native Claude subscription.
+
+## Meta route boundary
+
+The existing [Muse file fence](../../../docs/decisions/2026-10-14-muse-file-fence.md) and [reviewed toolchain-directory grants](../../../docs/decisions/2026-10-15-muse-toolchain-directory-grants.md) remain binding. The native fence names binary `1.4.7-R6101.1`, private configuration, masked ambient hooks/MCP/skills, and a limited toolchain allowlist; none was run or changed here. A later anonymous read of the [vendor stable channel](https://api.meta.ai/muse-code/channels/muse-stable) resolves **1.4.9-R6297.1**; its public manifest names `x86_linux` and `aarch64_macos` artifacts. This establishes today's vendor pin and platform artifacts, not compatibility with the older fence. The source gap remains explicit and the fence is not retargeted.
+
+The independently read OmniRoute mirror is `diegosouzapw/OmniRoute@88c1e3342b44978a72ce75beb0cc509cc83a93d2`. Its [`open-sse/config/providers/registry/muse-code/index.ts:31-44`](https://github.com/diegosouzapw/OmniRoute/blob/88c1e3342b44978a72ce75beb0cc509cc83a93d2/open-sse/config/providers/registry/muse-code/index.ts#L31-L44) defines an HTTP OpenAI Responses provider; [`open-sse/config/museCode.ts:10-19`](https://github.com/diegosouzapw/OmniRoute/blob/88c1e3342b44978a72ce75beb0cc509cc83a93d2/open-sse/config/museCode.ts#L10-L19) defines endpoint/identity constants. This is not a native Muse-process launcher. Compatible HTTP syntax does not establish the native file-fence composition or entitlement. Meta rows preserve that unresolved boundary rather than converting a generic provider capability into a clean-session claim.
+
+## Startup context estimates
+
+Every number is **ESTIMATE**, using `ceil(decoded UTF-8 bytes / 4)`, not a tokenizer and not a measured session. `context-counts-runtime.json` retains exact source file/ranges, source-file and decoded-text SHA256, bytes, method, and family applicability. Python AST/JSON/YAML parsing reads string literals without importing or running candidate code; Markdown/text prompts are counted as text. Plugin frontmatter counts advertised names/descriptions; command/skill bodies are on-demand and are not falsely counted as unconditional startup instructions.
+
+Counts are named components, not whole-session totals. Alternatives (e.g. Codex Astra versus Sol, CLI versus SDK, Anthropic versus OpenAI) are not summed. Templates retain unexpanded placeholders. Upstream test snapshots are explicitly fixture text, never a real-session measurement. Dynamic project/system instructions, discovered skill descriptions, hooks, MCP tool schemas, memory and transport framing remain UNKNOWN unless a specific counted source is listed. Closed Claude/Muse binaries do not expose enough text for a defensible total; no arbitrary estimate is fabricated. A zero only describes a disabled family or an explicitly model-free/library-only automatic-injection surface, never opaque model inference. Jev's dated [model page](https://docs.typesafe.ai/models.md) resolves the stable alias to `jev-1.13.0`, and the [SDK changelog](https://docs.typesafe.ai/sdk/python/changelog.md) plus public package metadata bind Python SDK `0.7.5`; the `jev-1.14.0` preview is not selected.
+
+NativeHorizonNY's later authorized installation stage must capture a real start for the exact family, model, role, profile, skills/hooks/MCP set and provider. That measurement supersedes these estimates. A missing context total alone is not a missing model capability, but it prevents a claim that the full prompt cost has been established.
+
+## Validation and handoff
+
+Every new evidence file is registered using the existing `scripts.host_receipts.register_file(root, relative_path)` API. The script does not expose a `register_file` CLI subcommand. `python3 scripts/validate.py` runs before each commit. The layer tables are copied to the co-op's `screens-20261015/tables/` directory when complete, with family-specific SHA256s sent in `R LAYER-DONE`; the install stage must respect the per-row verdict and conditional role scope. No implementation script is added to the repository.
