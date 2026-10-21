@@ -11673,8 +11673,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "1d617390cb65971935836b0a5732155ca7748f9ff79fe1223bbb9480d512fad8",
-      "bytes": 1256
+      "sha256": "0c5fc1ef920e24d4010fa6c4029db61f2ad4e32a94c91df7a1ce14ada867e9e7",
+      "bytes": 1509
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11740,6 +11740,16 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261014-pr1094-rebase-delta.json",
       "sha256": "5f81fe355c0fc06bff935047a6ea27ef16588917a9a537710d7692a0e1ec5872",
       "bytes": 16981
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261016-lane-packets-carried-survivors-delta.json",
+      "sha256": "9284884d1e895cb1a21daa60525851d03d59c0e7175f7ef65a2888614ad71106",
+      "bytes": 55659
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261016-lane-packets-replay-delta.json",
+      "sha256": "7e17b050cd705636007d90fb4ee75911f8c5d1da2fbfc631c143217f57422478",
+      "bytes": 55687
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -64883,8 +64893,8 @@
     },
     {
       "path": "tests/test_lane_packets.py",
-      "sha256": "f1e74add4e93c382c46e9df426d40a084fa327ebdbbda6873bb03740a42ce4cf",
-      "bytes": 111632
+      "sha256": "2eb1bbc7982ea4df05ec6f3675dd8b421b7631fca021359195ad2e7681b07319",
+      "bytes": 130723
     },
     {
       "path": "tests/test_layer_verdict_mutations.py",
@@ -66293,8 +66303,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "7180cbcf0e13d0b52da62620c23fd9d3a558ae6eaf4d38e40f089fb603504077",
-      "bytes": 193238
+      "sha256": "27400622d9c55d13ba0613ab71477e75643fc766511d13a1a2288d056c8ba190",
+      "bytes": 196058
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",

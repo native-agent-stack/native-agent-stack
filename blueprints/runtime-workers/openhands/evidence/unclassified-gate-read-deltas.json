@@ -44,6 +44,14 @@
     {
       "date": "2026-10-14",
       "path": "unclassified-gate-reads-20261014-pr1094-rebase-delta.json"
+    },
+    {
+      "date": "2026-10-16",
+      "path": "unclassified-gate-reads-20261016-lane-packets-carried-survivors-delta.json"
+    },
+    {
+      "date": "2026-10-16",
+      "path": "unclassified-gate-reads-20261016-lane-packets-replay-delta.json"
     }
   ]
 }

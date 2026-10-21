@@ -1,0 +1,1366 @@
+{
+  "schema_version": 1,
+  "kind": "gate_read_accounting_delta",
+  "date": "2026-10-16",
+  "source_commit": null,
+  "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr1016.json",
+  "baseline_sha256": "6df6bb62e1bde5843ba77a800af2e889a4affb1c4c4bb6389234697c2755df05",
+  "mode": "monitoring_only",
+  "added_by_script": {
+    "scripts/adoption_status.py": 4,
+    "scripts/validate.py": 1,
+    "tests/adaptive_paper_hermetic.py": 2,
+    "tools/credentials/set_credential.py": 4,
+    "tools/sota-convergence/lane_packets.py": 6
+  },
+  "removed_by_script": {
+    "scripts/skills_status.py": 2
+  },
+  "added_shapes": [
+    {
+      "script": "scripts/validate.py",
+      "shape": [
+        "*:",
+        "*:*"
+      ],
+      "count": 1
+    },
+    {
+      "script": "tools/credentials/set_credential.py",
+      "shape": [
+        ".*.*.tmp"
+      ],
+      "count": 1
+    },
+    {
+      "script": "tools/sota-convergence/lane_packets.py",
+      "shape": [
+        "**"
+      ],
+      "count": 6
+    }
+  ],
+  "removed_shapes": [],
+  "added_locations": [
+    "scripts/adoption_status.py:1019",
+    "scripts/adoption_status.py:1107",
+    "scripts/adoption_status.py:1280",
+    "scripts/adoption_status.py:1396",
+    "scripts/adoption_status.py:1399",
+    "scripts/adoption_status.py:1448",
+    "scripts/adoption_status.py:1496",
+    "scripts/adoption_status.py:1497",
+    "scripts/adoption_status.py:1499",
+    "scripts/adoption_status.py:1515",
+    "scripts/adoption_status.py:1518",
+    "scripts/adoption_status.py:1521",
+    "scripts/adoption_status.py:953",
+    "scripts/component_matrix.py:1025",
+    "scripts/component_matrix.py:241",
+    "scripts/component_matrix.py:244",
+    "scripts/component_matrix.py:303",
+    "scripts/component_matrix.py:304",
+    "scripts/component_matrix.py:308",
+    "scripts/component_matrix.py:309",
+    "scripts/component_matrix.py:315",
+    "scripts/component_matrix.py:676",
+    "scripts/component_matrix.py:677",
+    "scripts/component_matrix.py:684",
+    "scripts/component_matrix.py:685",
+    "scripts/credential_status.py:347",
+    "scripts/credential_status.py:493",
+    "scripts/credential_status.py:550",
+    "scripts/credential_status.py:557",
+    "scripts/credential_status.py:560",
+    "scripts/landscape.py:1482",
+    "scripts/landscape.py:1590",
+    "scripts/landscape.py:813",
+    "scripts/landscape.py:814",
+    "scripts/landscape.py:827",
+    "scripts/landscape.py:828",
+    "scripts/landscape.py:840",
+    "scripts/landscape.py:841",
+    "scripts/landscape.py:844",
+    "scripts/landscape.py:853",
+    "scripts/landscape.py:854",
+    "scripts/landscape.py:860",
+    "scripts/landscape.py:861",
+    "scripts/landscape.py:863",
+    "scripts/landscape.py:866",
+    "scripts/landscape.py:890",
+    "scripts/landscape.py:891",
+    "scripts/landscape.py:892",
+    "scripts/skills_status.py:245",
+    "scripts/skills_status.py:382",
+    "scripts/skills_status.py:383",
+    "scripts/skills_status.py:384",
+    "scripts/skills_status.py:388",
+    "scripts/skills_status.py:786",
+    "scripts/skills_status.py:871",
+    "scripts/skills_status.py:976",
+    "scripts/validate.py:795",
+    "scripts/validate_foundation.py:116",
+    "scripts/validate_foundation.py:162",
+    "scripts/validate_foundation.py:163",
+    "scripts/validate_foundation.py:165",
+    "scripts/validate_foundation.py:168",
+    "scripts/validate_foundation.py:170",
+    "scripts/validate_foundation.py:171",
+    "scripts/validate_foundation.py:174",
+    "scripts/validate_foundation.py:176",
+    "scripts/validate_foundation.py:181",
+    "scripts/validate_foundation.py:182",
+    "scripts/validate_foundation.py:184",
+    "scripts/validate_foundation.py:196",
+    "scripts/validate_foundation.py:200",
+    "scripts/validate_foundation.py:201",
+    "scripts/validate_foundation.py:208",
+    "scripts/validate_foundation.py:210",
+    "scripts/validate_foundation.py:211",
+    "scripts/validate_foundation.py:213",
+    "scripts/validate_foundation.py:214",
+    "scripts/validate_foundation.py:217",
+    "scripts/validate_foundation.py:218",
+    "scripts/validate_foundation.py:244",
+    "scripts/validate_foundation.py:245",
+    "scripts/validate_foundation.py:246",
+    "scripts/validate_foundation.py:250",
+    "scripts/validate_foundation.py:251",
+    "scripts/verdict_review_gate.py:1559",
+    "scripts/verdict_review_gate.py:432",
+    "tests/adaptive_paper_hermetic.py:76",
+    "tests/adaptive_paper_hermetic.py:81",
+    "tools/adoption/install_skills.py:319",
+    "tools/adoption/install_skills.py:320",
+    "tools/adoption/install_skills.py:832",
+    "tools/adoption/install_skills.py:859",
+    "tools/adoption/install_skills.py:860",
+    "tools/credentials/credential_run.py:172",
+    "tools/credentials/credential_run.py:213",
+    "tools/credentials/credential_run.py:229",
+    "tools/credentials/credential_run.py:663",
+    "tools/credentials/credential_run.py:777",
+    "tools/credentials/set_credential.py:105",
+    "tools/credentials/set_credential.py:133",
+    "tools/credentials/set_credential.py:160",
+    "tools/credentials/set_credential.py:213",
+    "tools/credentials/set_credential.py:297",
+    "tools/credentials/set_credential.py:323",
+    "tools/credentials/set_credential.py:347",
+    "tools/credentials/set_credential.py:84",
+    "tools/sota-convergence/build_verdicts.py:210",
+    "tools/sota-convergence/build_verdicts.py:548",
+    "tools/sota-convergence/lane_packets.py:1360",
+    "tools/sota-convergence/lane_packets.py:1375",
+    "tools/sota-convergence/lane_packets.py:1381",
+    "tools/sota-convergence/lane_packets.py:1382",
+    "tools/sota-convergence/lane_packets.py:1383",
+    "tools/sota-convergence/lane_packets.py:1561",
+    "tools/sota-convergence/lane_packets.py:414",
+    "tools/sota-convergence/lane_packets.py:453",
+    "tools/sota-convergence/lane_packets.py:652",
+    "tools/sota-convergence/lane_packets.py:977",
+    "tools/sota-convergence/lane_packets.py:979",
+    "tools/sota-convergence/lane_packets.py:983",
+    "tools/sota-convergence/record_verdicts.py:1283",
+    "tools/sota-convergence/record_verdicts.py:1285",
+    "tools/sota-convergence/record_verdicts.py:1286",
+    "tools/sota-convergence/record_verdicts.py:1395",
+    "tools/sota-convergence/record_verdicts.py:1397",
+    "tools/sota-convergence/record_verdicts.py:1400",
+    "tools/sota-convergence/record_verdicts.py:1440",
+    "tools/sota-convergence/record_verdicts.py:1443",
+    "tools/sota-convergence/record_verdicts.py:1444",
+    "tools/sota-convergence/record_verdicts.py:1445",
+    "tools/sota-convergence/record_verdicts.py:1448",
+    "tools/sota-convergence/record_verdicts.py:1460",
+    "tools/sota-convergence/record_verdicts.py:1495",
+    "tools/sota-convergence/record_verdicts.py:1547",
+    "tools/sota-convergence/record_verdicts.py:1552",
+    "tools/sota-convergence/record_verdicts.py:1555",
+    "tools/sota-convergence/record_verdicts.py:1557",
+    "tools/sota-convergence/record_verdicts.py:1580",
+    "tools/sota-convergence/record_verdicts.py:1581",
+    "tools/sota-convergence/record_verdicts.py:180",
+    "tools/sota-convergence/record_verdicts.py:660",
+    "tools/sota-convergence/record_verdicts.py:669",
+    "tools/sota-convergence/record_verdicts.py:717",
+    "tools/sota-convergence/record_verdicts.py:830",
+    "tools/sota-convergence/record_verdicts.py:883",
+    "tools/sota-convergence/record_verdicts.py:967",
+    "tools/sota-convergence/record_verdicts.py:974"
+  ],
+  "derived_count": 359,
+  "derivation": {
+    "source": "blueprints/runtime-workers/openhands/resolver/push_gate.py:derive_ci_protected; input this change's tree on c168d4d0211bc447c3924d6d284b0b18fc3345e9 before this delta append (a working-tree snapshot; the commit holds identical executable sources)",
+    "contract": "blueprints/runtime-workers/openhands/evidence/advisory-gate-deltas.md at 65d66a370d9a5f129662d14c84f2820e940b3a83",
+    "replay": "python3 -m unittest tests.test_runtime_worker_openhands_push_gate",
+    "method": "Native patch_policy.GitTree and derive_ci_protected at the change's tree; compare counters, shape multiplicities and locations with the immutable #1016 baseline, retaining the newest delta's classifications for its unchanged locations. This supersedes the first 2026-10-16 lane_packets delta. The follow-on commit, which carries the FINAL replay's survivors, moves lane_packets.py lines only. The counters, shapes and the six counted statements are unchanged (derived_count 359). Moved reads are matched to the baseline by their line text at the base.",
+    "interpretation": "Monitoring accounting only; no permission or execution authority added."
+  },
+  "read_classifications": [
+    {
+      "location": "scripts/adoption_status.py:1019",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only client-wiring status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1107",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only client-wiring status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1280",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only client-wiring status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1396",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script; the line itself was edited by this change (it passes the source folder of the agent definitions on), the read is unchanged",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1399",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1448",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1496",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1497",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1499",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1515",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1518",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1521",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:953",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only client-wiring status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:1025",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:241",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:244",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:303",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:304",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:308",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:309",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:315",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:676",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:677",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:684",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/component_matrix.py:685",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:347",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:493",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:550",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:557",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:560",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:1482",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:1590",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:813",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:814",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:827",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:828",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:840",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:841",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:844",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:853",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:854",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:860",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:861",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:863",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:866",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:890",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:891",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/landscape.py:892",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:245",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:382",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:383",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:384",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:388",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:786",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "An existing native monitoring read at a moved source line; no new read.",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:871",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "An existing native monitoring read at a moved source line; no new read.",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:976",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "An existing native monitoring read at a moved source line; no new read.",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate.py:795",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Read-only committed Git blob integrity for PR registration continuity; monitoring only, no worker permission or execution authority.",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:116",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:162",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:163",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:165",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:168",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:170",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:171",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:174",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:176",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:181",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:182",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:184",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:196",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:200",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:201",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:208",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:210",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:211",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:213",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:214",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:217",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:218",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:244",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:245",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:246",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:250",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate_foundation.py:251",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/verdict_review_gate.py:1559",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/verdict_review_gate.py:432",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tests/adaptive_paper_hermetic.py:76",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "CI integration-runner helper observation for isolated test defaults and temporary paths; native monitoring only, no worker permission or execution authority.",
+      "permission_change": false
+    },
+    {
+      "location": "tests/adaptive_paper_hermetic.py:81",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "CI integration-runner helper observation for isolated test defaults and temporary paths; native monitoring only, no worker permission or execution authority.",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:319",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:320",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:832",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:859",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:860",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/credential_run.py:172",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/credential_run.py:213",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/credential_run.py:229",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/credential_run.py:663",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/credential_run.py:777",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:105",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "operator-run credential custody (set_credential.py --from-file): reads the inventory, the operator's downloaded key file and the stored copy for openssl's check; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:133",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "operator-run credential custody (set_credential.py --from-file): reads the inventory, the operator's downloaded key file and the stored copy for openssl's check; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:160",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "operator-run credential custody (set_credential.py --from-file): reads the inventory, the operator's downloaded key file and the stored copy for openssl's check; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:213",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "operator-run credential custody (set_credential.py --from-file): reads the inventory, the operator's downloaded key file and the stored copy for openssl's check; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:297",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:323",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:347",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:84",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/build_verdicts.py:210",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/build_verdicts.py:548",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/lane_packets.py:1360",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "A repository string from scripts/host_receipts.py normalize_repository (string normalization the reader models as a computed path) reaches a lane_packets.py --carried-survivors candidate list or record; this line opens no file. The flag reads catalogs/landscape/final-stack.json, the saturation ledger and sha256-bound sweep manifests under --root. Monitoring only, no worker permission or execution authority.",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/lane_packets.py:1375",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "A repository string from scripts/host_receipts.py normalize_repository (string normalization the reader models as a computed path) reaches a lane_packets.py --carried-survivors candidate list or record; this line opens no file. The flag reads catalogs/landscape/final-stack.json, the saturation ledger and sha256-bound sweep manifests under --root. Monitoring only, no worker permission or execution authority.",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/lane_packets.py:1381",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "A repository string from scripts/host_receipts.py normalize_repository (string normalization the reader models as a computed path) reaches a lane_packets.py --carried-survivors candidate list or record; this line opens no file. The flag reads catalogs/landscape/final-stack.json, the saturation ledger and sha256-bound sweep manifests under --root. Monitoring only, no worker permission or execution authority.",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/lane_packets.py:1382",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "A repository string from scripts/host_receipts.py normalize_repository (string normalization the reader models as a computed path) reaches a lane_packets.py --carried-survivors candidate list or record; this line opens no file. The flag reads catalogs/landscape/final-stack.json, the saturation ledger and sha256-bound sweep manifests under --root. Monitoring only, no worker permission or execution authority.",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/lane_packets.py:1383",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "A repository string from scripts/host_receipts.py normalize_repository (string normalization the reader models as a computed path) reaches a lane_packets.py --carried-survivors candidate list or record; this line opens no file. The flag reads catalogs/landscape/final-stack.json, the saturation ledger and sha256-bound sweep manifests under --root. Monitoring only, no worker permission or execution authority.",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/lane_packets.py:1561",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/lane_packets.py:414",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/lane_packets.py:453",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/lane_packets.py:652",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "A repository string from scripts/host_receipts.py normalize_repository (string normalization the reader models as a computed path) reaches a lane_packets.py --carried-survivors candidate list or record; this line opens no file. The flag reads catalogs/landscape/final-stack.json, the saturation ledger and sha256-bound sweep manifests under --root. Monitoring only, no worker permission or execution authority.",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/lane_packets.py:977",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/lane_packets.py:979",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/lane_packets.py:983",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1283",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1285",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1286",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1395",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1397",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1400",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1440",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1443",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1444",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1445",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1448",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1460",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1495",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1547",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1552",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1555",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1557",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1580",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:1581",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:180",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:660",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:669",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:717",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:830",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:883",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:967",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/sota-convergence/record_verdicts.py:974",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    }
+  ],
+  "removed_locations": [
+    "scripts/adoption_status.py:1032",
+    "scripts/adoption_status.py:1034",
+    "scripts/adoption_status.py:1083",
+    "scripts/adoption_status.py:1131",
+    "scripts/adoption_status.py:1132",
+    "scripts/adoption_status.py:1134",
+    "scripts/adoption_status.py:1150",
+    "scripts/adoption_status.py:1153",
+    "scripts/adoption_status.py:1156",
+    "scripts/component_matrix.py:1020",
+    "scripts/component_matrix.py:239",
+    "scripts/component_matrix.py:240",
+    "scripts/component_matrix.py:301",
+    "scripts/component_matrix.py:302",
+    "scripts/component_matrix.py:306",
+    "scripts/component_matrix.py:307",
+    "scripts/component_matrix.py:313",
+    "scripts/component_matrix.py:671",
+    "scripts/component_matrix.py:672",
+    "scripts/component_matrix.py:674",
+    "scripts/component_matrix.py:680",
+    "scripts/credential_status.py:346",
+    "scripts/credential_status.py:492",
+    "scripts/credential_status.py:549",
+    "scripts/credential_status.py:556",
+    "scripts/credential_status.py:559",
+    "scripts/landscape.py:1395",
+    "scripts/landscape.py:1503",
+    "scripts/landscape.py:738",
+    "scripts/landscape.py:739",
+    "scripts/landscape.py:740",
+    "scripts/landscape.py:752",
+    "scripts/landscape.py:753",
+    "scripts/landscape.py:765",
+    "scripts/landscape.py:766",
+    "scripts/landscape.py:769",
+    "scripts/landscape.py:778",
+    "scripts/landscape.py:779",
+    "scripts/landscape.py:785",
+    "scripts/landscape.py:786",
+    "scripts/landscape.py:788",
+    "scripts/landscape.py:791",
+    "scripts/landscape.py:816",
+    "scripts/landscape.py:817",
+    "scripts/skills_status.py:223",
+    "scripts/skills_status.py:346",
+    "scripts/skills_status.py:347",
+    "scripts/skills_status.py:348",
+    "scripts/skills_status.py:352",
+    "scripts/skills_status.py:604",
+    "scripts/skills_status.py:612",
+    "scripts/skills_status.py:614",
+    "scripts/skills_status.py:682",
+    "scripts/skills_status.py:785",
+    "scripts/validate_foundation.py:139",
+    "scripts/validate_foundation.py:140",
+    "scripts/validate_foundation.py:142",
+    "scripts/validate_foundation.py:145",
+    "scripts/validate_foundation.py:147",
+    "scripts/validate_foundation.py:148",
+    "scripts/validate_foundation.py:151",
+    "scripts/validate_foundation.py:153",
+    "scripts/validate_foundation.py:154",
+    "scripts/validate_foundation.py:158",
+    "scripts/validate_foundation.py:159",
+    "scripts/validate_foundation.py:161",
+    "scripts/validate_foundation.py:173",
+    "scripts/validate_foundation.py:178",
+    "scripts/validate_foundation.py:185",
+    "scripts/validate_foundation.py:187",
+    "scripts/validate_foundation.py:188",
+    "scripts/validate_foundation.py:190",
+    "scripts/validate_foundation.py:191",
+    "scripts/validate_foundation.py:194",
+    "scripts/validate_foundation.py:195",
+    "scripts/validate_foundation.py:219",
+    "scripts/validate_foundation.py:220",
+    "scripts/validate_foundation.py:221",
+    "scripts/validate_foundation.py:225",
+    "scripts/validate_foundation.py:226",
+    "scripts/validate_foundation.py:93",
+    "scripts/verdict_review_gate.py:1557",
+    "scripts/verdict_review_gate.py:430",
+    "tools/adoption/install_skills.py:294",
+    "tools/adoption/install_skills.py:295",
+    "tools/adoption/install_skills.py:721",
+    "tools/adoption/install_skills.py:748",
+    "tools/adoption/install_skills.py:749",
+    "tools/credentials/credential_run.py:169",
+    "tools/credentials/credential_run.py:210",
+    "tools/credentials/credential_run.py:226",
+    "tools/credentials/credential_run.py:660",
+    "tools/credentials/credential_run.py:774",
+    "tools/credentials/set_credential.py:103",
+    "tools/credentials/set_credential.py:129",
+    "tools/credentials/set_credential.py:153",
+    "tools/credentials/set_credential.py:69",
+    "tools/sota-convergence/build_verdicts.py:206",
+    "tools/sota-convergence/build_verdicts.py:540",
+    "tools/sota-convergence/lane_packets.py:1359",
+    "tools/sota-convergence/lane_packets.py:408",
+    "tools/sota-convergence/lane_packets.py:447",
+    "tools/sota-convergence/lane_packets.py:809",
+    "tools/sota-convergence/lane_packets.py:811",
+    "tools/sota-convergence/lane_packets.py:815",
+    "tools/sota-convergence/record_verdicts.py:1274",
+    "tools/sota-convergence/record_verdicts.py:1276",
+    "tools/sota-convergence/record_verdicts.py:1277",
+    "tools/sota-convergence/record_verdicts.py:1386",
+    "tools/sota-convergence/record_verdicts.py:1388",
+    "tools/sota-convergence/record_verdicts.py:1391",
+    "tools/sota-convergence/record_verdicts.py:1430",
+    "tools/sota-convergence/record_verdicts.py:1431",
+    "tools/sota-convergence/record_verdicts.py:1434",
+    "tools/sota-convergence/record_verdicts.py:1435",
+    "tools/sota-convergence/record_verdicts.py:1436",
+    "tools/sota-convergence/record_verdicts.py:1451",
+    "tools/sota-convergence/record_verdicts.py:1486",
+    "tools/sota-convergence/record_verdicts.py:1538",
+    "tools/sota-convergence/record_verdicts.py:1539",
+    "tools/sota-convergence/record_verdicts.py:1543",
+    "tools/sota-convergence/record_verdicts.py:1546",
+    "tools/sota-convergence/record_verdicts.py:1571",
+    "tools/sota-convergence/record_verdicts.py:1572",
+    "tools/sota-convergence/record_verdicts.py:179",
+    "tools/sota-convergence/record_verdicts.py:658",
+    "tools/sota-convergence/record_verdicts.py:668",
+    "tools/sota-convergence/record_verdicts.py:716",
+    "tools/sota-convergence/record_verdicts.py:828",
+    "tools/sota-convergence/record_verdicts.py:874",
+    "tools/sota-convergence/record_verdicts.py:958",
+    "tools/sota-convergence/record_verdicts.py:965"
+  ]
+}

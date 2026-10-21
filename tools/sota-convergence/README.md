@@ -869,6 +869,36 @@ Hugging Face model, is identified by its lowercased URL rather than dropped. Wit
 flag adds 35 foundation newcomers, 6 of them Hugging Face models, and removes 9 refuted trading newcomers
 across the 32 blind packets (312 candidates).
 
+**Carried survivors** (`--carried-survivors`, with `--manifest-newcomers`; 2026-10-16). `--manifest` joins one dated
+manifest. A survivor of an earlier covering sweep that a later manifest no longer lists therefore reached no packet,
+so `record_verdicts.py` gave it no disposition and the FINAL check refuses it
+([angle-records decision](../../docs/decisions/2026-10-12-angle-records-final-check.md)). The
+[layer resolution protocol](../../docs/decisions/2026-10-11-layer-resolution-protocol.md), step 2, carries every
+unresolved survivor forward from all covering sweeps. With the flag, each packet also takes the survivors
+`catalogs/landscape/final-stack.json` lists for its layer that are not already candidates. `scripts/final_stack.py`
+derives that list (`layers[].survivors[]`) from every completed sweep in `catalogs/saturation/ledger.json`. Each
+survivor becomes a newcomer built from its own sweep's manifest row, with that row's registered evidence. The row's
+`refuted_*` disposition is not applied again: a later survival, or a refutation no returned vote made, already
+decided it. A repository its latest covering sweep refuted on merit is not listed, so it stays out. The build refuses a
+`final-stack.json` built from other ledger bytes, a survivor manifest whose bytes changed since its sweep, and a
+survivor with no row there. Without the flag, packets are byte-identical. With `manifest-20260929.json` at
+`65d66a37`, 49 of the 107 listed survivors reach no packet: 15 in seven foundation layers and 34 in trading (36 with
+`--trading-candidates manifest`). With the flag, all 107 do in either trading mode.
+
+`survivors[]` holds a non-FINAL layer's survivals of completed sweeps dated after its verdict. The protocol's
+terminal-state rule needs a disposition for the whole cumulative unresolved set first. So the flag also carries what
+`scripts/final_stack.py`'s FINAL replay (`final_unresolved_survivors`, over every covering ledger row) holds unresolved
+beyond `survivors[]`. Each such candidate is labelled with a `survivor_basis`:
+- `stopped_sweep_proposal`: a stopped attempt proposed it and no refuter evaluated it. Such an attempt merged nothing
+  into a manifest, so the candidate is built from the repository its ledger record names, with no evidence.
+- `pre_verdict`: a completed sweep dated on or before the layer's verdict holds it.
+- `final_replay`: any other repository the replay holds.
+
+The replay leaves the verdict's own dispositions to the FINAL check. That check needs FINAL-grade retained evidence for
+them and refuses six trading layers at `65d66a37`. At `65d66a37` the replay adds 15 foundation repositories in seven
+layers, all `stopped_sweep_proposal`, and none in trading. With the flag, the blind foundation build on
+`manifest-20260929.json` carries all 83 (68 listed plus 15).
+
 A newcomer's name must not redact the packet's shared prose (Codex review of #151 at `cf82e689`). A name part
 unique to one candidate is a redaction term, so granite-embedding's "embedding" had turned semantic-rag's
 requirement "a compatible embedding service" into "a compatible <candidate> service". Capability and format words
