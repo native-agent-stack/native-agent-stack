@@ -1,0 +1,221 @@
+{
+  "task": "T2",
+  "harnesses": {
+    "codex-exec": {
+      "input_includes_cached": true,
+      "per_run": [
+        {
+          "rep": 1,
+          "source": "codex-exec/T2-1.events.jsonl",
+          "tokens_in": 265951,
+          "tokens_out": 2481,
+          "tokens_cached": 227072,
+          "reply": {
+            "changed_line": 77,
+            "tests_ok": true
+          }
+        },
+        {
+          "rep": 2,
+          "source": "codex-exec/T2-2.events.jsonl",
+          "tokens_in": 273208,
+          "tokens_out": 2146,
+          "tokens_cached": 242432,
+          "reply": {
+            "changed_line": 77,
+            "tests_ok": true
+          }
+        }
+      ]
+    },
+    "pi": {
+      "input_includes_cached": false,
+      "per_run": [
+        {
+          "rep": 1,
+          "source": "pi/T2-1.jsonl",
+          "tokens_in": 15873,
+          "tokens_out": 602,
+          "tokens_cached": 44416,
+          "reply": {
+            "changed_line": 77,
+            "tests_ok": true
+          }
+        },
+        {
+          "rep": 2,
+          "source": "pi/T2-2.jsonl",
+          "tokens_in": 18484,
+          "tokens_out": 752,
+          "tokens_cached": 69504,
+          "reply": {
+            "changed_line": 77,
+            "tests_ok": true
+          }
+        }
+      ]
+    },
+    "opencode": {
+      "input_includes_cached": false,
+      "per_run": [
+        {
+          "rep": 1,
+          "source": "opencode/T2-1.jsonl",
+          "tokens_in": 22633,
+          "tokens_out": 1070,
+          "tokens_cached": 131840,
+          "reply": {
+            "changed_line": 77,
+            "tests_ok": true
+          }
+        },
+        {
+          "rep": 2,
+          "source": "opencode/T2-2.jsonl",
+          "tokens_in": 27266,
+          "tokens_out": 1136,
+          "tokens_cached": 160512,
+          "reply": {
+            "changed_line": 141,
+            "tests_ok": true
+          }
+        }
+      ]
+    },
+    "kilo": {
+      "input_includes_cached": false,
+      "per_run": [
+        {
+          "rep": 1,
+          "source": "kilo/T2-1.jsonl",
+          "tokens_in": 15099,
+          "tokens_out": 639,
+          "tokens_cached": 124032,
+          "reply": {
+            "changed_line": 141,
+            "tests_ok": true
+          }
+        },
+        {
+          "rep": 2,
+          "source": "kilo/T2-2.jsonl",
+          "tokens_in": 14908,
+          "tokens_out": 602,
+          "tokens_cached": 123776,
+          "reply": {
+            "changed_line": 141,
+            "tests_ok": true
+          }
+        }
+      ]
+    },
+    "oh-my-pi": {
+      "input_includes_cached": false,
+      "per_run": [
+        {
+          "rep": 1,
+          "source": "oh-my-pi/T2-1.jsonl",
+          "tokens_in": 23123,
+          "tokens_out": 1690,
+          "tokens_cached": 173952,
+          "reply": {
+            "changed_line": 141,
+            "tests_ok": true
+          }
+        },
+        {
+          "rep": 2,
+          "source": "oh-my-pi/T2-2.jsonl",
+          "tokens_in": 39820,
+          "tokens_out": 1623,
+          "tokens_cached": 120576,
+          "reply": {
+            "changed_line": 141,
+            "tests_ok": true
+          }
+        }
+      ]
+    },
+    "goose": {
+      "input_includes_cached": true,
+      "per_run": [
+        {
+          "rep": 1,
+          "source": "goose/T2-1/out.json",
+          "tokens_in": 67956,
+          "tokens_out": 934,
+          "tokens_cached": 56704,
+          "reply": {
+            "changed_line": 77,
+            "tests_ok": true
+          }
+        },
+        {
+          "rep": 2,
+          "source": "goose/T2-2/out.json",
+          "tokens_in": 95488,
+          "tokens_out": 1357,
+          "tokens_cached": 80768,
+          "reply": {
+            "changed_line": 77,
+            "tests_ok": true
+          }
+        }
+      ]
+    },
+    "openhands": {
+      "input_includes_cached": true,
+      "per_run": [
+        {
+          "rep": 1,
+          "source": "openhands/T2-1/out.log",
+          "tokens_in": 102034,
+          "tokens_out": 1099,
+          "tokens_cached": 81536,
+          "reply": {
+            "changed_line": 77,
+            "tests_ok": true
+          }
+        },
+        {
+          "rep": 2,
+          "source": "openhands/T2-2/out.log",
+          "tokens_in": 152547,
+          "tokens_out": 1225,
+          "tokens_cached": 123136,
+          "reply": {
+            "changed_line": 141,
+            "tests_ok": true
+          }
+        }
+      ]
+    },
+    "deerflow": {
+      "input_includes_cached": true,
+      "per_run": [
+        {
+          "rep": 1,
+          "source": "deerflow/T2-1.jsonl",
+          "tokens_in": 118671,
+          "tokens_out": 468,
+          "tokens_cached": 105344,
+          "reply": {
+            "changed_line": 141,
+            "tests_ok": true
+          }
+        },
+        {
+          "rep": 2,
+          "source": "deerflow/T2-2.jsonl",
+          "tokens_in": 88926,
+          "tokens_out": 466,
+          "tokens_cached": 83584,
+          "reply": {
+            "changed_line": 141,
+            "tests_ok": true
+          }
+        }
+      ]
+    }
+  }
+}

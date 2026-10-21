@@ -19487,6 +19487,11 @@
       "bytes": 30434
     },
     {
+      "path": "docs/decisions/2026-10-17-gpt-harness-bakeoff-round-1.md",
+      "sha256": "071d3287a64b2c77f4ad0e46ca31c8e944a0d9f3c7d2af35deed15522e53d119",
+      "bytes": 28337
+    },
+    {
       "path": "docs/decisions/2026-10-17-zero-tolerance-currency.md",
       "sha256": "00eb7228052fb3b1afeb1e92b81e2108412d4f74f544aab042dda14a7c1eee1c",
       "bytes": 18602
@@ -37685,6 +37690,31 @@
       "path": "evidence/artifacts/gitleaks-macos-memory-bound-20260924/measure.py",
       "sha256": "619afdd1e30773633498215af9a0c881b1ab24632172879ef65421586ec749ab",
       "bytes": 5904
+    },
+    {
+      "path": "evidence/artifacts/gpt-harness-bakeoff-20261017/RANKING.md",
+      "sha256": "6c6cb1d05b9ad81364974c401be895dab832645a25ecde8d3172e0cc34297895",
+      "bytes": 4612
+    },
+    {
+      "path": "evidence/artifacts/gpt-harness-bakeoff-20261017/ROUND2-PREREGISTRATION.json",
+      "sha256": "5655b151c54803c856029ff610797677a80b5d8e5bd4e6cef2870889cde6a2c4",
+      "bytes": 8212
+    },
+    {
+      "path": "evidence/artifacts/gpt-harness-bakeoff-20261017/SCORES.json",
+      "sha256": "59a73ecc86a5f6af588cf979b18523a0bb9043025eb8a708185dbd6ad5ab6c4c",
+      "bytes": 12055
+    },
+    {
+      "path": "evidence/artifacts/gpt-harness-bakeoff-20261017/T2-USAGE.json",
+      "sha256": "119b30ce29653b029a9b32af5776f5500263b7c715e53ca084515133b78258bc",
+      "bytes": 5110
+    },
+    {
+      "path": "evidence/artifacts/gpt-harness-bakeoff-20261017/recompute.py",
+      "sha256": "f551de432b6c47c050075163785b1a9be2d4b2284286d85941fe9a1181d67c55",
+      "bytes": 10308
     },
     {
       "path": "evidence/artifacts/gpt6-family-tiering-20260927/README.md",

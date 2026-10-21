@@ -1,0 +1,116 @@
+{
+  "comparison_id": "gpt-harness-bakeoff-round-2",
+  "status": "proposal_not_SCHEDULED",
+  "scope": {
+    "layer": "foundation/agent-sdks",
+    "model": "cx/gpt-6.1-sol",
+    "effort": "max",
+    "repetitions_per_task_per_arm": 3,
+    "arms": {
+      "codex-exec": {
+        "pin": "83086188ae0614bd882818ff1aa23f3194962012",
+        "version": "rust-v0.163.0",
+        "write_mode_path": "tools/sota-convergence/landscape-sweep/codex_call.sh -> codex_job.py: reviewed workspace-write mode in an isolated task clone (not implemented)",
+        "readiness": "Reviewed write-capable mode, rendered argv and allowed roots retained; successful edit-and-test smoke through this exact path at this pin with all harness layers enabled.",
+        "adoption": "Reviewed runner write-mode change required; current wrapper forces read-only."
+      },
+      "pi": {
+        "pin": "71023aec1546d6d677a65669c5665c0927ce0dd0",
+        "version": "v1.3.0",
+        "write_mode_path": "tools/adoption/runtime_profiles.py launch pi-gpt --role isolated-builder --repository <isolated task clone> --state-root <qualified state>",
+        "readiness": "Reviewed write-capable mode, rendered argv and allowed roots retained; successful edit-and-test smoke through this exact path at this pin with all harness layers enabled.",
+        "adoption": "Re-pin and requalify existing profile."
+      },
+      "opencode": {
+        "pin": "e3c4eb242585dcd77be1a867391b7c25fd47ce52",
+        "version": "v1.19.3",
+        "write_mode_path": "tools/adoption/runtime_profiles.py launch opencode-gpt --role isolated-builder --repository <isolated task clone> --state-root <qualified state>",
+        "readiness": "Reviewed write-capable mode, rendered argv and allowed roots retained; successful edit-and-test smoke through this exact path at this pin with all harness layers enabled.",
+        "adoption": "Re-pin and requalify existing profile."
+      },
+      "kilo": {
+        "pin": "8001cdc387522ff36fc0b775e3bd11e098f5b03f",
+        "version": "v7.8.12",
+        "write_mode_path": "tools/adoption/runtime_profiles.py launch kilo-gpt --role isolated-builder --repository <isolated task clone> --state-root <qualified state>",
+        "readiness": "Reviewed write-capable mode, rendered argv and allowed roots retained; successful edit-and-test smoke through this exact path at this pin with all harness layers enabled.",
+        "adoption": "Proposed profile name only; profile-adoption decision and implementation required before launch."
+      },
+      "oh-my-pi": {
+        "pin": "df4f996e66a200ab7e0496114d43bdf85f32194d",
+        "version": "v18.12.0",
+        "write_mode_path": "tools/adoption/runtime_profiles.py launch oh-my-pi-gpt --role isolated-builder --repository <isolated task clone> --state-root <qualified state>",
+        "readiness": "Reviewed write-capable mode, rendered argv and allowed roots retained; successful edit-and-test smoke through this exact path at this pin with all harness layers enabled.",
+        "adoption": "Proposed profile name only; profile-adoption decision and implementation required before launch."
+      },
+      "goose": {
+        "pin": "2bcb8583a18a0623eb78c9ed845d597ed99fae48",
+        "version": "v1.55.0",
+        "write_mode_path": "tools/adoption/runtime_profiles.py launch goose-gpt --role isolated-builder --repository <isolated task clone> --state-root <qualified state>",
+        "readiness": "Reviewed write-capable mode, rendered argv and allowed roots retained; successful edit-and-test smoke through this exact path at this pin with all harness layers enabled.",
+        "adoption": "Proposed profile name only; profile-adoption decision and implementation required before launch."
+      },
+      "openhands": {
+        "pin": "5fa4dea24c52fe3ac53fa4e3e67a1376b72189e2",
+        "version": "v1.55.1",
+        "write_mode_path": "tools/adoption/runtime_profiles.py launch openhands-gpt --role isolated-builder --repository <isolated task clone> --state-root <qualified state>",
+        "readiness": "Reviewed write-capable mode, rendered argv and allowed roots retained; successful edit-and-test smoke through this exact path at this pin with all harness layers enabled.",
+        "adoption": "Proposed profile name only; profile-adoption decision and implementation required before launch."
+      },
+      "deerflow": {
+        "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+        "version": "v2.1.0",
+        "write_mode_path": "tools/adoption/runtime_profiles.py launch deerflow-gpt --role isolated-builder --repository <isolated task clone> --state-root <qualified state>",
+        "readiness": "Reviewed write-capable mode, rendered argv and allowed roots retained; successful edit-and-test smoke through this exact path at this pin with all harness layers enabled.",
+        "adoption": "Proposed profile name only; profile-adoption decision and implementation required before launch."
+      }
+    },
+    "tasks": [
+      {
+        "id": "T1",
+        "kind": "code reading",
+        "fixture": "bfd139c347c73cf94eed2bf36eb7767dff082063",
+        "answer": {
+          "cited": 76,
+          "actual": 77
+        }
+      },
+      {
+        "id": "T2",
+        "kind": "single-file edit and test",
+        "fixture": "bfd139c347c73cf94eed2bf36eb7767dff082063",
+        "answer": {
+          "edited_file_line": 141,
+          "new_value": 77,
+          "tests_ok": true
+        },
+        "test": "python3 -m unittest tests.test_local_pages_atlas_data"
+      },
+      {
+        "id": "T3",
+        "kind": "multi-file edit",
+        "fixture_requirement": "At least two tracked files must change; exact fixture, expected diff and tests frozen in the pre-run input manifest."
+      },
+      {
+        "id": "T4",
+        "kind": "long tool-heavy task",
+        "fixture_requirement": "Exact fixture, required tool calls, expected state, tests and bounded run limit frozen in the pre-run input manifest."
+      },
+      {
+        "id": "T5",
+        "kind": "concurrency task",
+        "fixture_requirement": "Several jobs on the same gateway; exact job count, prompts, expected states and aggregation frozen in the pre-run input manifest."
+      }
+    ],
+    "scoring": "Same prompt text and reply schema per task across arms; state checked independently of replies. Record uncached input, cached input and output separately; compare uncached input plus reported output, with reasoning counters retained separately.",
+    "exclusions": "No arm substitution, extra task class or post-result scope change. A new pin or scope requires a reviewed superseding preregistration hash before any run."
+  },
+  "readiness": [
+    "Reviewed protocol reopen bound to retained changed sweep evidence for pi; disposition of github/copilot-sdk and agentproto/ts survivors retained without treating omission as adjudication.",
+    "Profile-adoption decision and native qualification for each missing runtime profile, plus requalification of existing profiles at the frozen pins.",
+    "A write-capable baseline and successful edit-and-test smoke for every arm through its named write-mode path, with exact rendered argv, allowed roots, isolation, MCP, skills, hooks, telemetry and invoke receipts retained.",
+    "An existing protocol comparison driver selected and retained with its pin and command, or its own reviewed adoption decision.",
+    "Before any run, a reviewed input manifest binds all exact task fixtures, prompts, schemas, scorers, ordering, resource bounds and launch receipts by public hashes to this comparison id and scope hash. Any scope change supersedes this registration before running.",
+    "Applied effort verified per runtime from events or gateway request records; runs without verification are marked unverified and cannot qualify a default."
+  ],
+  "decision_rule": "Propose a default role only if, on every task, state-correct and reply-correct counts are at least the baseline counts, median wall time or median uncached input plus output is lower with the other not worse, and MCP, skills, hook equivalents, telemetry, isolation and invoke receipts are proven under the qualified profile. Record each missed term without changing a default."
+}
