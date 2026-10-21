@@ -1,31 +1,35 @@
-# NativeStack2604 offline research runtime — aiohttp 3.14.4 re-pin, October 20, 2026
+# NativeStack2604 offline research runtime — Pillow 13.0.0 re-pin, October 21, 2026
 
 The published bundle is lock SHA256
-`a1413f202937aa05625bad34b35d4ad75c9ab637805c3747abc4fb8b0f85634a`
+`9d8350a6773437a6890808c5b6ae61d98d305021b16ea0a4b4e753dd2f4f6223`
 and manifest SHA256 `aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b`.
 It contains EdgarTools **5.61.1**, skfolio **1.7.0**, LightGBM **4.7.0**, and the
 pytest **9.1.1** dev group (pluggy **1.6.0**, iniconfig **2.3.1**). CPython
 **3.12.3**, NautilusTrader **2.0.0rc5**, the adapter pins and their gates stay fixed.
 
-The manifest is unchanged from the measured October 8 native pair. The lock is
-that pair's lock `f451ef97…` relocked for GHSA-2g87-pp6c-29x5,
-GHSA-5wr8-gcqf-gqf3 and GHSA-494j-54xm-rwp3 (aiohttp <=3.14.3, fixed in 3.14.4).
-It was produced by `UV_PYTHON_DOWNLOADS=never uv lock --python <managed CPython 3.12.3>
---upgrade-package aiohttp==3.14.4` with uv 0.13.1. Only the aiohttp entry moves,
-from **3.14.3** to **3.14.4** (its sdist and wheels; dependencies unchanged; yarl
-stays **1.25.1**); the other 191 entries and the lock `revision = 5` header are
-byte-identical. The installer's pinned uv **0.12.17** `uv --no-config lock --check`
-passes on the new lock. A relock with uv 0.12.17 itself resolves the same
-packages but rewrites the header to `revision = 3`, an unrelated change, so it
-was not used. No install, sync or acceptance ran for this re-pin.
+This publication carries #1266's reviewed certifi **2026.10.19** change at
+`eb898b558afbaa36b3d7a69b1f8c6cbfa91cbd2b` and adds Pillow **13.0.0**.
+Starting from that accepted lock, uv **0.13.1** ran
+`UV_PYTHON_DOWNLOADS=never uv lock --python <scratch CPython 3.12.3>
+--upgrade-package pillow==13.0.0`. The native output hashes to `52f17cf0…`.
+The wave builder authorized preserving only the two certifi upload-time strings
+at lock lines 254 and 256 exactly as #1266 recorded them from PyPI JSON.
+Native pillow content, reviewed certifi timestamp precision preserved, as #1266 recorded them.
+Every other native byte is unchanged. Parsed against the accepted parent, only
+Pillow changes; the other 191 entries and `revision = 5` are unchanged.
+The certifi block is byte-identical to the accepted head. Both uv **0.13.1**
+and **0.12.17** pass `uv --no-config lock --check --offline` with the exact
+scratch Python and unchanged default cache. No install, sync or destination-host
+acceptance ran. Sources and compatibility boundaries are in
+[the security repin research](../../../evidence/artifacts/pillow-13-repin-20261020/RESEARCH.md).
 
-The 24/24 native acceptance below is bound to lock `f451ef97…` and does **not**
-transfer to this lock. Acceptance of `a1413f20…` is pending and runs under the
-North Star plan's C05, from this lock, on the destination host. The installer
-admits an existing runtime at the `f451ef97…`/`aa370e42…` pair as one more
-recorded migration input, like the earlier recorded pairs, never as acceptance.
-The offline acceptance script and scheduled trial require `a1413f20…` and refuse
-a runtime still at `f451ef97…`.
+The 24/24 native acceptance below remains bound to `f451ef97…` and does **not**
+transfer to this lock, `a1413f20…` or `2df71327…`. Destination-host acceptance
+remains pending under the North Star plan's C05. Each exact prior pair is only
+a migration input and inverse record. The accepted certifi lock is retained
+[byte for byte](../../../evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/blueprints/us-equities/runtime-2604/trading-2604-runtime/published-2df71327.source.txt), without duplicating #1266's
+reviewed `a1413f20…` historical input. The offline acceptance script and
+scheduled trial require `9d8350a6…` and refuse earlier locks.
 
 Runtime users coordinate on `$HOME/projects/.us-equities-runtime.lock`, outside
 the venv, project adoption directory and trial output directories. The installer
@@ -171,7 +175,7 @@ the only destination is the published final pair. These allowances do not
 authorize an uncoordinated host migration or overwrite another writer's changes.
 The installer keeps its native host, ownership, interpreter and Docker guards.
 A runtime installed at the October 8 `f451ef97…` pair no longer matches the
-published lock. Moving it to `a1413f20…` is a migration through this installer
+published lock. Moving it to `2df71327…` is a migration through this installer
 that runs only under the North Star plan's C05, followed by that plan's own
 acceptance from the new lock. A future authorized new-prefix installation uses the
 recipe's existing native route, then needs its own acceptance.

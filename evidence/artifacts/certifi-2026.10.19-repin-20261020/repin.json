@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "base_commit": "da5549584abb3c95f0c90d7aa0d948b2f72c7876",
+  "advisory": "GHSA-6q48-6c7w-9gw2",
+  "release": "2026.10.19",
+  "method": "Only certifi pin and release artifact metadata changed. No resolver or trading code run. Prior native acceptance does not transfer; current qualification remains gated.",
+  "pypi_json": {
+    "url": "https://pypi.org/pypi/certifi/2026.10.19/json",
+    "sha256": "5b6ba21c20c09f5e4ca52bf8251de25fafbdb56909c60e3ba44d4f2b6ef5d319",
+    "whole_call_deadline_seconds": 15
+  },
+  "artifacts": [
+    {
+      "filename": "certifi-2026.10.19-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/c4/51/29046e48f693c54e5b7412216d447a1d8362c9653148d98c02cdf65fa733/certifi-2026.10.19-py3-none-any.whl",
+      "size": 136464,
+      "sha256": "42d35340cc5b9ba78e818ddbff0c5b1c2b779de448a340fd1b989f5fa8670e1b",
+      "verified": true,
+      "storage": "downloaded bytes verified locally in resident kernel; not installed"
+    },
+    {
+      "filename": "certifi-2026.10.19.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/a6/bd/1436c50cc46699de0230fbaacc1d1de7bfec413176099949e9d5112e88f2/certifi-2026.10.19.tar.gz",
+      "size": 137598,
+      "sha256": "035c1e85572b141bf1c3a3eff0e33a8eb74917522f2559075ff8d2fea780a1ae",
+      "verified": true,
+      "storage": "downloaded bytes verified locally in resident kernel; not installed"
+    }
+  ],
+  "inputs": [
+    {
+      "current": {
+        "path": "examples/deepagents-omniroute/requirements.lock",
+        "sha256": "2b71e8693ddc2ea1219aa31b179596bbcd645d1042f69dce759bddc10efef232"
+      },
+      "prior": {
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/examples/deepagents-omniroute/published-3832e6cc-requirements.lock",
+        "sha256": "3832e6cc94f9108112a10ec0eb11b5b6b7dfc55d60fc4fada2f752d650879e11"
+      },
+      "from": "2026.7.22",
+      "to": "2026.10.19"
+    },
+    {
+      "current": {
+        "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/examples/openhands-native-capabilities/published-e0c3539d.source.txt",
+        "sha256": "e0c3539df8b0ccacff5853df46b3c8fbfff3569cb73525dfc51bee3c9a19c08e"
+      },
+      "prior": {
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/examples/openhands-native-capabilities/published-40c0ebc9-requirements.lock",
+        "sha256": "40c0ebc98b0492a0c773d77e789ab4695696d77dc3697003d5a5896013ec8db4"
+      },
+      "from": "2026.7.22",
+      "to": "2026.10.19"
+    },
+    {
+      "current": {
+        "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/blueprints/us-equities/sim-crosscheck-hftbacktest/published-fd0eec4f.source.txt",
+        "sha256": "fd0eec4f5839985f46a8d1984c55792d0c89136105211b7e44005fa63301f618"
+      },
+      "prior": {
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/sim-crosscheck-hftbacktest/published-c6a3e11f-requirements.lock",
+        "sha256": "c6a3e11fef05209374aae054b303513246771663f8c69349fb0d93e4d8c4ff35"
+      },
+      "from": "2026.7.22",
+      "to": "2026.10.19"
+    },
+    {
+      "current": {
+        "path": "adoption/sdk/accepted-constraints.txt",
+        "sha256": "a6859e72b2bbe692b6a3a2c1db3a1ec813ed6cf948b3d0e61607ce71ddda7c98"
+      },
+      "prior": {
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/adoption/sdk/published-e9ef5be2-accepted-constraints.lock",
+        "sha256": "e9ef5be2300d651bc8db67e4cb00731e69b6fb1757e623ce49263f6a62844d00"
+      },
+      "from": "2026.7.22",
+      "to": "2026.10.19"
+    },
+    {
+      "current": {
+        "path": "adoption/sdk/requirements-linux-x86_64-py313.lock",
+        "sha256": "9ee41e37f13a133edb72a4a07c8aedafd6e65270a2ad8fe6d4371305f997a396"
+      },
+      "prior": {
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/adoption/sdk/published-3a17fa09-requirements-linux-x86_64-py313.lock",
+        "sha256": "3a17fa09d3c598e30ed8a6e833eb061ca84cad8a3af99fd975a4024c4031cddc"
+      },
+      "from": "2026.7.22",
+      "to": "2026.10.19"
+    },
+    {
+      "current": {
+        "path": "blueprints/memory-stack/native-qualification/uv.lock",
+        "sha256": "cae555dae8482eed12436fdebe65a62c796bd86c57d8f64e4c593130ea0b9526"
+      },
+      "prior": {
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/memory-stack/native-qualification/published-28118b8f-uv.lock",
+        "sha256": "28118b8f56b0d97356477f8120b3e0bab569e2756f30cf442b3cfeeef6000fa0"
+      },
+      "from": "2026.7.22",
+      "to": "2026.10.19"
+    },
+    {
+      "current": {
+        "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/blueprints/us-equities/runtime-2604/trading-2604-runtime/published-2df71327.source.txt",
+        "sha256": "2df713279918415554d7ba23972d3c9b8dc3a8762c52b36cfd31de53e92c22d7"
+      },
+      "prior": {
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/runtime-2604/trading-2604-runtime/published-a1413f20-uv.lock",
+        "sha256": "a1413f202937aa05625bad34b35d4ad75c9ab637805c3747abc4fb8b0f85634a"
+      },
+      "from": "2026.7.22",
+      "to": "2026.10.19"
+    },
+    {
+      "current": {
+        "path": "blueprints/us-equities/catalyst-provenance/requirements.lock",
+        "sha256": "4534537d83bb749e0b7d8f63850348752188e301526aa7e7abbdbd4edc991b4d"
+      },
+      "prior": {
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/catalyst-provenance/published-8249d798-requirements.lock",
+        "sha256": "8249d798431f0499970b68a34690060f48c50a2fef98322b4fb1706f30eb5a8c"
+      },
+      "from": "2026.7.22",
+      "to": "2026.10.19"
+    },
+    {
+      "current": {
+        "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/blueprints/runtime-workers/openhands/published-096f6255.source.txt",
+        "sha256": "096f6255391e56270df7843cb6739d1e373012d6a54e38d7fd7813e0b9e6a96a"
+      },
+      "prior": {
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/runtime-workers/openhands/published-6045a575-requirements.lock",
+        "sha256": "6045a575ada4f0ee7d06a741e40eeff3b08ea3fb5a2567eef57d36055ff81577"
+      },
+      "from": "2025.8.3",
+      "to": "2026.10.19"
+    },
+    {
+      "current": {
+        "path": "tools/mlx-smoke/requirements.lock.txt",
+        "sha256": "e8760a529e4fa1a55adb098f092ed999e5b456069dee8e18bcdfae0ef54d8e16"
+      },
+      "prior": {
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/tools/mlx-smoke/published-71b920ce-requirements.lock.lock",
+        "sha256": "71b920ceab903cf59e6387651f79dd9c9ac70880065508689eac664a8d27e6a4"
+      },
+      "from": "2026.7.22",
+      "to": "2026.10.19"
+    },
+    {
+      "current": {
+        "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/published-ba1b090b.source.txt",
+        "sha256": "ba1b090b5a868b456614c704cd4d626b2fe381ecd0d228757d5338e91e2deda3"
+      },
+      "prior": {
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/published-19067f82-requirements-libs.lock",
+        "sha256": "19067f822ff89f6694445e34b5c78da34cd7e4bbf781d1c352f507066f65a45e"
+      },
+      "from": "2026.7.22",
+      "to": "2026.10.19"
+    },
+    {
+      "current": {
+        "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock",
+        "sha256": "fbb7b0acfebba92e3a76b5e859b9e399303a211fff8537b9dbd2cf41accbcc93"
+      },
+      "prior": {
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/evidence/artifacts/macos-syn-e2e-20260924/published-d756583b-requirements-macos-arm64-py312.lock",
+        "sha256": "d756583bbdb6aff7d43394d628070a6ec9297401468b466005420eef9bc04da9"
+      },
+      "from": "2026.7.22",
+      "to": "2026.10.19"
+    },
+    {
+      "current": {
+        "path": "blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock",
+        "sha256": "8e08849c3370b905b7993a75e2f356920d45cdba81d64709a71fa3ff6263cb2d"
+      },
+      "prior": {
+        "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/adaptive-paper/published-645544ed-requirements-linux-x86_64-py312.lock",
+        "sha256": "645544edbd13e7ff2434d5459e981ec0a2506c944e30d47844b4f3c57f602db8"
+      },
+      "from": "2026.7.22",
+      "to": "2026.10.19"
+    }
+  ],
+  "historical_claims": "Existing measurements, verdicts and hashes are unchanged. Only frozen source paths relocate to retained original bytes. Old locks are excluded evidence fixtures, never install inputs.",
+  "live": "NO-GO"
+}

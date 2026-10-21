@@ -5187,8 +5187,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "36536b1bfa0cde65ec67d132f33c9d3a21cb07df277b7a109a8789f9e154e7b5",
-      "bytes": 17395
+      "sha256": "51178ed467ffaefeaba10d3daa727ebf95ad903bb46f6b81906f04be5ca81dd3",
+      "bytes": 27551
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -5247,8 +5247,8 @@
     },
     {
       "path": ".github/workflows/hardware-profile-smoke.yml",
-      "sha256": "17264678834e8c4ef47f0bc0820a980310eb71676db5f07500358119b53b3753",
-      "bytes": 5951
+      "sha256": "cdcf3511bd8838e15356d93af9c9f3633a280d14525f01afe8efe0c084b585e5",
+      "bytes": 6456
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -5752,13 +5752,13 @@
     },
     {
       "path": "adoption/sdk/accepted-constraints.txt",
-      "sha256": "e9ef5be2300d651bc8db67e4cb00731e69b6fb1757e623ce49263f6a62844d00",
-      "bytes": 1048
+      "sha256": "a6859e72b2bbe692b6a3a2c1db3a1ec813ed6cf948b3d0e61607ce71ddda7c98",
+      "bytes": 1049
     },
     {
       "path": "adoption/sdk/requirements-linux-x86_64-py313.lock",
-      "sha256": "3a17fa09d3c598e30ed8a6e833eb061ca84cad8a3af99fd975a4024c4031cddc",
-      "bytes": 77578
+      "sha256": "9ee41e37f13a133edb72a4a07c8aedafd6e65270a2ad8fe6d4371305f997a396",
+      "bytes": 77579
     },
     {
       "path": "adoption/skills/claude-routing/README.md",
@@ -9072,6 +9072,11 @@
       "bytes": 2779
     },
     {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock",
+      "sha256": "fba54bad05f34e19554fd0e3549a376f042419b10eab65fc389c3784ddf11705",
+      "bytes": 151600
+    },
+    {
       "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_finish_and_watch.py",
       "sha256": "2af779fd6511fe98cfe4af81881a3746f3ec41946c1ffbdd5157f3eabdee8b44",
       "bytes": 2595
@@ -10638,8 +10643,8 @@
     },
     {
       "path": "blueprints/memory-stack/native-qualification/uv.lock",
-      "sha256": "28118b8f56b0d97356477f8120b3e0bab569e2756f30cf442b3cfeeef6000fa0",
-      "bytes": 615691
+      "sha256": "cae555dae8482eed12436fdebe65a62c796bd86c57d8f64e4c593130ea0b9526",
+      "bytes": 615700
     },
     {
       "path": "blueprints/native-skill-practice/README.md",
@@ -11023,8 +11028,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
-      "sha256": "92a03fc2b4ad9b4c9551a542fba7c39060b831b07e529e8e4effadc4ef2134b0",
-      "bytes": 72677
+      "sha256": "f6e632efb56fe71ae6d3f06d868cd2c3f5dd7355ee14ee8d06eadc15a7c92b36",
+      "bytes": 73168
     },
     {
       "path": "blueprints/runtime-workers/openhands/RESOLVER.md",
@@ -11783,7 +11788,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/pins.json",
-      "sha256": "1b1de8190c252a4b9545c2df3025bb83b74fc55921d12a9f7803ad1ba0c583d3",
+      "sha256": "ea980e9b3ece35fc522b628c04f51905cce1f5fd7e4395c789d018955a9ebad2",
       "bytes": 4460
     },
     {
@@ -11803,13 +11808,13 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/requirements.lock",
-      "sha256": "6045a575ada4f0ee7d06a741e40eeff3b08ea3fb5a2567eef57d36055ff81577",
-      "bytes": 107107
+      "sha256": "582c4886cd803fbda6a3a23cca253cc103aee795b0c477825dea1a35bcecf8c2",
+      "bytes": 107194
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
-      "sha256": "10bc618a0d5793fb8f7f42d897aa23af88dda11cd0cc9a2fd689b36656bc4e54",
-      "bytes": 90828
+      "sha256": "6377fdd74abe86675a2fa6a9dc85ba81b774221e75ad36f7a5be074373b8cffd",
+      "bytes": 96356
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver.py",
@@ -13678,8 +13683,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock",
-      "sha256": "645544edbd13e7ff2434d5459e981ec0a2506c944e30d47844b4f3c57f602db8",
-      "bytes": 60649
+      "sha256": "8e08849c3370b905b7993a75e2f356920d45cdba81d64709a71fa3ff6263cb2d",
+      "bytes": 60650
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/requirements.txt",
@@ -13703,7 +13708,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/scheduled_trial.sh",
-      "sha256": "cfae08a5edc6c0bc43e64b7d3af41a9840f9dafc010bb29e0593d6c0e55c233c",
+      "sha256": "96c0c8b7110a4c86ba59957958771672a974342d31431457c44fac5bbb6d90d2",
       "bytes": 4997
     },
     {
@@ -13723,7 +13728,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "f91711014790585c0d5fad7ba6bc05822a6ae4319af91eb722de38f82e79db22",
+      "sha256": "0f0f34466d571d4527e0ec2d18e44fdac5238d78882f96885b6db3fe8d54982a",
       "bytes": 10600
     },
     {
@@ -14978,8 +14983,8 @@
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/requirements.lock",
-      "sha256": "8249d798431f0499970b68a34690060f48c50a2fef98322b4fb1706f30eb5a8c",
-      "bytes": 737
+      "sha256": "4534537d83bb749e0b7d8f63850348752188e301526aa7e7abbdbd4edc991b4d",
+      "bytes": 738
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/upstream-8k-source.json",
@@ -17128,18 +17133,18 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "13c722796576b3173ba8e0824697607893f95f768618830264cf4950dd1e9060",
-      "bytes": 42515
+      "sha256": "b74dc44d02301d356461de7add2638238e003ab19ba955e4a82fde5b031c8707",
+      "bytes": 42937
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
-      "sha256": "f38197a3ba4fa23f83b47babc0d2aa06b98bb2c2c20471ab569e073f5c6ead77",
+      "sha256": "8a6874c792a315e31486ec639caeb35252634e92fea8d447ddcab928155256ce",
       "bytes": 15244
     },
     {
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
-      "sha256": "0fed2e5c651186cab1c2abc2673284def5e74b1e430dc0f141f5eef731020873",
-      "bytes": 21844
+      "sha256": "ddc1742c367a1b41ced20a205b057e489c3383f9345ec10d58c4920a54a1148f",
+      "bytes": 22644
     },
     {
       "path": "blueprints/us-equities/runtime-2604/receipts/acceptance-20261008.json",
@@ -17163,8 +17168,8 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
-      "sha256": "a1413f202937aa05625bad34b35d4ad75c9ab637805c3747abc4fb8b0f85634a",
-      "bytes": 308625
+      "sha256": "9d8350a6773437a6890808c5b6ae61d98d305021b16ea0a4b4e753dd2f4f6223",
+      "bytes": 310276
     },
     {
       "path": "blueprints/us-equities/security-identity/README.md",
@@ -17273,8 +17278,8 @@
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
-      "sha256": "c6a3e11fef05209374aae054b303513246771663f8c69349fb0d93e4d8c4ff35",
-      "bytes": 92438
+      "sha256": "466b8dd17ec7fde7e2762bd9f24a8ab7f8e9632728a2d767af55d138694c6a36",
+      "bytes": 92099
     },
     {
       "path": "blueprints/us-equities/sim-engine-crosscheck/README.md",
@@ -17713,7 +17718,7 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "8d714cd2179c3d530eba855302bfece533b25fedf342c77925a8a6885c18eafe",
+      "sha256": "b9314fccc34c06e3377c7818ce9559cde941b00cd948018eebcc1d6ef5a4c246",
       "bytes": 339603
     },
     {
@@ -21850,6 +21855,76 @@
       "path": "evidence/artifacts/catalog-search.json",
       "sha256": "3f65add4e0745ca9c5f5801a6e654f747611142f8190c106c9fbbdfd590d699e",
       "bytes": 568
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/adoption/sdk/published-3a17fa09-requirements-linux-x86_64-py313.lock",
+      "sha256": "3a17fa09d3c598e30ed8a6e833eb061ca84cad8a3af99fd975a4024c4031cddc",
+      "bytes": 77578
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/adoption/sdk/published-e9ef5be2-accepted-constraints.lock",
+      "sha256": "e9ef5be2300d651bc8db67e4cb00731e69b6fb1757e623ce49263f6a62844d00",
+      "bytes": 1048
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/published-19067f82-requirements-libs.lock",
+      "sha256": "19067f822ff89f6694445e34b5c78da34cd7e4bbf781d1c352f507066f65a45e",
+      "bytes": 151939
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/memory-stack/native-qualification/published-28118b8f-uv.lock",
+      "sha256": "28118b8f56b0d97356477f8120b3e0bab569e2756f30cf442b3cfeeef6000fa0",
+      "bytes": 615691
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/runtime-workers/openhands/published-6045a575-requirements.lock",
+      "sha256": "6045a575ada4f0ee7d06a741e40eeff3b08ea3fb5a2567eef57d36055ff81577",
+      "bytes": 107107
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/adaptive-paper/published-645544ed-requirements-linux-x86_64-py312.lock",
+      "sha256": "645544edbd13e7ff2434d5459e981ec0a2506c944e30d47844b4f3c57f602db8",
+      "bytes": 60649
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/catalyst-provenance/published-8249d798-requirements.lock",
+      "sha256": "8249d798431f0499970b68a34690060f48c50a2fef98322b4fb1706f30eb5a8c",
+      "bytes": 737
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/runtime-2604/trading-2604-runtime/published-a1413f20-uv.lock",
+      "sha256": "a1413f202937aa05625bad34b35d4ad75c9ab637805c3747abc4fb8b0f85634a",
+      "bytes": 308625
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/sim-crosscheck-hftbacktest/published-c6a3e11f-requirements.lock",
+      "sha256": "c6a3e11fef05209374aae054b303513246771663f8c69349fb0d93e4d8c4ff35",
+      "bytes": 92438
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/evidence/artifacts/macos-syn-e2e-20260924/published-d756583b-requirements-macos-arm64-py312.lock",
+      "sha256": "d756583bbdb6aff7d43394d628070a6ec9297401468b466005420eef9bc04da9",
+      "bytes": 60036
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/examples/deepagents-omniroute/published-3832e6cc-requirements.lock",
+      "sha256": "3832e6cc94f9108112a10ec0eb11b5b6b7dfc55d60fc4fada2f752d650879e11",
+      "bytes": 137489
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/examples/openhands-native-capabilities/published-40c0ebc9-requirements.lock",
+      "sha256": "40c0ebc98b0492a0c773d77e789ab4695696d77dc3697003d5a5896013ec8db4",
+      "bytes": 300345
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/tools/mlx-smoke/published-71b920ce-requirements.lock.lock",
+      "sha256": "71b920ceab903cf59e6387651f79dd9c9ac70880065508689eac664a8d27e6a4",
+      "bytes": 50139
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json",
+      "sha256": "6359f469c1893563c3f936d6897a49e3af0155e2f0029d2d7cb1cb4c4fb56238",
+      "bytes": 8922
     },
     {
       "path": "evidence/artifacts/child-lane-baseline-20260926/README.md",
@@ -34438,8 +34513,8 @@
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/1-candidate-libs-execution.json",
-      "sha256": "3c3aae7022cdcc8660d3d2385e1cfe354ed176f1b1cea87209842c49e37a7d2d",
-      "bytes": 19895
+      "sha256": "188f21d90999b598480351e4fc575d8816a4474a505410b9927d5d602401cfed",
+      "bytes": 19978
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/10-nautilus-optimizer-pnl.json",
@@ -40828,8 +40903,8 @@
     },
     {
       "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock",
-      "sha256": "d756583bbdb6aff7d43394d628070a6ec9297401468b466005420eef9bc04da9",
-      "bytes": 60036
+      "sha256": "fbb7b0acfebba92e3a76b5e859b9e399303a211fff8537b9dbd2cf41accbcc93",
+      "bytes": 60037
     },
     {
       "path": "evidence/artifacts/macos-syn-e2e-20260924/summary.json",
@@ -43048,8 +43123,8 @@
     },
     {
       "path": "evidence/artifacts/native-runtime-role-resolution-20260930/experiment.json",
-      "sha256": "703837f451638a3a65f34f9d8094aa8676d830f4a54260b0694c36406acd9bf3",
-      "bytes": 36784
+      "sha256": "2e6cefaf5241e908fe6e5294837cdabcb6de338d11abe0d8fee1fa60251adccc",
+      "bytes": 36867
     },
     {
       "path": "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-install.json",
@@ -49740,6 +49815,36 @@
       "path": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stdout.txt",
       "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
       "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/pillow-13-repin-20261020/RESEARCH.md",
+      "sha256": "a798cc233a5833dcff0221e837328ceef2bee5049e2f7cac349bc841f8e6e26d",
+      "bytes": 20985
+    },
+    {
+      "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/published-ba1b090b.source.txt",
+      "sha256": "ba1b090b5a868b456614c704cd4d626b2fe381ecd0d228757d5338e91e2deda3",
+      "bytes": 151940
+    },
+    {
+      "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/blueprints/runtime-workers/openhands/published-096f6255.source.txt",
+      "sha256": "096f6255391e56270df7843cb6739d1e373012d6a54e38d7fd7813e0b9e6a96a",
+      "bytes": 107109
+    },
+    {
+      "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/blueprints/us-equities/runtime-2604/trading-2604-runtime/published-2df71327.source.txt",
+      "sha256": "2df713279918415554d7ba23972d3c9b8dc3a8762c52b36cfd31de53e92c22d7",
+      "bytes": 308634
+    },
+    {
+      "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/blueprints/us-equities/sim-crosscheck-hftbacktest/published-fd0eec4f.source.txt",
+      "sha256": "fd0eec4f5839985f46a8d1984c55792d0c89136105211b7e44005fa63301f618",
+      "bytes": 92439
+    },
+    {
+      "path": "evidence/artifacts/pillow-13-repin-20261020/historical/on-1266/examples/openhands-native-capabilities/published-e0c3539d.source.txt",
+      "sha256": "e0c3539df8b0ccacff5853df46b3c8fbfff3569cb73525dfc51bee3c9a19c08e",
+      "bytes": 300346
     },
     {
       "path": "evidence/artifacts/plugin-skill-identity-20261013/README.md",
@@ -62368,8 +62473,8 @@
     },
     {
       "path": "examples/deepagents-omniroute/requirements.lock",
-      "sha256": "3832e6cc94f9108112a10ec0eb11b5b6b7dfc55d60fc4fada2f752d650879e11",
-      "bytes": 137489
+      "sha256": "2b71e8693ddc2ea1219aa31b179596bbcd645d1042f69dce759bddc10efef232",
+      "bytes": 137490
     },
     {
       "path": "examples/deepagents-omniroute/task-repair-plan.json",
@@ -62513,8 +62618,8 @@
     },
     {
       "path": "examples/openhands-native-capabilities/requirements.lock",
-      "sha256": "40c0ebc98b0492a0c773d77e789ab4695696d77dc3697003d5a5896013ec8db4",
-      "bytes": 300345
+      "sha256": "6ec6f96bedef99a38a871e7597bfe585565444f1da8ed9268d86236d2db70d0a",
+      "bytes": 300006
     },
     {
       "path": "examples/promptfoo-nemotron-upstream/promptfooconfig.yaml",
@@ -64103,8 +64208,8 @@
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "8bfd38217d9759122787d511eb79e86e33fa68ec1c75e542ffbd121324f6caae",
-      "bytes": 24092
+      "sha256": "9fad9a9e553758e358faecd24b13cb210a4fb48fb02d5030f209ce995b3c5b14",
+      "bytes": 30771
     },
     {
       "path": "tests/test_adoption_docs_consistency.py",
@@ -65433,7 +65538,7 @@
     },
     {
       "path": "tests/test_scheduled_trial.py",
-      "sha256": "aab2b57b49653acaf82f12670a774a37cae485f95e2365b3a4128a5bdd593bc6",
+      "sha256": "5c0036fde08e840687a5de5e77bec1a4665a8b6b76c1440e31fd0297d5b2cf45",
       "bytes": 30441
     },
     {
@@ -65625,6 +65730,11 @@
       "path": "tests/test_trading_2604_lock.py",
       "sha256": "43ec520d08fb78e6a6dae5df82ea251ca8d9c44dec51f02ef54e7e2d30a22a3f",
       "bytes": 10502
+    },
+    {
+      "path": "tests/test_trading_2604_migration.py",
+      "sha256": "3b5ce29374021cdda594019c71c7c947c2d22544a32e2f88a483c2e946ffd811",
+      "bytes": 6808
     },
     {
       "path": "tests/test_trading_2604_source_acceptance.py",

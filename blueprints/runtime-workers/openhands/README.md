@@ -69,6 +69,14 @@ uv.lock with `uv sync --frozen` (SDK@fcc102a
 That lock, whose SHA256 is pins.json `uv_lock`, still pins anyio 4.11.0, click 8.1.8,
 pypdf 6.14.2, soupsieve 2.8.4 and PyJWT 2.13.0, the five versions the relock replaces.
 
+The 2026-10-21 Pillow relock starts from #1266's reviewed certifi head
+([research.md](research.md#runtime-lock-pillow-relock-2026-10-21)). Its worker
+control reproduced that export byte for byte before the unchanged scratch-only
+Pillow override. Only Pillow changes to 13.0.0; certifi stays 2026.10.19.
+This fixes the recipe venv only. The image's PyInstaller server still builds
+from upstream's unchanged lock with Pillow 12.3.0; neither it nor the grader
+is repaired or requalified here.
+
 [agent-server-image-grype-20260928.json](evidence/agent-server-image-grype-20260928.json)
 records a grype 0.119.0 scan of the pinned linux/amd64 digest, with a database
 built 2026-09-28T06:42:30Z. It found 1,464 unique matches in 164 package

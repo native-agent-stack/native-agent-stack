@@ -15,12 +15,13 @@
     },
     {
       "path": "examples/deepagents-omniroute/requirements.lock",
-      "parser": "requirements.txt"
+      "parser": "requirements.txt",
+      "sha256": "2b71e8693ddc2ea1219aa31b179596bbcd645d1042f69dce759bddc10efef232"
     },
     {
       "path": "examples/openhands-native-capabilities/requirements.lock",
       "parser": "requirements.txt",
-      "sha256": "40c0ebc98b0492a0c773d77e789ab4695696d77dc3697003d5a5896013ec8db4"
+      "sha256": "6ec6f96bedef99a38a871e7597bfe585565444f1da8ed9268d86236d2db70d0a"
     },
     {
       "path": "examples/openhands-native-capabilities/cli-constraints.txt",
@@ -40,15 +41,18 @@
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
-      "parser": "requirements.txt"
+      "parser": "requirements.txt",
+      "sha256": "466b8dd17ec7fde7e2762bd9f24a8ab7f8e9632728a2d767af55d138694c6a36"
     },
     {
       "path": "adoption/sdk/accepted-constraints.txt",
-      "parser": "requirements.txt"
+      "parser": "requirements.txt",
+      "sha256": "a6859e72b2bbe692b6a3a2c1db3a1ec813ed6cf948b3d0e61607ce71ddda7c98"
     },
     {
       "path": "adoption/sdk/requirements-linux-x86_64-py313.lock",
-      "parser": "requirements.txt"
+      "parser": "requirements.txt",
+      "sha256": "9ee41e37f13a133edb72a4a07c8aedafd6e65270a2ad8fe6d4371305f997a396"
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml"
@@ -58,18 +62,19 @@
     },
     {
       "path": "blueprints/memory-stack/native-qualification/uv.lock",
-      "sha256": "28118b8f56b0d97356477f8120b3e0bab569e2756f30cf442b3cfeeef6000fa0"
+      "sha256": "cae555dae8482eed12436fdebe65a62c796bd86c57d8f64e4c593130ea0b9526"
     },
     {
       "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
-      "sha256": "a1413f202937aa05625bad34b35d4ad75c9ab637805c3747abc4fb8b0f85634a"
+      "sha256": "9d8350a6773437a6890808c5b6ae61d98d305021b16ea0a4b4e753dd2f4f6223"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/requirements.txt"
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/requirements.lock",
-      "parser": "requirements.txt"
+      "parser": "requirements.txt",
+      "sha256": "4534537d83bb749e0b7d8f63850348752188e301526aa7e7abbdbd4edc991b4d"
     },
     {
       "path": "blueprints/us-equities/data/requirements.in",
@@ -82,7 +87,7 @@
     {
       "path": "blueprints/runtime-workers/openhands/requirements.lock",
       "parser": "requirements.txt",
-      "sha256": "6045a575ada4f0ee7d06a741e40eeff3b08ea3fb5a2567eef57d36055ff81577"
+      "sha256": "582c4886cd803fbda6a3a23cca253cc103aee795b0c477825dea1a35bcecf8c2"
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -175,11 +180,13 @@
     },
     {
       "path": "tools/mlx-smoke/requirements.lock.txt",
-      "parser": "requirements.txt"
+      "parser": "requirements.txt",
+      "sha256": "e8760a529e4fa1a55adb098f092ed999e5b456069dee8e18bcdfae0ef54d8e16"
     },
     {
       "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock",
-      "parser": "requirements.txt"
+      "parser": "requirements.txt",
+      "sha256": "fba54bad05f34e19554fd0e3549a376f042419b10eab65fc389c3784ddf11705"
     },
     {
       "path": "blueprints/us-equities/mover-v3/data-tools/requirements.lock",
@@ -195,7 +202,8 @@
     },
     {
       "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock",
-      "parser": "requirements.txt"
+      "parser": "requirements.txt",
+      "sha256": "fbb7b0acfebba92e3a76b5e859b9e399303a211fff8537b9dbd2cf41accbcc93"
     },
     {
       "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock",
@@ -207,7 +215,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock",
-      "parser": "requirements.txt"
+      "parser": "requirements.txt",
+      "sha256": "8e08849c3370b905b7993a75e2f356920d45cdba81d64709a71fa3ff6263cb2d"
     },
     {
       "path": "blueprints/native-skill-practice/p1/requirements-scoring.in",
@@ -323,6 +332,71 @@
       "path": "evidence/artifacts/trading-2604-aiohttp-repin-20261020/published-f451-trading-2604-runtime.lock",
       "reason": "Retained evidence fixture: the byte-identical October 8 published trading-2604 lock f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989 (aiohttp 3.14.3, affected by GHSA-2g87-pp6c-29x5, GHSA-5wr8-gcqf-gqf3 and GHSA-494j-54xm-rwp3), reproduced with git show 30ab2e3a. It is not an install input. It is kept so the lock digests in the October 8 final-lock and 24/24 acceptance receipts stay checkable against tracked bytes, and as the recorded inverse of the aiohttp 3.14.4 re-pin. The active lock blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock (aiohttp 3.14.4) is scanned. Before any restore or new consuming route, relock and restore vulnerability scanning.",
       "evidence": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json"
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/examples/deepagents-omniroute/published-3832e6cc-requirements.lock",
+      "reason": "Retained evidence fixture: byte-identical pre-certifi-bump input at da5549584abb3c95f0c90d7aa0d948b2f72c7876 (certifi 2026.7.22, affected by GHSA-6q48-6c7w-9gw2). Not an install input; the active replacement examples/deepagents-omniroute/requirements.lock is scanned at certifi 2026.10.19. Retained for frozen source/receipt hash custody and inverse history. Before restore or new consumption, relock and restore vulnerability scanning.",
+      "evidence": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json"
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/examples/openhands-native-capabilities/published-40c0ebc9-requirements.lock",
+      "reason": "Retained evidence fixture: byte-identical pre-certifi-bump input at da5549584abb3c95f0c90d7aa0d948b2f72c7876 (certifi 2026.7.22, affected by GHSA-6q48-6c7w-9gw2). Not an install input; the active replacement examples/openhands-native-capabilities/requirements.lock is scanned at certifi 2026.10.19. Retained for frozen source/receipt hash custody and inverse history. Before restore or new consumption, relock and restore vulnerability scanning.",
+      "evidence": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json"
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/sim-crosscheck-hftbacktest/published-c6a3e11f-requirements.lock",
+      "reason": "Retained evidence fixture: byte-identical pre-certifi-bump input at da5549584abb3c95f0c90d7aa0d948b2f72c7876 (certifi 2026.7.22, affected by GHSA-6q48-6c7w-9gw2). Not an install input; the active replacement blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock is scanned at certifi 2026.10.19. Retained for frozen source/receipt hash custody and inverse history. Before restore or new consumption, relock and restore vulnerability scanning.",
+      "evidence": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json"
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/adoption/sdk/published-e9ef5be2-accepted-constraints.lock",
+      "reason": "Retained evidence fixture: byte-identical pre-certifi-bump input at da5549584abb3c95f0c90d7aa0d948b2f72c7876 (certifi 2026.7.22, affected by GHSA-6q48-6c7w-9gw2). Not an install input; the active replacement adoption/sdk/accepted-constraints.txt is scanned at certifi 2026.10.19. Retained for frozen source/receipt hash custody and inverse history. Before restore or new consumption, relock and restore vulnerability scanning.",
+      "evidence": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json"
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/adoption/sdk/published-3a17fa09-requirements-linux-x86_64-py313.lock",
+      "reason": "Retained evidence fixture: byte-identical pre-certifi-bump input at da5549584abb3c95f0c90d7aa0d948b2f72c7876 (certifi 2026.7.22, affected by GHSA-6q48-6c7w-9gw2). Not an install input; the active replacement adoption/sdk/requirements-linux-x86_64-py313.lock is scanned at certifi 2026.10.19. Retained for frozen source/receipt hash custody and inverse history. Before restore or new consumption, relock and restore vulnerability scanning.",
+      "evidence": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json"
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/memory-stack/native-qualification/published-28118b8f-uv.lock",
+      "reason": "Retained evidence fixture: byte-identical pre-certifi-bump input at da5549584abb3c95f0c90d7aa0d948b2f72c7876 (certifi 2026.7.22, affected by GHSA-6q48-6c7w-9gw2). Not an install input; the active replacement blueprints/memory-stack/native-qualification/uv.lock is scanned at certifi 2026.10.19. Retained for frozen source/receipt hash custody and inverse history. Before restore or new consumption, relock and restore vulnerability scanning.",
+      "evidence": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json"
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/runtime-2604/trading-2604-runtime/published-a1413f20-uv.lock",
+      "reason": "Retained evidence fixture: byte-identical pre-certifi-bump input at da5549584abb3c95f0c90d7aa0d948b2f72c7876 (certifi 2026.7.22, affected by GHSA-6q48-6c7w-9gw2). Not an install input; the active replacement blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock is scanned at certifi 2026.10.19. Retained for frozen source/receipt hash custody and inverse history. Before restore or new consumption, relock and restore vulnerability scanning.",
+      "evidence": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json"
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/catalyst-provenance/published-8249d798-requirements.lock",
+      "reason": "Retained evidence fixture: byte-identical pre-certifi-bump input at da5549584abb3c95f0c90d7aa0d948b2f72c7876 (certifi 2026.7.22, affected by GHSA-6q48-6c7w-9gw2). Not an install input; the active replacement blueprints/us-equities/catalyst-provenance/requirements.lock is scanned at certifi 2026.10.19. Retained for frozen source/receipt hash custody and inverse history. Before restore or new consumption, relock and restore vulnerability scanning.",
+      "evidence": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json"
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/runtime-workers/openhands/published-6045a575-requirements.lock",
+      "reason": "Retained evidence fixture: byte-identical pre-certifi-bump input at da5549584abb3c95f0c90d7aa0d948b2f72c7876 (certifi 2025.8.3, affected by GHSA-6q48-6c7w-9gw2). Not an install input; the active replacement blueprints/runtime-workers/openhands/requirements.lock is scanned at certifi 2026.10.19. Retained for frozen source/receipt hash custody and inverse history. Before restore or new consumption, relock and restore vulnerability scanning.",
+      "evidence": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json"
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/tools/mlx-smoke/published-71b920ce-requirements.lock.lock",
+      "reason": "Retained evidence fixture: byte-identical pre-certifi-bump input at da5549584abb3c95f0c90d7aa0d948b2f72c7876 (certifi 2026.7.22, affected by GHSA-6q48-6c7w-9gw2). Not an install input; the active replacement tools/mlx-smoke/requirements.lock.txt is scanned at certifi 2026.10.19. Retained for frozen source/receipt hash custody and inverse history. Before restore or new consumption, relock and restore vulnerability scanning.",
+      "evidence": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json"
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/published-19067f82-requirements-libs.lock",
+      "reason": "Retained evidence fixture: byte-identical pre-certifi-bump input at da5549584abb3c95f0c90d7aa0d948b2f72c7876 (certifi 2026.7.22, affected by GHSA-6q48-6c7w-9gw2). Not an install input; the active replacement blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock is scanned at certifi 2026.10.19. Retained for frozen source/receipt hash custody and inverse history. Before restore or new consumption, relock and restore vulnerability scanning.",
+      "evidence": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json"
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/evidence/artifacts/macos-syn-e2e-20260924/published-d756583b-requirements-macos-arm64-py312.lock",
+      "reason": "Retained evidence fixture: byte-identical pre-certifi-bump input at da5549584abb3c95f0c90d7aa0d948b2f72c7876 (certifi 2026.7.22, affected by GHSA-6q48-6c7w-9gw2). Not an install input; the active replacement evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock is scanned at certifi 2026.10.19. Retained for frozen source/receipt hash custody and inverse history. Before restore or new consumption, relock and restore vulnerability scanning.",
+      "evidence": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json"
+    },
+    {
+      "path": "evidence/artifacts/certifi-2026.10.19-repin-20261020/historical/blueprints/us-equities/adaptive-paper/published-645544ed-requirements-linux-x86_64-py312.lock",
+      "reason": "Retained evidence fixture: byte-identical pre-certifi-bump input at da5549584abb3c95f0c90d7aa0d948b2f72c7876 (certifi 2026.7.22, affected by GHSA-6q48-6c7w-9gw2). Not an install input; the active replacement blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock is scanned at certifi 2026.10.19. Retained for frozen source/receipt hash custody and inverse history. Before restore or new consumption, relock and restore vulnerability scanning.",
+      "evidence": "evidence/artifacts/certifi-2026.10.19-repin-20261020/repin.json"
     }
   ]
 }
