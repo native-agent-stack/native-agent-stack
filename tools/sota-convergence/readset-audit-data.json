@@ -1818,7 +1818,7 @@
     },
     {
       "path": "evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json",
-      "sha256": "e84144043abb0ec830ce0e73904c529d56289c82170199b220ad085219a2f3c6",
+      "sha256": "767c0a821b0f97534cc83a48f0b0146440c850677b20b463a8fee0ae3cc3c096",
       "reason": "Post-mask pin and inventory provenance only: the live-selection assertion is removed; selected_version is a source schema locator, with source revisions and historical endpoint scope retained."
     },
     {
@@ -1893,7 +1893,7 @@
     },
     {
       "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json",
-      "sha256": "e84144043abb0ec830ce0e73904c529d56289c82170199b220ad085219a2f3c6",
+      "sha256": "767c0a821b0f97534cc83a48f0b0146440c850677b20b463a8fee0ae3cc3c096",
       "reason": "Post-mask version and inventory provenance; original selection-mirror assertion is gone, while selected_version remains a schema locator and the older endpoint is expressly historical."
     },
     {

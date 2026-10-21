@@ -64333,8 +64333,8 @@
     },
     {
       "path": "tests/test_blind_readset_v6.py",
-      "sha256": "ab5a526fda6e5be26ff335fa4e8241219f639e1b146a9b099b2698dfc0c64b3b",
-      "bytes": 24566
+      "sha256": "aa579149d139a3438cfaf136350ac53a55f9217063f06dd98058f4ecdf1513d2",
+      "bytes": 24658
     },
     {
       "path": "tests/test_bootstrap_full_profile.py",
@@ -66548,7 +66548,7 @@
     },
     {
       "path": "tools/sota-convergence/readset-audit-data.json",
-      "sha256": "e327c2b67535475f4bb3d53af99c933b3ac99912c04b81adaa6913e72e1196ae",
+      "sha256": "2afee48d43e4d7488e150d044296447f42c2d0d380d7a9f5b83c2629b1ab5836",
       "bytes": 117934
     },
     {

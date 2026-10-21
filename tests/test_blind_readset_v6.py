@@ -253,6 +253,7 @@ class V7SelectionBoundaryTests(unittest.TestCase):
                     target = root / relative
                     view = target.read_text()
                     self.assertFalse("are live selection mirrors" in view)
+                    self.assertEqual(audit.audit_readset(root, [relative])["findings"], [])
                     for retained in ("5.60.0", "95cf94ca4", "29da752f5",
                                      "saturation-audit.json:3209", "upstream-snapshot.json:3524"):
                         self.assertIn(retained, view)
