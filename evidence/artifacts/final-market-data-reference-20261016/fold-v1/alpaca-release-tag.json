@@ -1,0 +1,32 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Scope-locked fold setup or explicitly synthetic masking/custody regression; no broker calls or model adjudication.",
+  "command": [
+    "/usr/bin/git",
+    "ls-remote",
+    "https://github.com/alpacahq/alpaca-py.git",
+    "refs/tags/v0.44.0",
+    "refs/tags/v0.44.0^{}",
+    "refs/tags/0.44.0",
+    "refs/tags/0.44.0^{}"
+  ],
+  "cwd": "<fold-scratch>",
+  "declared_inputs": {
+    "alpaca-py": "0.44.0",
+    "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T07:50:35.425183+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "output": "alpaca-release-tag.log",
+  "output_sha256": "87b9c71363ac5d5bfe04abbb4d382f604ebbddfd68c054354f0b6945598beee4",
+  "private_capture_name": "alpaca-release-tag",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T07:50:35.213156+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

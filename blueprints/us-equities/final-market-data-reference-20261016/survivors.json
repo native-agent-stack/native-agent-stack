@@ -1,0 +1,230 @@
+{
+  "schema": "market-data-final-survivor-delta/1",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "checked_utc": "2026-10-16T05:11:32.829425Z",
+  "latest_covering_sweep": "landscape-sweep-20260926",
+  "survivors": [
+    {
+      "repository": "https://github.com/databento/databento-python",
+      "carried_pin": "25eef4ee8e66559e2370166a57c20925ce244d49",
+      "role": "vendor_historical_live_reference",
+      "read_at": "2026-10-16T05:11:32.829425Z",
+      "source_sha256": "5b494741354dc3f6aef08daffa1af1d4d3ddffc755b4b43543abb1141867a229",
+      "source": "README.md",
+      "source_refs": [
+        {
+          "repository": "https://github.com/databento/databento-python",
+          "pin": "25eef4ee8e66559e2370166a57c20925ce244d49",
+          "path": "README.md",
+          "line": 49
+        }
+      ],
+      "status": "CARRIED_UNRESOLVED",
+      "e2e": "NOT_RUN",
+      "gap": "VENDOR_KEY_AND_MATCHED_PIT_RIGHTS_GAP",
+      "survivor_remains": true,
+      "carried_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260926/databento-databento-python.json",
+        "line": 7,
+        "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+      },
+      "carried_version": "0.87.0",
+      "carried_version_source": {
+        "repository": "https://github.com/databento/databento-python",
+        "pin": "25eef4ee8e66559e2370166a57c20925ce244d49",
+        "path": "pyproject.toml",
+        "line": 3
+      },
+      "pin_drift": {
+        "previous_version": "0.86.0",
+        "previous_source_commit": "e675ef30369f5ee9f68b04606080c519adf3be69",
+        "prior_catalog_source": {
+          "path": "catalogs/us-equities/data-research.json",
+          "line": 65,
+          "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        },
+        "packet_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/lane-packet.json",
+          "line": 42,
+          "at_commit": "7d740ccb66a9e2f041ea9b34ee1585996f859560"
+        },
+        "scope": "Carried source review is newer than the older catalog/packet release identity; both scopes retained, no adoption or retirement inferred."
+      },
+      "installation_status": "NOT_RUN_IN_THIS_BOUNDED_SOURCE_DELTA",
+      "installation_scope": "No claim that package installation requires a vendor key. The key/rights requirement applies to acquisition only; the current record is a carried-source screen, not completed vendor E2E."
+    },
+    {
+      "repository": "https://github.com/hydrosquall/tiingo-python",
+      "carried_pin": "4d9a9776a811efb5b70b3238e31363f84fabab94",
+      "role": "vendor_history_news_client",
+      "read_at": "2026-10-16T05:11:32.829425Z",
+      "source_sha256": "3b26511e2517f1d12826e51294ef350de5115bb2feca0d7143ea89321dd173df",
+      "source": "README.rst",
+      "source_refs": [
+        {
+          "repository": "https://github.com/hydrosquall/tiingo-python",
+          "pin": "4d9a9776a811efb5b70b3238e31363f84fabab94",
+          "path": "README.rst",
+          "line": 77
+        }
+      ],
+      "status": "CARRIED_UNRESOLVED",
+      "e2e": "NOT_RUN",
+      "gap": "VENDOR_KEY_AND_MATCHED_PIT_RIGHTS_GAP",
+      "survivor_remains": true,
+      "carried_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260926/hydrosquall-tiingo-python.json",
+        "line": 7,
+        "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+      },
+      "installation_status": "NOT_RUN_IN_THIS_BOUNDED_SOURCE_DELTA",
+      "installation_scope": "No claim that package installation requires a vendor key. The key/rights requirement applies to acquisition only; the current record is a carried-source screen, not completed vendor E2E."
+    },
+    {
+      "repository": "https://github.com/man-group/arcticdb",
+      "carried_pin": "7d30a6eefe709e5379f1dd7f38b03074750cf1be",
+      "role": "local_or_object_dataframe_storage",
+      "read_at": "2026-10-16T05:11:32.829425Z",
+      "source_sha256": "a61475de9755923a6f5e1459af315a8459155e8b3241ebe6c41e52ec5f27c09e",
+      "source": "README.md",
+      "source_refs": [
+        {
+          "repository": "https://github.com/man-group/arcticdb",
+          "pin": "7d30a6eefe709e5379f1dd7f38b03074750cf1be",
+          "path": "README.md",
+          "line": 26
+        },
+        {
+          "repository": "https://github.com/man-group/arcticdb",
+          "pin": "7d30a6eefe709e5379f1dd7f38b03074750cf1be",
+          "path": "README.md",
+          "line": 103
+        }
+      ],
+      "status": "CARRIED_UNRESOLVED",
+      "e2e": "NOT_RUN_AT_CARRIED_SOURCE_PIN",
+      "gap": "LOCAL_STORE_MATCHED_WORKLOAD_AND_PRODUCTION_LICENSE_GAP",
+      "survivor_remains": true,
+      "proposed_trial_pin": {
+        "version": "6.26.0",
+        "commit": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+        "main_source": {
+          "path": "catalogs/us-equities/data-research.json",
+          "line": 327,
+          "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        }
+      },
+      "pin_scope": "carried_pin is historical sweep source identity; proposed_trial_pin is a separate release already named on main. No survivor identity is silently overwritten.",
+      "carried_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260926/man-group-arcticdb.json",
+        "line": 7,
+        "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+      },
+      "separate_release_trial": {
+        "pin": {
+          "version": "6.26.0",
+          "commit": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+          "main_source": {
+            "path": "catalogs/us-equities/data-research.json",
+            "line": 327,
+            "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+          }
+        },
+        "e2e": "BOUNDED_LOCAL_NATIVE_SDK_DIAGNOSTIC_EXIT_0",
+        "sources": [
+          {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-install.json",
+            "line": 19
+          },
+          {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.json",
+            "line": 14
+          },
+          {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
+            "line": 1
+          },
+          {
+            "path": "evidence/artifacts/final-market-data-reference-20261016/recapture-v1/arctic-upstream-lmdb-smoke.log",
+            "line": 16
+          },
+          {
+            "repository": "https://github.com/man-group/arcticdb",
+            "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+            "path": "README.md",
+            "line": 77
+          },
+          {
+            "repository": "https://github.com/man-group/arcticdb",
+            "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+            "path": "README.md",
+            "line": 103
+          },
+          {
+            "repository": "https://github.com/man-group/arcticdb",
+            "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+            "path": "README.md",
+            "line": 126
+          },
+          {
+            "repository": "https://github.com/man-group/arcticdb",
+            "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+            "path": "README.md",
+            "line": 127
+          }
+        ],
+        "scope": "Real local native SDK roundtrip on explicitly synthetic 100000x10 frame; no performance comparison, vendor data, production license or default inferred."
+      }
+    },
+    {
+      "repository": "https://github.com/massive-com/client-python",
+      "carried_pin": "481e5c270ea85e8eae5e96f8b9fda34e5e2a674a",
+      "role": "vendor_rest_websocket_reference",
+      "read_at": "2026-10-16T05:11:32.829425Z",
+      "source_sha256": "f023ebdcb3e989fa5ad9302e2a11ab2ba7f36b16d6964d1f8bca570064070a2a",
+      "source": "README.md",
+      "source_refs": [
+        {
+          "repository": "https://github.com/massive-com/client-python",
+          "pin": "481e5c270ea85e8eae5e96f8b9fda34e5e2a674a",
+          "path": "README.md",
+          "line": 31
+        },
+        {
+          "repository": "https://github.com/massive-com/client-python",
+          "pin": "481e5c270ea85e8eae5e96f8b9fda34e5e2a674a",
+          "path": "README.md",
+          "line": 167
+        }
+      ],
+      "status": "CARRIED_UNRESOLVED",
+      "e2e": "NOT_RUN",
+      "gap": "VENDOR_KEY_AND_MATCHED_PIT_RIGHTS_GAP",
+      "survivor_remains": true,
+      "carried_pin_source": {
+        "path": "evidence/artifacts/landscape-sweep-20260926/massive-com-client-python.json",
+        "line": 7,
+        "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+      },
+      "pin_drift": {
+        "previous_version": "2.8.0",
+        "previous_source_commit": "3c247d78c603fc13d274fda1aa26749e7c8c3710",
+        "prior_catalog_source": {
+          "path": "catalogs/us-equities/data-research.json",
+          "line": 112,
+          "at_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+        },
+        "packet_source": {
+          "path": "evidence/artifacts/final-market-data-reference-20261016/lane-packet.json",
+          "line": 14,
+          "at_commit": "7d740ccb66a9e2f041ea9b34ee1585996f859560"
+        },
+        "scope": "Carried source commit differs from catalog/packet release; version at the carried source is not inferred from the older2.8.0record."
+      },
+      "installation_status": "NOT_RUN_IN_THIS_BOUNDED_SOURCE_DELTA",
+      "installation_scope": "No claim that package installation requires a vendor key. The key/rights requirement applies to acquisition only; the current record is a carried-source screen, not completed vendor E2E."
+    }
+  ],
+  "new_discovery": false,
+  "scope": "Only carried survivors; pinned primary-source checks and one authorized bounded local ArcticDB release trial. No fresh landscape survey."
+}

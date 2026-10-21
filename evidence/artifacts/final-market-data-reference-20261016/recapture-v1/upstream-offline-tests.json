@@ -1,0 +1,42 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Native observed command output only; no source acquisition, comparative A6 or FINAL admission.",
+  "command": [
+    "<scratch>/venv/bin/python",
+    "-m",
+    "pytest",
+    "-p",
+    "tests._offline_harness",
+    "-p",
+    "no:pytest-retry",
+    "-m",
+    "not network",
+    "-o",
+    "env=",
+    "tests/sgml/test_filing_header.py",
+    "tests/ownership/test_insider_parse_contract.py",
+    "tests/documents/test_html_style_parser.py",
+    "-q",
+    "--tb=short"
+  ],
+  "cwd": "<pinned-upstream>",
+  "declared_inputs": {
+    "edgartools": "5.61.1",
+    "source_commit": "7338aa335f6442c52dfa0695422cf1cd27e946e0"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T06:20:44.911156+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
+  "output": "upstream-offline-tests.log",
+  "output_sha256": "4b72d3fa2c05fdc729e7f8dbdacebe2830a7129cd18527a45db8959b9ac0a7dc",
+  "private_capture_name": "upstream-offline-tests",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T06:20:37.655359+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

@@ -1,0 +1,33 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Scope-locked fold setup or explicitly synthetic masking/custody regression; no broker calls or model adjudication.",
+  "command": [
+    "/usr/bin/python3",
+    "<repository>/blueprints/us-equities/final-market-data-reference-20261016/closure_audit.py",
+    "--freeze",
+    "<repository>/evidence/artifacts/final-market-data-reference-20261016/fold-v1/fold-freeze.log",
+    "--runtime-lock",
+    "<repository>/blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
+  ],
+  "cwd": "<fold-scratch>",
+  "declared_inputs": {
+    "component": "resolved_closure_source_audit",
+    "runtime_lock": "uv.lock",
+    "scope": "not component E2E"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T07:54:20.170235+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
+  "output": "fold-closure-audit.log",
+  "output_sha256": "b785eb0519000c78bbe94cbc8fef171f890091bc0da294c118866cb35722c130",
+  "private_capture_name": "fold-closure-audit",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T07:54:19.972560+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

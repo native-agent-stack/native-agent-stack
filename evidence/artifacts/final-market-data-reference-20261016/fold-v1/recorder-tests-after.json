@@ -1,0 +1,35 @@
+{
+  "capture_class": "masked_native_capture",
+  "claim_scope": "Scope-locked fold setup or explicitly synthetic masking/custody regression; no broker calls or model adjudication.",
+  "command": [
+    "/usr/bin/python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "<repository>/blueprints/us-equities/final-market-data-reference-20261016",
+    "-p",
+    "test_native_capture.py",
+    "-v"
+  ],
+  "cwd": "<fold-scratch>",
+  "declared_inputs": {
+    "component": "capture_recorder_and_masker",
+    "scope": "synthetic regression fixtures"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-16T07:45:59.396824+00:00",
+  "masking_rule": "mask_capture.py:mask_bytes",
+  "masking_scope": "Declared literal substitution only; all other bytes retained",
+  "metadata_correction": "Source-specific declaration corrected by publish_capture.py; original recorder metadata remains private and unchanged. Command/rc/times are unaltered.",
+  "output": "recorder-tests-after.log",
+  "output_sha256": "bf9b7d24fffbafd09f80297fa1c84667d4a6c7b25c5874347bdfe03f7b41743c",
+  "private_capture_name": "recorder-tests-after",
+  "private_mapping_name": "mask-map.json",
+  "private_original_name": "stdout.raw",
+  "private_receipt_original_name": "receipt.raw.json",
+  "publication_transform": "publish_capture.py:public_pair; retained originals and maps reproduce both derivatives",
+  "schema": "masked-native-command/1",
+  "started_utc": "2026-10-16T07:45:59.029566+00:00",
+  "stream": "stdout_and_stderr_merged_as_bytes"
+}

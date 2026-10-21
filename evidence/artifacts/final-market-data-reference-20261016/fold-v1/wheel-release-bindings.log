@@ -1,0 +1,69 @@
+{
+  "bindings": [
+    {
+      "official_tag_refs": [
+        "refs/tags/v0.44.0"
+      ],
+      "package": "alpaca-py",
+      "pypi_record": {
+        "line": 1,
+        "path": "pypi-alpaca.log"
+      },
+      "runtime_lock_wheel_match": true,
+      "scope": "Official tag identity plus PyPI release-wheel hash and locked wheel; full bit-for-bit source build not performed.",
+      "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "tag_record": {
+        "line": 1,
+        "path": "alpaca-release-tag.log"
+      },
+      "version": "0.44.0",
+      "wheel": "alpaca_py-0.44.0-py3-none-any.whl",
+      "wheel_sha256": "b54673f967c0c814a5e0223cbb0211a5d9d75a8d107e792872b14e5bae957c03",
+      "wheel_url": "https://files.pythonhosted.org/packages/8e/9e/69a2d867988578d6f9e52e35d435d8a43296257cf590fb881a3752de7651/alpaca_py-0.44.0-py3-none-any.whl"
+    },
+    {
+      "official_tag_refs": [
+        "refs/tags/v5.61.1"
+      ],
+      "package": "edgartools",
+      "pypi_record": {
+        "line": 1,
+        "path": "pypi-edgar.log"
+      },
+      "runtime_lock_wheel_match": true,
+      "scope": "Official tag identity plus PyPI release-wheel hash and locked wheel; full bit-for-bit source build not performed.",
+      "source_commit": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "tag_record": {
+        "line": 1,
+        "path": "edgar-release-tag.log"
+      },
+      "version": "5.61.1",
+      "wheel": "edgartools-5.61.1-py3-none-any.whl",
+      "wheel_sha256": "8229753d3fb4dfdc865291bf7fd684d11297094b88ec724c919630cf21e81037",
+      "wheel_url": "https://files.pythonhosted.org/packages/9e/c1/10e2baaeb32364a7147a181de1d22cc1e74eaefb57d54a1aaabfe7e95074/edgartools-5.61.1-py3-none-any.whl"
+    },
+    {
+      "official_tag_refs": [
+        "refs/tags/4.13.2"
+      ],
+      "package": "exchange-calendars",
+      "pypi_record": {
+        "line": 1,
+        "path": "pypi-calendar.log"
+      },
+      "runtime_lock_wheel_match": true,
+      "scope": "Official tag identity plus PyPI release-wheel hash and locked wheel; full bit-for-bit source build not performed.",
+      "source_commit": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+      "tag_record": {
+        "line": 1,
+        "path": "calendar-release-tag.log"
+      },
+      "version": "4.13.2",
+      "wheel": "exchange_calendars-4.13.2-py3-none-any.whl",
+      "wheel_sha256": "fc5a2ad0d61b5c3a6539a3061cd4cbb55c59f4a903455cec7926e4b798919996",
+      "wheel_url": "https://files.pythonhosted.org/packages/c8/4c/0469b40057bc9f8d9594dcc6024202626b981ae4b52dfcd304552e8e1c3a/exchange_calendars-4.13.2-py3-none-any.whl"
+    }
+  ],
+  "schema": "wheel-release-binding/1",
+  "scope": "Deterministic source/lock audit; not native component E2E or comparative evidence."
+}

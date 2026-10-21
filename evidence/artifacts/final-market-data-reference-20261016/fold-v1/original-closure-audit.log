@@ -1,0 +1,614 @@
+{
+  "rows": [
+    {
+      "freeze_line": 2,
+      "locked": "25.1.0",
+      "name": "aiofiles",
+      "observed": "25.1.0",
+      "runtime_lock_version_line": 24,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 3,
+      "locked": "0.44.0",
+      "name": "alpaca-py",
+      "observed": "0.44.0",
+      "runtime_lock_version_line": 105,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 4,
+      "locked": "0.8.0",
+      "name": "annotated-types",
+      "observed": "0.8.0",
+      "runtime_lock_version_line": 132,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 5,
+      "locked": "4.15.1",
+      "name": "anyio",
+      "observed": "4.15.1",
+      "runtime_lock_version_line": 141,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 6,
+      "locked": "4.15.0",
+      "name": "beautifulsoup4",
+      "observed": "4.15.0",
+      "runtime_lock_version_line": 206,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 7,
+      "locked": "2026.7.22",
+      "name": "certifi",
+      "observed": "2026.7.22",
+      "runtime_lock_version_line": 251,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 8,
+      "locked": "3.5.2",
+      "name": "charset-normalizer",
+      "observed": "3.5.2",
+      "runtime_lock_version_line": 283,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 9,
+      "locked": null,
+      "name": "coverage",
+      "observed": "7.16.2",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    },
+    {
+      "freeze_line": 10,
+      "locked": "5.61.1",
+      "name": "edgartools",
+      "observed": "5.61.1",
+      "runtime_lock_version_line": 546,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 11,
+      "locked": null,
+      "name": "et-xmlfile",
+      "observed": "2.0.0",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    },
+    {
+      "freeze_line": 12,
+      "locked": "4.13.2",
+      "name": "exchange-calendars",
+      "observed": "4.13.2",
+      "runtime_lock_version_line": 603,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 13,
+      "locked": null,
+      "name": "execnet",
+      "observed": "2.1.2",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    },
+    {
+      "freeze_line": 14,
+      "locked": "4.0.10",
+      "name": "filelock",
+      "observed": "4.2.0",
+      "runtime_lock_version_line": 700,
+      "status": "differs"
+    },
+    {
+      "freeze_line": 15,
+      "locked": null,
+      "name": "freezegun",
+      "observed": "1.5.1",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    },
+    {
+      "freeze_line": 16,
+      "locked": "0.16.0",
+      "name": "h11",
+      "observed": "0.16.0",
+      "runtime_lock_version_line": 906,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 17,
+      "locked": "1.0.9",
+      "name": "httpcore",
+      "observed": "1.0.9",
+      "runtime_lock_version_line": 915,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 18,
+      "locked": "0.28.1",
+      "name": "httpx",
+      "observed": "0.28.1",
+      "runtime_lock_version_line": 928,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 19,
+      "locked": "0.6.1",
+      "name": "httpxthrottlecache",
+      "observed": "0.7.0",
+      "runtime_lock_version_line": 952,
+      "status": "differs"
+    },
+    {
+      "freeze_line": 20,
+      "locked": "4.16.0",
+      "name": "humanize",
+      "observed": "4.16.0",
+      "runtime_lock_version_line": 980,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 21,
+      "locked": "3.20",
+      "name": "idna",
+      "observed": "3.20",
+      "runtime_lock_version_line": 989,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 22,
+      "locked": "2.3.1",
+      "name": "iniconfig",
+      "observed": "2.3.1",
+      "runtime_lock_version_line": 1010,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 23,
+      "locked": "3.1.6",
+      "name": "jinja2",
+      "observed": "3.1.6",
+      "runtime_lock_version_line": 1079,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 24,
+      "locked": "0.4.0",
+      "name": "korean-lunar-calendar",
+      "observed": "0.4.0",
+      "runtime_lock_version_line": 1209,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 25,
+      "locked": "6.1.3",
+      "name": "lxml",
+      "observed": "6.1.3",
+      "runtime_lock_version_line": 1236,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 26,
+      "locked": "4.2.0",
+      "name": "markdown-it-py",
+      "observed": "4.2.0",
+      "runtime_lock_version_line": 1274,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 27,
+      "locked": "3.0.4",
+      "name": "markupsafe",
+      "observed": "3.0.4",
+      "runtime_lock_version_line": 1286,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 28,
+      "locked": "0.1.2",
+      "name": "mdurl",
+      "observed": "0.1.2",
+      "runtime_lock_version_line": 1360,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 29,
+      "locked": "1.2.3",
+      "name": "msgpack",
+      "observed": "1.2.3",
+      "runtime_lock_version_line": 1466,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 30,
+      "locked": "1.6.0",
+      "name": "nest-asyncio",
+      "observed": "1.6.0",
+      "runtime_lock_version_line": 1544,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 31,
+      "locked": "2.5.3",
+      "name": "numpy",
+      "observed": "2.5.4",
+      "runtime_lock_version_line": 1553,
+      "status": "differs"
+    },
+    {
+      "freeze_line": 32,
+      "locked": null,
+      "name": "openpyxl",
+      "observed": "3.1.5",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    },
+    {
+      "freeze_line": 33,
+      "locked": "3.12.0",
+      "name": "orjson",
+      "observed": "3.13.0",
+      "runtime_lock_version_line": 1635,
+      "status": "differs"
+    },
+    {
+      "freeze_line": 34,
+      "locked": "26.3",
+      "name": "packaging",
+      "observed": "26.3",
+      "runtime_lock_version_line": 1654,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 35,
+      "locked": "3.0.6",
+      "name": "pandas",
+      "observed": "3.0.6",
+      "runtime_lock_version_line": 1663,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 36,
+      "locked": "1.6.0",
+      "name": "pluggy",
+      "observed": "1.7.0",
+      "runtime_lock_version_line": 1768,
+      "status": "differs"
+    },
+    {
+      "freeze_line": 37,
+      "locked": "25.0.1",
+      "name": "pyarrow",
+      "observed": "26.0.0",
+      "runtime_lock_version_line": 1870,
+      "status": "differs"
+    },
+    {
+      "freeze_line": 38,
+      "locked": "2.13.5",
+      "name": "pydantic",
+      "observed": "2.14.1",
+      "runtime_lock_version_line": 1915,
+      "status": "differs"
+    },
+    {
+      "freeze_line": 39,
+      "locked": "2.46.5",
+      "name": "pydantic-core",
+      "observed": "2.50.1",
+      "runtime_lock_version_line": 1935,
+      "status": "differs"
+    },
+    {
+      "freeze_line": 40,
+      "locked": "2.21.0",
+      "name": "pygments",
+      "observed": "2.21.0",
+      "runtime_lock_version_line": 1979,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 41,
+      "locked": "2.3.0",
+      "name": "pyluach",
+      "observed": "2.3.0",
+      "runtime_lock_version_line": 2002,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 42,
+      "locked": "4.5.0",
+      "name": "pyrate-limiter",
+      "observed": "4.5.0",
+      "runtime_lock_version_line": 2029,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 43,
+      "locked": "9.1.1",
+      "name": "pytest",
+      "observed": "9.1.1",
+      "runtime_lock_version_line": 2038,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 44,
+      "locked": null,
+      "name": "pytest-asyncio",
+      "observed": "1.4.0",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    },
+    {
+      "freeze_line": 45,
+      "locked": null,
+      "name": "pytest-cov",
+      "observed": "7.1.0",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    },
+    {
+      "freeze_line": 46,
+      "locked": null,
+      "name": "pytest-env",
+      "observed": "1.8.0",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    },
+    {
+      "freeze_line": 47,
+      "locked": null,
+      "name": "pytest-mock",
+      "observed": "3.16.0",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    },
+    {
+      "freeze_line": 48,
+      "locked": null,
+      "name": "pytest-retry",
+      "observed": "1.7.0",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    },
+    {
+      "freeze_line": 49,
+      "locked": null,
+      "name": "pytest-vcr",
+      "observed": "1.0.2",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    },
+    {
+      "freeze_line": 50,
+      "locked": null,
+      "name": "pytest-xdist",
+      "observed": "3.8.0",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    },
+    {
+      "freeze_line": 51,
+      "locked": "2.9.0.post0",
+      "name": "python-dateutil",
+      "observed": "2.9.0.post0",
+      "runtime_lock_version_line": 2054,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 52,
+      "locked": "1.2.4",
+      "name": "python-dotenv",
+      "observed": "1.2.4",
+      "runtime_lock_version_line": 2066,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 53,
+      "locked": "2026.5",
+      "name": "pytz",
+      "observed": "2026.5",
+      "runtime_lock_version_line": 2084,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 54,
+      "locked": "6.0.3",
+      "name": "pyyaml",
+      "observed": "6.0.3",
+      "runtime_lock_version_line": 2112,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 55,
+      "locked": "0.2.2",
+      "name": "rank-bm25",
+      "observed": "0.2.2",
+      "runtime_lock_version_line": 2148,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 56,
+      "locked": "3.14.6",
+      "name": "rapidfuzz",
+      "observed": "3.14.6",
+      "runtime_lock_version_line": 2160,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 57,
+      "locked": "2.34.2",
+      "name": "requests",
+      "observed": "2.34.2",
+      "runtime_lock_version_line": 2197,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 58,
+      "locked": "15.0.0",
+      "name": "rich",
+      "observed": "15.0.0",
+      "runtime_lock_version_line": 2212,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 59,
+      "locked": "1.17.0",
+      "name": "six",
+      "observed": "1.17.0",
+      "runtime_lock_version_line": 2328,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 60,
+      "locked": "2.10",
+      "name": "soupsieve",
+      "observed": "3.0.3",
+      "runtime_lock_version_line": 2380,
+      "status": "differs"
+    },
+    {
+      "freeze_line": 61,
+      "locked": "1.9.0",
+      "name": "sseclient-py",
+      "observed": "1.9.0",
+      "runtime_lock_version_line": 2449,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 62,
+      "locked": "26.1.0",
+      "name": "stamina",
+      "observed": "26.1.0",
+      "runtime_lock_version_line": 2457,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 63,
+      "locked": "0.10.0",
+      "name": "tabulate",
+      "observed": "0.10.0",
+      "runtime_lock_version_line": 2504,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 64,
+      "locked": "9.1.4",
+      "name": "tenacity",
+      "observed": "9.2.1",
+      "runtime_lock_version_line": 2513,
+      "status": "differs"
+    },
+    {
+      "freeze_line": 65,
+      "locked": "4.6.3",
+      "name": "textdistance",
+      "observed": "4.6.3",
+      "runtime_lock_version_line": 2522,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 66,
+      "locked": "1.1.0",
+      "name": "toolz",
+      "observed": "1.2.0",
+      "runtime_lock_version_line": 2540,
+      "status": "differs"
+    },
+    {
+      "freeze_line": 67,
+      "locked": "4.70.1",
+      "name": "tqdm",
+      "observed": "4.70.1",
+      "runtime_lock_version_line": 2549,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 68,
+      "locked": "0.10.4",
+      "name": "truststore",
+      "observed": "0.10.5",
+      "runtime_lock_version_line": 2561,
+      "status": "differs"
+    },
+    {
+      "freeze_line": 69,
+      "locked": "4.16.0",
+      "name": "typing-extensions",
+      "observed": "4.16.0",
+      "runtime_lock_version_line": 2582,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 70,
+      "locked": "0.4.4",
+      "name": "typing-inspection",
+      "observed": "0.4.4",
+      "runtime_lock_version_line": 2604,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 71,
+      "locked": "2026.5",
+      "name": "tzdata",
+      "observed": "2026.5",
+      "runtime_lock_version_line": 2616,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 72,
+      "locked": "1.4.0",
+      "name": "unidecode",
+      "observed": "1.4.0",
+      "runtime_lock_version_line": 2634,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 73,
+      "locked": "2.8.0",
+      "name": "urllib3",
+      "observed": "2.8.0",
+      "runtime_lock_version_line": 2643,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 74,
+      "locked": null,
+      "name": "vcrpy",
+      "observed": "8.3.0",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    },
+    {
+      "freeze_line": 75,
+      "locked": "17.2",
+      "name": "websockets",
+      "observed": "17.2",
+      "runtime_lock_version_line": 2766,
+      "status": "matches"
+    },
+    {
+      "freeze_line": 76,
+      "locked": "2.5.0",
+      "name": "wrapt",
+      "observed": "2.5.1",
+      "runtime_lock_version_line": 2807,
+      "status": "differs"
+    },
+    {
+      "freeze_line": 77,
+      "locked": null,
+      "name": "xlsxwriter",
+      "observed": "3.2.9",
+      "runtime_lock_version_line": null,
+      "status": "not_in_runtime_lock"
+    }
+  ],
+  "schema": "resolved-closure-audit/1",
+  "scope": "Native freeze versus accepted runtime lock, not a claim of locked migration or suite acceptance."
+}

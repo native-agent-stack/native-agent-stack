@@ -1,0 +1,20 @@
+Using Python 3.12.3 environment at: arctic-venv
+Resolved 12 packages in 200ms
+Downloading pandas (11.8MiB)
+Downloading arcticdb (20.4MiB)
+ Downloaded arcticdb
+ Downloaded pandas
+Prepared 4 packages in 483ms
+Installed 12 packages in 173ms
+ + arcticdb==6.26.0
+ + attrs==26.1.0
+ + msgpack==1.2.3
+ + numpy==2.5.4
+ + packaging==26.3
+ + pandas==2.3.3
+ + protobuf==6.33.6
+ + python-dateutil==2.9.0.post0
+ + pytz==2026.5
+ + pyyaml==6.0.3
+ + six==1.17.0
+ + tzdata==2026.5

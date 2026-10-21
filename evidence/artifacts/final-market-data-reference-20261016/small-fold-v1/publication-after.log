@@ -1,0 +1,8 @@
+test_non_source_output_is_only_masked (test_publish_capture.PublicationTests.test_non_source_output_is_only_masked) ... ok
+test_release_projection_is_an_allowlist (test_publish_capture.PublicationTests.test_release_projection_is_an_allowlist) ... ok
+test_source_projection_is_labelled_and_native_rc_is_preserved (test_publish_capture.PublicationTests.test_source_projection_is_labelled_and_native_rc_is_preserved) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+OK
