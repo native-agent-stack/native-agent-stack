@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "kind": "lane-packet-scope-projection",
+  "base": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "generator": "tools/sota-convergence/lane_packets.py",
+  "command": "python3 tools/sota-convergence/lane_packets.py --root . --out $SCRATCH/packet-generation --catalog foundation --manifest catalogs/sota-convergence/manifest-20260929.json --registered-receipts --manifest-newcomers --checked-at 2026-10-16",
+  "source_layer_packet": "foundation__workers.json",
+  "original_candidates": 12,
+  "catalog": "foundation",
+  "layer_id": "workers",
+  "requirement": "Delegate bounded independent work, preserve owned edits and actual failed results, and integrate only after relevant review.",
+  "candidates": [
+    {
+      "name": "Worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "evidence_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/token-native-saturation.md"
+      ]
+    },
+    {
+      "name": "Codex native workers",
+      "repository": "https://github.com/openai/codex",
+      "evidence_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/foundation-rd-readiness.md"
+      ]
+    },
+    {
+      "name": "Claude native workers",
+      "repository": "https://github.com/anthropics/claude-code",
+      "evidence_refs": [
+        "docs/foundation-convergence-20260921.md",
+        "catalogs/foundation/decisions.json"
+      ]
+    }
+  ],
+  "projection": "Only winner and carried-survivor identities/evidence pointers. Other original candidates were generated but not re-surveyed. Not a blind adjudication packet; no prior selection or score is hidden from this author."
+}

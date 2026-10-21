@@ -59527,6 +59527,156 @@
       "bytes": 8327
     },
     {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/README.md",
+      "sha256": "635f7f1cc9e0b93637a725906f112565328f62b5b46e8a85479ed326d2a22df2",
+      "bytes": 5073
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/angles-draft.md",
+      "sha256": "faa27e43b3b3a54942b4fb90f41f127e97a68cbed4666983f158b515613a2ca9",
+      "bytes": 12596
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/claude-code-smoke.json",
+      "sha256": "81a375ae4b297ec414e211db7fb061479de00084794f8cf3e671fd1352c1d006",
+      "bytes": 10289
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/claude-release-manifest.json",
+      "sha256": "8517444f8515ccb572272d6dd666999aa7115fd14ae4207631edaa25d4dfce40",
+      "bytes": 1897
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/invoke-evidence.json",
+      "sha256": "976a3c524e4c03d742f85236f707475298038c049be7dfc4f0f37606014761ab",
+      "bytes": 2340
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/claude/001-verify.txt",
+      "sha256": "04ff48448f712c405b30ce108581a3d295e83ceeda52cd182079205e8200cb26",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/claude/004-install.txt",
+      "sha256": "7787fa40ce1c8cd05fbdd4ed597635927fc4a0c8b59c1acf0855346537792938",
+      "bytes": 721
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/claude/010-verify.txt",
+      "sha256": "c038e686dd4234dbed67f2be884559952ef7220511a02338c92d87fc18bac06b",
+      "bytes": 196
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/claude/011-test.txt",
+      "sha256": "f98cef0381704b555d9188ed0ac009867d71df3478510517617c28f5a5054953",
+      "bytes": 22
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/claude/012-test.txt",
+      "sha256": "223ec71c6e89368ce9d8d4b36118ec535a3af755728b7868fd60f69f6af7c64e",
+      "bytes": 22110
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/claude/013-invoke.txt",
+      "sha256": "9fbe72669d83895620407464992d7f3a370766a7a809fd4b6c8b6912ea40f788",
+      "bytes": 134
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/claude/014-invoke.txt",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/worktrunk/001-verify.txt",
+      "sha256": "32870ce2316d1c0cf24fcc5ef5a8ab0f1109d39cd8475dfa997c60914bce81c6",
+      "bytes": 59
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/worktrunk/005-verify.txt",
+      "sha256": "eb434eb3a508c65a318905269aa3878dd6a1e92c2e8c2a55caea6874dcbccbff",
+      "bytes": 41
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/worktrunk/008-verify.txt",
+      "sha256": "d3e95e5e792d8f53ed034722f4765e7f1d15437b4bcff54b450f29180d581935",
+      "bytes": 103
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/worktrunk/010-verify.txt",
+      "sha256": "322de99d4f0079c1e23f2078197eeab386189b25790619554c654a40a5290ff9",
+      "bytes": 11
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/worktrunk/016-test.txt",
+      "sha256": "becab8f601a484829ed8dfe0606f9d489b8522b7efbfadab622ff3a7d8b95bb4",
+      "bytes": 160
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/worktrunk/017-invoke.txt",
+      "sha256": "7a453763f262d7f866344d481de5ffd348b5580442910b4ad0098d0e80399270",
+      "bytes": 2291
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/worktrunk/018-setup.txt",
+      "sha256": "c1ecf87967ed6f1208e01c0154e2a38609b3fbf70840259518521e17735e4767",
+      "bytes": 28
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/worktrunk/019-test.txt",
+      "sha256": "240da0c03c2bf8368cad21551dd179eef22e70766d536bb7efe9e413eb8284c9",
+      "bytes": 182
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/worktrunk/020-verify.txt",
+      "sha256": "c36fdd96be603d204f63a550bcfc366cf0b3838d3ae3ace1b18ce5a8704307e1",
+      "bytes": 26
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/worktrunk/021-setup.txt",
+      "sha256": "8474d04731e77133689db978c28ee90a1903fb8f780d2213f17419b1bfb6a7c7",
+      "bytes": 35
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/worktrunk/022-test.txt",
+      "sha256": "96dfebffcebad44beafbb759294d6e8c9139efb3565cf8f09849f5aceb0359d1",
+      "bytes": 83
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/outputs/worktrunk/023-verify.txt",
+      "sha256": "1a5e84f24dd6a7bc6ebf07b9a71595d8cf4b613e7ae63707045245bdf74243be",
+      "bytes": 28
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/packet-scope.json",
+      "sha256": "df5d9b822b8e5449158aa982883eafd8c8aa0111fd0d41c43a8da5f5eedceac9",
+      "bytes": 1654
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/pins.md",
+      "sha256": "3d58b7365bfe8d8d2d57c8a69ed06902713d95209e5c90455ce56e236cc07430",
+      "bytes": 7508
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/protocol.md",
+      "sha256": "b8989fc0b4eddca6fb678b9449a5a861c7af292e48697623f53eb61a726f7109",
+      "bytes": 7132
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/public-source-observations.json",
+      "sha256": "4cd658768e50cb7e84febb0d73b2ae90b89f65cbff4573a2c382ec37a7dacfb3",
+      "bytes": 11660
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/release-integrity.json",
+      "sha256": "c99c9160413c0c54c0abfed46f5fc5ad5cdfe7a85be2aebd26d0663d1b4305ff",
+      "bytes": 1627
+    },
+    {
+      "path": "evidence/artifacts/workers-final-preparation-20261016/worktrunk-smoke.json",
+      "sha256": "deeb2e16a26305f296b7d84dad42c0c76405ac906ac718e923f8778582d78d48",
+      "bytes": 15819
+    },
+    {
       "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py",
       "sha256": "c6ecc30a169b4af802f7e8497c7ebfc7c9373114bdd8589ef4ee4db102e516c3",
       "bytes": 8384
