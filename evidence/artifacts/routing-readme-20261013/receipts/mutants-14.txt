@@ -1,0 +1,17 @@
+The 14 mutants of CPA-V-12 (the README's claims, the counts it quotes, the link, the record's table and the baseline file it is read against). Each is one exact change of one file (restored after each run); tests.test_routing_readme runs; a mutant is killed when the run fails. The unmutated run passes first. The first run left one survivor (a count that appears twice in the README), and the check now compares the pair the record holds.
+
+killed   (failed) the README calls the AFTER measurement outstanding again
+killed   (failed) the README says no baseline demand again
+killed   (failed) the README drops the absence-of-demand caveat
+killed   (failed) the README quotes another turn-one count
+killed   (failed) the README quotes another listed count
+killed   (failed) the README drops the sessions and arms
+killed   (failed) the README quotes another p value
+killed   (failed) the README drops the optional re-run heading
+killed   (failed) the README drops the staging command
+killed   (failed) the README's link names a heading that is not there
+killed   (failed) the README quotes another baseline count
+killed   (failed) the record's table changes a count the README quotes
+killed   (failed) the record drops its sessions sentence
+killed   (failed) the baseline file changes its count
+14 mutants, 14 killed, survivors: none

@@ -5762,8 +5762,8 @@
     },
     {
       "path": "adoption/skills/claude-routing/README.md",
-      "sha256": "4934779119e5d51f683cdb13240c00dc094203ae1723158468b55953631b39b0",
-      "bytes": 3451
+      "sha256": "8fee08dc3ad25435da4db311fa82777824c190371bb8eefa7224511030224218",
+      "bytes": 4639
     },
     {
       "path": "adoption/skills/claude-routing/evals/frontend-design/graders/target-used.md",
@@ -52692,6 +52692,26 @@
       "bytes": 2166
     },
     {
+      "path": "evidence/artifacts/routing-readme-20261013/README.md",
+      "sha256": "fbd50210e9104822bc251844e8810cf8ffde725593859c6258f6abbe35826065",
+      "bytes": 1384
+    },
+    {
+      "path": "evidence/artifacts/routing-readme-20261013/receipts/fail-before.txt",
+      "sha256": "8b679e0d2f781fdcc09afaeaecc885adad945de20c066fdc7e2ce32e83289618",
+      "bytes": 1578
+    },
+    {
+      "path": "evidence/artifacts/routing-readme-20261013/receipts/mutants-14.txt",
+      "sha256": "85dc167a39e096d9674a8e6c654e00d626a3561c463d4d4461ae500424d598d5",
+      "bytes": 1332
+    },
+    {
+      "path": "evidence/artifacts/routing-readme-20261013/receipts/mutants-round1-17.txt",
+      "sha256": "62cae99ba509b87c546d1d983aa94654423823e4d5831c412c5d3a3853a1ce05",
+      "bytes": 1874
+    },
+    {
       "path": "evidence/artifacts/row70-codex-binding-20261008/ci-citation-repair.json",
       "sha256": "3bbd1b050288eb7380ddb53a029dd9d5d1fef0fbcd8fea50ecd7150f1d4af123",
       "bytes": 19815
@@ -65430,6 +65450,11 @@
       "path": "tests/test_retrieval_quality_v2.py",
       "sha256": "d1f61612522dc3de6bb78b9bf953668d920fe3778567e935d1b609131dab87ee",
       "bytes": 58079
+    },
+    {
+      "path": "tests/test_routing_readme.py",
+      "sha256": "c803935fe66ae440ca042472c23507bd727afb0e771868f1754065ae109f4d2b",
+      "bytes": 6222
     },
     {
       "path": "tests/test_rtk_receipt_locators.py",

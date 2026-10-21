@@ -17,15 +17,34 @@ security-audit phrasings, one real repository-path request and six indirect
 requests, with unique IDs. Comparison base remains 60004bb1.
 
 The seven skills appear in the supplied native doctor baseline with zero
-lifetime uses. CC-owned native BEFORE runs then measured six targets at 3/3
-and security-audit initially at 1/3, later settled at 16/23 with 6/23 in turn one.
-The six are wired, with no baseline demand; their
-routes remain unchanged. Only the security-audit invocation cue changes.
-`trigger-baseline.json` records the names/counts. Native AFTER measurement
-remains cc-native-practice-owned, without any lane model launch.
+lifetime uses: zero observed calls, which is a reason to check wiring and does
+not establish absence of demand. CC-owned native BEFORE runs then measured six
+targets at 3/3 and security-audit initially at 1/3, later settled at 16/23 with
+6/23 in turn one. The six are wired; their routes remain unchanged. Only the
+security-audit invocation cue changes. `trigger-baseline.json` records the
+names/counts of that BEFORE snapshot.
 
-## Native trigger measurement
+## Retained AFTER measurement
 
+The AFTER measurement is complete. It is the same-checkout hermetic ablation of
+[the decision record](../../../docs/decisions/2026-10-10-daily-skill-invoke-rate.md#primary-effect-size-same-checkout-hermetic-ablation):
+128 sessions, 64 per arm, one checkout and one HEAD, with only the inline
+`skillOverrides.native-skill-routing` setting changing, on Claude Code 2.1.296.
+With the cue hidden against listed, security-audit in turn one was 13/20
+against 20/20 (Fisher two-sided p=0.008) and invoked within three turns 17/20
+against 20/20; the indirect security-best-practices request in turn one was
+8/12 against 12/12; near-miss negatives fired 0/28 in both arms.
+
+Its limits are the record's: synthetic explicit-task prompts, five phrasings,
+one model and one client version; observed counts, not an invocation rate.
+The earlier three-arm study had other HEAD subjects and is supporting evidence
+only. The router stays; the result can be rejected or refined by later
+observations.
+
+## Optional re-run with the vendor harness
+
+The ablation above is the retained measurement; the staged suite below is an
+optional re-run of the same kind of prompts through the vendor's own harness.
 The `evals/` cases use the upstream Claude Code plugin-eval format: a synthetic
 `prompt.md`, `allowed_tools: [Skill]`, and a deterministic `tool_used` grader
 matching the target name with an optional staging-plugin namespace. They test
