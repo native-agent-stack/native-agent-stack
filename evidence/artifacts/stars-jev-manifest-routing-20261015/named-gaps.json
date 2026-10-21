@@ -1,0 +1,47 @@
+{
+  "base_commit": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+  "named_gaps": [
+    {
+      "id": "NO-FINAL-ROWS",
+      "next_action": "Complete existing layer pipeline and require explicit FINAL before default proposal",
+      "reason": "All35 final-stack terminal_state values are null at this base; selected or classified rows cannot be promoted to FINAL",
+      "scope": "NativeHorizonNY defaults"
+    },
+    {
+      "id": "DISCOVERY-SCREEN",
+      "next_action": "Owning layer's next sweep screens only the named new role; no trial install before passing",
+      "reason": "A pinned index/metadata claim is not a target source pin or requirements screen",
+      "scope": "Unscreened new/Jev identities"
+    },
+    {
+      "id": "CUMULATIVE-SURVIVORS",
+      "next_action": "Resolve/compare existing carried survivors before broad discovery; use newer retained completed sweeps if supplied",
+      "reason": "Later omission and absent votes cannot remove unresolved candidates; detailed refs retained per layer",
+      "scope": "All routed layers"
+    },
+    {
+      "id": "JEV-SCORED-AND-ADMISSION",
+      "next_action": "Owning trading-cc frozen comparison after its named inputs/reviews; separate dated availability/threshold admission",
+      "reason": "Two10-15 decisions prove synthetic/local plumbing and corrections, not scored model selection, order or feature admission",
+      "scope": "Trading Jev classification and feature use"
+    },
+    {
+      "id": "TYPESAFE-ORG-ASSOCIATION",
+      "next_action": "Retain explicit excluded/reference rows; independently justify any new role",
+      "reason": "Public membership does not establish a Jev workload or supersede selected upstreams",
+      "scope": "Organization-owned forks/infrastructure"
+    },
+    {
+      "id": "HISTORIC-UNDECIDED-MEANING",
+      "next_action": "Carry26 existing decisions unchanged and screen only7 new proposals",
+      "reason": "26 already have later canonical scope/seed dispositions and7 do not; no350-row resurvey inferred",
+      "scope": "33 legacy-audit gaps"
+    },
+    {
+      "id": "RD-AGENT-NARRATIVE-DRIFT",
+      "next_action": "Use the exact latest-candidate adjudication and retained fit vote in layer-contexts; do not silently rewrite the earlier narrative or re-adjudicate RD-Agent",
+      "reason": "The10-15 Jev build narrative carries RD-Agent from09-23, but the retained09-26 fit return substantively refutes it in both families; this is not a missing vote",
+      "scope": "Research-factors survivor narrative"
+    }
+  ]
+}

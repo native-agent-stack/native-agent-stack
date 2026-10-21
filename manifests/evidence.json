@@ -57567,6 +57567,136 @@
       "bytes": 6424
     },
     {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/README.md",
+      "sha256": "1439846c84e2b5bb17d00ff585a5872e09332ab01a54f7acaf247e8dd8bc7e2d",
+      "bytes": 12357
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/audit.json",
+      "sha256": "eeb0bed8b7570dbcf0c548a746ad7cc94410bec51295ec07f2a52794b6cf4e76",
+      "bytes": 876
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/audit.py",
+      "sha256": "d0734ee1b2f8e75e28afa72842fa0126b205eb01336de8834d9cde6e295ccb70",
+      "bytes": 6412
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/builder-receipt.json",
+      "sha256": "bc0c1dd6be54a7c0dd0a0fd6f824f0d4f03df98a54cb1c71ce6c9d3571e3a210",
+      "bytes": 691
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/derive.py",
+      "sha256": "4bf6944c9c6ba7270bbed41309325664960c0fd7c7a6ee7fbadaa42c70557f9f",
+      "bytes": 37207
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/historical-undecided.json",
+      "sha256": "9793ebf0ebe91b892df1375ff380694b051078f2402d2ebb8a56bdcf5c02635a",
+      "bytes": 1958
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/jev-inventory.json",
+      "sha256": "07e1f7401c05ab42c85cbb76bd7e5abe4cf0441fc832b66caabe82e6cbc0f003",
+      "bytes": 362582
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/layer-contexts.json",
+      "sha256": "681f77d29085f7c3979c9d199743fdcb1a9399b0c148380d02620a1e4e02912d",
+      "bytes": 320231
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/manifest-proposal.json",
+      "sha256": "715a90268d423d66ab72af980b6c385a3b476421ea242999d907f33d783be406",
+      "bytes": 666905
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/named-gaps.json",
+      "sha256": "c801e5d4dcd925e2a4de81aa78c85e3fdcd3a41c44dac7684b779a78e3da7a60",
+      "bytes": 2540
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/protocol.json",
+      "sha256": "6e57f6a76c813290e88a5addb4f9cc740123e6fbbaa6cbe521607933483bb4c3",
+      "bytes": 43159
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/public-starred.refreshed.json",
+      "sha256": "7b9d607eecdf6157cd35624024d2a805a53d77702f3d3d3982d492bee23f67c7",
+      "bytes": 772758
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/routing.json",
+      "sha256": "e6b4b72df02445db7b8047c64073c1ac8fe91c56bb3e1a376f3c5b10e25f13e3",
+      "bytes": 686359
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/routing.md",
+      "sha256": "a2dc2d0ffe8a219fe28e7ffa448f70f999c0100f486a935b6da6d6c3acdeca46",
+      "bytes": 180873
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/star-diff.json",
+      "sha256": "384b32005c5f2447b2e01c0c8b7f2e68497eb5a3b70eb1a3a5b646f8cdabf8df",
+      "bytes": 2717
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream-sources.json",
+      "sha256": "86ff08efa0c1ac5f7d955ae4c23d832659be545348214527913c5bab2b6e2c0e",
+      "bytes": 5025
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/apollo-11.README.md",
+      "sha256": "51742a8bfc44fd5bc5b32776ebfe11a1d009e55611c35feb4b61ca1fc8d5e7fe",
+      "bytes": 6093
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/artcraft.README.md",
+      "sha256": "fdee41b8e2603512751f0379b19de91d6413ddfaaf4343131b6b7edc662a06a0",
+      "bytes": 249
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/awesome-jev-projects.README.md",
+      "sha256": "6ca97fb01e01fe4a35ce3972ab2dc46dce65d108840cfc46567344d8f15de194",
+      "bytes": 573524
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/billion-context.README.md",
+      "sha256": "fd570896cb885c849c3bca971a94f0846df946dbd866166d2a9a2e84eab188f7",
+      "bytes": 56255
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/flutter.README.md",
+      "sha256": "4bc9b330ef1c690f06adb0f90c25018c980977ad47d25d88efca11f45e91930a",
+      "bytes": 6946
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/jev-trader.README.md",
+      "sha256": "409bdc2ee95316d33059dca0b2c1d621f6b96dcba7eb475237fe1ab541de2b1a",
+      "bytes": 5726
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/openrig.README.md",
+      "sha256": "4c0862e6e39e2d39721e626b71748f9790bb634618db946323b9378a8e812d7d",
+      "bytes": 38081
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/rea.README.md",
+      "sha256": "6856a965e4b6cc3ca7b4211c7cfa63fc59e6aa638b30bdb38c46a5eb3e4cfdb2",
+      "bytes": 22177
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/tester-e2e.README.md",
+      "sha256": "cec51074048b5bb8cffa6982a3264f05c6e4d772cd4de6bbbc4710b4b7deeacd",
+      "bytes": 5333
+    },
+    {
+      "path": "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/typesafe-skills.README.md",
+      "sha256": "799ce1dc39dc1cb98977f930610bf693a26d1a78e5912b860014447d97390282",
+      "bytes": 1336
+    },
+    {
       "path": "evidence/artifacts/suite-parallelism-trial-20261003/README.md",
       "sha256": "0a9faceaf4268eb54b76c174609ea8e597d50a9ea39170317944f62caea474e4",
       "bytes": 9207
