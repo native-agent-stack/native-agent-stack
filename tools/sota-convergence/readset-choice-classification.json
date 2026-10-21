@@ -3,6 +3,181 @@
   "source_rev": "63f1618798f7019d7b6623503da4a47874636c25",
   "statements": [
     {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/native-client.json",
+      "sha256": "9696d0fe381dbfa3e7ee1b794984790c704c6cb49974ef07110da9daeb6ef7b0",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/native-client.json",
+      "sha256": "cf6aca238faf65fa386005176b3528caa431b4789333df0b697ddb7696021e5e",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "cb6cd1bd757f5cbf6c3d88be20e252e0db35197aaa8f7641e336c2d81512843b",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "d9bd0b49070a2904961e75286725b5eacd07bbdc7235fb71d92932bbb18dde62",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "927b1146038f0219eb2847bae05b0911078b3e822a135de394878d61b00e23d0",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "352a8b316fb523a5213ac9f60a89669374324beb581d5f9dbf7721ef15914768",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "42704ca0e64c0854ac688aeb205b6b0a7297fced46dce9547a2c51d83fe401d3",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "a8c99917e76821503235fb83f1e2dab273da351937ae2fba61b8ad818c6298f4",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "5f991036edc88e62dbd5f6d84e769ada74bea4a7c466e182cef50f67a73d2027",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "cc1ab165f66b8fa3c64ab4f6bafa952b25c5b5ae1b670952500d808a58a9ac0b",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "4d969cdb5bae087fd5b6a82ac06752e621f19e79772c921e79f6eedfa9dd0e53",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "b6b019e2322af6e002792093f4b9ebb1471231b7efb1723d3cb2546800d29bb5",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "f8b6a072d42a42169a610479b8f3a60e9b2d053767c9c5fe22bd44e0b53876b3",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "ce54d830d87fbb3e1f1282e65c60f442df5931c398978f84a7bf31de996e14b9",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "7b10b1139265c027ed7eafeca422aabd3ae1064e52c1af53c904fe090452fc40",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "3d17bbcd4d6e1df53abdd3a7ee83572794b4fa1ee2de1eab8d0733c3421dca79",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "b1089edb3c0c1ecd54cd28d38d63a974db2e3b1125becd445e3aa32d0ee1592f",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "5a10a7afeaeececad7832b70bd771736a54c0ee473ab1ccc2a506efaef73934b",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "5849f84b74aca6767fff020b63a9ffbccb683551ab284de4bf3687c093775751",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "b5619427fde9b01af63eaaaba8fd6b2f5500e0c10880d04568853669dcd63eca",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "33bd67934f484c0fae7968e0fed7b27c8d5eaf868c9f6d00f8fa15517ffa3fb0",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "b1089edb3c0c1ecd54cd28d38d63a974db2e3b1125becd445e3aa32d0ee1592f",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "5f991036edc88e62dbd5f6d84e769ada74bea4a7c466e182cef50f67a73d2027",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "cc1ab165f66b8fa3c64ab4f6bafa952b25c5b5ae1b670952500d808a58a9ac0b",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "4d969cdb5bae087fd5b6a82ac06752e621f19e79772c921e79f6eedfa9dd0e53",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "b6b019e2322af6e002792093f4b9ebb1471231b7efb1723d3cb2546800d29bb5",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "f8b6a072d42a42169a610479b8f3a60e9b2d053767c9c5fe22bd44e0b53876b3",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "ce54d830d87fbb3e1f1282e65c60f442df5931c398978f84a7bf31de996e14b9",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "7b10b1139265c027ed7eafeca422aabd3ae1064e52c1af53c904fe090452fc40",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "3d17bbcd4d6e1df53abdd3a7ee83572794b4fa1ee2de1eab8d0733c3421dca79",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "a8c99917e76821503235fb83f1e2dab273da351937ae2fba61b8ad818c6298f4",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "d9bd0b49070a2904961e75286725b5eacd07bbdc7235fb71d92932bbb18dde62",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "927b1146038f0219eb2847bae05b0911078b3e822a135de394878d61b00e23d0",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "352a8b316fb523a5213ac9f60a89669374324beb581d5f9dbf7721ef15914768",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
+      "sha256": "d64342e0753405596869de6bb24a2666b643ef2337740a0d68cdf72cec770206",
+      "disposition": "choice"
+    },
+    {
       "sha256": "1b61772537d3ac9ef94858e8b4a88627657aedeea09c4dac0c211bf3136e8196",
       "path": "adoption/lifecycle.md",
       "disposition": "data"
@@ -1966,9 +2141,681 @@
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
       "sha256": "d19c15025268e01be38f6641c2f4713b1d564723ced8fdd6c55c518a36861083",
       "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "5caa970a5eb4e5c1a76f3be9a9adde9252e3d29aac01a90e54b4508e2de5550b",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "05eb4549789cd177334302ea773e938703426cfd2f114ef0bca2d033f32808fa",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "012b8bb94e2c9f0c52263afb6b069601636dded08da8a86d0561e1a14bb939cb",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "5caa970a5eb4e5c1a76f3be9a9adde9252e3d29aac01a90e54b4508e2de5550b",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "05eb4549789cd177334302ea773e938703426cfd2f114ef0bca2d033f32808fa",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "012b8bb94e2c9f0c52263afb6b069601636dded08da8a86d0561e1a14bb939cb",
+      "disposition": "choice"
     }
   ],
   "fields": [
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/0/selected",
+      "sha256": "ee8b9057dd06b8f8f972833c96908f940d61913525438a4d99eb20dc3e610dc1"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/1/selected",
+      "sha256": "bcb8f9618a5033ae193d09422351f169da85e8c79088e38d89c8c4e8238672ef"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/2/selected",
+      "sha256": "c89c13f7d015a1946b8d2618e6c002901a30be31acb20d78f49f295a1e68df32"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/3/selected",
+      "sha256": "8fcd51d0cb730af96aec7a83db1b0313d584ab148abe6f97a058183e831ef97a"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/4/selected",
+      "sha256": "521621fdb96fe499ee072f6e796438520d03dd7406177dc98226a8866432a25e"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/5/selected",
+      "sha256": "6f51b3d3d1a6b314e53c8a3d63350e08c089d763826ccbb9ea9af9ca86adf465"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/6/selected",
+      "sha256": "699b58affcc0a0619b2eff0769347585a87562d55041b30289d7754cde67a969"
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/receipt.json",
+      "pointer": "/current_owner_amendment/slot",
+      "sha256": "28c8125b105875de15af936ededda61abab92e3e4afab4031cc3cabe6ce38f8e"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/0/selected",
+      "sha256": "ee8b9057dd06b8f8f972833c96908f940d61913525438a4d99eb20dc3e610dc1"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/1/selected",
+      "sha256": "bcb8f9618a5033ae193d09422351f169da85e8c79088e38d89c8c4e8238672ef"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/2/selected",
+      "sha256": "c89c13f7d015a1946b8d2618e6c002901a30be31acb20d78f49f295a1e68df32"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/3/selected",
+      "sha256": "8fcd51d0cb730af96aec7a83db1b0313d584ab148abe6f97a058183e831ef97a"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/4/selected",
+      "sha256": "521621fdb96fe499ee072f6e796438520d03dd7406177dc98226a8866432a25e"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/5/selected",
+      "sha256": "63f8e5a0945e3ec97600cf3af41f155c10b9a1427e979cd15cbe27239d18eaed"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/6/selected",
+      "sha256": "699b58affcc0a0619b2eff0769347585a87562d55041b30289d7754cde67a969"
+    },
+    {
+      "path": "evidence/receipts/claude-spend-window-20261004.json",
+      "pointer": "/data/ccusage_daily/selection",
+      "sha256": "ffd8e2f325e4251585d17e5e3ef6755b18a191ed174d2651c520d9b06878bed1"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/0/alternatives",
+      "sha256": "6926fc868cd1efc00c649661dcaae175e15a671a47a04d5df8765d9c6b955d3c"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/1/alternatives",
+      "sha256": "8521b63f684f2e7bbe48095dee8fe8bb12d1102df0fd168783ab9a22c453eba8"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/2/alternatives",
+      "sha256": "153518ba3dc51183e6ebce35a8db317b444d3d0f0d5248a06c830f442654c799"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/3/alternatives",
+      "sha256": "f7155bdd45643704f06120b69254568b09e65bd880ae4c3518b30d2bae6c6d00"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/4/alternatives",
+      "sha256": "7d4ed8e63b71835f1693768e553bfac2322b79e5163317130b0d0068b97e0e93"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/5/alternatives",
+      "sha256": "617a373d1de76d8886471532203859b0d1080525d5ce0b3cb9645d9b0c98b66a"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "pointer": "/collisions/6/alternatives",
+      "sha256": "fe4b867d3a22ab38f21e18806d4b6b08fafb4bafbbf46a713987f30e31009be1"
+    },
+    {
+      "path": "catalogs/landscape/native-practice.json",
+      "pointer": "/alternatives",
+      "sha256": "c736a8e8ea472fc06185e3ea8a66b83d5089a88f556b62138c2b7a629918b9ea",
+      "source_sha256": "c2de0fffe03d3cb25f2adec5a7c8a73d222c8bbd8ae16282919525ee30a3e014",
+      "reason": "V9: bind the collection after generic catalog-role removal; source_sha256 records the original value."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "pointer": "/pinned_requirements/us-equities/0/name",
+      "sha256": "a72c1003dfa1e7315794d27d6c2018eb4219d6a327b321d743dfac623fbdba54"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "pointer": "/pinned_requirements/us-equities/1/name",
+      "sha256": "621aa18c6f29b941952ea744858b1f68ea65e2774bb33138cca413854a19dae1"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "pointer": "/pinned_requirements/us-equities/2/name",
+      "sha256": "bf53323ff720123ab7d880ea80c0974098d67c926e106e7bf81b544e4f63897f"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "pointer": "/no_blind_default_today/us-equities/0/slot",
+      "sha256": "62e9331dca78ed3dcaf49ca5b7a5e9449f34671fa0eea881a4062ca26a9bf110"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "pointer": "/no_blind_default_today/us-equities/1/slot",
+      "sha256": "684fa0f2946047b446eb679574ff3a01f4bd83daa45911d44df5119b08f62e0f"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "pointer": "/slots/19/interim",
+      "sha256": "16838cc597816162ea72b46648f9c58d68df463970d7637b0b11990067133f96"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "pointer": "/slots/19/overturned/interim",
+      "sha256": "ff05b21fb28e1be4f05cafd66a2cf3e7deb220d5b179173429a2155a25d74be8"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "pointer": "/slots/27/interim",
+      "sha256": "f7797b7c435904995be761402ae43054807340a1133f0814459c8a7ee0b31d2d"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "pointer": "/slots/29/overturned/interim",
+      "sha256": "f869d0940341f6b6229cb8951ada46b82d7a3d34bfcdf86111db0b458ac75076"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "pointer": "/wave2/interim_rows/0/interim",
+      "sha256": "f7797b7c435904995be761402ae43054807340a1133f0814459c8a7ee0b31d2d"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "pointer": "/wave2/interim_rows/1/interim",
+      "sha256": "e803d8a34163b63b17ac70a609db7d95a5b806f25a892e9d02ea2ccf89229ddd"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "pointer": "/wave2/interim_rows/2/interim",
+      "sha256": "f869d0940341f6b6229cb8951ada46b82d7a3d34bfcdf86111db0b458ac75076"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "pointer": "/wave3/amend_rows/0/owner_default",
+      "sha256": "325a0f963153bf23e220cc3002e9f1e1ecd6b5bc596401c637566839244bf912"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "pointer": "/wave3/amend_rows/1/owner_default",
+      "sha256": "9cd6eb87bfa8d7cba5dbfada215ac4ac513fd783e9590b1989b92d8a516ad7e2"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "pointer": "/wave3/amend_rows/2/owner_default",
+      "sha256": "a951501917bd4cf4839c68d03731023a2419acbdfbbb6c910b86a1998d3cdfeb"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "pointer": "/wave3/amend_rows/3/interim",
+      "sha256": "683239aa931e9a267181cc8b18cbd8c31fe0a9e337dd7c3e844ee77f047be8bd"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "pointer": "/wave4/amend_rows/0/owner_default",
+      "sha256": "6381089ca9f7b39b40031abdb790570703b00c34b85316dd5d822d606dc0a701"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "pointer": "/wave5/amend_rows/0/owner_default",
+      "sha256": "76a45e91f9f233e6108435ba8b980c01eb74a5fe380ee092d9dc147d6a240c7e"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "pointer": "/wave5/amend_rows/1/owner_default",
+      "sha256": "d2fe6f07056b3732fe4e88b3d9f4e4e128cf32dbf69c41a65b88f1f49a0382ff"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/0/slot",
+      "sha256": "8d8defd12ad85622ef9bfeefc8c7e0303c0856cc6d4858c38ba2227172dce2a7"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/1/slot",
+      "sha256": "e547142c84c78c82eb72b49da737fc384e34c8a5af7be25564e15233cc8b5872"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/2/slot",
+      "sha256": "cc1e2b1a6149dfb12b5347195eb5cf090e4acc554737d48527828b49278e0c9a"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/3/slot",
+      "sha256": "11fb7037d6e2f4f92c1e8e2a7dfef9f0fe17a5e1fec185289904356c16d3d142"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/4/slot",
+      "sha256": "dc8041aae7c8b3a847cde285085da9f85f3fc6d04a8f2167d182945b1366b062"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/5/slot",
+      "sha256": "e378fb84cb580edfa970ecf65e7f350a803025b2a4296a45fb5f9589e39438aa"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/6/slot",
+      "sha256": "8654ac2cca9d119033f5c1be752fc4be5bbc296a2a46303b38c3fa34519ead1c"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/7/slot",
+      "sha256": "5a02d2323db44b34aac50aca928d6856901ae1ab40d427ad8f8dec0f22923910"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/8/slot",
+      "sha256": "7b98ef654575ffd130f4112759353b9b973225e4bfecd38ce5954199a844107b"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/9/slot",
+      "sha256": "d6ee36646206435b50e87e20022489587538d3a56b715b8656c3c19a6f230601"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/10/slot",
+      "sha256": "c032108c1a629261d4978a1e142d5f0c8a237e171d6aa98bc0cf23d1062e5241"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/11/slot",
+      "sha256": "55b331f96428f082094991742c1f6ae05514a037c8596c9f7b2fc5457efc0f6e"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/12/slot",
+      "sha256": "f1aae55a58714878f63c21be3059f0c59163e947e8d47749dfa256b780752eae"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/13/slot",
+      "sha256": "5fb2e120d6b8d3d222bed7ea547a04f777ee54a2ef09c5243a19faf33c5c406d"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/14/slot",
+      "sha256": "de4824a978ecec89b09991ee59cee96bd3c9553daf70d1e46cfc9fea67364407"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/15/slot",
+      "sha256": "68df8f40617f3cc1d990fefea1b63f517a033d518f7afb4a3ed3a024d6d1c723"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/criterion_2/slots/16/slot",
+      "sha256": "388de6ae8d2afae6ceb4a83a81c47817a77e9f8ac763a36bc5b50cb2c6af230d"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/controls/0/slot",
+      "sha256": "8d8defd12ad85622ef9bfeefc8c7e0303c0856cc6d4858c38ba2227172dce2a7"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/controls/1/slot",
+      "sha256": "ca2c31a204de1ad7b36a6b148040b89f9e1a2a25d60e7b8372e32a209e1528b3"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/controls/2/slot",
+      "sha256": "e547142c84c78c82eb72b49da737fc384e34c8a5af7be25564e15233cc8b5872"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/dated_disposition_changes/0/slot",
+      "sha256": "b25c003c14e873d2edad8d8e3e894b562597a2f7b3a693bb4af2bd2805fcd6e5"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/dated_control_demotions/0/slot",
+      "sha256": "ca2c31a204de1ad7b36a6b148040b89f9e1a2a25d60e7b8372e32a209e1528b3"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/dated_control_demotions/1/slot",
+      "sha256": "e547142c84c78c82eb72b49da737fc384e34c8a5af7be25564e15233cc8b5872"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/roadmap_partial_reported_passes/1/slot",
+      "sha256": "9e4d568c5fa4d92cbe58f53485de7e4f1eb1c888d522a1c12ccb639c1fbe8333"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/roadmap_partial_reported_passes/2/slot",
+      "sha256": "1bbf5addb1761c81dc863e35b53134881590152f810863ab5ae7ee4664003d0c"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/roadmap_partial_reported_passes/3/slot",
+      "sha256": "a8dd8be44dd35e881867e082ab4f64aaa9119cc8f7ce86965b98d1bfb3a71aef"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/roadmap_baseline_ready_demotions/0/slot",
+      "sha256": "87f31e4a1d2e64a70373265a589406dfad36304acc3f8d9f0b3ee98f28d49b1c"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/roadmap_baseline_ready_demotions/1/slot",
+      "sha256": "c032108c1a629261d4978a1e142d5f0c8a237e171d6aa98bc0cf23d1062e5241"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/roadmap_baseline_ready_demotions/2/slot",
+      "sha256": "b689b96ed36cbdb0d0142bdc74607be91d66d6ef493b534302e40323e3ae83ef"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/roadmap_baseline_ready_demotions/3/slot",
+      "sha256": "11a4947d727e8fbf012118abedc46def53ab43bee1bf4eae0387e64b7a677d8d"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/command_center_ready_objections/0/slot",
+      "sha256": "8d8defd12ad85622ef9bfeefc8c7e0303c0856cc6d4858c38ba2227172dce2a7"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/command_center_ready_objections/1/slot",
+      "sha256": "600765690e8616a407ffa8682dcfdb1b42fb879b60643f299c6993c871287d49"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/command_center_ready_objections/2/slot",
+      "sha256": "c413cdafda789c8f7c5cf1abf05be1e46d7108be7db5305d3db1dad619d285e3"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/command_center_ready_objections/3/slot",
+      "sha256": "6e754c27ab19ad6ffd53807a96aa43a09c06b9ffcb719804f5b059895651ac89"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/command_center_ready_objections/4/slot",
+      "sha256": "b41d6d02b5b5677443d36fd9e5c2d179705141a502656929c70d6221f662c1c8"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/command_center_ready_objections/5/slot",
+      "sha256": "ca2c31a204de1ad7b36a6b148040b89f9e1a2a25d60e7b8372e32a209e1528b3"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/command_center_ready_objections/6/slot",
+      "sha256": "e547142c84c78c82eb72b49da737fc384e34c8a5af7be25564e15233cc8b5872"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
+      "pointer": "/slots/0/slot_id",
+      "sha256": "6229f7e74ba353924e0894b8646edb82b4ce2884d9c45e9ee3c8d1a096e315f3"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
+      "pointer": "/slots/1/slot_id",
+      "sha256": "70a95cc724a3440d7e63a8f1d65d3f2c08c349b309c68c05f5de75a80e726ffb"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
+      "pointer": "/slots/2/slot_id",
+      "sha256": "765c733635e54dd94469e81eaf40595ee843a7e139919de8af3b7be8af0bfae8"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
+      "pointer": "/slots/3/slot_id",
+      "sha256": "03dac00aaef4e7aa3667b0a8e554b57d1d6ee67945593e19555cf92f9de291e4"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
+      "pointer": "/slots/4/slot_id",
+      "sha256": "4482a9c7aa50c794251eb2f5513b32d5ce6e707705bb5d2717f7b87ff377aed4"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
+      "pointer": "/slots/5/slot_id",
+      "sha256": "632d0043e1e3e752f253c4a4255a4ef68363c09813932e5cb837865bb053ca39"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
+      "pointer": "/slots/6/slot_id",
+      "sha256": "770279b88e165840dd624e7d485a3740d44b82951066ced2a3a4aec864784239"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
+      "pointer": "/slots/7/slot_id",
+      "sha256": "0c097c53c97055fc1d1dbed363cb446a27aa62f58887338f1e4c0d29d9c14aff"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
+      "pointer": "/slots/8/slot_id",
+      "sha256": "34a6dd6d51112c7ea2b18bb0c8a24e96d179e3cf87f288ec4670115356a743ec"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
+      "pointer": "/slots/9/slot_id",
+      "sha256": "341086475cc03673ee01222621e99ea70fd147c28541b7cf8dacfb499388164a"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-memory-skills.json",
+      "pointer": "/slots/0/slot_id",
+      "sha256": "ff0c5c19727259c7978eb9108e049fdcb866e16eaa7f8fe6fc06b9ed6df8bff1"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-memory-skills.json",
+      "pointer": "/slots/0/upstream_source",
+      "sha256": "ca39d5c1586258a0a66abe445f42611417ce98de42a17813168b298a7222a78c"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-memory-skills.json",
+      "pointer": "/slots/1/slot_id",
+      "sha256": "00d9006a6a03b890239fec94e57d88d298c696d813558285b1dbf2557264244f"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-memory-skills.json",
+      "pointer": "/slots/1/upstream_source",
+      "sha256": "e78c27d6bdb6325dbdd7f74597b7a5c48a52bbebf97a61de474efb9a15a7d7bf"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-observation.json",
+      "pointer": "/slots/0/slot_id",
+      "sha256": "c29e7a789a6143453ffa3b2999b09a12ae18db500663b2063bb35a2a2f410eaf"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-observation.json",
+      "pointer": "/slots/1/slot_id",
+      "sha256": "4c0a134502a3cbedfa1d336fa73a1f795928cd6ddf7f5df66c270e80e4aa898f"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-observation.json",
+      "pointer": "/slots/2/slot_id",
+      "sha256": "72a057dad9657eafc09f2a6f95f3f1c45178a4a502662a192e5113daae0377a2"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-observation.json",
+      "pointer": "/slots/3/slot_id",
+      "sha256": "25fb31736fbf373164c8ec56742d246cd85d53025fa4b425d9354efb05ad3478"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/0/slot_id",
+      "sha256": "cc1e2b1a6149dfb12b5347195eb5cf090e4acc554737d48527828b49278e0c9a"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/1/slot_id",
+      "sha256": "76201b5d26b5808c35a80a4e78c9e63c5cb7b84c602daaf18970134e243a77a3"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/2/slot_id",
+      "sha256": "ee7a0d503a4cde286713e5e5c82f772fffeead0e0e4a064e8f4356467584a4d3"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/3/slot_id",
+      "sha256": "018e32fc9a06b39e419d94fea40e9040e54991ec940ef4fab7580c567c09c375"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/4/slot_id",
+      "sha256": "192ed4efad7ec1476c474c9444f0f018c7ffab386257a96dfef462cd86b8f3b9"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/5/slot_id",
+      "sha256": "a5254ac18e3f3ee64554a8f259dca8ddb70890175af98184880d6831528798f0"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/6/slot_id",
+      "sha256": "ca2c31a204de1ad7b36a6b148040b89f9e1a2a25d60e7b8372e32a209e1528b3"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/7/slot_id",
+      "sha256": "281d0c0d5e135d590ee0bad1c6c7c6cb54c79ba0ea9eaaf84c87e88e75e05740"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/8/slot_id",
+      "sha256": "a283c9f5d9a7f2757375ccadbd6cc5887f8da5d56693ec61f802116a65c3b28c"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/9/slot_id",
+      "sha256": "e547142c84c78c82eb72b49da737fc384e34c8a5af7be25564e15233cc8b5872"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/10/slot_id",
+      "sha256": "11fb7037d6e2f4f92c1e8e2a7dfef9f0fe17a5e1fec185289904356c16d3d142"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/11/slot_id",
+      "sha256": "dc8041aae7c8b3a847cde285085da9f85f3fc6d04a8f2167d182945b1366b062"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/12/slot_id",
+      "sha256": "e378fb84cb580edfa970ecf65e7f350a803025b2a4296a45fb5f9589e39438aa"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "pointer": "/slots/13/slot_id",
+      "sha256": "8654ac2cca9d119033f5c1be752fc4be5bbc296a2a46303b38c3fa34519ead1c"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "pointer": "/disputed_token_slots/0/slot",
+      "sha256": "9e5120786565c25149b94a4371e61f67353d8b99ded80d79696777ae8ea31b07"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "pointer": "/disputed_token_slots/1/slot",
+      "sha256": "600765690e8616a407ffa8682dcfdb1b42fb879b60643f299c6993c871287d49"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "pointer": "/disputed_token_slots/2/slot",
+      "sha256": "7064d348832c7a422d9a63c80b5d1b02f0cf374bf528090298d61da040df981f"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "pointer": "/disputed_token_slots/3/slot",
+      "sha256": "de4824a978ecec89b09991ee59cee96bd3c9553daf70d1e46cfc9fea67364407"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "pointer": "/record_conflicts/0/slot",
+      "sha256": "00d9006a6a03b890239fec94e57d88d298c696d813558285b1dbf2557264244f"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "pointer": "/record_conflicts/1/slot",
+      "sha256": "6e754c27ab19ad6ffd53807a96aa43a09c06b9ffcb719804f5b059895651ac89"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "pointer": "/record_conflicts/2/slot",
+      "sha256": "b41d6d02b5b5677443d36fd9e5c2d179705141a502656929c70d6221f662c1c8"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/0/alternatives",
+      "sha256": "6926fc868cd1efc00c649661dcaae175e15a671a47a04d5df8765d9c6b955d3c"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/1/alternatives",
+      "sha256": "8521b63f684f2e7bbe48095dee8fe8bb12d1102df0fd168783ab9a22c453eba8"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/2/alternatives",
+      "sha256": "153518ba3dc51183e6ebce35a8db317b444d3d0f0d5248a06c830f442654c799"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/3/alternatives",
+      "sha256": "f7155bdd45643704f06120b69254568b09e65bd880ae4c3518b30d2bae6c6d00"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/4/alternatives",
+      "sha256": "7d4ed8e63b71835f1693768e553bfac2322b79e5163317130b0d0068b97e0e93"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/5/alternatives",
+      "sha256": "617a373d1de76d8886471532203859b0d1080525d5ce0b3cb9645d9b0c98b66a"
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "pointer": "/collisions/6/alternatives",
+      "sha256": "fe4b867d3a22ab38f21e18806d4b6b08fafb4bafbbf46a713987f30e31009be1"
+    },
+    {
+      "path": "evidence/receipts/ns2604-e2e-20261004.json",
+      "pointer": "/data/fix_plan/open_token_slots/0/slot_id",
+      "sha256": "8d8defd12ad85622ef9bfeefc8c7e0303c0856cc6d4858c38ba2227172dce2a7"
+    },
+    {
+      "path": "evidence/receipts/ns2604-e2e-20261004.json",
+      "pointer": "/data/fix_plan/open_token_slots/1/slot_id",
+      "sha256": "b83576a16cb01b026763513b556a61a05c6a6508707be7ef5fa4d1d5c60b6484"
+    },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
       "pointer": "/amend_rows/0/amendment/text",
@@ -18576,9 +19423,693 @@
       "pointer": "/owners/83",
       "sha256": "f16376d28fc407d61f42d9c2afeff3702ce87775a9a8703c945b06cc2a04b242",
       "reason": "N5-R: withhold selected identity binding; preserve independent measured data."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "pointer": "/dated_disposition_changes/1/slot",
+      "sha256": "7d385d25abf3288badc3f70ec862f221698d63600cd2f88e0a6f37c3aafe998e",
+      "reason": "V9: withhold cross-layer slot identity while preserving qualification measurements."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "pointer": "/roadmap_partial_reported_passes/0/slot",
+      "sha256": "7d385d25abf3288badc3f70ec862f221698d63600cd2f88e0a6f37c3aafe998e",
+      "reason": "V9: withhold cross-layer slot identity while preserving qualification measurements."
     }
   ],
   "spans": [
+    {
+      "path": "blueprints/us-equities/README.md",
+      "sha256": "046c8ad40120fe32cb5b95a620d6ffb46e6e7c4d057bc0953dfc287bd2cd3a81",
+      "source_sha256": "046c8ad40120fe32cb5b95a620d6ffb46e6e7c4d057bc0953dfc287bd2cd3a81",
+      "start": 0,
+      "end": 13,
+      "ranges": [
+        [
+          0,
+          13
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923f-first-passed/README.md",
+      "sha256": "8d9c582e53ea8fb88bbd981261b4bda78e150085b09ab66e1cdcf924c5ca7811",
+      "source_sha256": "8d9c582e53ea8fb88bbd981261b4bda78e150085b09ab66e1cdcf924c5ca7811",
+      "start": 76,
+      "end": 85,
+      "ranges": [
+        [
+          76,
+          85
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/README.md",
+      "sha256": "9b2f0d46a116d542c1703c6f235caf83e31b293b6a19d9ac509e73f68d29b7e8",
+      "source_sha256": "9b2f0d46a116d542c1703c6f235caf83e31b293b6a19d9ac509e73f68d29b7e8",
+      "start": 24,
+      "end": 33,
+      "ranges": [
+        [
+          24,
+          33
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "blueprints/us-equities/simulation-research/receipt.json",
+      "sha256": "3cc626b606d38efe2dfc3d070e303b0a55f15ca84647dbee7d94d9c967d46e43",
+      "source_sha256": "3cc626b606d38efe2dfc3d070e303b0a55f15ca84647dbee7d94d9c967d46e43",
+      "start": 0,
+      "end": 9,
+      "ranges": [
+        [
+          0,
+          9
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "catalogs/us-equities/agents-operations.json",
+      "sha256": "46e3133a59193cfd2b725e14c9528743ea5643996bd8ebfafce092c64f71f468",
+      "source_sha256": "46e3133a59193cfd2b725e14c9528743ea5643996bd8ebfafce092c64f71f468",
+      "start": 35,
+      "end": 44,
+      "ranges": [
+        [
+          35,
+          44
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "docs/native-telemetry-resolution.md",
+      "sha256": "6a4d2caa048d9ad9983ecb76acbec583082540223570a5419f78c5a7227b5b42",
+      "source_sha256": "6a4d2caa048d9ad9983ecb76acbec583082540223570a5419f78c5a7227b5b42",
+      "start": 55,
+      "end": 64,
+      "ranges": [
+        [
+          55,
+          64
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/source-observations.json",
+      "sha256": "b67bd903ddfdee347d530a9f1626f4c9873242db181b79aac46480ad2c9ea39b",
+      "source_sha256": "b67bd903ddfdee347d530a9f1626f4c9873242db181b79aac46480ad2c9ea39b",
+      "start": 32,
+      "end": 41,
+      "ranges": [
+        [
+          32,
+          41
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "sha256": "e5295f933fce5503daa5bcf5124b4693599a7b76bde28406512d059e82bfdb98",
+      "source_sha256": "e5295f933fce5503daa5bcf5124b4693599a7b76bde28406512d059e82bfdb98",
+      "start": 39,
+      "end": 48,
+      "ranges": [
+        [
+          39,
+          48
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "sha256": "b7295f8679960c83974315235b647851df5f8ab32e196bf8d9ae94d6d98f395f",
+      "source_sha256": "b7295f8679960c83974315235b647851df5f8ab32e196bf8d9ae94d6d98f395f",
+      "start": 28,
+      "end": 37,
+      "ranges": [
+        [
+          28,
+          37
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "sha256": "1d18329000299343c19d663374dbb0ab44f866a66b8c68451a518ed870b11715",
+      "source_sha256": "1d18329000299343c19d663374dbb0ab44f866a66b8c68451a518ed870b11715",
+      "start": 22,
+      "end": 31,
+      "ranges": [
+        [
+          22,
+          31
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "sha256": "b84990046501bc930c47871b10c9486fb04099b88ae38e8f61f901ec5ba81cba",
+      "source_sha256": "b84990046501bc930c47871b10c9486fb04099b88ae38e8f61f901ec5ba81cba",
+      "start": 82,
+      "end": 91,
+      "ranges": [
+        [
+          82,
+          91
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "2b0989e3eb8df4b6fa2424146a82d7bb90aa5b5d74bd2dde28244019d30ee542",
+      "source_sha256": "2b0989e3eb8df4b6fa2424146a82d7bb90aa5b5d74bd2dde28244019d30ee542",
+      "start": 75,
+      "end": 84,
+      "ranges": [
+        [
+          75,
+          84
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "47ebc4e6ea2187442ca65c629112c1ed0fb4253cefb4a0ded3c8c1563b58a244",
+      "source_sha256": "47ebc4e6ea2187442ca65c629112c1ed0fb4253cefb4a0ded3c8c1563b58a244",
+      "start": 34,
+      "end": 43,
+      "ranges": [
+        [
+          34,
+          43
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "3d87679d13a1a894b00686d90c7cd7548d8a9640a47d76f8eee9e246d8141acc",
+      "source_sha256": "3d87679d13a1a894b00686d90c7cd7548d8a9640a47d76f8eee9e246d8141acc",
+      "start": 0,
+      "end": 9,
+      "ranges": [
+        [
+          0,
+          9
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "3d87679d13a1a894b00686d90c7cd7548d8a9640a47d76f8eee9e246d8141acc",
+      "source_sha256": "3d87679d13a1a894b00686d90c7cd7548d8a9640a47d76f8eee9e246d8141acc",
+      "start": 0,
+      "end": 9,
+      "ranges": [
+        [
+          0,
+          9
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "76e6d1ad0d896894157d053bc0e119d0239c495b4cc938fd789128e93783c1e9",
+      "source_sha256": "76e6d1ad0d896894157d053bc0e119d0239c495b4cc938fd789128e93783c1e9",
+      "start": 0,
+      "end": 13,
+      "ranges": [
+        [
+          0,
+          13
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "bcfb43f0bee8d2169b65007824903131ca5e8c09e4d356927dcf67cb62617f43",
+      "source_sha256": "bcfb43f0bee8d2169b65007824903131ca5e8c09e4d356927dcf67cb62617f43",
+      "start": 0,
+      "end": 13,
+      "ranges": [
+        [
+          0,
+          13
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "2b0989e3eb8df4b6fa2424146a82d7bb90aa5b5d74bd2dde28244019d30ee542",
+      "source_sha256": "2b0989e3eb8df4b6fa2424146a82d7bb90aa5b5d74bd2dde28244019d30ee542",
+      "start": 75,
+      "end": 84,
+      "ranges": [
+        [
+          75,
+          84
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/fixes.json",
+      "sha256": "e16e4f72d58ea019121f8229b57294d7fe4889f95352f6f061e2833431cc0b88",
+      "source_sha256": "e16e4f72d58ea019121f8229b57294d7fe4889f95352f6f061e2833431cc0b88",
+      "start": 65,
+      "end": 74,
+      "ranges": [
+        [
+          65,
+          74
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/slots.json",
+      "sha256": "e16e4f72d58ea019121f8229b57294d7fe4889f95352f6f061e2833431cc0b88",
+      "source_sha256": "e16e4f72d58ea019121f8229b57294d7fe4889f95352f6f061e2833431cc0b88",
+      "start": 65,
+      "end": 74,
+      "ranges": [
+        [
+          65,
+          74
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/README.md",
+      "sha256": "c94a37598f016ce530fc01c71df54ebd3ca1b2e76f9eb5052c93f1282905a73d",
+      "source_sha256": "c94a37598f016ce530fc01c71df54ebd3ca1b2e76f9eb5052c93f1282905a73d",
+      "start": 71,
+      "end": 80,
+      "ranges": [
+        [
+          71,
+          80
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-workers-experiment.json.source.txt",
+      "sha256": "516637f22d7d033cc599327f0cf8d45d77ee79fdae7725f4cf660324d03fd08e",
+      "source_sha256": "516637f22d7d033cc599327f0cf8d45d77ee79fdae7725f4cf660324d03fd08e",
+      "start": 8,
+      "end": 17,
+      "ranges": [
+        [
+          8,
+          17
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-workers-experiment.json.source.txt",
+      "sha256": "8daacce38f53f0aa17223e05fb093fa6665c7365fc3585fe85ef183dee5f33af",
+      "source_sha256": "8daacce38f53f0aa17223e05fb093fa6665c7365fc3585fe85ef183dee5f33af",
+      "start": 6,
+      "end": 15,
+      "ranges": [
+        [
+          6,
+          15
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/sources.json",
+      "sha256": "fe6ead42500d1e2344e7aa82275b125025ee79862c8baeca79ade442c35f0406",
+      "source_sha256": "fe6ead42500d1e2344e7aa82275b125025ee79862c8baeca79ade442c35f0406",
+      "start": 30,
+      "end": 39,
+      "ranges": [
+        [
+          30,
+          39
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/native-receipt.json",
+      "sha256": "c301809a1ff0eb580a6277ac500a4091c7f7fb7cee5f674112fc09a1d63c6eb7",
+      "source_sha256": "c301809a1ff0eb580a6277ac500a4091c7f7fb7cee5f674112fc09a1d63c6eb7",
+      "start": 0,
+      "end": 9,
+      "ranges": [
+        [
+          0,
+          9
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "blueprints/us-equities/routing/README.md",
+      "sha256": "ebe74e554aec363ecbc9c475cfddb1eb9312ed3a712de5b82f48b75f8da23e23",
+      "source_sha256": "ebe74e554aec363ecbc9c475cfddb1eb9312ed3a712de5b82f48b75f8da23e23",
+      "start": 41,
+      "end": 50,
+      "ranges": [
+        [
+          41,
+          50
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "fa23c2f5e821f8a765f70d38c9b927e864c65940ab46c74bcbe7fbb2f7345713",
+      "source_sha256": "fa23c2f5e821f8a765f70d38c9b927e864c65940ab46c74bcbe7fbb2f7345713",
+      "start": 0,
+      "end": 9,
+      "ranges": [
+        [
+          0,
+          9
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "188c55b5e109e171b57f8d6f849ebb9814a629b189b29cf1a380543f16df67fe",
+      "source_sha256": "188c55b5e109e171b57f8d6f849ebb9814a629b189b29cf1a380543f16df67fe",
+      "start": 15,
+      "end": 24,
+      "ranges": [
+        [
+          15,
+          24
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "dcfdeaa78ab698d6c05eb7e7778367a8fbf924b6994b2e01b8ee7ab5d207691c",
+      "source_sha256": "dcfdeaa78ab698d6c05eb7e7778367a8fbf924b6994b2e01b8ee7ab5d207691c",
+      "start": 5,
+      "end": 14,
+      "ranges": [
+        [
+          5,
+          14
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "9a0ea51cf88e3350fb54a1e730ce0944539caf75f7baa29ffac582a25dd5749d",
+      "source_sha256": "9a0ea51cf88e3350fb54a1e730ce0944539caf75f7baa29ffac582a25dd5749d",
+      "start": 94,
+      "end": 103,
+      "ranges": [
+        [
+          94,
+          103
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "edb450018d8a72d129ea619bf4f6a69cbf05fcdfb8cb3bb5a4015a64eec87858",
+      "source_sha256": "edb450018d8a72d129ea619bf4f6a69cbf05fcdfb8cb3bb5a4015a64eec87858",
+      "start": 8,
+      "end": 17,
+      "ranges": [
+        [
+          8,
+          17
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/dashboard-results.json",
+      "sha256": "eae3e2674d4007bcca2a1816a2047d6aecc2f195d9f38e8b2ea8993d8c8216e8",
+      "source_sha256": "eae3e2674d4007bcca2a1816a2047d6aecc2f195d9f38e8b2ea8993d8c8216e8",
+      "start": 43,
+      "end": 52,
+      "ranges": [
+        [
+          43,
+          52
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "sha256": "e9d23a32605c175413e00429eb915289d7fa5dd7aabf233b320ac8b8351454dd",
+      "source_sha256": "e9d23a32605c175413e00429eb915289d7fa5dd7aabf233b320ac8b8351454dd",
+      "start": 7,
+      "end": 16,
+      "ranges": [
+        [
+          7,
+          16
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "sha256": "3a453d85956b5f404efd0eae91d538ab7da8ac82e97ff547b1117e78567f5e3b",
+      "source_sha256": "3a453d85956b5f404efd0eae91d538ab7da8ac82e97ff547b1117e78567f5e3b",
+      "start": 0,
+      "end": 13,
+      "ranges": [
+        [
+          0,
+          13
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-role-mcp-followup-20261002/trials.json",
+      "sha256": "2f009b0fb86527db9164ce4f1caffc903ec5141f6e5525507b5c31176d583b4a",
+      "source_sha256": "2f009b0fb86527db9164ce4f1caffc903ec5141f6e5525507b5c31176d583b4a",
+      "start": 40,
+      "end": 49,
+      "ranges": [
+        [
+          40,
+          49
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-role-mcp-followup-20261002/trials.json",
+      "sha256": "6cf0e3aa6c5bc6565eb0d48fab2caaab3aaaa47ac5d9c02fbe9f132b287f0bd7",
+      "source_sha256": "6cf0e3aa6c5bc6565eb0d48fab2caaab3aaaa47ac5d9c02fbe9f132b287f0bd7",
+      "start": 0,
+      "end": 9,
+      "ranges": [
+        [
+          0,
+          9
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "20ecc452bbbeaf89361657e9a44b49c1f096e558d1651edc25439e55aec6fe8e",
+      "source_sha256": "20ecc452bbbeaf89361657e9a44b49c1f096e558d1651edc25439e55aec6fe8e",
+      "start": 0,
+      "end": 9,
+      "ranges": [
+        [
+          0,
+          9
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "78924220f59dcc369da35fa5bed1c59824cf453c5029b9318286faefb631ca61",
+      "source_sha256": "78924220f59dcc369da35fa5bed1c59824cf453c5029b9318286faefb631ca61",
+      "start": 107,
+      "end": 116,
+      "ranges": [
+        [
+          107,
+          116
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "689053e2f953cd2c59747c650bf53d7550a92fec63240d628d4ca288091be8ba",
+      "source_sha256": "689053e2f953cd2c59747c650bf53d7550a92fec63240d628d4ca288091be8ba",
+      "start": 0,
+      "end": 9,
+      "ranges": [
+        [
+          0,
+          9
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "c59347c08bd8cb4da2c8d91107bcdb9b03c640e853ee821e7fa5099359a819df",
+      "source_sha256": "c59347c08bd8cb4da2c8d91107bcdb9b03c640e853ee821e7fa5099359a819df",
+      "start": 105,
+      "end": 114,
+      "ranges": [
+        [
+          105,
+          114
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "89bed63de414c8c3f9c94b6e8f080c698f9438d2fc099cba71a61283262e6917",
+      "source_sha256": "89bed63de414c8c3f9c94b6e8f080c698f9438d2fc099cba71a61283262e6917",
+      "start": 116,
+      "end": 125,
+      "ranges": [
+        [
+          116,
+          125
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/slots.json",
+      "sha256": "0fe81e6eb532d0931fdc302f49b13ee8bc4d5a311c76cd4d2d76a6441b1703f9",
+      "source_sha256": "0fe81e6eb532d0931fdc302f49b13ee8bc4d5a311c76cd4d2d76a6441b1703f9",
+      "start": 12,
+      "end": 21,
+      "ranges": [
+        [
+          12,
+          21
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json",
+      "sha256": "d000fa4e6f9b0b0cfe4562e4d45f9d9f49563efa45bbb2139f5dbf7021c15269",
+      "source_sha256": "d000fa4e6f9b0b0cfe4562e4d45f9d9f49563efa45bbb2139f5dbf7021c15269",
+      "start": 75,
+      "end": 84,
+      "ranges": [
+        [
+          75,
+          84
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/receipts/native-cli-gaps.json",
+      "sha256": "cad1e895d09abca9fd686ef5f74783a19ff002fc61cd1a54408ba0e0cbb5410c",
+      "source_sha256": "cad1e895d09abca9fd686ef5f74783a19ff002fc61cd1a54408ba0e0cbb5410c",
+      "start": 11,
+      "end": 20,
+      "ranges": [
+        [
+          11,
+          20
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/receipts/native-sdk-role-mcp-followup-20261002.json",
+      "sha256": "85e9edfde0b2362935135cdb710d17321b21a8b57831443289b54b07d0d8d386",
+      "source_sha256": "85e9edfde0b2362935135cdb710d17321b21a8b57831443289b54b07d0d8d386",
+      "start": 0,
+      "end": 9,
+      "ranges": [
+        [
+          0,
+          9
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+      "sha256": "d3e395d125515245919f169e0bcb6602431633503a91aac493c1aec3516ec6ec",
+      "source_sha256": "d3e395d125515245919f169e0bcb6602431633503a91aac493c1aec3516ec6ec",
+      "start": 128,
+      "end": 137,
+      "ranges": [
+        [
+          128,
+          137
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "recipes/README.md",
+      "sha256": "db3f9ebe0a1e1dd093e2ca2af311b28e0013305022c3e713108a822bfd6fdfbf",
+      "source_sha256": "db3f9ebe0a1e1dd093e2ca2af311b28e0013305022c3e713108a822bfd6fdfbf",
+      "start": 36,
+      "end": 45,
+      "ranges": [
+        [
+          36,
+          45
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
+    {
+      "path": "recipes/README.md",
+      "sha256": "f4c73d5363f284a4159befbeced2aefeec53618f35e30ab98271d5630d4001b1",
+      "source_sha256": "f4c73d5363f284a4159befbeced2aefeec53618f35e30ab98271d5630d4001b1",
+      "start": 36,
+      "end": 45,
+      "ranges": [
+        [
+          36,
+          45
+        ]
+      ],
+      "reason": "V9: remove the selected-role binding; retain the named subject and measured scope."
+    },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/README.md",
       "sha256": "86b17dd5e9e9eee8008b9e50d1e94a93225faa3c4a74816db027c5883138244a",
@@ -20958,7 +22489,7 @@
           2755
         ]
       ],
-      "replacement": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution, the one meant to stay; the record of that run is private, and its public receipt comes with that distribution's acceptance. Five rows were added after the clean run, from the layer consensus of 2026-10-02, which makes 69 foundation rows: skill-discovery and skill-authoring install, and their install and acceptance commands have not run anywhere, neither in a throwaway distribution nor on the destination; research-skill, credential-custody and cross-family-review install nothing. On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable, after their measurement settled them in the manifest: they are created through the running model server, which the plan does not start, so the default run skips them and --only installs each; as plan rows their install and acceptance commands have not run anywhere (the measurement created and ran the same models in a throwaway distribution). Wave 2 (2026-10-03), 70 foundation rows: four rows install for the first time, from the wave-2 records of the layer consensus (memory-owner, code-search and context-supply, and the added statusline row), and the revised commands remain unrun; the three skills rows run tools/adoption/install_skills.py; each interim install's function first calls interim_acknowledged, which refuses while the wave-2 batch owes an acknowledgement; none of these commands or checks has run anywhere, neither in a throwaway distribution nor on the destination. Wave 3 (2026-10-04), 80 foundation rows: on the owner's decision of that day (amendment 4 of the manifest's decision rule), ten owner rows are added in token-efficiency (command-output, output-compression, code-index, code-graph, repo-packing, structured-data, doc-conversion, api-docs, trace-viewer, token-lane-carriers), the revised commands remain unrun; none of these commands has run anywhere. Fix-wave/wave-4 repair in this PR (2026-10-04): promptfoo follows the written manifest; repaired installation/prerequisites, isolated client probes and ownership migration. Destination commands remain UNRUN; local regression and artifact checks are recorded separately.",
+      "replacement": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution, the one meant to stay; the record of that run is private, and its public receipt comes with that distribution's acceptance. Five rows were added after the clean run, from the layer consensus of 2026-10-02, which makes 69 foundation rows: skill-discovery and skill-authoring install, and their install and acceptance commands have not run anywhere, neither in a throwaway distribution nor on the destination; research-skill, credential-custody and cross-family-review install nothing. On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable, after their measurement settled them in the manifest: they are created through the running model server, which the plan does not start, so the default run skips them and --only installs each; as plan rows their install and acceptance commands have not run anywhere (the measurement created and ran the same models in a throwaway distribution). Wave 2 (2026-10-03), 70 foundation rows: four rows install for the first time, from the wave-2 records of the layer consensus (memory-owner, code-search and context-supply, and the added statusline row), and the revised commands remain unrun; the three skills rows run tools/adoption/install_skills.py; each interim install's function first calls interim_acknowledged, which refuses while the wave-2 batch owes an acknowledgement; none of these commands or checks has run anywhere, neither in a throwaway distribution nor on the destination. Wave 3 (2026-10-04), 80 foundation rows: on the owner's decision of that day (amendment 4 of the manifest's decision rule), ten owner rows are added in token-efficiency (command-output, output-compression, code-index, code-graph, repo-packing, structured-data, doc-conversion, api-docs, trace-viewer, token-lane-carriers), the revised commands remain unrun; none of these commands has run anywhere. Fix-wave/wave-4 repair in this PR (2026-10-04): repaired installation/prerequisites, isolated client probes and ownership migration. Destination commands remain UNRUN; local regression and artifact checks are recorded separately.",
       "reason": "N5-R/M1/L-b3: source-bound selection masking and grammatical normalization; preserve nonchoice observations."
     },
     {
@@ -20992,6 +22523,38 @@
       ],
       "replacement": "",
       "reason": "N5-R/M1/L-b3: source-bound selection masking and grammatical normalization; preserve nonchoice observations."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "78e5426d995491ba5f1512647ad1a7daf7b536e039f44d21e23f127d5d0af051",
+      "source_sha256": "78e5426d995491ba5f1512647ad1a7daf7b536e039f44d21e23f127d5d0af051",
+      "unit": "line",
+      "start": 0,
+      "end": 457,
+      "ranges": [
+        [
+          0,
+          457
+        ]
+      ],
+      "replacement": "The wave-3 batch of 2026-10-04: ten rows added and three rows revised. No comparison named here has run, net provider savings stay unmeasured, and this record changes nothing on any host",
+      "reason": "V9: retain the dated row counts and unrun comparison boundary without the chosen-stack assignment."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "78e5426d995491ba5f1512647ad1a7daf7b536e039f44d21e23f127d5d0af051",
+      "source_sha256": "78e5426d995491ba5f1512647ad1a7daf7b536e039f44d21e23f127d5d0af051",
+      "unit": "line",
+      "start": 0,
+      "end": 457,
+      "ranges": [
+        [
+          0,
+          457
+        ]
+      ],
+      "replacement": "The wave-3 batch of 2026-10-04: ten rows added and three rows revised. No comparison named here has run, net provider savings stay unmeasured, and this record changes nothing on any host",
+      "reason": "V9: retain the dated row counts and unrun comparison boundary without the chosen-stack assignment."
     }
   ],
   "tables": {
@@ -21239,6 +22802,31 @@
     }
   },
   "paragraphs": [
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "8f32685925d52d800f39f0bf0ee9f86784f689b588933c0e7c759c3699ed47ba",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "3172dc4ec4fe81c31656046749c8c2f2106a62f9f4a1c8cba2fa7b56eeca8562",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "c598c25dc7474e142fba9469bee12b3aa55fb1c9ec2220ca4781b9370003c014",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "8f32685925d52d800f39f0bf0ee9f86784f689b588933c0e7c759c3699ed47ba",
+      "disposition": "choice"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "3172dc4ec4fe81c31656046749c8c2f2106a62f9f4a1c8cba2fa7b56eeca8562",
+      "disposition": "choice"
+    },
     {
       "path": "docs/memory-landscape-maintenance.md",
       "sha256": "b88b239cf002da362adfb92d7020ce620680f60c026d3f3112efcc8568f67621",

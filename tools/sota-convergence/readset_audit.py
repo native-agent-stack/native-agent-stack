@@ -29,7 +29,10 @@ CHOICE = re.compile(
     r"\b(?:retain|keep)\s+(?:(?-i:[A-Z][\w./-]*)|[a-z][\w.]*[-/][\w./-]+)"
     r"(?:\s+v?[\d.]+)?\s+as\s+the\b|"
     r"\bthe\s+selected\s+(?:(?-i:[A-Z][\w./-]*)|[a-z][\w.]*[-/][\w./-]+)\b|"
-    r"\bcurrent\s+host\s+uses\b",
+    r"\bcurrent\s+host\s+uses\b|"
+    r"\binstalls?\b[^.!?\n]{0,160}\bby\s+default\b|"
+    r"\b(?:stays?|remains?|is)\s+the\s+selection\b|"
+    r"\bthe\s+selected\s+v?\d+(?:\.\w+)+\b",
     re.I)
 
 
@@ -51,7 +54,7 @@ def text_content(data: bytes) -> str | None:
         return text if controls / max(1, len(text)) < 0.01 else None
 
 
-def units(text: str, container=""):
+def units(text: str, container="", pinned=False):
     """Read JSON keys and strings, otherwise paragraphs and individual table rows."""
     try:
         document = json.loads(text)
@@ -68,20 +71,23 @@ def units(text: str, container=""):
                     and any(name in document for name in ("installed", "repository", "route")))
                 or (container in ("slots", "add_rows", "amend_rows", "owner_defaults")
                     and any(document.get(name) for name in ("repository", "interim", "owner_default",
-                                                            "label", "claude", "gpt", "default")))):
+                                                            "label", "claude", "gpt", "default")))
+                or (isinstance(document.get("slot"), str) and "/" in document["slot"])
+                or (pinned and document.get("owner") and any(document.get(name) for name in
+                                                            ("name", "repository", "package")))):
             yield "selection of record: " + json.dumps(document, ensure_ascii=False, sort_keys=True)
         for name, value in document.items():
             yield name
             if isinstance(value, str):
-                yield from units(value)
+                yield from units(value, pinned=pinned)
             elif isinstance(value, (dict, list)):
-                yield from units(json.dumps(value, ensure_ascii=False), name)
+                yield from units(json.dumps(value, ensure_ascii=False), name, pinned or name == "pinned_requirements")
     elif isinstance(document, list):
         for value in document:
             if isinstance(value, str):
-                yield from units(value)
+                yield from units(value, pinned=pinned)
             elif isinstance(value, (dict, list)):
-                yield from units(json.dumps(value, ensure_ascii=False), container)
+                yield from units(json.dumps(value, ensure_ascii=False), container, pinned)
     else:
         for paragraph in re.split(r"\n\s*\n", text):
             if paragraph.lstrip().startswith("|"):

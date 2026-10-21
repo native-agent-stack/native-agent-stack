@@ -131,7 +131,7 @@ class SelectionCueTests(unittest.TestCase):
             ("evidence/receipts/native-claude-profile-20260920.json",
              "Selected skill file", "do not establish improved task performance"),
             ("evidence/artifacts/new-wsl-definitive-defaults-20261001/"
-             "definitive-manifest.json", "Its interim, semble", "needs a Qdrant store"),
+             "definitive-manifest.json", "needs a Qdrant store", "measurement"),
             ("blueprints/us-equities/catalyst-provenance/"
              "native-network-edgartools-5600-20261004.json", "selection moves", "5.60.0"),
             ("blueprints/us-equities/runtime-2604/README.md",
@@ -333,6 +333,9 @@ class V8SelectionIdentityTests(unittest.TestCase):
             records = blind.strip_worktree(root, b"k" * 32)
             for relative in paths:
                 with self.subTest(path=relative):
+                    if relative.endswith("/install.sh"):
+                        self.assertFalse((root / relative).exists())
+                        continue
                     text = (root / relative).read_text()
                     self.assertEqual(audit.audit_readset(root, [relative])["findings"], [])
                     if relative.endswith(".json"):
@@ -423,6 +426,9 @@ class V8SelectionIdentityTests(unittest.TestCase):
                 shutil.copyfile(ROOT / relative, target)
             blind.strip_worktree(root, b"k" * 32)
             for relative, fragments in cases.items():
+                if relative.endswith("/install.sh"):
+                    self.assertFalse((root / relative).exists())
+                    continue
                 for fragment in fragments:
                     with self.subTest(path=relative, fragment=fragment):
                         self.assertNotIn(fragment, (root / relative).read_text())

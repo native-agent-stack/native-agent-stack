@@ -1,10 +1,23 @@
 {
   "schema_version": 1,
+  "replacement_sha256": {
+    "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json/78e5426d995491ba5f1512647ad1a7daf7b536e039f44d21e23f127d5d0af051": "6b58cbda122baac4a4082a4333c243ff0ab769daff16a71e6f0bd0fcb5e4db6e",
+    "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json/78e5426d995491ba5f1512647ad1a7daf7b536e039f44d21e23f127d5d0af051": "6b58cbda122baac4a4082a4333c243ff0ab769daff16a71e6f0bd0fcb5e4db6e",
+    "evidence/artifacts/memory-rag-lifecycle-20260921/native-client.json/748f7ab590c2e58af029f36511f07868536f82f5cd0ea69fb6578cfe8d047d47": "f7696032d2344afca41a15feea25153739efbe9a2bf353d4f3df4ad464014a94",
+    "evidence/receipts/edgartools-5600-pin-move-20261004.json/8b55b283a5465d3550d5e843934478bcdef8ebe960ed89719899b426202d61a0": "66f55cbe3b625efeb6b704ce87759a89fdc8491cb7f42944b2bc588b722861f9",
+    "evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json/8b55b283a5465d3550d5e843934478bcdef8ebe960ed89719899b426202d61a0": "66f55cbe3b625efeb6b704ce87759a89fdc8491cb7f42944b2bc588b722861f9",
+    "evidence/artifacts/new-wsl-install-plan-20261002/install.sh/06f581166fe8092a06dc87bd20158f2bfa39d4e372b5059e549bcd15488c1afb": "c82bf3a06065a2786b8b834a05eb532ccec79dada5fbc4d7426cbd4e74823a34",
+    "evidence/artifacts/new-wsl-install-plan-20261002/install.sh/126ef80d7a082663922f0a0114bd205d209ea8253b2c6a6499f8c8b06c621ecc": "d668721984d67a978d3118cc2c4379706392e5d2671f4795fcde271afa43f9d6",
+    "docs/token-practice.md/8f3cc34e0de9ad6d899f42e4e0a01fc3b3dff354c0a090627bb2177d684afd97": "7a4c4970f38f76757cc2617b26840a102e0bf8b5db74b07c499654b7f347b22a",
+    "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json/ebc8bfcc74ee9f47ec157f2c2d5657da61a8c80b627ca240269ea69856e04268": "0e5944fdffa1d3d1f941694b6de3bd9bdebcd188350cf0d0856a363e273b27c4",
+    "evidence/artifacts/new-wsl-install-plan-20261002/install.sh/f4a88706c2d0afc70456a4a931dd6c55e0f606de7ea307127f1711b87aac1255": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/artifacts/new-wsl-install-plan-20261002/install.sh/f4a1816dc7f07bb3eef5eb852ff9cfc696227833999a81e002aa90442f12a96b": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
   "data": [
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "b756654f3e9be07bd0d0e05ea703bba9fef8a1737481f810393c82619e8f3157",
-      "reason": "M1 narrowed unit: dated execution counts and UNRUN history only; named owner-default and revised-candidate clauses have been masked."
+      "sha256": "0e5944fdffa1d3d1f941694b6de3bd9bdebcd188350cf0d0856a363e273b27c4",
+      "reason": "M1-b: execution counts, abstract slot roles and UNRUN history only; no candidate identity or promptfoo selection clause remains."
     },
     {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",

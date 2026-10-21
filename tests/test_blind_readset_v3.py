@@ -81,7 +81,7 @@ class IndependentAuditTests(unittest.TestCase):
             shutil.copyfile(ROOT / relative, target)
             blind.strip_worktree(root, b"k" * 32)
             document = json.loads(target.read_text())
-            self.assertEqual(document.get("discovery_provenance"), [])
+            self.assertNotIn("discovery_provenance", document)
             self.assertEqual(redaction.content_findings(root, {relative}), [])
 
     def test_real_source_twin_is_redacted_and_restoring_it_fails_audit(self):

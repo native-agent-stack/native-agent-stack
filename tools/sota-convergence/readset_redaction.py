@@ -146,7 +146,7 @@ def redact_document(node, relative, pointer, stripped, key, labels, fields, span
             else:
                 had_content = bool(value)
                 redact_document(value, relative, child, stripped, key, labels, fields, spans)
-                if had_content and isinstance(value, dict) and not value and name != "measurement":
+                if had_content and isinstance(value, (dict, list)) and not value and name != "measurement":
                     del node[name]
     elif isinstance(node, list):
         emptied = []

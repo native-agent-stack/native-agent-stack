@@ -572,6 +572,7 @@ class CompleteBlindReadsetTests(unittest.TestCase):
         sys.path.insert(0, str(TOOL_DIR))
         from readset_redaction import content_findings
         import export_isolation_check as isolation
+        import winner_asymmetry
         lane = load_module("lane_readset_content", "lane_packets.py")
         winners = isolation.ledger_winners(ROOT)
         with tempfile.TemporaryDirectory() as temporary:
@@ -625,6 +626,10 @@ class CompleteBlindReadsetTests(unittest.TestCase):
                     self.assertTrue(any(row["scored"] for row in exposure.values()))
                     self.assertEqual({layer: row["cited_files"] for layer, row in exposure.items()
                                       if row["cited_files"]}, {})
+                    bindings = winner_asymmetry.audit_export(export, packets, winners, keys)
+                    self.assertEqual(
+                        {layer: row for layer, row in bindings.items() if row["scored"]
+                         and (row["separating"] or row["correlating"])}, {})
             self.assertEqual(len(builds), 20)
             self.assertEqual(complete, expected | set(blind_checkout.ROOT_INSTRUCTION_STUBS))
             print(f"COMPLETE_READSET builds={len(builds)} files={len(complete)}")

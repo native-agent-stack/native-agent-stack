@@ -194,6 +194,10 @@ REMOVE_GLOBS = (
     # Code and data that assert or name the incumbents, removed even if a packet referenced them (binding
     # re-review L8; cross-family review F3).
     "tools/sota-convergence/reconciliations-*.json",
+    # These chosen-stack scripts encode selection in function names, package
+    # specs and dispatch. Separate qualification receipts retain measured results.
+    "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+    "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
     # Membership lists and earlier verdict records that isolate a layer's winner among its adopted candidates
     # (blindness re-review N1, per-layer subtraction check): the stack manifest, upstream snapshots, the
     # saturation audit and the 2026-09-21 convergence and repository-evidence runs.
@@ -588,6 +592,11 @@ def strip_worktree(dest: Path, hmac_key: bytes) -> dict:
                 continue
 
     remove_paths(dest, removed_files)
+    for relative in (
+            "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+            "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh"):
+        if relative in removed_files:
+            stripped_fields.append({"path": relative, "old_sha256": originals[relative]})
 
     for relative in LEDGER_RELATIVE_FILES:
         path = dest / relative
