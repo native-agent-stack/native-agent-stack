@@ -51,7 +51,7 @@ if [[ "$PY" == "$runtime/.venv/bin/python" || "$PY" -ef "$runtime/.venv/bin/pyth
   IFS= read -r recorded_owner < "$runtime/.trading-2604-owner" || refuse_runtime
   [[ "$recorded_owner" == native-stack-trading-2604-v1 ]] || refuse_runtime
   for entry in 'pyproject.toml|aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b' \
-               'uv.lock|a1413f202937aa05625bad34b35d4ad75c9ab637805c3747abc4fb8b0f85634a'; do
+               'uv.lock|9d8350a6773437a6890808c5b6ae61d98d305021b16ea0a4b4e753dd2f4f6223'; do
     IFS='|' read -r filename expected_hash <<< "$entry"
     [[ -f "$runtime/$filename" && ! -L "$runtime/$filename" ]] || refuse_runtime
     printf '%s  %s\n' "$expected_hash" "$runtime/$filename" | sha256sum --check --status || refuse_runtime

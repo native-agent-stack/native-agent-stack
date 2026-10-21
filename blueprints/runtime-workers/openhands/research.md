@@ -818,3 +818,99 @@ fixed release the recipe's resolution can reach.
 Overturn conditions: (a) OSV lists an advisory for mcp 1.30.0 that only a later release fixes; (b) an OpenHands run of the
 recipe fails with mcp 1.30.0 and passes with 1.28.1; (c) upstream's workspace publishes a lock with mcp 1.30.0 or later (the
 next relock then follows that lock).
+
+## Runtime lock pillow relock (2026-10-21)
+
+Stacked on #1266 accepted head eb898b558afbaa36b3d7a69b1f8c6cbfa91cbd2b,
+not on the earlier aiohttp-only base. The exported lock changes Pillow 12.3.0
+to 13.0.0 only; all 335 other entries, including certifi 2026.10.19, markers
+and hashes, are byte-identical to that accepted head. New requirements SHA256:
+582c4886cd803fbda6a3a23cca253cc103aee795b0c477825dea1a35bcecf8c2.
+The 17 selected Pillow hashes match the 13.0.0 PyPI release metadata:
+https://pypi.org/pypi/pillow/13.0.0/json .
+
+### Accepted certifi control before Pillow
+
+Use SDK@fcc102a697874d54a357e36004e02c95040dbdc0 and uv 0.12.17. Start
+from upstream uv.lock d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910.
+Add environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+to the existing root [tool.uv]; keep member files unchanged. Unset UV_NO_CONFIG,
+use scratch CPython 3.13.16 explicitly with --python, and set
+UV_PYTHON_DOWNLOADS=never. Keep the upstream seven-day cooldown and lmnr
+August 23 cutoff, and apply the documented LiteLLM constraint/cutoff correction
+to 1.93.2 / 2026-08-10T00:00:00Z. Replay the historical pins before any Pillow
+exception:
+
+    uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 \
+      --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 \
+      --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 \
+      --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 \
+      --upgrade-package multidict==6.9.1 --upgrade-package oauthlib==4.0.0 \
+      --upgrade-package mcp==1.30.0
+    uv lock --upgrade-package aiohttp==3.14.4
+
+Each invocation exits 0. Frozen export with --format requirements.txt
+--no-header --no-annotate --package openhands-tools --no-emit-workspace, then
+the unchanged pins.json wheel append, reproduces the pre-certifi lock
+6045a575ada4f0ee7d06a741e40eeff3b08ea3fb5a2567eef57d36055ff81577.
+Add only certifi = "2026-10-20T02:30:00Z" to exclude-newer-package and run
+uv lock --upgrade-package certifi==2026.10.19. The same frozen export and wheel
+append reproduce the accepted #1266 bytes exactly:
+096f6255391e56270df7843cb6739d1e373012d6a54e38d7fd7813e0b9e6a96a.
+The successful control root hashes to
+1e7b34ec9926691bd1c9b3dd7e71e883a3c3554caa797c1f1babd53db12d81d0.
+
+Only after that control, reapply the unchanged deviation below, retaining the
+certifi cutoff. The resolver updates Pillow only; the 336-entry export has no
+Darwin cryptography branch. Root SHA256 becomes
+0672b354c39437db16f309633f1a3972c02d97b9d6a8f50b2dec1dd176311263.
+The rule-6 record is byte-for-byte the one accepted in bd861172. No upstream
+metadata, image, grader, host or model qualification is changed. Raw commands
+and results are retained externally in BLOCKER-on-1266.json (historical name;
+its trading timestamp blocker is superseded by the wave builder decision),
+WORKER-CONTROL-on-1266.source.txt and WORKER-ROOT-on-1266.source.toml.
+
+### Deviation (rule 6): authorized scratch-only Pillow override
+
+Only AFTER reproducing that current control, add to the same root [tool.uv]
+table in scratch, beside environments:
+
+    override-dependencies = ["pillow==13.0.0"]
+
+Add pillow = "2026-10-21T00:00:00Z" to exclude-newer-package. Preserve the
+seven-day cooldown, LiteLLM August 10 and lmnr August 23 dates. Then:
+
+    uv lock --upgrade-package pillow==13.0.0
+    uv lock --check
+    uv export --frozen --format requirements.txt --no-header --no-annotate \
+      --package openhands-tools --no-emit-workspace
+
+All exit 0. Resolved 412 packages; exactly one Updated line:
+Updated pillow v12.3.0 -> v13.0.0. Append the unchanged wheels for the adopted
+SHA256 above. Every other exported block is byte-identical; no Darwin 48.0.1
+branch returns, and Linux cryptography stays 50.0.0 with its original marker.
+
+Reason and turn-back: the nine Pillow GHSAs in
+[the repin research](../../../evidence/artifacts/pillow-13-repin-20261020/RESEARCH.md)
+(maximum CVSS 9.2) first fix in 13.0.0. Streamlit 1.63.0's pillow<13,>=7.1.0
+cap belongs only to the workspace dev group, absent from this export.
+Every exported parent permits 13.0.0: SDK 1.49.6 pillow>=12.3.0, browser-use
+0.11.9 pillow>=11.2.1 and reportlab 4.4.4 pillow>=9.0.0. Primary metadata:
+https://pypi.org/pypi/openhands-sdk/1.49.6/json ,
+https://pypi.org/pypi/browser-use/0.11.9/json ,
+https://pypi.org/pypi/reportlab/4.4.4/json ,
+https://pypi.org/pypi/streamlit/1.63.0/json . Remove the scratch override when
+Streamlit or upstream admits Pillow >=13. Neither override nor scratch uv.lock
+is installed or committed as runtime metadata.
+
+F18-style scope limit: only the recipe venv is fixed. The image's PyInstaller
+server still builds from upstream's unchanged uv.lock with Pillow 12.3.0;
+image digest, server build and grader remain unchanged. Primary source:
+https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-agent-server/openhands/agent_server/docker/Dockerfile#L129-L158 .
+No model or host acceptance is inferred. uv override/environment/export sources:
+https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/resolution.md and
+https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/export.md .
+Exact commands, raw output and hashes are in external WORKER-RELOCK.json.
+Regression control: require the current SHA256 before adding Pillow settings,
+then compare all 336 exported blocks. A returning Darwin fork or any unexplained
+non-Pillow delta rejects the candidate.
