@@ -1,0 +1,42 @@
+The 38 mutants of review round 2 (the choice of the response in an event stream, its framing, the limits, the refusals, the URL check, the probe's lifecycle and headers, the retained excerpt and the record): one change
+each; a mutant is killed when tests.test_mcp_instruction_cap fails or times out (90 s).
+
+killed   (failed) a server request or notification can be the response
+killed   (failed) a response to another id is taken
+killed   (failed) a boolean is an id
+killed   (failed) any message is a response
+killed   (failed) only the first message of a batch is looked at
+killed   (failed) the first event is the answer
+killed   (failed) a lone CR does not end a line
+killed   (failed) only the first data line of an event is kept
+killed   (failed) the first character after the colon is always dropped
+killed   (failed) the last event is lost without a blank line
+killed   (failed) an event that is not JSON is an error
+killed   (failed) the stream is read to its end
+killed   (failed) the whole reply has no time limit
+killed   (failed) an event stream has no size limit
+killed   (failed) a line has no size limit
+killed   (failed) a JSON reply has no size limit
+killed   (failed) a JSON-RPC error is a result
+killed   (failed) no response is not checked
+killed   (failed) a result that is not an object passes
+killed   (failed) the port of the URL is not checked
+killed   (failed) a malformed URL raises
+killed   (failed) a URL without a host is accepted
+killed   (failed) a failure inside the http library raises
+killed   (failed) bytes that are not UTF-8 raise
+killed   (failed) the Accept header offers one type
+killed   (failed) the tool asks for another protocol version
+killed   (failed) a notification is read as a request
+killed   (failed) the probe sends no protocol version
+killed   (failed) the probe sends the version it asked for, not the negotiated one
+killed   (failed) the probe sends no session id
+killed   (failed) the probe sends no initialized notification
+killed   (failed) the probe does not follow pages
+killed   (failed) the probe asks for the cursor wrongly
+killed   (failed) the probe counts the longest description as the median
+killed   (failed) the excerpt publishes a digest again
+killed   (failed) the record cites the lines of the GET stream
+killed   (failed) the record attributes the rule to a person again
+killed   (failed) the ledger prefix is called the file's
+38 mutants, 38 killed, survivors: none

@@ -1,0 +1,80 @@
+{
+  "about": "The group CPA-V-06 of the converged Claude practice audit, copied verbatim from the full file, which stays in the private research record; no digest of that file is published here, because a digest of bytes that are not published binds nothing a reader can check (docs/decisions/2026-10-12-mcp-instruction-cap.md cites this excerpt).",
+  "source": {
+    "file": "converged.json",
+    "kind": "claude_practice_audit_converged_manifest",
+    "generated_at_tool_utc": "2026-10-12T13:36:19Z",
+    "group_count": 48,
+    "source_finding_count": 80
+  },
+  "group": {
+    "id": "CPA-V-06",
+    "title": "ai-memory's MCP instruction block is cut at the client's cap",
+    "route": "PR",
+    "priority": "P2",
+    "touches": [
+      "token spend"
+    ],
+    "mechanism": "The block is longer than the 4,096-character default, so its routing text for memory_status and every later tool never reaches the model.",
+    "sources": [
+      {
+        "id": "CPA-C-007",
+        "part": "part b: the truncated ai-memory block"
+      }
+    ],
+    "evidence_type": "measured",
+    "claims": [
+      {
+        "claim": "The block is truncated",
+        "status": "reproduced",
+        "how": "this analyst session's own ai-memory instructions end in a truncation marker after the memory_status line"
+      },
+      {
+        "claim": "The vendor knob is unset",
+        "status": "reproduced",
+        "how": "host settings env has no CLAUDE_CODE_MAX_MCP_DESCRIPTION_LENGTH"
+      },
+      {
+        "claim": "ai-memory offers no shorter instruction mode",
+        "status": "reproduced",
+        "how": "akitaonrails/ai-memory@89bd8ded:crates/ai-memory-mcp/src/server.rs:172 defines one constant, MEMORY_INSTRUCTIONS"
+      },
+      {
+        "claim": "The block is 4,122 characters",
+        "status": "not re-checked",
+        "how": "length not re-measured"
+      }
+    ],
+    "upstream": [
+      {
+        "ref": "anthropics/claude-code@3deb8736:CHANGELOG.md:1522",
+        "verified_here": true,
+        "note": "CLAUDE_CODE_MAX_MCP_DESCRIPTION_LENGTH"
+      },
+      {
+        "ref": "anthropics/claude-code@3deb8736:CHANGELOG.md:65",
+        "verified_here": true,
+        "note": "default raised from 2,048 to 4,096"
+      }
+    ],
+    "pr": {
+      "name": "mcp-description-cap",
+      "scope": "Add CLAUDE_CODE_MAX_MCP_DESCRIPTION_LENGTH to the settings template env at the smallest value that fits the block measured at the pinned ai-memory version; the CC installs. The knob raises the cap for every server's descriptions and instructions, which the PR states.",
+      "owner_lane": "cc-native-practice (profile templates); may ride with FIX-3",
+      "fail_first_test": "A template test: the env key is present and not below the measured block length; it is absent today."
+    },
+    "owner": "cc-native-practice",
+    "next_step": "Measure the block length, then the PR.",
+    "related": [
+      "CPA-V-36"
+    ],
+    "audits": [
+      "claude"
+    ],
+    "families": [
+      "claude"
+    ],
+    "single_source": true,
+    "cross_family": false
+  }
+}
