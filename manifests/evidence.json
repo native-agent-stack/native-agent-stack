@@ -11673,8 +11673,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "cbe0017c3f44c528969734851928ed043f91d1de68731a85587cf5fd097a1a80",
-      "bytes": 1373
+      "sha256": "2c5fa977a847b8e5b1698cccc0babf8cf18a38a24385a1975bfab8a87bb060cf",
+      "bytes": 1490
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11745,6 +11745,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261020-nas-blinding-v3-delta.json",
       "sha256": "91bfee35710eedbbe1bd6ed45c49c21f5195a5e0f74e0aa0142ef1a2f53c25f1",
       "bytes": 59793
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261021-nas-blinding-v9-delta.json",
+      "sha256": "94b4d58def8ccbe3e8120d6df05981e4bc04600db8edcb7d2163927b428ae0ed",
+      "bytes": 68368
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
