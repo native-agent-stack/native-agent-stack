@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "tradingview-automation-research-20261015",
+  "label": "SINGLE-FAMILY (GPT) research sweep",
+  "catalog": "us-equities",
+  "layer_id": "tradingview-automation-gap",
+  "layer_registration": "GAP: proposed scope identifier only; not a catalog layer",
+  "base_commit": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+  "requirement": "Adjudicate TradingView-native Pine strategy research, alert/webhook bridge feasibility, MCP app control with an authoritative positions-manifest boundary, current strategy templates, and parameter/model fine-tuning. Use public primary sources only; propose at most a paper-only attended observer trial. Models cannot enter numeric, risk or order state. Existing backtesting survivors receive role-only dispositions.",
+  "platform_profiles": [
+    {
+      "id": "linux-wsl2-x86_64",
+      "scope": "research checkout; no TradingView Desktop, server or broker runtime acceptance supplied"
+    },
+    {
+      "id": "macos-arm64",
+      "scope": "unmeasured; no inherited platform acceptance"
+    },
+    {
+      "id": "windows-desktop",
+      "scope": "source-documented prerequisite of some CDP candidates; no host acceptance supplied"
+    }
+  ],
+  "touched_layers": [
+    [
+      "us-equities",
+      "backtesting-engine"
+    ],
+    [
+      "us-equities",
+      "execution-broker"
+    ],
+    [
+      "foundation",
+      "mcp-surfaces"
+    ],
+    [
+      "us-equities",
+      "market-data-reference"
+    ],
+    [
+      "us-equities",
+      "research-factors-ml"
+    ]
+  ],
+  "allowed": [
+    "public repository metadata and pinned source reads",
+    "public vendor documentation",
+    "local evidence analysis and repository validation",
+    "artifact registration, commit, normal push and one non-draft PR"
+  ],
+  "forbidden": [
+    "candidate installs or execution",
+    "account sign-in or credential inspection",
+    "keyed TradingView or broker calls",
+    "creating any order path",
+    "catalog, saturation-ledger or research-state edits"
+  ],
+  "prior_survivor_scope": "All seven Pine backtesting survivors remain unresolved in their original layer.",
+  "source_review_date": "2026-10-15",
+  "cross_family_status": "OPEN until Claude facts and fit returns are independently retained"
+}

@@ -1,0 +1,128 @@
+{
+  "layer_id": "tradingview-automation-gap",
+  "proposed": [
+    {
+      "repository": "https://www.tradingview.com/pine-script-docs/concepts/strategies/",
+      "proposed_label": "targeted_candidate",
+      "demonstrated_gap": "Run strategies in TradingView's native broker emulator; use vendor examples as correctness controls. Survives only for attended in-app research and emulator observation. No brokerage or TradingView Paper Trading connection; no SOTA-return claim.",
+      "comparison_that_would_overturn": "TV-AUTO-OBSERVER-PAIR-20261015-01, not run. Its fixed safety/correctness/efficiency rule rejects this narrow observer proposal.",
+      "evidence": [
+        "https://www.tradingview.com/pine-script-docs/concepts/strategies/#broker-emulator (observed 2026-10-15)",
+        "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)"
+      ],
+      "upstream_now": {
+        "latest_release": null,
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": "Proprietary service; Terms of Use; each copied example's license must be recorded"
+      },
+      "source": "primary-source gap discovery"
+    },
+    {
+      "repository": "https://www.tradingview.com/mcp/docs",
+      "proposed_label": "targeted_candidate",
+      "demonstrated_gap": "Vendor-supported personal interactive market research and simple watchlist/price-alert operations; delayed beta data. Survives only for a read-allowlisted attended research observer. Does not provide requested Pine/chart control or manifest binding.",
+      "comparison_that_would_overturn": "TV-AUTO-OBSERVER-PAIR-20261015-01, not run. Its fixed safety/correctness/efficiency rule rejects this narrow observer proposal.",
+      "evidence": [
+        "https://www.tradingview.com/support/solutions/43000795699-mcp-server-connect-your-ai-assistant-to-tradingview/ (observed 2026-10-15, Beta limitations; Permitted use)",
+        "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)"
+      ],
+      "upstream_now": {
+        "latest_release": null,
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": "Proprietary service; TradingView Terms and beta permitted-use conditions"
+      },
+      "source": "primary-source gap discovery"
+    },
+    {
+      "repository": "https://github.com/tradesdontlie/tradingview-mcp",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "Uses Desktop CDP/internal APIs to set, compile and save Pine. Technical app-control fit, but vendor support/permission and enforced manifest/risk boundaries are unestablished. Desktop-internal API breakage is acknowledged by upstream; do not trial as an automated trading path.",
+      "comparison_that_would_overturn": "No runtime comparison is admitted. Resolve the cited permission/manifest/evidence gap first, then preregister a role-specific paper comparison; TV-AUTO-OBSERVER-PAIR-20261015-01 does not test this candidate.",
+      "evidence": [
+        "https://github.com/tradesdontlie/tradingview-mcp/blob/c05b8f5755ed8e64ea242de88ddbf46aa24d56a4/src/core/pine.js#L266",
+        "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)"
+      ],
+      "upstream_now": {
+        "latest_release": null,
+        "released_at": null,
+        "stars": 6842,
+        "pushed_at": "2026-07-28T17:28:37Z",
+        "archived": false,
+        "license": "NOASSERTION"
+      },
+      "source": "primary-source gap discovery"
+    },
+    {
+      "repository": "https://github.com/folknor/pine-oracle",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "Offline Pine v6 semantic lookup and independently authored recipes; never executes user strategies. Useful template/semantic reference, but no strategy efficacy or broker authority. Its install bundles vendor-derived docs (README:27–46); permission and exact recipe test provenance remain unresolved. Authored-recipe source review can continue without installing the bundled CLI.",
+      "comparison_that_would_overturn": "No runtime comparison is admitted. Resolve the cited permission/manifest/evidence gap first, then preregister a role-specific paper comparison; TV-AUTO-OBSERVER-PAIR-20261015-01 does not test this candidate.",
+      "evidence": [
+        "https://github.com/folknor/pine-oracle/blob/f4a1e25edf9c0176bcf1cd9cbc1f229c2bb5ef37/README.md#L3",
+        "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)"
+      ],
+      "upstream_now": {
+        "latest_release": null,
+        "released_at": null,
+        "stars": 2,
+        "pushed_at": "2026-10-14T16:05:00Z",
+        "archived": false,
+        "license": "MPL-2.0"
+      },
+      "source": "carried survivor; role-only re-adjudication"
+    },
+    {
+      "repository": "https://alpaca.markets/learn/low-code-algorithimic-trading-on-alpaca-using-tradingview",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "Tutorial demonstrates alert-to-Zapier-to-Alpaca technical routing. Conflicts with current TradingView non-display terms and does not establish a vendor-maintained bridge with a manifest governor. No SaaS subscription or bridge implementation proposed.",
+      "comparison_that_would_overturn": "No runtime comparison is admitted. Resolve the cited permission/manifest/evidence gap first, then preregister a role-specific paper comparison; TV-AUTO-OBSERVER-PAIR-20261015-01 does not test this candidate.",
+      "evidence": [
+        "https://alpaca.markets/learn/low-code-algorithimic-trading-on-alpaca-using-tradingview (observed 2026-10-15, Setting Webhook Alerts; Takeaways)",
+        "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)"
+      ],
+      "upstream_now": {
+        "latest_release": null,
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": "Vendor article; third-party Zapier service terms separate"
+      },
+      "source": "primary-source gap discovery"
+    },
+    {
+      "repository": "https://interactivebrokers.github.io/tws-api/",
+      "proposed_label": "keep_but_compare",
+      "demonstrated_gap": "Official TWS API is the broker lane's supported interface family; IBKR separately documents TradingView chart integration. No current broker-maintained TradingView webhook receiver or positions-manifest integration was established. Bounded absence in reviewed docs, not a universal nonexistence claim.",
+      "comparison_that_would_overturn": "No runtime comparison is admitted. Resolve the cited permission/manifest/evidence gap first, then preregister a role-specific paper comparison; TV-AUTO-OBSERVER-PAIR-20261015-01 does not test this candidate.",
+      "evidence": [
+        "https://www.interactivebrokers.com/docs/third-party-integrations/trading-view/intro (observed 2026-10-15)",
+        "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)"
+      ],
+      "upstream_now": {
+        "latest_release": null,
+        "released_at": null,
+        "stars": null,
+        "pushed_at": null,
+        "archived": null,
+        "license": "Interactive Brokers API distribution license; no redistribution clearance inferred"
+      },
+      "source": "primary-source gap discovery"
+    }
+  ],
+  "calls": {
+    "web_search": 12,
+    "web_fetch": 57,
+    "gh_api": 40
+  },
+  "notes": "Direct native GPT research session, not a Workflow job. Counters are manually reconstructed HTTP/search requests across shared discovery and fit reading, including failed public HTTP requests; no per-role cost attribution or workflow-budget conformance is claimed. One earlier malformed search-tool request returned an error and executed no search. Six decision-bearing proposals are retained here; proposed-rows.json retains all 23 screened/carried/reference identities, all of which receive a fit vote. Native services use official dated URLs as identity; they have no public Git commit pin. This is an explicit identity-domain extension of the schema's string field, not an invented repository. GAP/keep_but_compare never authorizes trial. No candidate was run. Missing facts and Claude votes leave the layer OPEN.",
+  "skills_used": [
+    "context-mode:context-mode"
+  ]
+}

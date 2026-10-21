@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "base_commit": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+  "hash_method": "SHA256 of exact checked-out bytes",
+  "co_op_protocol": {
+    "reference": "ns2604-coop/lanes/tv-automation.protocol-20261015T1957Z.md",
+    "sha256": "ad67d0cde8bd0e0148fa0cf84aed6d6e72411e567643a49751958db2ee15f947"
+  },
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "badc1a93731095641e71ae1bf1d5ae5d5021e522c1da62926ddc65268f5c10a1"
+    },
+    {
+      "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
+      "sha256": "010e39f2a915cc1ea1e163d56cb0f8cbfbd9cedb14a9fd7f78b2defd24648c58"
+    },
+    {
+      "path": "blueprints/us-equities/AGENTS.md",
+      "sha256": "4a1d3f125f3e8c77484b736e592777fa887991d6dc1cd43d941b4cd621f68719"
+    },
+    {
+      "path": "recipes/saturation-sweep.md",
+      "sha256": "7a02df8416e87f4d872bac10dacec9872668311ec3b0bc206420e4c28d17ad78"
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "sha256": "6da163f65c353dc8485ac880b919dca8d027c23a6f0a0458a70aad54e925eeaf"
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/schemas/discover.json",
+      "sha256": "15b4b7d69f64f9b37e0c5b21a70dca4b499ece041674037fcc6009f59ab76dd0"
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/schemas/votes.json",
+      "sha256": "dfc181ebdcadc82015344a37bbb3083c46d0e3c38c49ccd0d4e171483647ad0f"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "sha256": "55751afc9a6e3d2dd814d5ba35d811ea9424464ccc417234b8cb6d08864e48b8"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "sha256": "6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e"
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdict-waves.json",
+      "sha256": "7f7056066fec1d5ea6e6cc5e243a668e509b1d74add94ec3d74cbd3025ebc756"
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+    },
+    {
+      "path": "catalogs/saturation/ledger.json",
+      "sha256": "b6ca3220516a515bd6dec13f122f48acdd8ef738565f9c0145839d99dd0c21f2"
+    },
+    {
+      "path": "catalogs/landscape/final-stack.json",
+      "sha256": "e482c30346bbe97fc06a8909a43e86d8d69a93983a443747f92ad7d3d8b9d46d"
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260923.json",
+      "sha256": "304d75dd0dabb02ba46191161732c17d234c3608a194f538c6bee6b64b8069c8"
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "sha256": "a72177d162f84ba827028a7bff5ebc78ea9195c7a99ed2b411c75f7869b20e0e"
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260929.json",
+      "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee"
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261009.json",
+      "sha256": "3f061eeb261a91e8eec0f586bc135179e56bacd6216adcf9ddfa526877879153"
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "sha256": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600"
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+      "sha256": "2f93067652c0f1e8e4f3d726895d2017eafef018412e47e9bc9b48e7ef931a9c"
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json",
+      "sha256": "8b91d1acc81d71d8a911916cd1869a4d0a5742f95bb529c76d321c9793e2f961"
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+      "sha256": "69484156d2ba6736ba7dd5dfe0f4eca89b83b41899c2379a0a8467db92797f5d"
+    },
+    {
+      "path": "catalogs/landscape/grand-catalog-20261008.json",
+      "sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb"
+    },
+    {
+      "path": "catalogs/us-equities/coverage.json",
+      "sha256": "7b355f4c1f8cbfead4ad315d4ddc79f0efd5cd75e3bcb7812db4e7f509bf04a5"
+    },
+    {
+      "path": "catalogs/convergence-practice/starred-convergence-20261010.json",
+      "sha256": "e9b66183cb4f15a64065b22c0cd689ac4b32d3133732605bb68c26d931697712"
+    }
+  ]
+}

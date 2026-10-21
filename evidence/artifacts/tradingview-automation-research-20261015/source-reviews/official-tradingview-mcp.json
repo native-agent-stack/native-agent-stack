@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "kind": "upstream_provenance",
+  "evidence_class": "source_review",
+  "review": {
+    "id": "official-tradingview-mcp",
+    "identity": "https://www.tradingview.com/mcp/docs",
+    "maintainer": "TradingView Inc.",
+    "pin": "Official MCP public beta documentation observed 2026-10-15",
+    "license": "Proprietary service; TradingView Terms and beta permitted-use conditions",
+    "catalog": "foundation",
+    "layer_id": "mcp-surfaces",
+    "proposed_label": "TRIAL candidate",
+    "evidence_class": "source_review",
+    "capability": {
+      "claim": "Vendor-supported personal interactive market research and simple watchlist/price-alert operations; delayed beta data.",
+      "locator": "https://www.tradingview.com/support/solutions/43000795699-mcp-server-connect-your-ai-assistant-to-tradingview/ (observed 2026-10-15, Beta limitations; Permitted use)"
+    },
+    "terms_of_service": {
+      "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+      "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+    },
+    "hot_path_fit": {
+      "required_model_in_order_path": false,
+      "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+      "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+      "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+      "current_execution": "None. Public source review only."
+    },
+    "reason": "Survives only for a read-allowlisted attended research observer. Does not provide requested Pine/chart control or manifest binding.",
+    "pin_kind": "dated_vendor_documentation",
+    "trial_scope": "Read-only observer with a synthetic symbol manifest; no webhook, watchlist or alert mutation."
+  },
+  "reviewer": {
+    "family": "GPT",
+    "role": "gpt6-discover and gpt6-refute-fit",
+    "independent_families": 1
+  },
+  "convergence_angles": {
+    "capability_at_pin": "Vendor documentation supports the bounded attended research role; runtime behavior was not measured.",
+    "upstream_engineering_quality": "Vendor-maintained hosted service; no local build, deployment, availability or reliability audit.",
+    "community_consensus": "Not established by this bounded primary-source review.",
+    "net_usage": "No usage receipts or adoption metrics gathered; popularity is not used as fit evidence.",
+    "published_evaluations": "No independent role-matched paired evaluation established.",
+    "own_measured_runs": "None; the named observer comparison is proposed and unrun.",
+    "default_eligibility": "Not converged; no default or admitted runtime trial is claimed."
+  },
+  "measured_results": null,
+  "adoption": "Not admitted; proposed observer TRIAL only; Claude-family review and readiness gates pending."
+}

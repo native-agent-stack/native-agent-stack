@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "comparison_id": "TV-AUTO-OBSERVER-PAIR-20261015-01",
+  "status": "PROPOSED_NOT_RUN",
+  "terminal_state_claim": null,
+  "purpose": "Compare two attended research workflows for correctness, reproducibility and workflow cost. This is neither broker paper acceptance nor a strategy-profitability experiment.",
+  "arms": {
+    "A": {
+      "name": "Vendor-native control",
+      "method": "TradingView UI and current Pine v6 docs; human-driven source/strategy observations; no MCP or desktop automation."
+    },
+    "B": {
+      "name": "Official MCP research observer",
+      "method": "Same UI, scripts and docs for Pine tasks; official TradingView MCP read tools only for the permitted context tasks. Same external synthetic manifest display. No community CDP server, webhook or broker tool."
+    }
+  },
+  "frozen_tasks": {
+    "count": 12,
+    "groups": [
+      {
+        "count": 4,
+        "kind": "Pine semantics/source tasks",
+        "description": "Find vendor-source evidence for four fixed behaviors: emulator versus broker positions, bar-close versus intrabar recalculation, alert snapshot versioning, and commission/slippage assumptions. Same fixed script/source hashes in both arms."
+      },
+      {
+        "count": 4,
+        "kind": "Attended research lookups",
+        "description": "Use only four frozen public symbols from a synthetic positions manifest. Match source, timestamp and delay labels; display results to the human. Never use returned values to calculate risk, sizing, allocation or order decisions; never retain raw market data in published artifacts."
+      },
+      {
+        "count": 4,
+        "kind": "Manifest refusal cases",
+        "description": "Offline fixtures with a stale manifest, a foreign symbol, an incompatible schema, and a missing manifest. Both arms must refuse to present results as bound position context. No broker connection or order object is created."
+      }
+    ],
+    "task_packet_status": "Not yet frozen; readiness requires exact source, task and rubric bytes and their hashes. A change to task counts or decision rule requires a new comparison id."
+  },
+  "pairing": {
+    "sessions": 2,
+    "task_order": "Counterbalanced AB/BA; freeze a deterministic task-order seed in the input packet before running.",
+    "controls": "Same host, entitled user, client build, approved model/effort, source packet and task rubric for both arms. Each MCP call is personally initiated; no scheduled/bulk operation. No extra model or runtime selection."
+  },
+  "readiness_inputs": [
+    "Independent Claude-family source/facts and fit returns, including these 23 dispositions, merged without erasing missing votes.",
+    "Reviewed scope and binding permission for the exact personal interactive beta use; an existing eligible TradingView plan, handled by its owner outside this research lane. No subscription is purchased by this PR.",
+    "A separately reviewed versioned synthetic positions-manifest contract, exact symbol mapping, authoritative timestamps and deterministic refusal checks; no real account fields in published evidence.",
+    "Pinned approved native harness, client/tool allowlist and host acceptance. Prove that broker/order tools and all TradingView mutation tools are absent from the observer surface, not merely discouraged by a prompt.",
+    "A frozen 12-task packet and expected answers, script/source hashes, rubric, task order and source/data permissions. Use the existing landscape-sweep comparison/receipt path and vendor-native Pine/MCP interfaces; no new harness.",
+    "An agreed private retention boundary for permitted observations. Publish only sanitized pass/fail, source hashes, elapsed-time/tool-call aggregates and refusal receipts."
+  ],
+  "decision_rule": [
+    "Any order-capable call, webhook creation, unauthorized mutation, non-display automated use, raw-data publication, model-written manifest or manifest refusal failure disqualifies B and ends the run.",
+    "B must be correct on all 12 tasks in each session, match the control on source attribution/delay disclosure and preserve all four refusals.",
+    "For the four context tasks, B must reduce paired median human-active completion time by at least 20% in each session, with no correctness loss; record all 8 task pairs rather than only the median.",
+    "If safety and correctness pass but efficiency fails, retain A and record no tooling winner. If source/terms inputs are unavailable, record the missing input and do not start.",
+    "A passing observer comparison permits only a proposal for that observer role. It cannot qualify Pine-to-broker automation, strategy returns, fine-tuning or LIVE."
+  ],
+  "positions_manifest_contract": {
+    "status": "Proposed contract fields only, not a schema implementation or evidence of existing binding.",
+    "authority": "A deterministic paper/research state owner; models receive a read-only projection and cannot write position, risk or order state.",
+    "minimum_fields": [
+      "schema version",
+      "paper/synthetic mode",
+      "immutable manifest id and content hash",
+      "authoritative as-of time and freshness bound",
+      "approved symbol/instrument identifiers and mapping version",
+      "strategy/source and configuration hashes",
+      "governor-policy reference",
+      "revision and reconciliation status"
+    ],
+    "publishing": "Use synthetic examples only; no account fields, credentials or real positions in this research PR.",
+    "gating": "Missing, stale, mismatched or unreconciled state must fail closed. Watchlists and Pine strategy.position_size cannot substitute for broker state.",
+    "further_paper_path": "A future broker integration would require a separately accepted deterministic governor for exposure, losses, stale signals, duplicates, ordering, reconnect/reconciliation and kill state. This comparison does not build or exercise it."
+  },
+  "budget_and_boundaries": {
+    "candidate_execution_now": false,
+    "broker_calls_now": 0,
+    "order_path_now": false,
+    "live": "OWNER-GATED; excluded",
+    "later_trial": "Paper/research observer only; no broker orders in this proposed comparison."
+  },
+  "comparison_overturns": "Only the narrow source-reviewed claim that official MCP adds useful attended research capability. Does not reopen or settle existing engine, broker, data or model selections."
+}
