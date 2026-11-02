@@ -45,7 +45,7 @@ jobs:
       pull-requests: read # native PR force-push timeline; docs/decisions/2026-10-04-ci-least-privilege.md
     steps:
       - name: Harden the runner (audit-only network egress)
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
         with:
           egress-policy: audit
       - name: Check out repository with full history
@@ -367,7 +367,7 @@ jobs:
           printf 'validate: ran %s tests; skipped %s.\n' "${ran:-unknown}" "${skipped:-unknown}" >> "$GITHUB_STEP_SUMMARY" || true
       - name: Upload the verbose test suite log
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: validate-shard-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
           path: |
@@ -388,7 +388,7 @@ jobs:
       contents: read
     steps:
       - name: Harden the runner (audit-only network egress)
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
         with:
           egress-policy: audit
       - name: Check out integration sources
@@ -441,7 +441,7 @@ jobs:
               2>&1 | tee "$INTEGRATION_ROOT/reports/unittest.log"
       - name: Retain the integration log and duration
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: integration-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ env.INTEGRATION_ROOT }}/reports/unittest.log
@@ -458,7 +458,7 @@ jobs:
       contents: read
     steps:
       - name: Harden the runner (audit-only network egress)
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
         with:
           egress-policy: audit
       - name: Check out repository with full history
@@ -467,7 +467,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       - name: Download this attempt's shard reports and native logs
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: validate-shard-${{ github.run_id }}-${{ github.run_attempt }}-*
           path: ${{ runner.temp }}/shards
@@ -484,7 +484,7 @@ jobs:
             --job-result "$VALIDATE_SHARDS_RESULT" --summary "$GITHUB_STEP_SUMMARY"
       - name: Upload the aggregate shard receipt
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: validate-shard-summary-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/shards/aggregate.json
@@ -499,7 +499,7 @@ jobs:
       contents: read
     steps:
       - name: Harden the runner (audit-only network egress)
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
         with:
           egress-policy: audit
       - name: Check out repository with full history
@@ -576,7 +576,7 @@ jobs:
           exit "$metrics_status"
       - name: Retain full gitleaks timing receipts
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: secret-scan-metrics-gitleaks-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/gitleaks/full-*.metrics.json
@@ -585,7 +585,7 @@ jobs:
           retention-days: 30
       - name: Upload redacted secret-scan report
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: secret-scan-${{ github.run_id }}
           path: ${{ runner.temp }}/gitleaks/gitleaks.json
@@ -620,7 +620,7 @@ jobs:
         shell: bash
     steps:
       - name: Harden the runner (audit-only network egress)
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
         with:
           egress-policy: audit
       - name: Check out repository with full history
@@ -795,7 +795,7 @@ jobs:
           exit "$metrics_status"
       - name: Retain full betterleaks timing receipts
         if: ${{ always() && steps.install.outcome == 'success' }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: secret-scan-metrics-betterleaks-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/betterleaks/full-*.metrics.json
