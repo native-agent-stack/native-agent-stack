@@ -1,4 +1,4 @@
-# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.9.2`)
+# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.9.3`)
 
 | ADR | Title | Status | Date | Grade |
 |---|---|---|---|---|
@@ -20,3 +20,4 @@
 | [ADR-0016](ADR-0016-v390-dual-machine-lane-hub-v2-h091-lit-queue-and-prewall-lake-sha-seal.md) | `v3.9.0` Dual-Machine Lane Hub v2 (`T1`–`T5` × `H0`–`H7`), `Trial #91` (`H091`) Lit-Queue Law, `18/18` `UPSTREAM.md` Lineage & Pre-Wall Lake SHA Seal | Accepted | 2026-11-18 | E4 |
 | [ADR-0017](ADR-0017-v391-h092-h093-overnight-whipsaw-law-mcp-pipe-fix-and-93trial-seal.md) | `v3.9.1` `H092`+`H093` Overnight Whipsaw Boundary Law (`7,473` Events), MCP Pipe-Deadlock Fix & Live `ADR-0017` E2E Seal | Accepted | 2026-11-18 | E4 |
 | [ADR-0018](ADR-0018-v392-3surface-dual-desktop-adr0018-adr0015-and-22repo-zero-drift-seal.md) | `v3.9.2` Dual-Desktop Zero-WS Coexistence (`ADR-0018` & `ADR-0015`), Workflow `ADR-0017`/`ADR-0023` & 54-Checkout 3-Surface Seal | Accepted | 2026-11-18 | E4 |
+| [ADR-0019](ADR-0019-v393-starred-visual-craft-dual-native-tv-eb-throttle-and-dec6-shadow-seal.md) | `v3.9.3` Starred Visual/Diagram Craft Atlas (`ADR-0024`), `0.15x` Probation EB Throttle (`ADR-0012`), Dec-6 `23/5` Shadow Probe (`ADR-0016`) & Dual-TV Coexistence | Accepted | 2026-11-18 | E4 |

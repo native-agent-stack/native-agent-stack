@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.9.2",
+  "schemaVersion": "3.9.3",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -250,6 +250,20 @@
     "hlzTrialsCompleted": 93,
     "nextHlzTHurdle": 4.1834,
     "lessonsCount": 69,
+    "threeSurfaceSyncedCheckouts": 54
+  },
+  "v393StarredVisualCraftDualTvAndCompoundingSeal": {
+    "adr": "ADR-0019",
+    "agySotaHarnessAdr0024Sha": "994e14441a055a1fef0ad64ab6f962e65ed6cdbf",
+    "sotaCompoundingLabAdr0012Sha": "57ff858b1e099ec87facaa094cb933a86f111b1a",
+    "sotaDynamicTrailCAdr0016Sha": "ec276a3493fa5c2c499333724999b69ce24773b7",
+    "sotaPrivateVaultAdr0015Sha": "bcb1292682e89baec89a57a3dc4eb724af3f55eb",
+    "starredVisualCraftSchema": "sota-starred-visual-craft.v1",
+    "starredVisualCraftReposManifested": 24,
+    "probationNegativeEbThrottle": 0.15,
+    "dec6ShadowPauseWindowEt": "20:00-21:00",
+    "dualNativeTradingViewCoexistence": true,
+    "orcaCcLeadDualMeshActive": true,
     "threeSurfaceSyncedCheckouts": 54
   }
 }

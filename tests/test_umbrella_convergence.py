@@ -17,7 +17,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.9.2"
+    assert lock["schemaVersion"] == "3.9.3"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
     assert v380["adr"] == "ADR-0015"
     assert v380["rankingFeedSchema"] == "sota-ranking-datafeeds.v3.8"
@@ -33,6 +33,10 @@ def test_default_lock_passes_all_invariants() -> None:
     v392 = lock["v392DualDesktopCoexistenceAnd22RepoZeroDriftSeal"]
     assert v392["adr"] == "ADR-0018"
     assert v392["threeSurfaceSyncedCheckouts"] == 54
+    v393 = lock["v393StarredVisualCraftDualTvAndCompoundingSeal"]
+    assert v393["adr"] == "ADR-0019"
+    assert v393["starredVisualCraftReposManifested"] == 24
+    assert v393["dualNativeTradingViewCoexistence"] is True
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:
