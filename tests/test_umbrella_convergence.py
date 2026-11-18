@@ -55,6 +55,10 @@ def test_default_lock_passes_all_invariants() -> None:
     assert v399["adr"] == "ADR-0026"
     assert v399["smartTaskSuitabilityProfiles"] == 8
     assert v399["ownerTotalStarsAudited"] >= 413
+    v399_final = lock["v399Complete18RepoPostRestartCoopSeal"]
+    assert v399_final["adr"] == "ADR-0027"
+    assert v399_final["qmdEmbeddedVectorsTotal"] == 2325
+    assert v399_final["threeSurfaceSyncedCheckouts"] == 54
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:
