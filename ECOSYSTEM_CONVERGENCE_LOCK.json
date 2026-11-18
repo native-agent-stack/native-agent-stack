@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.9.1",
+  "schemaVersion": "3.9.2",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -240,5 +240,16 @@
     "hlzTrialsCompleted": 93,
     "nextHlzTHurdle": 4.1834,
     "lessonsCount": 69
+  },
+  "v392DualDesktopCoexistenceAnd22RepoZeroDriftSeal": {
+    "adr": "ADR-0018",
+    "sotaMoverRankerAdr0018Sha": "31907e95999d56ee63b790f60db6dcc5967be6d6",
+    "sotaDynamicTrailCAdr0015Sha": "7fb92138931e5c2908947b26c4932ba34c9cee79",
+    "sotaMultiModelWorkflowsAdr0017Sha": "a6c71a4a4d0fa7189345b0202f295936fd3f6eab",
+    "agySotaHarnessAdr0023Sha": "6c4073d9f36a2212a3d9f6258d5cd34b9d939c1a",
+    "hlzTrialsCompleted": 93,
+    "nextHlzTHurdle": 4.1834,
+    "lessonsCount": 69,
+    "threeSurfaceSyncedCheckouts": 54
   }
 }

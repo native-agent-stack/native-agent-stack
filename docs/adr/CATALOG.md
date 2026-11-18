@@ -1,4 +1,4 @@
-# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.9.1`)
+# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.9.2`)
 
 | ADR | Title | Status | Date | Grade |
 |---|---|---|---|---|
@@ -19,3 +19,4 @@
 | [ADR-0015](ADR-0015-v380-nine-feed-ranking-datafeeds-and-compounding-versioning-seal.md) | `v3.8.0` Nine-Feed PIT Ranking DataFeeds (`DF1`–`DF9`), Two-Track Compounding Versioning & Cross-Repo `orca.yaml` Seal | Accepted | 2026-11-18 | E4 |
 | [ADR-0016](ADR-0016-v390-dual-machine-lane-hub-v2-h091-lit-queue-and-prewall-lake-sha-seal.md) | `v3.9.0` Dual-Machine Lane Hub v2 (`T1`–`T5` × `H0`–`H7`), `Trial #91` (`H091`) Lit-Queue Law, `18/18` `UPSTREAM.md` Lineage & Pre-Wall Lake SHA Seal | Accepted | 2026-11-18 | E4 |
 | [ADR-0017](ADR-0017-v391-h092-h093-overnight-whipsaw-law-mcp-pipe-fix-and-93trial-seal.md) | `v3.9.1` `H092`+`H093` Overnight Whipsaw Boundary Law (`7,473` Events), MCP Pipe-Deadlock Fix & Live `ADR-0017` E2E Seal | Accepted | 2026-11-18 | E4 |
+| [ADR-0018](ADR-0018-v392-3surface-dual-desktop-adr0018-adr0015-and-22repo-zero-drift-seal.md) | `v3.9.2` Dual-Desktop Zero-WS Coexistence (`ADR-0018` & `ADR-0015`), Workflow `ADR-0017`/`ADR-0023` & 54-Checkout 3-Surface Seal | Accepted | 2026-11-18 | E4 |
