@@ -137,9 +137,9 @@
       "sota_skills_adr_and_orca_grand_workflow.py (#17)"
     ],
     "noesisHeadlessOrcaServe": "--no-pairing --refuse-public + Ubuntu 26.04.1 Noesis-Carbon WSL2 guest",
-    "hypothesisTrialsLogged": 94,
-    "nextHlzTHurdle": 4.1858,
-    "compiledLessonsTotal": 77
+    "hypothesisTrialsLogged": 95,
+    "nextHlzTHurdle": 4.1882,
+    "compiledLessonsTotal": 80
   },
   "ccLeadMultiRuntimeHub": {
     "adr": "ADR-0011",
@@ -312,6 +312,15 @@
     "sotaPrivateVaultAdr0018Sha": "da0190f4339131d19281ea0268620a9fedaaf2a3",
     "runtimeFleetBinariesVerified": 27,
     "win32StdioMcpServersVerified": 4,
+    "threeSurfaceSyncedCheckouts": 54
+  },
+  "v397AdiaMinTrlDualCcLeadAnd80LessonVaultSeal": {
+    "adr": "ADR-0024",
+    "sotaPrivateVaultAdr0019Sha": "8abd957c356a5e712d921a6016c63b0af5841f9e",
+    "lessonsCount": 80,
+    "adialabMinTrlYearsAtSr150": 7.83,
+    "h095Stage2BidSurvivedCollarNet1xBps": 15.305,
+    "win32McpToolsVerified": 48,
     "threeSurfaceSyncedCheckouts": 54
   }
 }
