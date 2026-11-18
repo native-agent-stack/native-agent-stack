@@ -1,4 +1,4 @@
-# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.4.0`)
+# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.6.0`)
 
 | ADR | Title | Status | Date | Grade |
 |---|---|---|---|---|
@@ -14,3 +14,4 @@
 | [ADR-0010](ADR-0010-v340-full-ecosystem-research-convergence-noesis-carbon-and-orca-coop.md) | v3.4.0 Full-Ecosystem Research Convergence, Clean `Noesis-Carbon` WSL2 Guest & Lease-Safe Bidirectional Orca Co-op | Accepted | 2026-11-18 | E4 |
 | [ADR-0011](ADR-0011-v350-cc-lead-central-orchestrator-14workflow-and-runtime-workers.md) | v3.5.0 Claude Code (`cc-lead`) Central Multi-Session Orchestrator, 14-Workflow Hub & 5-Channel Runtime Worker Convergence | Accepted | 2026-11-18 | E4 |
 | [ADR-0012](ADR-0012-final-cross-tier-adr-runner-convexity-and-cross-os-hub-convergence.md) | Final Cross-Tier ADR Convergence (`H088`/`H089` `50/50` Runner Convexity, Cross-OS `15/15` `cc-lead` Hub & `89`-Trial / `52`-Lesson Seal) | Accepted | 2026-11-18 | E4 |
+| [ADR-0013](ADR-0013-v360-universal-workflow-datafeed-template-engine-and-3surface-workstation-convergence.md) | `v3.6.0` Universal `14/14` + `5/5` Workflow Research-Convergence, 6 DataFeed APIs, 4 Strategy Templates, 8 Engine Sources & 3-Surface Workstation Parity | Accepted | 2026-11-18 | E4 |

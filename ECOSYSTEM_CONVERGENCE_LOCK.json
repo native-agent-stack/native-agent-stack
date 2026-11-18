@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.5.1",
+  "schemaVersion": "3.6.0",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -122,7 +122,7 @@
     "powerAndQueueGates": "ml4t/diagnostic ADIA #19 MinTRL/MDE + nkaz001/hftbacktest RiskAdverseQueueModel (Shelf-Lock ADR-0004)",
     "rvolAndPitSources": "QuantConnect/Lean RelativeDailyVolume.cs (Canon 0173) + massive-com/client-python v2.10.0 & alpaca-py asof (Canon 0172)",
     "boatsHistoryBound": "<= 8 symbols & <= 8h isolated roots pre-2026-12-06 23/5 SIP (Canon 0174)",
-    "dualWorkstationCoop": "sota-workstation v2.0.0 coop (1-pkt Tailscale wakeup + ConPTY-safe @@B64: E2EE send/inbox + lease-safe sync)"
+    "dualWorkstationCoop": "sota-workstation v2.1.0 coop & 3-surface sync (Mac ~/Documents <-> Noesis Win32 C:/sota-workstation <-> Noesis-Carbon WSL2 ~/sota-workstation)"
   },
   "tradingResearchAutomationConvergence": {
     "adr": "ADR-0010",
@@ -183,5 +183,19 @@
     "ibkr_paper_max_mpm": 3000,
     "live_capital_hard_refused": true,
     "private_github_actions_enabled": false
+  },
+  "v360UniversalWorkflowAndEngineConvergence": {
+    "adr": "ADR-0013",
+    "envelopeSchema": "sota-workflow-research-convergence.v3.6",
+    "canonicalWorkflowsVerified": 14,
+    "nativeAgyWorkflowsVerified": 5,
+    "tradingLaneDatafeedApis": 6,
+    "canonicalStrategyTemplates": 4,
+    "tradingEngineSourceRepos": 8,
+    "workstationSurfaces": [
+      "portable_mac_m5_max",
+      "stationary_noesis_win32",
+      "stationary_noesis_wsl_carbon"
+    ]
   }
 }
