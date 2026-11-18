@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.2.0",
+  "schemaVersion": "3.3.0",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -113,6 +113,16 @@
     "vaultOwnerDirectivesSealedCommit": "77f229f",
     "tslPaperOpenLiveClosedCommit": "aa1ae0d",
     "legacyHarvestSealedRepos": 47
+  },
+  "researchConvergedContracts": {
+    "adr": "ADR-0008",
+    "canonAdrsTotal": 150,
+    "starredUpstreamMatrixRows": 424,
+    "snapshotIdentity": "RFC-8493 BagIt + golang/mod v0.43.0 sumdb/dirhash h1:<base64(sha256)> (Canon 0170)",
+    "powerAndQueueGates": "ml4t/diagnostic ADIA #19 MinTRL/MDE + nkaz001/hftbacktest RiskAdverseQueueModel (Shelf-Lock ADR-0004)",
+    "rvolAndPitSources": "QuantConnect/Lean RelativeDailyVolume.cs (Canon 0173) + massive-com/client-python v2.10.0 & alpaca-py asof (Canon 0172)",
+    "boatsHistoryBound": "<= 8 symbols & <= 8h isolated roots pre-2026-12-06 23/5 SIP (Canon 0174)",
+    "dualWorkstationCoop": "sota-workstation coop (E2EE Orca send/inbox/sync + crossStoreLineage + orca reference add)"
   },
   "layerSingleOwnerMap": {
     "L0_org_governance_and_reusable_ci": ".github",
