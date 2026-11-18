@@ -64,6 +64,13 @@ def test_default_lock_passes_all_invariants() -> None:
     assert v3100["targetClaudeFableShare"] == 0.5
     assert v3100["haikuSprawlTarget"] == 0.0
     assert v3100["threeSurfaceSyncedCheckouts"] == 54
+    v3102 = lock["v3102AdvancedResearchConvergence12FeedAndOrcaLeadE2ESeal"]
+    assert v3102["adr"] == "ADR-0029"
+    assert v3102["symbolRankingSchema"] == "sota-symbol-ranking-datafeeds.v3.10"
+    assert v3102["canonicalSymbolRankingFeeds"] == 12
+    assert v3102["autoStrategyRoutesCount"] == 6
+    assert v3102["canonicalWorkflowsTotal"] == 19
+    assert v3102["beyondStarredFrontierRepos"] == 6
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:

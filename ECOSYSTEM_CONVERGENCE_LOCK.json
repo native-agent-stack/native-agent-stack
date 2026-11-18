@@ -427,5 +427,29 @@
     "sotaDynamicTrailCAdr0023Sha": "1d2df7904624afb45a1c94cb248326218a5b3687",
     "sotaPrivateVaultAdr0023Sha": "266060b6edd7ef2a4018503433e1a2d5eb01c3cd",
     "threeSurfaceSyncedCheckouts": 54
+  },
+  "v3102AdvancedResearchConvergence12FeedAndOrcaLeadE2ESeal": {
+    "adr": "ADR-0029",
+    "symbolRankingSchema": "sota-symbol-ranking-datafeeds.v3.10",
+    "canonicalSymbolRankingFeeds": 12,
+    "autoStrategyRoutesCount": 6,
+    "advancedResearchConvergenceStages": 8,
+    "canonicalWorkflowsTotal": 19,
+    "agySchemaTypedDagsTotal": 10,
+    "ownerTotalStarsAudited": 413,
+    "beyondStarredFrontierRepos": 6,
+    "zeroKimiZeroStaleModelHygiene": true,
+    "sotaMultiModelWorkflowsAdr0024Sha": "de121fb6d65d230f17c179512291e6db6fb135a2",
+    "ccSotaHarnessAdr0037Sha": "50e9967cf4f888f44cc10a4d92a418561dd3f1a4",
+    "agySotaHarnessAdr0031Sha": "617f37ce43deef41f000858423112e0db781c54d",
+    "sotaCompoundingLabAdr0016Sha": "def30e1cb197557a31602bf9dbd369022a377d18",
+    "astrolabeAdr0014Sha": "d4f3fe9d747da7659bb205ae917c47b0a51bc2af",
+    "meridianAdr0065Sha": "389a8d8baa2c75a0173b12087a82ba7bf5e77e9f",
+    "sotaHarnessFoundationAdr0038Sha": "17e66666b86eb8f932247f676e80d5986542b298",
+    "dshSotaHarnessAdr0014Sha": "623430bcfa37c88fe266baaa62bc7ee737a3459d",
+    "dshPluginLandscapeAdr0011Sha": "3e41392c157a1665c970278a00ead5e39776a04c",
+    "canonAdr0187Sha": "56f8ea4fc2fb6384f1d2c4db0df85645e0ca7d50",
+    "sotaPrivateVaultAdr0024Sha": "3071f44a923d9e439af1eb3d04173be9160afd94",
+    "threeSurfaceSyncedCheckouts": 54
   }
 }
