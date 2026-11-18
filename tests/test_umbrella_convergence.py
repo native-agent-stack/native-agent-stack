@@ -17,7 +17,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.9.9"
+    assert lock["schemaVersion"] == "3.10.0"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
     assert v380["adr"] == "ADR-0015"
     assert v380["rankingFeedSchema"] == "sota-ranking-datafeeds.v3.8"
@@ -59,6 +59,11 @@ def test_default_lock_passes_all_invariants() -> None:
     assert v399_final["adr"] == "ADR-0027"
     assert v399_final["qmdEmbeddedVectorsTotal"] == 2325
     assert v399_final["threeSurfaceSyncedCheckouts"] == 54
+    v3100 = lock["v3100QualityDirective3PowerhouseAnd1To1FableMixSeal"]
+    assert v3100["adr"] == "ADR-0028"
+    assert v3100["targetClaudeFableShare"] == 0.5
+    assert v3100["haikuSprawlTarget"] == 0.0
+    assert v3100["threeSurfaceSyncedCheckouts"] == 54
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:

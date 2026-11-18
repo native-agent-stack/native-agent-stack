@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.9.9",
+  "schemaVersion": "3.10.0",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -404,6 +404,28 @@
     "dshSotaHarnessAdr0012Sha": "18fc538a65e152f0d29679f593f009e5b5b0712f",
     "dshPluginLandscapeAdr0010Sha": "ae792366c5a12e84481ecb9226321f2d33ef0f92",
     "sotaPrivateVaultAdr0022Sha": "dbc0631698517a69c443c7433b25f79779ebbd3d",
+    "threeSurfaceSyncedCheckouts": 54
+  },
+  "v3100QualityDirective3PowerhouseAnd1To1FableMixSeal": {
+    "adr": "ADR-0028",
+    "frontierPowerhouses": [
+      "anthropic: claude-fable-5-2 (xhigh) + claude-opus-5-5 + claude-sonnet-5-5",
+      "openai: gpt-6.2-astra (xhigh) + gpt-6.2-sol (high, incl. Pi & OMP)",
+      "google: gemini-4-carbon-high (Antigravity)",
+      "deepseek: deepseek-v4-pro (DSH pre-wall)"
+    ],
+    "targetClaudeFableShare": 0.5,
+    "haikuSprawlTarget": 0.0,
+    "hostAwareNoesisSelfRoutingFixed": true,
+    "failOpenStopHookVerified": true,
+    "sotaMultiModelWorkflowsAdr0023Sha": "279110a20d7d75d0d68c24cbbb1c445152a8a939",
+    "ccSotaHarnessAdr0035Sha": "5d0ec66be252231ab3fd38d0523cef49f847e7ce",
+    "agySotaHarnessAdr0029Sha": "10e0bdef32fd674f2beb4195cb819ca36ce75abc",
+    "sotaHarnessFoundationAdr0036Sha": "4dcbcdc8991ebbb88aeee6407cbf5b43baf55a41",
+    "canonAdr0185Sha": "0626a2b34d02a7b3c67f01db8194128fe46fafdb",
+    "sotaMoverRankerSha": "e35acab11221d3110b8f7e27f7212861a4dc85ea",
+    "sotaDynamicTrailCAdr0023Sha": "1d2df7904624afb45a1c94cb248326218a5b3687",
+    "sotaPrivateVaultAdr0023Sha": "266060b6edd7ef2a4018503433e1a2d5eb01c3cd",
     "threeSurfaceSyncedCheckouts": 54
   }
 }
