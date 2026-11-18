@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.0.0",
+  "schemaVersion": "3.2.0",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -55,6 +55,27 @@
       "disposition": "PRIVATE + archived=true + actions_enabled=false"
     },
     {
+      "supersededRepo": "legacy-edge-202611",
+      "era": "2026-11",
+      "reason": "Pre-org edge prototype harvested into sota-compounding-lab, agy-sota-harness, and sota-private-vault",
+      "supersededBy": [
+        "sota-compounding-lab",
+        "agy-sota-harness",
+        "sota-private-vault"
+      ],
+      "disposition": "PRIVATE + archived=true + actions_enabled=false"
+    },
+    {
+      "supersededRepo": "legacy-movers-202611",
+      "era": "2026-11",
+      "reason": "Pre-org movers prototype harvested into sota-mover-ranker (:8787) and sota-dynamic-trail-c (:8799)",
+      "supersededBy": [
+        "sota-mover-ranker",
+        "sota-dynamic-trail-c"
+      ],
+      "disposition": "PRIVATE + archived=true + actions_enabled=false"
+    },
+    {
       "supersededRepo": "trading-sota",
       "era": "2026-10..2026-11",
       "reason": "ADR-0001..0010 PIT research prototype evolved into TSL (ADR-0001..0018) and open-core sota-compounding-lab",
@@ -74,6 +95,25 @@
       "disposition": "PRIVATE upstream plugin index + actions_enabled=false + MADR 4.0 CATALOG.md parity"
     }
   ],
+  "dualWorkstationMesh": {
+    "adr": "ADR-0006",
+    "portableLead": "Apple M5 Max (18 cores, 64 GB RAM, darwin-arm64, Orca v1.4.255, autonomous offline failover)",
+    "stationaryHeavy": "Noesis Threadripper (64 logical cores, 128 GB RAM, RTX 4090 24 GB, 100.110.115.22, Orca v1.4.261, 18 repos in C:/sota-workstation/* + WSL2 CUDA)",
+    "singleActiveBrokerHostOnly": true,
+    "sharedWslVmIsolation": {
+      "noWslShutdown": true,
+      "protectedCoResidentDistro": "sextant",
+      "noUnauthenticatedTailscaleGatewayProxy": true
+    }
+  },
+  "meridianSuccessorHandoff": {
+    "adr": "ADR-0007",
+    "meridianConvergedHead": "85def3e",
+    "meridianAdrsTotal": 54,
+    "vaultOwnerDirectivesSealedCommit": "77f229f",
+    "tslPaperOpenLiveClosedCommit": "aa1ae0d",
+    "legacyHarvestSealedRepos": 47
+  },
   "layerSingleOwnerMap": {
     "L0_org_governance_and_reusable_ci": ".github",
     "L1_ecosystem_umbrella_and_supersession_lock": "native-agent-stack",

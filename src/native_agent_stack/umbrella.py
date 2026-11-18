@@ -47,6 +47,8 @@ def evaluate_convergence_lock(lock: dict[str, Any]) -> tuple[bool, list[str]]:
         "trading-sota",
         "ecosystem-records",
         "legacy-agent-stack-202610",
+        "legacy-edge-202611",
+        "legacy-movers-202611",
     }
     exposed = pub_set & must_never_be_public
     if exposed:

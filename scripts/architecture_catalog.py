@@ -86,8 +86,9 @@ def main() -> int:
         for e in errs:
             print(f"[ADR-GATE FAIL] {e}", file=sys.stderr)
         return 1
+    adrs_cnt = len(sorted(ADR_DIR.glob("ADR-[0-9][0-9][0-9][0-9]-*.md")))
     print(
-        "[ADR-GATE PASS] 5/5 MADR 4.0 ADRs, 40-char SHA-pinned CI actions, and zero-leak privacy verified."
+        f"[ADR-GATE PASS] {adrs_cnt}/{adrs_cnt} MADR 4.0 ADRs, 40-char SHA-pinned CI actions, and zero-leak privacy verified."
     )
     return 0
 
