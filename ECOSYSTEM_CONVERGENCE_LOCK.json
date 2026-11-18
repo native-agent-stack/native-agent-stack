@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "3.0.0",
+  "org": "native-agent-stack",
+  "orgUrl": "https://github.com/native-agent-stack",
+  "updatedDate": "2026-11-18",
+  "publicUnlimitedActionsTier": [
+    ".github",
+    "agy-sota-harness",
+    "astrolabe",
+    "dsh-sota-harness",
+    "native-agent-stack",
+    "sota-compounding-lab",
+    "sota-harness-foundation",
+    "sota-multi-model-workflows",
+    "sota-upstream-shelf-lock"
+  ],
+  "privateProprietaryExecutionAndVaultTier": [
+    "canon",
+    "cc-sota-harness",
+    "dsh-plugin-landscape",
+    "meridian",
+    "sota-dynamic-trail-c",
+    "sota-mover-ranker",
+    "sota-private-vault",
+    "trading-sota",
+    "tsl"
+  ],
+  "coldArchivedSupersededTier": [
+    "ecosystem-records",
+    "legacy-agent-stack-202610"
+  ],
+  "supersessionLedger": [
+    {
+      "supersededRepo": "legacy-agent-stack-202610",
+      "era": "2026-09..2026-10",
+      "reason": "312.13 MB Sep-Oct 2026 WSL/OmniRoute/jcodemunch snapshot with 23 legacy crons and 13.5 KB .gitleaksignore debt",
+      "supersededBy": [
+        "native-agent-stack",
+        "sota-harness-foundation",
+        "agy-sota-harness",
+        "cc-sota-harness",
+        "sota-multi-model-workflows"
+      ],
+      "disposition": "PRIVATE + archived=true + actions_enabled=false (preserves PRs #1-#1272 in cold storage)"
+    },
+    {
+      "supersededRepo": "ecosystem-records",
+      "era": "2026-10-14",
+      "reason": "Static October 2026 continuity snapshot superseded by structured HLZ & Empirical-Bayes vault",
+      "supersededBy": [
+        "sota-private-vault"
+      ],
+      "disposition": "PRIVATE + archived=true + actions_enabled=false"
+    },
+    {
+      "supersededRepo": "trading-sota",
+      "era": "2026-10..2026-11",
+      "reason": "ADR-0001..0010 PIT research prototype evolved into TSL (ADR-0001..0018) and open-core sota-compounding-lab",
+      "supersededBy": [
+        "tsl",
+        "sota-compounding-lab"
+      ],
+      "disposition": "PRIVATE research reference + actions_enabled=false + MADR 4.0 CATALOG.md parity"
+    },
+    {
+      "supersededRepo": "dsh-plugin-landscape",
+      "era": "2026-11",
+      "reason": "Upstream DSH plugin catalog snapshot feeding active runtime probes in dsh-sota-harness",
+      "supersededBy": [
+        "dsh-sota-harness"
+      ],
+      "disposition": "PRIVATE upstream plugin index + actions_enabled=false + MADR 4.0 CATALOG.md parity"
+    }
+  ],
+  "layerSingleOwnerMap": {
+    "L0_org_governance_and_reusable_ci": ".github",
+    "L1_ecosystem_umbrella_and_supersession_lock": "native-agent-stack",
+    "L2_upstream_40char_sha_shelf_lock": "sota-upstream-shelf-lock",
+    "L3_open_core_multi_runtime_foundation": "sota-harness-foundation",
+    "L4_antigravity_l0_l12_harness_and_prewall_studies": "agy-sota-harness",
+    "L5_claude_27_runtime_lead_harness": "cc-sota-harness",
+    "L6_deepseek_10_layer_harness": "dsh-sota-harness",
+    "L7_multi_model_workflows_and_sqlite_wal_peer_bus": "sota-multi-model-workflows",
+    "Stage1_nautilus_queue_fill_parity_simulation": "meridian",
+    "Stage2_deterministic_causal_research_and_tsl": "canon",
+    "Stage3A_alpaca_200rpm_and_whole_market_sip_radar": "sota-mover-ranker",
+    "Stage3B_ibkr_port_4002_nautilus_paper_lane": "astrolabe",
+    "Stage4_five_stage_compounding_and_eb_shrinkage": "sota-compounding-lab",
+    "Stage5A_24x5_sub50ms_dynamic_trailing_guardian": "sota-dynamic-trail-c",
+    "Stage5B_hlz_trial_ledger_and_broker_promotion_vault": "sota-private-vault"
+  },
+  "hardInvariants": {
+    "prewall_study_cutoff": "2026-10-15",
+    "adr_0022_max_stop_pct": 2.0,
+    "alpaca_paper_max_rpm": 200,
+    "ibkr_paper_port": 4002,
+    "ibkr_paper_max_mpm": 3000,
+    "live_capital_hard_refused": true,
+    "private_github_actions_enabled": false
+  }
+}

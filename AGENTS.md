@@ -1,0 +1,5 @@
+# Native Agent Stack Charter (`v3.0.0`)
+
+1. **Upstream First, Single Owner Per Layer:** Check pinned upstream repositories (`sota-upstream-shelf-lock`) and `ECOSYSTEM_CONVERGENCE_LOCK.json` before writing custom code. Never duplicate ownership across repositories; supersede older artifacts via explicit MADR 4.0 ADRs and cold-archive (`PRIVATE` + `archived=true`).
+2. **Two-Tier CI & Privacy Firewall:** Run automated GitHub Actions exclusively on `PUBLIC` open-core repositories (`40`-char SHA-pinned actions, `permissions: contents: read`). Keep all `PRIVATE` execution/vault repositories at `actions_enabled=false` (enforced locally via `scripts/merge_gate.py` and `sota-org-doctor --live`). Never commit secrets, `PA...`/`DU...` account IDs, raw balances, or concrete home paths.
+3. **Hard Paper-Only & Pre-Wall Invariants:** Historical factor discovery filters strictly `<= 2026-10-15` (HLZ `t`-hurdle + `CPCV` + `DSR`). Live real-money broker accounts and ports (`4001`, `7496`) are 100% forbidden; paper lanes (`PA...` `<= 200 req/min`, `DU...` `:4002` `<= 3,000 msg/min`) enforce atomic `ADR-0022 <= 2.00%` stops.

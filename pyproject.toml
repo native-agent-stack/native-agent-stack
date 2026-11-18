@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "native-agent-stack"
+version = "3.0.0"
+description = "Canonical Upstream-First Ecosystem Umbrella, Single-Owner Layer Lock & 5-Stage Compounding Governance for native-agent-stack"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "hypothesis>=6.115.0",
+  "pytest>=8.3.0",
+  "ruff>=0.8.0",
+  "ty>=0.0.1a7",
+]
+
+[project.scripts]
+sota-umbrella = "native_agent_stack.umbrella:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/native_agent_stack"]
+
+[tool.ruff]
+line-length = 108
+target-version = "py312"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
