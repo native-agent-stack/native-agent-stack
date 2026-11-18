@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.9.7",
+  "schemaVersion": "3.9.8",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -122,24 +122,25 @@
     "powerAndQueueGates": "ml4t/diagnostic ADIA #19 MinTRL/MDE + nkaz001/hftbacktest RiskAdverseQueueModel (Shelf-Lock ADR-0004)",
     "rvolAndPitSources": "QuantConnect/Lean RelativeDailyVolume.cs (Canon 0173) + massive-com/client-python v2.10.0 & alpaca-py asof (Canon 0172)",
     "boatsHistoryBound": "<= 8 symbols & <= 8h isolated roots pre-2026-12-06 23/5 SIP (Canon 0174)",
-    "dualWorkstationCoop": "sota-workstation v2.2.0 coop & 3-surface sync (Mac ~/Documents <-> Noesis Win32 C:/sota-workstation <-> Noesis-Carbon WSL2 ~/sota-workstation + ~/Documents + ~/canon)"
+    "dualWorkstationCoop": "sota-workstation v2.3.0 coop --sync-memory & 3-surface sync (Mac ~/Documents <-> Noesis Win32 C:/sota-workstation <-> Noesis-Carbon WSL2 ~/sota-workstation + ~/Documents + ~/canon)"
   },
   "tradingResearchAutomationConvergence": {
     "adr": "ADR-0010",
     "feedSchema": "sota-ranking-datafeeds.v3.8 (9 canonical PIT DataFeeds DF1..DF9 superseding sota-research-feeds.v2 + 17-tool MCP surface)",
-    "workflowsTotal": 17,
+    "workflowsTotal": 18,
     "aoAndResearchWorkflows": [
       "ao_multi_model_convergence_workflow.py (#12)",
       "research_convergence_landing_workflow.py (#13)",
       "cc_lead_multi_runtime_workers_workflow.py (#14)",
       "dual_machine_trading_and_harness_lanes_workflow.py (#15)",
       "compounding_versioning_and_ranking_adr_workflow.py (#16)",
-      "sota_skills_adr_and_orca_grand_workflow.py (#17)"
+      "sota_skills_adr_and_orca_grand_workflow.py (#17)",
+      "multi_model_omc_memory_assign_workflow.py (#18)"
     ],
     "noesisHeadlessOrcaServe": "--no-pairing --refuse-public + Ubuntu 26.04.1 Noesis-Carbon WSL2 guest",
-    "hypothesisTrialsLogged": 95,
-    "nextHlzTHurdle": 4.1882,
-    "compiledLessonsTotal": 80
+    "hypothesisTrialsLogged": 96,
+    "nextHlzTHurdle": 4.1905,
+    "compiledLessonsTotal": 85
   },
   "ccLeadMultiRuntimeHub": {
     "adr": "ADR-0011",
@@ -321,6 +322,33 @@
     "adialabMinTrlYearsAtSr150": 7.83,
     "h095Stage2BidSurvivedCollarNet1xBps": 15.305,
     "win32McpToolsVerified": 48,
+    "threeSurfaceSyncedCheckouts": 54
+  },
+  "v398H096DryPowderCollarAnd18WorkflowM1M4Seal": {
+    "adr": "ADR-0025",
+    "trial96EmpiricalReceipt": "H096 pure 15s dry-powder bid-survival + OFI>=0.25 & (ISO_F>=0.15|BJZZ>=0.12) <=10bps collar (spec_sha256=588d27755bad, n=52/47d: +16.835 bps 1x, +11.366 bps 2x, +29.564 bps joint-necessity lift vs bare OFI>0, 11/15 disjoint CPCV >0, 3/3 years positive)",
+    "hlzTrialsCompleted": 96,
+    "nextHlzTHurdle": 4.1905,
+    "lessonsCount": 85,
+    "canonicalWorkflowsTotal": 18,
+    "agyWorkflowsTotal": 8,
+    "qmdIndexedDocsTotal": 567,
+    "sotaMoverRankerAdr0025Sha": "eaaa2a9783f9287916f56db7e075c99ffacd692b",
+    "sotaDynamicTrailCAdr0021Sha": "3f494a01ee910e29533dfdb72be9c2c44aa7f9ab",
+    "astrolabeAdr0012Sha": "e45a420204c52550681d2823f5ea4591b77c7baf",
+    "sotaCompoundingLabAdr0014Sha": "b65fe676088700e2e2b94ec6db74f1c47282b905",
+    "sotaUpstreamShelfLockAdr0011Sha": "4db3a939f88c3355f4c976a27b269280252be089",
+    "sotaMultiModelWorkflowsAdr0020Sha": "49d447af34759d92c3fad8704b597583355147a2",
+    "ccSotaHarnessAdr0032Sha": "b68a7a248a0a23626263261af89d7ac36e22df08",
+    "agySotaHarnessAdr0027Sha": "3a45712c3c45e56729f75c166c43179037b63438",
+    "sotaHarnessFoundationAdr0034Sha": "23ace5470af4c92b662762f248ed70f5f58f0d10",
+    "canonAdr0183Sha": "83238436643c26bf2105e725d422fe54c4f54ead",
+    "meridianAdr0063Sha": "7f2cdd4a3d7078f3e1145240a8f2a6edc291d238",
+    "tslAdr0026Sha": "f0a517ebf38f1e2795622de56823497367d3b083",
+    "tradingSotaAdr0018Sha": "b95bbebc192c453a89da13528f14ec0314f694f4",
+    "dshSotaHarnessAdr0011Sha": "39ab371697f3b18d5edd5a65da391f4b28bbe656",
+    "dshPluginLandscapeAdr0009Sha": "eeb60606bac8e3c8b6073bcd99b9aeffc6572fc3",
+    "sotaPrivateVaultAdr0020Sha": "0193dbc336d93e790595ab30dd05548f8d603b56",
     "threeSurfaceSyncedCheckouts": 54
   }
 }

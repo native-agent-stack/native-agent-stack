@@ -17,7 +17,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.9.7"
+    assert lock["schemaVersion"] == "3.9.8"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
     assert v380["adr"] == "ADR-0015"
     assert v380["rankingFeedSchema"] == "sota-ranking-datafeeds.v3.8"
@@ -46,6 +46,11 @@ def test_default_lock_passes_all_invariants() -> None:
     assert v395["hlzTrialsCompleted"] == 94
     assert v395["sotaSkillsTotal"] == 46
     assert v395["canonicalWorkflowsTotal"] == 17
+    v398 = lock["v398H096DryPowderCollarAnd18WorkflowM1M4Seal"]
+    assert v398["adr"] == "ADR-0025"
+    assert v398["hlzTrialsCompleted"] == 96
+    assert v398["canonicalWorkflowsTotal"] == 18
+    assert v398["threeSurfaceSyncedCheckouts"] == 54
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:
