@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.4.0",
+  "schemaVersion": "3.5.0",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -127,15 +127,29 @@
   "tradingResearchAutomationConvergence": {
     "adr": "ADR-0010",
     "feedSchema": "sota-research-feeds.v2 (7 canonical PIT DataFeeds on :8787 + 16-tool MCP surface)",
-    "workflowsTotal": 13,
+    "workflowsTotal": 14,
     "aoAndResearchWorkflows": [
       "ao_multi_model_convergence_workflow.py (#12)",
-      "research_convergence_landing_workflow.py (#13)"
+      "research_convergence_landing_workflow.py (#13)",
+      "cc_lead_multi_runtime_workers_workflow.py (#14)"
     ],
     "noesisHeadlessOrcaServe": "--no-pairing --refuse-public + Ubuntu 26.04.1 Noesis-Carbon WSL2 guest",
-    "hypothesisTrialsLogged": 88,
-    "nextHlzTHurdle": 4.1709,
+    "hypothesisTrialsLogged": 89,
+    "nextHlzTHurdle": 4.1735,
     "compiledLessonsTotal": 51
+  },
+  "ccLeadMultiRuntimeHub": {
+    "adr": "ADR-0011",
+    "centralOrchestrator": "Claude Code (cc-lead, claude-fable-5-2 xhigh) + oh-my-claudecode (OMC Runtime v2, oneModelPerConversation=true)",
+    "hubCli": "sota-cc-hub",
+    "workflow": "cc_lead_multi_runtime_workers_workflow.py (#14)",
+    "channels": [
+      "1_omc_ultragoal_plus_goal_stop_hook",
+      "2_omc_team_branch_worktrees_and_omx_interop",
+      "3_omc_ask_and_omx_exec_3plus_vendors",
+      "4_orca_supervised_child_worktrees_mac_and_noesis",
+      "5_omo_kimi_hephaestus_dsh_prewall_hcom_and_sota_bus"
+    ]
   },
   "layerSingleOwnerMap": {
     "L0_org_governance_and_reusable_ci": ".github",
