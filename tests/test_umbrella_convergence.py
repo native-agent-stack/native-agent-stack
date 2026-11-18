@@ -17,7 +17,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.10.2"
+    assert lock["schemaVersion"] == "3.10.3"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
     assert v380["adr"] == "ADR-0015"
     assert v380["rankingFeedSchema"] == "sota-ranking-datafeeds.v3.8"
@@ -71,6 +71,16 @@ def test_default_lock_passes_all_invariants() -> None:
     assert v3102["autoStrategyRoutesCount"] == 6
     assert v3102["canonicalWorkflowsTotal"] == 19
     assert v3102["beyondStarredFrontierRepos"] == 6
+    v3103 = lock["v3103Shared24x5LosslessFoundationAndMeritHarnessSeal"]
+    assert v3103["adr"] == "ADR-0031"
+    assert v3103["goalId"] == "G_SOTA_DUAL_MACHINE_MERIT_TO_LOSSLESS_LIVE_24X5"
+    assert v3103["paperAndLiveShareSame24x5Foundation"] is True
+    assert v3103["simLanesNeverGated"] == 2
+    assert v3103["paperAccountsNeverGated"] == 4
+    assert v3103["alpacaPaperAccounts"] == 3
+    assert v3103["ibkrPaperAccounts"] == 1
+    assert v3103["liveStage5LosslessLanes"] == 1
+    assert v3103["canonicalWorkflowsTotal"] == 20
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:

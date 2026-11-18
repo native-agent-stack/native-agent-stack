@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.10.2",
+  "schemaVersion": "3.10.3",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -450,6 +450,26 @@
     "dshPluginLandscapeAdr0011Sha": "3e41392c157a1665c970278a00ead5e39776a04c",
     "canonAdr0187Sha": "56f8ea4fc2fb6384f1d2c4db0df85645e0ca7d50",
     "sotaPrivateVaultAdr0024Sha": "3071f44a923d9e439af1eb3d04173be9160afd94",
+    "threeSurfaceSyncedCheckouts": 54
+  },
+  "v3103Shared24x5LosslessFoundationAndMeritHarnessSeal": {
+    "adr": "ADR-0031",
+    "goalId": "G_SOTA_DUAL_MACHINE_MERIT_TO_LOSSLESS_LIVE_24X5",
+    "sharedFoundationSchema": "sota-shared-24x5-merit-foundation.v1",
+    "meritHarnessSchema": "sota-grand-merit-harness.v1",
+    "paperAndLiveShareSame24x5Foundation": true,
+    "simLanesNeverGated": 2,
+    "paperAccountsNeverGated": 4,
+    "alpacaPaperAccounts": 3,
+    "ibkrPaperAccounts": 1,
+    "liveStage5LosslessLanes": 1,
+    "liveGatingPolicy": "PROVEN_AUTOMATION_ONLY_STARTING_WITH_LOSSLESS_FOUNDATION",
+    "canonicalWorkflowsTotal": 20,
+    "dualMachineOrcaAutomationsTotal": 11,
+    "sotaHarnessFoundationAdr0040Sha": "43b51358af05a65aef9761b71abed26ff3dc2594",
+    "sotaMultiModelWorkflowsAdr0027Sha": "163d86e7d80144806b5dd0d070c3cadff0823bca",
+    "sotaMoverRankerAdr0031Sha": "a628552bed37cb97ff2276c65f3fbdfa0debe105",
+    "sotaDynamicTrailCAdr0024Sha": "00b8ecc69a97915a7c76c7495795cfc95b92a6c5",
     "threeSurfaceSyncedCheckouts": 54
   }
 }
