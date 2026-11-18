@@ -17,7 +17,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.9.6"
+    assert lock["schemaVersion"] == "3.9.7"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
     assert v380["adr"] == "ADR-0015"
     assert v380["rankingFeedSchema"] == "sota-ranking-datafeeds.v3.8"

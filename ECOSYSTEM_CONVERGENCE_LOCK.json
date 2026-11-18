@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.9.6",
+  "schemaVersion": "3.9.7",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -300,6 +300,18 @@
     "sotaMoverRankerAdr0021AndFifoSha": "8e01ec178404fc5f18e33a2f3328083be7e35eb4",
     "sotaPrivateVaultAdr0017Sha": "6e4c0094edef76323b4614881cb984382d442565",
     "lessonsCount": 77,
+    "threeSurfaceSyncedCheckouts": 54
+  },
+  "v397H095CollarBifurcationBlotterAnd27RuntimeSeal": {
+    "adr": "ADR-0023",
+    "hlzTrialsCompleted": 95,
+    "nextHlzTHurdle": 4.1882,
+    "sotaMoverRankerAdr0022Sha": "29cf82d375ae1a1061b133064cb891b3e68ffccc",
+    "sotaDynamicTrailCAdr0019Sha": "3cd4ceac9cc1aaeb377e150db5ccd2faae8ca802",
+    "sotaCompoundingLabAdr0013Sha": "a1b406c422a34952e537e40d3ebcb12d4e837b0c",
+    "sotaPrivateVaultAdr0018Sha": "da0190f4339131d19281ea0268620a9fedaaf2a3",
+    "runtimeFleetBinariesVerified": 27,
+    "win32StdioMcpServersVerified": 4,
     "threeSurfaceSyncedCheckouts": 54
   }
 }
