@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.5.0",
+  "schemaVersion": "3.5.1",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -136,13 +136,14 @@
     "noesisHeadlessOrcaServe": "--no-pairing --refuse-public + Ubuntu 26.04.1 Noesis-Carbon WSL2 guest",
     "hypothesisTrialsLogged": 89,
     "nextHlzTHurdle": 4.1735,
-    "compiledLessonsTotal": 51
+    "compiledLessonsTotal": 52
   },
   "ccLeadMultiRuntimeHub": {
     "adr": "ADR-0011",
     "centralOrchestrator": "Claude Code (cc-lead, claude-fable-5-2 xhigh) + oh-my-claudecode (OMC Runtime v2, oneModelPerConversation=true)",
     "hubCli": "sota-cc-hub",
     "workflow": "cc_lead_multi_runtime_workers_workflow.py (#14)",
+    "crossOs15of15BinaryParity": true,
     "channels": [
       "1_omc_ultragoal_plus_goal_stop_hook",
       "2_omc_team_branch_worktrees_and_omx_interop",
@@ -150,6 +151,12 @@
       "4_orca_supervised_child_worktrees_mac_and_noesis",
       "5_omo_kimi_hephaestus_dsh_prewall_hcom_and_sota_bus"
     ]
+  },
+  "finalCrossTierAdrConvergence": {
+    "adr": "ADR-0012",
+    "twoStageQueueAndRunnerSynthesis": "Trials #85 -> #88 -> #89 (95.50% hybrid participation, 23x runner survival 2.20%->50.75%, -42.4% SE compression across 587 dates <= 2026-10-15)",
+    "livePaperRunnerConvexity": "sota-mover-ranker ADR-0011 (:8787 50/50 Core-Harvest + +8bps Breakeven Runner) + sota-dynamic-trail-c v1.0.1 ADR-0010 (:8799 [L]/[M]/[B] TV stager & dual Pine v6 mount)",
+    "vaultSeal": "sota-private-vault v1.3.1 (89 HLZ trials t*(90)=4.1735, 52 E1-E4 lessons, 883-fill runner telemetry)"
   },
   "layerSingleOwnerMap": {
     "L0_org_governance_and_reusable_ci": ".github",

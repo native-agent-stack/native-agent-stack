@@ -13,3 +13,4 @@
 | [ADR-0009](ADR-0009-7feed-first-hand-pit-apis-13workflow-ao-and-85trial-trading-convergence.md) | Unified 7-Feed First-Hand PIT APIs, 13-Workflow AO Automation & 85-Trial Trading Convergence | Accepted | 2026-11-18 | E4 |
 | [ADR-0010](ADR-0010-v340-full-ecosystem-research-convergence-noesis-carbon-and-orca-coop.md) | v3.4.0 Full-Ecosystem Research Convergence, Clean `Noesis-Carbon` WSL2 Guest & Lease-Safe Bidirectional Orca Co-op | Accepted | 2026-11-18 | E4 |
 | [ADR-0011](ADR-0011-v350-cc-lead-central-orchestrator-14workflow-and-runtime-workers.md) | v3.5.0 Claude Code (`cc-lead`) Central Multi-Session Orchestrator, 14-Workflow Hub & 5-Channel Runtime Worker Convergence | Accepted | 2026-11-18 | E4 |
+| [ADR-0012](ADR-0012-final-cross-tier-adr-runner-convexity-and-cross-os-hub-convergence.md) | Final Cross-Tier ADR Convergence (`H088`/`H089` `50/50` Runner Convexity, Cross-OS `15/15` `cc-lead` Hub & `89`-Trial / `52`-Lesson Seal) | Accepted | 2026-11-18 | E4 |
