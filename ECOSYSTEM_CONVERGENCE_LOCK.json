@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.9.0",
+  "schemaVersion": "3.9.1",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -136,9 +136,9 @@
       "compounding_versioning_and_ranking_adr_workflow.py (#16)"
     ],
     "noesisHeadlessOrcaServe": "--no-pairing --refuse-public + Ubuntu 26.04.1 Noesis-Carbon WSL2 guest",
-    "hypothesisTrialsLogged": 91,
-    "nextHlzTHurdle": 4.1785,
-    "compiledLessonsTotal": 65
+    "hypothesisTrialsLogged": 93,
+    "nextHlzTHurdle": 4.1834,
+    "compiledLessonsTotal": 69
   },
   "ccLeadMultiRuntimeHub": {
     "adr": "ADR-0011",
@@ -231,5 +231,14 @@
     "hlzTrialsCompleted": 91,
     "nextHlzTHurdle": 4.1785,
     "lessonsCount": 65
+  },
+  "v391OvernightWhipsawLawAndLiveE2ESeal": {
+    "adr": "ADR-0017",
+    "overnightTwinProof": "H092 (5,400 events, t=-5.4145, 23.06% stop rate) + H093 (2,073 events, t=-4.6903, 18.81% stop rate) -> 7,473-event Kaminski-Lo high-sigma overnight -200 bps stop-whipsaw boundary law",
+    "sotaMoverRankerLiveE2ESha": "e8eebd7a0570",
+    "liveExecutionReliability": "64KB macOS MCP stderr=PIPE + readline deadlock eliminated, ADR-0017 protective_entry_shield + alloc_mult wired into alpaca_paper_e2e.py, 1-share dust crumbs blocked",
+    "hlzTrialsCompleted": 93,
+    "nextHlzTHurdle": 4.1834,
+    "lessonsCount": 69
   }
 }
