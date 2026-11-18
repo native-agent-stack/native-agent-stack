@@ -17,12 +17,16 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.8.0"
+    assert lock["schemaVersion"] == "3.9.0"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
     assert v380["adr"] == "ADR-0015"
     assert v380["rankingFeedSchema"] == "sota-ranking-datafeeds.v3.8"
     assert v380["canonicalRankingFeeds"] == 9
-    assert v380["nextHlzTHurdle"] == 4.176
+    v390 = lock["v390DualMachineLaneHubV2AndH091Seal"]
+    assert v390["adr"] == "ADR-0016"
+    assert v390["dualMachineLanesSchema"] == "sota-dual-machine-lanes.v2"
+    assert v390["orcaLaneHubSchema"] == "sota-orca-lane-hub.v2"
+    assert len(v390["prewallLakeSha256"]) == 64
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:

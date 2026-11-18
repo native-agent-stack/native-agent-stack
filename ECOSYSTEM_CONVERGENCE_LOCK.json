@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.8.0",
+  "schemaVersion": "3.9.0",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -108,7 +108,7 @@
   },
   "meridianSuccessorHandoff": {
     "adr": "ADR-0007",
-    "meridianConvergedHead": "e2153da7",
+    "meridianConvergedHead": "0a98fa8f",
     "meridianAdrsTotal": 57,
     "vaultOwnerDirectivesSealedCommit": "39f0e3f",
     "tslPaperOpenLiveClosedCommit": "aa1ae0d",
@@ -116,7 +116,7 @@
   },
   "researchConvergedContracts": {
     "adr": "ADR-0008",
-    "canonAdrsTotal": 152,
+    "canonAdrsTotal": 153,
     "starredUpstreamMatrixRows": 424,
     "snapshotIdentity": "RFC-8493 BagIt + golang/mod v0.43.0 sumdb/dirhash h1:<base64(sha256)> (Canon 0170)",
     "powerAndQueueGates": "ml4t/diagnostic ADIA #19 MinTRL/MDE + nkaz001/hftbacktest RiskAdverseQueueModel (Shelf-Lock ADR-0004)",
@@ -136,9 +136,9 @@
       "compounding_versioning_and_ranking_adr_workflow.py (#16)"
     ],
     "noesisHeadlessOrcaServe": "--no-pairing --refuse-public + Ubuntu 26.04.1 Noesis-Carbon WSL2 guest",
-    "hypothesisTrialsLogged": 90,
-    "nextHlzTHurdle": 4.176,
-    "compiledLessonsTotal": 62
+    "hypothesisTrialsLogged": 91,
+    "nextHlzTHurdle": 4.1785,
+    "compiledLessonsTotal": 65
   },
   "ccLeadMultiRuntimeHub": {
     "adr": "ADR-0011",
@@ -218,5 +218,18 @@
     "hlzTrialsN": 90,
     "nextHlzTHurdle": 4.176,
     "lessonsCount": 62
+  },
+  "v390DualMachineLaneHubV2AndH091Seal": {
+    "adr": "ADR-0016",
+    "dualMachineLanesSchema": "sota-dual-machine-lanes.v2",
+    "orcaLaneHubSchema": "sota-orca-lane-hub.v2",
+    "prewallLakeSha256": "a253421e873441740d5d4b410d993cfa7345fe34b88ec4ab7f4eecd537b3f234",
+    "tradingAndHarnessLanes": "T1..T5 x H0..H7 (8 Trading + 10 Harness repos across Mac M5 Max, Noesis Win32 & Noesis-Carbon WSL2)",
+    "rthBrokerContentionShield": true,
+    "upstreamLineageCoverage": "18/18 active repos carry UPSTREAM.md + orca.yaml",
+    "trial91EmpiricalReceipt": "H091 lit-only round-lot queue (x!='D', non-'I') across C(6,2)=15 split CPCV (65.75% lit fill rate, -23.732 bps net 1x) -> enforces ADR-0017 <=10 bps / OFI>=0.25 protective shield",
+    "hlzTrialsCompleted": 91,
+    "nextHlzTHurdle": 4.1785,
+    "lessonsCount": 65
   }
 }
