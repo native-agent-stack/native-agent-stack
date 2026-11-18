@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.6.0",
+  "schemaVersion": "3.7.0",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -197,5 +197,13 @@
       "stationary_noesis_win32",
       "stationary_noesis_wsl_carbon"
     ]
+  },
+  "v370StageBSymmetricOrcaAnd0930ProtectionSeal": {
+    "adr": "ADR-0014",
+    "stageBResetSealed": "meridian 120.21 GB tar verified on E:, +871.6 GB reclaimed -> 2.85 TB free on Z: NVMe, * Noesis-Carbon Ubuntu 26.04.1 ext4 default",
+    "symmetricOrcaMesh": "100.93.211.101:6770 <-> 100.110.115.22:6770 (--no-pairing --refuse-public, E2EE paired)",
+    "prewallLakeSeeded": "Z:/sota-data/prewall-lake (1.57 GB, 29500 ORB Parquet files + 6 SEC/FINRA tables <= 2026-10-15)",
+    "trial90EmpiricalSynthesis": "H090 tight-spread <=10bps + high-OFI >=0.25 passive bid x ADR-0022 2.00% stop (+20.84bps 1x, +15.43bps 2x, 5/5 CPCV positive paths; N=90 -> t*(91)=4.1760, 59 lessons)",
+    "live0930ProtectionReady": ":8787 ADR-0013 (off-pool 50/50+Wave2 + SAR OFI/UCB) + :8799 ADR-0011 (5-preset [P]/[L]/[M]/[B]/[S] + Pine v1.0 HUD + zero-broker arm-watch)"
   }
 }
