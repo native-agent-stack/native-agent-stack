@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.10.0",
+  "schemaVersion": "3.10.2",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -153,7 +153,7 @@
       "2_omc_team_branch_worktrees_and_omx_interop",
       "3_omc_ask_and_omx_exec_3plus_vendors",
       "4_orca_supervised_child_worktrees_mac_and_noesis",
-      "5_omo_kimi_hephaestus_dsh_prewall_hcom_and_sota_bus"
+      "5_omo_sonnet_hephaestus_dsh_prewall_hcom_and_sota_bus"
     ]
   },
   "finalCrossTierAdrConvergence": {
@@ -412,7 +412,7 @@
       "anthropic: claude-fable-5-2 (xhigh) + claude-opus-5-5 + claude-sonnet-5-5",
       "openai: gpt-6.2-astra (xhigh) + gpt-6.2-sol (high, incl. Pi & OMP)",
       "google: gemini-4-carbon-high (Antigravity)",
-      "deepseek: deepseek-v4-pro (DSH pre-wall)"
+      "deepseek: deepseek-v4.1-flash (DSH pre-wall)"
     ],
     "targetClaudeFableShare": 0.5,
     "haikuSprawlTarget": 0.0,
