@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministic Merge Gate for native-agent-stack v3.0.0."""
+"""Deterministic Merge Gate for native-agent-stack v3.6.0."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def main() -> int:
         proc = subprocess.run(cmd, cwd=ROOT, check=False)
         if proc.returncode != 0:
             return proc.returncode
-    print("[MERGE-GATE PASS] All v3.0.0 umbrella invariants verified.")
+    print("[MERGE-GATE PASS] All v3.6.0 umbrella invariants verified.")
     return 0
 
 
