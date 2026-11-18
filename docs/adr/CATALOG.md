@@ -1,4 +1,4 @@
-# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.9.5`)
+# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.9.6`)
 
 | ADR | Title | Status | Date | Grade |
 |---|---|---|---|---|
@@ -23,3 +23,4 @@
 | [ADR-0019](ADR-0019-v393-starred-visual-craft-dual-native-tv-eb-throttle-and-dec6-shadow-seal.md) | `v3.9.3` Starred Visual/Diagram Craft Atlas (`ADR-0024`), `0.15x` Probation EB Throttle (`ADR-0012`), Dec-6 `23/5` Shadow Probe (`ADR-0016`) & Dual-TV Coexistence | Accepted | 2026-11-18 | E4 |
 | [ADR-0020](ADR-0020-v394-noesis-4k-primary-tradingview-display-and-continuous-keepup-seal.md) | `v3.9.4` `Noesis` 4K Primary `TradingView.exe` Display, Orca Focus Routing & Continuous Keep-Up Seal | Accepted | 2026-11-18 | E4 |
 | [ADR-0021](ADR-0021-v395-all-gaps-h094-46skill-17workflow-ext4-lake-and-22repo-convergence-seal.md) | `v3.9.5` All-Gaps Convergence (`Trial #94` `H094`, 46-Skill / 17-Workflow Enactor, Native `ext4` Lake, `:4002` Probe & `ADR-0019..0020` Seal) | Accepted | 2026-11-18 | E4 |
+| [ADR-0022](ADR-0022-v396-cta-utp-session-guard-partial-fill-fifo-and-22repo-final-seal.md) | `v3.9.6` CTA/UTP Single-Session Guard (`ADR-0021`), Partial-Fill FIFO Attribution (`8e01ec17`) & Zero-Lease 22-Repo Final Seal | Accepted | 2026-11-18 | E4 |
