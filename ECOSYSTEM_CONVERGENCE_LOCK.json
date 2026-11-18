@@ -333,7 +333,7 @@
     "canonicalWorkflowsTotal": 18,
     "agyWorkflowsTotal": 8,
     "qmdIndexedDocsTotal": 567,
-    "sotaMoverRankerAdr0025Sha": "eaaa2a9783f9287916f56db7e075c99ffacd692b",
+    "sotaMoverRankerAdr0025Sha": "bd9f9f45a3cee70f337ef3b70a0a4d3d9ae8d8e9",
     "sotaDynamicTrailCAdr0021Sha": "3f494a01ee910e29533dfdb72be9c2c44aa7f9ab",
     "astrolabeAdr0012Sha": "e45a420204c52550681d2823f5ea4591b77c7baf",
     "sotaCompoundingLabAdr0014Sha": "b65fe676088700e2e2b94ec6db74f1c47282b905",
@@ -348,7 +348,7 @@
     "tradingSotaAdr0018Sha": "b95bbebc192c453a89da13528f14ec0314f694f4",
     "dshSotaHarnessAdr0011Sha": "39ab371697f3b18d5edd5a65da391f4b28bbe656",
     "dshPluginLandscapeAdr0009Sha": "eeb60606bac8e3c8b6073bcd99b9aeffc6572fc3",
-    "sotaPrivateVaultAdr0020Sha": "0193dbc336d93e790595ab30dd05548f8d603b56",
+    "sotaPrivateVaultAdr0020Sha": "c750d9637ce5e41607ce0fe5d4ad076e4c113902",
     "threeSurfaceSyncedCheckouts": 54
   }
 }
