@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.9.8",
+  "schemaVersion": "3.9.9",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -359,5 +359,20 @@
     "curatedStarAnchors": 32,
     "sotaMultiModelWorkflowsWf18FixSha": "ffef6180c8bef8848ee6e9b5faac49cad7833074",
     "agySotaHarnessWf18FixSha": "11f18fe21dc73f57f14e885bfc21c2925f8944d6"
+  },
+  "v399SmartTaskModelRouter413StarAnd22RepoSeal": {
+    "adr": "ADR-0026",
+    "smartTaskSuitabilityProfiles": 8,
+    "runtimesIndependentlyHarnessed": 8,
+    "verifiedMcpToolsPerSurface": 49,
+    "ownerTotalStarsAudited": 413,
+    "curatedStarAnchors": 33,
+    "sotaMultiModelWorkflowsAdr0022Sha": "d2c1ef34d82f2b6613558aeb85c6d69dc825c37a",
+    "ccSotaHarnessAdr0034Sha": "4f8bf4f4da2d6fb2debc63bab232a61b8f574a8d",
+    "sotaMoverRankerSha": "25b18cf12eef54e03b6aaf2f11f0120249235acb",
+    "sotaDynamicTrailCSha": "cac8e0fc2d9cefca741586c922fd6934f5da4f9b",
+    "sotaCompoundingLabAdr0015Sha": "575e0fb90162befdf2c8a95005efeec40e193517",
+    "sotaPrivateVaultAdr0021Sha": "063f9d396fe5671d382a166f00bd6e146a2f4d2f",
+    "threeSurfaceSyncedCheckouts": 54
   }
 }
