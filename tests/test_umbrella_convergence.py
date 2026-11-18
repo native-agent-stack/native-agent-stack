@@ -16,7 +16,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert ok, f"Default lock failed validation: {errors}"
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
-    assert len(lock["coldArchivedSupersededTier"]) == 2
+    assert len(lock["coldArchivedSupersededTier"]) == 4
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:

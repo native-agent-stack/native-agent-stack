@@ -27,7 +27,9 @@
   ],
   "coldArchivedSupersededTier": [
     "ecosystem-records",
-    "legacy-agent-stack-202610"
+    "legacy-agent-stack-202610",
+    "legacy-edge-202611",
+    "legacy-movers-202611"
   ],
   "supersessionLedger": [
     {
