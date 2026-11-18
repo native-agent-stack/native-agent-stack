@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.9.4",
+  "schemaVersion": "3.9.5",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -108,37 +108,38 @@
   },
   "meridianSuccessorHandoff": {
     "adr": "ADR-0007",
-    "meridianConvergedHead": "0a98fa8f",
-    "meridianAdrsTotal": 57,
+    "meridianConvergedHead": "b8795c5c",
+    "meridianAdrsTotal": 58,
     "vaultOwnerDirectivesSealedCommit": "39f0e3f",
     "tslPaperOpenLiveClosedCommit": "aa1ae0d",
     "legacyHarvestSealedRepos": 47
   },
   "researchConvergedContracts": {
     "adr": "ADR-0008",
-    "canonAdrsTotal": 153,
+    "canonAdrsTotal": 155,
     "starredUpstreamMatrixRows": 424,
     "snapshotIdentity": "RFC-8493 BagIt + golang/mod v0.43.0 sumdb/dirhash h1:<base64(sha256)> (Canon 0170)",
     "powerAndQueueGates": "ml4t/diagnostic ADIA #19 MinTRL/MDE + nkaz001/hftbacktest RiskAdverseQueueModel (Shelf-Lock ADR-0004)",
     "rvolAndPitSources": "QuantConnect/Lean RelativeDailyVolume.cs (Canon 0173) + massive-com/client-python v2.10.0 & alpaca-py asof (Canon 0172)",
     "boatsHistoryBound": "<= 8 symbols & <= 8h isolated roots pre-2026-12-06 23/5 SIP (Canon 0174)",
-    "dualWorkstationCoop": "sota-workstation v2.1.0 coop & 3-surface sync (Mac ~/Documents <-> Noesis Win32 C:/sota-workstation <-> Noesis-Carbon WSL2 ~/sota-workstation)"
+    "dualWorkstationCoop": "sota-workstation v2.2.0 coop & 3-surface sync (Mac ~/Documents <-> Noesis Win32 C:/sota-workstation <-> Noesis-Carbon WSL2 ~/sota-workstation + ~/Documents + ~/canon)"
   },
   "tradingResearchAutomationConvergence": {
     "adr": "ADR-0010",
     "feedSchema": "sota-ranking-datafeeds.v3.8 (9 canonical PIT DataFeeds DF1..DF9 superseding sota-research-feeds.v2 + 17-tool MCP surface)",
-    "workflowsTotal": 16,
+    "workflowsTotal": 17,
     "aoAndResearchWorkflows": [
       "ao_multi_model_convergence_workflow.py (#12)",
       "research_convergence_landing_workflow.py (#13)",
       "cc_lead_multi_runtime_workers_workflow.py (#14)",
       "dual_machine_trading_and_harness_lanes_workflow.py (#15)",
-      "compounding_versioning_and_ranking_adr_workflow.py (#16)"
+      "compounding_versioning_and_ranking_adr_workflow.py (#16)",
+      "sota_skills_adr_and_orca_grand_workflow.py (#17)"
     ],
     "noesisHeadlessOrcaServe": "--no-pairing --refuse-public + Ubuntu 26.04.1 Noesis-Carbon WSL2 guest",
-    "hypothesisTrialsLogged": 93,
-    "nextHlzTHurdle": 4.1834,
-    "compiledLessonsTotal": 69
+    "hypothesisTrialsLogged": 94,
+    "nextHlzTHurdle": 4.1858,
+    "compiledLessonsTotal": 74
   },
   "ccLeadMultiRuntimeHub": {
     "adr": "ADR-0011",
@@ -189,8 +190,8 @@
   "v360UniversalWorkflowAndEngineConvergence": {
     "adr": "ADR-0013",
     "envelopeSchema": "sota-workflow-research-convergence.v3.6",
-    "canonicalWorkflowsVerified": 16,
-    "nativeAgyWorkflowsVerified": 6,
+    "canonicalWorkflowsVerified": 17,
+    "nativeAgyWorkflowsVerified": 7,
     "tradingLaneDatafeedApis": 9,
     "canonicalStrategyTemplates": 4,
     "tradingEngineSourceRepos": 8,
@@ -272,6 +273,26 @@
     "sotaDynamicTrailCAdr0017Sha": "56121965ef8f8db8f3150294dc4df658ac2ac386",
     "primaryTradingViewDisplayHost": "noesis_4k_main_display",
     "autoKeepUpIntervalMinutes": 15,
+    "threeSurfaceSyncedCheckouts": 54
+  },
+  "v395AllGapsH094And46Skill17WorkflowSeal": {
+    "adr": "ADR-0021",
+    "trial94EmpiricalReceipt": "H094 controlled lit-only round-lot <=10bps/$20M/OFI>=0.25 ablation (spec_sha256=5f039dc14ab7, 212/319=66.46% fills across 175 dates: +2.154 bps 1x, -3.233 bps 2x, t=0.1374, +25.886 bps lift vs H091 validating ADR-0017/0019 protective shields)",
+    "hlzTrialsCompleted": 94,
+    "nextHlzTHurdle": 4.1858,
+    "lessonsCount": 74,
+    "sotaSkillsTotal": 46,
+    "canonicalWorkflowsTotal": 17,
+    "nativeExt4PrewallLake": "~/sota-data/prewall-lake (Noesis-Carbon ext4)",
+    "sotaMoverRankerAdr0019To0020Sha": "fd572c09fee58366b61ab720e3be59bf32daad7b",
+    "astrolabeAdr0010Sha": "856d1cb0a95bfd2571b4284e0df5c827a083edbb",
+    "sotaMultiModelWorkflowsAdr0018Sha": "422be1b2cd06f0f3dea521b52e5dc678d54ebdaa",
+    "agySotaHarnessAdr0025Sha": "9a3b5e06bfa5f0675695ec47728350dd355e289f",
+    "sotaHarnessFoundationAdr0032Sha": "9c32b82639a98ead21860c4be678720ca978be42",
+    "ccSotaHarnessAdr0030Sha": "217cf6b56af9fbb2388b24809a59a512a24cbfbc",
+    "meridianAdr0061Sha": "b8795c5cd7d352ccd51570c140f74daf6ce2cfe3",
+    "canonAdr0181Sha": "5740c225d48492a060a769bb2a46e84fc0753456",
+    "sotaPrivateVaultAdr0016Sha": "ddea523aa5221dddbfd70bbcb4903cda410ce5a5",
     "threeSurfaceSyncedCheckouts": 54
   }
 }
