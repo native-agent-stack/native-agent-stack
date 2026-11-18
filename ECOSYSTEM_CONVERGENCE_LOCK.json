@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.3.0",
+  "schemaVersion": "3.4.0",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -108,9 +108,9 @@
   },
   "meridianSuccessorHandoff": {
     "adr": "ADR-0007",
-    "meridianConvergedHead": "85def3e",
-    "meridianAdrsTotal": 54,
-    "vaultOwnerDirectivesSealedCommit": "77f229f",
+    "meridianConvergedHead": "ce99430",
+    "meridianAdrsTotal": 56,
+    "vaultOwnerDirectivesSealedCommit": "39f0e3f",
     "tslPaperOpenLiveClosedCommit": "aa1ae0d",
     "legacyHarvestSealedRepos": 47
   },
@@ -122,19 +122,20 @@
     "powerAndQueueGates": "ml4t/diagnostic ADIA #19 MinTRL/MDE + nkaz001/hftbacktest RiskAdverseQueueModel (Shelf-Lock ADR-0004)",
     "rvolAndPitSources": "QuantConnect/Lean RelativeDailyVolume.cs (Canon 0173) + massive-com/client-python v2.10.0 & alpaca-py asof (Canon 0172)",
     "boatsHistoryBound": "<= 8 symbols & <= 8h isolated roots pre-2026-12-06 23/5 SIP (Canon 0174)",
-    "dualWorkstationCoop": "sota-workstation coop (E2EE Orca send/inbox/sync + crossStoreLineage + orca reference add)"
+    "dualWorkstationCoop": "sota-workstation v2.0.0 coop (1-pkt Tailscale wakeup + ConPTY-safe @@B64: E2EE send/inbox + lease-safe sync)"
   },
   "tradingResearchAutomationConvergence": {
-    "adr": "ADR-0009",
+    "adr": "ADR-0010",
     "feedSchema": "sota-research-feeds.v2 (7 canonical PIT DataFeeds on :8787 + 16-tool MCP surface)",
     "workflowsTotal": 13,
     "aoAndResearchWorkflows": [
       "ao_multi_model_convergence_workflow.py (#12)",
       "research_convergence_landing_workflow.py (#13)"
     ],
-    "hypothesisTrialsLogged": 85,
-    "nextHlzTHurdle": 4.1631,
-    "compiledLessonsTotal": 43
+    "noesisHeadlessOrcaServe": "--no-pairing --refuse-public + Ubuntu 26.04.1 Noesis-Carbon WSL2 guest",
+    "hypothesisTrialsLogged": 88,
+    "nextHlzTHurdle": 4.1709,
+    "compiledLessonsTotal": 51
   },
   "layerSingleOwnerMap": {
     "L0_org_governance_and_reusable_ci": ".github",
