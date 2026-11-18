@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import copy
 
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
 from native_agent_stack.umbrella import evaluate_convergence_lock, load_default_lock
 
