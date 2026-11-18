@@ -124,6 +124,18 @@
     "boatsHistoryBound": "<= 8 symbols & <= 8h isolated roots pre-2026-12-06 23/5 SIP (Canon 0174)",
     "dualWorkstationCoop": "sota-workstation coop (E2EE Orca send/inbox/sync + crossStoreLineage + orca reference add)"
   },
+  "tradingResearchAutomationConvergence": {
+    "adr": "ADR-0009",
+    "feedSchema": "sota-research-feeds.v2 (7 canonical PIT DataFeeds on :8787 + 16-tool MCP surface)",
+    "workflowsTotal": 13,
+    "aoAndResearchWorkflows": [
+      "ao_multi_model_convergence_workflow.py (#12)",
+      "research_convergence_landing_workflow.py (#13)"
+    ],
+    "hypothesisTrialsLogged": 85,
+    "nextHlzTHurdle": 4.1631,
+    "compiledLessonsTotal": 43
+  },
   "layerSingleOwnerMap": {
     "L0_org_governance_and_reusable_ci": ".github",
     "L1_ecosystem_umbrella_and_supersession_lock": "native-agent-stack",

@@ -10,3 +10,4 @@
 | [ADR-0006](ADR-0006-dual-machine-orca-mesh-and-wsl-reset-isolation.md) | Dual-Machine Portable M5 Max & Stationary Noesis Orca Mesh with Shared-VM WSL2 Isolation | Accepted | 2026-11-18 | E4 |
 | [ADR-0007](ADR-0007-meridian-54-adr-and-guard-successor-convergence.md) | Meridian 54-ADR, GUARD & TSL Workstation Handoff Convergence into `native-agent-stack` | Accepted | 2026-11-18 | E4 |
 | [ADR-0008](ADR-0008-research-converged-contracts-424-star-matrix-and-orca-coop-mesh.md) | Research-Converged Contracts (`Canon` `0169..0176` + `Shelf-Lock` `ADR-0004` + `424`-Star Matrix) & Bidirectional Dual-Workstation `agy` Orca Co-op | Accepted | 2026-11-18 | E4 |
+| [ADR-0009](ADR-0009-7feed-first-hand-pit-apis-13workflow-ao-and-85trial-trading-convergence.md) | Unified 7-Feed First-Hand PIT APIs, 13-Workflow AO Automation & 85-Trial Trading Convergence | Accepted | 2026-11-18 | E4 |
