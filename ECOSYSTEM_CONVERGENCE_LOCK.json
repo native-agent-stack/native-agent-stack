@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.9.3",
+  "schemaVersion": "3.9.4",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -264,6 +264,14 @@
     "dec6ShadowPauseWindowEt": "20:00-21:00",
     "dualNativeTradingViewCoexistence": true,
     "orcaCcLeadDualMeshActive": true,
+    "threeSurfaceSyncedCheckouts": 54
+  },
+  "v394NoesisMainTradingViewDisplayAndKeepUpSeal": {
+    "adr": "ADR-0020",
+    "sotaMoverRankerAdr0020Sha": "fd572c09fee58366b61ab720e3be59bf32daad7b",
+    "sotaDynamicTrailCAdr0017Sha": "56121965ef8f8db8f3150294dc4df658ac2ac386",
+    "primaryTradingViewDisplayHost": "noesis_4k_main_display",
+    "autoKeepUpIntervalMinutes": 15,
     "threeSurfaceSyncedCheckouts": 54
   }
 }
