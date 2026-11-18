@@ -1,4 +1,4 @@
-# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.6.0`)
+# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.8.0`)
 
 | ADR | Title | Status | Date | Grade |
 |---|---|---|---|---|
@@ -16,3 +16,4 @@
 | [ADR-0012](ADR-0012-final-cross-tier-adr-runner-convexity-and-cross-os-hub-convergence.md) | Final Cross-Tier ADR Convergence (`H088`/`H089` `50/50` Runner Convexity, Cross-OS `15/15` `cc-lead` Hub & `89`-Trial / `52`-Lesson Seal) | Accepted | 2026-11-18 | E4 |
 | [ADR-0013](ADR-0013-v360-universal-workflow-datafeed-template-engine-and-3surface-workstation-convergence.md) | `v3.6.0` Universal `14/14` + `5/5` Workflow Research-Convergence, 6 DataFeed APIs, 4 Strategy Templates, 8 Engine Sources & 3-Surface Workstation Parity | Accepted | 2026-11-18 | E4 |
 | [ADR-0014](ADR-0014-v370-stageb-z-reset-symmetric-orca-h090-and-0930-protection-convergence.md) | `v3.7.0` Stage-B `Noesis-Carbon` `Z:` Reset (`2.85 TB`), Symmetric `:6770` Orca Mesh, `Trial #90` (`+20.84 bps` 1x) & `09:30` ET Protection Convergence | Accepted | 2026-11-18 | E4 |
+| [ADR-0015](ADR-0015-v380-nine-feed-ranking-datafeeds-and-compounding-versioning-seal.md) | `v3.8.0` Nine-Feed PIT Ranking DataFeeds (`DF1`–`DF9`), Two-Track Compounding Versioning & Cross-Repo `orca.yaml` Seal | Accepted | 2026-11-18 | E4 |

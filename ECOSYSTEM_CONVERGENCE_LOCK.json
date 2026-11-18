@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.7.0",
+  "schemaVersion": "3.8.0",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -108,15 +108,15 @@
   },
   "meridianSuccessorHandoff": {
     "adr": "ADR-0007",
-    "meridianConvergedHead": "ce99430",
-    "meridianAdrsTotal": 56,
+    "meridianConvergedHead": "e2153da7",
+    "meridianAdrsTotal": 57,
     "vaultOwnerDirectivesSealedCommit": "39f0e3f",
     "tslPaperOpenLiveClosedCommit": "aa1ae0d",
     "legacyHarvestSealedRepos": 47
   },
   "researchConvergedContracts": {
     "adr": "ADR-0008",
-    "canonAdrsTotal": 150,
+    "canonAdrsTotal": 152,
     "starredUpstreamMatrixRows": 424,
     "snapshotIdentity": "RFC-8493 BagIt + golang/mod v0.43.0 sumdb/dirhash h1:<base64(sha256)> (Canon 0170)",
     "powerAndQueueGates": "ml4t/diagnostic ADIA #19 MinTRL/MDE + nkaz001/hftbacktest RiskAdverseQueueModel (Shelf-Lock ADR-0004)",
@@ -126,17 +126,19 @@
   },
   "tradingResearchAutomationConvergence": {
     "adr": "ADR-0010",
-    "feedSchema": "sota-research-feeds.v2 (7 canonical PIT DataFeeds on :8787 + 16-tool MCP surface)",
-    "workflowsTotal": 14,
+    "feedSchema": "sota-ranking-datafeeds.v3.8 (9 canonical PIT DataFeeds DF1..DF9 superseding sota-research-feeds.v2 + 17-tool MCP surface)",
+    "workflowsTotal": 16,
     "aoAndResearchWorkflows": [
       "ao_multi_model_convergence_workflow.py (#12)",
       "research_convergence_landing_workflow.py (#13)",
-      "cc_lead_multi_runtime_workers_workflow.py (#14)"
+      "cc_lead_multi_runtime_workers_workflow.py (#14)",
+      "dual_machine_trading_and_harness_lanes_workflow.py (#15)",
+      "compounding_versioning_and_ranking_adr_workflow.py (#16)"
     ],
     "noesisHeadlessOrcaServe": "--no-pairing --refuse-public + Ubuntu 26.04.1 Noesis-Carbon WSL2 guest",
-    "hypothesisTrialsLogged": 89,
-    "nextHlzTHurdle": 4.1735,
-    "compiledLessonsTotal": 52
+    "hypothesisTrialsLogged": 90,
+    "nextHlzTHurdle": 4.176,
+    "compiledLessonsTotal": 62
   },
   "ccLeadMultiRuntimeHub": {
     "adr": "ADR-0011",
@@ -187,9 +189,9 @@
   "v360UniversalWorkflowAndEngineConvergence": {
     "adr": "ADR-0013",
     "envelopeSchema": "sota-workflow-research-convergence.v3.6",
-    "canonicalWorkflowsVerified": 14,
-    "nativeAgyWorkflowsVerified": 5,
-    "tradingLaneDatafeedApis": 6,
+    "canonicalWorkflowsVerified": 16,
+    "nativeAgyWorkflowsVerified": 6,
+    "tradingLaneDatafeedApis": 9,
     "canonicalStrategyTemplates": 4,
     "tradingEngineSourceRepos": 8,
     "workstationSurfaces": [
@@ -205,5 +207,16 @@
     "prewallLakeSeeded": "Z:/sota-data/prewall-lake (1.57 GB, 29500 ORB Parquet files + 6 SEC/FINRA tables <= 2026-10-15)",
     "trial90EmpiricalSynthesis": "H090 tight-spread <=10bps + high-OFI >=0.25 passive bid x ADR-0022 2.00% stop (+20.84bps 1x, +15.43bps 2x, 5/5 CPCV positive paths; N=90 -> t*(91)=4.1760, 59 lessons)",
     "live0930ProtectionReady": ":8787 ADR-0013 (off-pool 50/50+Wave2 + SAR OFI/UCB) + :8799 ADR-0011 (5-preset [P]/[L]/[M]/[B]/[S] + Pine v1.0 HUD + zero-broker arm-watch)"
+  },
+  "v380RankingDatafeedsAndCompoundingVersioningSeal": {
+    "adr": "ADR-0015",
+    "rankingFeedSchema": "sota-ranking-datafeeds.v3.8",
+    "canonicalRankingFeeds": 9,
+    "moverRankerMcpTools": 17,
+    "versionCli": "sota-version",
+    "twoTrackPromotionRule": "ALPHA_STRATEGY_MINOR vs PROTECTIVE_FILTER_OR_GOVERNANCE",
+    "hlzTrialsN": 90,
+    "nextHlzTHurdle": 4.176,
+    "lessonsCount": 62
   }
 }

@@ -1,0 +1,10 @@
+# Orca (https://github.com/stablyai/orca) dual-machine workspace recipe for native-agent-stack
+# Supports portable Apple M5 Max (macOS) and paired stationary Noesis (Windows + WSL2 Noesis-Carbon).
+scripts:
+  setup: |
+    if command -v uv >/dev/null 2>&1; then uv sync --locked || uv sync; fi
+setupAgentStartupPolicy: start-immediately
+defaultTabs:
+  - title: Umbrella Agent
+  - title: Org Visibility Doctor
+    command: python3 scripts/merge_gate.py
