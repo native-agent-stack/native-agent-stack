@@ -17,6 +17,7 @@ $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 $defenderPaths = @(
     "C:\sota-workstation",
     "Z:\sota-data",
+    "Z:\sota-cache",
     "Z:\WSL",
     (Join-Path $env:LOCALAPPDATA "uv"),
     (Join-Path $env:LOCALAPPDATA "mise"),
