@@ -17,7 +17,9 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.10.3"
+    assert lock["schemaVersion"] == "3.10.5"
+    assert lock["dualWorkstationMesh"]["primarySovereignHost"] == "stationary_noesis_win32"
+    assert lock["dualWorkstationMesh"]["portableCockpitAndFailover"] == "portable_mac_m5_max"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
     assert v380["adr"] == "ADR-0015"
     assert v380["rankingFeedSchema"] == "sota-ranking-datafeeds.v3.8"
@@ -81,6 +83,16 @@ def test_default_lock_passes_all_invariants() -> None:
     assert v3103["ibkrPaperAccounts"] == 1
     assert v3103["liveStage5LosslessLanes"] == 1
     assert v3103["canonicalWorkflowsTotal"] == 20
+    v3105 = lock["v3105FullEcosystemSevenDomainOrcaLanesAndStationaryNoesisSeal"]
+    assert v3105["adr"] == "ADR-0032"
+    assert v3105["primarySovereignWorkstation"] == "stationary_noesis_win32"
+    assert v3105["portableCockpitAndFailover"] == "portable_mac_m5_max"
+    assert v3105["singleActiveBrokerHostOnly"] is True
+    assert v3105["dedicatedLiveExtGuardianPort"] == 8796
+    assert v3105["canonicalOrcaLaneLeadsReadOnlyT5"] is True
+    assert v3105["dualMachineOrcaFolderHubsTotal"] == 18
+    assert v3105["dualMachineOrcaAutomationsTotal"] == 14
+    assert len(v3105["sevenDomainOrcaLaneHubs"]) == 7
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:

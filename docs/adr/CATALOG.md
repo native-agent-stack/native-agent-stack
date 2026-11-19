@@ -1,4 +1,4 @@
-# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.9.7`)
+# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.10.5`)
 
 | ADR | Title | Status | Date | Grade |
 |---|---|---|---|---|
@@ -33,3 +33,4 @@
 | [ADR-0029](ADR-0029-v3102-12feed-symbol-ranking-8stage-convergence-and-orca-lead-e2e-seal.md) | `v3.10.2` `12`-Feed (`DF1..DF12`) Symbol Ranking Foundation, `8`-Stage SOTA Research Convergence (`413+6`), Zero-Kimi 8-Runtime Parity & Orca-Lead E2E Seal | Accepted | 2026-11-18 | E4 |
 | [ADR-0030](ADR-0030-v3102-zero-kimi-zero-stale-ieee754-df12-and-cross-os-win32-doctor-seal.md) | `v3.10.2` Zero-Kimi / Zero-Stale Model Seal, IEEE-754 & Bitemporal `DF1..DF12` Hardening, and Cross-OS `Noesis` Win32 Doctor Parity | Accepted | 2026-11-18 | E4 |
 | [ADR-0031](ADR-0031-v3103-dual-machine-24x5-shared-lossless-foundation-merit-harness-seal.md) | `v3.10.3` Dual-Machine Active `24/5` Shared Lossless Foundation, 7-Lane Merit-Promotion Harness & SOTA GitHub Maintenance Seal | Accepted | 2026-11-18 | E4 |
+| [ADR-0032](ADR-0032-v3105-seven-domain-orca-lanes-stationary-workstation-primary-and-dedicated-live-guardian-seal.md) | `v3.10.5` Full-Ecosystem 7-Domain Orca Lane Hubs, Stationary `Noesis` Primary `24/5` Host & Dedicated `:8796` Live Guardian Seal | Accepted | 2026-11-18 | E4 |
