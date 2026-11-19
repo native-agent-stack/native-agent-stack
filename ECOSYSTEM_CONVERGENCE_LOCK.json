@@ -591,7 +591,7 @@
       "goose"
     ],
     "zeroStaleAndZeroKimiEnforced": true,
-    "sotaHarnessFoundationAdr0043Sha": "da6b90a3010fdbc3e79a594f870dd31fe5ac481e",
+    "sotaHarnessFoundationAdr0043Sha": "d130720f6ee3ae868b950fd2bb264682abc3ebfb",
     "sotaMultiModelWorkflowsAdr0033Sha": "3e60a76c98a947f0722ffe7e6146c49162074d30",
     "sotaUpstreamShelfLockAdr0015Sha": "ce5f5ac6d14f326b37d39e845001c5d3a8ad13a1",
     "agySotaHarnessAdr0034Sha": "ed05b00cc5bd505052bf21f3747faa0a81fbf137",

@@ -3,7 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-11-19
 - **Layer:** Organization Umbrella, Dual-Machine Orca Runtime Fleet (`1.4.263`), Red-Team Security & 4-Tier SkillEvaluator (`ADR-0043`), `60` Skills, `21` Workflows & `415+8` Starred Convergence (`L0–L13` × `H1–H3`)
-- **Evidence Grade:** E4 (`sota-harness-foundation@da6b90a3` `ADR-0043`, `sota-multi-model-workflows@3e60a76c` `ADR-0033`, `sota-upstream-shelf-lock@ce5f5ac6` `ADR-0015`, `agy-sota-harness@ed05b00c` `ADR-0034`, `cc-sota-harness@fa053bfc` `ADR-0041`, `35/35` MADR 4.0 ADRs, `merge_gate.py` + `ruff` + `pytest` + `gitleaks` `0` Leaks)
+- **Evidence Grade:** E4 (`sota-harness-foundation@d130720f` `ADR-0043`, `sota-multi-model-workflows@3e60a76c` `ADR-0033`, `sota-upstream-shelf-lock@ce5f5ac6` `ADR-0015`, `agy-sota-harness@ed05b00c` `ADR-0034`, `cc-sota-harness@fa053bfc` `ADR-0041`, `35/35` MADR 4.0 ADRs, `merge_gate.py` + `ruff` + `pytest` + `gitleaks` `0` Leaks)
 - **GitHub Evidence:** https://github.com/native-agent-stack/native-agent-stack, https://github.com/native-agent-stack/sota-harness-foundation, https://github.com/native-agent-stack/sota-multi-model-workflows, https://github.com/native-agent-stack/sota-upstream-shelf-lock, https://github.com/native-agent-stack/agy-sota-harness, https://github.com/native-agent-stack/cc-sota-harness, https://github.com/elementalsouls/Claude-BugHunter, https://github.com/NVIDIA/SkillEvaluator, https://github.com/Tencent/LoopForge
 - **Revisit Trigger:** Addition of canonical runtime skills beyond `60`, Orca workflow changes beyond `21`, or modification of immutable `18`-pin `40`-char SHAs in `sota-upstream-shelf-lock`.
 
