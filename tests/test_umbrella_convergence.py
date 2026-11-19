@@ -17,7 +17,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.10.8"
+    assert lock["schemaVersion"] == "3.10.9"
     assert lock["dualWorkstationMesh"]["primarySovereignHost"] == "stationary_noesis_win32"
     assert lock["dualWorkstationMesh"]["portableCockpitAndFailover"] == "portable_mac_m5_max"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
@@ -115,6 +115,12 @@ def test_default_lock_passes_all_invariants() -> None:
     assert v3108["beyondStarredAnchorsTotal"] == 8
     assert v3108["skillEvaluatorAllPassed"] is True
     assert v3108["zeroStaleAndZeroKimiEnforced"] is True
+    v3109 = lock["v3109LandscapeAndDualMachineOrcaManifestSeal"]
+    assert v3109["adr"] == "ADR-0037"
+    assert v3109["crossOsOrcaYamlReposTotal"] == 18
+    assert v3109["dualMachineOrcaLaneHubsTotal"] == 9
+    assert v3109["sotaDoctorChecksTotal"] == 18
+    assert v3109["rtx4090CudaSidecarPort"] == 8794
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:

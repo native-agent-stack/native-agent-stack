@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.10.8",
+  "schemaVersion": "3.10.9",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-19",
@@ -596,5 +596,23 @@
     "sotaUpstreamShelfLockAdr0015Sha": "ce5f5ac6d14f326b37d39e845001c5d3a8ad13a1",
     "agySotaHarnessAdr0034Sha": "ed05b00cc5bd505052bf21f3747faa0a81fbf137",
     "ccSotaHarnessAdr0041Sha": "fa053bfc3730105ee9bff267e88192bfbc1d0015"
+  },
+  "v3109LandscapeAndDualMachineOrcaManifestSeal": {
+    "adr": "ADR-0037",
+    "orcaInstalledVersion": "1.4.263",
+    "orcaLatestEvaluated": "1.4.264",
+    "claudeCodeLiveVersion": "2.1.328",
+    "agyLiveVersion": "1.5.12",
+    "crossOsOrcaYamlReposTotal": 18,
+    "dualMachineOrcaLaneHubsTotal": 9,
+    "sotaDoctorChecksTotal": 18,
+    "rtx4090CudaSidecarPort": 8794,
+    "landedShas": {
+      "sota-harness-foundation": "316fa79cf0174f93e4b7d82f9e210da3b68f8219",
+      "sota-multi-model-workflows": "156050a69f5c7683fb5cc51e48f55c57e7fd4666",
+      "sota-upstream-shelf-lock": "b82bd522a305a92f4414a838c4a8a96392a7cd15",
+      "sota-private-vault": "29cfcb807b878245012f4315aec2814759cf5df7",
+      "dot-github": "cbe1ab0537c1af2cbfd4399adaa1991b1ae1c804"
+    }
   }
 }

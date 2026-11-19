@@ -1,4 +1,4 @@
-# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.10.8`)
+# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.10.9`)
 
 | ADR | Title | Status | Date | Grade |
 |---|---|---|---|---|
@@ -38,3 +38,4 @@
 | [ADR-0034](ADR-0034-v3107-advanced-computer-use-runtime-stack-and-seamless-workstation-landing-seal.md) | `v3.10.7` Advanced 5-Layer Computer-Use Runtime Stack & Seamless Workstation Change Landing Seal | Accepted | 2026-11-18 | E4 |
 | [ADR-0035](ADR-0035-v3108-orca-sota-worker-defaults-60skill-redteam-skilleval-and-415-starred-seal.md) | `v3.10.8` Orca SOTA Worker Defaults, 60-Skill Red-Team/SkillEvaluator & 415-Starred Convergence Seal | Accepted | 2026-11-19 | E4 |
 | [ADR-0036](ADR-0036-v3109-noesis-rtx4090-gpu-first-compute-win32-job-isolation-and-workstation-sota-tune.md) | `v3.10.9` Stationary `Noesis` RTX 4090 GPU-First Compute, Win32 Job-Object MCP Isolation & Workstation SOTA Tune | Accepted | 2026-11-19 | E4 |
+| [ADR-0037](ADR-0037-v3109-landscape-release-audit-and-dual-machine-orca-manifest-parity-seal.md) | `v3.10.9` Upstream Landscape Release Audit & Dual-Machine Orca Manifest Parity Seal | Accepted | 2026-11-19 | E4 |
