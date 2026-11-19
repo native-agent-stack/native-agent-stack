@@ -17,7 +17,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.10.5"
+    assert lock["schemaVersion"] == "3.10.6"
     assert lock["dualWorkstationMesh"]["primarySovereignHost"] == "stationary_noesis_win32"
     assert lock["dualWorkstationMesh"]["portableCockpitAndFailover"] == "portable_mac_m5_max"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
@@ -93,6 +93,13 @@ def test_default_lock_passes_all_invariants() -> None:
     assert v3105["dualMachineOrcaFolderHubsTotal"] == 18
     assert v3105["dualMachineOrcaAutomationsTotal"] == 14
     assert len(v3105["sevenDomainOrcaLaneHubs"]) == 7
+    v3106 = lock["v3106PreIpoP0ShieldClosureAndTenLeadMultiModelOrcaSeal"]
+    assert v3106["adr"] == "ADR-0033"
+    assert v3106["adr0035UnifiedShieldActive"] is True
+    assert v3106["failClosed8796DirectCallDefault"] is True
+    assert v3106["noesis24x5KeepaliveSupervisorShipped"] is True
+    assert v3106["canonicalOrcaLaneLeadsTotal"] == 10
+    assert v3106["sevenDomainHubsFullyStaffed"] is True
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:

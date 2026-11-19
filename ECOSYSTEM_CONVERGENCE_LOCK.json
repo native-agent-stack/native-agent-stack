@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.10.5",
+  "schemaVersion": "3.10.6",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-18",
@@ -532,6 +532,25 @@
     "sotaMoverRankerAdr0034Sha": "2010a9e157c8810750411dc16486004c010b8757",
     "sotaCompoundingLabAdr0017Sha": "54497df18255e625a98b589302682e3accddfd08",
     "agySotaHarnessAdr0032Sha": "f47ba6f46e8a4ea285d1c1d05da3ae8760af0156",
+    "threeSurfaceSyncedCheckouts": 54
+  },
+  "v3106PreIpoP0ShieldClosureAndTenLeadMultiModelOrcaSeal": {
+    "adr": "ADR-0033",
+    "goalId": "G_SOTA_IPO_20261119_FULL_ECOSYSTEM_CONVERGENCE",
+    "targetIpoSymbol": "NASDAQ:ANT",
+    "targetIpoDate": "2026-11-19",
+    "targetIpoOfferPriceUsd": 83.0,
+    "adr0035UnifiedShieldActive": true,
+    "failClosed8796DirectCallDefault": true,
+    "noesis24x5KeepaliveSupervisorShipped": true,
+    "canonicalOrcaLaneLeadsTotal": 10,
+    "nestedNoesisLaneLeadWorktrees": 8,
+    "sevenDomainHubsFullyStaffed": true,
+    "liveMultiModelOrcaRunId": "run_5c51382bc888",
+    "standingPreMarketCrons": 7,
+    "dualMachineOrcaAutomationsTotal": 14,
+    "sotaMoverRankerAdr0035Sha": "4de58adef1e00490d6dd4c24ad38fa59689ec923",
+    "sotaMultiModelWorkflowsAdr0030Sha": "ff3d11d1f8b42733741a0fabfc0b8b45475c007f",
     "threeSurfaceSyncedCheckouts": 54
   }
 }
