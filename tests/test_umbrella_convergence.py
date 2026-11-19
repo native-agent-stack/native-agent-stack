@@ -100,6 +100,12 @@ def test_default_lock_passes_all_invariants() -> None:
     assert v3106["noesis24x5KeepaliveSupervisorShipped"] is True
     assert v3106["canonicalOrcaLaneLeadsTotal"] == 10
     assert v3106["sevenDomainHubsFullyStaffed"] is True
+    v3107 = lock["v3107AdvancedComputerUseAndSeamlessWorkstationLandingSeal"]
+    assert v3107["adr"] == "ADR-0034"
+    assert v3107["computerUseSchema"] == "sota-computer-use-5layer.v1.0"
+    assert v3107["win32BackgroundUiaTarget"] == "mediar-ai/terminator"
+    assert v3107["hardInvariantsFailClosed"] is True
+    assert v3107["humanTrustGatesNeverBypassed"] is True
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:

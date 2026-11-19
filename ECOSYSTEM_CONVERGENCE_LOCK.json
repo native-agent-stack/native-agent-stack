@@ -552,5 +552,28 @@
     "sotaMoverRankerAdr0035Sha": "4de58adef1e00490d6dd4c24ad38fa59689ec923",
     "sotaMultiModelWorkflowsAdr0030Sha": "ff3d11d1f8b42733741a0fabfc0b8b45475c007f",
     "threeSurfaceSyncedCheckouts": 54
+  },
+  "v3107AdvancedComputerUseAndSeamlessWorkstationLandingSeal": {
+    "adr": "ADR-0034",
+    "computerUseSchema": "sota-computer-use-5layer.v1.0",
+    "escalationLayers": 4,
+    "permissionTiers": 3,
+    "win32BackgroundUiaTarget": "mediar-ai/terminator",
+    "macosAccessibilityTarget": "steipete/peekaboo",
+    "compactBrowserRefTargets": [
+      "vercel-labs/agent-browser",
+      "microsoft/playwright-mcp",
+      "orca-browser"
+    ],
+    "cliDistillationTargets": [
+      "HKUDS/CLI-Anything",
+      "simular-ai/Agent-S"
+    ],
+    "sotaHarnessFoundationAdr0042Sha": "52ce4c735d161d169244495ed6a944f928417909",
+    "ccSotaHarnessAdr0040Sha": "4590c9954d982e77257a50b575aef7b1dd744520",
+    "agySotaHarnessAdr0033Sha": "2f56eadf150cc4f14060ab9d57714c88b8f96ac7",
+    "sotaMultiModelWorkflowsAdr0032Sha": "2eebb67621619894838f12f5ff3a91937681b8c3",
+    "hardInvariantsFailClosed": true,
+    "humanTrustGatesNeverBypassed": true
   }
 }
