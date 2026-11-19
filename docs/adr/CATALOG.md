@@ -1,4 +1,4 @@
-# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.10.6`)
+# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.10.8`)
 
 | ADR | Title | Status | Date | Grade |
 |---|---|---|---|---|
@@ -36,3 +36,4 @@
 | [ADR-0032](ADR-0032-v3105-seven-domain-orca-lanes-stationary-workstation-primary-and-dedicated-live-guardian-seal.md) | `v3.10.5` Full-Ecosystem 7-Domain Orca Lane Hubs, Stationary `Noesis` Primary `24/5` Host & Dedicated `:8796` Live Guardian Seal | Accepted | 2026-11-18 | E4 |
 | [ADR-0033](ADR-0033-v3106-pre-ipo-p0-shield-closure-ten-orca-leads-and-autonomous-goal-seal.md) | `v3.10.6` Pre-IPO `2026-11-19` Convergence — `P0-1..6` Unified Protective Shield, `10` Canonical Multi-Model Orca Lane Leads & Autonomous Overnight Goal Seal | Accepted | 2026-11-18 | E4 |
 | [ADR-0034](ADR-0034-v3107-advanced-computer-use-runtime-stack-and-seamless-workstation-landing-seal.md) | `v3.10.7` Advanced 5-Layer Computer-Use Runtime Stack & Seamless Workstation Change Landing Seal | Accepted | 2026-11-18 | E4 |
+| [ADR-0035](ADR-0035-v3108-orca-sota-worker-defaults-60skill-redteam-skilleval-and-415-starred-seal.md) | `v3.10.8` Orca SOTA Worker Defaults, 60-Skill Red-Team/SkillEvaluator & 415-Starred Convergence Seal | Accepted | 2026-11-19 | E4 |

@@ -17,7 +17,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.10.6"
+    assert lock["schemaVersion"] == "3.10.8"
     assert lock["dualWorkstationMesh"]["primarySovereignHost"] == "stationary_noesis_win32"
     assert lock["dualWorkstationMesh"]["portableCockpitAndFailover"] == "portable_mac_m5_max"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
@@ -106,6 +106,15 @@ def test_default_lock_passes_all_invariants() -> None:
     assert v3107["win32BackgroundUiaTarget"] == "mediar-ai/terminator"
     assert v3107["hardInvariantsFailClosed"] is True
     assert v3107["humanTrustGatesNeverBypassed"] is True
+    v3108 = lock["v3108OrcaSotaDefaultsRedteamSkillEvalAnd415StarredSeal"]
+    assert v3108["adr"] == "ADR-0035"
+    assert v3108["canonicalSkillsTotal"] == 60
+    assert v3108["canonicalWorkflowsTotal"] == 21
+    assert v3108["dualMachineOrcaAutomationsTotal"] == 15
+    assert v3108["ownerStarredTotalAudited"] == 415
+    assert v3108["beyondStarredAnchorsTotal"] == 8
+    assert v3108["skillEvaluatorAllPassed"] is True
+    assert v3108["zeroStaleAndZeroKimiEnforced"] is True
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:

@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "3.10.6",
+  "schemaVersion": "3.10.8",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
-  "updatedDate": "2026-11-18",
+  "updatedDate": "2026-11-19",
   "publicUnlimitedActionsTier": [
     ".github",
     "agy-sota-harness",
@@ -575,5 +575,26 @@
     "sotaMultiModelWorkflowsAdr0032Sha": "2eebb67621619894838f12f5ff3a91937681b8c3",
     "hardInvariantsFailClosed": true,
     "humanTrustGatesNeverBypassed": true
+  },
+  "v3108OrcaSotaDefaultsRedteamSkillEvalAnd415StarredSeal": {
+    "adr": "ADR-0035",
+    "orcaVersion": "1.4.263",
+    "canonicalSkillsTotal": 60,
+    "canonicalWorkflowsTotal": 21,
+    "dualMachineOrcaAutomationsTotal": 15,
+    "ownerStarredTotalAudited": 415,
+    "beyondStarredAnchorsTotal": 8,
+    "skillEvaluatorAllPassed": true,
+    "redteamAdr": "sota-harness-foundation/ADR-0043",
+    "retiredRuntimesPurged": [
+      "grok",
+      "goose"
+    ],
+    "zeroStaleAndZeroKimiEnforced": true,
+    "sotaHarnessFoundationAdr0043Sha": "da6b90a3010fdbc3e79a594f870dd31fe5ac481e",
+    "sotaMultiModelWorkflowsAdr0033Sha": "3e60a76c98a947f0722ffe7e6146c49162074d30",
+    "sotaUpstreamShelfLockAdr0015Sha": "ce5f5ac6d14f326b37d39e845001c5d3a8ad13a1",
+    "agySotaHarnessAdr0034Sha": "ed05b00cc5bd505052bf21f3747faa0a81fbf137",
+    "ccSotaHarnessAdr0041Sha": "fa053bfc3730105ee9bff267e88192bfbc1d0015"
   }
 }
