@@ -1,0 +1,29 @@
+# ADR-0023 fail-closed upstream-map.toml for `native-agent-stack`
+# Every tracked implementation path maps directly to a pinned SOTA upstream in UPSTREAM.md.
+
+[shelf_pins]
+"alpaca-py" = "c42add7c0a7026e2ead3ed64e76f4def2b99fda4"
+"alpaca-mcp-server" = "63cc4278d87b31f3ed4efcfaa55624095c6d7be8"
+"nautilus_trader" = "da6b57aefdd62b44f675e434ffcfefca7f4025dd"
+"nautilus-alpaca" = "59685d56631b981018a189b5ced1a7000a50bfbd"
+"polars" = "7f902bd3ffd27ff82d14278a09a295ff2f7aed92"
+"duckdb" = "d54cbbe3df17e8e5ce68312f483b4155836112aa"
+"edgartools" = "574c2bd15f6c629bceef03b6550ea8ac8abf3473"
+"ml4t-diagnostic" = "19e76072e64a18c9ba56130e4a7bcc0bc871f57e"
+"skfolio" = "90e3fb907fab39d244d899f3caf4e9676889309c"
+"hftbacktest" = "5f3ec40b2afb764e0fea112f941ed85523ef4e88"
+"ib_async" = "ab629f34c1823ea4c1542f32f07377208a86bdfd"
+"perspective" = "0264ec13cd28ef4a2a136c8ef021c3c112bc8990"
+"lightweight-charts" = "c29c51e1e5bc61981da5832c97797cb8283d120f"
+"quantstats" = "d1a214fb906e76f974f45cdccf923b601c67a756"
+"vectorbt" = "a52a984b631624bb9daf41cb19f532fe559cf0ef"
+"pandera" = "02b375ab43f39f8c5c5108695c1791fa04f99a26"
+"exchange_calendars" = "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a"
+"statsmodels" = "278ff9950636cdd4939b4055e339a8e681d79cab"
+
+[areas]
+"scripts/architecture_catalog.py" = { upstream = "orca", how = "build-on", feature = "MADR 4.0 umbrella ADR catalog and SHA-pinned workflow checker", why = "keep umbrella org ADRs synchronized across all 18 repos" }
+"scripts/merge_gate.py" = { upstream = "orca", how = "build-on", feature = "Umbrella zero-leak, noreply-author, and manifest integrity gate", why = "enforce zero-leak invariants before umbrella commits land" }
+"scripts/tune-noesis-os-elevated.ps1" = { upstream = "orca", how = "integrate", feature = "Noesis stationary Win32 host performance & power-plan helper", why = "maintain deterministic 24/5 primary workstation hosting" }
+"src/native_agent_stack/__init__.py" = { upstream = "agent-orchestrator", how = "integrate", feature = "Umbrella package export namespace", why = "expose org-wide convergence helpers cleanly" }
+"src/native_agent_stack/umbrella.py" = { upstream = "agent-orchestrator", how = "build-on", feature = "18-repository umbrella manifest and dual-machine convergence layer", why = "coordinate public open-core vs private vault boundaries" }
