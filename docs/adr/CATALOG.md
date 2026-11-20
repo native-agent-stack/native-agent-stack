@@ -1,4 +1,4 @@
-# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.11.1`)
+# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.12.0`)
 
 | ADR | Title | Status | Date | Grade |
 |---|---|---|---|---|
@@ -44,3 +44,4 @@
 | [ADR-0040](ADR-0040-v31011-landscape-terminal-convergence-dec6-readiness-and-dual-pool-compute.md) | `v3.10.11` Landscape Terminal Convergence, Dec 6 `23/5` SIP Pre-Cutover Readiness Contract & Dual-Pool Compute Standard | Accepted | 2026-11-19 | E3 |
 | [ADR-0041](ADR-0041-v3110-upstream-24x5-terminal-lossless-kernel-quarantine-and-alpha-factory-seal.md) | `v3.11.0` Upstream-First `24/5` OpenBB Terminal, Shared `LosslessProtectionKernel`, Paper Quarantine & Pre-Wall Alpha Factory (`Trial #104`) Seal | Accepted | 2026-11-20 | E4 |
 | [ADR-0042](ADR-0042-v3111-post-ant-whole-market-merit-and-lossless-consolidation-seal.md) | `v3.11.1` Post-ANT Whole-Market `DF1..DF12` Merit Ranking & Lossless Consolidation Seal | Accepted | 2026-11-20 | E4 |
+| [ADR-0043](ADR-0043-v3120-finalized-ecosystem-full-landscape-and-trial105-seal.md) | `v3.12.0` Finalized Ecosystem, Full Landscape, Quality-First SOTA Standard, `Trial #105` Empirical Governance & Persistent `4/4` Paper Parity Seal | Accepted | 2026-11-20 | E4 |

@@ -19,7 +19,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.11.1"
+    assert lock["schemaVersion"] == "3.12.0"
     assert lock["dualWorkstationMesh"]["primarySovereignHost"] == "stationary_noesis_win32"
     assert lock["dualWorkstationMesh"]["portableCockpitAndFailover"] == "portable_mac_m5_max"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
@@ -279,6 +279,56 @@ def test_v3111_post_ant_whole_market_merit_and_lossless_consolidation_seal() -> 
         "astrolabe": "801efa5a5706c606a60fe0c9577702624056b26e",
         "sota-multi-model-workflows": "3b08855f9c39a8b77d0ff24d872ef97cd1a66eed",
         "sota-compounding-lab": "2235a8273060cf2336a0b38d3a11fba9ac89f13a",
+    }
+    active = set(lock["publicUnlimitedActionsTier"]) | set(lock["privateProprietaryExecutionAndVaultTier"])
+    for repo, sha in landed.items():
+        assert repo in active
+        assert len(sha) == 40 and set(sha) <= HEX_DIGITS
+
+
+def test_v3120_finalized_ecosystem_full_landscape_and_trial105_seal() -> None:
+    lock = load_default_lock()
+    seal = lock["v3120FinalizedEcosystemFullLandscapeAndTrial105Seal"]
+    assert seal["adr"] == "ADR-0043"
+    assert seal["evaluationStandardPolicy"] == "QUALITY_AND_SOTA_ONLY_NO_LICENSE_EXCLUSION"
+    assert seal["promotionTrack"] == "PROTECTIVE_FILTER_OR_GOVERNANCE"
+    assert seal["standaloneAlphaClaim"] is False
+    assert seal["immutableCorePinsPreserved"] == 18
+    assert seal["cumulativeNewEliteSotaStarsSynced"] == 108
+    assert seal["hlzTrialsCompleted"] == 105
+    assert seal["nextTrialId"] == 106
+    assert seal["nextHlzTHurdle"] == 4.2105
+    assert seal["trial105Status"] == "FAILED_HLZ_OR_STAT_GATE"
+    assert seal["seamlessImportLayoutsCount"] == 5
+    assert seal["canonicalPineV6ScriptsVerifiedCount"] == 8
+    assert seal["openbbWorkspaceWidgetsCount"] == 8
+    assert seal["tvLegacy10ListQuotaBurnRetired"] is True
+    assert seal["paper1000RpmAntiAdverseTtlAndFixedShareHedgeActive"] is True
+    assert seal["stage5ElevatedReloadFailClosedGuardActive"] is True
+    assert seal["paperAccountsOnlineVerifiedCount"] == 4
+    assert seal["ibkrPaper4002LiveE2EVerified"] is True
+    assert seal["ibkrIbc3242PersistentAutoRestartInstalled"] is True
+    assert seal["openbb6900KeepAliveInstalled"] is True
+
+    for hash_key in (
+        "trial105ReceiptSha256",
+        "finalizationManifestSha256",
+        "fullLandscapeManifestSha256",
+        "tvMultilayoutManifestSha256",
+    ):
+        val = seal[hash_key]
+        assert len(val) == 64 and set(val) <= HEX_DIGITS
+
+    landed = seal["landedShas"]
+    assert landed == {
+        "sota-mover-ranker": "4ef97d8146984b164f83aa5847104ffbdfa8f03a",
+        "sota-compounding-lab": "fba98a9bdbd31ba7664828f16480b6d9428393b3",
+        "sota-upstream-shelf-lock": "505b149c0acce21a2bd9661256c11c450c8660fb",
+        "sota-harness-foundation": "c23b618848f2639dccf7ba8f859b1201c639c9f4",
+        "agy-sota-harness": "e25e6320d974ce0d446d3a3400bed6db24bf4de9",
+        "sota-dynamic-trail-c": "94c302ef096fc8152cb08d1b482cb28b295a871f",
+        "sota-multi-model-workflows": "1cca7989d01ac3f4cbd778bc58c3ca5ea9b23134",
+        "sota-private-vault": "51f4b1818b42e5c91e69f0345a73afff72177bd4",
     }
     active = set(lock["publicUnlimitedActionsTier"]) | set(lock["privateProprietaryExecutionAndVaultTier"])
     for repo, sha in landed.items():

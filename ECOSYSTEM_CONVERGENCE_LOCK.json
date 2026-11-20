@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.11.1",
+  "schemaVersion": "3.12.0",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-20",
@@ -740,6 +740,42 @@
       "astrolabe": "801efa5a5706c606a60fe0c9577702624056b26e",
       "sota-multi-model-workflows": "3b08855f9c39a8b77d0ff24d872ef97cd1a66eed",
       "sota-compounding-lab": "2235a8273060cf2336a0b38d3a11fba9ac89f13a"
+    }
+  },
+  "v3120FinalizedEcosystemFullLandscapeAndTrial105Seal": {
+    "adr": "ADR-0043",
+    "evaluationStandardPolicy": "QUALITY_AND_SOTA_ONLY_NO_LICENSE_EXCLUSION",
+    "promotionTrack": "PROTECTIVE_FILTER_OR_GOVERNANCE",
+    "standaloneAlphaClaim": false,
+    "immutableCorePinsPreserved": 18,
+    "cumulativeNewEliteSotaStarsSynced": 108,
+    "hlzTrialsCompleted": 105,
+    "nextTrialId": 106,
+    "nextHlzTHurdle": 4.2105,
+    "trial105Status": "FAILED_HLZ_OR_STAT_GATE",
+    "trial105ReceiptSha256": "79d8e91c452bed271137140dd8cabb91cbe9bc1a025d58050de3bf64144b352c",
+    "finalizationManifestSha256": "4f4c177ed2aafb8021a93a91c1d255988ae2137d6129170f00f79e3a1379fa3a",
+    "fullLandscapeManifestSha256": "c02d661b8587ac49d2a8c1168db2d1658e4793266044a8aaa1b13f84b8df5c72",
+    "tvMultilayoutManifestSha256": "58afbb3a6f040d08c5263334e95885b6d03290178c010166a825ee1a2091a95e",
+    "seamlessImportLayoutsCount": 5,
+    "canonicalPineV6ScriptsVerifiedCount": 8,
+    "openbbWorkspaceWidgetsCount": 8,
+    "tvLegacy10ListQuotaBurnRetired": true,
+    "paper1000RpmAntiAdverseTtlAndFixedShareHedgeActive": true,
+    "stage5ElevatedReloadFailClosedGuardActive": true,
+    "paperAccountsOnlineVerifiedCount": 4,
+    "ibkrPaper4002LiveE2EVerified": true,
+    "ibkrIbc3242PersistentAutoRestartInstalled": true,
+    "openbb6900KeepAliveInstalled": true,
+    "landedShas": {
+      "sota-mover-ranker": "4ef97d8146984b164f83aa5847104ffbdfa8f03a",
+      "sota-compounding-lab": "fba98a9bdbd31ba7664828f16480b6d9428393b3",
+      "sota-upstream-shelf-lock": "505b149c0acce21a2bd9661256c11c450c8660fb",
+      "sota-harness-foundation": "c23b618848f2639dccf7ba8f859b1201c639c9f4",
+      "agy-sota-harness": "e25e6320d974ce0d446d3a3400bed6db24bf4de9",
+      "sota-dynamic-trail-c": "94c302ef096fc8152cb08d1b482cb28b295a871f",
+      "sota-multi-model-workflows": "1cca7989d01ac3f4cbd778bc58c3ca5ea9b23134",
+      "sota-private-vault": "51f4b1818b42e5c91e69f0345a73afff72177bd4"
     }
   }
 }
