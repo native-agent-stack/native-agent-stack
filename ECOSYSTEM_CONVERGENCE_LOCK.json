@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.11.0",
+  "schemaVersion": "3.11.1",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-20",
@@ -709,6 +709,37 @@
       "sota-compounding-lab": "00178c12fbf318dbf4ae5ab9e59a374ba5a3a921",
       "sota-dynamic-trail-c": "d89ce3acf0ff9c4468b790c2df4fffb8a99c3879",
       "sota-mover-ranker": "67f786382ad81c0de3a518c23330552d55592530"
+    }
+  },
+  "v3111PostAntWholeMarketMeritAndLosslessConsolidationSeal": {
+    "adr": "ADR-0042",
+    "era": "POST_ANT_WHOLE_MARKET_MERIT",
+    "promotionTrack": "PROTECTIVE_FILTER_OR_GOVERNANCE",
+    "standaloneAlphaClaim": false,
+    "hlzTrialsCompleted": 104,
+    "nextHlzTHurdle": 4.2084,
+    "trial105Consumed": false,
+    "sixPillarDf1ToDf12MeritRankingActive": true,
+    "zeroHardcodedLegacyAntOrSpcxAnchors": true,
+    "strictAdr0064PerStrategyContractParity": true,
+    "failClosedQuoteSecRegimeAndTcaGates": true,
+    "losslessProtectionKernelFiveLaneParity": true,
+    "zeroRoundtripLiveCanaryClosed": true,
+    "fullAutoRequiresP1AndNonP1MultiAccountParity": true,
+    "fullLandscapeManifestSha256": "e9e925881cd90e0e29addc23255ca965019ea9f523d5d48a4a102fcc9fd8fdfa",
+    "codexAstraIndependentAuditZeroFindingsRepos": 5,
+    "livePaperReloadVerifiedPorts": [
+      8787,
+      8799,
+      6900
+    ],
+    "livePorts8798And8796Untouched": true,
+    "landedShas": {
+      "sota-mover-ranker": "dd5a65aa4bd99a8b09b808154beb797e5f1280df",
+      "sota-dynamic-trail-c": "cc4348cfd1d2c78749f505a73cbbfd65b5d05cff",
+      "astrolabe": "801efa5a5706c606a60fe0c9577702624056b26e",
+      "sota-multi-model-workflows": "3b08855f9c39a8b77d0ff24d872ef97cd1a66eed",
+      "sota-compounding-lab": "2235a8273060cf2336a0b38d3a11fba9ac89f13a"
     }
   }
 }

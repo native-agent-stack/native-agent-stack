@@ -19,7 +19,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.11.0"
+    assert lock["schemaVersion"] == "3.11.1"
     assert lock["dualWorkstationMesh"]["primarySovereignHost"] == "stationary_noesis_win32"
     assert lock["dualWorkstationMesh"]["portableCockpitAndFailover"] == "portable_mac_m5_max"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
@@ -240,6 +240,45 @@ def test_v3110_upstream_terminal_lossless_kernel_and_alpha_factory_seal() -> Non
         "sota-compounding-lab": "00178c12fbf318dbf4ae5ab9e59a374ba5a3a921",
         "sota-dynamic-trail-c": "d89ce3acf0ff9c4468b790c2df4fffb8a99c3879",
         "sota-mover-ranker": "67f786382ad81c0de3a518c23330552d55592530",
+    }
+    active = set(lock["publicUnlimitedActionsTier"]) | set(lock["privateProprietaryExecutionAndVaultTier"])
+    for repo, sha in landed.items():
+        assert repo in active
+        assert len(sha) == 40 and set(sha) <= HEX_DIGITS
+
+
+def test_v3111_post_ant_whole_market_merit_and_lossless_consolidation_seal() -> None:
+    lock = load_default_lock()
+    seal = lock["v3111PostAntWholeMarketMeritAndLosslessConsolidationSeal"]
+    assert seal["adr"] == "ADR-0042"
+    assert seal["era"] == "POST_ANT_WHOLE_MARKET_MERIT"
+    assert seal["promotionTrack"] == "PROTECTIVE_FILTER_OR_GOVERNANCE"
+    assert seal["standaloneAlphaClaim"] is False
+    assert seal["hlzTrialsCompleted"] == 104
+    assert seal["nextHlzTHurdle"] == 4.2084
+    assert seal["trial105Consumed"] is False
+    assert seal["sixPillarDf1ToDf12MeritRankingActive"] is True
+    assert seal["zeroHardcodedLegacyAntOrSpcxAnchors"] is True
+    assert seal["strictAdr0064PerStrategyContractParity"] is True
+    assert seal["failClosedQuoteSecRegimeAndTcaGates"] is True
+    assert seal["losslessProtectionKernelFiveLaneParity"] is True
+    assert seal["zeroRoundtripLiveCanaryClosed"] is True
+    assert seal["fullAutoRequiresP1AndNonP1MultiAccountParity"] is True
+    assert seal["codexAstraIndependentAuditZeroFindingsRepos"] == 5
+    assert seal["livePaperReloadVerifiedPorts"] == [8787, 8799, 6900]
+    assert seal["livePorts8798And8796Untouched"] is True
+
+    manifest_sha = seal["fullLandscapeManifestSha256"]
+    assert manifest_sha == "e9e925881cd90e0e29addc23255ca965019ea9f523d5d48a4a102fcc9fd8fdfa"
+    assert len(manifest_sha) == 64 and set(manifest_sha) <= HEX_DIGITS
+
+    landed = seal["landedShas"]
+    assert landed == {
+        "sota-mover-ranker": "dd5a65aa4bd99a8b09b808154beb797e5f1280df",
+        "sota-dynamic-trail-c": "cc4348cfd1d2c78749f505a73cbbfd65b5d05cff",
+        "astrolabe": "801efa5a5706c606a60fe0c9577702624056b26e",
+        "sota-multi-model-workflows": "3b08855f9c39a8b77d0ff24d872ef97cd1a66eed",
+        "sota-compounding-lab": "2235a8273060cf2336a0b38d3a11fba9ac89f13a",
     }
     active = set(lock["publicUnlimitedActionsTier"]) | set(lock["privateProprietaryExecutionAndVaultTier"])
     for repo, sha in landed.items():
