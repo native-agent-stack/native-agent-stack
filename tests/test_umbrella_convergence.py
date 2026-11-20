@@ -17,7 +17,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.10.9"
+    assert lock["schemaVersion"] == "3.10.10"
     assert lock["dualWorkstationMesh"]["primarySovereignHost"] == "stationary_noesis_win32"
     assert lock["dualWorkstationMesh"]["portableCockpitAndFailover"] == "portable_mac_m5_max"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
@@ -121,6 +121,16 @@ def test_default_lock_passes_all_invariants() -> None:
     assert v3109["dualMachineOrcaLaneHubsTotal"] == 9
     assert v3109["sotaDoctorChecksTotal"] == 18
     assert v3109["rtx4090CudaSidecarPort"] == 8794
+    v31010 = lock["v31010PostIpoConsolidationUniversal4xLosslessAndCausalTcaSeal"]
+    assert v31010["adr"] == "ADR-0038"
+    assert v31010["postIpoSymbol"] == "ANT"
+    assert v31010["newIssue30dSeasoningEndDateEt"] == "2026-12-19"
+    assert v31010["seasonedLargeCapDateEt"] == "2026-12-20"
+    assert v31010["universalZeroGap4xLosslessLiveActive"] is True
+    assert v31010["crossProcessExitLockAndComingledDebit"] is True
+    assert v31010["wholeMarketSotaOpportunityRanking"] is True
+    assert v31010["causalMarkoutTcaAndQueueParityActive"] is True
+    assert v31010["hlzTrialsCompleted"] >= 103
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.10.9",
+  "schemaVersion": "3.10.10",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-19",
@@ -613,6 +613,26 @@
       "sota-upstream-shelf-lock": "b82bd522a305a92f4414a838c4a8a96392a7cd15",
       "sota-private-vault": "29cfcb807b878245012f4315aec2814759cf5df7",
       "dot-github": "cbe1ab0537c1af2cbfd4399adaa1991b1ae1c804"
+    }
+  },
+  "v31010PostIpoConsolidationUniversal4xLosslessAndCausalTcaSeal": {
+    "adr": "ADR-0038",
+    "postIpoSymbol": "ANT",
+    "ipoDebutDateEt": "2026-11-19",
+    "newIssue30dSeasoningEndDateEt": "2026-12-19",
+    "seasonedLargeCapDateEt": "2026-12-20",
+    "universalZeroGap4xLosslessLiveActive": true,
+    "crossProcessExitLockAndComingledDebit": true,
+    "wholeMarketSotaOpportunityRanking": true,
+    "causalMarkoutTcaAndQueueParityActive": true,
+    "hlzTrialsCompleted": 103,
+    "nextHlzTHurdle": 4.2063,
+    "compiledLessonsTotal": 242,
+    "landedShas": {
+      "sota-mover-ranker": "630a4e6ba0bf13ccd6e9cb6833abc843dda78a40",
+      "sota-dynamic-trail-c": "e4cccdf60596232f568822148278e439bd503574",
+      "sota-compounding-lab": "9bc50788b582fab72dba37a02af1b503efbe65c3",
+      "sota-multi-model-workflows": "e7c2ea1b3520908d7d384bd4fe3b4a93c00c6f0c"
     }
   }
 }
