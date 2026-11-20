@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.10.10",
+  "schemaVersion": "3.10.11",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
   "updatedDate": "2026-11-19",
@@ -650,6 +650,33 @@
       "sota-harness-foundation": "8b2ce5352018d377e32b3e234d7106a843d68285",
       "agy-sota-harness": "df8e6b7dd92c508947cd228243b260a482a80fe8",
       "dsh-sota-harness": "ab0e5ff84f3ef6cd79d817bd611653179e8292b2"
+    }
+  },
+  "v31011LandscapeTerminalConvergenceAndDec6ReadinessSeal": {
+    "adr": "ADR-0040",
+    "terminalPlatformTaxonomyOwner": "sota-upstream-shelf-lock",
+    "terminalPlatformTaxonomySha256": "2c81665b9dba2590db3649f00dae309bf5c33704d641faa19160741c54b8c61d",
+    "terminalPlatformTaxonomyClasses": 4,
+    "terminalPlatformTaxonomyNamedSurfaces": 14,
+    "immutableCorePinsPreserved": 18,
+    "collarRecalibrationNeverLoosensBeyondPrewallPrior": true,
+    "collarRecalibrationPaperNeverGatedAdvisory": true,
+    "cockpitOverlaysPromotionTrack": "VISUAL_TELEMETRY_OR_GOVERNANCE",
+    "cockpitOverlaysDecisionAuthority": "NONE",
+    "cockpitOverlaysStandaloneAlphaClaim": false,
+    "alphaPromotionRequiresMinorBumpAndPreregisteredTrial": true,
+    "hlzTrialsCompleted": 103,
+    "nextHlzTHurdle": 4.2063,
+    "trial104Consumed": false,
+    "sip23x5CutoverDateEt": "2026-12-06",
+    "sip23x5CutoverStatus": "PRE_CUTOVER_READINESS_CONTRACT",
+    "dualPoolComputeGovernanceSchema": "sota-anthropic-keybank.v1",
+    "publicCiOnlyApiSecretFirewall": true,
+    "landedShas": {
+      "sota-upstream-shelf-lock": "546cdef91ba72c7679969a8bd879058c51e70ec0",
+      "sota-compounding-lab": "69c86acf8701979d47b03eb173796e97bfd46160",
+      "sota-mover-ranker": "a58c1b8dc29fcb4fcae9867ef37890d45479d3f5",
+      "sota-multi-model-workflows": "fbd6fdb7d43da5ed001ef0f995d05da28a136889"
     }
   }
 }

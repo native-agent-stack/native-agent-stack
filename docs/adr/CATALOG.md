@@ -1,4 +1,4 @@
-# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.10.10`)
+# Native Agent Stack MADR 4.0 Architecture Decision Catalog (`v3.10.11`)
 
 | ADR | Title | Status | Date | Grade |
 |---|---|---|---|---|
@@ -41,3 +41,4 @@
 | [ADR-0037](ADR-0037-v3109-landscape-release-audit-and-dual-machine-orca-manifest-parity-seal.md) | `v3.10.9` Upstream Landscape Release Audit & Dual-Machine Orca Manifest Parity Seal | Accepted | 2026-11-19 | E4 |
 | [ADR-0038](ADR-0038-v31010-post-ipo-ant-consolidation-universal-4x-lossless-and-causal-tca-seal.md) | `v3.10.10` Post-IPO `NASDAQ:ANT` Consolidation, Universal Zero-Gap 4x Live Lossless Foundation (`:8798` + `:8796`) & Unified Causal Markout TCA Seal | Accepted | 2026-11-19 | E4 |
 | [ADR-0039](ADR-0039-v31010-cross-vendor-landscape-audit-8runtime-firewalls-and-zero-leak-seal.md) | `v3.10.10` Cross-Vendor Full-Landscape Audit, 8-Runtime Upstream-Native Firewalls & Zero-Leak Seal | Accepted | 2026-11-19 | E4 |
+| [ADR-0040](ADR-0040-v31011-landscape-terminal-convergence-dec6-readiness-and-dual-pool-compute.md) | `v3.10.11` Landscape Terminal Convergence, Dec 6 `23/5` SIP Pre-Cutover Readiness Contract & Dual-Pool Compute Standard | Accepted | 2026-11-19 | E3 |

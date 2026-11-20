@@ -9,6 +9,8 @@ from hypothesis import strategies as st
 
 from native_agent_stack.umbrella import evaluate_convergence_lock, load_default_lock
 
+HEX_DIGITS = frozenset("0123456789abcdef")
+
 
 def test_default_lock_passes_all_invariants() -> None:
     lock = load_default_lock()
@@ -17,7 +19,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.10.10"
+    assert lock["schemaVersion"] == "3.10.11"
     assert lock["dualWorkstationMesh"]["primarySovereignHost"] == "stationary_noesis_win32"
     assert lock["dualWorkstationMesh"]["portableCockpitAndFailover"] == "portable_mac_m5_max"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
@@ -141,6 +143,60 @@ def test_default_lock_passes_all_invariants() -> None:
     assert v31010_audit["dag10OfflineFallbackFailClosedE1"] is True
     assert v31010_audit["codexRedteamP0P1OpenCount"] == 0
     assert len(v31010_audit["landedShas"]) == 4
+    assert lock["v31011LandscapeTerminalConvergenceAndDec6ReadinessSeal"]["adr"] == "ADR-0040"
+
+
+def test_v31011_landscape_terminal_convergence_and_dec6_readiness_seal() -> None:
+    lock = load_default_lock()
+    seal = lock["v31011LandscapeTerminalConvergenceAndDec6ReadinessSeal"]
+    assert len(seal) == 20
+    assert seal["adr"] == "ADR-0040"
+
+    # Shelf ADR-0017 owns the taxonomy; the umbrella holds a pointer (owner, hash, counts) only.
+    assert seal["terminalPlatformTaxonomyOwner"] == "sota-upstream-shelf-lock"
+    assert seal["terminalPlatformTaxonomyOwner"] in lock["publicUnlimitedActionsTier"]
+    taxonomy_sha = seal["terminalPlatformTaxonomySha256"]
+    assert taxonomy_sha == "2c81665b9dba2590db3649f00dae309bf5c33704d641faa19160741c54b8c61d"
+    assert len(taxonomy_sha) == 64 and set(taxonomy_sha) <= HEX_DIGITS
+    assert seal["terminalPlatformTaxonomyClasses"] == 4
+    assert seal["terminalPlatformTaxonomyNamedSurfaces"] == 14
+    assert seal["immutableCorePinsPreserved"] == 18
+
+    # Lab ADR-0026: one-sided collar advisory that never gates a paper lane.
+    assert seal["collarRecalibrationNeverLoosensBeyondPrewallPrior"] is True
+    assert seal["collarRecalibrationPaperNeverGatedAdvisory"] is True
+
+    # Promotion-track non-interference boundary: visual artifacts hold no decision authority.
+    assert seal["cockpitOverlaysPromotionTrack"] == "VISUAL_TELEMETRY_OR_GOVERNANCE"
+    assert seal["cockpitOverlaysDecisionAuthority"] == "NONE"
+    assert seal["cockpitOverlaysStandaloneAlphaClaim"] is False
+    assert seal["alphaPromotionRequiresMinorBumpAndPreregisteredTrial"] is True
+    assert seal["hlzTrialsCompleted"] == 103
+    assert seal["nextHlzTHurdle"] == 4.2063
+    assert seal["trial104Consumed"] is False
+
+    # The Dec 6 cutover is a readiness contract after the pre-wall cutoff, never an active flag.
+    assert seal["sip23x5CutoverDateEt"] == "2026-12-06"
+    assert seal["sip23x5CutoverStatus"] == "PRE_CUTOVER_READINESS_CONTRACT"
+    assert seal["sip23x5CutoverDateEt"] > lock["hardInvariants"]["prewall_study_cutoff"]
+
+    # Dual-pool compute standard: API secrets may exist in public-tier CI only.
+    assert seal["dualPoolComputeGovernanceSchema"] == "sota-anthropic-keybank.v1"
+    assert seal["publicCiOnlyApiSecretFirewall"] is True
+    assert lock["hardInvariants"]["private_github_actions_enabled"] is False
+
+    landed = seal["landedShas"]
+    assert landed == {
+        "sota-upstream-shelf-lock": "546cdef91ba72c7679969a8bd879058c51e70ec0",
+        "sota-compounding-lab": "69c86acf8701979d47b03eb173796e97bfd46160",
+        "sota-mover-ranker": "a58c1b8dc29fcb4fcae9867ef37890d45479d3f5",
+        "sota-multi-model-workflows": "fbd6fdb7d43da5ed001ef0f995d05da28a136889",
+    }
+    active = set(lock["publicUnlimitedActionsTier"]) | set(lock["privateProprietaryExecutionAndVaultTier"])
+    for repo, sha in landed.items():
+        assert repo in active
+        assert len(sha) == 40 and set(sha) <= HEX_DIGITS
+    assert "sota-mover-ranker" in lock["privateProprietaryExecutionAndVaultTier"]
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:
