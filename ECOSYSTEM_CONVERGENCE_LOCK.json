@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "3.10.11",
+  "schemaVersion": "3.11.0",
   "org": "native-agent-stack",
   "orgUrl": "https://github.com/native-agent-stack",
-  "updatedDate": "2026-11-19",
+  "updatedDate": "2026-11-20",
   "publicUnlimitedActionsTier": [
     ".github",
     "agy-sota-harness",
@@ -677,6 +677,38 @@
       "sota-compounding-lab": "69c86acf8701979d47b03eb173796e97bfd46160",
       "sota-mover-ranker": "a58c1b8dc29fcb4fcae9867ef37890d45479d3f5",
       "sota-multi-model-workflows": "fbd6fdb7d43da5ed001ef0f995d05da28a136889"
+    }
+  },
+  "v3110UpstreamTerminalLosslessKernelAndAlphaFactorySeal": {
+    "adr": "ADR-0041",
+    "upstreamShelfLockPinsSha256": "ed5e461e451b58f04df8b97c44fe14fc1ae9362491abb3e78dffd4ca044ecc5d",
+    "immutableCorePinsPreserved": 18,
+    "openbbWorkspaceBackendPinned": true,
+    "qlibAlpha158Pinned": true,
+    "sharedLosslessProtectionKernelUnified": true,
+    "hypothesisPropertyExamplesTotal": 14500,
+    "activeMarketTargetsSchema": "sota.active-market-targets.v1",
+    "strategyContractSchema": "sota.strategy-contract.v2",
+    "staticPineLiveRankerRetiredHttp410": true,
+    "paperP1P4ActiveSotaFamiliesCount": 6,
+    "paperP1P4QuarantinedNoisyFamiliesCount": 5,
+    "fullLandscapeManifestSha256": "fb60d3938eac8576661ec36c4c930d1f93ab52df78a60b2913176bb81271185a",
+    "paper24x5BoatsLiveFillVerified": true,
+    "paper24x5BoatsZero42210000Rejections": true,
+    "livePorts8798And8796Untouched": true,
+    "prewallNextSessionLakeSha256": "793ecc1e9bab14f8f704e25552f6e4f9e02974d1d2deb0849878ac2cf9f56cc2",
+    "trial104ReceiptSha256": "5e073f988d9c545090b8a133416b99ae7c43b34d5284b0048eb20e892e9da5a0",
+    "trial104Status": "FAILED",
+    "trial104PromotionTrack": "PROTECTIVE_FILTER_OR_GOVERNANCE",
+    "trial104StandaloneAlphaClaim": false,
+    "trial104CscvPbo": 0.6,
+    "hlzTrialsCompleted": 104,
+    "nextHlzTHurdle": 4.2084,
+    "landedShas": {
+      "sota-upstream-shelf-lock": "e3549753294874eaf4d388119ff7053c308794dd",
+      "sota-compounding-lab": "00178c12fbf318dbf4ae5ab9e59a374ba5a3a921",
+      "sota-dynamic-trail-c": "d89ce3acf0ff9c4468b790c2df4fffb8a99c3879",
+      "sota-mover-ranker": "67f786382ad81c0de3a518c23330552d55592530"
     }
   }
 }

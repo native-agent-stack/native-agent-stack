@@ -19,7 +19,7 @@ def test_default_lock_passes_all_invariants() -> None:
     assert len(lock["publicUnlimitedActionsTier"]) == 9
     assert len(lock["privateProprietaryExecutionAndVaultTier"]) == 9
     assert len(lock["coldArchivedSupersededTier"]) == 4
-    assert lock["schemaVersion"] == "3.10.11"
+    assert lock["schemaVersion"] == "3.11.0"
     assert lock["dualWorkstationMesh"]["primarySovereignHost"] == "stationary_noesis_win32"
     assert lock["dualWorkstationMesh"]["portableCockpitAndFailover"] == "portable_mac_m5_max"
     v380 = lock["v380RankingDatafeedsAndCompoundingVersioningSeal"]
@@ -197,6 +197,54 @@ def test_v31011_landscape_terminal_convergence_and_dec6_readiness_seal() -> None
         assert repo in active
         assert len(sha) == 40 and set(sha) <= HEX_DIGITS
     assert "sota-mover-ranker" in lock["privateProprietaryExecutionAndVaultTier"]
+
+
+def test_v3110_upstream_terminal_lossless_kernel_and_alpha_factory_seal() -> None:
+    lock = load_default_lock()
+    seal = lock["v3110UpstreamTerminalLosslessKernelAndAlphaFactorySeal"]
+    assert seal["adr"] == "ADR-0041"
+    assert seal["immutableCorePinsPreserved"] == 18
+    assert seal["openbbWorkspaceBackendPinned"] is True
+    assert seal["qlibAlpha158Pinned"] is True
+    assert seal["sharedLosslessProtectionKernelUnified"] is True
+    assert seal["hypothesisPropertyExamplesTotal"] >= 14500
+    assert seal["activeMarketTargetsSchema"] == "sota.active-market-targets.v1"
+    assert seal["strategyContractSchema"] == "sota.strategy-contract.v2"
+    assert seal["staticPineLiveRankerRetiredHttp410"] is True
+    assert seal["paperP1P4ActiveSotaFamiliesCount"] == 6
+    assert seal["paperP1P4QuarantinedNoisyFamiliesCount"] == 5
+    assert seal["paper24x5BoatsLiveFillVerified"] is True
+    assert seal["paper24x5BoatsZero42210000Rejections"] is True
+    assert seal["livePorts8798And8796Untouched"] is True
+
+    # Honest Pre-Wall Trial #104 scientific falsification boundary
+    assert seal["trial104Status"] == "FAILED"
+    assert seal["trial104PromotionTrack"] == "PROTECTIVE_FILTER_OR_GOVERNANCE"
+    assert seal["trial104StandaloneAlphaClaim"] is False
+    assert seal["trial104CscvPbo"] == 0.6
+    assert seal["hlzTrialsCompleted"] == 104
+    assert seal["nextHlzTHurdle"] == 4.2084
+
+    for hash_key in (
+        "upstreamShelfLockPinsSha256",
+        "fullLandscapeManifestSha256",
+        "prewallNextSessionLakeSha256",
+        "trial104ReceiptSha256",
+    ):
+        val = seal[hash_key]
+        assert len(val) == 64 and set(val) <= HEX_DIGITS
+
+    landed = seal["landedShas"]
+    assert landed == {
+        "sota-upstream-shelf-lock": "e3549753294874eaf4d388119ff7053c308794dd",
+        "sota-compounding-lab": "00178c12fbf318dbf4ae5ab9e59a374ba5a3a921",
+        "sota-dynamic-trail-c": "d89ce3acf0ff9c4468b790c2df4fffb8a99c3879",
+        "sota-mover-ranker": "67f786382ad81c0de3a518c23330552d55592530",
+    }
+    active = set(lock["publicUnlimitedActionsTier"]) | set(lock["privateProprietaryExecutionAndVaultTier"])
+    for repo, sha in landed.items():
+        assert repo in active
+        assert len(sha) == 40 and set(sha) <= HEX_DIGITS
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:
