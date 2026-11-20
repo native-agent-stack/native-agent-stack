@@ -634,5 +634,22 @@
       "sota-compounding-lab": "9bc50788b582fab72dba37a02af1b503efbe65c3",
       "sota-multi-model-workflows": "e7c2ea1b3520908d7d384bd4fe3b4a93c00c6f0c"
     }
+  },
+  "v31010CrossVendorLandscapeAuditAnd8RuntimeFirewallSeal": {
+    "adr": "ADR-0039",
+    "eightRuntimeNativeFirewallsCount": 8,
+    "explicitAllowFailClosedJsTsWrappers": true,
+    "tier3FullManifestSkillMountParity": true,
+    "skillMountsVerifiedCount": 8,
+    "wsl2DoctorSixOfSixPass": true,
+    "dag10OfflineFallbackFailClosedE1": true,
+    "codexRedteamP0P1OpenCount": 0,
+    "threeSurfaceSyncedCheckouts": 54,
+    "landedShas": {
+      "cc-sota-harness": "85f54cd1b0b9a0bc6686559dd1b693e4a9376c92",
+      "sota-harness-foundation": "8b2ce5352018d377e32b3e234d7106a843d68285",
+      "agy-sota-harness": "df8e6b7dd92c508947cd228243b260a482a80fe8",
+      "dsh-sota-harness": "ab0e5ff84f3ef6cd79d817bd611653179e8292b2"
+    }
   }
 }

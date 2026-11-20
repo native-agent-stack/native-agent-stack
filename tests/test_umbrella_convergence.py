@@ -131,6 +131,16 @@ def test_default_lock_passes_all_invariants() -> None:
     assert v31010["wholeMarketSotaOpportunityRanking"] is True
     assert v31010["causalMarkoutTcaAndQueueParityActive"] is True
     assert v31010["hlzTrialsCompleted"] >= 103
+    v31010_audit = lock["v31010CrossVendorLandscapeAuditAnd8RuntimeFirewallSeal"]
+    assert v31010_audit["adr"] == "ADR-0039"
+    assert v31010_audit["eightRuntimeNativeFirewallsCount"] == 8
+    assert v31010_audit["explicitAllowFailClosedJsTsWrappers"] is True
+    assert v31010_audit["tier3FullManifestSkillMountParity"] is True
+    assert v31010_audit["skillMountsVerifiedCount"] == 8
+    assert v31010_audit["wsl2DoctorSixOfSixPass"] is True
+    assert v31010_audit["dag10OfflineFallbackFailClosedE1"] is True
+    assert v31010_audit["codexRedteamP0P1OpenCount"] == 0
+    assert len(v31010_audit["landedShas"]) == 4
 
 
 def test_exposing_proprietary_repo_fails_closed() -> None:
