@@ -1,9 +1,9 @@
 {
   "schema": "sota.public-master-finalized-adr-registry.v1",
   "adr": "ADR-0044",
-  "generated_at_utc": "2026-11-21T01:56:23.058919Z",
+  "generated_at_utc": "2026-11-21T02:08:16.611306Z",
   "repos_indexed": 18,
-  "total_adrs_indexed": 790,
+  "total_adrs_indexed": 792,
   "verbatim_private_archive_repo": "native-agent-stack/sota-private-vault (adr_archive/)",
   "per_repo_counts": {
     "agy-sota-harness": 36,
@@ -14,14 +14,14 @@
     "dsh-plugin-landscape": 11,
     "dsh-sota-harness": 16,
     "meridian": 65,
-    "native-agent-stack": 47,
+    "native-agent-stack": 48,
     "sota-compounding-lab": 38,
     "sota-dynamic-trail-c": 35,
     "sota-harness-foundation": 46,
     "sota-mover-ranker": 100,
     "sota-multi-model-workflows": 37,
     "sota-private-vault": 27,
-    "sota-upstream-shelf-lock": 25,
+    "sota-upstream-shelf-lock": 26,
     "trading-sota": 20,
     "tsl": 27
   },
@@ -5738,6 +5738,22 @@
       "file_sha256": "b4b10625a73b8e7e11d25e6a701c75a6ab0a9bed1569c4aacd5323d1cd872c03"
     },
     {
+      "repo": "native-agent-stack",
+      "tier": "PUBLIC",
+      "file": "ADR-0048-advanced-llm-native-quant-foundation-causal-conformal-and-16layer-research-convergence.md",
+      "title": "ADR-0048: Full-Landscape Advanced LLM-Native Quant, Microstructure Foundation Models, Causal/Conformal Risk & License-Firewall Convergence (`v3`)",
+      "status": "Accepted",
+      "date": "2026-11-20",
+      "evidence_grade": "E4 (`36`-repo live `gh api` 40-char HEAD SHA + S",
+      "github_urls": [
+        "https://github.com/AI4Finance-Foundation/FinRobot",
+        "https://github.com/BrainDAO/mcp-polymarket",
+        "https://github.com/FreedomIntelligence/TwinMarket",
+        "https://github.com/HKUDS/Vibe-Trading"
+      ],
+      "file_sha256": "bf49fb50fef1e6e017aa89412c057dfaf3caf38a36b0634f358d6c669cd1430e"
+    },
+    {
       "repo": "sota-compounding-lab",
       "tier": "PUBLIC",
       "file": "ADR-0001-public-open-core-vs-private-vault-org-firewall.md",
@@ -10209,6 +10225,22 @@
       "file_sha256": "1f8f52cd3f8b2c871a15ce6ac0751c38bad69efed10b44bb327c4f2397247f8a"
     },
     {
+      "repo": "sota-upstream-shelf-lock",
+      "tier": "PUBLIC",
+      "file": "ADR-0026-llm-native-quant-foundation-causal-conformal-and-license-firewall-landscape.md",
+      "title": "ADR-0026: Live-Verified LLM-Native Quant, Microstructure Foundation Models, Causal/Conformal Risk & License-Firewall Landscape (`2026-11-20`)",
+      "status": "Accepted",
+      "date": "2026-11-20",
+      "evidence_grade": "E4 (`gh api` live 40-char HEAD SHA + SPDX licens",
+      "github_urls": [
+        "https://github.com/AI4Finance-Foundation/FinRobot",
+        "https://github.com/BrainDAO/mcp-polymarket",
+        "https://github.com/FreedomIntelligence/TwinMarket",
+        "https://github.com/HKUDS/Vibe-Trading"
+      ],
+      "file_sha256": "581bbb5f31dd2a41df753f604facffecb2d05b4d0b1d81be63c9c22e99401487"
+    },
+    {
       "repo": "trading-sota",
       "tier": "PRIVATE",
       "file": "ADR-0001-trading-architecture.md",
@@ -10766,5 +10798,5 @@
       "file_sha256": "ca48518bef018ae289a5b3798c2c0171c4ac8cc93342dbb702f71d302b9b81a4"
     }
   ],
-  "manifest_sha256": "d35903f6e5f80145fd73fbed4d75422ccb8cd5b78be87aa63e384a9fac51d49e"
+  "manifest_sha256": "073722288265700a1fd42daead1e5289577e2a14bcf190a0dc270dd4fd41631d"
 }

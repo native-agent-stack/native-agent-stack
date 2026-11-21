@@ -26,7 +26,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_WORKSTATION = ROOT.parent
-SCHEMA_VERSION = "sota.full-landscape-resolute-layer-pin-manifest.v2"
+SCHEMA_VERSION = "sota.full-landscape-resolute-layer-pin-manifest.v3"
 
 CORE_PIN_URLS: dict[str, tuple[str, str]] = {
     "alpaca-py": ("https://github.com/alpacahq/alpaca-py", "v0.45.0"),
@@ -263,6 +263,18 @@ def build_full_landscape_layer_manifest(
                     "repo": "gerrymanoim/exchange_calendars",
                     "role": "XNYS trading session, holiday & early-close calendar pre-join",
                 },
+                {
+                    "repo": "massive-com/mcp_massive",
+                    "role": "Official Massive.com (formerly Polygon.io) read-only equities/options MCP (MIT, 1e161a8c50)",
+                },
+                {
+                    "repo": "BrainDAO/mcp-polymarket",
+                    "role": "Read-only (zero private key) Polymarket Gamma macro/Fed implied-probability MCP (MIT, 5360bef548)",
+                },
+                {
+                    "repo": "aliyun/qwen-dianjin",
+                    "role": "Local RTX 4090 DianJin-R1 & Fin-PRM SEC 8-K/earnings catalyst parsing (MIT, a626b083c1)",
+                },
             ],
             research_convergence_stages=["S2_BITEMPORAL_12FEED_PIT_INGEST"],
             harness_and_agent_md_binding={
@@ -311,6 +323,18 @@ def build_full_landscape_layer_manifest(
                 {
                     "repo": "ranaroussi/quantstats",
                     "role": "Deterministic institutional tearsheets, Sharpe/Sortino/CVaR/drawdown reporting",
+                },
+                {
+                    "repo": "microsoft/MarS",
+                    "role": "ICLR 2025 Large Market Model order-level generative LOB & market-impact sim (MIT, f04dd87a4d)",
+                },
+                {
+                    "repo": "peernagy/LOBS5",
+                    "role": "State-Space generative LOB simulator & LOB-Bench stylized-fact parity (MIT, aa36029e9d)",
+                },
+                {
+                    "repo": "nautechsystems/nautilus_agents",
+                    "role": "Official Rust-native Agents SDK for NautilusTrader (LGPL-3.0, 380ae38f35, 0 order-path code)",
                 },
             ],
             research_convergence_stages=["S4_NAUTILUS_HFTBACKTEST_QUEUE_SIM"],
@@ -363,6 +387,26 @@ def build_full_landscape_layer_manifest(
                     "role": "Conformal prediction intervals & multi-horizon statistical baselines",
                 },
                 {"repo": "Nixtla/statsforecast", "role": "Zero-leakage fast statistical baseline hurdles"},
+                {
+                    "repo": "anthropics/financial-services",
+                    "role": "Official Anthropic financial-analysis & Earnings Reviewer plugins (Apache-2.0, 41.4k stars, 3e32c2287d)",
+                },
+                {
+                    "repo": "AI4Finance-Foundation/FinRobot",
+                    "role": "Deterministic tool-backed financial agent platform (Apache-2.0, 8.5k stars, 63e1884a42)",
+                },
+                {
+                    "repo": "PriorLabs/TabPFN",
+                    "role": "In-context tabular foundation model for small-sample cross-sectional factors (Apache-2.0, e1a3550654)",
+                },
+                {
+                    "repo": "amazon-science/chronos-forecasting",
+                    "role": "Chronos-2 120M multivariate & exogenous macro-covariate TSFM (Apache-2.0, 1224fafa91)",
+                },
+                {
+                    "repo": "The-FinAI/Fino1",
+                    "role": "14B SFT+GRPO FinCoT financial reasoning model for FinQA/XBRL-Math (MIT, f2b9e99317)",
+                },
             ],
             research_convergence_stages=[
                 "S3_RD_AGENT_DSPY_HYPOTHESIS_PROPOSAL",
@@ -418,6 +462,18 @@ def build_full_landscape_layer_manifest(
                     "repo": "bashtage/arch",
                     "role": "Hansen SPA / Stationary Bootstrap / Model Confidence Set (MCS) inference",
                 },
+                {
+                    "repo": "waylonli/FINSABER",
+                    "role": "KDD 2026 Oral leakage-free & LLM token-cost backtest harness (Apache-2.0, e72c26206d)",
+                },
+                {
+                    "repo": "py-why/dowhy",
+                    "role": "Causal inference, refutation & Double-ML alpha/execution attribution (MIT, 45de9a9062)",
+                },
+                {
+                    "repo": "The-FinAI/FinBen",
+                    "role": "lm-evaluation-harness holistic financial LLM evaluation suite (MIT, 74ea6b8f8f)",
+                },
             ],
             research_convergence_stages=[
                 "S1_IMMUTABLE_PREREGISTRATION_MINTRL_MDE",
@@ -471,6 +527,10 @@ def build_full_landscape_layer_manifest(
                     "repo": "ib-api-reloaded/ib_async",
                     "role": "Paper P4 (:4002) 3,000 msg/min IBKR overnight BOATS overflow & IBC v3.24.2",
                 },
+                {
+                    "repo": "nautechsystems/nautilus_agents",
+                    "role": "Official Rust-native Agents SDK for NautilusTrader (LGPL-3.0, 380ae38f35, 0 order-path code)",
+                },
             ],
             research_convergence_stages=["S7_SINGLE_HOST_PAPER_BRACKET_EXECUTION"],
             harness_and_agent_md_binding={
@@ -523,8 +583,16 @@ def build_full_landscape_layer_manifest(
             ],
             beyond_starred_sota_repos=[
                 {
+                    "repo": "openbq-org/finos-workspace",
+                    "role": "Hosted FINOS/OpenBB Institutional Workspace (:1420, ADR-0047 zero self-built HTML/JS)",
+                },
+                {
                     "repo": "OpenBB-finance/backends-for-openbb",
                     "role": "OpenBB Platform Workspace KeepAlive backend (:6900, paper-only widgets)",
+                },
+                {
+                    "repo": "AI4Finance-Foundation/FinRobot",
+                    "role": "Deterministic tool-backed equity/quant research workstation patterns (Apache-2.0, 63e1884a42)",
                 },
             ],
             research_convergence_stages=[
@@ -562,6 +630,10 @@ def build_full_landscape_layer_manifest(
                     "repo": "opendatalab/MinerU",
                     "role": "GPU-assisted high-throughput institutional PDF/filing parsing",
                 },
+                {
+                    "repo": "shiyu-coder/Kronos",
+                    "role": "48k-star MIT K-line foundation model (12B+ K-lines) for Monte Carlo volatility/path bounds",
+                },
             ],
             beyond_starred_sota_repos=[
                 {
@@ -571,6 +643,18 @@ def build_full_landscape_layer_manifest(
                 {
                     "repo": "pytorch/pytorch",
                     "role": "CUDA TF32/BF16 + Triton + CuPy + XGBoost GPU sidecar (:8794)",
+                },
+                {
+                    "repo": "aliyun/qwen-dianjin",
+                    "role": "Local RTX 4090 DianJin-R1-7B & Fin-PRM financial reasoning (MIT, a626b083c1)",
+                },
+                {
+                    "repo": "PriorLabs/TabPFN",
+                    "role": "Zero-tuning tabular foundation model for small-sample quant regimes (Apache-2.0, e1a3550654)",
+                },
+                {
+                    "repo": "SalesforceAIResearch/uni2ts",
+                    "role": "MOIRAI-2 decoder-only multi-quantile VaR/ES TSFM (Apache-2.0, cfd46d4510)",
                 },
             ],
             research_convergence_stages=[
@@ -652,6 +736,18 @@ def build_full_landscape_layer_manifest(
                 },
                 {"repo": "aannoo/hcom", "role": "Cross-terminal live wakeup & agent push bus"},
                 {"repo": "gastownhall/beads", "role": "Git-backed dependency task graph tracking"},
+                {
+                    "repo": "nautechsystems/nautilus_agents",
+                    "role": "Official Rust-native NautilusTrader Agents SDK (LGPL-3.0, 380ae38f35)",
+                },
+                {
+                    "repo": "anthropics/financial-services",
+                    "role": "Official Anthropic Financial Services Plugins & MCP connectors (Apache-2.0, 3e32c2287d)",
+                },
+                {
+                    "repo": "HKUDS/Vibe-Trading",
+                    "role": "Skill-native trading research harness reference (MIT, 38.6k stars; sandboxed, 0 broker keys)",
+                },
             ],
             research_convergence_stages=["S6_MULTI_VENDOR_ADVERSARIAL_REDTEAM"],
             harness_and_agent_md_binding={
@@ -796,6 +892,18 @@ def build_full_landscape_layer_manifest(
                     "repo": "unit8co/darts",
                     "role": "Regime-conditioned Fixed-Share Hedge & Conformal PID allocation with 100% cash fallback",
                 },
+                {
+                    "repo": "scikit-learn-contrib/MAPIE",
+                    "role": "Distribution-free adaptive conformal prediction intervals for dynamic VaR & risk bounds (BSD-3-Clause, e4c4f5f7da)",
+                },
+                {
+                    "repo": "SalesforceAIResearch/uni2ts",
+                    "role": "MOIRAI-2 multi-quantile pinball-loss tail-risk forecasting (Apache-2.0, cfd46d4510)",
+                },
+                {
+                    "repo": "FreedomIntelligence/TwinMarket",
+                    "role": "NeurIPS/ICLR 2025 Best Paper BDI market herding & flash-crash stress simulator (MIT, de5f2446fc)",
+                },
             ],
             research_convergence_stages=[
                 "S5_CPCV_DSR_HLZ_CLUSTERED_FALSIFICATION",
@@ -841,6 +949,18 @@ def build_full_landscape_layer_manifest(
                     "repo": "alpacahq/alpaca-py",
                     "role": "Adaptive GTX/Midpoint SOR routing with mandatory arrival_mid_px capture",
                 },
+                {
+                    "repo": "py-why/dowhy",
+                    "role": "Causal execution, dark/lit routing & slippage impact attribution (MIT, 45de9a9062)",
+                },
+                {
+                    "repo": "microsoft/MarS",
+                    "role": "Order-level Large Market Model market-impact stress validation (MIT, f04dd87a4d)",
+                },
+                {
+                    "repo": "peernagy/LOBS5",
+                    "role": "LOB-Bench & S5 generative price-impact fidelity verification (MIT, aa36029e9d)",
+                },
             ],
             research_convergence_stages=[
                 "S4_NAUTILUS_HFTBACKTEST_QUEUE_SIM",
@@ -885,6 +1005,18 @@ def build_full_landscape_layer_manifest(
                     "repo": "databento/databento-python",
                     "role": "Deterministic daily live-tick Parquet/DuckDB recorder & <10s shadow replay engine",
                 },
+                {
+                    "repo": "massive-com/mcp_massive",
+                    "role": "Official Massive.com read-only options/equities/SQLite MCP (MIT, 1e161a8c50)",
+                },
+                {
+                    "repo": "BrainDAO/mcp-polymarket",
+                    "role": "Read-only (zero private key) Polymarket Gamma macro/Fed/CPI probability feed (MIT, 5360bef548)",
+                },
+                {
+                    "repo": "FreedomIntelligence/TwinMarket",
+                    "role": "BDI multi-agent counterfactual contagion & shock simulator (MIT, de5f2446fc)",
+                },
             ],
             research_convergence_stages=[
                 "S2_BITEMPORAL_12FEED_PIT_INGEST",
@@ -926,6 +1058,10 @@ def build_full_landscape_layer_manifest(
                 {
                     "repo": "ADIA-Lab/MinTRL-MDE-PowerGate",
                     "role": "Post-wall sequential SPRT promotion ladder & CUSUM alpha-decay kill-switch",
+                },
+                {
+                    "repo": "online-ml/river",
+                    "role": "Streaming CUSUM, ADWIN & Page-Hinkley online concept-drift/alpha-decay detector (BSD-3-Clause, 5ea2454006)",
                 },
             ],
             research_convergence_stages=[
@@ -978,6 +1114,14 @@ def build_full_landscape_layer_manifest(
                     "repo": "stanfordnlp/dspy",
                     "role": "GEPA / MIPROv2 empirical prompt & skill regression scoring",
                 },
+                {
+                    "repo": "waylonli/FINSABER",
+                    "role": "LLM token/inference-cost vs trading-alpha ROI audit (Apache-2.0, e72c26206d)",
+                },
+                {
+                    "repo": "The-FinAI/FinBen",
+                    "role": "Standardized lm-evaluation-harness financial reasoning regression suite (MIT, 74ea6b8f8f)",
+                },
             ],
             research_convergence_stages=[
                 "S6_MULTI_VENDOR_ADVERSARIAL_REDTEAM",
@@ -1019,6 +1163,9 @@ def build_full_landscape_layer_manifest(
         "schema": SCHEMA_VERSION,
         "adr": "ADR-0045",
         "enforced_by_adr": "ADR-0046",
+        "hosted_platform_adr": "ADR-0047",
+        "advanced_research_landscape_adr": "ADR-0048",
+        "shelf_lock_frontier_adr": "sota-upstream-shelf-lock/ADR-0026",
         "generated_at_utc": generated_at_utc or datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "hard_invariants": {
             "tier0_sota_source_only": True,

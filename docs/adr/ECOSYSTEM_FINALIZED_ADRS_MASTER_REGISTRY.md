@@ -1,7 +1,7 @@
 # Native Agent Stack — Unified Single-Repo Master Finalized ADR Registry (`ADR-0044`)
 
-- **Total Finalized ADRs Indexed:** `790` across `18` repositories (`18/18` `ADR-0023` PASS)
-- **Canonical Manifest SHA-256:** `d35903f6e5f80145fd73fbed4d75422ccb8cd5b78be87aa63e384a9fac51d49e`
+- **Total Finalized ADRs Indexed:** `792` across `18` repositories (`18/18` `ADR-0023` PASS)
+- **Canonical Manifest SHA-256:** `073722288265700a1fd42daead1e5289577e2a14bcf190a0dc270dd4fd41631d`
 - **Verbatim Private Continuity Copy:** `sota-private-vault/adr_archive/` (`ADR-0027`, Two-Tier Public/Private Firewall intact)
 
 ## Per-Repository Finalized ADR Summary
@@ -16,14 +16,14 @@
 | `dsh-plugin-landscape` | `PRIVATE` | `11` |
 | `dsh-sota-harness` | `PUBLIC` | `16` |
 | `meridian` | `PRIVATE` | `65` |
-| `native-agent-stack` | `PUBLIC` | `47` |
+| `native-agent-stack` | `PUBLIC` | `48` |
 | `sota-compounding-lab` | `PUBLIC` | `38` |
 | `sota-dynamic-trail-c` | `PRIVATE` | `35` |
 | `sota-harness-foundation` | `PUBLIC` | `46` |
 | `sota-mover-ranker` | `PRIVATE` | `100` |
 | `sota-multi-model-workflows` | `PUBLIC` | `37` |
 | `sota-private-vault` | `PRIVATE` | `27` |
-| `sota-upstream-shelf-lock` | `PUBLIC` | `25` |
+| `sota-upstream-shelf-lock` | `PUBLIC` | `26` |
 | `trading-sota` | `PRIVATE` | `20` |
 | `tsl` | `PRIVATE` | `27` |
 
@@ -466,6 +466,7 @@
 | `native-agent-stack` | `PUBLIC` | ADR-0045: Full-Landscape Resolute SOTA Layer-Pin Architecture Manifest (`L0`–`L15`: Shelf, Backtest, Strategies, Trading Engine/UI, Orca Harness & Institutional Expansion) | Accepted | 2026-11-20 | `f670b94e615c` |
 | `native-agent-stack` | `PUBLIC` | ADR-0046: Continuous One-Harness SOTA Cleanliness Doctor, Universal Git Hooks, 18/18 Orca Gate Parity & 16-Layer Starred/Beyond Maintenance | Accepted | 2026-11-20 | `fefa4cfbb874` |
 | `native-agent-stack` | `PUBLIC` | ADR-0047: No Self-Built Anti-Tier-0 Waste, Legacy Monolith Freeze & Hosted SOTA Platform Mandate | Accepted | 2026-11-20 | `b4b10625a73b` |
+| `native-agent-stack` | `PUBLIC` | ADR-0048: Full-Landscape Advanced LLM-Native Quant, Microstructure Foundation Models, Causal/Conformal Risk & License-Firewall Convergence (`v3`) | Accepted | 2026-11-20 | `bf49fb50fef1` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0001: Public Open-Core vs. Private Execution & Vault Organization Firewall | Accepted | 2026-11-17 | `fc73c9d38f87` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0002: Five-Stage Sim -> Pre-Wall Backtest -> Paper -> Empirical-Bayes -> Broker Pipeline | Accepted | 2026-11-17 | `f55ed3efc217` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0003: Pre-Wall (`<= 2026-10-15`), Harvey–Liu–Zhu `t*(N)` & Native-Frequency `DSR` Gate | Accepted | 2026-11-17 | `d127aa9fefef` |
@@ -774,6 +775,7 @@
 | `sota-upstream-shelf-lock` | `PUBLIC` | ADR-0023: Universal Hard SOTA Upstream-Source, Zero-Escape-Hatch Engine Binding & ADR-Evidence Rule | Accepted | 2026-11-20 | `451ba892f27e` |
 | `sota-upstream-shelf-lock` | `PUBLIC` | ADR-0024: Clean-Room Sim->Paper->Live Org Blueprint & Full 18/18 Workstation Hard-Rule Enforcement | Accepted | 2026-11-20 | `129eae78d829` |
 | `sota-upstream-shelf-lock` | `PUBLIC` | ADR-0025: Universal Tier-0 Full-Resolution, Always-Full-Resolution, Zero-Residual, Zero-Fallback Hard Rule | Accepted | 2026-11-20 | `1f8f52cd3f8b` |
+| `sota-upstream-shelf-lock` | `PUBLIC` | ADR-0026: Live-Verified LLM-Native Quant, Microstructure Foundation Models, Causal/Conformal Risk & License-Firewall Landscape (`2026-11-20`) | Accepted | 2026-11-20 | `581bbb5f31dd` |
 | `trading-sota` | `PRIVATE` | ADR-0001: Trading ecosystem architecture and clean landing | Accepted | 2026-11-14 | `f2f835e4683a` |
 | `trading-sota` | `PRIVATE` | ADR-0002: Equities-only scope | Accepted | 2026-11-14 | `e4489457203d` |
 | `trading-sota` | `PRIVATE` | ADR-0003: Strategy landing lifecycle | Accepted | 2026-11-14 | `7809a80dbd70` |

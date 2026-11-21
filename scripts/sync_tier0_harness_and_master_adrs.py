@@ -73,6 +73,12 @@ TIER0_CANONICAL_BLOCK = (
     "`FINOS/OpenBB Workspace` `:1420` + `backends-for-openbb` `:6900`, `hftbacktest`, `vectorbt`, `QuantStats`, "
     "`Perspective`, `Lightweight Charts`, `Polars`, `DuckDB`) with only a thin native plugin layer; keep legacy monoliths "
     "frozen under downward-only LOC ratchets and prune merged Orca worktrees immediately after push.\n"
+    "- **Tier-0 Advanced LLM-Native Quant Frontier & License/Order-Path Firewall (`ADR-0048` / `shelf-lock ADR-0026`):** "
+    "All `16` layers (`L0`–`L15`) converge live-verified, non-archived, SPDX-licensed frontier anchors (`nautilus_agents`, "
+    "`anthropics/financial-services`, `FINSABER`, `MarS`, `LOBS5`, `FinRobot`, `qwen-dianjin`, `Fino1`, `FinBen`, `TabPFN`, "
+    "`Chronos-2`, `MOIRAI-2`, `river`, `MAPIE`, `DoWhy`, `mcp_massive`, `mcp-polymarket` read-only, `TwinMarket`, `openbq-org/OpenBB` "
+    "+ `edgartools` built-in MCP) while strictly quarantining unlicensed (`NONE`), archived, and GPL-3.0 repos and blocking external "
+    "agent order-routing paths (`Vibe-Trading`, `mcp-polymarket`, `FINSABER` vendored broker scripts) under `ADR-0022`.\n"
     f"{TIER0_MARKER_END}"
 )
 
