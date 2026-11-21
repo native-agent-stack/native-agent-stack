@@ -1,0 +1,173 @@
+{
+  "schema": "sota.one-harness-cleanliness-receipt.v1",
+  "adr": "ADR-0046",
+  "generated_at_utc": "2026-11-21T01:29:56.132021Z",
+  "mode": "full_workstation",
+  "overall_ok": true,
+  "summary": {
+    "checks_total": 10,
+    "checks_passed": 10,
+    "checks_failed": 0,
+    "failed_check_ids": []
+  },
+  "checks": {
+    "1_adr0023_upstream_and_shelf_lock": {
+      "ok": true,
+      "repos_audited": 18,
+      "upstream_map_pass": 18,
+      "adr_evidence_pass": 18,
+      "shelf_pins_ok": true,
+      "audit_sha256": "d26aed5896032660",
+      "failure_count": 0,
+      "failures": []
+    },
+    "2_adr0038_zero_stub_and_full_res": {
+      "ok": true,
+      "quant_ast_zero_stub_wired": {
+        "meridian": true,
+        "sota-compounding-lab": true,
+        "sota-dynamic-trail-c": true,
+        "sota-mover-ranker": true
+      },
+      "quant_ast_count": 4,
+      "live_full_resolution_sidecar": {
+        "probed": true,
+        "reachable": true,
+        "cuda_available": true,
+        "engines_verified_n": 9,
+        "required_engines_n": 9,
+        "allow_silent_fallback": false,
+        "residual_fallbacks_count": 0,
+        "ok": true
+      }
+    },
+    "3_adr0045_16layer_starred_beyond_and_research": {
+      "ok": true,
+      "manifest_sha256_valid": true,
+      "manifest_sha256": "524d75739ffe14bf750a6dd26f1f5d04229606f495be5712bdb1665e70bc76d2",
+      "total_layers": 16,
+      "research_stages_covered": 8,
+      "pins_match_pins_lock": true,
+      "layer_errors": [],
+      "research_convergence_contract": {
+        "available": true,
+        "valid": true,
+        "stages_count": 8,
+        "owner_starred_total_audited": 415,
+        "beyond_starred_sota_count": 8,
+        "bitemporal_pit_verified": true
+      }
+    },
+    "4_adr0044_7runtime_md_60skills_redteam_and_models": {
+      "ok": true,
+      "global_md_parity": {
+        "total_targets": 7,
+        "synced_count": 7,
+        "drifted": [],
+        "all_synced": true,
+        "statuses": {
+          "gemini_global": "synced",
+          "claude_global": "synced",
+          "codex_global": "synced",
+          "opencode_global": "synced",
+          "dsh_global": "synced",
+          "omp_global": "synced",
+          "agy_plugin_rules": "synced"
+        }
+      },
+      "skill_evaluator": {
+        "available": true,
+        "all_passed": true,
+        "skills_evaluated": 60,
+        "passed_count": 60,
+        "failed_skills": [],
+        "report_sha256": "ba24f6b417e6748459e9a69fb1a20891bd61121689ac15eb06a758eb37e0eb00"
+      },
+      "redteam_firewall": {
+        "available": true,
+        "passed": true,
+        "p0_count": 0,
+        "p1_count": 0,
+        "vulnerability_classes_catalog_count": 24
+      },
+      "stale_model_hits": []
+    },
+    "5_adr0027_adr0044_single_repo_adr_0drift": {
+      "ok": true,
+      "live_total_adrs": 789,
+      "public_registry_total": 789,
+      "public_drift": {},
+      "vault_archive_present": true,
+      "vault_archive_total": 789,
+      "vault_drift": {}
+    },
+    "6_universal_git_hooks_and_18repo_orca_gate": {
+      "ok": true,
+      "hooks_files_present": true,
+      "global_core_hooks_path_active": true,
+      "repos_checked": 18,
+      "merge_gate_scripts_present": 18,
+      "orca_yaml_merge_gate_present": 18,
+      "missing_merge_gate_script": [],
+      "missing_orca_merge_gate": []
+    },
+    "7_security_zero_leak_and_github_firewall": {
+      "ok": true,
+      "noreply_global_email_ok": true,
+      "umbrella_two_tier_firewall_ok": true,
+      "gitleaks_on_path": true
+    },
+    "8_anti_bloat_size_budget_and_ratchet": {
+      "ok": true,
+      "size_budget_repos_count": 2,
+      "size_budget_repos": [
+        "astrolabe",
+        "meridian"
+      ],
+      "monolith_ratchet": {
+        "sota-mover-ranker/ranker/stage5_lossless_live_lane.py": {
+          "loc": 8324,
+          "ratchet_cap": 8450,
+          "ok": true
+        },
+        "sota-mover-ranker/ranker/alpaca_paper_e2e.py": {
+          "loc": 8399,
+          "ratchet_cap": 8450,
+          "ok": true
+        }
+      },
+      "ratchet_violations": []
+    },
+    "9_sota_bus_peer_coordination_health": {
+      "ok": true,
+      "available": true,
+      "live_sessions_count": 12,
+      "active_leases_count": 2
+    },
+    "10_paper_trajectory_manifest_and_live_probes": {
+      "ok": true,
+      "paper_trajectory_manifest": {
+        "present": true,
+        "schema": "sota.paper-improvement-trajectory-manifest.v1",
+        "version": "1.2.0",
+        "snapshots_tracked_count": 14,
+        "latest_snapshot_ny": "2026-11-20 19:45:00 ET",
+        "dimensionless_privacy_firewall": true,
+        "quarantine_firewall_intact": true,
+        "ok": true
+      },
+      "live_paper_probes": {
+        "p1_8799": {
+          "reachable": true
+        },
+        "p2_8787": {
+          "reachable": true
+        },
+        "p3_8797": {
+          "reachable": true
+        }
+      }
+    }
+  },
+  "receipt_sha256": "e7845428d6c919e40aec8a12ef756a9124525b0e6fadc2248d67acd9a11c8787"
+}

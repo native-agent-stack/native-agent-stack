@@ -1,9 +1,9 @@
 {
   "schema": "sota.public-master-finalized-adr-registry.v1",
   "adr": "ADR-0044",
-  "generated_at_utc": "2026-11-21T01:06:14.503286Z",
+  "generated_at_utc": "2026-11-21T01:29:39.000411Z",
   "repos_indexed": 18,
-  "total_adrs_indexed": 787,
+  "total_adrs_indexed": 789,
   "verbatim_private_archive_repo": "native-agent-stack/sota-private-vault (adr_archive/)",
   "per_repo_counts": {
     "agy-sota-harness": 36,
@@ -14,11 +14,11 @@
     "dsh-plugin-landscape": 11,
     "dsh-sota-harness": 16,
     "meridian": 65,
-    "native-agent-stack": 45,
+    "native-agent-stack": 46,
     "sota-compounding-lab": 38,
     "sota-dynamic-trail-c": 35,
     "sota-harness-foundation": 46,
-    "sota-mover-ranker": 99,
+    "sota-mover-ranker": 100,
     "sota-multi-model-workflows": 37,
     "sota-private-vault": 27,
     "sota-upstream-shelf-lock": 25,
@@ -5706,6 +5706,22 @@
       "file_sha256": "f670b94e615cb6125232815fabd03819a9ef5fe3123c56ed94a2ea56051fc121"
     },
     {
+      "repo": "native-agent-stack",
+      "tier": "PUBLIC",
+      "file": "ADR-0046-one-harness-sota-cleanliness-doctor-universal-git-hooks-and-16layer-maintenance.md",
+      "title": "ADR-0046: Continuous One-Harness SOTA Cleanliness Doctor, Universal Git Hooks, 18/18 Orca Gate Parity & 16-Layer Starred/Beyond Maintenance",
+      "status": "Accepted",
+      "date": "2026-11-20",
+      "evidence_grade": "E4",
+      "github_urls": [
+        "https://github.com/NVIDIA/SkillEvaluator",
+        "https://github.com/elementalsouls/Claude-BugHunter",
+        "https://github.com/gitleaks/gitleaks",
+        "https://github.com/microsoft/RD-Agent"
+      ],
+      "file_sha256": "fefa4cfbb874b00c182905191ad278c09317a70ac0695e74301c35895867d239"
+    },
+    {
       "repo": "sota-compounding-lab",
       "tier": "PUBLIC",
       "file": "ADR-0001-public-open-core-vs-private-vault-org-firewall.md",
@@ -8855,6 +8871,22 @@
       "file_sha256": "668a1deee616f61ce68168d5b55683c8067f207f294f0dc0568507f5f3381f2e"
     },
     {
+      "repo": "sota-mover-ranker",
+      "tier": "PRIVATE",
+      "file": "ADR-0100-p3-slot-unblock-payoff-asymmetry-and-swing-s04-s09-s12-wiring.md",
+      "title": "ADR-0100: Paper `P3 :8797` Deadlock Closure, `0.44x` EXT/Swing Payoff-Asymmetry Fix & Pre-Wall Net-Positive `S04`/`S09`/`S12` Multi-Lane Paper Wiring",
+      "status": "Accepted",
+      "date": "2026-11-20",
+      "evidence_grade": "E4 (Forensic `2026-11-20 19:37\u201319:39 ET` live St",
+      "github_urls": [
+        "https://github.com/alpacahq/alpaca-py",
+        "https://github.com/dgunning/edgartools",
+        "https://github.com/native-agent-stack/sota-mover-ranker",
+        "https://github.com/nautechsystems/nautilus_trader"
+      ],
+      "file_sha256": "930aceac03a3f006b77046e5ca7ec3f054984b9eeb2617c23222102aa166bf12"
+    },
+    {
       "repo": "sota-multi-model-workflows",
       "tier": "PUBLIC",
       "file": "ADR-0001-self-bootstrapping-multi-model-workflow-registry.md",
@@ -10718,5 +10750,5 @@
       "file_sha256": "ca48518bef018ae289a5b3798c2c0171c4ac8cc93342dbb702f71d302b9b81a4"
     }
   ],
-  "manifest_sha256": "bcb0551fdbc09031dfd9a363143a33cac15657cc99dff8bb4892e23b16b0ce28"
+  "manifest_sha256": "2a38396578ac6142a05b06aa14972076707b1426a164a557d9b411004e85809a"
 }

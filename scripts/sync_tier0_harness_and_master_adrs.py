@@ -61,16 +61,22 @@ TIER0_CANONICAL_BLOCK = (
     "stubs fail `merge_gate.py` via AST across `4/4` quant repos), real Rust `hftbacktest` "
     "`HashMapMarketDepthBacktest` + `RiskAdverseQueueModel` L1 ticks, `rtx4090_gpu_cuda` (`require_gpu=True`), "
     "and strict pre-wall `<= 2026-10-15` isolation.\n"
+    "- **Tier-0 One-Harness Cleanliness, 16-Layer Landscape & 415+ Starred/Beyond Maintenance (`ADR-0045` / `ADR-0046`):** "
+    "All `16` layers (`L0`–`L15`), `18` repos, `415` audited GitHub starred repos + beyond-starred SOTA anchors, "
+    "`8`-stage Research Convergence Practice (`S1`–`S8`), `7/7` runtime `.md` files, `60/60` `SkillEvaluator` corpus, "
+    "`18/18` `orca.yaml` `Tier-0 Merge Gate` tabs, and universal Git `pre-commit`/`pre-push` hooks (`core.hooksPath` -> "
+    "`native-agent-stack/hooks`) are continuously audited by `native-agent-stack/scripts/one_harness_cleanliness_doctor.py --check`.\n"
     f"{TIER0_MARKER_END}"
 )
 
 AGY_PLUGIN_ADR0023_LINE = (
-    "- **Tier-0 SOTA-Source-Only & Consolidated ADR Rule (`ADR-0023` / `ADR-0027` / `ADR-0044`):** "
+    "- **Tier-0 SOTA-Source-Only, 16-Layer Landscape & One-Harness Doctor (`ADR-0023` / `ADR-0027` / `ADR-0044` / `ADR-0045` / `ADR-0046`):** "
     "Every production file, strategy, hook, skill, and ADR across all `18/18` repos MUST install, integrate, "
     "or build upon pinned SOTA upstream libraries (`UPSTREAM.md`, `upstream-map.toml`, `18`-pin shelf lock, "
-    "`scripts/merge_gate.py`); single-repo finalized ADR archives live in `sota-private-vault/adr_archive/` "
-    "(verbatim private) and `native-agent-stack/docs/adr/ECOSYSTEM_FINALIZED_ADRS_MASTER_REGISTRY.md` "
-    "(public-safe registry)."
+    "`scripts/merge_gate.py`, universal Git `core.hooksPath`, `18/18` `orca.yaml`, `415+` Starred & Beyond + "
+    "`8`-Stage Research Convergence audited via `native-agent-stack/scripts/one_harness_cleanliness_doctor.py`); "
+    "single-repo finalized ADR archives live in `sota-private-vault/adr_archive/` (verbatim private) and "
+    "`native-agent-stack/docs/adr/ECOSYSTEM_FINALIZED_ADRS_MASTER_REGISTRY.md` (public-safe registry)."
 )
 
 
@@ -202,41 +208,93 @@ def upsert_tier0_block_in_text(text: str) -> str:
     return f"{text}{suffix}\n{TIER0_CANONICAL_BLOCK}\n"
 
 
-def sync_tier0_harness_md_files(home_dir: Path | None = None) -> dict[str, str]:
-    """Propagate canonical Tier-0 SOTA-Source-Only & Full-Resolution rules across all 7 runtime `.md` files."""
+def global_runtime_md_targets(home_dir: Path | None = None) -> tuple[tuple[str, Path], ...]:
     home = home_dir or Path.home()
-    synced_targets = (
-        home / ".gemini" / "GEMINI.md",
-        home / ".claude" / "CLAUDE.md",
-        home / ".codex" / "AGENTS.md",
-        home / ".config" / "opencode" / "AGENTS.md",
-        home / ".dsh" / "AGENTS.md",
-        home / ".omp" / "agent" / "AGENTS.md",
+    return (
+        ("gemini_global", home / ".gemini" / "GEMINI.md"),
+        ("claude_global", home / ".claude" / "CLAUDE.md"),
+        ("codex_global", home / ".codex" / "AGENTS.md"),
+        ("opencode_global", home / ".config" / "opencode" / "AGENTS.md"),
+        ("dsh_global", home / ".dsh" / "AGENTS.md"),
+        ("omp_global", home / ".omp" / "agent" / "AGENTS.md"),
     )
-    results: dict[str, str] = {}
-    for target in synced_targets:
+
+
+def _upsert_agy_plugin_line(text: str) -> str:
+    if AGY_PLUGIN_ADR0023_LINE in text:
+        return text
+    pat = re.compile(r"^- \*\*Tier-0 SOTA-Source-Only[^\n]*$", flags=re.MULTILINE)
+    if pat.search(text):
+        return pat.sub(AGY_PLUGIN_ADR0023_LINE, text, count=1)
+    sep = "" if text.endswith("\n") else "\n"
+    return f"{text}{sep}{AGY_PLUGIN_ADR0023_LINE}\n"
+
+
+def check_tier0_harness_md_parity(home_dir: Path | None = None) -> dict[str, Any]:
+    """Deterministically verify 0-byte Tier-0 drift across all 7 global runtime `.md` files."""
+    home = home_dir or Path.home()
+    statuses: dict[str, str] = {}
+    drifted: list[str] = []
+    for label, target in global_runtime_md_targets(home):
         if not target.is_file():
-            results[str(target.name)] = "missing"
+            statuses[label] = "missing"
+            drifted.append(label)
+            continue
+        cur = target.read_text(encoding="utf-8")
+        if TIER0_CANONICAL_BLOCK in cur:
+            statuses[label] = "synced"
+        else:
+            statuses[label] = "drifted"
+            drifted.append(label)
+
+    agy_plugin_rules = home / ".gemini" / "config" / "plugins" / "agy-sota-core" / "rules" / "AGENTS.md"
+    if not agy_plugin_rules.is_file():
+        statuses["agy_plugin_rules"] = "missing"
+        drifted.append("agy_plugin_rules")
+    else:
+        cur_p = agy_plugin_rules.read_text(encoding="utf-8")
+        if AGY_PLUGIN_ADR0023_LINE in cur_p:
+            statuses["agy_plugin_rules"] = "synced"
+        else:
+            statuses["agy_plugin_rules"] = "drifted"
+            drifted.append("agy_plugin_rules")
+
+    return {
+        "total_targets": len(statuses),
+        "synced_count": sum(1 for v in statuses.values() if v == "synced"),
+        "drifted": drifted,
+        "all_synced": len(drifted) == 0,
+        "statuses": statuses,
+    }
+
+
+def sync_tier0_harness_md_files(home_dir: Path | None = None) -> dict[str, str]:
+    """Propagate canonical Tier-0 SOTA-Source-Only, Full-Resolution & One-Harness rules across all 7 runtime `.md` files."""
+    home = home_dir or Path.home()
+    results: dict[str, str] = {}
+    for label, target in global_runtime_md_targets(home):
+        if not target.is_file():
+            results[label] = "missing"
             continue
         old = target.read_text(encoding="utf-8")
         new = upsert_tier0_block_in_text(old)
         if new != old:
             target.write_text(new, encoding="utf-8", newline="\n")
-            results[str(target)] = "updated"
+            results[label] = "updated"
         else:
-            results[str(target)] = "unchanged"
+            results[label] = "unchanged"
 
     agy_plugin_rules = home / ".gemini" / "config" / "plugins" / "agy-sota-core" / "rules" / "AGENTS.md"
     if agy_plugin_rules.is_file():
         old_p = agy_plugin_rules.read_text(encoding="utf-8")
-        if "ADR-0023" not in old_p:
-            sep = "" if old_p.endswith("\n") else "\n"
-            agy_plugin_rules.write_text(
-                f"{old_p}{sep}{AGY_PLUGIN_ADR0023_LINE}\n", encoding="utf-8", newline="\n"
-            )
-            results[str(agy_plugin_rules)] = "updated"
+        new_p = _upsert_agy_plugin_line(old_p)
+        if new_p != old_p:
+            agy_plugin_rules.write_text(new_p, encoding="utf-8", newline="\n")
+            results["agy_plugin_rules"] = "updated"
         else:
-            results[str(agy_plugin_rules)] = "unchanged"
+            results["agy_plugin_rules"] = "unchanged"
+    else:
+        results["agy_plugin_rules"] = "missing"
     return results
 
 
@@ -247,12 +305,22 @@ def main() -> int:
     parser.add_argument(
         "--apply-global-md", action="store_true", help="Update all 7 local runtime .md files"
     )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Verify 0-byte Tier-0 drift across all 7 global runtime .md files",
+    )
     parser.add_argument("--workstation", type=Path, default=DEFAULT_WORKSTATION)
     args = parser.parse_args()
 
+    if args.check:
+        parity = check_tier0_harness_md_parity()
+        print(json.dumps(parity, indent=2))
+        return 0 if parity["all_synced"] else 1
+
     reg = build_public_master_adr_registry(workstation=args.workstation)
     md_res = sync_tier0_harness_md_files() if args.apply_global_md else {}
-    print(json.dumps({"registry": reg, "global_md_synced": len(md_res)}, indent=2))
+    print(json.dumps({"registry": reg, "global_md_synced": len(md_res), "details": md_res}, indent=2))
     return 0
 
 

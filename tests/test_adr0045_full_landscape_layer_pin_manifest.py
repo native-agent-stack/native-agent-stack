@@ -40,17 +40,30 @@ def test_full_landscape_manifest_covers_all_16_layers_and_18_exact_pins() -> Non
     assert set(inv["forbidden_live_ports"]) == {4001, 7496, 8796, 8798}
 
     seen_ids: set[str] = set()
+    covered_stages: set[str] = set()
     for ly in manifest["layers"]:
         assert ly["layer_id"] not in seen_ids
         seen_ids.add(ly["layer_id"])
         assert ly["status"] in {"ACTIVE_FULL_RES_VERIFIED", "ACTIVE_PAPER_LIVE", "EXPANSION_ROADMAP"}
         assert len(ly["owning_local_repos"]) >= 1
         assert len(ly["pinned_core_shelf"]) >= 1
-        assert len(ly["sota_ecosystem_repos"]) >= 1
+        assert len(ly["starred_sota_repos"]) >= 1
+        assert len(ly["beyond_starred_sota_repos"]) >= 1
+        assert len(ly["sota_ecosystem_repos"]) >= 2
+        assert len(ly["research_convergence_stages"]) >= 1
+        covered_stages.update(ly["research_convergence_stages"])
+        hb = ly["harness_and_agent_md_binding"]
+        assert hb["runtime_md_rules"].strip()
+        assert len(hb["canonical_skills"]) >= 1
+        assert hb["enforcement_gate"].strip()
         assert ly["full_resolution_invariant"].strip()
         assert ly["verification_gate"].strip()
         for pin in ly["pinned_core_shelf"]:
             assert re.fullmatch(r"[0-9a-f]{40}", pin["commit"]), f"Non-40-char SHA on {pin}"
+    assert len(covered_stages) == 8
+    sb = manifest["starred_and_beyond_convergence"]
+    assert sb["owner_starred_total_audited"] == 415
+    assert sb["research_convergence_stages_covered"] == 8
 
     body = {k: v for k, v in manifest.items() if k != "manifest_sha256"}
     expected_sha = hashlib.sha256(

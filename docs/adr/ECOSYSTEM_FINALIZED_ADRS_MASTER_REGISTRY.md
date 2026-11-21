@@ -1,7 +1,7 @@
 # Native Agent Stack — Unified Single-Repo Master Finalized ADR Registry (`ADR-0044`)
 
-- **Total Finalized ADRs Indexed:** `787` across `18` repositories (`18/18` `ADR-0023` PASS)
-- **Canonical Manifest SHA-256:** `bcb0551fdbc09031dfd9a363143a33cac15657cc99dff8bb4892e23b16b0ce28`
+- **Total Finalized ADRs Indexed:** `789` across `18` repositories (`18/18` `ADR-0023` PASS)
+- **Canonical Manifest SHA-256:** `2a38396578ac6142a05b06aa14972076707b1426a164a557d9b411004e85809a`
 - **Verbatim Private Continuity Copy:** `sota-private-vault/adr_archive/` (`ADR-0027`, Two-Tier Public/Private Firewall intact)
 
 ## Per-Repository Finalized ADR Summary
@@ -16,11 +16,11 @@
 | `dsh-plugin-landscape` | `PRIVATE` | `11` |
 | `dsh-sota-harness` | `PUBLIC` | `16` |
 | `meridian` | `PRIVATE` | `65` |
-| `native-agent-stack` | `PUBLIC` | `45` |
+| `native-agent-stack` | `PUBLIC` | `46` |
 | `sota-compounding-lab` | `PUBLIC` | `38` |
 | `sota-dynamic-trail-c` | `PRIVATE` | `35` |
 | `sota-harness-foundation` | `PUBLIC` | `46` |
-| `sota-mover-ranker` | `PRIVATE` | `99` |
+| `sota-mover-ranker` | `PRIVATE` | `100` |
 | `sota-multi-model-workflows` | `PUBLIC` | `37` |
 | `sota-private-vault` | `PRIVATE` | `27` |
 | `sota-upstream-shelf-lock` | `PUBLIC` | `25` |
@@ -464,6 +464,7 @@
 | `native-agent-stack` | `PUBLIC` | ADR-0043: `v3.12.0` Finalized Ecosystem, Full Landscape, Quality-First SOTA Standard, `Trial #105` Empirical Governance & Persistent `4/4` Paper Parity Seal | Accepted | 2026-11-20 | `8157c3dcbc26` |
 | `native-agent-stack` | `PUBLIC` | ADR-0044: Tier-0 Multi-Runtime Harness `.md` Convergence & Unified Single-Repo Master Finalized ADR Registry | Accepted | 2026-11-20 | `727d8845cf58` |
 | `native-agent-stack` | `PUBLIC` | ADR-0045: Full-Landscape Resolute SOTA Layer-Pin Architecture Manifest (`L0`–`L15`: Shelf, Backtest, Strategies, Trading Engine/UI, Orca Harness & Institutional Expansion) | Accepted | 2026-11-20 | `f670b94e615c` |
+| `native-agent-stack` | `PUBLIC` | ADR-0046: Continuous One-Harness SOTA Cleanliness Doctor, Universal Git Hooks, 18/18 Orca Gate Parity & 16-Layer Starred/Beyond Maintenance | Accepted | 2026-11-20 | `fefa4cfbb874` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0001: Public Open-Core vs. Private Execution & Vault Organization Firewall | Accepted | 2026-11-17 | `fc73c9d38f87` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0002: Five-Stage Sim -> Pre-Wall Backtest -> Paper -> Empirical-Bayes -> Broker Pipeline | Accepted | 2026-11-17 | `f55ed3efc217` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0003: Pre-Wall (`<= 2026-10-15`), Harvey–Liu–Zhu `t*(N)` & Native-Frequency `DSR` Gate | Accepted | 2026-11-17 | `d127aa9fefef` |
@@ -682,6 +683,7 @@
 | `sota-mover-ranker` | `PRIVATE` | ADR-0097: Extended-Hours Payoff Floor, Unconditional Exhausted-Bottom Short Guard & IBKR P4 Live ET Session Parity | Accepted | 2026-11-20 | `5f70bd5d5add` |
 | `sota-mover-ranker` | `PRIVATE` | ADR-0098: Whole-Market All-Symbol Extreme-Mover Potential Factors Engine (`100%` Coverage, RTX 4090 GPU Scoring & Bidirectional `104`-Slot Audit) | Accepted | 2026-11-20 | `6e06e0c17d5b` |
 | `sota-mover-ranker` | `PRIVATE` | ADR-0099: 24/5 Per-Session Entry Budget Reset, Passive Unfilled-Cancel Slot Refund & Post-Cooldown Tier-0 Unblock | Accepted | 2026-11-20 | `668a1deee616` |
+| `sota-mover-ranker` | `PRIVATE` | ADR-0100: Paper `P3 :8797` Deadlock Closure, `0.44x` EXT/Swing Payoff-Asymmetry Fix & Pre-Wall Net-Positive `S04`/`S09`/`S12` Multi-Lane Paper Wiring | Accepted | 2026-11-20 | `930aceac03a3` |
 | `sota-multi-model-workflows` | `PUBLIC` | ADR-0001: Self-Bootstrapping Multi-Model Workflow Registry (`REGISTRY.json` + `_sota_kit.py`) | Accepted | 2026-11-17 | `e0ee08fd911b` |
 | `sota-multi-model-workflows` | `PUBLIC` | ADR-0002: Portable SQLite WAL Peer Bus & Atomic Lease Collision Guard | Accepted | 2026-11-17 | `be9ff53b31ab` |
 | `sota-multi-model-workflows` | `PUBLIC` | ADR-0003: Deterministic Five-Stage Strategy Promotion Gate (`Sim -> Backtest -> Paper -> Fine-Tune -> Broker`) | Accepted | 2026-11-17 | `027c665cebeb` |

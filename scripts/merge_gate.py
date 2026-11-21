@@ -38,7 +38,12 @@ def _verify_zero_leaks() -> list[str]:
             ["git", "-C", str(ROOT), "ls-files"], capture_output=True, text=True, check=True
         )
     for rel in (ln.strip() for ln in tracked.stdout.splitlines() if ln.strip()):
-        if rel in ("scripts/merge_gate.py", "scripts/sync_tier0_harness_and_master_adrs.py"):
+        if rel in (
+            "scripts/merge_gate.py",
+            "scripts/sync_tier0_harness_and_master_adrs.py",
+            "scripts/one_harness_cleanliness_doctor.py",
+            "hooks/run_sota_git_hook.py",
+        ):
             continue
         fp = ROOT / rel
         if not fp.is_file():
@@ -105,7 +110,7 @@ def main() -> int:
         [sys.executable, "-m", "native_agent_stack.umbrella", "--check"],
         [sys.executable, "-m", "ruff", "check", "."],
         [sys.executable, "-m", "ruff", "format", "--check", "."],
-        [sys.executable, "-m", "ty", "check", "src", "scripts", "tests"],
+        [sys.executable, "-m", "ty", "check", "src", "scripts", "hooks", "tests"],
         [sys.executable, "-m", "pytest", "-q"],
     ]
     for cmd in steps:

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PY_BIN="${PYTHON:-}"
+if [[ -z "$PY_BIN" ]]; then
+  if command -v python >/dev/null 2>&1; then
+    PY_BIN="python"
+  elif command -v python3 >/dev/null 2>&1; then
+    PY_BIN="python3"
+  else
+    echo "[SOTA-PRE-COMMIT FAIL] python interpreter not found on PATH" >&2
+    exit 1
+  fi
+fi
+exec "$PY_BIN" "$HOOK_DIR/run_sota_git_hook.py" pre-commit "$@"
