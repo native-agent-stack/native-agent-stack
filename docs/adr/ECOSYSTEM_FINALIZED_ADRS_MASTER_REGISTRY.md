@@ -1,7 +1,7 @@
 # Native Agent Stack — Unified Single-Repo Master Finalized ADR Registry (`ADR-0044`)
 
-- **Total Finalized ADRs Indexed:** `797` across `18` repositories (`18/18` `ADR-0023` PASS)
-- **Canonical Manifest SHA-256:** `55edb0eb57677e177f7157286bdde1826382d3863c4f07d3856263419cd9bfaa`
+- **Total Finalized ADRs Indexed:** `801` across `19` repositories (`18/18` `ADR-0023` PASS + Disk-Z `tier0-quant`)
+- **Canonical Manifest SHA-256:** `2d0d9916aeb55b49ec83fbfc4ed531ba98a4c0e6db17b3fb791a9ba3f5b03085`
 - **Verbatim Private Continuity Copy:** `sota-private-vault/adr_archive/` (`ADR-0027`, Two-Tier Public/Private Firewall intact)
 
 ## Per-Repository Finalized ADR Summary
@@ -24,6 +24,7 @@
 | `sota-multi-model-workflows` | `PUBLIC` | `37` |
 | `sota-private-vault` | `PRIVATE` | `27` |
 | `sota-upstream-shelf-lock` | `PUBLIC` | `26` |
+| `tier0-quant` | `PRIVATE` | `4` |
 | `trading-sota` | `PRIVATE` | `20` |
 | `tsl` | `PRIVATE` | `27` |
 
@@ -781,6 +782,10 @@
 | `sota-upstream-shelf-lock` | `PUBLIC` | ADR-0024: Clean-Room Sim->Paper->Live Org Blueprint & Full 18/18 Workstation Hard-Rule Enforcement | Accepted | 2026-11-20 | `129eae78d829` |
 | `sota-upstream-shelf-lock` | `PUBLIC` | ADR-0025: Universal Tier-0 Full-Resolution, Always-Full-Resolution, Zero-Residual, Zero-Fallback Hard Rule | Accepted | 2026-11-20 | `1f8f52cd3f8b` |
 | `sota-upstream-shelf-lock` | `PUBLIC` | ADR-0026: Live-Verified LLM-Native Quant, Microstructure Foundation Models, Causal/Conformal Risk & License-Firewall Landscape (`2026-11-20`) | Accepted | 2026-11-20 | `581bbb5f31dd` |
+| `tier0-quant` | `PRIVATE` | ADR-0001: Finalized Clean-Room `tier0-quant` Architecture — Complete Layers (`L0`–`L15` × `S1`–`S8`), Hosted Advanced Research Frameworks (`95` Repos), Research Convergence & Fail-Closed Execution Parity | Accepted | 2026-11-21 | `092e4f06c3ad` |
+| `tier0-quant` | `PRIVATE` | ADR-0002: Evolvable SOTA Memory/RAG (`XERJ`), Research-Native Locked Skills (`NVIDIA/SkillEvaluator`), 6-Lane Routing & Landscape Lifecycle Governance | Accepted | 2026-11-21 | `6ddcc9d2a790` |
+| `tier0-quant` | `PRIVATE` | ADR-0003: Complete `523`-Starred & `51`-Beyond-Starred (`L0`–`L15`) SOTA Convergence Atlas & Dual-Workstation Loopback Hosting | Accepted | 2026-11-21 | `58dc1eedb1b9` |
+| `tier0-quant` | `PRIVATE` | ADR-0004: Canonical SHA-256-Sealed SOTA Research Converged Frameworks Manifest & Cross-Workstation Empirical Evidence Convergence | Accepted | 2026-11-21 | `79291781aa3e` |
 | `trading-sota` | `PRIVATE` | ADR-0001: Trading ecosystem architecture and clean landing | Accepted | 2026-11-14 | `f2f835e4683a` |
 | `trading-sota` | `PRIVATE` | ADR-0002: Equities-only scope | Accepted | 2026-11-14 | `e4489457203d` |
 | `trading-sota` | `PRIVATE` | ADR-0003: Strategy landing lifecycle | Accepted | 2026-11-14 | `7809a80dbd70` |

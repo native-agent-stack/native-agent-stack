@@ -1,7 +1,7 @@
 {
   "schema": "sota.one-harness-cleanliness-receipt.v1",
   "adr": "ADR-0046",
-  "generated_at_utc": "2026-11-21T13:56:05.733993Z",
+  "generated_at_utc": "2026-11-21T16:45:11.026707Z",
   "mode": "full_workstation",
   "overall_ok": true,
   "summary": {
@@ -87,10 +87,10 @@
       "skill_evaluator": {
         "available": true,
         "all_passed": true,
-        "skills_evaluated": 60,
-        "passed_count": 60,
+        "skills_evaluated": 33,
+        "passed_count": 33,
         "failed_skills": [],
-        "report_sha256": "ba24f6b417e6748459e9a69fb1a20891bd61121689ac15eb06a758eb37e0eb00"
+        "report_sha256": "e1b26b955821251b2d89f4fe1c999e4bf14f14b1821598d0806d2e0f87cc361d"
       },
       "redteam_firewall": {
         "available": true,
@@ -103,11 +103,11 @@
     },
     "5_adr0027_adr0044_single_repo_adr_0drift": {
       "ok": true,
-      "live_total_adrs": 797,
-      "public_registry_total": 797,
+      "live_total_adrs": 801,
+      "public_registry_total": 801,
       "public_drift": {},
       "vault_archive_present": true,
-      "vault_archive_total": 797,
+      "vault_archive_total": 801,
       "vault_drift": {}
     },
     "6_universal_git_hooks_and_18repo_orca_gate": {
@@ -179,7 +179,7 @@
       "ok": true,
       "available": true,
       "live_sessions_count": 1,
-      "active_leases_count": 2
+      "active_leases_count": 1
     },
     "10_paper_trajectory_manifest_and_live_probes": {
       "ok": true,
@@ -206,5 +206,5 @@
       }
     }
   },
-  "receipt_sha256": "b47e94a466162729f4f7a03e099a2839ee83118e6b85e21bcef9868b9cedff4d"
+  "receipt_sha256": "4d413c3b39167c1d9f0c7205d0acd4a99cffdf4ff322b3e7dbe62663e2a01d2c"
 }

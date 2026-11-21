@@ -105,3 +105,36 @@ def test_one_harness_doctor_receipt_on_disk_is_sealed_and_zero_leak() -> None:
         + r"home/|PA[0-9A-Z]{8,}|DU[0-9]{7,}|AK[0-9A-Z]{16,}|PK[0-9A-Z]{16,})"
     )
     assert not leak_rx.search(combined)
+
+
+def test_extra_disk_z_adr_repo_parity_and_isolation(tmp_path: Path) -> None:
+    ws = tmp_path / "ws"
+    demo = ws / "demo-repo"
+    (demo / ".git").mkdir(parents=True)
+    (demo / "docs" / "adr").mkdir(parents=True)
+    (demo / "docs" / "adr" / "ADR-0001-demo.md").write_text(
+        "# ADR-0001: Demo\n- **Status:** Accepted\n- **Date:** 2026-11-21\n",
+        encoding="utf-8",
+    )
+    disk_z_repo = tmp_path / "disk_z" / "tier0-quant"
+    (disk_z_repo / "docs" / "adr").mkdir(parents=True)
+    (disk_z_repo / "docs" / "adr" / "ADR-0001-converged.md").write_text(
+        "# ADR-0001: Tier-0 Quant Converged\n- **Status:** Accepted\n- **Date:** 2026-11-21\n",
+        encoding="utf-8",
+    )
+
+    isolated = _DOCTOR._discover_adr_repos(ws)
+    assert [p.name for p in isolated] == ["demo-repo"]
+
+    combined = _DOCTOR._discover_adr_repos(ws, extra_repo_dirs=(disk_z_repo,))
+    assert [p.name for p in combined] == ["demo-repo", "tier0-quant"]
+
+    out = tmp_path / "out"
+    res = _SYNC.build_public_master_adr_registry(
+        workstation=ws, out_dir=out, extra_repo_dirs=(disk_z_repo,)
+    )
+    assert res["repos_indexed"] == 2
+    assert res["total_adrs_indexed"] == 2
+    reg = json.loads((out / "ECOSYSTEM_FINALIZED_ADRS_MASTER_REGISTRY.json").read_text(encoding="utf-8"))
+    by_repo = {rec["repo"]: rec for rec in reg["records"]}
+    assert by_repo["tier0-quant"]["tier"] == "PRIVATE"

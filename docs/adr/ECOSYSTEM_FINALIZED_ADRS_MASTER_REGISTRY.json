@@ -1,9 +1,9 @@
 {
   "schema": "sota.public-master-finalized-adr-registry.v1",
   "adr": "ADR-0044",
-  "generated_at_utc": "2026-11-21T13:55:34.672068Z",
-  "repos_indexed": 18,
-  "total_adrs_indexed": 797,
+  "generated_at_utc": "2026-11-21T16:44:55.575059Z",
+  "repos_indexed": 19,
+  "total_adrs_indexed": 801,
   "verbatim_private_archive_repo": "native-agent-stack/sota-private-vault (adr_archive/)",
   "per_repo_counts": {
     "agy-sota-harness": 36,
@@ -22,6 +22,7 @@
     "sota-multi-model-workflows": 37,
     "sota-private-vault": 27,
     "sota-upstream-shelf-lock": 26,
+    "tier0-quant": 4,
     "trading-sota": 20,
     "tsl": 27
   },
@@ -10321,6 +10322,65 @@
       "file_sha256": "581bbb5f31dd2a41df753f604facffecb2d05b4d0b1d81be63c9c22e99401487"
     },
     {
+      "repo": "tier0-quant",
+      "tier": "PRIVATE",
+      "file": "ADR-0001-tier0-quant-clean-architecture-layers-research-convergence-and-hosted-frameworks.md",
+      "title": "ADR-0001: Finalized Clean-Room `tier0-quant` Architecture \u2014 Complete Layers (`L0`\u2013`L15` \u00d7 `S1`\u2013`S8`), Hosted Advanced Research Frameworks (`95` Repos), Research Convergence & Fail-Closed Execution Parity",
+      "status": "Accepted",
+      "date": "2026-11-21",
+      "evidence_grade": "E4 (Canonical 29-line Single-Rule Tier-0 Charter",
+      "github_urls": [
+        "https://github.com/UKGovernmentBEIS/inspect_ai",
+        "https://github.com/WecoAI/aideml",
+        "https://github.com/bashtage/arch",
+        "https://github.com/dagster-io/dagster"
+      ],
+      "file_sha256": "092e4f06c3adab1b98050b8b0e907a1f21b2ee001d49400bfdc02f8d946584df"
+    },
+    {
+      "repo": "tier0-quant",
+      "tier": "PRIVATE",
+      "file": "ADR-0002-evolvable-sota-memory-rag-research-skills-6-lanes-and-landscape-governance.md",
+      "title": "ADR-0002: Evolvable SOTA Memory/RAG (`XERJ`), Research-Native Locked Skills (`NVIDIA/SkillEvaluator`), 6-Lane Routing & Landscape Lifecycle Governance",
+      "status": "Accepted",
+      "date": "2026-11-21",
+      "evidence_grade": "E4 (Live `docker-xerj-1` `v1.0.0-rc.104` on `127",
+      "github_urls": [
+        "https://github.com/NVIDIA/SkillEvaluator",
+        "https://github.com/dagster-io/dagster",
+        "https://github.com/ml4t/skills",
+        "https://github.com/obra/superpowers"
+      ],
+      "file_sha256": "6ddcc9d2a790722ab9a3ae6b73621f48e67c08c4662522822359b9f3e7a357f8"
+    },
+    {
+      "repo": "tier0-quant",
+      "tier": "PRIVATE",
+      "file": "ADR-0003-starred-and-beyond-sota-convergence-atlas-523-stars-and-dual-workstation-hosting.md",
+      "title": "ADR-0003: Complete `523`-Starred & `51`-Beyond-Starred (`L0`\u2013`L15`) SOTA Convergence Atlas & Dual-Workstation Loopback Hosting",
+      "status": "Accepted",
+      "date": "2026-11-21",
+      "evidence_grade": "E4 (`523 / 523` live GitHub stars audited with `",
+      "github_urls": [
+        "https://github.com/PriorLabs/TabPFN",
+        "https://github.com/boxed/mutmut",
+        "https://github.com/e2b-dev/E2B",
+        "https://github.com/ethz-spylab/agentdojo"
+      ],
+      "file_sha256": "58dc1eedb1b9841089a32c42ab0f60ddc7c625053b0c66aef10edd420bbebd46"
+    },
+    {
+      "repo": "tier0-quant",
+      "tier": "PRIVATE",
+      "file": "ADR-0004-sota-research-converged-frameworks-manifest-and-empirical-evidence-convergence.md",
+      "title": "ADR-0004: Canonical SHA-256-Sealed SOTA Research Converged Frameworks Manifest & Cross-Workstation Empirical Evidence Convergence",
+      "status": "Accepted",
+      "date": "2026-11-21",
+      "evidence_grade": "E4 (`SOTA_RESEARCH_FRAMEWORKS_MANIFEST.json` det",
+      "github_urls": [],
+      "file_sha256": "79291781aa3e06842dd55d02bb0d70975a45c47f037aef007f3eab66a64166bf"
+    },
+    {
       "repo": "trading-sota",
       "tier": "PRIVATE",
       "file": "ADR-0001-trading-architecture.md",
@@ -10878,5 +10938,5 @@
       "file_sha256": "ca48518bef018ae289a5b3798c2c0171c4ac8cc93342dbb702f71d302b9b81a4"
     }
   ],
-  "manifest_sha256": "55edb0eb57677e177f7157286bdde1826382d3863c4f07d3856263419cd9bfaa"
+  "manifest_sha256": "2d0d9916aeb55b49ec83fbfc4ed531ba98a4c0e6db17b3fb791a9ba3f5b03085"
 }

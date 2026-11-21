@@ -59,6 +59,7 @@ SKIP_ADR_NAMES = frozenset(
         "ECOSYSTEM_FINALIZED_ADRS_MASTER_REGISTRY.md",
     }
 )
+DEFAULT_EXTRA_ADR_REPOS: tuple[Path, ...] = (Path("Z:/tier0-quant"),)
 
 
 def _run(
@@ -116,6 +117,24 @@ def _discover_repos(workstation: Path) -> list[Path]:
         (p for p in workstation.iterdir() if p.is_dir() and (p / ".git").exists()),
         key=lambda p: p.name,
     )
+
+
+def _discover_adr_repos(
+    workstation: Path,
+    extra_repo_dirs: tuple[Path, ...] | None = None,
+) -> list[Path]:
+    repos = _discover_repos(workstation)
+    extras = (
+        DEFAULT_EXTRA_ADR_REPOS
+        if (extra_repo_dirs is None and workstation.resolve() == DEFAULT_WORKSTATION.resolve())
+        else (extra_repo_dirs or ())
+    )
+    seen_names = {p.name for p in repos}
+    for extra in extras:
+        if extra.is_dir() and (extra / "docs" / "adr").is_dir() and extra.name not in seen_names:
+            repos.append(extra)
+            seen_names.add(extra.name)
+    return sorted(repos, key=lambda p: p.name)
 
 
 def _check_1_upstream_shelf_lock(workstation: Path, *, is_ci: bool) -> dict[str, Any]:
@@ -490,7 +509,7 @@ def _check_5_single_repo_adr_parity(workstation: Path, *, is_ci: bool) -> dict[s
         }
 
     live_counts: dict[str, int] = {}
-    for rp in _discover_repos(workstation):
+    for rp in _discover_adr_repos(workstation):
         adr_dir = rp / "docs" / "adr"
         if adr_dir.is_dir():
             cnt = sum(1 for p in adr_dir.glob("*.md") if p.is_file() and p.name not in SKIP_ADR_NAMES)

@@ -13,6 +13,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_WORKSTATION = ROOT.parent
+DEFAULT_EXTRA_ADR_REPOS: tuple[Path, ...] = (Path("Z:/tier0-quant"),)
 PUBLIC_REPOS = frozenset(
     {
         "agy-sota-harness",
@@ -123,14 +124,26 @@ def _scrub_public_meta(text: str) -> str:
 def build_public_master_adr_registry(
     workstation: Path = DEFAULT_WORKSTATION,
     out_dir: Path | None = None,
+    extra_repo_dirs: tuple[Path, ...] | None = None,
 ) -> dict[str, Any]:
-    """Generate public-safe metadata-only Master Finalized ADR Registry across all 18 repos."""
+    """Generate public-safe metadata-only Master Finalized ADR Registry across all 18 workstation repos + Disk-Z tier0-quant."""
     target_dir = out_dir or (ROOT / "docs" / "adr")
     target_dir.mkdir(parents=True, exist_ok=True)
     repos = sorted(
         (p for p in workstation.iterdir() if p.is_dir() and (p / ".git").exists()),
         key=lambda p: p.name,
     )
+    extras = (
+        DEFAULT_EXTRA_ADR_REPOS
+        if (extra_repo_dirs is None and workstation.resolve() == DEFAULT_WORKSTATION.resolve())
+        else (extra_repo_dirs or ())
+    )
+    seen_names = {p.name for p in repos}
+    for extra in extras:
+        if extra.is_dir() and (extra / "docs" / "adr").is_dir() and extra.name not in seen_names:
+            repos.append(extra)
+            seen_names.add(extra.name)
+    repos.sort(key=lambda p: p.name)
     records: list[dict[str, Any]] = []
     per_repo_counts: dict[str, int] = {}
 
@@ -182,10 +195,15 @@ def build_public_master_adr_registry(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n"
     )
 
+    scope_label = (
+        "`18/18` `ADR-0023` PASS + Disk-Z `tier0-quant`"
+        if "tier0-quant" in per_repo_counts
+        else "`18/18` `ADR-0023` PASS"
+    )
     lines = [
         "# Native Agent Stack — Unified Single-Repo Master Finalized ADR Registry (`ADR-0044`)",
         "",
-        f"- **Total Finalized ADRs Indexed:** `{len(records)}` across `{len(per_repo_counts)}` repositories (`18/18` `ADR-0023` PASS)",
+        f"- **Total Finalized ADRs Indexed:** `{len(records)}` across `{len(per_repo_counts)}` repositories ({scope_label})",
         f"- **Canonical Manifest SHA-256:** `{manifest['manifest_sha256']}`",
         "- **Verbatim Private Continuity Copy:** `sota-private-vault/adr_archive/` (`ADR-0027`, Two-Tier Public/Private Firewall intact)",
         "",
