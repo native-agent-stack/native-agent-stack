@@ -1,9 +1,9 @@
 {
   "schema": "sota.public-master-finalized-adr-registry.v1",
   "adr": "ADR-0044",
-  "generated_at_utc": "2026-11-21T01:29:39.000411Z",
+  "generated_at_utc": "2026-11-21T01:56:23.058919Z",
   "repos_indexed": 18,
-  "total_adrs_indexed": 789,
+  "total_adrs_indexed": 790,
   "verbatim_private_archive_repo": "native-agent-stack/sota-private-vault (adr_archive/)",
   "per_repo_counts": {
     "agy-sota-harness": 36,
@@ -14,7 +14,7 @@
     "dsh-plugin-landscape": 11,
     "dsh-sota-harness": 16,
     "meridian": 65,
-    "native-agent-stack": 46,
+    "native-agent-stack": 47,
     "sota-compounding-lab": 38,
     "sota-dynamic-trail-c": 35,
     "sota-harness-foundation": 46,
@@ -5722,6 +5722,22 @@
       "file_sha256": "fefa4cfbb874b00c182905191ad278c09317a70ac0695e74301c35895867d239"
     },
     {
+      "repo": "native-agent-stack",
+      "tier": "PUBLIC",
+      "file": "ADR-0047-no-self-built-waste-and-hosted-sota-platform-mandate.md",
+      "title": "ADR-0047: No Self-Built Anti-Tier-0 Waste, Legacy Monolith Freeze & Hosted SOTA Platform Mandate",
+      "status": "Accepted",
+      "date": "2026-11-20",
+      "evidence_grade": "E4",
+      "github_urls": [
+        "https://github.com/duckdb/duckdb",
+        "https://github.com/finos/perspective",
+        "https://github.com/nautechsystems/nautilus_trader",
+        "https://github.com/nkaz001/hftbacktest"
+      ],
+      "file_sha256": "b4b10625a73b8e7e11d25e6a701c75a6ab0a9bed1569c4aacd5323d1cd872c03"
+    },
+    {
       "repo": "sota-compounding-lab",
       "tier": "PUBLIC",
       "file": "ADR-0001-public-open-core-vs-private-vault-org-firewall.md",
@@ -10750,5 +10766,5 @@
       "file_sha256": "ca48518bef018ae289a5b3798c2c0171c4ac8cc93342dbb702f71d302b9b81a4"
     }
   ],
-  "manifest_sha256": "2a38396578ac6142a05b06aa14972076707b1426a164a557d9b411004e85809a"
+  "manifest_sha256": "d35903f6e5f80145fd73fbed4d75422ccb8cd5b78be87aa63e384a9fac51d49e"
 }

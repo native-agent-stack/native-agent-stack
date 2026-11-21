@@ -65,6 +65,20 @@ def test_sync_tier0_check_parity_on_temp_home(tmp_path: Path) -> None:
     assert after["all_synced"] is True
     assert after["synced_count"] == 7
     assert after["drifted"] == []
+    for p in targets:
+        assert "ADR-0047" in p.read_text(encoding="utf-8")
+
+
+def test_adr0047_monolith_ratchet_freeze_and_worktree_waste_cap() -> None:
+    assert len(_DOCTOR.MONOLITH_RATCHET_CAPS) >= 7
+    assert _DOCTOR.MAX_MERGED_ORCA_WORKTREE_WASTE_GB <= 4.0
+    for req_rel in (
+        "sota-mover-ranker/ranker/stage5_lossless_live_lane.py",
+        "sota-mover-ranker/ranker/alpaca_paper_e2e.py",
+        "sota-mover-ranker/ranker/scanner.py",
+        "sota-mover-ranker/ranker/paper_auto_engine.py",
+    ):
+        assert req_rel in _DOCTOR.MONOLITH_RATCHET_CAPS
 
 
 def test_one_harness_doctor_receipt_on_disk_is_sealed_and_zero_leak() -> None:

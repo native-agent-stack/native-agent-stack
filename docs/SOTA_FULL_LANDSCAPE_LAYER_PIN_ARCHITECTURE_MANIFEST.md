@@ -1,6 +1,6 @@
 # Native Agent Stack — Full-Landscape Resolute SOTA Layer-Pin Architecture Manifest (`ADR-0045` / `ADR-0046`)
 
-- **Canonical SHA-256:** `524d75739ffe14bf750a6dd26f1f5d04229606f495be5712bdb1665e70bc76d2`
+- **Canonical SHA-256:** `c7b590489d3957bce0f83d322ee2aec6264514c185ee36454739331ecf5c8ef7`
 - **Total Layers:** `16` (`11` Active Operational `L0–L10` · `5` Institutional Expansion `L11–L15`)
 - **Immutable Core Upstream Pins:** `18` (exact 40-char Git SHAs verified against `PINS_LOCK.json`)
 - **Starred & Beyond SOTA Convergence:** `415` audited GitHub stars (`33` distinct starred anchors mapped) + `23` distinct Beyond-Starred SOTA additions

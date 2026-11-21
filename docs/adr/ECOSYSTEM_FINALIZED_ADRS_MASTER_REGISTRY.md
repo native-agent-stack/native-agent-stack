@@ -1,7 +1,7 @@
 # Native Agent Stack — Unified Single-Repo Master Finalized ADR Registry (`ADR-0044`)
 
-- **Total Finalized ADRs Indexed:** `789` across `18` repositories (`18/18` `ADR-0023` PASS)
-- **Canonical Manifest SHA-256:** `2a38396578ac6142a05b06aa14972076707b1426a164a557d9b411004e85809a`
+- **Total Finalized ADRs Indexed:** `790` across `18` repositories (`18/18` `ADR-0023` PASS)
+- **Canonical Manifest SHA-256:** `d35903f6e5f80145fd73fbed4d75422ccb8cd5b78be87aa63e384a9fac51d49e`
 - **Verbatim Private Continuity Copy:** `sota-private-vault/adr_archive/` (`ADR-0027`, Two-Tier Public/Private Firewall intact)
 
 ## Per-Repository Finalized ADR Summary
@@ -16,7 +16,7 @@
 | `dsh-plugin-landscape` | `PRIVATE` | `11` |
 | `dsh-sota-harness` | `PUBLIC` | `16` |
 | `meridian` | `PRIVATE` | `65` |
-| `native-agent-stack` | `PUBLIC` | `46` |
+| `native-agent-stack` | `PUBLIC` | `47` |
 | `sota-compounding-lab` | `PUBLIC` | `38` |
 | `sota-dynamic-trail-c` | `PRIVATE` | `35` |
 | `sota-harness-foundation` | `PUBLIC` | `46` |
@@ -465,6 +465,7 @@
 | `native-agent-stack` | `PUBLIC` | ADR-0044: Tier-0 Multi-Runtime Harness `.md` Convergence & Unified Single-Repo Master Finalized ADR Registry | Accepted | 2026-11-20 | `727d8845cf58` |
 | `native-agent-stack` | `PUBLIC` | ADR-0045: Full-Landscape Resolute SOTA Layer-Pin Architecture Manifest (`L0`–`L15`: Shelf, Backtest, Strategies, Trading Engine/UI, Orca Harness & Institutional Expansion) | Accepted | 2026-11-20 | `f670b94e615c` |
 | `native-agent-stack` | `PUBLIC` | ADR-0046: Continuous One-Harness SOTA Cleanliness Doctor, Universal Git Hooks, 18/18 Orca Gate Parity & 16-Layer Starred/Beyond Maintenance | Accepted | 2026-11-20 | `fefa4cfbb874` |
+| `native-agent-stack` | `PUBLIC` | ADR-0047: No Self-Built Anti-Tier-0 Waste, Legacy Monolith Freeze & Hosted SOTA Platform Mandate | Accepted | 2026-11-20 | `b4b10625a73b` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0001: Public Open-Core vs. Private Execution & Vault Organization Firewall | Accepted | 2026-11-17 | `fc73c9d38f87` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0002: Five-Stage Sim -> Pre-Wall Backtest -> Paper -> Empirical-Bayes -> Broker Pipeline | Accepted | 2026-11-17 | `f55ed3efc217` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0003: Pre-Wall (`<= 2026-10-15`), Harvey–Liu–Zhu `t*(N)` & Native-Frequency `DSR` Gate | Accepted | 2026-11-17 | `d127aa9fefef` |

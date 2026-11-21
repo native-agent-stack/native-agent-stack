@@ -39,11 +39,17 @@ QUANT_AST_REPOS = (
     "sota-mover-ranker",
 )
 
-# Downward-ratchet LOC ceilings on legacy monoliths (may only shrink via Strangler refactoring)
+# Downward-ratchet LOC ceilings on legacy monoliths (`ADR-0047`: frozen against growth; may only shrink)
 MONOLITH_RATCHET_CAPS: dict[str, int] = {
-    "sota-mover-ranker/ranker/stage5_lossless_live_lane.py": 8450,
-    "sota-mover-ranker/ranker/alpaca_paper_e2e.py": 8450,
+    "sota-mover-ranker/ranker/stage5_lossless_live_lane.py": 8330,
+    "sota-mover-ranker/ranker/alpaca_paper_e2e.py": 8405,
+    "sota-mover-ranker/ranker/tv_watchlist_fast_sync.py": 3775,
+    "sota-mover-ranker/ranker/paper_p3_aggressive_lab.py": 3120,
+    "sota-mover-ranker/ranker/ipo_microstructure_stream.py": 3035,
+    "sota-mover-ranker/ranker/scanner.py": 2915,
+    "sota-mover-ranker/ranker/paper_auto_engine.py": 2650,
 }
+MAX_MERGED_ORCA_WORKTREE_WASTE_GB = 4.0
 
 SKIP_ADR_NAMES = frozenset(
     {
@@ -559,6 +565,43 @@ def _check_7_security_and_github_firewall(*, is_ci: bool) -> dict[str, Any]:
     }
 
 
+def _audit_merged_orca_worktrees() -> tuple[float, int]:
+    """Measure clean, already-merged Orca worktree byte waste (no home paths emitted)."""
+    orca_root = Path.home() / "orca" / "workspaces"
+    if not orca_root.is_dir():
+        return 0.0, 0
+    merged_bytes = 0
+    merged_count = 0
+    for repo_dir in orca_root.iterdir():
+        if not repo_dir.is_dir():
+            continue
+        for wt in repo_dir.iterdir():
+            if not wt.is_dir() or not (wt / ".git").exists():
+                continue
+            st = _run(["git", "-C", str(wt), "status", "--porcelain"], timeout=10)
+            if st.returncode != 0 or st.stdout.strip():
+                continue
+            ab = _run(
+                ["git", "-C", str(wt), "rev-list", "--left-right", "--count", "origin/main...HEAD"],
+                timeout=10,
+            )
+            if ab.returncode != 0:
+                continue
+            parts = ab.stdout.strip().split()
+            ahead = int(parts[1]) if len(parts) == 2 else 999
+            if ahead != 0:
+                continue
+            merged_count += 1
+            for r_dir, _, files in os.walk(wt):
+                rp = Path(r_dir)
+                for fn in files:
+                    try:
+                        merged_bytes += (rp / fn).stat().st_size
+                    except OSError:
+                        pass
+    return round(merged_bytes / 1e9, 2), merged_count
+
+
 def _check_8_anti_bloat_and_ratchet(workstation: Path, *, is_ci: bool) -> dict[str, Any]:
     if is_ci:
         return {"ok": True, "mode": "ci_skipped"}
@@ -574,11 +617,19 @@ def _check_8_anti_bloat_and_ratchet(workstation: Path, *, is_ci: bool) -> dict[s
             monolith_lines[rel] = {"loc": loc, "ratchet_cap": cap, "ok": not exceeded}
             if exceeded:
                 ratchet_violations.append(f"{rel}: {loc} > {cap}")
+    merged_waste_gb, merged_worktrees_count = _audit_merged_orca_worktrees()
+    if merged_waste_gb > MAX_MERGED_ORCA_WORKTREE_WASTE_GB:
+        ratchet_violations.append(
+            f"merged_orca_worktree_waste: {merged_waste_gb}GB > {MAX_MERGED_ORCA_WORKTREE_WASTE_GB}GB"
+        )
     return {
         "ok": len(ratchet_violations) == 0,
         "size_budget_repos_count": len(size_budget_repos),
         "size_budget_repos": size_budget_repos,
         "monolith_ratchet": monolith_lines,
+        "merged_worktrees_count": merged_worktrees_count,
+        "merged_waste_gb": merged_waste_gb,
+        "max_merged_waste_gb": MAX_MERGED_ORCA_WORKTREE_WASTE_GB,
         "ratchet_violations": ratchet_violations,
     }
 

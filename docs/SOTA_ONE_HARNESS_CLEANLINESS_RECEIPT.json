@@ -1,7 +1,7 @@
 {
   "schema": "sota.one-harness-cleanliness-receipt.v1",
   "adr": "ADR-0046",
-  "generated_at_utc": "2026-11-21T01:29:56.132021Z",
+  "generated_at_utc": "2026-11-21T01:56:52.113984Z",
   "mode": "full_workstation",
   "overall_ok": true,
   "summary": {
@@ -17,7 +17,7 @@
       "upstream_map_pass": 18,
       "adr_evidence_pass": 18,
       "shelf_pins_ok": true,
-      "audit_sha256": "d26aed5896032660",
+      "audit_sha256": "567679a2e6027f9b",
       "failure_count": 0,
       "failures": []
     },
@@ -44,7 +44,7 @@
     "3_adr0045_16layer_starred_beyond_and_research": {
       "ok": true,
       "manifest_sha256_valid": true,
-      "manifest_sha256": "524d75739ffe14bf750a6dd26f1f5d04229606f495be5712bdb1665e70bc76d2",
+      "manifest_sha256": "c7b590489d3957bce0f83d322ee2aec6264514c185ee36454739331ecf5c8ef7",
       "total_layers": 16,
       "research_stages_covered": 8,
       "pins_match_pins_lock": true,
@@ -94,11 +94,11 @@
     },
     "5_adr0027_adr0044_single_repo_adr_0drift": {
       "ok": true,
-      "live_total_adrs": 789,
-      "public_registry_total": 789,
+      "live_total_adrs": 790,
+      "public_registry_total": 790,
       "public_drift": {},
       "vault_archive_present": true,
-      "vault_archive_total": 789,
+      "vault_archive_total": 790,
       "vault_drift": {}
     },
     "6_universal_git_hooks_and_18repo_orca_gate": {
@@ -127,15 +127,43 @@
       "monolith_ratchet": {
         "sota-mover-ranker/ranker/stage5_lossless_live_lane.py": {
           "loc": 8324,
-          "ratchet_cap": 8450,
+          "ratchet_cap": 8330,
           "ok": true
         },
         "sota-mover-ranker/ranker/alpaca_paper_e2e.py": {
           "loc": 8399,
-          "ratchet_cap": 8450,
+          "ratchet_cap": 8405,
+          "ok": true
+        },
+        "sota-mover-ranker/ranker/tv_watchlist_fast_sync.py": {
+          "loc": 3765,
+          "ratchet_cap": 3775,
+          "ok": true
+        },
+        "sota-mover-ranker/ranker/paper_p3_aggressive_lab.py": {
+          "loc": 3111,
+          "ratchet_cap": 3120,
+          "ok": true
+        },
+        "sota-mover-ranker/ranker/ipo_microstructure_stream.py": {
+          "loc": 3029,
+          "ratchet_cap": 3035,
+          "ok": true
+        },
+        "sota-mover-ranker/ranker/scanner.py": {
+          "loc": 2908,
+          "ratchet_cap": 2915,
+          "ok": true
+        },
+        "sota-mover-ranker/ranker/paper_auto_engine.py": {
+          "loc": 2639,
+          "ratchet_cap": 2650,
           "ok": true
         }
       },
+      "merged_worktrees_count": 0,
+      "merged_waste_gb": 0.0,
+      "max_merged_waste_gb": 4.0,
       "ratchet_violations": []
     },
     "9_sota_bus_peer_coordination_health": {
@@ -169,5 +197,5 @@
       }
     }
   },
-  "receipt_sha256": "e7845428d6c919e40aec8a12ef756a9124525b0e6fadc2248d67acd9a11c8787"
+  "receipt_sha256": "4dafedf8100afcc3b3bce8cdbeab8f2ab3efb61a012d2137f878524cbfcef798"
 }

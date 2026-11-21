@@ -66,17 +66,23 @@ TIER0_CANONICAL_BLOCK = (
     "`8`-stage Research Convergence Practice (`S1`–`S8`), `7/7` runtime `.md` files, `60/60` `SkillEvaluator` corpus, "
     "`18/18` `orca.yaml` `Tier-0 Merge Gate` tabs, and universal Git `pre-commit`/`pre-push` hooks (`core.hooksPath` -> "
     "`native-agent-stack/hooks`) are continuously audited by `native-agent-stack/scripts/one_harness_cleanliness_doctor.py --check`.\n"
+    "- **Tier-0 No Self-Built Waste, Monolith Freeze & Hosted SOTA Platform Mandate (`ADR-0047`):** "
+    "NEVER hand-roll custom OMS loops, fill reconcilers, backtest runners, custom HTML/JS dashboards, or 1-bar strategy "
+    "proxies behind cosmetic `upstream-map.toml` labels, and NEVER mask negative-expectancy strategy bugs with stacked "
+    "sizing throttles. Host the actual pinned SOTA platforms directly (`NautilusTrader v2` `BacktestNode`/`TradingNode`, "
+    "`FINOS/OpenBB Workspace` `:1420` + `backends-for-openbb` `:6900`, `hftbacktest`, `vectorbt`, `QuantStats`, "
+    "`Perspective`, `Lightweight Charts`, `Polars`, `DuckDB`) with only a thin native plugin layer; keep legacy monoliths "
+    "frozen under downward-only LOC ratchets and prune merged Orca worktrees immediately after push.\n"
     f"{TIER0_MARKER_END}"
 )
 
 AGY_PLUGIN_ADR0023_LINE = (
-    "- **Tier-0 SOTA-Source-Only, 16-Layer Landscape & One-Harness Doctor (`ADR-0023` / `ADR-0027` / `ADR-0044` / `ADR-0045` / `ADR-0046`):** "
-    "Every production file, strategy, hook, skill, and ADR across all `18/18` repos MUST install, integrate, "
-    "or build upon pinned SOTA upstream libraries (`UPSTREAM.md`, `upstream-map.toml`, `18`-pin shelf lock, "
-    "`scripts/merge_gate.py`, universal Git `core.hooksPath`, `18/18` `orca.yaml`, `415+` Starred & Beyond + "
-    "`8`-Stage Research Convergence audited via `native-agent-stack/scripts/one_harness_cleanliness_doctor.py`); "
-    "single-repo finalized ADR archives live in `sota-private-vault/adr_archive/` (verbatim private) and "
-    "`native-agent-stack/docs/adr/ECOSYSTEM_FINALIZED_ADRS_MASTER_REGISTRY.md` (public-safe registry)."
+    "- **Tier-0 SOTA-Source-Only, No Self-Built Waste & Hosted SOTA Platform Mandate (`ADR-0023` / `ADR-0027` / `ADR-0044` / `ADR-0045` / `ADR-0046` / `ADR-0047`):** "
+    "Every production file, strategy, hook, skill, and ADR across all `18/18` repos MUST host or build thinly atop pinned SOTA upstream platforms "
+    "(`NautilusTrader v2`, `OpenBB/FINOS Workspace :1420/:6900`, `hftbacktest`, `vectorbt`, `QuantStats`, `Perspective`, `Polars`, `DuckDB`) — "
+    "ZERO self-built custom OMS/UI/proxy waste, ZERO throttle band-aids on broken strategies, strict legacy monolith LOC freeze & merged-worktree cleanup "
+    "audited via `native-agent-stack/scripts/one_harness_cleanliness_doctor.py`; single-repo finalized ADR archives live in "
+    "`sota-private-vault/adr_archive/` (verbatim private) and `native-agent-stack/docs/adr/ECOSYSTEM_FINALIZED_ADRS_MASTER_REGISTRY.md` (public-safe registry)."
 )
 
 

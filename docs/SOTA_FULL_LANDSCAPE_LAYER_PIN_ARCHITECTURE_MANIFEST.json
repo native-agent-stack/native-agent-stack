@@ -2,7 +2,7 @@
   "schema": "sota.full-landscape-resolute-layer-pin-manifest.v2",
   "adr": "ADR-0045",
   "enforced_by_adr": "ADR-0046",
-  "generated_at_utc": "2026-11-21T01:29:38.764319Z",
+  "generated_at_utc": "2026-11-21T01:56:22.759441Z",
   "hard_invariants": {
     "tier0_sota_source_only": true,
     "allow_silent_fallback": false,
@@ -251,13 +251,13 @@
     "dsh-plugin-landscape": "4b881a9",
     "dsh-sota-harness": "7d0d37a",
     "meridian": "e698958",
-    "native-agent-stack": "2039e07",
+    "native-agent-stack": "2a5abd2",
     "sota-compounding-lab": "5a8880a",
     "sota-dynamic-trail-c": "88c487f",
     "sota-harness-foundation": "9f56644",
     "sota-mover-ranker": "dc17266",
     "sota-multi-model-workflows": "cfee27f",
-    "sota-private-vault": "21b4f20",
+    "sota-private-vault": "a3207bd",
     "sota-upstream-shelf-lock": "8d81f57",
     "trading-sota": "54f0325",
     "tsl": "d3eec67"
@@ -1879,5 +1879,5 @@
       "verification_gate": "Semantic watchdog alert test + OSV CVE 0-critical gate + SkillOpt replay friction score."
     }
   ],
-  "manifest_sha256": "524d75739ffe14bf750a6dd26f1f5d04229606f495be5712bdb1665e70bc76d2"
+  "manifest_sha256": "c7b590489d3957bce0f83d322ee2aec6264514c185ee36454739331ecf5c8ef7"
 }
