@@ -1,7 +1,7 @@
 {
   "schema": "sota.one-harness-cleanliness-receipt.v1",
   "adr": "ADR-0046",
-  "generated_at_utc": "2026-11-21T02:24:58.767248Z",
+  "generated_at_utc": "2026-11-21T13:14:50.700343Z",
   "mode": "full_workstation",
   "overall_ok": true,
   "summary": {
@@ -17,7 +17,7 @@
       "upstream_map_pass": 18,
       "adr_evidence_pass": 18,
       "shelf_pins_ok": true,
-      "audit_sha256": "54c42b37ce44eb3f",
+      "audit_sha256": "d0e3897eb1e5146c",
       "failure_count": 0,
       "failures": []
     },
@@ -44,7 +44,7 @@
     "3_adr0045_16layer_starred_beyond_and_research": {
       "ok": true,
       "manifest_sha256_valid": true,
-      "manifest_sha256": "2c72e849e4b09387c036b423616ac2210492eb04894bbc85f03effba4928b613",
+      "manifest_sha256": "2168f2f512ec3e065e341e8664a079640cffa49eb45ee5f90ae60ae7ce103a34",
       "total_layers": 16,
       "research_stages_covered": 8,
       "pins_match_pins_lock": true,
@@ -65,6 +65,8 @@
         "synced_count": 7,
         "drifted": [],
         "all_synced": true,
+        "canonical_charter_mode": true,
+        "canonical_charter_sha256_16": "fa08b815ebc15bce",
         "statuses": {
           "gemini_global": "synced",
           "claude_global": "synced",
@@ -94,11 +96,11 @@
     },
     "5_adr0027_adr0044_single_repo_adr_0drift": {
       "ok": true,
-      "live_total_adrs": 793,
-      "public_registry_total": 793,
+      "live_total_adrs": 795,
+      "public_registry_total": 795,
       "public_drift": {},
       "vault_archive_present": true,
-      "vault_archive_total": 793,
+      "vault_archive_total": 795,
       "vault_drift": {}
     },
     "6_universal_git_hooks_and_18repo_orca_gate": {
@@ -169,8 +171,8 @@
     "9_sota_bus_peer_coordination_health": {
       "ok": true,
       "available": true,
-      "live_sessions_count": 12,
-      "active_leases_count": 2
+      "live_sessions_count": 1,
+      "active_leases_count": 5
     },
     "10_paper_trajectory_manifest_and_live_probes": {
       "ok": true,
@@ -186,16 +188,16 @@
       },
       "live_paper_probes": {
         "p1_8799": {
-          "reachable": true
+          "reachable": false
         },
         "p2_8787": {
-          "reachable": true
+          "reachable": false
         },
         "p3_8797": {
-          "reachable": true
+          "reachable": false
         }
       }
     }
   },
-  "receipt_sha256": "b7d906ce81e3bfd51daa02a7c6bc9ba2a7bae1d2d294e579e7a0072228899510"
+  "receipt_sha256": "394d2a96e71ebf8dbadf58019f9bc06f37a52fe9c9ea633ddc73d7eb02b20114"
 }

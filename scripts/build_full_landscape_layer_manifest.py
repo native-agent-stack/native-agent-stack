@@ -275,6 +275,10 @@ def build_full_landscape_layer_manifest(
                     "repo": "aliyun/qwen-dianjin",
                     "role": "Local RTX 4090 DianJin-R1 & Fin-PRM SEC 8-K/earnings catalyst parsing (MIT, a626b083c1)",
                 },
+                {
+                    "repo": "dagster-io/dagster",
+                    "role": "Software-defined PIT data & pre-wall research pipeline orchestration (Apache-2.0, 939bd1ea94)",
+                },
             ],
             research_convergence_stages=["S2_BITEMPORAL_12FEED_PIT_INGEST"],
             harness_and_agent_md_binding={
@@ -407,6 +411,22 @@ def build_full_landscape_layer_manifest(
                     "repo": "The-FinAI/Fino1",
                     "role": "14B SFT+GRPO FinCoT financial reasoning model for FinQA/XBRL-Math (MIT, f2b9e99317)",
                 },
+                {
+                    "repo": "ml4t/engineer",
+                    "role": "Point-in-time quantitative feature engineering companion to ml4t-diagnostic (MIT, c63159245c)",
+                },
+                {
+                    "repo": "deepcharles/ruptures",
+                    "role": "Structural change-point & regime-break segmentation for norm disruptions (BSD-2-Clause, ee1c8ff8a5)",
+                },
+                {
+                    "repo": "stumpy-dev/stumpy",
+                    "role": "Matrix-profile anomaly/discord & motif discovery for early-entry detection (BSD-3-Clause, a42ca40e54)",
+                },
+                {
+                    "repo": "optuna/optuna",
+                    "role": "Pre-registered HLZ-bounded hyperparameter & threshold optimization (MIT, 0abf066c1e)",
+                },
             ],
             research_convergence_stages=[
                 "S3_RD_AGENT_DSPY_HYPOTHESIS_PROPOSAL",
@@ -473,6 +493,10 @@ def build_full_landscape_layer_manifest(
                 {
                     "repo": "The-FinAI/FinBen",
                     "role": "lm-evaluation-harness holistic financial LLM evaluation suite (MIT, 74ea6b8f8f)",
+                },
+                {
+                    "repo": "mlflow/mlflow",
+                    "role": "MLflow 3 sole upstream experiment & true trial-count (N) tracking ledger (Apache-2.0, 1ca7129977)",
                 },
             ],
             research_convergence_stages=[
@@ -584,11 +608,19 @@ def build_full_landscape_layer_manifest(
             beyond_starred_sota_repos=[
                 {
                     "repo": "openbq-org/finos-workspace",
-                    "role": "Hosted FINOS/OpenBB Institutional Workspace (:1420, ADR-0047 zero self-built HTML/JS)",
+                    "role": "Hosted FINOS/OpenBB Institutional Workspace (:1420, ADR-0047/0050 zero self-built HTML/JS, ag-grid@2.3.0 active)",
+                },
+                {
+                    "repo": "openbq-org/finos-workspace-plugins",
+                    "role": "Official FINOS Workspace widget plugin monorepo (Apache-2.0, d9b57e9014, plotly-charts@2.5.0 active)",
+                },
+                {
+                    "repo": "openbq-org/backends-for-openbb",
+                    "role": "Official MIT OpenBB Workspace FastAPI custom backend contract (:6900, a629370757)",
                 },
                 {
                     "repo": "OpenBB-finance/backends-for-openbb",
-                    "role": "OpenBB Platform Workspace KeepAlive backend (:6900, paper-only widgets)",
+                    "role": "Legacy OpenBB Platform Workspace KeepAlive reference (:6900, paper-only widgets)",
                 },
                 {
                     "repo": "AI4Finance-Foundation/FinRobot",
@@ -1122,6 +1154,10 @@ def build_full_landscape_layer_manifest(
                     "repo": "The-FinAI/FinBen",
                     "role": "Standardized lm-evaluation-harness financial reasoning regression suite (MIT, 74ea6b8f8f)",
                 },
+                {
+                    "repo": "UKGovernmentBEIS/inspect_ai",
+                    "role": "Structured multi-model agent & skill regression evaluation harness (MIT, cf72dbc041)",
+                },
             ],
             research_convergence_stages=[
                 "S6_MULTI_VENDOR_ADVERSARIAL_REDTEAM",
@@ -1165,6 +1201,8 @@ def build_full_landscape_layer_manifest(
         "enforced_by_adr": "ADR-0046",
         "hosted_platform_adr": "ADR-0047",
         "advanced_research_landscape_adr": "ADR-0048",
+        "cleanroom_v4_adr": "ADR-0049",
+        "hosted_research_frameworks_seal_adr": "ADR-0050",
         "shelf_lock_frontier_adr": "sota-upstream-shelf-lock/ADR-0026",
         "generated_at_utc": generated_at_utc or datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "hard_invariants": {

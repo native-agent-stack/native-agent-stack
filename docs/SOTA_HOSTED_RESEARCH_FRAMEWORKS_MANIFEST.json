@@ -1,0 +1,891 @@
+{
+  "schema": "sota.hosted-research-frameworks-manifest.v1",
+  "adr": "ADR-0050",
+  "supersedes_self_built_ui_adr": "ADR-0047",
+  "cleanroom_v4_adr": "ADR-0049",
+  "generated_at_utc": "2026-11-21T13:11:41.459466Z",
+  "storage_root": "Z:/sota-data/hosted-research-frameworks/",
+  "hard_boundaries": {
+    "immutable_shelf_untouched": true,
+    "paper_only_firewall": true,
+    "study_wall_date": "2026-10-15",
+    "zero_unsandboxed_llm_exec": true,
+    "zero_broker_keys_to_external_agents": true,
+    "zero_self_built_html_js_ui": true
+  },
+  "live_local_services": {
+    "finos_workspace_ui": "http://localhost:1420",
+    "finos_workspace_api": "http://localhost:8000",
+    "finos_workspace_active_plugins": [
+      "plotly-charts@2.5.0",
+      "ag-grid@2.3.0"
+    ],
+    "openbb_sota_backend": "http://127.0.0.1:6900",
+    "upstream_tearsheets_server": "http://127.0.0.1:8793",
+    "rtx4090_full_res_sidecar": "http://127.0.0.1:8794",
+    "ibkr_paper_gateway": "127.0.0.1:4002",
+    "tearsheet_html_artifacts": [
+      "nautilus_v2_prewall_tearsheet.html",
+      "quantstats_prewall_tearsheet.html",
+      "vectorbt_prewall_portfolio.html"
+    ]
+  },
+  "summary": {
+    "immutable_core_shelf_count": 18,
+    "immutable_core_shelf_verified": 18,
+    "hosted_ui_and_plugins_count": 3,
+    "hosted_frontier_and_charter_count": 30,
+    "quarantined_reference_count": 4,
+    "total_local_upstream_repos_indexed": 55,
+    "active_hosted_present_on_disk_z": 33
+  },
+  "tier_a_immutable_core_shelf": [
+    {
+      "name": "alpaca-mcp-server",
+      "ref": "v2.4.1",
+      "locked_sha": "63cc4278d87b31f3ed4efcfaa55624095c6d7be8",
+      "live_sha": "63cc4278d87b31f3ed4efcfaa55624095c6d7be8",
+      "sha_verified_match": true,
+      "license": "MIT",
+      "url": "https://github.com/alpacahq/alpaca-mcp-server",
+      "local_path": "Z:/sota-data/upstream/alpaca-mcp-server",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "alpaca-py",
+      "ref": "v0.45.0",
+      "locked_sha": "c42add7c0a7026e2ead3ed64e76f4def2b99fda4",
+      "live_sha": "c42add7c0a7026e2ead3ed64e76f4def2b99fda4",
+      "sha_verified_match": true,
+      "license": "Apache-2.0",
+      "url": "https://github.com/alpacahq/alpaca-py",
+      "local_path": "Z:/sota-data/upstream/alpaca-py",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "duckdb",
+      "ref": "v2.0.0",
+      "locked_sha": "d54cbbe3df17e8e5ce68312f483b4155836112aa",
+      "live_sha": "d54cbbe3df17e8e5ce68312f483b4155836112aa",
+      "sha_verified_match": true,
+      "license": "MIT",
+      "url": "https://github.com/duckdb/duckdb",
+      "local_path": "Z:/sota-data/upstream/duckdb",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "edgartools",
+      "ref": "v6.2.0",
+      "locked_sha": "574c2bd15f6c629bceef03b6550ea8ac8abf3473",
+      "live_sha": "574c2bd15f6c629bceef03b6550ea8ac8abf3473",
+      "sha_verified_match": true,
+      "license": "MIT",
+      "url": "https://github.com/dgunning/edgartools",
+      "local_path": "Z:/sota-data/upstream/edgartools",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "exchange_calendars",
+      "ref": "4.13.2",
+      "locked_sha": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+      "live_sha": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+      "sha_verified_match": true,
+      "license": "Apache-2.0",
+      "url": "https://github.com/gerrymanoim/exchange_calendars",
+      "local_path": "Z:/sota-data/upstream/exchange_calendars",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "hftbacktest",
+      "ref": "main",
+      "locked_sha": "5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+      "live_sha": "5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+      "sha_verified_match": true,
+      "license": "MIT",
+      "url": "https://github.com/nkaz001/hftbacktest",
+      "local_path": "Z:/sota-data/upstream/hftbacktest",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "ib_async",
+      "ref": "v2.1.0",
+      "locked_sha": "ab629f34c1823ea4c1542f32f07377208a86bdfd",
+      "live_sha": "ab629f34c1823ea4c1542f32f07377208a86bdfd",
+      "sha_verified_match": true,
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/ib-api-reloaded/ib_async",
+      "local_path": "Z:/sota-data/upstream/ib_async",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "lightweight-charts",
+      "ref": "master",
+      "locked_sha": "c29c51e1e5bc61981da5832c97797cb8283d120f",
+      "live_sha": "c29c51e1e5bc61981da5832c97797cb8283d120f",
+      "sha_verified_match": true,
+      "license": "Apache-2.0",
+      "url": "https://github.com/tradingview/lightweight-charts",
+      "local_path": "Z:/sota-data/upstream/lightweight-charts",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "ml4t-diagnostic",
+      "ref": "v0.2.0",
+      "locked_sha": "19e76072e64a18c9ba56130e4a7bcc0bc871f57e",
+      "live_sha": "19e76072e64a18c9ba56130e4a7bcc0bc871f57e",
+      "sha_verified_match": true,
+      "license": "MIT",
+      "url": "https://github.com/ml4t/diagnostic",
+      "local_path": "Z:/sota-data/upstream/ml4t-diagnostic",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "nautilus-alpaca",
+      "ref": "main",
+      "locked_sha": "59685d56631b981018a189b5ced1a7000a50bfbd",
+      "live_sha": "59685d56631b981018a189b5ced1a7000a50bfbd",
+      "sha_verified_match": true,
+      "license": "Apache-2.0",
+      "url": "https://github.com/gmatrunich/nautilus-alpaca",
+      "local_path": "Z:/sota-data/upstream/nautilus-alpaca",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "nautilus_trader",
+      "ref": "v2.0.0rc9",
+      "locked_sha": "da6b57aefdd62b44f675e434ffcfefca7f4025dd",
+      "live_sha": "da6b57aefdd62b44f675e434ffcfefca7f4025dd",
+      "sha_verified_match": true,
+      "license": "LGPL-3.0-or-later",
+      "url": "https://github.com/nautechsystems/nautilus_trader",
+      "local_path": "Z:/sota-data/upstream/nautilus_trader",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "pandera",
+      "ref": "v0.35.0",
+      "locked_sha": "02b375ab43f39f8c5c5108695c1791fa04f99a26",
+      "live_sha": "02b375ab43f39f8c5c5108695c1791fa04f99a26",
+      "sha_verified_match": true,
+      "license": "MIT",
+      "url": "https://github.com/unionai-oss/pandera",
+      "local_path": "Z:/sota-data/upstream/pandera",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "perspective",
+      "ref": "v5.9.2",
+      "locked_sha": "0264ec13cd28ef4a2a136c8ef021c3c112bc8990",
+      "live_sha": "0264ec13cd28ef4a2a136c8ef021c3c112bc8990",
+      "sha_verified_match": true,
+      "license": "Apache-2.0",
+      "url": "https://github.com/finos/perspective",
+      "local_path": "Z:/sota-data/upstream/perspective",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "polars",
+      "ref": "py-2.1.0",
+      "locked_sha": "7f902bd3ffd27ff82d14278a09a295ff2f7aed92",
+      "live_sha": "7f902bd3ffd27ff82d14278a09a295ff2f7aed92",
+      "sha_verified_match": true,
+      "license": "MIT",
+      "url": "https://github.com/pola-rs/polars",
+      "local_path": "Z:/sota-data/upstream/polars",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "quantstats",
+      "ref": "main",
+      "locked_sha": "d1a214fb906e76f974f45cdccf923b601c67a756",
+      "live_sha": "d1a214fb906e76f974f45cdccf923b601c67a756",
+      "sha_verified_match": true,
+      "license": "Apache-2.0",
+      "url": "https://github.com/ranaroussi/quantstats",
+      "local_path": "Z:/sota-data/upstream/quantstats",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "skfolio",
+      "ref": "v1.12.7",
+      "locked_sha": "90e3fb907fab39d244d899f3caf4e9676889309c",
+      "live_sha": "90e3fb907fab39d244d899f3caf4e9676889309c",
+      "sha_verified_match": true,
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/skfolio/skfolio",
+      "local_path": "Z:/sota-data/upstream/skfolio",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "statsmodels",
+      "ref": "v0.15.0",
+      "locked_sha": "278ff9950636cdd4939b4055e339a8e681d79cab",
+      "live_sha": "278ff9950636cdd4939b4055e339a8e681d79cab",
+      "sha_verified_match": true,
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/statsmodels/statsmodels",
+      "local_path": "Z:/sota-data/upstream/statsmodels",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    },
+    {
+      "name": "vectorbt",
+      "ref": "v1.2.0",
+      "locked_sha": "a52a984b631624bb9daf41cb19f532fe559cf0ef",
+      "live_sha": "a52a984b631624bb9daf41cb19f532fe559cf0ef",
+      "sha_verified_match": true,
+      "license": "Apache-2.0",
+      "url": "https://github.com/polakowo/vectorbt",
+      "local_path": "Z:/sota-data/upstream/vectorbt",
+      "posture": "IMMUTABLE_CORE_SHELF_READ_ONLY"
+    }
+  ],
+  "tier_b_hosted_ui_and_plugins": [
+    {
+      "name": "finos-workspace",
+      "repo": "openbq-org/finos-workspace",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/finos-workspace",
+      "present_on_disk_z": true,
+      "head_sha": "a0047d50d97c8db901eb802a224da890866dafba",
+      "layers": [
+        "L6"
+      ],
+      "stages": [
+        "S7",
+        "S8"
+      ],
+      "posture": "LIVE_HOSTED_LOCAL_DOCKER",
+      "role": "Official Apache-2.0 FINOS/OpenBB Workspace UI with plotly-charts@2.5.0 & ag-grid@2.3.0 plugins active",
+      "endpoint": "http://localhost:1420 (API :8000, Docker Compose 5-container stack)"
+    },
+    {
+      "name": "finos-workspace-plugins",
+      "repo": "openbq-org/finos-workspace-plugins",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/finos-workspace-plugins",
+      "present_on_disk_z": true,
+      "head_sha": "d9b57e9014110e21d2ccef7c211f479558ca0c20",
+      "layers": [
+        "L6"
+      ],
+      "stages": [
+        "S7",
+        "S8"
+      ],
+      "posture": "LIVE_PLUGIN_APPROVED_GRANTED",
+      "role": "Official FINOS Workspace widget plugin monorepo (plotly-charts, mermaid, react-flow, map-widget)",
+      "endpoint": "Deployed plugin plotly-charts@2.5.0 -> Z:/sota-data/finos-workspace/widget-plugins/"
+    },
+    {
+      "name": "backends-for-openbb",
+      "repo": "openbq-org/backends-for-openbb",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/backends-for-openbb",
+      "present_on_disk_z": true,
+      "head_sha": "a6293707576e16edda8305adda95b07b6a4b968b",
+      "layers": [
+        "L6"
+      ],
+      "stages": [
+        "S7",
+        "S8"
+      ],
+      "posture": "LIVE_HOSTED_LOCAL_API",
+      "role": "Official MIT OpenBB Workspace FastAPI custom backend contract & reference widgets",
+      "endpoint": "http://127.0.0.1:6900 (SOTA OpenBB Workspace FastAPI widgets.json backend)"
+    }
+  ],
+  "tier_c_hosted_frontier_and_charter_frameworks": [
+    {
+      "name": "qlib",
+      "repo": "microsoft/qlib",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-cache/llm-native-eval/qlib",
+      "present_on_disk_z": true,
+      "head_sha": "54355232463878d2eebb91fe0ee5fa7fa1f5976c",
+      "layers": [
+        "L3",
+        "L14"
+      ],
+      "stages": [
+        "S3",
+        "S5"
+      ],
+      "posture": "CLEARED_RESEARCH_ISOLATED_PY312",
+      "role": "Qlib v0.9.8 Alpha158 PIT cross-sectional factor research (REG_US 1m, 0 order code)"
+    },
+    {
+      "name": "OpenBB",
+      "repo": "openbq-org/OpenBB",
+      "spdx": "AGPL-3.0",
+      "local_path": "Z:/sota-cache/llm-native-eval/OpenBB",
+      "present_on_disk_z": true,
+      "head_sha": "bbf1ab2020c2ce025333db56ece2036190fcad9c",
+      "layers": [
+        "L6",
+        "L13"
+      ],
+      "stages": [
+        "S2",
+        "S7"
+      ],
+      "posture": "CLEARED_HOSTED_LOCAL_ONLY",
+      "role": "Official active OpenBQ OpenBB terminal & built-in MCP server continuation"
+    },
+    {
+      "name": "nautilus_agents",
+      "repo": "nautechsystems/nautilus_agents",
+      "spdx": "LGPL-3.0",
+      "local_path": "Z:/sota-cache/llm-native-eval-pass2/nautilus_agents",
+      "present_on_disk_z": true,
+      "head_sha": "380ae38f353355cdd4a9eb58a51baa8bb01e583d",
+      "layers": [
+        "L2",
+        "L5",
+        "L8"
+      ],
+      "stages": [
+        "S4",
+        "S6"
+      ],
+      "posture": "CLEARED_WATCH_ZERO_ORDER_PATH",
+      "role": "Official Rust-native Agents SDK for NautilusTrader (0 order-path code, 0 API keys)"
+    },
+    {
+      "name": "financial-services",
+      "repo": "anthropics/financial-services",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-cache/llm-native-eval-pass2/financial-services",
+      "present_on_disk_z": true,
+      "head_sha": "3e32c2287dcb637c184c01cc0ad82d6af7e9bb0f",
+      "layers": [
+        "L3",
+        "L8"
+      ],
+      "stages": [
+        "S3",
+        "S6"
+      ],
+      "posture": "CLEARED_RESEARCH_ZERO_ORDER_PATH",
+      "role": "Official Anthropic financial analysis, Earnings Reviewer & MCP connectors"
+    },
+    {
+      "name": "FINSABER",
+      "repo": "waylonli/FINSABER",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-cache/llm-native-eval-pass2/FINSABER",
+      "present_on_disk_z": true,
+      "head_sha": "e72c26206d08de2ffeab736b96878109f144040f",
+      "layers": [
+        "L4",
+        "L15"
+      ],
+      "stages": [
+        "S5",
+        "S6"
+      ],
+      "posture": "CLEARED_EVAL_ONLY_NO_BROKER_KEYS",
+      "role": "KDD 2026 Oral leakage-free & LLM token-cost backtest evaluation harness (eval-only)"
+    },
+    {
+      "name": "FinRobot",
+      "repo": "AI4Finance-Foundation/FinRobot",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-cache/llm-native-eval-pass2/FinRobot",
+      "present_on_disk_z": true,
+      "head_sha": "63e1884a42ea7b729551a5424b4bd6a65af636e0",
+      "layers": [
+        "L3",
+        "L6"
+      ],
+      "stages": [
+        "S3",
+        "S8"
+      ],
+      "posture": "CLEARED_RESEARCH_READ_ONLY",
+      "role": "Deterministic tool-backed equity & quant research agent platform"
+    },
+    {
+      "name": "qwen-dianjin",
+      "repo": "aliyun/qwen-dianjin",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-cache/llm-native-eval-pass2/qwen-dianjin",
+      "present_on_disk_z": true,
+      "head_sha": "a626b083c1c3ff776a88c3c684ec0e186e622c62",
+      "layers": [
+        "L1",
+        "L7"
+      ],
+      "stages": [
+        "S2",
+        "S3"
+      ],
+      "posture": "CLEARED_LOCAL_RTX4090_ONLY",
+      "role": "Local RTX 4090 DianJin-R1 & Fin-PRM SEC 8-K / earnings catalyst reasoning"
+    },
+    {
+      "name": "mcp_massive",
+      "repo": "massive-com/mcp_massive",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-cache/llm-native-eval-pass2/mcp_massive",
+      "present_on_disk_z": true,
+      "head_sha": "1e161a8c50b69bd467b092e0721e30908ab94eb6",
+      "layers": [
+        "L1",
+        "L13"
+      ],
+      "stages": [
+        "S2"
+      ],
+      "posture": "CLEARED_READ_ONLY_MCP",
+      "role": "Official Massive.com (formerly Polygon.io) read-only US equities & options MCP"
+    },
+    {
+      "name": "mcp-polymarket",
+      "repo": "BrainDAO/mcp-polymarket",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-cache/llm-native-eval-pass2/mcp-polymarket",
+      "present_on_disk_z": true,
+      "head_sha": "5360bef548afded0770e27b296ef467e78894f2f",
+      "layers": [
+        "L1",
+        "L13"
+      ],
+      "stages": [
+        "S2"
+      ],
+      "posture": "CLEARED_READ_ONLY_ZERO_PRIVATE_KEY",
+      "role": "Read-only Polymarket Gamma macro/Fed/CPI implied-probability MCP (0 private keys)"
+    },
+    {
+      "name": "MarS",
+      "repo": "microsoft/MarS",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/MarS",
+      "present_on_disk_z": true,
+      "head_sha": "f04dd87a4d56342a6a2fc271cdb158fbacd83674",
+      "layers": [
+        "L2",
+        "L12"
+      ],
+      "stages": [
+        "S4"
+      ],
+      "posture": "CLEARED_RESEARCH_SIM_ONLY",
+      "role": "ICLR 2025 Large Market Model order-level generative LOB & market-impact simulator"
+    },
+    {
+      "name": "LOBS5",
+      "repo": "peernagy/LOBS5",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/LOBS5",
+      "present_on_disk_z": true,
+      "head_sha": "aa36029e9d348a017d00efc37c6b6dda89fab150",
+      "layers": [
+        "L2",
+        "L12"
+      ],
+      "stages": [
+        "S4"
+      ],
+      "posture": "CLEARED_RESEARCH_SIM_ONLY",
+      "role": "State-Space generative LOB simulator & LOB-Bench stylized-fact parity"
+    },
+    {
+      "name": "TabPFN",
+      "repo": "PriorLabs/TabPFN",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/TabPFN",
+      "present_on_disk_z": true,
+      "head_sha": "e1a3550654df04bf8428fd1a2c4e8ebe2d805796",
+      "layers": [
+        "L3",
+        "L7"
+      ],
+      "stages": [
+        "S3"
+      ],
+      "posture": "CLEARED_LOCAL_RTX4090_ONLY",
+      "role": "In-context tabular foundation model for small-sample cross-sectional factors"
+    },
+    {
+      "name": "chronos-forecasting",
+      "repo": "amazon-science/chronos-forecasting",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/chronos-forecasting",
+      "present_on_disk_z": true,
+      "head_sha": "1224fafa91e1ecd6674f5204066b159e40b5e4a1",
+      "layers": [
+        "L3"
+      ],
+      "stages": [
+        "S3"
+      ],
+      "posture": "CLEARED_LOCAL_RTX4090_ONLY",
+      "role": "Chronos-2 120M multivariate & exogenous macro-covariate time-series foundation model"
+    },
+    {
+      "name": "uni2ts",
+      "repo": "SalesforceAIResearch/uni2ts",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/uni2ts",
+      "present_on_disk_z": true,
+      "head_sha": "cfd46d4510ed8896f263116f32928eede05b0a75",
+      "layers": [
+        "L7",
+        "L11"
+      ],
+      "stages": [
+        "S3",
+        "S5"
+      ],
+      "posture": "CLEARED_LOCAL_RTX4090_ONLY",
+      "role": "MOIRAI-2 decoder-only multi-quantile VaR/ES tail-risk foundation model"
+    },
+    {
+      "name": "river",
+      "repo": "online-ml/river",
+      "spdx": "BSD-3-Clause",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/river",
+      "present_on_disk_z": true,
+      "head_sha": "5ea245400645aba5239e4fcb19b59b756d2e9e53",
+      "layers": [
+        "L3",
+        "L14"
+      ],
+      "stages": [
+        "S3",
+        "S5"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "Streaming CUSUM, ADWIN & Page-Hinkley online anomaly & alpha-decay detection"
+    },
+    {
+      "name": "MAPIE",
+      "repo": "scikit-learn-contrib/MAPIE",
+      "spdx": "BSD-3-Clause",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/MAPIE",
+      "present_on_disk_z": true,
+      "head_sha": "e4c4f5f7daeaa7c8b09323852ad1997e506891a2",
+      "layers": [
+        "L11"
+      ],
+      "stages": [
+        "S5"
+      ],
+      "posture": "CLEARED_RESEARCH_RISK_GATE",
+      "role": "Distribution-free adaptive conformal prediction intervals for dynamic VaR/stop bounds"
+    },
+    {
+      "name": "dowhy",
+      "repo": "py-why/dowhy",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/dowhy",
+      "present_on_disk_z": true,
+      "head_sha": "45de9a90623bae166e32790a6bb5a77827ef91cd",
+      "layers": [
+        "L4",
+        "L12"
+      ],
+      "stages": [
+        "S5",
+        "S6"
+      ],
+      "posture": "CLEARED_RESEARCH_CAUSAL_GATE",
+      "role": "Causal inference, refutation & Double-ML alpha/execution slippage attribution"
+    },
+    {
+      "name": "Kronos",
+      "repo": "shiyu-coder/Kronos",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/Kronos",
+      "present_on_disk_z": true,
+      "head_sha": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+      "layers": [
+        "L7"
+      ],
+      "stages": [
+        "S3",
+        "S4"
+      ],
+      "posture": "CLEARED_LOCAL_RTX4090_ONLY",
+      "role": "K-line foundation model (12B+ K-lines) for Monte Carlo volatility & path bounds"
+    },
+    {
+      "name": "arch",
+      "repo": "bashtage/arch",
+      "spdx": "NCSA",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/arch",
+      "present_on_disk_z": true,
+      "head_sha": "d3e858fc1c99932bb6936cbaf0d1b45b136266e5",
+      "layers": [
+        "L4"
+      ],
+      "stages": [
+        "S5"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "Hansen SPA, StationaryBootstrap & Model Confidence Set (MCS) falsification"
+    },
+    {
+      "name": "FinBen",
+      "repo": "The-FinAI/FinBen",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/FinBen",
+      "present_on_disk_z": true,
+      "head_sha": "74ea6b8f8fcdee51f49281634982a8f29da52e7e",
+      "layers": [
+        "L4",
+        "L15"
+      ],
+      "stages": [
+        "S6",
+        "S8"
+      ],
+      "posture": "CLEARED_EVAL_BENCHMARK",
+      "role": "lm-evaluation-harness holistic financial LLM evaluation benchmark"
+    },
+    {
+      "name": "Fino1",
+      "repo": "The-FinAI/Fino1",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/Fino1",
+      "present_on_disk_z": true,
+      "head_sha": "f2b9e9931778d806ff9dd0fbb299b0ce1a2c3398",
+      "layers": [
+        "L3"
+      ],
+      "stages": [
+        "S3"
+      ],
+      "posture": "CLEARED_LOCAL_RTX4090_ONLY",
+      "role": "14B SFT+GRPO FinCoT financial reasoning model for FinQA/XBRL-Math"
+    },
+    {
+      "name": "TwinMarket",
+      "repo": "FreedomIntelligence/TwinMarket",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/TwinMarket",
+      "present_on_disk_z": true,
+      "head_sha": "de5f2446fcba0d0aba533a6adaede034160e29b4",
+      "layers": [
+        "L11",
+        "L13"
+      ],
+      "stages": [
+        "S4",
+        "S6"
+      ],
+      "posture": "CLEARED_STRESS_SIM_ONLY",
+      "role": "BDI multi-agent herding, contagion & flash-crash counterfactual stress simulator"
+    },
+    {
+      "name": "mlflow",
+      "repo": "mlflow/mlflow",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/mlflow",
+      "present_on_disk_z": true,
+      "head_sha": "1ca7129977abce86ad69d1c108617adebbbaa1a8",
+      "layers": [
+        "L4",
+        "L10"
+      ],
+      "stages": [
+        "S1",
+        "S5",
+        "S8"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "MLflow 3 sole upstream experiment & true trial-count (N) tracking ledger"
+    },
+    {
+      "name": "optuna",
+      "repo": "optuna/optuna",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/optuna",
+      "present_on_disk_z": true,
+      "head_sha": "0abf066c1e5d9d83987986869daa3c2bb23df519",
+      "layers": [
+        "L3",
+        "L14"
+      ],
+      "stages": [
+        "S3",
+        "S5"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "Hyperparameter & threshold optimization bounded by pre-registered HLZ trial budgets"
+    },
+    {
+      "name": "ruptures",
+      "repo": "deepcharles/ruptures",
+      "spdx": "BSD-2-Clause",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/ruptures",
+      "present_on_disk_z": true,
+      "head_sha": "ee1c8ff8a548d54c641b2bb471562165931f31c7",
+      "layers": [
+        "L3"
+      ],
+      "stages": [
+        "S3"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "Offline structural change-point & regime-break segmentation for pre-wall norm disruptions"
+    },
+    {
+      "name": "stumpy",
+      "repo": "stumpy-dev/stumpy",
+      "spdx": "BSD-3-Clause",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/stumpy",
+      "present_on_disk_z": true,
+      "head_sha": "a42ca40e544bf4000e84cdcbba6a58f902ca7714",
+      "layers": [
+        "L3"
+      ],
+      "stages": [
+        "S3"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "Matrix-profile time-series anomaly/discord & motif discovery for early-entry detection"
+    },
+    {
+      "name": "ml4t-engineer",
+      "repo": "ml4t/engineer",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/ml4t-engineer",
+      "present_on_disk_z": true,
+      "head_sha": "c63159245c0c82838b231680cd46380dad29a1bf",
+      "layers": [
+        "L3"
+      ],
+      "stages": [
+        "S2",
+        "S3"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "Point-in-time quantitative feature engineering companion to ml4t-diagnostic"
+    },
+    {
+      "name": "dagster",
+      "repo": "dagster-io/dagster",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/dagster",
+      "present_on_disk_z": true,
+      "head_sha": "939bd1ea940e326044090aa4f25b79962c9c3fd4",
+      "layers": [
+        "L1",
+        "L8"
+      ],
+      "stages": [
+        "S2",
+        "S8"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "Software-defined data & pre-wall research pipeline orchestration"
+    },
+    {
+      "name": "inspect_ai",
+      "repo": "UKGovernmentBEIS/inspect_ai",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/inspect_ai",
+      "present_on_disk_z": true,
+      "head_sha": "cf72dbc041f9311d12d8e4b0aeef9208bca276ef",
+      "layers": [
+        "L8",
+        "L15"
+      ],
+      "stages": [
+        "S6",
+        "S8"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "Structured agent & skill evaluation harness for multi-model regression testing"
+    },
+    {
+      "name": "dspy",
+      "repo": "stanfordnlp/dspy",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/dspy",
+      "present_on_disk_z": true,
+      "head_sha": "7fbc8ff1665ee87122f06633270782dbf1f69c6b",
+      "layers": [
+        "L10",
+        "L15"
+      ],
+      "stages": [
+        "S3",
+        "S8"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "Declarative GEPA / MIPROv2 prompt & skill optimization with empirical regression metrics"
+    }
+  ],
+  "tier_d_quarantined_reference_only": [
+    {
+      "name": "RD-Agent",
+      "repo": "microsoft/RD-Agent",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-cache/llm-native-eval/RD-Agent",
+      "present_on_disk_z": true,
+      "head_sha": "484776c211e4fbbeef03e0ec00d6bbee7362a4f4",
+      "layers": [
+        "L3",
+        "L14"
+      ],
+      "stages": [
+        "S3"
+      ],
+      "posture": "QUARANTINED_DO_NOT_RUN_UNSANDBOXED",
+      "role": "Reference-only Co-STEER methodology; factor.py:165 runs unsandboxed host shell & lacks HLZ control"
+    },
+    {
+      "name": "TradingAgents",
+      "repo": "TauricResearch/TradingAgents",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-cache/llm-native-eval/TradingAgents",
+      "present_on_disk_z": true,
+      "head_sha": "c4544913a14ed3df5f1ed7b9e8483270ce20682a",
+      "layers": [
+        "L3"
+      ],
+      "stages": [
+        "S2"
+      ],
+      "posture": "REFERENCE_ONLY_DATE_WINDOW_PATTERN",
+      "role": "Reference-only trade-date clamping pattern (date_window.py:79); daily/non-repeatable LLM outputs"
+    },
+    {
+      "name": "ai-hedge-fund",
+      "repo": "virattt/ai-hedge-fund",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-cache/llm-native-eval/ai-hedge-fund",
+      "present_on_disk_z": true,
+      "head_sha": "5c553b5222044f6a5527bd377b4104c50ee0ad28",
+      "layers": [
+        "L3"
+      ],
+      "stages": [
+        "S3"
+      ],
+      "posture": "REFERENCE_ONLY_MOCK_BOOK",
+      "role": "Reference-only educational multi-agent mock book; not for production execution"
+    },
+    {
+      "name": "Vibe-Trading",
+      "repo": "HKUDS/Vibe-Trading",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-cache/llm-native-eval-pass2/Vibe-Trading",
+      "present_on_disk_z": true,
+      "head_sha": "25c89a0aa21d72d9eb2303c14f6c1524dd8aed1e",
+      "layers": [
+        "L8"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "QUARANTINED_ZERO_BROKER_KEYS",
+      "role": "Skill-native trading research harness reference; contains order-routing code (0 broker keys ever)"
+    }
+  ],
+  "manifest_sha256": "557d42cd3736e666545995c8cdce10acf39bef50a19320d8efbfeec69cd1fd37"
+}

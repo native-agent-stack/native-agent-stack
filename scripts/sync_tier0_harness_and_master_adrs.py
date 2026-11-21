@@ -44,6 +44,22 @@ TIER0_MARKER_START = "<!-- BEGIN TIER0-SOTA-RULES -->"
 TIER0_MARKER_END = "<!-- END TIER0-SOTA-RULES -->"
 SYNC_END_MARKER = "<!-- END SOTA-ECOSYSTEM-SYNC -->"
 
+CANONICAL_CHARTER_HEADER = "# Tier-0 Engineering & Quantitative Charter (Canonical Single Rule)"
+CANONICAL_CHARTER_REQUIRED_CLAUSES: tuple[str, ...] = (
+    CANONICAL_CHARTER_HEADER,
+    "Upstream-Only Mandate",
+    "<= 5,000",
+    "<= 2026-10-15",
+    "<= 2.00%",
+    "singleActiveBrokerHostOnly = true",
+    "Zero Secret or PII Leaks",
+)
+
+
+def is_canonical_tier0_charter(text: str) -> bool:
+    """Return True if text matches the concise Canonical Single-Rule Tier-0 Charter (`ADR-0049`/`ADR-0050`)."""
+    return all(clause in text for clause in CANONICAL_CHARTER_REQUIRED_CLAUSES)
+
 TIER0_CANONICAL_BLOCK = (
     f"{TIER0_MARKER_START}\n"
     "- **Tier-0 SOTA-Source-Only & Hard Upstream Provenance (`ADR-0023` / `ADR-0092` / `ADR-0094`):** "
@@ -243,29 +259,46 @@ def _upsert_agy_plugin_line(text: str) -> str:
 
 
 def check_tier0_harness_md_parity(home_dir: Path | None = None) -> dict[str, Any]:
-    """Deterministically verify 0-byte Tier-0 drift across all 7 global runtime `.md` files."""
+    """Deterministically verify 0-byte Tier-0 drift across global runtime `.md` files (Canonical Charter or legacy sync)."""
     home = home_dir or Path.home()
     statuses: dict[str, str] = {}
     drifted: list[str] = []
+    canonical_hashes: dict[str, str] = {}
     for label, target in global_runtime_md_targets(home):
         if not target.is_file():
             statuses[label] = "missing"
             drifted.append(label)
             continue
         cur = target.read_text(encoding="utf-8")
-        if TIER0_CANONICAL_BLOCK in cur:
+        if is_canonical_tier0_charter(cur):
+            statuses[label] = "synced"
+            canonical_hashes[label] = hashlib.sha256(cur.encode("utf-8")).hexdigest()[:16]
+        elif TIER0_CANONICAL_BLOCK in cur:
             statuses[label] = "synced"
         else:
             statuses[label] = "drifted"
             drifted.append(label)
 
+    # When runtimes adopt the Canonical Single-Rule Charter, enforce 0-byte cross-runtime parity
+    canonical_mode = len(canonical_hashes) == len(global_runtime_md_targets(home))
+    if canonical_hashes and len(set(canonical_hashes.values())) > 1:
+        dominant = max(set(canonical_hashes.values()), key=lambda h: list(canonical_hashes.values()).count(h))
+        for label, digest in canonical_hashes.items():
+            if digest != dominant:
+                statuses[label] = "drifted"
+                if label not in drifted:
+                    drifted.append(label)
+
     agy_plugin_rules = home / ".gemini" / "config" / "plugins" / "agy-sota-core" / "rules" / "AGENTS.md"
     if not agy_plugin_rules.is_file():
-        statuses["agy_plugin_rules"] = "missing"
-        drifted.append("agy_plugin_rules")
+        if canonical_mode and statuses.get("gemini_global") == "synced":
+            statuses["agy_plugin_rules"] = "synced"
+        else:
+            statuses["agy_plugin_rules"] = "missing"
+            drifted.append("agy_plugin_rules")
     else:
         cur_p = agy_plugin_rules.read_text(encoding="utf-8")
-        if AGY_PLUGIN_ADR0023_LINE in cur_p:
+        if AGY_PLUGIN_ADR0023_LINE in cur_p or is_canonical_tier0_charter(cur_p):
             statuses["agy_plugin_rules"] = "synced"
         else:
             statuses["agy_plugin_rules"] = "drifted"
@@ -276,19 +309,26 @@ def check_tier0_harness_md_parity(home_dir: Path | None = None) -> dict[str, Any
         "synced_count": sum(1 for v in statuses.values() if v == "synced"),
         "drifted": drifted,
         "all_synced": len(drifted) == 0,
+        "canonical_charter_mode": canonical_mode,
+        "canonical_charter_sha256_16": next(iter(canonical_hashes.values()), "") if canonical_mode else "",
         "statuses": statuses,
     }
 
 
 def sync_tier0_harness_md_files(home_dir: Path | None = None) -> dict[str, str]:
-    """Propagate canonical Tier-0 SOTA-Source-Only, Full-Resolution & One-Harness rules across all 7 runtime `.md` files."""
+    """Propagate canonical Tier-0 rules across runtime `.md` files (preserving concise Canonical Charter verbatim)."""
     home = home_dir or Path.home()
     results: dict[str, str] = {}
+    canonical_count = 0
     for label, target in global_runtime_md_targets(home):
         if not target.is_file():
             results[label] = "missing"
             continue
         old = target.read_text(encoding="utf-8")
+        if is_canonical_tier0_charter(old):
+            canonical_count += 1
+            results[label] = "unchanged"
+            continue
         new = upsert_tier0_block_in_text(old)
         if new != old:
             target.write_text(new, encoding="utf-8", newline="\n")
@@ -299,12 +339,17 @@ def sync_tier0_harness_md_files(home_dir: Path | None = None) -> dict[str, str]:
     agy_plugin_rules = home / ".gemini" / "config" / "plugins" / "agy-sota-core" / "rules" / "AGENTS.md"
     if agy_plugin_rules.is_file():
         old_p = agy_plugin_rules.read_text(encoding="utf-8")
-        new_p = _upsert_agy_plugin_line(old_p)
-        if new_p != old_p:
-            agy_plugin_rules.write_text(new_p, encoding="utf-8", newline="\n")
-            results["agy_plugin_rules"] = "updated"
-        else:
+        if is_canonical_tier0_charter(old_p):
             results["agy_plugin_rules"] = "unchanged"
+        else:
+            new_p = _upsert_agy_plugin_line(old_p)
+            if new_p != old_p:
+                agy_plugin_rules.write_text(new_p, encoding="utf-8", newline="\n")
+                results["agy_plugin_rules"] = "updated"
+            else:
+                results["agy_plugin_rules"] = "unchanged"
+    elif canonical_count == len(global_runtime_md_targets(home)):
+        results["agy_plugin_rules"] = "superseded_by_canonical_charter"
     else:
         results["agy_plugin_rules"] = "missing"
     return results

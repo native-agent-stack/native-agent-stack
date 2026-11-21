@@ -1,7 +1,7 @@
 # Native Agent Stack — Unified Single-Repo Master Finalized ADR Registry (`ADR-0044`)
 
-- **Total Finalized ADRs Indexed:** `793` across `18` repositories (`18/18` `ADR-0023` PASS)
-- **Canonical Manifest SHA-256:** `36ca52fc984be4e9d1b8ca4ad1036fce15893ea8068a61ced1d00e908bf8a9a5`
+- **Total Finalized ADRs Indexed:** `795` across `18` repositories (`18/18` `ADR-0023` PASS)
+- **Canonical Manifest SHA-256:** `26d24b12efa6183c2751b46eb0adefb544e37b282276ef03af2af37b8cf99e2a`
 - **Verbatim Private Continuity Copy:** `sota-private-vault/adr_archive/` (`ADR-0027`, Two-Tier Public/Private Firewall intact)
 
 ## Per-Repository Finalized ADR Summary
@@ -16,8 +16,8 @@
 | `dsh-plugin-landscape` | `PRIVATE` | `11` |
 | `dsh-sota-harness` | `PUBLIC` | `16` |
 | `meridian` | `PRIVATE` | `65` |
-| `native-agent-stack` | `PUBLIC` | `49` |
-| `sota-compounding-lab` | `PUBLIC` | `38` |
+| `native-agent-stack` | `PUBLIC` | `50` |
+| `sota-compounding-lab` | `PUBLIC` | `39` |
 | `sota-dynamic-trail-c` | `PRIVATE` | `35` |
 | `sota-harness-foundation` | `PUBLIC` | `46` |
 | `sota-mover-ranker` | `PRIVATE` | `100` |
@@ -468,6 +468,7 @@
 | `native-agent-stack` | `PUBLIC` | ADR-0047: No Self-Built Anti-Tier-0 Waste, Legacy Monolith Freeze & Hosted SOTA Platform Mandate | Accepted | 2026-11-20 | `b4b10625a73b` |
 | `native-agent-stack` | `PUBLIC` | ADR-0048: Full-Landscape Advanced LLM-Native Quant, Microstructure Foundation Models, Causal/Conformal Risk & License-Firewall Convergence (`v3`) | Accepted | 2026-11-20 | `bf49fb50fef1` |
 | `native-agent-stack` | `PUBLIC` | ADR-0049: Clean-Room `v4.0` SOTA-Only Hosted Ecosystem Blueprint, Legacy `18`-Repo Self-Built Retirement, Inspector Security Corrections & Tier-0-Only `AGENTS.md` / `GEMINI.md` Standard | Accepted | 2026-11-20 | `63c8ea96ba9d` |
+| `native-agent-stack` | `PUBLIC` | ADR-0050: Finalized Clean Repos, 16-Layer (`L0`–`L15`) × 8-Stage (`S1`–`S8`) Research Convergence & Disk-Z Hosted Advanced Research Frameworks Seal | Accepted | 2026-11-21 | `996cd67d9fdb` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0001: Public Open-Core vs. Private Execution & Vault Organization Firewall | Accepted | 2026-11-17 | `fc73c9d38f87` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0002: Five-Stage Sim -> Pre-Wall Backtest -> Paper -> Empirical-Bayes -> Broker Pipeline | Accepted | 2026-11-17 | `f55ed3efc217` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0003: Pre-Wall (`<= 2026-10-15`), Harvey–Liu–Zhu `t*(N)` & Native-Frequency `DSR` Gate | Accepted | 2026-11-17 | `d127aa9fefef` |
@@ -506,6 +507,7 @@
 | `sota-compounding-lab` | `PUBLIC` | ADR-0036: Fail-Closed `upstream-map.toml`, 18-Pin Shelf Parity & Zero-Placeholder Merge Gate for `sota-compounding-lab` | Accepted | 2026-11-20 | `f9dd2275000a` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0037: Sim Lanes (`S1`/`S2`) Tier-0 SOTA-Source-Only Enforcement & Anti-Self-Invention Gate | Accepted | 2026-11-20 | `00c72835be30` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0038: Tier-0 Full-Resolution, Always-Full-Resolution, Zero-Residual, Zero-Fallback Backbone Rule | Accepted | 2026-11-20 | `89e7d6b1fcaf` |
+| `sota-compounding-lab` | `PUBLIC` | ADR-0039: Tier-0 Official Upstream Tearsheet Export & Hosted FINOS/OpenBB Workspace Integration (Zero Self-Built UI) | Accepted | 2026-11-21 | `e0ce812cdccd` |
 | `sota-dynamic-trail-c` | `PRIVATE` | ADR-0001: Sub-50ms Hybrid WebSocket + REST 24/5 Dual-Tranche Dynamic Trailing Guardian | Accepted | 2026-11-17 | `4652b1ed5d77` |
 | `sota-dynamic-trail-c` | `PRIVATE` | ADR-0002: Pre-Wall Empirical-Bayes Quantile Calibration & L1 OBI / Lee-Ready OFI Modulation | Accepted | 2026-11-17 | `867f18e5d888` |
 | `sota-dynamic-trail-c` | `PRIVATE` | ADR-0003: TradingView 24/5 Off-Hours Relay, 5-Gate Webhook & Daily Scratch Circuit Breaker | Accepted | 2026-11-17 | `774cea3e19f6` |

@@ -1,9 +1,9 @@
 {
   "schema": "sota.public-master-finalized-adr-registry.v1",
   "adr": "ADR-0044",
-  "generated_at_utc": "2026-11-21T02:24:36.457017Z",
+  "generated_at_utc": "2026-11-21T13:14:25.143068Z",
   "repos_indexed": 18,
-  "total_adrs_indexed": 793,
+  "total_adrs_indexed": 795,
   "verbatim_private_archive_repo": "native-agent-stack/sota-private-vault (adr_archive/)",
   "per_repo_counts": {
     "agy-sota-harness": 36,
@@ -14,8 +14,8 @@
     "dsh-plugin-landscape": 11,
     "dsh-sota-harness": 16,
     "meridian": 65,
-    "native-agent-stack": 49,
-    "sota-compounding-lab": 38,
+    "native-agent-stack": 50,
+    "sota-compounding-lab": 39,
     "sota-dynamic-trail-c": 35,
     "sota-harness-foundation": 46,
     "sota-mover-ranker": 100,
@@ -5770,6 +5770,22 @@
       "file_sha256": "63c8ea96ba9d1be5ddfa841f9d350536b9f5ce11b6fa38aa17d2a797a3db0cc3"
     },
     {
+      "repo": "native-agent-stack",
+      "tier": "PUBLIC",
+      "file": "ADR-0050-finalized-clean-repos-16layer-research-convergence-and-hosted-research-frameworks-seal.md",
+      "title": "ADR-0050: Finalized Clean Repos, 16-Layer (`L0`\u2013`L15`) \u00d7 8-Stage (`S1`\u2013`S8`) Research Convergence & Disk-Z Hosted Advanced Research Frameworks Seal",
+      "status": "Accepted",
+      "date": "2026-11-21",
+      "evidence_grade": "E4 (`one_harness_cleanliness_doctor.py --check` ",
+      "github_urls": [
+        "https://github.com/PriorLabs/TabPFN",
+        "https://github.com/SalesforceAIResearch/uni2ts",
+        "https://github.com/UKGovernmentBEIS/inspect_ai",
+        "https://github.com/amazon-science/chronos-forecasting"
+      ],
+      "file_sha256": "996cd67d9fdba5d5d06febcccca2f191dc77a73770023815792610917c7c7245"
+    },
+    {
       "repo": "sota-compounding-lab",
       "tier": "PUBLIC",
       "file": "ADR-0001-public-open-core-vs-private-vault-org-firewall.md",
@@ -6244,6 +6260,22 @@
         "https://github.com/nkaz001/hftbacktest"
       ],
       "file_sha256": "89e7d6b1fcafd21e8b4093ccc79d4fd44c3e40f00a14b02120152a3c8446f56c"
+    },
+    {
+      "repo": "sota-compounding-lab",
+      "tier": "PUBLIC",
+      "file": "ADR-0039-tier0-official-upstream-tearsheets-and-hosted-finos-workspace.md",
+      "title": "ADR-0039: Tier-0 Official Upstream Tearsheet Export & Hosted FINOS/OpenBB Workspace Integration (Zero Self-Built UI)",
+      "status": "Accepted",
+      "date": "2026-11-21",
+      "evidence_grade": "E4 (Authentic full-resolution pre-wall `<= 2026-",
+      "github_urls": [
+        "https://github.com/native-agent-stack/sota-compounding-lab",
+        "https://github.com/nautechsystems/nautilus_trader",
+        "https://github.com/openbq-org/backends-for-openbb",
+        "https://github.com/openbq-org/finos-workspace"
+      ],
+      "file_sha256": "e0ce812cdccd947a474b23b73848048bea5c2b14ce2814518b3d2b409c6ccad1"
     },
     {
       "repo": "sota-dynamic-trail-c",
@@ -10814,5 +10846,5 @@
       "file_sha256": "ca48518bef018ae289a5b3798c2c0171c4ac8cc93342dbb702f71d302b9b81a4"
     }
   ],
-  "manifest_sha256": "36ca52fc984be4e9d1b8ca4ad1036fce15893ea8068a61ced1d00e908bf8a9a5"
+  "manifest_sha256": "26d24b12efa6183c2751b46eb0adefb544e37b282276ef03af2af37b8cf99e2a"
 }

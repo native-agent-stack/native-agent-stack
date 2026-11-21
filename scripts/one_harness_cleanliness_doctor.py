@@ -61,7 +61,13 @@ SKIP_ADR_NAMES = frozenset(
 )
 
 
-def _run(cmd: list[str], *, cwd: Path | None = None, timeout: int = 45) -> subprocess.CompletedProcess[str]:
+def _run(
+    cmd: list[str],
+    *,
+    cwd: Path | None = None,
+    timeout: int = 45,
+    env: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess[str]:
     if sys.platform == "win32":
         return subprocess.run(
             cmd,
@@ -70,6 +76,7 @@ def _run(cmd: list[str], *, cwd: Path | None = None, timeout: int = 45) -> subpr
             text=True,
             check=False,
             timeout=timeout,
+            env=env,
             creationflags=CREATE_NO_WINDOW,
         )
     return subprocess.run(
@@ -79,6 +86,7 @@ def _run(cmd: list[str], *, cwd: Path | None = None, timeout: int = 45) -> subpr
         text=True,
         check=False,
         timeout=timeout,
+        env=env,
     )
 
 
@@ -554,7 +562,17 @@ def _check_7_security_and_github_firewall(*, is_ci: bool) -> dict[str, Any]:
     email = _run(["git", "config", "--global", "--get", "user.email"]).stdout.strip()
     noreply_ok = is_ci or ("@users.noreply.github.com" in email.lower())
 
-    umbrella_proc = _run([sys.executable, "-m", "native_agent_stack.umbrella", "--check"], cwd=ROOT)
+    src_dir = str(ROOT / "src")
+    existing_pp = os.environ.get("PYTHONPATH", "")
+    umbrella_env = {
+        **os.environ,
+        "PYTHONPATH": f"{src_dir}{os.pathsep}{existing_pp}" if existing_pp else src_dir,
+    }
+    umbrella_proc = _run(
+        [sys.executable, "-m", "native_agent_stack.umbrella", "--check"],
+        cwd=ROOT,
+        env=umbrella_env,
+    )
     umbrella_ok = umbrella_proc.returncode == 0
 
     return {

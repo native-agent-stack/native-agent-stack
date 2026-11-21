@@ -4,8 +4,10 @@
   "enforced_by_adr": "ADR-0046",
   "hosted_platform_adr": "ADR-0047",
   "advanced_research_landscape_adr": "ADR-0048",
+  "cleanroom_v4_adr": "ADR-0049",
+  "hosted_research_frameworks_seal_adr": "ADR-0050",
   "shelf_lock_frontier_adr": "sota-upstream-shelf-lock/ADR-0026",
-  "generated_at_utc": "2026-11-21T02:24:36.220699Z",
+  "generated_at_utc": "2026-11-21T13:14:24.926159Z",
   "hard_invariants": {
     "tier0_sota_source_only": true,
     "allow_silent_fallback": false,
@@ -30,7 +32,7 @@
   "starred_and_beyond_convergence": {
     "owner_starred_total_audited": 415,
     "distinct_starred_anchors_mapped_across_layers": 34,
-    "distinct_beyond_starred_sota_mapped_across_layers": 43,
+    "distinct_beyond_starred_sota_mapped_across_layers": 52,
     "research_convergence_stages_covered": 8,
     "research_convergence_stages_total": 8,
     "global_runtime_md_files_synced": 7,
@@ -86,6 +88,7 @@
       "SalesforceAIResearch/uni2ts",
       "The-FinAI/FinBen",
       "The-FinAI/Fino1",
+      "UKGovernmentBEIS/inspect_ai",
       "Yeachan-Heo/oh-my-claudecode",
       "Yeachan-Heo/oh-my-codex",
       "aannoo/hcom",
@@ -95,7 +98,9 @@
       "anthropics/financial-services",
       "bashtage/arch",
       "code-yeongyu/oh-my-openagent",
+      "dagster-io/dagster",
       "databento/databento-python",
+      "deepcharles/ruptures",
       "deepseek-ai/deepseek-harness",
       "gastownhall/beads",
       "gerrymanoim/exchange_calendars",
@@ -104,10 +109,15 @@
       "microsoft/MarS",
       "microsoft/RD-Agent",
       "microsoft/SkillOpt",
+      "ml4t/engineer",
+      "mlflow/mlflow",
       "nautechsystems/nautilus_agents",
       "obra/superpowers",
       "online-ml/river",
+      "openbq-org/backends-for-openbb",
       "openbq-org/finos-workspace",
+      "openbq-org/finos-workspace-plugins",
+      "optuna/optuna",
       "peernagy/LOBS5",
       "py-why/dowhy",
       "pytorch/pytorch",
@@ -115,6 +125,7 @@
       "rapidsai/cudf",
       "scikit-learn-contrib/MAPIE",
       "stanfordnlp/dspy",
+      "stumpy-dev/stumpy",
       "trailofbits/skills",
       "unit8co/darts",
       "waylonli/FINSABER"
@@ -275,14 +286,14 @@
     "dsh-plugin-landscape": "4b881a9",
     "dsh-sota-harness": "7d0d37a",
     "meridian": "e698958",
-    "native-agent-stack": "f7ebcb6",
-    "sota-compounding-lab": "5a8880a",
+    "native-agent-stack": "7133beb",
+    "sota-compounding-lab": "b436549",
     "sota-dynamic-trail-c": "88c487f",
     "sota-harness-foundation": "9f56644",
-    "sota-mover-ranker": "dc17266",
+    "sota-mover-ranker": "74b44f6",
     "sota-multi-model-workflows": "cfee27f",
-    "sota-private-vault": "949a5d7",
-    "sota-upstream-shelf-lock": "b6eb237",
+    "sota-private-vault": "c9b66c5",
+    "sota-upstream-shelf-lock": "31836c3",
     "trading-sota": "54f0325",
     "tsl": "d3eec67"
   },
@@ -475,6 +486,10 @@
         {
           "repo": "aliyun/qwen-dianjin",
           "role": "Local RTX 4090 DianJin-R1 & Fin-PRM SEC 8-K/earnings catalyst parsing (MIT, a626b083c1)"
+        },
+        {
+          "repo": "dagster-io/dagster",
+          "role": "Software-defined PIT data & pre-wall research pipeline orchestration (Apache-2.0, 939bd1ea94)"
         }
       ],
       "sota_ecosystem_repos": [
@@ -521,6 +536,11 @@
         {
           "repo": "aliyun/qwen-dianjin",
           "role": "Local RTX 4090 DianJin-R1 & Fin-PRM SEC 8-K/earnings catalyst parsing (MIT, a626b083c1)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "dagster-io/dagster",
+          "role": "Software-defined PIT data & pre-wall research pipeline orchestration (Apache-2.0, 939bd1ea94)",
           "source_tier": "BEYOND_STARRED_SOTA"
         }
       ],
@@ -755,6 +775,22 @@
         {
           "repo": "The-FinAI/Fino1",
           "role": "14B SFT+GRPO FinCoT financial reasoning model for FinQA/XBRL-Math (MIT, f2b9e99317)"
+        },
+        {
+          "repo": "ml4t/engineer",
+          "role": "Point-in-time quantitative feature engineering companion to ml4t-diagnostic (MIT, c63159245c)"
+        },
+        {
+          "repo": "deepcharles/ruptures",
+          "role": "Structural change-point & regime-break segmentation for norm disruptions (BSD-2-Clause, ee1c8ff8a5)"
+        },
+        {
+          "repo": "stumpy-dev/stumpy",
+          "role": "Matrix-profile anomaly/discord & motif discovery for early-entry detection (BSD-3-Clause, a42ca40e54)"
+        },
+        {
+          "repo": "optuna/optuna",
+          "role": "Pre-registered HLZ-bounded hyperparameter & threshold optimization (MIT, 0abf066c1e)"
         }
       ],
       "sota_ecosystem_repos": [
@@ -811,6 +847,26 @@
         {
           "repo": "The-FinAI/Fino1",
           "role": "14B SFT+GRPO FinCoT financial reasoning model for FinQA/XBRL-Math (MIT, f2b9e99317)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "ml4t/engineer",
+          "role": "Point-in-time quantitative feature engineering companion to ml4t-diagnostic (MIT, c63159245c)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "deepcharles/ruptures",
+          "role": "Structural change-point & regime-break segmentation for norm disruptions (BSD-2-Clause, ee1c8ff8a5)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "stumpy-dev/stumpy",
+          "role": "Matrix-profile anomaly/discord & motif discovery for early-entry detection (BSD-3-Clause, a42ca40e54)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "optuna/optuna",
+          "role": "Pre-registered HLZ-bounded hyperparameter & threshold optimization (MIT, 0abf066c1e)",
           "source_tier": "BEYOND_STARRED_SOTA"
         }
       ],
@@ -904,6 +960,10 @@
         {
           "repo": "The-FinAI/FinBen",
           "role": "lm-evaluation-harness holistic financial LLM evaluation suite (MIT, 74ea6b8f8f)"
+        },
+        {
+          "repo": "mlflow/mlflow",
+          "role": "MLflow 3 sole upstream experiment & true trial-count (N) tracking ledger (Apache-2.0, 1ca7129977)"
         }
       ],
       "sota_ecosystem_repos": [
@@ -945,6 +1005,11 @@
         {
           "repo": "The-FinAI/FinBen",
           "role": "lm-evaluation-harness holistic financial LLM evaluation suite (MIT, 74ea6b8f8f)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "mlflow/mlflow",
+          "role": "MLflow 3 sole upstream experiment & true trial-count (N) tracking ledger (Apache-2.0, 1ca7129977)",
           "source_tier": "BEYOND_STARRED_SOTA"
         }
       ],
@@ -1129,11 +1194,19 @@
       "beyond_starred_sota_repos": [
         {
           "repo": "openbq-org/finos-workspace",
-          "role": "Hosted FINOS/OpenBB Institutional Workspace (:1420, ADR-0047 zero self-built HTML/JS)"
+          "role": "Hosted FINOS/OpenBB Institutional Workspace (:1420, ADR-0047/0050 zero self-built HTML/JS, ag-grid@2.3.0 active)"
+        },
+        {
+          "repo": "openbq-org/finos-workspace-plugins",
+          "role": "Official FINOS Workspace widget plugin monorepo (Apache-2.0, d9b57e9014, plotly-charts@2.5.0 active)"
+        },
+        {
+          "repo": "openbq-org/backends-for-openbb",
+          "role": "Official MIT OpenBB Workspace FastAPI custom backend contract (:6900, a629370757)"
         },
         {
           "repo": "OpenBB-finance/backends-for-openbb",
-          "role": "OpenBB Platform Workspace KeepAlive backend (:6900, paper-only widgets)"
+          "role": "Legacy OpenBB Platform Workspace KeepAlive reference (:6900, paper-only widgets)"
         },
         {
           "repo": "AI4Finance-Foundation/FinRobot",
@@ -1163,12 +1236,22 @@
         },
         {
           "repo": "openbq-org/finos-workspace",
-          "role": "Hosted FINOS/OpenBB Institutional Workspace (:1420, ADR-0047 zero self-built HTML/JS)",
+          "role": "Hosted FINOS/OpenBB Institutional Workspace (:1420, ADR-0047/0050 zero self-built HTML/JS, ag-grid@2.3.0 active)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "openbq-org/finos-workspace-plugins",
+          "role": "Official FINOS Workspace widget plugin monorepo (Apache-2.0, d9b57e9014, plotly-charts@2.5.0 active)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "openbq-org/backends-for-openbb",
+          "role": "Official MIT OpenBB Workspace FastAPI custom backend contract (:6900, a629370757)",
           "source_tier": "BEYOND_STARRED_SOTA"
         },
         {
           "repo": "OpenBB-finance/backends-for-openbb",
-          "role": "OpenBB Platform Workspace KeepAlive backend (:6900, paper-only widgets)",
+          "role": "Legacy OpenBB Platform Workspace KeepAlive reference (:6900, paper-only widgets)",
           "source_tier": "BEYOND_STARRED_SOTA"
         },
         {
@@ -2175,6 +2258,10 @@
         {
           "repo": "The-FinAI/FinBen",
           "role": "Standardized lm-evaluation-harness financial reasoning regression suite (MIT, 74ea6b8f8f)"
+        },
+        {
+          "repo": "UKGovernmentBEIS/inspect_ai",
+          "role": "Structured multi-model agent & skill regression evaluation harness (MIT, cf72dbc041)"
         }
       ],
       "sota_ecosystem_repos": [
@@ -2207,6 +2294,11 @@
           "repo": "The-FinAI/FinBen",
           "role": "Standardized lm-evaluation-harness financial reasoning regression suite (MIT, 74ea6b8f8f)",
           "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "UKGovernmentBEIS/inspect_ai",
+          "role": "Structured multi-model agent & skill regression evaluation harness (MIT, cf72dbc041)",
+          "source_tier": "BEYOND_STARRED_SOTA"
         }
       ],
       "research_convergence_stages": [
@@ -2227,5 +2319,5 @@
       "verification_gate": "Semantic watchdog alert test + OSV CVE 0-critical gate + SkillOpt replay friction score."
     }
   ],
-  "manifest_sha256": "2c72e849e4b09387c036b423616ac2210492eb04894bbc85f03effba4928b613"
+  "manifest_sha256": "2168f2f512ec3e065e341e8664a079640cffa49eb45ee5f90ae60ae7ce103a34"
 }
