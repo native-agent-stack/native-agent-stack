@@ -1,9 +1,10 @@
 {
-  "schema": "sota.hosted-research-frameworks-manifest.v1",
-  "adr": "ADR-0050",
+  "schema": "sota.hosted-research-frameworks-manifest.v2",
+  "adr": "ADR-0051",
+  "prior_seal_adr": "ADR-0050",
   "supersedes_self_built_ui_adr": "ADR-0047",
   "cleanroom_v4_adr": "ADR-0049",
-  "generated_at_utc": "2026-11-21T13:11:41.459466Z",
+  "generated_at_utc": "2026-11-21T13:33:20.139062Z",
   "storage_root": "Z:/sota-data/hosted-research-frameworks/",
   "hard_boundaries": {
     "immutable_shelf_untouched": true,
@@ -11,7 +12,9 @@
     "study_wall_date": "2026-10-15",
     "zero_unsandboxed_llm_exec": true,
     "zero_broker_keys_to_external_agents": true,
-    "zero_self_built_html_js_ui": true
+    "zero_self_built_html_js_ui": true,
+    "zero_paper_self_invention": true,
+    "clean_installed_frameworks_plus_official_paper_e2e_only": true
   },
   "live_local_services": {
     "finos_workspace_ui": "http://localhost:1420",
@@ -21,9 +24,12 @@
       "ag-grid@2.3.0"
     ],
     "openbb_sota_backend": "http://127.0.0.1:6900",
+    "mlflow_3_tracking_ui": "http://127.0.0.1:5050",
+    "mlflow_backend_store": "sqlite:///Z:/sota-data/mlflow-store/mlflow.db",
     "upstream_tearsheets_server": "http://127.0.0.1:8793",
     "rtx4090_full_res_sidecar": "http://127.0.0.1:8794",
     "ibkr_paper_gateway": "127.0.0.1:4002",
+    "orca_local_runtime": "1.4.264 (ready, reachable)",
     "tearsheet_html_artifacts": [
       "nautilus_v2_prewall_tearsheet.html",
       "quantstats_prewall_tearsheet.html",
@@ -34,10 +40,11 @@
     "immutable_core_shelf_count": 18,
     "immutable_core_shelf_verified": 18,
     "hosted_ui_and_plugins_count": 3,
-    "hosted_frontier_and_charter_count": 30,
-    "quarantined_reference_count": 4,
-    "total_local_upstream_repos_indexed": 55,
-    "active_hosted_present_on_disk_z": 33
+    "hosted_frontier_and_charter_count": 44,
+    "hosted_harness_orca_ao_count": 25,
+    "quarantined_reference_count": 5,
+    "total_local_upstream_repos_indexed": 95,
+    "active_hosted_present_on_disk_z": 72
   },
   "tier_a_immutable_core_shelf": [
     {
@@ -255,8 +262,8 @@
         "S8"
       ],
       "posture": "LIVE_HOSTED_LOCAL_DOCKER",
-      "role": "Official Apache-2.0 FINOS/OpenBB Workspace UI with plotly-charts@2.5.0 & ag-grid@2.3.0 plugins active",
-      "endpoint": "http://localhost:1420 (API :8000, Docker Compose 5-container stack)"
+      "role": "Official Apache-2.0 FINOS/OpenBB Workspace UI with plotly-charts@2.5.0 & ag-grid@2.3.0 active",
+      "endpoint": "http://localhost:1420 (API :8000, Docker Compose 5/5 healthy)"
     },
     {
       "name": "finos-workspace-plugins",
@@ -695,8 +702,8 @@
         "S5",
         "S8"
       ],
-      "posture": "CLEARED_TIER0_CHARTER_CORE",
-      "role": "MLflow 3 sole upstream experiment & true trial-count (N) tracking ledger"
+      "posture": "LIVE_HOSTED_LOCAL_SERVER_5050",
+      "role": "MLflow 3.18.0 sole upstream experiment & true trial-count (N) tracking server (:5050)"
     },
     {
       "name": "optuna",
@@ -818,6 +825,674 @@
       ],
       "posture": "CLEARED_TIER0_CHARTER_CORE",
       "role": "Declarative GEPA / MIPROv2 prompt & skill optimization with empirical regression metrics"
+    },
+    {
+      "name": "OpenHands",
+      "repo": "OpenHands/OpenHands",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/OpenHands",
+      "present_on_disk_z": true,
+      "head_sha": "0f4cb6af95915fee776913c4aa8694e7c4b76033",
+      "layers": [
+        "L8",
+        "L14"
+      ],
+      "stages": [
+        "S3",
+        "S6"
+      ],
+      "posture": "CLEARED_DOCKER_SANDBOX_ONLY",
+      "role": "Tier-0 Charter Docker-sandboxed autonomous research & coding runtime"
+    },
+    {
+      "name": "aideml",
+      "repo": "WecoAI/aideml",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/aideml",
+      "present_on_disk_z": true,
+      "head_sha": "ad73d227af481bea3de06f884f41b2993dd6453a",
+      "layers": [
+        "L3",
+        "L14"
+      ],
+      "stages": [
+        "S3",
+        "S5"
+      ],
+      "posture": "CLEARED_DOCKER_SANDBOX_ONLY",
+      "role": "Tier-0 Charter Docker-sandboxed autonomous ML engineering search agent"
+    },
+    {
+      "name": "LightGBM",
+      "repo": "lightgbm-org/LightGBM",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/LightGBM",
+      "present_on_disk_z": true,
+      "head_sha": "7810ecea3f2331b5312852170347154c86eb7d31",
+      "layers": [
+        "L3",
+        "L7"
+      ],
+      "stages": [
+        "S3"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "Gradient boosted decision trees for PIT cross-sectional tabular alpha"
+    },
+    {
+      "name": "catboost",
+      "repo": "catboost/catboost",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/catboost",
+      "present_on_disk_z": true,
+      "head_sha": "b7f986a16ac27245e18fde70d2a4e82d93f96dc6",
+      "layers": [
+        "L3",
+        "L7"
+      ],
+      "stages": [
+        "S3"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "Symmetric oblivious trees with native categorical & sector regime handling"
+    },
+    {
+      "name": "dvc",
+      "repo": "treeverse/dvc",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/dvc",
+      "present_on_disk_z": true,
+      "head_sha": "b59add99ee667f2b352cc1be337619f965fe3fea",
+      "layers": [
+        "L1",
+        "L10"
+      ],
+      "stages": [
+        "S1",
+        "S2"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "Cryptographic PIT dataset versioning & pre-wall lake lineage tracking"
+    },
+    {
+      "name": "darts",
+      "repo": "unit8co/darts",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/darts",
+      "present_on_disk_z": true,
+      "head_sha": "b91773760a227d426cf3659dfddab1e547c04523",
+      "layers": [
+        "L3",
+        "L11"
+      ],
+      "stages": [
+        "S3",
+        "S5"
+      ],
+      "posture": "CLEARED_RESEARCH_BASELINES",
+      "role": "Conformal prediction intervals & multi-horizon statistical forecasting"
+    },
+    {
+      "name": "statsforecast",
+      "repo": "Nixtla/statsforecast",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/statsforecast",
+      "present_on_disk_z": true,
+      "head_sha": "98ce313b089b6e3d29490d2764c9a366d7256d05",
+      "layers": [
+        "L3"
+      ],
+      "stages": [
+        "S3",
+        "S5"
+      ],
+      "posture": "CLEARED_RESEARCH_BASELINES",
+      "role": "Zero-leakage fast statistical baseline hurdles"
+    },
+    {
+      "name": "databento-python",
+      "repo": "databento/databento-python",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/databento-python",
+      "present_on_disk_z": true,
+      "head_sha": "f6529f1062e0642fe52334d767a72f2a75244398",
+      "layers": [
+        "L1",
+        "L13"
+      ],
+      "stages": [
+        "S2",
+        "S4"
+      ],
+      "posture": "CLEARED_PIT_DATA_CLIENT",
+      "role": "Bitemporal nanosecond PIT tick & MBO/L1 market-data contract"
+    },
+    {
+      "name": "claude-trading-skills",
+      "repo": "tradermonty/claude-trading-skills",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/claude-trading-skills",
+      "present_on_disk_z": true,
+      "head_sha": "901985468f4dd4a9c45f460345b7df1991302b24",
+      "layers": [
+        "L3",
+        "L11"
+      ],
+      "stages": [
+        "S3"
+      ],
+      "posture": "CLEARED_STRATEGY_SKILLS",
+      "role": "VCP, PEAD, Episodic Pivot, Momentum Burst, Breadth & Market-Top/FTD skills"
+    },
+    {
+      "name": "aeon",
+      "repo": "aeon-toolkit/aeon",
+      "spdx": "BSD-3-Clause",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/aeon",
+      "present_on_disk_z": true,
+      "head_sha": "1510ad271b91e3388c68a994841d26507538b584",
+      "layers": [
+        "L3",
+        "L7"
+      ],
+      "stages": [
+        "S3"
+      ],
+      "posture": "CLEARED_TIME_SERIES_ML",
+      "role": "Time-series classification, regression, clustering, segmentation & anomaly detection"
+    },
+    {
+      "name": "cvxpy",
+      "repo": "cvxpy/cvxpy",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/cvxpy",
+      "present_on_disk_z": true,
+      "head_sha": "d889ec46a03a04ea447505f4604f34124226dfb7",
+      "layers": [
+        "L11"
+      ],
+      "stages": [
+        "S5",
+        "S7"
+      ],
+      "posture": "CLEARED_CONVEX_RISK_OPT",
+      "role": "Convex portfolio risk-budgeting & turnover/beta-constrained allocation"
+    },
+    {
+      "name": "timesfm",
+      "repo": "google-research/timesfm",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/timesfm",
+      "present_on_disk_z": true,
+      "head_sha": "918df02c9d366b2145bc5876135fa2131d3ed2a6",
+      "layers": [
+        "L3",
+        "L7"
+      ],
+      "stages": [
+        "S3"
+      ],
+      "posture": "CLEARED_LOCAL_RTX4090_ONLY",
+      "role": "Google Research Time-Series Foundation Model (TSFM) for pre-wall horizon forecasts"
+    },
+    {
+      "name": "Lean",
+      "repo": "QuantConnect/Lean",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/Lean",
+      "present_on_disk_z": true,
+      "head_sha": "32a302a9a0fde64c0435798c0c4cb2c2309873ed",
+      "layers": [
+        "L1",
+        "L3"
+      ],
+      "stages": [
+        "S2",
+        "S4"
+      ],
+      "posture": "CLEARED_EQUITIES_OPTIONS_REF",
+      "role": "Institutional US equities & options corporate-action, RVOL & Greeks engine reference"
+    },
+    {
+      "name": "QuantLib",
+      "repo": "lballabio/QuantLib",
+      "spdx": "BSD-3-Clause",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/QuantLib",
+      "present_on_disk_z": true,
+      "head_sha": "26a44f1fc884c71f16c9d5c0e505f82349609088",
+      "layers": [
+        "L2",
+        "L13"
+      ],
+      "stages": [
+        "S4"
+      ],
+      "posture": "CLEARED_US_OPTIONS_PRICING",
+      "role": "Institutional US options Greeks, implied-volatility surface & derivatives pricing library"
+    }
+  ],
+  "tier_c2_hosted_harness_orca_ao_and_security": [
+    {
+      "name": "orca",
+      "repo": "stablyai/orca",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/orca",
+      "present_on_disk_z": true,
+      "head_sha": "9e9ceede7543f0cc0479a7b00508a9e4883b7f9b",
+      "layers": [
+        "L8",
+        "L15"
+      ],
+      "stages": [
+        "S6",
+        "S8"
+      ],
+      "posture": "LIVE_LOCAL_RUNTIME_1_4_264",
+      "role": "Isolated git worktree fleet (18/18 orca.yaml), dual-machine mesh & automations"
+    },
+    {
+      "name": "agent-orchestrator",
+      "repo": "OrchestratorInc/agent-orchestrator",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/agent-orchestrator",
+      "present_on_disk_z": true,
+      "head_sha": "080a1a2a5830673caa7b4f6571172bbea9f6e114",
+      "layers": [
+        "L8"
+      ],
+      "stages": [
+        "S6",
+        "S8"
+      ],
+      "posture": "CLEARED_MULTI_MODEL_AO",
+      "role": "8-slot pluggable Multi-Model Agent Orchestrator (AO) worktree, CI-reaction & review lifecycle"
+    },
+    {
+      "name": "oh-my-claudecode",
+      "repo": "Yeachan-Heo/oh-my-claudecode",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/oh-my-claudecode",
+      "present_on_disk_z": true,
+      "head_sha": "dec7e4188c0e3de6b92fb3d734ee5c95326021ed",
+      "layers": [
+        "L8"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_RUNTIME_ORCHESTRATOR",
+      "role": "Claude Code OMC v2 central multi-session runtime orchestrator"
+    },
+    {
+      "name": "oh-my-codex",
+      "repo": "Yeachan-Heo/oh-my-codex",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/oh-my-codex",
+      "present_on_disk_z": true,
+      "head_sha": "0323a79e5b0b79231451652e71bef5a949863497",
+      "layers": [
+        "L8"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_RUNTIME_ORCHESTRATOR",
+      "role": "Codex OMX adversarial critic & parallel implementation workers"
+    },
+    {
+      "name": "oh-my-pi",
+      "repo": "can1357/oh-my-pi",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/oh-my-pi",
+      "present_on_disk_z": true,
+      "head_sha": "517aaf00c435bd8be15684a7991928a24a5f82a8",
+      "layers": [
+        "L8"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_RUNTIME_ORCHESTRATOR",
+      "role": "Pi/OMP @worker role-selected thinking-effort runtime workers"
+    },
+    {
+      "name": "deepseek-harness",
+      "repo": "deepseek-ai/deepseek-harness",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/deepseek-harness",
+      "present_on_disk_z": true,
+      "head_sha": "2e39e70496aa02986ca6a820c5d497e816b69d7e",
+      "layers": [
+        "L8"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_RUNTIME_ORCHESTRATOR",
+      "role": "DSH 10-layer plugin harness & 1M-context pre-wall evaluation runtime"
+    },
+    {
+      "name": "hcom",
+      "repo": "aannoo/hcom",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/hcom",
+      "present_on_disk_z": true,
+      "head_sha": "de33e31a0cdbba4c5863f7cc050d8b79aa50bcdf",
+      "layers": [
+        "L8",
+        "L10"
+      ],
+      "stages": [
+        "S6",
+        "S8"
+      ],
+      "posture": "CLEARED_PEER_BUS",
+      "role": "Real-time cross-terminal agent wakeup & peer push messaging"
+    },
+    {
+      "name": "beads",
+      "repo": "gastownhall/beads",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/beads",
+      "present_on_disk_z": true,
+      "head_sha": "78624109904655d7a4609f27d34eb0982cd8963f",
+      "layers": [
+        "L8"
+      ],
+      "stages": [
+        "S6",
+        "S8"
+      ],
+      "posture": "CLEARED_TASK_DAG",
+      "role": "Git-backed distributed dependency task graph tracking (bd)"
+    },
+    {
+      "name": "oh-my-hermes",
+      "repo": "rlaope/oh-my-hermes",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/oh-my-hermes",
+      "present_on_disk_z": true,
+      "head_sha": "78e2c3b62e75a15da59e0e7e9cbc60762dc074cf",
+      "layers": [
+        "L8",
+        "L10"
+      ],
+      "stages": [
+        "S6",
+        "S8"
+      ],
+      "posture": "CLEARED_COWORKER_NET",
+      "role": "Cross-vendor coworker network & adaptive self-evolution bridge"
+    },
+    {
+      "name": "oh-my-opencode-slim",
+      "repo": "alvinunreal/oh-my-opencode-slim",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/oh-my-opencode-slim",
+      "present_on_disk_z": true,
+      "head_sha": "d667451c304b5049b5c4b1c1e5498e851e94fce2",
+      "layers": [
+        "L8"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_MODEL_ROUTER",
+      "role": "Lean multi-model routing for OpenCode Hephaestus/Sisyphus"
+    },
+    {
+      "name": "openrig",
+      "repo": "mvschwarz/openrig",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/openrig",
+      "present_on_disk_z": true,
+      "head_sha": "5295b61a7c232592bfd6961f74b2b210f34335aa",
+      "layers": [
+        "L8"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_MULTI_AGENT_RIG",
+      "role": "Structured multi-agent rig & worker dispatch supervision"
+    },
+    {
+      "name": "plannotator",
+      "repo": "backnotprop/plannotator",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/plannotator",
+      "present_on_disk_z": true,
+      "head_sha": "5cf5177267aa96405fec56faa3e8426c12bd648b",
+      "layers": [
+        "L6",
+        "L8"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_PLAN_REVIEW",
+      "role": "Visual plan review & institutional editorial craft verification"
+    },
+    {
+      "name": "auto-ontology",
+      "repo": "NVIDIA/auto-ontology",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/auto-ontology",
+      "present_on_disk_z": true,
+      "head_sha": "f3c310c7a279fcdfadf559d3fd7cd34e976d73e0",
+      "layers": [
+        "L8"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_ONTOLOGY_GRAPH",
+      "role": "Automated codebase & ecosystem ontology graph reasoning"
+    },
+    {
+      "name": "xerj",
+      "repo": "xerj-org/xerj",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/xerj",
+      "present_on_disk_z": true,
+      "head_sha": "d9dd2cbb9155009cc753a072cff7c1afc0b80890",
+      "layers": [
+        "L8"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_AST_INDEXER",
+      "role": "High-speed local semantic & AST workspace indexing"
+    },
+    {
+      "name": "hallmark",
+      "repo": "Nutlope/hallmark",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/hallmark",
+      "present_on_disk_z": true,
+      "head_sha": "04977e15f3dfd6ee4b74c887dac3eb52665d6c92",
+      "layers": [
+        "L8",
+        "L15"
+      ],
+      "stages": [
+        "S6",
+        "S8"
+      ],
+      "posture": "CLEARED_QUALITY_BENCH",
+      "role": "Structured engineering quality verification benchmarks"
+    },
+    {
+      "name": "SkillEvaluator",
+      "repo": "NVIDIA/SkillEvaluator",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/SkillEvaluator",
+      "present_on_disk_z": true,
+      "head_sha": "4327960b90d1943d3f2df9ba023a454ee5aba07b",
+      "layers": [
+        "L9",
+        "L15"
+      ],
+      "stages": [
+        "S6",
+        "S8"
+      ],
+      "posture": "CLEARED_4TIER_SKILL_AUDIT",
+      "role": "4-tier skill quality, security & 8-runtime parity auditing (60/60)"
+    },
+    {
+      "name": "openshell",
+      "repo": "ai-openshell/openshell",
+      "spdx": "Apache-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/openshell",
+      "present_on_disk_z": true,
+      "head_sha": "438e07b2312476c9057f3f7630fde31d29b6d377",
+      "layers": [
+        "L9"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_SANDBOX_POLICY",
+      "role": "Fail-closed execution & secret-access sandbox boundaries"
+    },
+    {
+      "name": "Claude-BugHunter",
+      "repo": "elementalsouls/Claude-BugHunter",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/Claude-BugHunter",
+      "present_on_disk_z": true,
+      "head_sha": "8258d29726804f5b954a09c625caedc183f7130d",
+      "layers": [
+        "L9"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_REDTEAM_24CLASS",
+      "role": "24-class adversarial bug-hunting & trading-firewall red-team audits"
+    },
+    {
+      "name": "security-audit-skill",
+      "repo": "cloudflare/security-audit-skill",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/security-audit-skill",
+      "present_on_disk_z": true,
+      "head_sha": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+      "layers": [
+        "L9"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_TWOPASS_AUDIT",
+      "role": "Two-pass self-refuting vulnerability confirmation methodology"
+    },
+    {
+      "name": "trailofbits-skills",
+      "repo": "trailofbits/skills",
+      "spdx": "CC-BY-SA-4.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/trailofbits-skills",
+      "present_on_disk_z": true,
+      "head_sha": "149d7b21f4067765b82e67029730b42d228ef4b4",
+      "layers": [
+        "L0",
+        "L9"
+      ],
+      "stages": [
+        "S1",
+        "S6"
+      ],
+      "posture": "CLEARED_DIMENSIONAL_FP",
+      "role": "Dimensional analysis, IEEE-754 fp-check & Hypothesis property invariants"
+    },
+    {
+      "name": "superpowers",
+      "repo": "obra/superpowers",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/superpowers",
+      "present_on_disk_z": true,
+      "head_sha": "22f0b463e7a5e579904dd6211a520321035526f7",
+      "layers": [
+        "L0",
+        "L8"
+      ],
+      "stages": [
+        "S6",
+        "S8"
+      ],
+      "posture": "CLEARED_TDD_DISCIPLINE",
+      "role": "Red-Green-Refactor TDD, root-cause debugging & isolated worktree verification"
+    },
+    {
+      "name": "SkillOpt",
+      "repo": "microsoft/SkillOpt",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/SkillOpt",
+      "present_on_disk_z": true,
+      "head_sha": "4fa83964c71a62dc7b815b344f6272d3383b6eb1",
+      "layers": [
+        "L10",
+        "L15"
+      ],
+      "stages": [
+        "S8"
+      ],
+      "posture": "CLEARED_FRICTION_MINING",
+      "role": "Trajectory-friction mining converting transcript.jsonl errors into SKILL.md upgrades"
+    },
+    {
+      "name": "gitleaks",
+      "repo": "gitleaks/gitleaks",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/gitleaks",
+      "present_on_disk_z": true,
+      "head_sha": "5f6ec56cfa6f8c67648d863582c7ae2f206d5c1c",
+      "layers": [
+        "L0",
+        "L9"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_ZERO_LEAK_GATE",
+      "role": "Pre-commit & CI zero-secret / zero-home-path enforcement"
+    },
+    {
+      "name": "ast-grep",
+      "repo": "ast-grep/ast-grep",
+      "spdx": "MIT",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/ast-grep",
+      "present_on_disk_z": true,
+      "head_sha": "8a92260ad4b65cf4b716518a76b919e6f0d051b8",
+      "layers": [
+        "L0",
+        "L9"
+      ],
+      "stages": [
+        "S6"
+      ],
+      "posture": "CLEARED_AST_LINT_GATE",
+      "role": "Structural AST search, lint rule authoring & deterministic multi-file codemods"
+    },
+    {
+      "name": "hypothesis",
+      "repo": "HypothesisWorks/hypothesis",
+      "spdx": "MPL-2.0",
+      "local_path": "Z:/sota-data/hosted-research-frameworks/harness-and-ao/hypothesis",
+      "present_on_disk_z": true,
+      "head_sha": "9a15ddde58248954d62f97e6265c8bf99c25bd54",
+      "layers": [
+        "L0",
+        "L4"
+      ],
+      "stages": [
+        "S5",
+        "S6"
+      ],
+      "posture": "CLEARED_TIER0_CHARTER_CORE",
+      "role": "Property-based invariant fuzzing for ADR-0022 stops, PIT timestamps & IEEE-754 bounds"
     }
   ],
   "tier_d_quarantined_reference_only": [
@@ -885,7 +1560,23 @@
       ],
       "posture": "QUARANTINED_ZERO_BROKER_KEYS",
       "role": "Skill-native trading research harness reference; contains order-routing code (0 broker keys ever)"
+    },
+    {
+      "name": "hermes-agent-self-evolution",
+      "repo": "NousResearch/hermes-agent-self-evolution",
+      "spdx": "NONE",
+      "local_path": "(NOT_CLONED_LICENSE_FIREWALL)",
+      "present_on_disk_z": false,
+      "head_sha": "",
+      "layers": [
+        "L10"
+      ],
+      "stages": [
+        "S8"
+      ],
+      "posture": "EXCLUDED_UNLICENSED_NONE",
+      "role": "Live GitHub API returned spdx=NONE (all rights reserved); blocked by ADR-0048 license firewall"
     }
   ],
-  "manifest_sha256": "557d42cd3736e666545995c8cdce10acf39bef50a19320d8efbfeec69cd1fd37"
+  "manifest_sha256": "f9164837df0bd1ee326efc7d7959b4d261637d2f1e4a5a7cbbf3b0aae7cbdc70"
 }

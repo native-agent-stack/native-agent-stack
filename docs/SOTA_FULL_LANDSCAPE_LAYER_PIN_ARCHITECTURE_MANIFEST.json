@@ -6,8 +6,9 @@
   "advanced_research_landscape_adr": "ADR-0048",
   "cleanroom_v4_adr": "ADR-0049",
   "hosted_research_frameworks_seal_adr": "ADR-0050",
+  "full_landscape_ao_and_zero_paper_self_invention_adr": "ADR-0051",
   "shelf_lock_frontier_adr": "sota-upstream-shelf-lock/ADR-0026",
-  "generated_at_utc": "2026-11-21T13:14:24.926159Z",
+  "generated_at_utc": "2026-11-21T13:34:42.761619Z",
   "hard_invariants": {
     "tier0_sota_source_only": true,
     "allow_silent_fallback": false,
@@ -32,7 +33,7 @@
   "starred_and_beyond_convergence": {
     "owner_starred_total_audited": 415,
     "distinct_starred_anchors_mapped_across_layers": 34,
-    "distinct_beyond_starred_sota_mapped_across_layers": 52,
+    "distinct_beyond_starred_sota_mapped_across_layers": 65,
     "research_convergence_stages_covered": 8,
     "research_convergence_stages_total": 8,
     "global_runtime_md_files_synced": 7,
@@ -82,29 +83,41 @@
       "BrainDAO/mcp-polymarket",
       "FreedomIntelligence/TwinMarket",
       "HKUDS/Vibe-Trading",
+      "HypothesisWorks/hypothesis",
       "Nixtla/statsforecast",
       "OpenBB-finance/backends-for-openbb",
+      "OpenHands/OpenHands",
+      "OrchestratorInc/agent-orchestrator",
       "PriorLabs/TabPFN",
       "SalesforceAIResearch/uni2ts",
       "The-FinAI/FinBen",
       "The-FinAI/Fino1",
       "UKGovernmentBEIS/inspect_ai",
+      "WecoAI/aideml",
       "Yeachan-Heo/oh-my-claudecode",
       "Yeachan-Heo/oh-my-codex",
       "aannoo/hcom",
+      "aeon-toolkit/aeon",
       "aliyun/qwen-dianjin",
       "alpacahq/alpaca-py",
       "amazon-science/chronos-forecasting",
       "anthropics/financial-services",
+      "ast-grep/ast-grep",
       "bashtage/arch",
+      "can1357/oh-my-pi",
+      "catboost/catboost",
       "code-yeongyu/oh-my-openagent",
+      "cvxpy/cvxpy",
       "dagster-io/dagster",
       "databento/databento-python",
       "deepcharles/ruptures",
       "deepseek-ai/deepseek-harness",
       "gastownhall/beads",
       "gerrymanoim/exchange_calendars",
+      "google-research/timesfm",
       "ib-api-reloaded/ib_async",
+      "lballabio/QuantLib",
+      "lightgbm-org/LightGBM",
       "massive-com/mcp_massive",
       "microsoft/MarS",
       "microsoft/RD-Agent",
@@ -127,6 +140,7 @@
       "stanfordnlp/dspy",
       "stumpy-dev/stumpy",
       "trailofbits/skills",
+      "treeverse/dvc",
       "unit8co/darts",
       "waylonli/FINSABER"
     ]
@@ -281,19 +295,19 @@
     "agy-sota-harness": "fadebba",
     "astrolabe": "e0e991a",
     "canon": "2e28d1f",
-    "cc-sota-harness": "fac8121",
+    "cc-sota-harness": "da1aac0",
     "dot-github": "2397e21",
     "dsh-plugin-landscape": "4b881a9",
     "dsh-sota-harness": "7d0d37a",
     "meridian": "e698958",
-    "native-agent-stack": "7133beb",
+    "native-agent-stack": "7c975be",
     "sota-compounding-lab": "b436549",
     "sota-dynamic-trail-c": "88c487f",
-    "sota-harness-foundation": "9f56644",
+    "sota-harness-foundation": "ca9f649",
     "sota-mover-ranker": "74b44f6",
     "sota-multi-model-workflows": "cfee27f",
-    "sota-private-vault": "c9b66c5",
-    "sota-upstream-shelf-lock": "31836c3",
+    "sota-private-vault": "3725143",
+    "sota-upstream-shelf-lock": "4877b37",
     "trading-sota": "54f0325",
     "tsl": "d3eec67"
   },
@@ -355,6 +369,14 @@
         {
           "repo": "obra/superpowers",
           "role": "Disciplined Red-Green-Refactor TDD & systematic root-cause verification"
+        },
+        {
+          "repo": "ast-grep/ast-grep",
+          "role": "Structural AST search, lint rule authoring & multi-file codemods (MIT)"
+        },
+        {
+          "repo": "HypothesisWorks/hypothesis",
+          "role": "Property-based invariant testing for ADR-0022 stops & IEEE-754 bounds (MPL-2.0)"
         }
       ],
       "sota_ecosystem_repos": [
@@ -381,6 +403,16 @@
         {
           "repo": "obra/superpowers",
           "role": "Disciplined Red-Green-Refactor TDD & systematic root-cause verification",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "ast-grep/ast-grep",
+          "role": "Structural AST search, lint rule authoring & multi-file codemods (MIT)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "HypothesisWorks/hypothesis",
+          "role": "Property-based invariant testing for ADR-0022 stops & IEEE-754 bounds (MPL-2.0)",
           "source_tier": "BEYOND_STARRED_SOTA"
         }
       ],
@@ -490,6 +522,10 @@
         {
           "repo": "dagster-io/dagster",
           "role": "Software-defined PIT data & pre-wall research pipeline orchestration (Apache-2.0, 939bd1ea94)"
+        },
+        {
+          "repo": "treeverse/dvc",
+          "role": "Cryptographic PIT dataset versioning & pre-wall lake lineage (Apache-2.0, b59add99ee)"
         }
       ],
       "sota_ecosystem_repos": [
@@ -541,6 +577,11 @@
         {
           "repo": "dagster-io/dagster",
           "role": "Software-defined PIT data & pre-wall research pipeline orchestration (Apache-2.0, 939bd1ea94)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "treeverse/dvc",
+          "role": "Cryptographic PIT dataset versioning & pre-wall lake lineage (Apache-2.0, b59add99ee)",
           "source_tier": "BEYOND_STARRED_SOTA"
         }
       ],
@@ -627,6 +668,10 @@
         {
           "repo": "nautechsystems/nautilus_agents",
           "role": "Official Rust-native Agents SDK for NautilusTrader (LGPL-3.0, 380ae38f35, 0 order-path code)"
+        },
+        {
+          "repo": "lballabio/QuantLib",
+          "role": "Institutional US options Greeks, IV surface & derivatives pricing (BSD-3-Clause, 26a44f1fc8)"
         }
       ],
       "sota_ecosystem_repos": [
@@ -663,6 +708,11 @@
         {
           "repo": "nautechsystems/nautilus_agents",
           "role": "Official Rust-native Agents SDK for NautilusTrader (LGPL-3.0, 380ae38f35, 0 order-path code)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "lballabio/QuantLib",
+          "role": "Institutional US options Greeks, IV surface & derivatives pricing (BSD-3-Clause, 26a44f1fc8)",
           "source_tier": "BEYOND_STARRED_SOTA"
         }
       ],
@@ -791,6 +841,26 @@
         {
           "repo": "optuna/optuna",
           "role": "Pre-registered HLZ-bounded hyperparameter & threshold optimization (MIT, 0abf066c1e)"
+        },
+        {
+          "repo": "lightgbm-org/LightGBM",
+          "role": "PIT cross-sectional tabular alpha GBDT engine (MIT, 7810ecea3f)"
+        },
+        {
+          "repo": "catboost/catboost",
+          "role": "Symmetric oblivious trees with native categorical/sector handling (Apache-2.0, b7f986a16a)"
+        },
+        {
+          "repo": "aeon-toolkit/aeon",
+          "role": "Time-series ML classification, segmentation & anomaly detection (BSD-3-Clause, 1510ad271b)"
+        },
+        {
+          "repo": "google-research/timesfm",
+          "role": "Time-Series Foundation Model for pre-wall horizon forecasts (Apache-2.0, 918df02c9d)"
+        },
+        {
+          "repo": "WecoAI/aideml",
+          "role": "Docker-sandboxed autonomous ML engineering search agent (MIT, ad73d227af)"
         }
       ],
       "sota_ecosystem_repos": [
@@ -867,6 +937,31 @@
         {
           "repo": "optuna/optuna",
           "role": "Pre-registered HLZ-bounded hyperparameter & threshold optimization (MIT, 0abf066c1e)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "lightgbm-org/LightGBM",
+          "role": "PIT cross-sectional tabular alpha GBDT engine (MIT, 7810ecea3f)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "catboost/catboost",
+          "role": "Symmetric oblivious trees with native categorical/sector handling (Apache-2.0, b7f986a16a)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "aeon-toolkit/aeon",
+          "role": "Time-series ML classification, segmentation & anomaly detection (BSD-3-Clause, 1510ad271b)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "google-research/timesfm",
+          "role": "Time-Series Foundation Model for pre-wall horizon forecasts (Apache-2.0, 918df02c9d)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "WecoAI/aideml",
+          "role": "Docker-sandboxed autonomous ML engineering search agent (MIT, ad73d227af)",
           "source_tier": "BEYOND_STARRED_SOTA"
         }
       ],
@@ -1096,6 +1191,10 @@
         {
           "repo": "nautechsystems/nautilus_agents",
           "role": "Official Rust-native Agents SDK for NautilusTrader (LGPL-3.0, 380ae38f35, 0 order-path code)"
+        },
+        {
+          "repo": "lballabio/QuantLib",
+          "role": "Institutional US options Greeks, IV surface & derivatives pricing (BSD-3-Clause, 26a44f1fc8)"
         }
       ],
       "sota_ecosystem_repos": [
@@ -1122,6 +1221,11 @@
         {
           "repo": "nautechsystems/nautilus_agents",
           "role": "Official Rust-native Agents SDK for NautilusTrader (LGPL-3.0, 380ae38f35, 0 order-path code)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "lballabio/QuantLib",
+          "role": "Institutional US options Greeks, IV surface & derivatives pricing (BSD-3-Clause, 26a44f1fc8)",
           "source_tier": "BEYOND_STARRED_SOTA"
         }
       ],
@@ -1496,6 +1600,18 @@
         {
           "repo": "HKUDS/Vibe-Trading",
           "role": "Skill-native trading research harness reference (MIT, 38.6k stars; sandboxed, 0 broker keys)"
+        },
+        {
+          "repo": "OrchestratorInc/agent-orchestrator",
+          "role": "8-slot pluggable Multi-Model Agent Orchestrator (AO) worktree & review lifecycle (Apache-2.0, 080a1a2a58)"
+        },
+        {
+          "repo": "can1357/oh-my-pi",
+          "role": "Pi/OMP @worker role-selected thinking-effort runtime workers (MIT, 517aaf00c4)"
+        },
+        {
+          "repo": "OpenHands/OpenHands",
+          "role": "Docker-sandboxed autonomous research & coding runtime (MIT, 0f4cb6af95)"
         }
       ],
       "sota_ecosystem_repos": [
@@ -1582,6 +1698,21 @@
         {
           "repo": "HKUDS/Vibe-Trading",
           "role": "Skill-native trading research harness reference (MIT, 38.6k stars; sandboxed, 0 broker keys)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "OrchestratorInc/agent-orchestrator",
+          "role": "8-slot pluggable Multi-Model Agent Orchestrator (AO) worktree & review lifecycle (Apache-2.0, 080a1a2a58)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "can1357/oh-my-pi",
+          "role": "Pi/OMP @worker role-selected thinking-effort runtime workers (MIT, 517aaf00c4)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "OpenHands/OpenHands",
+          "role": "Docker-sandboxed autonomous research & coding runtime (MIT, 0f4cb6af95)",
           "source_tier": "BEYOND_STARRED_SOTA"
         }
       ],
@@ -1831,6 +1962,10 @@
         {
           "repo": "FreedomIntelligence/TwinMarket",
           "role": "NeurIPS/ICLR 2025 Best Paper BDI market herding & flash-crash stress simulator (MIT, de5f2446fc)"
+        },
+        {
+          "repo": "cvxpy/cvxpy",
+          "role": "Convex portfolio risk-budgeting & turnover/beta-constrained optimization (Apache-2.0, d889ec46a0)"
         }
       ],
       "sota_ecosystem_repos": [
@@ -1857,6 +1992,11 @@
         {
           "repo": "FreedomIntelligence/TwinMarket",
           "role": "NeurIPS/ICLR 2025 Best Paper BDI market herding & flash-crash stress simulator (MIT, de5f2446fc)",
+          "source_tier": "BEYOND_STARRED_SOTA"
+        },
+        {
+          "repo": "cvxpy/cvxpy",
+          "role": "Convex portfolio risk-budgeting & turnover/beta-constrained optimization (Apache-2.0, d889ec46a0)",
           "source_tier": "BEYOND_STARRED_SOTA"
         }
       ],
@@ -2319,5 +2459,5 @@
       "verification_gate": "Semantic watchdog alert test + OSV CVE 0-critical gate + SkillOpt replay friction score."
     }
   ],
-  "manifest_sha256": "2168f2f512ec3e065e341e8664a079640cffa49eb45ee5f90ae60ae7ce103a34"
+  "manifest_sha256": "dd788ab890ebc3da871bdf64ef248130e381a73e105bb6092558e0b8cba7df0b"
 }

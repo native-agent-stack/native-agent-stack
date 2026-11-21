@@ -1,9 +1,9 @@
 {
   "schema": "sota.public-master-finalized-adr-registry.v1",
   "adr": "ADR-0044",
-  "generated_at_utc": "2026-11-21T13:14:25.143068Z",
+  "generated_at_utc": "2026-11-21T13:34:43.106025Z",
   "repos_indexed": 18,
-  "total_adrs_indexed": 795,
+  "total_adrs_indexed": 796,
   "verbatim_private_archive_repo": "native-agent-stack/sota-private-vault (adr_archive/)",
   "per_repo_counts": {
     "agy-sota-harness": 36,
@@ -14,7 +14,7 @@
     "dsh-plugin-landscape": 11,
     "dsh-sota-harness": 16,
     "meridian": 65,
-    "native-agent-stack": 50,
+    "native-agent-stack": 51,
     "sota-compounding-lab": 39,
     "sota-dynamic-trail-c": 35,
     "sota-harness-foundation": 46,
@@ -5786,6 +5786,22 @@
       "file_sha256": "996cd67d9fdba5d5d06febcccca2f191dc77a73770023815792610917c7c7245"
     },
     {
+      "repo": "native-agent-stack",
+      "tier": "PUBLIC",
+      "file": "ADR-0051-full-landscape-95repo-hosted-research-orca-ao-zero-paper-self-invention-and-18repo-final-seal.md",
+      "title": "ADR-0051: Full-Landscape `95`-Repo Disk-Z Hosted Research, Orca & Multi-Model AO Stack, Live MLflow 3, Zero Paper Self-Invention Gate & `18/18`-Repo Final Seal",
+      "status": "Accepted",
+      "date": "2026-11-21",
+      "evidence_grade": "E4 (`one_harness_cleanliness_doctor.py --check` ",
+      "github_urls": [
+        "https://github.com/HypothesisWorks/hypothesis",
+        "https://github.com/NVIDIA/SkillEvaluator",
+        "https://github.com/NVIDIA/auto-ontology",
+        "https://github.com/Nixtla/statsforecast"
+      ],
+      "file_sha256": "d4c656e57df28fe33f1c3e8ad600562bb242a0801ff35880a76d00582eafa058"
+    },
+    {
       "repo": "sota-compounding-lab",
       "tier": "PUBLIC",
       "file": "ADR-0001-public-open-core-vs-private-vault-org-firewall.md",
@@ -10846,5 +10862,5 @@
       "file_sha256": "ca48518bef018ae289a5b3798c2c0171c4ac8cc93342dbb702f71d302b9b81a4"
     }
   ],
-  "manifest_sha256": "26d24b12efa6183c2751b46eb0adefb544e37b282276ef03af2af37b8cf99e2a"
+  "manifest_sha256": "b4218f3264681e67f835a2a5a752dd2046599c8d0d1dcd1e5c57097f3f6b4d4c"
 }

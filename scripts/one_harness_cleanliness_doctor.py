@@ -281,6 +281,32 @@ def _check_3_landscape_starred_beyond_and_research(workstation: Path, *, is_ci: 
     elif not is_ci:
         rc_summary = {"available": False, "valid": False, "error": "missing sota-multi-model-workflows"}
 
+    # Verify hosted research frameworks manifest & zero-paper-self-invention boundaries
+    hosted_path = ROOT / "docs" / "SOTA_HOSTED_RESEARCH_FRAMEWORKS_MANIFEST.json"
+    hosted_summary: dict[str, Any] = {"present": hosted_path.is_file(), "valid": False}
+    if hosted_path.is_file():
+        h_data = json.loads(hosted_path.read_text(encoding="utf-8"))
+        h_body = {k: v for k, v in h_data.items() if k != "manifest_sha256"}
+        h_expected_sha = hashlib.sha256(
+            json.dumps(h_body, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
+        ).hexdigest()
+        h_sha_ok = h_data.get("manifest_sha256") == h_expected_sha
+        h_hb = h_data.get("hard_boundaries") or {}
+        h_bounds_ok = (
+            h_hb.get("zero_paper_self_invention") is True
+            and h_hb.get("clean_installed_frameworks_plus_official_paper_e2e_only") is True
+            and h_hb.get("paper_only_firewall") is True
+        )
+        hosted_summary = {
+            "present": True,
+            "sha256_valid": h_sha_ok,
+            "zero_paper_self_invention": bool(h_hb.get("zero_paper_self_invention")),
+            "clean_installed_frameworks_plus_official_paper_e2e_only": bool(
+                h_hb.get("clean_installed_frameworks_plus_official_paper_e2e_only")
+            ),
+            "valid": h_sha_ok and h_bounds_ok,
+        }
+
     ok = (
         sha_ok
         and len(layers) == 16
@@ -288,6 +314,7 @@ def _check_3_landscape_starred_beyond_and_research(workstation: Path, *, is_ci: 
         and not layer_errors
         and pins_match_lock
         and bool(rc_summary.get("valid", False))
+        and bool(hosted_summary.get("valid", False))
     )
     return {
         "ok": ok,
@@ -298,6 +325,7 @@ def _check_3_landscape_starred_beyond_and_research(workstation: Path, *, is_ci: 
         "pins_match_pins_lock": pins_match_lock,
         "layer_errors": layer_errors[:10],
         "research_convergence_contract": rc_summary,
+        "hosted_frameworks_manifest": hosted_summary,
     }
 
 

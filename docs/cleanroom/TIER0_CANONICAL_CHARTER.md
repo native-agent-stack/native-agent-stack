@@ -1,7 +1,8 @@
 # Tier-0 Engineering & Quantitative Charter (Canonical Single Rule)
 
-## 1. Upstream-Only Mandate (Zero Self-Built Frameworks)
+## 1. Upstream-Only Mandate (Zero Self-Built Frameworks & Zero Paper Self-Invention)
 - **Install, integrate, or build upon verified SOTA upstream open-source repos only.** Never self-build backtest loops, broker polling daemons, experiment trackers, agent buses, memory stores, MCP wrappers, or manifest registries.
+- **Zero Paper Self-Invention (Clean-Installed Frameworks, Platforms & Official Paper Repos Only):** Never self-invent or hand-code strategies, models, indicators, simulators, or research algorithms from scratch "based on papers." ONLY cleanly install verified SOTA upstream frameworks, hosted platforms, and official/verified paper reference repositories, configure them with related installed paper packages, and test end-to-end (E2E) on pre-wall historical data (`<= 2026-10-15`).
 - **Pinned stack (exact versions in `pyproject.toml` / `uv.lock` & `~/Documents/upstream/PINS.md`):**
   - **Data & PIT:** `Polars`, `DuckDB`, `NautilusTrader ParquetDataCatalog`, `Pandera`, `exchange_calendars`, `edgartools`, `DVC`.
   - **Features, Anomaly & Reversal:** `ml4t-engineer`, `river`, `ruptures`, `stumpy`, `LightGBM`, `CatBoost` (plus isolated Python 3.12 `Qlib v0.9.8` worker).

@@ -40,12 +40,16 @@ def test_adr0050_hosted_research_frameworks_manifest_is_sealed_and_zero_leak() -
         json.dumps(body, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
     ).hexdigest()
     assert data["manifest_sha256"] == expected_sha
-    assert data["adr"] == "ADR-0050"
+    assert data["adr"] == "ADR-0051"
+    assert data["prior_seal_adr"] == "ADR-0050"
     assert data["summary"]["immutable_core_shelf_count"] == 18
     assert data["summary"]["hosted_ui_and_plugins_count"] == 3
-    assert data["summary"]["hosted_frontier_and_charter_count"] == 30
-    assert data["summary"]["quarantined_reference_count"] == 4
-    assert data["summary"]["total_local_upstream_repos_indexed"] == 55
+    assert data["summary"]["hosted_frontier_and_charter_count"] == 44
+    assert data["summary"]["hosted_harness_orca_ao_count"] == 25
+    assert data["summary"]["quarantined_reference_count"] == 5
+    assert data["summary"]["total_local_upstream_repos_indexed"] == 95
+    assert data["live_local_services"]["mlflow_3_tracking_ui"] == "http://127.0.0.1:5050"
+    assert "1.4." in data["live_local_services"]["orca_local_runtime"]
 
     # Verify mandatory safety boundaries
     hb = data["hard_boundaries"]
@@ -55,13 +59,36 @@ def test_adr0050_hosted_research_frameworks_manifest_is_sealed_and_zero_leak() -
     assert hb["zero_unsandboxed_llm_exec"] is True
     assert hb["zero_broker_keys_to_external_agents"] is True
     assert hb["zero_self_built_html_js_ui"] is True
+    assert hb["zero_paper_self_invention"] is True
+    assert hb["clean_installed_frameworks_plus_official_paper_e2e_only"] is True
 
-    # Verify quarantined repos are strictly in Tier D, never Tier C
+    # Verify Orca & Multi-Model AO are actively hosted in Tier C2
+    tier_c2_repos = {r["repo"] for r in data["tier_c2_hosted_harness_orca_ao_and_security"]}
+    for required_ao in (
+        "stablyai/orca",
+        "OrchestratorInc/agent-orchestrator",
+        "Yeachan-Heo/oh-my-claudecode",
+        "Yeachan-Heo/oh-my-codex",
+        "can1357/oh-my-pi",
+        "deepseek-ai/deepseek-harness",
+        "NVIDIA/SkillEvaluator",
+        "ai-openshell/openshell",
+    ):
+        assert required_ao in tier_c2_repos
+
+    # Verify quarantined/unlicensed repos are strictly in Tier D, never Tier C or C2
     tier_c_repos = {r["repo"] for r in data["tier_c_hosted_frontier_and_charter_frameworks"]}
     tier_d_repos = {r["repo"] for r in data["tier_d_quarantined_reference_only"]}
-    for q in ("microsoft/RD-Agent", "TauricResearch/TradingAgents", "virattt/ai-hedge-fund", "HKUDS/Vibe-Trading"):
+    for q in (
+        "microsoft/RD-Agent",
+        "TauricResearch/TradingAgents",
+        "virattt/ai-hedge-fund",
+        "HKUDS/Vibe-Trading",
+        "NousResearch/hermes-agent-self-evolution",
+    ):
         assert q in tier_d_repos
         assert q not in tier_c_repos
+        assert q not in tier_c2_repos
 
     combined = json.dumps(data) + md_path.read_text(encoding="utf-8")
     leak_rx = re.compile(
@@ -103,3 +130,55 @@ def test_adr0050_canonical_single_rule_charter_parity_without_bloat(tmp_path: Pa
     assert res["gemini_global"] == "unchanged"
     assert res["agy_plugin_rules"] == "superseded_by_canonical_charter"
     assert targets[0].read_text(encoding="utf-8") == charter_txt
+
+
+def test_canonical_charter_sync_upgrades_older_charter_idempotently(tmp_path: Path) -> None:
+    charter_path = ROOT / "docs" / "cleanroom" / "TIER0_CANONICAL_CHARTER.md"
+    charter_txt = charter_path.read_text(encoding="utf-8")
+    older_charter = (
+        "# Tier-0 Engineering & Quantitative Charter (Canonical Single Rule)\n\n"
+        "## 1. Upstream-Only Mandate (Zero Self-Built Frameworks)\n"
+        "- Old charter missing zero paper self-invention clause.\n"
+    )
+    targets = [
+        tmp_path / ".gemini" / "GEMINI.md",
+        tmp_path / ".claude" / "CLAUDE.md",
+        tmp_path / ".codex" / "AGENTS.md",
+        tmp_path / ".config" / "opencode" / "AGENTS.md",
+        tmp_path / ".dsh" / "AGENTS.md",
+        tmp_path / ".omp" / "agent" / "AGENTS.md",
+    ]
+    for p in targets:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(older_charter, encoding="utf-8")
+
+    res1 = _SYNC.sync_tier0_harness_md_files(tmp_path)
+    assert all(
+        res1[k] == "updated"
+        for k in (
+            "gemini_global",
+            "claude_global",
+            "codex_global",
+            "opencode_global",
+            "dsh_global",
+            "omp_global",
+        )
+    )
+    parity = _SYNC.check_tier0_harness_md_parity(tmp_path)
+    assert parity["all_synced"] is True
+    assert parity["canonical_charter_mode"] is True
+    for p in targets:
+        assert p.read_text(encoding="utf-8") == charter_txt
+
+    res2 = _SYNC.sync_tier0_harness_md_files(tmp_path)
+    assert all(
+        res2[k] == "unchanged"
+        for k in (
+            "gemini_global",
+            "claude_global",
+            "codex_global",
+            "opencode_global",
+            "dsh_global",
+            "omp_global",
+        )
+    )

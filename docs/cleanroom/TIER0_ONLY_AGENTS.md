@@ -6,9 +6,9 @@
 
 ## 1. The Single Tier-0 Law (Fail-Closed Across Every Layer)
 
-1. **Upstream-Only Mandate (`ADR-0023` / `ADR-0047` / `ADR-0049`):**
-   - **FORBIDDEN:** Hand-rolled OMS loops, custom fill reconcilers, custom backtesters, empty `BacktestEngine.run()` stubs, custom HTML/JS dashboards, 1-bar strategy proxies, throttle band-aids on negative-expectancy logic, or unlicensed (`NONE`) / archived / unverified repos.
-   - **REQUIRED:** Host the real pinned upstream platform directly and write only a thin, typed plugin/adapter layer (`upstream-map.toml` + `40`-char SHA in `PINS_LOCK.json` + GitHub-evidenced MADR 4.0 ADR + `scripts/merge_gate.py` + universal `core.hooksPath`).
+1. **Upstream-Only & Zero Paper Self-Invention Mandate (`ADR-0023` / `ADR-0047` / `ADR-0049` / `ADR-0050`):**
+   - **FORBIDDEN:** Hand-rolled OMS loops, custom fill reconcilers, custom backtesters, empty `BacktestEngine.run()` stubs, custom HTML/JS dashboards, 1-bar strategy proxies, throttle band-aids on negative-expectancy logic, unlicensed (`NONE`) / archived / unverified repos, or self-inventing/hand-coding algorithms, indicators, models, or strategies from scratch "based on papers."
+   - **REQUIRED:** Cleanly install and host the real pinned SOTA upstream frameworks, platforms, and official/verified paper reference repositories directly, configured with related installed paper packages and tested end-to-end (E2E) on pre-wall historical data (`<= 2026-10-15`), writing only a thin typed plugin/adapter layer (`upstream-map.toml` + `40`-char SHA in `PINS_LOCK.json` + GitHub-evidenced MADR 4.0 ADR + `scripts/merge_gate.py` + universal `core.hooksPath`).
 2. **Full-Resolution, Zero-Fallback Mandate (`ADR-0025` / `ADR-0038`):**
    - `allow_silent_fallback = False`, `0` residual stubs, real `NautilusTrader v2` instruments + data + `Strategy` (`iterations > 0`), real Rust `hftbacktest` `HashMapMarketDepthBacktest` + `RiskAdverseQueueModel`, RTX 4090 `cuda:0` (`require_gpu=True`), and strict pre-wall `<= 2026-10-15` isolation (`post_wall_n == 0`).
 3. **Research-Convergence-First Mandate (`S1`–`S8`):**

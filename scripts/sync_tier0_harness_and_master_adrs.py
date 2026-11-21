@@ -48,6 +48,7 @@ CANONICAL_CHARTER_HEADER = "# Tier-0 Engineering & Quantitative Charter (Canonic
 CANONICAL_CHARTER_REQUIRED_CLAUSES: tuple[str, ...] = (
     CANONICAL_CHARTER_HEADER,
     "Upstream-Only Mandate",
+    "Zero Paper Self-Invention",
     "<= 5,000",
     "<= 2026-10-15",
     "<= 2.00%",
@@ -60,13 +61,15 @@ def is_canonical_tier0_charter(text: str) -> bool:
     """Return True if text matches the concise Canonical Single-Rule Tier-0 Charter (`ADR-0049`/`ADR-0050`)."""
     return all(clause in text for clause in CANONICAL_CHARTER_REQUIRED_CLAUSES)
 
+
 TIER0_CANONICAL_BLOCK = (
     f"{TIER0_MARKER_START}\n"
-    "- **Tier-0 SOTA-Source-Only & Hard Upstream Provenance (`ADR-0023` / `ADR-0092` / `ADR-0094`):** "
-    "Every production line, backtest engine, strategy, hook, skill, and ADR across all `18/18` repos MUST "
-    "install, integrate, or build directly upon pinned SOTA upstream libraries (`~/Documents/upstream/` "
-    "`18`-pin shelf lock, `UPSTREAM.md`, `upstream-map.toml`, zero placeholders/banned libs, GitHub-evidenced "
-    "MADR 4.0 ADRs). Verify `scripts/merge_gate.py` and `shelf_lock.hard_upstream_rule "
+    "- **Tier-0 SOTA-Source-Only, Zero Paper Self-Invention & Hard Upstream Provenance (`ADR-0023` / `ADR-0092` / `ADR-0094`):** "
+    "Every production line, backtest engine, strategy, hook, skill, and ADR across all `18/18` repos MUST cleanly "
+    "install, integrate, or build directly upon pinned SOTA upstream frameworks, hosted platforms, and official/verified "
+    "paper repositories (`~/Documents/upstream/` `18`-pin shelf lock, `UPSTREAM.md`, `upstream-map.toml`, zero placeholders/"
+    "banned libs, GitHub-evidenced MADR 4.0 ADRs) and validate E2E on pre-wall historical data (`<= 2026-10-15`) — NEVER "
+    "self-invent from scratch based on papers. Verify `scripts/merge_gate.py` and `shelf_lock.hard_upstream_rule "
     "--require-full-compliance` before landing; consolidated single-repo finalized ADRs live verbatim in "
     "`sota-private-vault/adr_archive/` (`ADR-0027`) and as the public-safe master registry in "
     "`native-agent-stack/docs/adr/ECOSYSTEM_FINALIZED_ADRS_MASTER_REGISTRY.md` (`ADR-0044`).\n"
@@ -99,10 +102,10 @@ TIER0_CANONICAL_BLOCK = (
 )
 
 AGY_PLUGIN_ADR0023_LINE = (
-    "- **Tier-0 SOTA-Source-Only, No Self-Built Waste & Hosted SOTA Platform Mandate (`ADR-0023` / `ADR-0027` / `ADR-0044` / `ADR-0045` / `ADR-0046` / `ADR-0047`):** "
-    "Every production file, strategy, hook, skill, and ADR across all `18/18` repos MUST host or build thinly atop pinned SOTA upstream platforms "
+    "- **Tier-0 SOTA-Source-Only, Zero Paper Self-Invention & Hosted SOTA Platform Mandate (`ADR-0023` / `ADR-0027` / `ADR-0044` / `ADR-0045` / `ADR-0046` / `ADR-0047`):** "
+    "Every production file, strategy, hook, skill, and ADR across all `18/18` repos MUST cleanly install, host, or build thinly atop pinned SOTA upstream frameworks, platforms, and official paper repos tested E2E on historical data (`<= 2026-10-15`) "
     "(`NautilusTrader v2`, `OpenBB/FINOS Workspace :1420/:6900`, `hftbacktest`, `vectorbt`, `QuantStats`, `Perspective`, `Polars`, `DuckDB`) — "
-    "ZERO self-built custom OMS/UI/proxy waste, ZERO throttle band-aids on broken strategies, strict legacy monolith LOC freeze & merged-worktree cleanup "
+    "ZERO self-invented paper implementations, ZERO self-built custom OMS/UI/proxy waste, ZERO throttle band-aids on broken strategies, strict legacy monolith LOC freeze & merged-worktree cleanup "
     "audited via `native-agent-stack/scripts/one_harness_cleanliness_doctor.py`; single-repo finalized ADR archives live in "
     "`sota-private-vault/adr_archive/` (verbatim private) and `native-agent-stack/docs/adr/ECOSYSTEM_FINALIZED_ADRS_MASTER_REGISTRY.md` (public-safe registry)."
 )
@@ -282,7 +285,9 @@ def check_tier0_harness_md_parity(home_dir: Path | None = None) -> dict[str, Any
     # When runtimes adopt the Canonical Single-Rule Charter, enforce 0-byte cross-runtime parity
     canonical_mode = len(canonical_hashes) == len(global_runtime_md_targets(home))
     if canonical_hashes and len(set(canonical_hashes.values())) > 1:
-        dominant = max(set(canonical_hashes.values()), key=lambda h: list(canonical_hashes.values()).count(h))
+        dominant = max(
+            set(canonical_hashes.values()), key=lambda h: list(canonical_hashes.values()).count(h)
+        )
         for label, digest in canonical_hashes.items():
             if digest != dominant:
                 statuses[label] = "drifted"
@@ -316,15 +321,27 @@ def check_tier0_harness_md_parity(home_dir: Path | None = None) -> dict[str, Any
 
 
 def sync_tier0_harness_md_files(home_dir: Path | None = None) -> dict[str, str]:
-    """Propagate canonical Tier-0 rules across runtime `.md` files (preserving concise Canonical Charter verbatim)."""
+    """Propagate canonical Tier-0 rules across runtime `.md` files (upgrading Canonical Charter verbatim)."""
     home = home_dir or Path.home()
     results: dict[str, str] = {}
     canonical_count = 0
+    charter_path = ROOT / "docs" / "cleanroom" / "TIER0_CANONICAL_CHARTER.md"
+    canonical_txt = (
+        charter_path.read_text(encoding="utf-8").replace("\r\n", "\n") if charter_path.is_file() else ""
+    )
     for label, target in global_runtime_md_targets(home):
         if not target.is_file():
             results[label] = "missing"
             continue
         old = target.read_text(encoding="utf-8")
+        if old.lstrip().startswith(CANONICAL_CHARTER_HEADER) and canonical_txt:
+            canonical_count += 1
+            if old.replace("\r\n", "\n") == canonical_txt:
+                results[label] = "unchanged"
+            else:
+                target.write_text(canonical_txt, encoding="utf-8", newline="\n")
+                results[label] = "updated"
+            continue
         if is_canonical_tier0_charter(old):
             canonical_count += 1
             results[label] = "unchanged"

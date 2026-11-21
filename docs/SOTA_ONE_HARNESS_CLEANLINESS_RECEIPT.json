@@ -1,7 +1,7 @@
 {
   "schema": "sota.one-harness-cleanliness-receipt.v1",
   "adr": "ADR-0046",
-  "generated_at_utc": "2026-11-21T13:14:50.700343Z",
+  "generated_at_utc": "2026-11-21T13:35:11.741380Z",
   "mode": "full_workstation",
   "overall_ok": true,
   "summary": {
@@ -17,7 +17,7 @@
       "upstream_map_pass": 18,
       "adr_evidence_pass": 18,
       "shelf_pins_ok": true,
-      "audit_sha256": "d0e3897eb1e5146c",
+      "audit_sha256": "df09fbee0e2c7168",
       "failure_count": 0,
       "failures": []
     },
@@ -44,7 +44,7 @@
     "3_adr0045_16layer_starred_beyond_and_research": {
       "ok": true,
       "manifest_sha256_valid": true,
-      "manifest_sha256": "2168f2f512ec3e065e341e8664a079640cffa49eb45ee5f90ae60ae7ce103a34",
+      "manifest_sha256": "dd788ab890ebc3da871bdf64ef248130e381a73e105bb6092558e0b8cba7df0b",
       "total_layers": 16,
       "research_stages_covered": 8,
       "pins_match_pins_lock": true,
@@ -56,6 +56,13 @@
         "owner_starred_total_audited": 415,
         "beyond_starred_sota_count": 8,
         "bitemporal_pit_verified": true
+      },
+      "hosted_frameworks_manifest": {
+        "present": true,
+        "sha256_valid": true,
+        "zero_paper_self_invention": true,
+        "clean_installed_frameworks_plus_official_paper_e2e_only": true,
+        "valid": true
       }
     },
     "4_adr0044_7runtime_md_60skills_redteam_and_models": {
@@ -66,7 +73,7 @@
         "drifted": [],
         "all_synced": true,
         "canonical_charter_mode": true,
-        "canonical_charter_sha256_16": "fa08b815ebc15bce",
+        "canonical_charter_sha256_16": "ba34ef82f3ac5281",
         "statuses": {
           "gemini_global": "synced",
           "claude_global": "synced",
@@ -96,11 +103,11 @@
     },
     "5_adr0027_adr0044_single_repo_adr_0drift": {
       "ok": true,
-      "live_total_adrs": 795,
-      "public_registry_total": 795,
+      "live_total_adrs": 796,
+      "public_registry_total": 796,
       "public_drift": {},
       "vault_archive_present": true,
-      "vault_archive_total": 795,
+      "vault_archive_total": 796,
       "vault_drift": {}
     },
     "6_universal_git_hooks_and_18repo_orca_gate": {
@@ -172,7 +179,7 @@
       "ok": true,
       "available": true,
       "live_sessions_count": 1,
-      "active_leases_count": 5
+      "active_leases_count": 2
     },
     "10_paper_trajectory_manifest_and_live_probes": {
       "ok": true,
@@ -199,5 +206,5 @@
       }
     }
   },
-  "receipt_sha256": "394d2a96e71ebf8dbadf58019f9bc06f37a52fe9c9ea633ddc73d7eb02b20114"
+  "receipt_sha256": "6c1474f0ab30104a89b68e7f49ed8bf08b2469c6bc1015030d17f0fb24b7c1d1"
 }

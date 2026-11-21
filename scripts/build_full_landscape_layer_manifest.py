@@ -210,6 +210,14 @@ def build_full_landscape_layer_manifest(
                     "repo": "obra/superpowers",
                     "role": "Disciplined Red-Green-Refactor TDD & systematic root-cause verification",
                 },
+                {
+                    "repo": "ast-grep/ast-grep",
+                    "role": "Structural AST search, lint rule authoring & multi-file codemods (MIT)",
+                },
+                {
+                    "repo": "HypothesisWorks/hypothesis",
+                    "role": "Property-based invariant testing for ADR-0022 stops & IEEE-754 bounds (MPL-2.0)",
+                },
             ],
             research_convergence_stages=[
                 "S1_IMMUTABLE_PREREGISTRATION_MINTRL_MDE",
@@ -279,6 +287,10 @@ def build_full_landscape_layer_manifest(
                     "repo": "dagster-io/dagster",
                     "role": "Software-defined PIT data & pre-wall research pipeline orchestration (Apache-2.0, 939bd1ea94)",
                 },
+                {
+                    "repo": "treeverse/dvc",
+                    "role": "Cryptographic PIT dataset versioning & pre-wall lake lineage (Apache-2.0, b59add99ee)",
+                },
             ],
             research_convergence_stages=["S2_BITEMPORAL_12FEED_PIT_INGEST"],
             harness_and_agent_md_binding={
@@ -339,6 +351,10 @@ def build_full_landscape_layer_manifest(
                 {
                     "repo": "nautechsystems/nautilus_agents",
                     "role": "Official Rust-native Agents SDK for NautilusTrader (LGPL-3.0, 380ae38f35, 0 order-path code)",
+                },
+                {
+                    "repo": "lballabio/QuantLib",
+                    "role": "Institutional US options Greeks, IV surface & derivatives pricing (BSD-3-Clause, 26a44f1fc8)",
                 },
             ],
             research_convergence_stages=["S4_NAUTILUS_HFTBACKTEST_QUEUE_SIM"],
@@ -426,6 +442,26 @@ def build_full_landscape_layer_manifest(
                 {
                     "repo": "optuna/optuna",
                     "role": "Pre-registered HLZ-bounded hyperparameter & threshold optimization (MIT, 0abf066c1e)",
+                },
+                {
+                    "repo": "lightgbm-org/LightGBM",
+                    "role": "PIT cross-sectional tabular alpha GBDT engine (MIT, 7810ecea3f)",
+                },
+                {
+                    "repo": "catboost/catboost",
+                    "role": "Symmetric oblivious trees with native categorical/sector handling (Apache-2.0, b7f986a16a)",
+                },
+                {
+                    "repo": "aeon-toolkit/aeon",
+                    "role": "Time-series ML classification, segmentation & anomaly detection (BSD-3-Clause, 1510ad271b)",
+                },
+                {
+                    "repo": "google-research/timesfm",
+                    "role": "Time-Series Foundation Model for pre-wall horizon forecasts (Apache-2.0, 918df02c9d)",
+                },
+                {
+                    "repo": "WecoAI/aideml",
+                    "role": "Docker-sandboxed autonomous ML engineering search agent (MIT, ad73d227af)",
                 },
             ],
             research_convergence_stages=[
@@ -554,6 +590,10 @@ def build_full_landscape_layer_manifest(
                 {
                     "repo": "nautechsystems/nautilus_agents",
                     "role": "Official Rust-native Agents SDK for NautilusTrader (LGPL-3.0, 380ae38f35, 0 order-path code)",
+                },
+                {
+                    "repo": "lballabio/QuantLib",
+                    "role": "Institutional US options Greeks, IV surface & derivatives pricing (BSD-3-Clause, 26a44f1fc8)",
                 },
             ],
             research_convergence_stages=["S7_SINGLE_HOST_PAPER_BRACKET_EXECUTION"],
@@ -780,6 +820,18 @@ def build_full_landscape_layer_manifest(
                     "repo": "HKUDS/Vibe-Trading",
                     "role": "Skill-native trading research harness reference (MIT, 38.6k stars; sandboxed, 0 broker keys)",
                 },
+                {
+                    "repo": "OrchestratorInc/agent-orchestrator",
+                    "role": "8-slot pluggable Multi-Model Agent Orchestrator (AO) worktree & review lifecycle (Apache-2.0, 080a1a2a58)",
+                },
+                {
+                    "repo": "can1357/oh-my-pi",
+                    "role": "Pi/OMP @worker role-selected thinking-effort runtime workers (MIT, 517aaf00c4)",
+                },
+                {
+                    "repo": "OpenHands/OpenHands",
+                    "role": "Docker-sandboxed autonomous research & coding runtime (MIT, 0f4cb6af95)",
+                },
             ],
             research_convergence_stages=["S6_MULTI_VENDOR_ADVERSARIAL_REDTEAM"],
             harness_and_agent_md_binding={
@@ -935,6 +987,10 @@ def build_full_landscape_layer_manifest(
                 {
                     "repo": "FreedomIntelligence/TwinMarket",
                     "role": "NeurIPS/ICLR 2025 Best Paper BDI market herding & flash-crash stress simulator (MIT, de5f2446fc)",
+                },
+                {
+                    "repo": "cvxpy/cvxpy",
+                    "role": "Convex portfolio risk-budgeting & turnover/beta-constrained optimization (Apache-2.0, d889ec46a0)",
                 },
             ],
             research_convergence_stages=[
@@ -1203,6 +1259,7 @@ def build_full_landscape_layer_manifest(
         "advanced_research_landscape_adr": "ADR-0048",
         "cleanroom_v4_adr": "ADR-0049",
         "hosted_research_frameworks_seal_adr": "ADR-0050",
+        "full_landscape_ao_and_zero_paper_self_invention_adr": "ADR-0051",
         "shelf_lock_frontier_adr": "sota-upstream-shelf-lock/ADR-0026",
         "generated_at_utc": generated_at_utc or datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "hard_invariants": {
