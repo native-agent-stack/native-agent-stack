@@ -1,7 +1,7 @@
 {
   "schema": "sota.public-master-finalized-adr-registry.v1",
   "adr": "ADR-0044",
-  "generated_at_utc": "2026-11-21T00:41:16.292704Z",
+  "generated_at_utc": "2026-11-21T01:06:14.503286Z",
   "repos_indexed": 18,
   "total_adrs_indexed": 787,
   "verbatim_private_archive_repo": "native-agent-stack/sota-private-vault (adr_archive/)",
@@ -14,8 +14,8 @@
     "dsh-plugin-landscape": 11,
     "dsh-sota-harness": 16,
     "meridian": 65,
-    "native-agent-stack": 44,
-    "sota-compounding-lab": 39,
+    "native-agent-stack": 45,
+    "sota-compounding-lab": 38,
     "sota-dynamic-trail-c": 35,
     "sota-harness-foundation": 46,
     "sota-mover-ranker": 99,
@@ -5690,6 +5690,22 @@
       "file_sha256": "727d8845cf584ab609990d7b09b6b13ac1a3fec0ff584d4ad915e7e7076b9609"
     },
     {
+      "repo": "native-agent-stack",
+      "tier": "PUBLIC",
+      "file": "ADR-0045-full-landscape-resolute-sota-layer-pin-architecture-manifest.md",
+      "title": "ADR-0045: Full-Landscape Resolute SOTA Layer-Pin Architecture Manifest (`L0`\u2013`L15`: Shelf, Backtest, Strategies, Trading Engine/UI, Orca Harness & Institutional Expansion)",
+      "status": "Accepted",
+      "date": "2026-11-20",
+      "evidence_grade": "E4 (Deterministic 16-layer `L0\u2013L15` manifest res",
+      "github_urls": [
+        "https://github.com/finos/perspective",
+        "https://github.com/native-agent-stack/native-agent-stack",
+        "https://github.com/native-agent-stack/sota-upstream-shelf-lock",
+        "https://github.com/nautechsystems/nautilus_trader"
+      ],
+      "file_sha256": "f670b94e615cb6125232815fabd03819a9ef5fe3123c56ed94a2ea56051fc121"
+    },
+    {
       "repo": "sota-compounding-lab",
       "tier": "PUBLIC",
       "file": "ADR-0001-public-open-core-vs-private-vault-org-firewall.md",
@@ -6164,19 +6180,6 @@
         "https://github.com/nkaz001/hftbacktest"
       ],
       "file_sha256": "89e7d6b1fcafd21e8b4093ccc79d4fd44c3e40f00a14b02120152a3c8446f56c"
-    },
-    {
-      "repo": "sota-compounding-lab",
-      "tier": "PUBLIC",
-      "file": "ADR-0039-official-sota-backtest-platform-ui-nautilus-perspective-lightweight-options.md",
-      "title": "ADR-0039: Official SOTA Backtest Platform UI (NautilusTrader v2 Tearsheets, VectorBT Sweeps, FINOS Perspective WASM, Lightweight Charts & US Options Rust Greeks)",
-      "status": "Accepted",
-      "date": "2026-11-20",
-      "evidence_grade": "",
-      "github_urls": [
-        "https://github.com/native-agent-stack/sota-compounding-lab"
-      ],
-      "file_sha256": "a4158e4447ee19e4364ebf7a6f9f11024a8780d65782c0e130403d45362ba131"
     },
     {
       "repo": "sota-dynamic-trail-c",
@@ -10715,5 +10718,5 @@
       "file_sha256": "ca48518bef018ae289a5b3798c2c0171c4ac8cc93342dbb702f71d302b9b81a4"
     }
   ],
-  "manifest_sha256": "21279f02d6dc984c0fbaf8717089615cc7a96a2f8c1f4335b27466151e6d8ba0"
+  "manifest_sha256": "bcb0551fdbc09031dfd9a363143a33cac15657cc99dff8bb4892e23b16b0ce28"
 }

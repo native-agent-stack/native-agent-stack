@@ -23,6 +23,7 @@
 
 [areas]
 "scripts/architecture_catalog.py" = { upstream = "orca", how = "build-on", feature = "MADR 4.0 umbrella ADR catalog and SHA-pinned workflow checker", why = "keep umbrella org ADRs synchronized across all 18 repos" }
+"scripts/build_full_landscape_layer_manifest.py" = { upstream = "orca", how = "build-on", feature = "Full-landscape 16-layer (L0-L15) SOTA pin architecture manifest generator (ADR-0045)", why = "bind every operational and expansion layer to verified 40-char upstream shelf pins and full-resolution gates" }
 "scripts/merge_gate.py" = { upstream = "orca", how = "build-on", feature = "Umbrella zero-leak, noreply-author, and manifest integrity gate", why = "enforce zero-leak invariants before umbrella commits land" }
 "scripts/sync_tier0_harness_and_master_adrs.py" = { upstream = "orca", how = "build-on", feature = "Canonical Tier-0 7-runtime harness .md synchronizer and single-repo public-safe Master ADR Registry (ADR-0044)", why = "keep all 7 agent runtimes aligned on ADR-0023 + ADR-0038 and maintain a unified single-repo ADR index" }
 "scripts/tune-noesis-os-elevated.ps1" = { upstream = "orca", how = "integrate", feature = "Noesis stationary Win32 host performance & power-plan helper", why = "maintain deterministic 24/5 primary workstation hosting" }

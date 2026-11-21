@@ -1,7 +1,7 @@
 # Native Agent Stack — Unified Single-Repo Master Finalized ADR Registry (`ADR-0044`)
 
 - **Total Finalized ADRs Indexed:** `787` across `18` repositories (`18/18` `ADR-0023` PASS)
-- **Canonical Manifest SHA-256:** `21279f02d6dc984c0fbaf8717089615cc7a96a2f8c1f4335b27466151e6d8ba0`
+- **Canonical Manifest SHA-256:** `bcb0551fdbc09031dfd9a363143a33cac15657cc99dff8bb4892e23b16b0ce28`
 - **Verbatim Private Continuity Copy:** `sota-private-vault/adr_archive/` (`ADR-0027`, Two-Tier Public/Private Firewall intact)
 
 ## Per-Repository Finalized ADR Summary
@@ -16,8 +16,8 @@
 | `dsh-plugin-landscape` | `PRIVATE` | `11` |
 | `dsh-sota-harness` | `PUBLIC` | `16` |
 | `meridian` | `PRIVATE` | `65` |
-| `native-agent-stack` | `PUBLIC` | `44` |
-| `sota-compounding-lab` | `PUBLIC` | `39` |
+| `native-agent-stack` | `PUBLIC` | `45` |
+| `sota-compounding-lab` | `PUBLIC` | `38` |
 | `sota-dynamic-trail-c` | `PRIVATE` | `35` |
 | `sota-harness-foundation` | `PUBLIC` | `46` |
 | `sota-mover-ranker` | `PRIVATE` | `99` |
@@ -463,6 +463,7 @@
 | `native-agent-stack` | `PUBLIC` | ADR-0042: `v3.11.1` Post-ANT Whole-Market `DF1..DF12` Merit Ranking & Lossless Consolidation Seal | Accepted | 2026-11-20 | `6713edbef280` |
 | `native-agent-stack` | `PUBLIC` | ADR-0043: `v3.12.0` Finalized Ecosystem, Full Landscape, Quality-First SOTA Standard, `Trial #105` Empirical Governance & Persistent `4/4` Paper Parity Seal | Accepted | 2026-11-20 | `8157c3dcbc26` |
 | `native-agent-stack` | `PUBLIC` | ADR-0044: Tier-0 Multi-Runtime Harness `.md` Convergence & Unified Single-Repo Master Finalized ADR Registry | Accepted | 2026-11-20 | `727d8845cf58` |
+| `native-agent-stack` | `PUBLIC` | ADR-0045: Full-Landscape Resolute SOTA Layer-Pin Architecture Manifest (`L0`–`L15`: Shelf, Backtest, Strategies, Trading Engine/UI, Orca Harness & Institutional Expansion) | Accepted | 2026-11-20 | `f670b94e615c` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0001: Public Open-Core vs. Private Execution & Vault Organization Firewall | Accepted | 2026-11-17 | `fc73c9d38f87` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0002: Five-Stage Sim -> Pre-Wall Backtest -> Paper -> Empirical-Bayes -> Broker Pipeline | Accepted | 2026-11-17 | `f55ed3efc217` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0003: Pre-Wall (`<= 2026-10-15`), Harvey–Liu–Zhu `t*(N)` & Native-Frequency `DSR` Gate | Accepted | 2026-11-17 | `d127aa9fefef` |
@@ -501,7 +502,6 @@
 | `sota-compounding-lab` | `PUBLIC` | ADR-0036: Fail-Closed `upstream-map.toml`, 18-Pin Shelf Parity & Zero-Placeholder Merge Gate for `sota-compounding-lab` | Accepted | 2026-11-20 | `f9dd2275000a` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0037: Sim Lanes (`S1`/`S2`) Tier-0 SOTA-Source-Only Enforcement & Anti-Self-Invention Gate | Accepted | 2026-11-20 | `00c72835be30` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0038: Tier-0 Full-Resolution, Always-Full-Resolution, Zero-Residual, Zero-Fallback Backbone Rule | Accepted | 2026-11-20 | `89e7d6b1fcaf` |
-| `sota-compounding-lab` | `PUBLIC` | ADR-0039: Official SOTA Backtest Platform UI (NautilusTrader v2 Tearsheets, VectorBT Sweeps, FINOS Perspective WASM, Lightweight Charts & US Options Rust Greeks) | Accepted | 2026-11-20 | `a4158e4447ee` |
 | `sota-dynamic-trail-c` | `PRIVATE` | ADR-0001: Sub-50ms Hybrid WebSocket + REST 24/5 Dual-Tranche Dynamic Trailing Guardian | Accepted | 2026-11-17 | `4652b1ed5d77` |
 | `sota-dynamic-trail-c` | `PRIVATE` | ADR-0002: Pre-Wall Empirical-Bayes Quantile Calibration & L1 OBI / Lee-Ready OFI Modulation | Accepted | 2026-11-17 | `867f18e5d888` |
 | `sota-dynamic-trail-c` | `PRIVATE` | ADR-0003: TradingView 24/5 Off-Hours Relay, 5-Gate Webhook & Daily Scratch Circuit Breaker | Accepted | 2026-11-17 | `774cea3e19f6` |
