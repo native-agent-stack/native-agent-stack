@@ -1,9 +1,9 @@
 {
   "schema": "sota.public-master-finalized-adr-registry.v1",
   "adr": "ADR-0044",
-  "generated_at_utc": "2026-11-21T13:34:43.106025Z",
+  "generated_at_utc": "2026-11-21T13:45:06.176539Z",
   "repos_indexed": 18,
-  "total_adrs_indexed": 796,
+  "total_adrs_indexed": 797,
   "verbatim_private_archive_repo": "native-agent-stack/sota-private-vault (adr_archive/)",
   "per_repo_counts": {
     "agy-sota-harness": 36,
@@ -14,7 +14,7 @@
     "dsh-plugin-landscape": 11,
     "dsh-sota-harness": 16,
     "meridian": 65,
-    "native-agent-stack": 51,
+    "native-agent-stack": 52,
     "sota-compounding-lab": 39,
     "sota-dynamic-trail-c": 35,
     "sota-harness-foundation": 46,
@@ -5802,6 +5802,22 @@
       "file_sha256": "d4c656e57df28fe33f1c3e8ad600562bb242a0801ff35880a76d00582eafa058"
     },
     {
+      "repo": "native-agent-stack",
+      "tier": "PUBLIC",
+      "file": "ADR-0052-final-multi-repo-retirement-and-single-clean-monorepo-v5-cutover.md",
+      "title": "ADR-0052: Final Multi-Repo Retirement & Cutover to Single Clean Monorepo `v5.0` (`sota-ecosystem`, `10` Clean Consolidated ADRs)",
+      "status": "Accepted",
+      "date": "2026-11-21",
+      "evidence_grade": "E4 (Single clean monorepo initialized & verified",
+      "github_urls": [
+        "https://github.com/OrchestratorInc/agent-orchestrator",
+        "https://github.com/mlflow/mlflow",
+        "https://github.com/native-agent-stack/native-agent-stack",
+        "https://github.com/nautechsystems/nautilus_trader"
+      ],
+      "file_sha256": "7b6e24c4940e013afabca5094282241ff87658b54c981211c5612ce03b0cc816"
+    },
+    {
       "repo": "sota-compounding-lab",
       "tier": "PUBLIC",
       "file": "ADR-0001-public-open-core-vs-private-vault-org-firewall.md",
@@ -10862,5 +10878,5 @@
       "file_sha256": "ca48518bef018ae289a5b3798c2c0171c4ac8cc93342dbb702f71d302b9b81a4"
     }
   ],
-  "manifest_sha256": "b4218f3264681e67f835a2a5a752dd2046599c8d0d1dcd1e5c57097f3f6b4d4c"
+  "manifest_sha256": "2f3baa86b424ac1d7d650b1655f9ba5c767b92750d17f836ab3847a360371ded"
 }

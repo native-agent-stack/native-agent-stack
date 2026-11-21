@@ -1,7 +1,7 @@
 {
   "schema": "sota.one-harness-cleanliness-receipt.v1",
   "adr": "ADR-0046",
-  "generated_at_utc": "2026-11-21T13:35:11.741380Z",
+  "generated_at_utc": "2026-11-21T13:45:33.131403Z",
   "mode": "full_workstation",
   "overall_ok": true,
   "summary": {
@@ -17,7 +17,7 @@
       "upstream_map_pass": 18,
       "adr_evidence_pass": 18,
       "shelf_pins_ok": true,
-      "audit_sha256": "df09fbee0e2c7168",
+      "audit_sha256": "f5f7a9d7dcf68201",
       "failure_count": 0,
       "failures": []
     },
@@ -44,7 +44,7 @@
     "3_adr0045_16layer_starred_beyond_and_research": {
       "ok": true,
       "manifest_sha256_valid": true,
-      "manifest_sha256": "dd788ab890ebc3da871bdf64ef248130e381a73e105bb6092558e0b8cba7df0b",
+      "manifest_sha256": "1c7f31fd8c5732dc30db5d3cb8c8059199cba1e09f9ce232fef74ee4a9f5d9da",
       "total_layers": 16,
       "research_stages_covered": 8,
       "pins_match_pins_lock": true,
@@ -103,11 +103,11 @@
     },
     "5_adr0027_adr0044_single_repo_adr_0drift": {
       "ok": true,
-      "live_total_adrs": 796,
-      "public_registry_total": 796,
+      "live_total_adrs": 797,
+      "public_registry_total": 797,
       "public_drift": {},
       "vault_archive_present": true,
-      "vault_archive_total": 796,
+      "vault_archive_total": 797,
       "vault_drift": {}
     },
     "6_universal_git_hooks_and_18repo_orca_gate": {
@@ -206,5 +206,5 @@
       }
     }
   },
-  "receipt_sha256": "6c1474f0ab30104a89b68e7f49ed8bf08b2469c6bc1015030d17f0fb24b7c1d1"
+  "receipt_sha256": "f31f3af71d5f3a4e101ca81fac531cd586c9cabd0cc06de256123c4e9a588e99"
 }
