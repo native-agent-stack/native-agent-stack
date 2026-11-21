@@ -1,9 +1,9 @@
 {
   "schema": "sota.public-master-finalized-adr-registry.v1",
   "adr": "ADR-0044",
-  "generated_at_utc": "2026-11-21T02:08:16.611306Z",
+  "generated_at_utc": "2026-11-21T02:24:36.457017Z",
   "repos_indexed": 18,
-  "total_adrs_indexed": 792,
+  "total_adrs_indexed": 793,
   "verbatim_private_archive_repo": "native-agent-stack/sota-private-vault (adr_archive/)",
   "per_repo_counts": {
     "agy-sota-harness": 36,
@@ -14,7 +14,7 @@
     "dsh-plugin-landscape": 11,
     "dsh-sota-harness": 16,
     "meridian": 65,
-    "native-agent-stack": 48,
+    "native-agent-stack": 49,
     "sota-compounding-lab": 38,
     "sota-dynamic-trail-c": 35,
     "sota-harness-foundation": 46,
@@ -5754,6 +5754,22 @@
       "file_sha256": "bf49fb50fef1e6e017aa89412c057dfaf3caf38a36b0634f358d6c669cd1430e"
     },
     {
+      "repo": "native-agent-stack",
+      "tier": "PUBLIC",
+      "file": "ADR-0049-cleanroom-v4-sota-only-hosted-ecosystem-legacy-retirement-and-tier0-only-agent-md.md",
+      "title": "ADR-0049: Clean-Room `v4.0` SOTA-Only Hosted Ecosystem Blueprint, Legacy `18`-Repo Self-Built Retirement, Inspector Security Corrections & Tier-0-Only `AGENTS.md` / `GEMINI.md` Standard",
+      "status": "Accepted",
+      "date": "2026-11-20",
+      "evidence_grade": "E4 (Converges BOTH the 7-agent Claude inspect-on",
+      "github_urls": [
+        "https://github.com/TauricResearch/TradingAgents",
+        "https://github.com/alpacahq/alpaca-mcp-server",
+        "https://github.com/microsoft/qlib",
+        "https://github.com/nautechsystems/nautilus_agents"
+      ],
+      "file_sha256": "63c8ea96ba9d1be5ddfa841f9d350536b9f5ce11b6fa38aa17d2a797a3db0cc3"
+    },
+    {
       "repo": "sota-compounding-lab",
       "tier": "PUBLIC",
       "file": "ADR-0001-public-open-core-vs-private-vault-org-firewall.md",
@@ -10798,5 +10814,5 @@
       "file_sha256": "ca48518bef018ae289a5b3798c2c0171c4ac8cc93342dbb702f71d302b9b81a4"
     }
   ],
-  "manifest_sha256": "073722288265700a1fd42daead1e5289577e2a14bcf190a0dc270dd4fd41631d"
+  "manifest_sha256": "36ca52fc984be4e9d1b8ca4ad1036fce15893ea8068a61ced1d00e908bf8a9a5"
 }
