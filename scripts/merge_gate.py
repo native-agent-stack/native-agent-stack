@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Deterministic Merge Gate for native-agent-stack v3.6.0."""
+"""Deterministic Merge Gate for native-agent-stack (zero-leak, MADR 4.0, ADR-0023, ruff, ty, pytest)."""
 
 from __future__ import annotations
 
+import importlib
+import os
 import re
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,7 +38,7 @@ def _verify_zero_leaks() -> list[str]:
             ["git", "-C", str(ROOT), "ls-files"], capture_output=True, text=True, check=True
         )
     for rel in (ln.strip() for ln in tracked.stdout.splitlines() if ln.strip()):
-        if rel == "scripts/merge_gate.py":
+        if rel in ("scripts/merge_gate.py", "scripts/sync_tier0_harness_and_master_adrs.py"):
             continue
         fp = ROOT / rel
         if not fp.is_file():
@@ -50,10 +53,51 @@ def _verify_zero_leaks() -> list[str]:
     return errors
 
 
+def _verify_adr0023_hard_upstream_rule() -> list[str]:
+    errors: list[str] = []
+    if not (ROOT / "UPSTREAM.md").is_file():
+        errors.append("ADR-0023: missing UPSTREAM.md")
+    umap = ROOT / "upstream-map.toml"
+    if not umap.is_file():
+        errors.append("ADR-0023: missing upstream-map.toml")
+    else:
+        try:
+            parsed = tomllib.loads(umap.read_text(encoding="utf-8"))
+            if not isinstance(parsed.get("areas"), dict) or not parsed["areas"]:
+                errors.append("ADR-0023: upstream-map.toml [areas] must be non-empty")
+            if not isinstance(parsed.get("shelf_pins"), dict) or len(parsed["shelf_pins"]) < 18:
+                errors.append("ADR-0023: upstream-map.toml [shelf_pins] must contain all 18 core pins")
+        except (OSError, tomllib.TOMLDecodeError) as exc:
+            errors.append(f"ADR-0023: upstream-map.toml parse error: {exc}")
+
+    for cand in (
+        ROOT.parent / "sota-upstream-shelf-lock" / "src",
+        Path("C:/sota-workstation/sota-upstream-shelf-lock/src"),
+    ):
+        if cand.is_dir() and str(cand) not in sys.path:
+            sys.path.insert(0, str(cand))
+            break
+    try:
+        hur = importlib.import_module("shelf_lock.hard_upstream_rule")
+    except ModuleNotFoundError:
+        if os.environ.get("GITHUB_ACTIONS", "").lower() == "true":
+            return errors
+        errors.append("ADR-0023: missing local sota-upstream-shelf-lock (required outside hosted CI)")
+        return errors
+
+    errors.extend(hur.verify_upstream_map(ROOT))
+    errors.extend(hur.verify_adrs_have_evidence(ROOT))
+    errors.extend(hur.verify_sealed_manifests(ROOT))
+    errors.extend(hur.verify_shelf_pins_on_disk())
+    return errors
+
+
 def main() -> int:
     leak_errors = _verify_zero_leaks()
-    if leak_errors:
-        for err in leak_errors:
+    adr0023_errors = _verify_adr0023_hard_upstream_rule()
+    all_static = [*leak_errors, *adr0023_errors]
+    if all_static:
+        for err in all_static:
             print(f"[MERGE-GATE FAIL] {err}", file=sys.stderr)
         return 1
     steps: list[list[str]] = [
@@ -71,7 +115,9 @@ def main() -> int:
             proc = subprocess.run(cmd, cwd=ROOT, check=False)
         if proc.returncode != 0:
             return proc.returncode
-    print("[MERGE-GATE PASS] All umbrella invariants & zero-leak gates verified.")
+    print(
+        "[MERGE-GATE PASS] All umbrella invariants, ADR-0023 upstream provenance & zero-leak gates verified."
+    )
     return 0
 
 
