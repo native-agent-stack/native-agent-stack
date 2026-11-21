@@ -1,7 +1,7 @@
 {
   "schema": "sota.one-harness-cleanliness-receipt.v1",
   "adr": "ADR-0046",
-  "generated_at_utc": "2026-11-21T13:45:33.131403Z",
+  "generated_at_utc": "2026-11-21T13:56:05.733993Z",
   "mode": "full_workstation",
   "overall_ok": true,
   "summary": {
@@ -44,7 +44,7 @@
     "3_adr0045_16layer_starred_beyond_and_research": {
       "ok": true,
       "manifest_sha256_valid": true,
-      "manifest_sha256": "1c7f31fd8c5732dc30db5d3cb8c8059199cba1e09f9ce232fef74ee4a9f5d9da",
+      "manifest_sha256": "3c0d6bce613f2293f8ba6d9b4d6f84bef1a1eb8a030b5ab6bec0512bb09326fb",
       "total_layers": 16,
       "research_stages_covered": 8,
       "pins_match_pins_lock": true,
@@ -206,5 +206,5 @@
       }
     }
   },
-  "receipt_sha256": "f31f3af71d5f3a4e101ca81fac531cd586c9cabd0cc06de256123c4e9a588e99"
+  "receipt_sha256": "b47e94a466162729f4f7a03e099a2839ee83118e6b85e21bcef9868b9cedff4d"
 }

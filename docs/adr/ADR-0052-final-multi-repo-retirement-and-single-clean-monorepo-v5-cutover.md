@@ -1,26 +1,30 @@
-# ADR-0052: Final Multi-Repo Retirement & Cutover to Single Clean Monorepo `v5.0` (`sota-ecosystem`, `10` Clean Consolidated ADRs)
+# ADR-0052: Final Multi-Repo Retirement & Cutover to Disk-`Z:` Single Clean Monorepo (`Noesis-SOTA:~/tier0-quant` & Single Master ADR)
 
 - **Status:** Accepted
 - **Date:** 2026-11-21
 - **Supersedes:** Formally supersedes BOTH the legacy `18`-repo multi-repo sprawl (`C:\sota-workstation`) AND the intermediate `4`-repo split proposed in `ADR-0049`.
-- **Evidence Grade:** E4 (Single clean monorepo initialized & verified at `C:\sota-ecosystem` with `<= 5,000` LOC ceiling enforced fail-closed, `10/10` clean consolidated MADR 4.0 ADRs covering `L0–L15` × `S1–S8` & `95` Disk-`Z:` hosted upstream repos, `merge_gate.py PASS`, `pytest` + Hypothesis PASS, `ruff` 0, `gitleaks` 0; legacy `18/18` repos preserved clean & synced `0/0` at `one_harness_cleanliness_doctor.py` `10/10 PASS`)
-- **GitHub Evidence:** https://github.com/native-agent-stack/native-agent-stack, https://github.com/nautechsystems/nautilus_trader, https://github.com/stablyai/orca, https://github.com/OrchestratorInc/agent-orchestrator, https://github.com/mlflow/mlflow, https://github.com/openbq-org/finos-workspace
+- **Evidence Grade:** E4 (100% Disk-`Z:` topology verified via live WSL `Lxss` registry & Docker probes: `Noesis-SOTA` -> `Z:\WSL\Noesis-SOTA` (`~/tier0-quant`, single consolidated Master ADR `ADR-0001` hosted live via `Zensical` on `:8010`, native `dockerd` `6/6` services `:5000` MLflow 3 / `:3000` Dagster / `:8080` Optuna Dashboard / `:7575` Inspect AI View / `:8010` Zensical + `aideml-sandbox`), `docker-desktop` -> `Z:\sota-cache\docker-wsl\main` (`openbq-org/finos-workspace` `:1420`/`:8000` + `plotly-charts@2.5.0` & `ag-grid@2.3.0`), `Noesis-Carbon` -> `Z:\WSL\Noesis-Carbon` (`native_ext4` lake + `:8794` RTX 4090 CUDA sidecar), `95` hosted upstream repos on `Z:\sota-data\hosted-research-frameworks\` & `Z:\sota-data\upstream\`, all model/package caches on `Z:\sota-cache\`; legacy `18/18` repos preserved clean & synced `0/0` at `one_harness_cleanliness_doctor.py` `10/10 PASS`)
+- **GitHub Evidence:** https://github.com/native-agent-stack/native-agent-stack, https://github.com/nautechsystems/nautilus_trader, https://github.com/stablyai/orca, https://github.com/OrchestratorInc/agent-orchestrator, https://github.com/mlflow/mlflow, https://github.com/openbq-org/finos-workspace, https://github.com/zensical/zensical
 
 ## Context
 
-Even after converging `18/18` legacy repositories (`796+` ADRs) cleanly, maintaining multiple repositories—whether `18` legacy repos or the `4`-repo split originally drafted in `ADR-0049`—imposes unnecessary multi-repo synchronization, cross-repo ADR drift, and duplicated merge-gate boilerplate. The owner explicitly directed: **"no more multi-repo; the new ecosystem will live in one clean repository with clean ADRs"** covering every detail and layer (`L0–L15`) via Research Convergence (`S1–S8`) alongside local hosting of all advanced research framework repositories, Orca, and Multi-Model AO.
+Even after converging `18/18` legacy repositories cleanly, maintaining multiple repositories—or placing new clean-room repositories, Docker volumes, model weights, or package caches on Drive `C:`—violates the owner's **Disk-`Z:`-only, single-clean-repo** directive. The active clean-room harness is already hosted natively on Disk `Z:` inside `Noesis-SOTA` (`Z:\WSL\Noesis-SOTA` -> `~/tier0-quant`) alongside `Z:\sota-data\` and `Z:\sota-cache\`.
 
 ## Decision
 
-1. **Zero Multi-Repo Sprawl — Single Clean Monorepo `v5.0` (`C:\sota-ecosystem`):**
-   - Establishes `sota-ecosystem` (`C:\sota-ecosystem`) as the **sole active clean-room repository** replacing all multi-repo topologies (`18`-repo legacy AND `4`-repo `ADR-0049` split).
-   - Enforces a hard custom production code ceiling of **`<= 5,000` LOC** via single-repo `scripts/merge_gate.py`, with secrets/credentials strictly excluded from Git (`.gitignore` + `gitleaks` + universal `core.hooksPath`).
-2. **One Clean Consolidated `10`-ADR MADR 4.0 Canon (`C:\sota-ecosystem\docs\adr\ADR-0001..ADR-0010`):**
-   - Replaces `797` fragmented legacy ADRs with `10` clean, zero-cruft, GitHub-evidenced MADR 4.0 ADRs covering every layer (`L0–L15`), all `8` Research Convergence stages (`S1–S8`), Zero Paper Self-Invention (`AGENTS.md`), single-engine `NautilusTrader v2` + `hftbacktest` + `QuantLib` parity, `MLflow 3.18.0` (`:5050`), `FINOS Workspace` (`:1420` + `plotly-charts@2.5.0` & `ag-grid@2.3.0`) + `OpenBB` (`:6900`) + pure upstream tearsheets (`:8793`), RTX 4090 GPU compute (`:8794`) + `95` hosted Disk-`Z:` upstream repos, `Orca` (`1.4.264`) + `OrchestratorInc/agent-orchestrator` (8-slot Multi-Model AO) + Docker-sandboxed `OpenHands`/`aideml`, and fail-closed risk (`<= 2.00%` Reg-NMS stop, `-1.50%` daily breaker, `>= 10%` API exit reserve, `singleActiveBrokerHostOnly = true`).
-3. **Non-Destructive Archival Closure of `18/18` Legacy Repos:**
-   - Seals the legacy `18`-repo estate cleanly (`dirty=0`, `0/0` pushed, `10/10` cleanliness doctor, `797/797` verbatim ADR archive in `sota-private-vault/adr_archive/`) as read-only historical provenance while all new development proceeds strictly inside the single clean monorepo `sota-ecosystem`.
+1. **100% Disk-`Z:` Clean-Room Topology (Zero New Repos, Dockers, or Model Caches on Drive `C:`):**
+   - **Sole Active Clean-Room Monorepo:** `Noesis-SOTA:~/tier0-quant` (`Z:\WSL\Noesis-SOTA`, with Windows mirror `Z:\tier0-quant` & Mac converged reference `Z:\tier0-quant-mac-converged`), enforcing `<= 5,000` LOC custom production ceiling, Zero Self-Built Frameworks, and Zero Paper Self-Invention (`AGENTS.md` Charter `ba34ef82...`).
+   - **Single Consolidated Master ADR (`len(adr_files) == 1`):** `Noesis-SOTA:~/tier0-quant/docs/adr/ADR-0001-tier0-quant-clean-architecture-layers-research-convergence-and-hosted-frameworks.md` covering all `16` layers (`L0–L15`) × `8` Research Convergence stages (`S1–S8`), `18` core shelf pins, and all `95` Disk-`Z:` hosted research/Orca/AO frameworks, hosted live via `Zensical 0.1.3` on `http://127.0.0.1:8010`.
+   - **All Docker Engines & Live Research Services on Disk `Z:`:**
+     - `Noesis-SOTA` native `dockerd` (`Z:\WSL\Noesis-SOTA`): `MLflow 3` (`:5000`), `Dagster` (`:3000` + daemon), `Optuna Dashboard` (`:8080`), `Inspect AI View` (`:7575`), `Zensical ADR Portal` (`:8010`), plus `aideml-sandbox`.
+     - `docker-desktop` (`Z:\sota-cache\docker-wsl\main`): `openbq-org/finos-workspace` (`:1420`/`:8000` with `plotly-charts@2.5.0` & `ag-grid@2.3.0`) connected to `openbq-org/backends-for-openbb` (`:6900`).
+     - `Noesis-Carbon` (`Z:\WSL\Noesis-Carbon`): `native_ext4` pre-wall lake & RTX 4090 CUDA sidecar (`:8794`).
+     - Pure unmodified upstream tearsheets (`Z:\sota-data\tearsheets` -> `:8793`) & IBKR Paper (`:4002`).
+   - **All `95` Hosted Upstream Repos, Models & Multi-Runtime Caches on Disk `Z:`:** `Z:\sota-data\upstream\` (`18` immutable core pins, untouched), `Z:\sota-data\hosted-research-frameworks\` (`95`-repo registry including `Orca`, `OrchestratorInc/agent-orchestrator` AO, `OMC`/`OMX`/`oh-my-pi`/`DSH`, `OpenHands`, `aideml`, `QuantLib`, `Lean`, `Qlib`, `MarS`, `LOBS5`, `TabPFN`, `TimesFM`, `SkillEvaluator`, `OpenShell`, `Claude-BugHunter`), and `Z:\sota-cache\` (`huggingface`, `torch`, `ollama`, `pip`, `uv`, `uv-python`, `npm`, `venvs`, `cargo-target`, `docker-wsl`).
+2. **Non-Destructive Archival Closure of `18/18` Legacy Repos:**
+   - Seals the legacy `18`-repo `C:\sota-workstation` estate cleanly (`dirty=0`, `0/0` pushed, `10/10` cleanliness doctor, `797/797` verbatim ADR archive in `sota-private-vault/adr_archive/`) as read-only archival provenance. Any temporary duplicate repo on `C:` (`C:\sota-ecosystem`) is permanently removed.
 
 ## Consequences
 
-- **Positive:** Permanently eliminates multi-repo overhead, cross-repo ADR drift, and boilerplate duplication while preserving `100%` of the legacy audit trail non-destructively.
-- **Negative / Safeguards:** Creating a single GitHub remote for `sota-ecosystem` (private vs. public) remains gated on explicit owner confirmation.
+- **Positive:** Every single active component—clean monorepo, Master ADR + Zensical portal, both Docker engines, all `95` hosted upstream repos, multi-runtime toolchains, model weights, and caches—resides exclusively on Disk `Z:` (`3.3 TB` free), leaving Drive `C:` clean and legacy `18/18` repos frozen and archived.
+- **Negative / Safeguards:** Protected boundaries (`Z:\WSL\sextant`, `Z:\meridian-data\handoff-2026-11-17\`, `~/Documents/upstream/`, Drive `D:`, Drive `F:`, live broker ports, and `wsl --shutdown`) remain 100% hard-refused.

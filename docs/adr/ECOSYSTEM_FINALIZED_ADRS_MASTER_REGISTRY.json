@@ -1,7 +1,7 @@
 {
   "schema": "sota.public-master-finalized-adr-registry.v1",
   "adr": "ADR-0044",
-  "generated_at_utc": "2026-11-21T13:45:06.176539Z",
+  "generated_at_utc": "2026-11-21T13:55:34.672068Z",
   "repos_indexed": 18,
   "total_adrs_indexed": 797,
   "verbatim_private_archive_repo": "native-agent-stack/sota-private-vault (adr_archive/)",
@@ -5805,17 +5805,17 @@
       "repo": "native-agent-stack",
       "tier": "PUBLIC",
       "file": "ADR-0052-final-multi-repo-retirement-and-single-clean-monorepo-v5-cutover.md",
-      "title": "ADR-0052: Final Multi-Repo Retirement & Cutover to Single Clean Monorepo `v5.0` (`sota-ecosystem`, `10` Clean Consolidated ADRs)",
+      "title": "ADR-0052: Final Multi-Repo Retirement & Cutover to Disk-`Z:` Single Clean Monorepo (`Noesis-SOTA:~/tier0-quant` & Single Master ADR)",
       "status": "Accepted",
       "date": "2026-11-21",
-      "evidence_grade": "E4 (Single clean monorepo initialized & verified",
+      "evidence_grade": "E4 (100% Disk-`Z:` topology verified via live WS",
       "github_urls": [
         "https://github.com/OrchestratorInc/agent-orchestrator",
         "https://github.com/mlflow/mlflow",
         "https://github.com/native-agent-stack/native-agent-stack",
         "https://github.com/nautechsystems/nautilus_trader"
       ],
-      "file_sha256": "7b6e24c4940e013afabca5094282241ff87658b54c981211c5612ce03b0cc816"
+      "file_sha256": "2c8f38eca8ef1bfe71947a532c7b189d9e8f6db8fee4f79e8860d4621a90fc0b"
     },
     {
       "repo": "sota-compounding-lab",
@@ -10878,5 +10878,5 @@
       "file_sha256": "ca48518bef018ae289a5b3798c2c0171c4ac8cc93342dbb702f71d302b9b81a4"
     }
   ],
-  "manifest_sha256": "2f3baa86b424ac1d7d650b1655f9ba5c767b92750d17f836ab3847a360371ded"
+  "manifest_sha256": "55edb0eb57677e177f7157286bdde1826382d3863c4f07d3856263419cd9bfaa"
 }

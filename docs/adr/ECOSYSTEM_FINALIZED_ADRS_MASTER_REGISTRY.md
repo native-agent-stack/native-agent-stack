@@ -1,7 +1,7 @@
 # Native Agent Stack — Unified Single-Repo Master Finalized ADR Registry (`ADR-0044`)
 
 - **Total Finalized ADRs Indexed:** `797` across `18` repositories (`18/18` `ADR-0023` PASS)
-- **Canonical Manifest SHA-256:** `2f3baa86b424ac1d7d650b1655f9ba5c767b92750d17f836ab3847a360371ded`
+- **Canonical Manifest SHA-256:** `55edb0eb57677e177f7157286bdde1826382d3863c4f07d3856263419cd9bfaa`
 - **Verbatim Private Continuity Copy:** `sota-private-vault/adr_archive/` (`ADR-0027`, Two-Tier Public/Private Firewall intact)
 
 ## Per-Repository Finalized ADR Summary
@@ -470,7 +470,7 @@
 | `native-agent-stack` | `PUBLIC` | ADR-0049: Clean-Room `v4.0` SOTA-Only Hosted Ecosystem Blueprint, Legacy `18`-Repo Self-Built Retirement, Inspector Security Corrections & Tier-0-Only `AGENTS.md` / `GEMINI.md` Standard | Accepted | 2026-11-20 | `63c8ea96ba9d` |
 | `native-agent-stack` | `PUBLIC` | ADR-0050: Finalized Clean Repos, 16-Layer (`L0`–`L15`) × 8-Stage (`S1`–`S8`) Research Convergence & Disk-Z Hosted Advanced Research Frameworks Seal | Accepted | 2026-11-21 | `996cd67d9fdb` |
 | `native-agent-stack` | `PUBLIC` | ADR-0051: Full-Landscape `95`-Repo Disk-Z Hosted Research, Orca & Multi-Model AO Stack, Live MLflow 3, Zero Paper Self-Invention Gate & `18/18`-Repo Final Seal | Accepted | 2026-11-21 | `d4c656e57df2` |
-| `native-agent-stack` | `PUBLIC` | ADR-0052: Final Multi-Repo Retirement & Cutover to Single Clean Monorepo `v5.0` (`sota-ecosystem`, `10` Clean Consolidated ADRs) | Accepted | 2026-11-21 | `7b6e24c4940e` |
+| `native-agent-stack` | `PUBLIC` | ADR-0052: Final Multi-Repo Retirement & Cutover to Disk-`Z:` Single Clean Monorepo (`Noesis-SOTA:~/tier0-quant` & Single Master ADR) | Accepted | 2026-11-21 | `2c8f38eca8ef` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0001: Public Open-Core vs. Private Execution & Vault Organization Firewall | Accepted | 2026-11-17 | `fc73c9d38f87` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0002: Five-Stage Sim -> Pre-Wall Backtest -> Paper -> Empirical-Bayes -> Broker Pipeline | Accepted | 2026-11-17 | `f55ed3efc217` |
 | `sota-compounding-lab` | `PUBLIC` | ADR-0003: Pre-Wall (`<= 2026-10-15`), Harvey–Liu–Zhu `t*(N)` & Native-Frequency `DSR` Gate | Accepted | 2026-11-17 | `d127aa9fefef` |

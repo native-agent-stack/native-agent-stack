@@ -8,7 +8,7 @@
   "hosted_research_frameworks_seal_adr": "ADR-0050",
   "full_landscape_ao_and_zero_paper_self_invention_adr": "ADR-0051",
   "shelf_lock_frontier_adr": "sota-upstream-shelf-lock/ADR-0026",
-  "generated_at_utc": "2026-11-21T13:45:05.908202Z",
+  "generated_at_utc": "2026-11-21T13:55:34.424433Z",
   "hard_invariants": {
     "tier0_sota_source_only": true,
     "allow_silent_fallback": false,
@@ -300,13 +300,13 @@
     "dsh-plugin-landscape": "4b881a9",
     "dsh-sota-harness": "7d0d37a",
     "meridian": "e698958",
-    "native-agent-stack": "44089bb",
+    "native-agent-stack": "50bcfdb",
     "sota-compounding-lab": "b436549",
     "sota-dynamic-trail-c": "88c487f",
     "sota-harness-foundation": "ca9f649",
     "sota-mover-ranker": "74b44f6",
     "sota-multi-model-workflows": "cfee27f",
-    "sota-private-vault": "c686463",
+    "sota-private-vault": "3931e4b",
     "sota-upstream-shelf-lock": "4877b37",
     "trading-sota": "54f0325",
     "tsl": "d3eec67"
@@ -2459,5 +2459,5 @@
       "verification_gate": "Semantic watchdog alert test + OSV CVE 0-critical gate + SkillOpt replay friction score."
     }
   ],
-  "manifest_sha256": "1c7f31fd8c5732dc30db5d3cb8c8059199cba1e09f9ce232fef74ee4a9f5d9da"
+  "manifest_sha256": "3c0d6bce613f2293f8ba6d9b4d6f84bef1a1eb8a030b5ab6bec0512bb09326fb"
 }
