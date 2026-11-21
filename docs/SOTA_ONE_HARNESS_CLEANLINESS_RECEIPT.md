@@ -1,8 +1,8 @@
 # Native Agent Stack — One-Harness SOTA Cleanliness Receipt (`ADR-0046`)
 
 - **Overall Verdict:** `PASS` (`10/10` deterministic invariants passed)
-- **Canonical Receipt SHA-256:** `4d413c3b39167c1d9f0c7205d0acd4a99cffdf4ff322b3e7dbe62663e2a01d2c`
-- **Audit Mode:** `full_workstation` · **Generated (UTC):** `2026-11-21T16:45:11.026707Z`
+- **Canonical Receipt SHA-256:** `1c46206fa51e87b89ae640ba43e753d248acba848003e183594734705c44a2c8`
+- **Audit Mode:** `full_workstation` · **Generated (UTC):** `2026-11-21T17:34:45.873161Z`
 
 ## Deterministic 10-Invariant Verification Matrix
 

@@ -1,7 +1,7 @@
 {
   "schema": "sota.one-harness-cleanliness-receipt.v1",
   "adr": "ADR-0046",
-  "generated_at_utc": "2026-11-21T16:45:11.026707Z",
+  "generated_at_utc": "2026-11-21T17:34:45.873161Z",
   "mode": "full_workstation",
   "overall_ok": true,
   "summary": {
@@ -206,5 +206,5 @@
       }
     }
   },
-  "receipt_sha256": "4d413c3b39167c1d9f0c7205d0acd4a99cffdf4ff322b3e7dbe62663e2a01d2c"
+  "receipt_sha256": "1c46206fa51e87b89ae640ba43e753d248acba848003e183594734705c44a2c8"
 }

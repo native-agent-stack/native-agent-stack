@@ -1,7 +1,7 @@
 {
   "schema": "sota.public-master-finalized-adr-registry.v1",
   "adr": "ADR-0044",
-  "generated_at_utc": "2026-11-21T16:44:55.575059Z",
+  "generated_at_utc": "2026-11-21T17:34:30.678438Z",
   "repos_indexed": 19,
   "total_adrs_indexed": 801,
   "verbatim_private_archive_repo": "native-agent-stack/sota-private-vault (adr_archive/)",
@@ -10378,7 +10378,7 @@
       "date": "2026-11-21",
       "evidence_grade": "E4 (`SOTA_RESEARCH_FRAMEWORKS_MANIFEST.json` det",
       "github_urls": [],
-      "file_sha256": "79291781aa3e06842dd55d02bb0d70975a45c47f037aef007f3eab66a64166bf"
+      "file_sha256": "75cc9450a91b588c7cf1644a52f444c47dd9b26d16ee2956bb243fe58e6d9e9d"
     },
     {
       "repo": "trading-sota",
@@ -10938,5 +10938,5 @@
       "file_sha256": "ca48518bef018ae289a5b3798c2c0171c4ac8cc93342dbb702f71d302b9b81a4"
     }
   ],
-  "manifest_sha256": "2d0d9916aeb55b49ec83fbfc4ed531ba98a4c0e6db17b3fb791a9ba3f5b03085"
+  "manifest_sha256": "927580704244f83570b17d65d02f957c318977891801bdb95101185de70f3300"
 }
